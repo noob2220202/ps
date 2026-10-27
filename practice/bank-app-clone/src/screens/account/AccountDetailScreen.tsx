@@ -8,6 +8,7 @@ import { useTypewriter } from "../../hooks/useTypewriter";
 import { won } from "../../lib/format";
 import { AiDiamond, FriendsIllustration } from "../../components/art";
 import { Icon } from "../../components/icons/Icon";
+import { BackButton, GearButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
 import "./AccountDetail.css";
 
@@ -15,9 +16,7 @@ function DetailSkeleton({ onBack }: { onBack: () => void }) {
   return (
     <div className="screen detail detail--skeleton">
       <header className="detail__header">
-        <button onClick={onBack} aria-label="뒤로">
-          <Icon name="back" />
-        </button>
+        <BackButton onClick={onBack} />
       </header>
       <div className="skel" style={{ height: 150, margin: "84px 17px 0", borderRadius: 20 }} />
       <div style={{ display: "flex", justifyContent: "space-between", margin: "28px 20px 12px" }}>
@@ -54,12 +53,8 @@ export function AccountDetailScreen() {
     <div className="screen detail" ref={setScrollEl}>
       <div className="detail__gradient" />
       <header className={`detail__header ${scrollTop > 40 ? "detail__header--solid" : ""}`}>
-        <button onClick={() => navigate(-1)} aria-label="뒤로" className="icon-btn">
-          <Icon name="back" />
-        </button>
-        <button aria-label="설정" className="icon-btn">
-          <Icon name="gear" size={23} stroke={1.7} />
-        </button>
+        <BackButton onClick={() => navigate(-1)} />
+        <GearButton />
       </header>
 
       <div

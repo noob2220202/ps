@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 // 라인 아이콘은 stroke, 채워진 아이콘은 fill. 색은 currentColor라 부모 color를 따라감.
 const LINE: Record<string, ReactNode> = {
   back: <path d="M20 12H5m6-7-7 7 7 7" />,
+  "chevron-left": <path d="m14.5 4.5-7.5 7.5 7.5 7.5" />,
   gear: (
     <>
       <circle cx="12" cy="12" r="3" />

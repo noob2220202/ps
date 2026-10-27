@@ -1,0 +1,61 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y; /* 세로 스크롤은 브라우저에, 가로 이동은 스와이프 제스처에 */
+}
+
+/* ---------- 안드로이드: 영상처럼 새 화면이 위로 페이드인, 뒤로가기는 즉시 ---------- */
+[data-os="android"] .layer--push-enter {
+  animation: layer-fade var(--nav-ms) ease-out both;
+}
+@keyframes layer-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- iOS: 오른쪽에서 밀고 들어오는 push, 이전 화면은 30%만 왼쪽으로 + 살짝 어두워짐 ---------- */
+[data-os="ios"] .layer--push-enter,
+[data-os="ios"] .layer--dragging {
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
+}
+[data-os="ios"] .layer--push-enter {
+  animation: ios-push-in var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--push-exit {
+  animation: ios-push-out var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--pop-enter {
+  animation: ios-pop-in var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--pop-exit {
+  animation: ios-pop-out var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
+}
+[data-os="ios"] .layer--under {
+  filter: brightness(0.92);
+}
+
+@keyframes ios-push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes ios-push-out {
+  to {
+    transform: translateX(-30%);
+    filter: brightness(0.92);
+  }
+}
+@keyframes ios-pop-in {
+  from {
+    transform: translateX(-30%);
+    filter: brightness(0.92);
+  }
+}
+@keyframes ios-pop-out {
+  to {
+    transform: translateX(100%);
+  }
+}

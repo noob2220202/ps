@@ -13,4 +13,6 @@ export const TIMING = {
   typeSpeed: 45, // 글자당 타이핑 속도
   apiLatency: 420, // 화면 데이터 로딩(스켈레톤 노출 시간)
   pressDelay: 300, // 계좌 눌렀을 때 스피너 돈 뒤 이동
+  nav: { android: 240, ios: 420 }, // 화면 전환 (iOS push는 더 길고 스프링 느낌)
+  swipeRelease: 260, // 스와이프 뒤로가기 손 뗀 뒤 마무리 애니메이션
 };

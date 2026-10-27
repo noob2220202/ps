@@ -5,7 +5,7 @@ import type { Transaction, TransactionDetail } from "../../api/types";
 import { useAsync } from "../../hooks/useAsync";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { signedWon, won } from "../../lib/format";
-import { ArcSpinner } from "../../components/art";
+import { Spinner } from "../../components/Spinner";
 import { Icon } from "../../components/icons/Icon";
 import "./TxDetail.css";
 
@@ -83,7 +83,7 @@ export function TxDetailScreen() {
 
       {detail.status === "loading" ? (
         <div className="tx__loading">
-          <ArcSpinner size={24} color="#d0d0d0" />
+          <Spinner size={24} color="#b8b8b8" />
         </div>
       ) : !detail.data ? (
         <p className="tx__empty">거래 정보를 찾을 수 없습니다.</p>

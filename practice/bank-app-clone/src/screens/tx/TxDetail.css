@@ -112,7 +112,7 @@
   position: absolute;
   left: 15px;
   right: 15px;
-  bottom: 18px;
+  bottom: max(18px, calc(var(--safe-bottom) + 4px)); /* 아이폰은 홈 인디케이터 위로 */
   display: flex;
   gap: 8px;
 }
@@ -142,4 +142,9 @@
   color: #999;
   text-align: center;
   margin-top: 80px;
+}
+
+[data-os="ios"] .tx__share,
+[data-os="ios"] .tx__confirm {
+  border-radius: 16px;
 }

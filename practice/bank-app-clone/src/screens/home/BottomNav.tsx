@@ -8,16 +8,16 @@ const TABS = [
   { label: "전체", icon: "menu", dot: true },
 ] as const;
 
-export function BottomNav() {
+export function BottomNav({ minimized = false }: { minimized?: boolean }) {
   return (
-    <nav className="bottom-nav">
+    <nav className={`bottom-nav ${minimized ? "bottom-nav--min" : ""}`}>
       {TABS.map((t) => (
-        <button key={t.label} className="bottom-nav__item">
+        <button key={t.label} className={`bottom-nav__item ${t.label === "홈" ? "bottom-nav__item--active" : ""}`}>
           <span className="bottom-nav__icon">
             <Icon name={t.icon} size={23} stroke={1.8} />
             {t.dot && <span className="red-dot bottom-nav__dot" />}
           </span>
-          {t.label}
+          <span className="bottom-nav__label">{t.label}</span>
         </button>
       ))}
     </nav>

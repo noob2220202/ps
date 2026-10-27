@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
-import { Route, Routes } from "react-router-dom";
-import { PhoneFrame } from "./components/PhoneFrame";
+import { Route, Routes, type Location } from "react-router-dom";
+import { OsSwitch, PhoneFrame } from "./components/PhoneFrame";
+import { ScreenStack } from "./components/ScreenStack";
 import { StatusBarProvider } from "./hooks/useStatusBar";
 import { Splash } from "./screens/boot/Splash";
 import { BootLoading } from "./screens/boot/BootLoading";
@@ -11,6 +12,17 @@ import { TxDetailScreen } from "./screens/tx/TxDetailScreen";
 import { MiniScreen } from "./screens/mini/MiniScreen";
 
 type Boot = "splash" | "loading" | "ready";
+
+// ScreenStack이 화면마다 "그 화면의 주소"로 이 함수를 불러서 그린다
+const renderRoute = (location: Location) => (
+  <Routes location={location}>
+    <Route path="/" element={<HomeScreen />} />
+    <Route path="/account/:accountId" element={<AccountDetailScreen />} />
+    <Route path="/account/:accountId/history" element={<HistoryScreen />} />
+    <Route path="/account/:accountId/tx/:txId" element={<TxDetailScreen />} />
+    <Route path="/mini" element={<MiniScreen />} />
+  </Routes>
+);
 
 // 개발 중 매번 스플래시 보기 귀찮으면 주소 뒤에 ?skip
 const skipSplash = new URLSearchParams(location.search).has("skip");
@@ -26,16 +38,9 @@ export default function App() {
       <PhoneFrame>
         {boot === "splash" && <Splash onDone={toLoading} />}
         {boot === "loading" && <BootLoading onDone={toReady} />}
-        {boot === "ready" && (
-          <Routes>
-            <Route path="/" element={<HomeScreen />} />
-            <Route path="/account/:accountId" element={<AccountDetailScreen />} />
-            <Route path="/account/:accountId/history" element={<HistoryScreen />} />
-            <Route path="/account/:accountId/tx/:txId" element={<TxDetailScreen />} />
-            <Route path="/mini" element={<MiniScreen />} />
-          </Routes>
-        )}
+        {boot === "ready" && <ScreenStack render={renderRoute} />}
       </PhoneFrame>
+      <OsSwitch />
     </StatusBarProvider>
   );
 }

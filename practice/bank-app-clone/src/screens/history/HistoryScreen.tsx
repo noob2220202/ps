@@ -7,15 +7,14 @@ import { useScrollTop } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { FriendsAvatar } from "../../components/art";
 import { Icon } from "../../components/icons/Icon";
+import { BackButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
 import "./History.css";
 
 function Header({ onBack }: { onBack: () => void }) {
   return (
     <header className="history__header">
-      <button onClick={onBack} aria-label="뒤로" className="icon-btn">
-        <Icon name="back" />
-      </button>
+      <BackButton onClick={onBack} />
       <span className="history__star">⭐</span>
     </header>
   );

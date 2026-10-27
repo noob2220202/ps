@@ -132,3 +132,54 @@ JSX에 `{d.address && ...}`를 반복하지 않아도 됨.
 - [ ] `height: auto` 애니메이션이 필요하면 grid `0fr ↔ 1fr`
 - [ ] 클릭 영역 안의 버튼은 `stopPropagation`
 - [ ] 비동기 응답이 언마운트 후에 와도 안전한가
+
+---
+
+## 9. 아이폰 버전 — 플랫폼 분기
+
+### 분기를 한 곳에 모으기
+`platform/platform.ts`가 OS를 한 번 정하고 `<html data-os="ios">`를 붙입니다.
+- **CSS 차이**는 `[data-os="ios"] .bottom-nav { ... }`처럼 CSS에서 처리 → 컴포넌트 코드에 `if`가 안 늘어남
+- **생김새 자체가 다른 것**(스피너, 뒤로 아이콘)만 `Spinner`, `BackButton` 같은 작은 컴포넌트 안에서 분기
+- 화면 코드(`HomeScreen` 등)는 OS를 거의 모름 → 나중에 OS가 하나 더 생겨도 화면은 안 고침
+
+`main.tsx`에서 platform을 **제일 먼저** import하는 이유: CSS가 적용되기 전에 `data-os`가 붙어 있어야
+첫 화면이 안드로이드 모양으로 한 번 그려졌다가 바뀌는 깜빡임이 없음.
+
+### 화면 전환: `<Routes>` 하나로는 안 되는 이유 (`ScreenStack.tsx`)
+`<Routes>`는 현재 주소의 화면 **하나만** 그립니다. iOS push는 "나가는 화면"과 "들어오는 화면"이
+동시에 움직여야 하므로, 방문 기록(`entries`)을 직접 들고 화면마다 `<Routes location={그 화면 주소}>`로 따로 그립니다.
+
+핵심 트릭: 화면을 감싼 div의 `key`를 `location.key`로 둠 → 같은 화면은 배열에서 자리가 바뀌어도
+**언마운트되지 않고 상태(스크롤 위치, 입력값)가 유지**됩니다. "들어오는 화면 → 다음 이동 때 나가는 화면"이 같은 인스턴스.
+
+`useLayoutEffect`를 쓴 이유: 주소가 바뀐 직후 **화면에 그려지기 전에** 레이어 구성을 바꿔야
+한 프레임 동안 엉뚱한 화면이 보이는 깜빡임이 없음. (`useEffect`는 그린 뒤에 실행됨)
+
+### 스와이프로 뒤로가기
+1. `pointerdown`이 왼쪽 24px 안에서 시작했을 때만 시작, `setPointerCapture`로 손가락이 화면 밖으로 나가도 계속 추적
+2. 움직이는 동안: 위 화면은 `translateX(dx)`, 뒤 화면은 `-30% → 0%`로 비례 이동 (`transition: none`이어야 손가락에 딱 붙음)
+3. 손 떼면 1/3 기준으로 확정/취소 → 이때만 `transition`을 켜서 마무리 애니메이션
+4. 확정이면 애니메이션 끝난 뒤 `navigate(-1)`. 이미 화면을 밀어냈으니 pop 애니메이션은 `skipAnim`으로 건너뜀
+5. **깜빡임 주의**: `navigate(-1)` 직후 바로 드래그 상태를 지우면, 주소가 실제로 바뀌기 전 한 프레임 동안
+   밀려났던 화면이 제자리로 튀어나옴 → 드래그 상태는 주소가 바뀐 뒤(layout effect 안에서) 지움
+
+`touch-action: pan-y`: 세로 스크롤은 브라우저가, 가로 움직임은 우리 코드가 받도록.
+
+### 뒤에 깔린 화면 문제 → `LayerContext`
+스와이프 중엔 뒤 화면(예: 홈)이 미리 마운트됩니다. 그 화면이 마운트되자마자
+- 상태바 색을 바꿔버리거나(아직 위 화면이 보이는데 상태바만 검정),
+- AI 배너 방문 횟수를 세버리면(스와이프 취소해도 문구가 넘어감) 안 됨.
+
+그래서 각 레이어에 `active`(맨 위인지)를 Context로 내려주고, `useStatusBar`와 `AiPill`은 `active`일 때만 동작.
+스와이프가 확정되면 같은 인스턴스가 `active=true`로 바뀌면서 그때 실행됩니다.
+
+### Liquid Glass 탭바
+- 유리 질감 = `background: rgba(...)` 반투명 + `backdrop-filter: blur() saturate()` + 위쪽 1px 흰 하이라이트(`inset box-shadow`)
+- 스크롤 방향 감지: 이전 `scrollTop`과 비교. 6px 미만 움직임은 무시(안 그러면 손떨림에 탭바가 깜빡거림)
+- 축소: 탭바 `width` transition + 선택 안 된 탭은 `flex: 0; opacity: 0`
+
+### 안전영역(safe area)
+실제 아이폰에서 열면 `env(safe-area-inset-top/bottom)`으로 노치·홈 인디케이터 영역을 피합니다.
+`index.html`의 `viewport-fit=cover`가 있어야 `env()` 값이 0이 아니게 나옵니다.
+하단 고정 버튼은 `bottom: max(18px, calc(var(--safe-bottom) + 4px))`로 두 OS 모두 대응.

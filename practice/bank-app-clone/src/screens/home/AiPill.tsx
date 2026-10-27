@@ -3,6 +3,7 @@ import { TIMING } from "../../config/timing";
 import { useTypewriter } from "../../hooks/useTypewriter";
 import { AiDiamond, CoinIcon, RingSpinner } from "../../components/art";
 import { Icon } from "../../components/icons/Icon";
+import { useLayerActive } from "../../platform/LayerContext";
 
 const MESSAGES = [
   { icon: "ai", text: "원금 지키는 펀드, 정말 가능할까요?", closable: false },
@@ -22,15 +23,18 @@ export function AiPill({ ready }: { ready: boolean }) {
   const [stage, setStage] = useState<Stage>(() => (visits > 0 ? "previous" : "spinner"));
   const [closed, setClosed] = useState(false);
   const counted = useRef(false);
+  const active = useLayerActive();
 
   // 방문 횟수는 effect에서 센다. StrictMode(개발 모드)는 effect를 "마운트→정리→마운트"로
   // 두 번 돌리는데, ref는 그 사이에도 유지되므로 counted로 중복 카운트를 막는다.
   // (렌더 중에 visits++ 하면 StrictMode의 이중 렌더 때문에 2씩 올라감)
+  // active 조건: iOS에서 스와이프로 뒤로갈 때 홈이 "뒤에 깔린 채" 미리 마운트되는데,
+  // 스와이프를 취소하면 방문이 아니므로 맨 위가 됐을 때만 센다.
   useEffect(() => {
-    if (counted.current) return;
+    if (!active || counted.current) return;
     counted.current = true;
     setVisit(visits++);
-  }, []);
+  }, [active]);
 
   useEffect(() => {
     if (!ready || visit === null) return;

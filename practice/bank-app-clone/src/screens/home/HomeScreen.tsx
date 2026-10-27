@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/mockApi";
 import type { HomeData } from "../../api/types";
@@ -6,10 +6,11 @@ import { PROFILE } from "../../config/profile";
 import { TIMING } from "../../config/timing";
 import { useAsync } from "../../hooks/useAsync";
 import { useStatusBar } from "../../hooks/useStatusBar";
+import { useScrollTop } from "../../hooks/useScrollTop";
+import { OS } from "../../platform/platform";
 import { won } from "../../lib/format";
 import {
   AiSavingIcon,
-  ArcSpinner,
   CardThumb,
   CashbackIcon,
   MiniBIcon,
@@ -17,6 +18,7 @@ import {
   TmoneyIcon,
 } from "../../components/art";
 import { Icon } from "../../components/icons/Icon";
+import { Spinner } from "../../components/Spinner";
 import { AiPill } from "./AiPill";
 import { AdBanner } from "./AdBanner";
 import { BottomNav } from "./BottomNav";
@@ -48,6 +50,19 @@ export function HomeScreen() {
   const [promoOpen, setPromoOpen] = useState(true);
   const [pressing, setPressing] = useState<string | null>(null);
 
+  // iOS 26+ 탭바: 아래로 스크롤하면 작은 캡슐로 줄고, 위로 올리면 다시 펼쳐진다
+  const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
+  const scrollTop = useScrollTop(scrollEl);
+  const lastTop = useRef(0);
+  const [navMin, setNavMin] = useState(false);
+  useEffect(() => {
+    if (OS !== "ios") return;
+    const delta = scrollTop - lastTop.current;
+    if (Math.abs(delta) < 6) return; // 손떨림 수준의 작은 움직임은 무시
+    lastTop.current = scrollTop;
+    setNavMin(delta > 0 && scrollTop > 80);
+  }, [scrollTop]);
+
   useEffect(() => {
     if (!firstLoad) return;
     const a = setTimeout(() => {
@@ -74,7 +89,7 @@ export function HomeScreen() {
 
   return (
     <div className="home">
-      <div className="screen home__scroll">
+      <div className="screen home__scroll" ref={setScrollEl}>
         <header className="home__header">
           {full ? <AiPill ready={full} /> : <h1 className="home__name">{PROFILE.userName}</h1>}
           <button className="home__bell" aria-label="알림">
@@ -113,7 +128,7 @@ export function HomeScreen() {
             </button>
             {pressing === main.id && (
               <span className="acct__spinner">
-                <ArcSpinner size={22} color="#8a8a8a" />
+                <Spinner size={22} color="#8a8a8a" />
               </span>
             )}
           </div>
@@ -202,7 +217,7 @@ export function HomeScreen() {
         </div>
       </div>
 
-      <BottomNav />
+      <BottomNav minimized={navMin} />
     </div>
   );
 }

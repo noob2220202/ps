@@ -378,3 +378,60 @@
   top: -1px;
   right: -3px;
 }
+
+/* ---------- iOS 26+/27: 떠 있는 Liquid Glass 탭바 ---------- */
+/* 화면 가장자리에서 21pt 띄운 캡슐. 뒤 내용이 흐리게 비친다. 아래로 스크롤하면 작아짐. */
+[data-os="ios"] .home__scroll {
+  padding-bottom: 120px;
+}
+[data-os="ios"] .bottom-nav {
+  left: 21px;
+  right: auto;
+  bottom: calc(var(--safe-bottom) - 13px);
+  width: calc(100% - 42px);
+  height: 62px;
+  padding: 4px;
+  border-radius: 31px;
+  background: rgba(46, 46, 48, 0.62);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+  transition: width 380ms cubic-bezier(0.3, 1.2, 0.4, 1);
+}
+[data-os="ios"] .bottom-nav__item {
+  position: relative;
+  gap: 1px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+  border-radius: 27px;
+  transition:
+    flex 380ms cubic-bezier(0.3, 1.2, 0.4, 1),
+    opacity 200ms;
+  min-width: 0;
+}
+/* 선택된 탭: 유리 위에 한 겹 더 밝은 캡슐 */
+[data-os="ios"] .bottom-nav__item--active {
+  background: rgba(255, 255, 255, 0.13);
+  color: #fff;
+}
+[data-os="ios"] .bottom-nav__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+[data-os="ios"] .bottom-nav--min {
+  width: 62px;
+}
+[data-os="ios"] .bottom-nav--min .bottom-nav__item:not(.bottom-nav__item--active) {
+  flex: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+[data-os="ios"] .bottom-nav--min .bottom-nav__label {
+  display: none;
+}

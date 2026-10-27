@@ -4,7 +4,8 @@ import { useAsync } from "../../hooks/useAsync";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { won } from "../../lib/format";
 import { ACCOUNTS } from "../../api/db";
-import { ArcSpinner } from "../../components/art";
+import { Spinner } from "../../components/Spinner";
+import { BackButton, GearButton } from "../../components/NavButtons";
 import { Icon } from "../../components/icons/Icon";
 import "./Mini.css";
 
@@ -19,13 +20,9 @@ export function MiniScreen() {
     <div className="screen mini">
       <div className="mini__top">
         <header className="mini__header">
-          <button className="icon-btn" aria-label="뒤로" onClick={() => navigate(-1)}>
-            <Icon name="back" />
-          </button>
+          <BackButton onClick={() => navigate(-1)} />
           <h1>{mini.label}</h1>
-          <button className="icon-btn" aria-label="설정">
-            <Icon name="gear" size={23} stroke={1.7} />
-          </button>
+          <GearButton />
         </header>
         <div className="mini__number">{mini.number}</div>
         <strong className="mini__balance">{won(mini.balance)}</strong>
@@ -47,7 +44,7 @@ export function MiniScreen() {
 
       {txs.status === "loading" ? (
         <div className="mini__spinner">
-          <ArcSpinner size={18} color="#9a9a9a" />
+          <Spinner size={18} color="#9a9a9a" />
         </div>
       ) : (
         <p className="mini__empty fade-in">거래 내역이 없습니다.</p>
