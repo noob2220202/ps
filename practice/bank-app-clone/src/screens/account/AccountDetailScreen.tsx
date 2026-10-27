@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../../api/mockApi";
 import { useAsync } from "../../hooks/useAsync";
-import { useScrollTop } from "../../hooks/useScrollTop";
+import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { useTypewriter } from "../../hooks/useTypewriter";
 import { won } from "../../lib/format";
@@ -11,6 +11,13 @@ import { Icon } from "../../components/icons/Icon";
 import { BackButton, GearButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
 import "./AccountDetail.css";
+
+// 타이핑은 글자마다 state가 바뀐다. 화면 컴포넌트에서 바로 쓰면 한 글자마다 화면 "전체"가
+// 다시 렌더링되므로, 작은 컴포넌트로 분리해서 이 <span>만 다시 그리게 한다.
+function TypedText({ text }: { text: string }) {
+  const { typed } = useTypewriter(text);
+  return <span>{typed}</span>;
+}
 
 function DetailSkeleton({ onBack }: { onBack: () => void }) {
   return (
@@ -32,39 +39,46 @@ export function AccountDetailScreen() {
   const { accountId = "main" } = useParams();
   const navigate = useNavigate();
   const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
-  const scrollTop = useScrollTop(scrollEl);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+  // 패럴랙스는 매 프레임 바뀌므로 React를 거치지 않고 DOM 스타일을 직접 바꾼다.
+  // transform/opacity만 건드려서 레이아웃 계산 없이 GPU 합성만으로 처리됨.
+  useScrollFrame(scrollEl, (top) => {
+    const hero = heroRef.current;
+    if (hero) {
+      hero.style.opacity = String(Math.max(0, 1 - top / 160));
+      hero.style.transform = `translate3d(0, ${top * 0.35}px, 0)`;
+    }
+    setScrolled(top > 40); // on/off가 바뀔 때만 리렌더
+  });
 
   const state = useAsync(
     () => Promise.all([api.account(accountId), api.transactions(accountId)]),
     [accountId],
   );
   const loaded = state.status === "done";
-  useStatusBar(loaded && scrollTop < 40 ? "#f1e9fd" : "var(--light-bg)", "dark");
-  const { typed } = useTypewriter("지난 달보다 얼마나 더 썼을까요?", loaded);
+  useStatusBar(loaded && !scrolled ? "#f1e9fd" : "var(--light-bg)", "dark");
 
   if (!loaded) return <DetailSkeleton onBack={() => navigate(-1)} />;
   const [account, txs] = state.data;
   if (!account) return <div className="screen detail">계좌를 찾을 수 없습니다.</div>;
 
-  // 스크롤할수록 일러스트는 흐려지고 살짝 느리게 올라감(패럴랙스), 헤더엔 배경이 깔림
-  const heroFade = Math.max(0, 1 - scrollTop / 160);
 
   return (
     <div className="screen detail" ref={setScrollEl}>
       <div className="detail__gradient" />
-      <header className={`detail__header ${scrollTop > 40 ? "detail__header--solid" : ""}`}>
+      <header className={`detail__header ${scrolled ? "detail__header--solid" : ""}`}>
         <BackButton onClick={() => navigate(-1)} />
         <GearButton />
       </header>
 
       <div
-        className="detail__hero"
-        style={{ opacity: heroFade, transform: `translateY(${scrollTop * 0.35}px)` }}
+        className="detail__hero" ref={heroRef}
       >
         <FriendsIllustration width={212} />
         <div className="detail__pill">
           <AiDiamond size={17} />
-          <span>{typed}</span>
+          <TypedText text="지난 달보다 얼마나 더 썼을까요?" />
         </div>
       </div>
 

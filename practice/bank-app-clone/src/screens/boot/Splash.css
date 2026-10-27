@@ -25,14 +25,16 @@
   align-items: center;
 }
 
-/* B는 처음에 2.2배 크기로 있다가 brand 단계에서 1배로 줄어든다 */
+/* B: 처음엔 화면 가운데(워드마크 절반만큼 오른쪽)에 2.2배 → brand 단계에서 제자리·1배로.
+   transform만 움직이므로 GPU가 합성만 하면 된다 */
 .splash__b {
   display: inline-flex;
   opacity: 0;
-  transform: scale(2.2);
+  transform: translate3d(var(--shift, 0px), 0, 0) scale(2.2);
   transition:
-    transform 450ms cubic-bezier(0.3, 0.7, 0.2, 1),
+    transform 520ms cubic-bezier(0.3, 0.7, 0.2, 1),
     opacity 250ms ease;
+  will-change: transform;
 }
 .splash--logo .splash__b {
   opacity: 1;
@@ -40,31 +42,33 @@
 }
 .splash--brand .splash__b {
   opacity: 1;
-  transform: scale(1);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 @keyframes pop {
   from {
-    transform: scale(1.9);
+    transform: translate3d(var(--shift, 0px), 0, 0) scale(1.9);
     opacity: 0;
   }
 }
 
-/* 워드마크는 폭 0에서 펼쳐짐 → 중앙정렬이라 B가 자연스럽게 왼쪽으로 밀려남 */
+/* 워드마크: 바깥은 자리만 차지하고 overflow로 가림, 안쪽이 왼쪽(B 뒤)에서 미끄러져 나옴 */
 .splash__wordmark {
   display: inline-flex;
   overflow: hidden;
-  max-width: 0;
-  opacity: 0;
-  padding-left: 0;
-  transition:
-    max-width 500ms cubic-bezier(0.3, 0.7, 0.2, 1) 150ms,
-    opacity 300ms ease 200ms,
-    padding-left 500ms ease 150ms;
-}
-.splash--brand .splash__wordmark {
-  max-width: 200px;
-  opacity: 1;
   padding-left: 9px;
+}
+.splash__wordmark-inner {
+  display: inline-flex;
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
+  transition:
+    transform 520ms cubic-bezier(0.3, 0.7, 0.2, 1) 120ms,
+    opacity 260ms ease 160ms;
+  will-change: transform;
+}
+.splash--brand .splash__wordmark-inner {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 .splash__ad {

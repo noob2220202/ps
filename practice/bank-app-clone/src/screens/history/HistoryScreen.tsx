@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../../api/mockApi";
 import type { Transaction } from "../../api/types";
 import { useAsync } from "../../hooks/useAsync";
-import { useScrollTop } from "../../hooks/useScrollTop";
+import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { FriendsAvatar } from "../../components/art";
 import { Icon } from "../../components/icons/Icon";
@@ -41,7 +41,8 @@ export function HistoryScreen() {
   const { accountId = "main" } = useParams();
   const navigate = useNavigate();
   const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
-  const scrollTop = useScrollTop(scrollEl);
+  const [showTop, setShowTop] = useState(false);
+  useScrollFrame(scrollEl, (top) => setShowTop(top > 320));
   const [activeId, setActiveId] = useState<string | null>(null);
   useStatusBar("#fff", "dark");
 
@@ -83,7 +84,7 @@ export function HistoryScreen() {
       </div>
 
       <button
-        className={`to-top ${scrollTop > 320 ? "to-top--visible" : ""}`}
+        className={`to-top ${showTop ? "to-top--visible" : ""}`}
         onClick={() => scrollEl?.scrollTo({ top: 0, behavior: "smooth" })}
       >
         <Icon name="up" size={14} stroke={2} /> 맨 위로

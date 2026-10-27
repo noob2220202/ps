@@ -6,7 +6,7 @@ import { PROFILE } from "../../config/profile";
 import { TIMING } from "../../config/timing";
 import { useAsync } from "../../hooks/useAsync";
 import { useStatusBar } from "../../hooks/useStatusBar";
-import { useScrollTop } from "../../hooks/useScrollTop";
+import { useScrollFrame } from "../../hooks/useScrollTop";
 import { OS } from "../../platform/platform";
 import { won } from "../../lib/format";
 import {
@@ -52,16 +52,16 @@ export function HomeScreen() {
 
   // iOS 26+ 탭바: 아래로 스크롤하면 작은 캡슐로 줄고, 위로 올리면 다시 펼쳐진다
   const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
-  const scrollTop = useScrollTop(scrollEl);
   const lastTop = useRef(0);
   const [navMin, setNavMin] = useState(false);
-  useEffect(() => {
+  // 값이 실제로 바뀔 때만 리렌더된다 (같은 값으로 setState 하면 React가 건너뜀)
+  useScrollFrame(scrollEl, (top) => {
     if (OS !== "ios") return;
-    const delta = scrollTop - lastTop.current;
+    const delta = top - lastTop.current;
     if (Math.abs(delta) < 6) return; // 손떨림 수준의 작은 움직임은 무시
-    lastTop.current = scrollTop;
-    setNavMin(delta > 0 && scrollTop > 80);
-  }, [scrollTop]);
+    lastTop.current = top;
+    setNavMin(delta > 0 && top > 80);
+  });
 
   useEffect(() => {
     if (!firstLoad) return;

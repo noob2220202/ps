@@ -183,3 +183,48 @@ JSX에 `{d.address && ...}`를 반복하지 않아도 됨.
 실제 아이폰에서 열면 `env(safe-area-inset-top/bottom)`으로 노치·홈 인디케이터 영역을 피합니다.
 `index.html`의 `viewport-fit=cover`가 있어야 `env()` 값이 0이 아니게 나옵니다.
 하단 고정 버튼은 `bottom: max(18px, calc(var(--safe-bottom) + 4px))`로 두 OS 모두 대응.
+
+---
+
+## 10. 부드럽게 만들기 (성능)
+
+### 측정부터
+Chrome DevTools 프로토콜로 상호작용 1번 동안의 스크립트 시간과 25ms 넘는 프레임(끊김) 수를 쟀습니다.
+폰을 흉내 내려고 CPU를 6배 느리게 한 결과:
+
+| 상황 | 수정 전 | 수정 후 |
+|---|---|---|
+| 홈 스크롤 | 평균 43ms/프레임, 끊김 41 | 17ms, 끊김 2 |
+| 내역 스크롤 | 54ms, 끊김 54 | 17ms, 끊김 1 |
+| 계좌 상세 스크롤 | 25ms, 끊김 24 | 17ms, 끊김 1 |
+| 스와이프 뒤로가기 | 32ms, 끊김 37 | 19ms, 끊김 2 |
+
+60fps = 프레임당 16.7ms 안에 끝나야 합니다.
+
+### 원인 1: 매 프레임 setState
+스크롤 위치를 state로 들고 있으면 스크롤할 때마다(초당 60번+) 화면 **전체**가 다시 렌더링됩니다.
+- 매 프레임 바뀌는 값(패럴랙스 위치) → `ref`로 DOM 스타일을 직접 바꿈 (`useScrollFrame`)
+- 켜짐/꺼짐 값(맨 위로 버튼, 탭바 축소) → 바뀌는 순간에만 setState. 같은 값으로 setState 하면 React가 리렌더를 건너뜀
+- 스와이프 손가락 위치도 ref + `requestAnimationFrame`으로 프레임당 한 번만 DOM에 반영
+
+### 원인 2: 한 글자마다 화면 전체 리렌더
+타이핑 효과(`useTypewriter`)를 화면 컴포넌트에서 바로 쓰면 글자 하나마다 화면 전체가 다시 그려짐.
+→ `<TypedText>`라는 작은 컴포넌트로 분리해서 그 `<span>`만 다시 그리게. **state는 필요한 곳에 최대한 가깝게(아래로).**
+
+### 원인 3: 전환 중 화면 내용까지 리렌더
+`ScreenStack`이 리렌더될 때 각 화면도 같이 다시 계산되던 것 → `LayerContent`를 `memo`로 감싸서
+주소와 active가 같으면 건너뜀.
+
+### 원인 4: 레이아웃/페인트를 부르는 애니메이션
+브라우저는 `transform`과 `opacity`만 바뀌면 GPU **합성(composite)** 단계만 다시 하면 되지만,
+`width`·`max-width`·`filter`·`background-position`이 바뀌면 레이아웃이나 다시 칠하기(paint)가 매 프레임 일어남.
+- 스플래시 워드마크 `max-width` 펼치기 → 최종 위치에 미리 배치하고 `transform`으로만 이동
+- 이전 화면 어둡게 `filter: brightness()` → 검은 막(`.layer__dim`)의 `opacity`
+- 스켈레톤 반짝임 `background-position` → 빛줄기(`::after`)를 `transform`으로 이동
+- 움직이는 동안만 `will-change: transform` (항상 켜두면 GPU 메모리 낭비)
+
+### 녹화 영상이 끊겨 보였던 이유 (앱과 별개)
+이전 영상은 Playwright 녹화 기능(약 25fps 제한)으로 찍었고, 스크롤도 50px씩 뚝뚝 움직였습니다.
+이번엔 가상 디스플레이에 실제 브라우저를 띄워 ffmpeg로 60fps 캡처했고, 스크롤은 손가락으로 튕기듯
+감속 곡선으로 움직였습니다. 컨테이너에 GPU가 없어서 녹화할 때만 페이지 시간을 3배 느리게 흘려 찍은 뒤
+3배속으로 되돌렸습니다(앱 코드는 그대로). 큰 움직임 구간에서 58~60fps가 나옵니다.
