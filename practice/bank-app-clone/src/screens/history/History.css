@@ -1,0 +1,89 @@
+.history {
+  background: #fff;
+  padding-bottom: 60px;
+}
+
+.history__header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: #fff;
+}
+.history__star {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 17px;
+}
+
+.history__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 36px;
+}
+.history__balance {
+  margin-top: 20px;
+  font-size: 21px;
+  font-weight: 800;
+}
+.history__balance span {
+  margin-left: 3px;
+}
+
+.search-box {
+  margin: 44px 19px 0;
+  height: 60px;
+  padding: 0 19px 0 21px;
+  border-radius: 14px;
+  background: #f8f8f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #222;
+}
+.search-box__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: #666;
+}
+
+.history__list {
+  margin-top: 34px;
+}
+
+/* 스크롤 일정 이상 내려가면 아래에서 올라오는 "맨 위로" 버튼 */
+.to-top {
+  position: sticky;
+  bottom: 20px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: max-content;
+  margin: -34px auto 0;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+  font-size: 12px;
+  color: #333;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity 200ms,
+    transform 200ms;
+}
+.to-top--visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}

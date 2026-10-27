@@ -1,105 +1,134 @@
 # 해설지
 
-`SPEC.md`가 문제지라면 이 문서 + 실제 코드(`src/`)가 해설지입니다.
-막혔던 부분이나 "내가 짠 거랑 뭐가 다르지?" 싶은 부분을 찾아보는 용도로 쓰세요.
-전체 구조를 다시 설명하진 않고, **헷갈리기 쉬운 지점 / 대안이 있는 지점** 위주로 적었습니다.
+`SPEC.md`(문제지)를 보고 직접 짜다가 막히면 여기서 해당 부분을 찾아보세요.
+"무엇을"보다 **"왜 이렇게 했는지 / 어디서 틀리기 쉬운지"** 위주입니다.
 
-## 전체 데이터 흐름
+## 폴더 구조
 
 ```
-src/types/bank.ts      타입 정의 (Account, Transaction, TransactionDetail, ...)
-src/data/mockData.ts   가짜 데이터 (실제 API라고 치고 쓰는 곳)
-src/lib/format.ts      금액 포맷 공용 함수
-src/components/        화면에 재사용되는 조각들
-src/pages/              라우트 하나당 페이지 하나
+src/
+  config/      profile.ts(이름·계좌번호), timing.ts(모든 애니메이션 타이밍)
+  api/         db.ts(가짜 데이터) + mockApi.ts(지연을 주는 가짜 서버)
+  hooks/       useAsync, useTypewriter, useScrollTop, useStatusBar
+  lib/         format.ts (금액 포맷, 날짜 그룹핑)
+  components/  PhoneFrame, TxList, Icon, art(로고/일러스트/스피너 SVG)
+  screens/     boot / home / account / history / tx / mini
 ```
 
-페이지(`pages/`)가 `data/mockData.ts`에서 데이터를 가져와서, `components/`에 props로 내려주는
-단방향 흐름입니다. 컴포넌트는 "어디서 데이터가 왔는지" 몰라도 되게 짜는 게 포인트 —
-나중에 mock 대신 실제 API(`fetch`)로 바꿀 때 `pages/`만 고치면 되게 하기 위함입니다.
+**타이밍을 한 파일에 모은 이유**: 영상과 비교하며 속도를 맞출 때 컴포넌트를 돌아다니지 않고
+`timing.ts`만 고치면 되게. "매직 넘버를 흩뿌리지 않는다"의 실전 예.
 
-## 화면별 해설
+---
 
-### 1. Home (`pages/HomePage.tsx`)
+## 1. 스플래시 — 단계(phase) 상태 하나로 애니메이션 전체를 지휘
 
-- **배너 문구 자동 전환**: `useState`로 현재 인덱스를 들고, `useEffect` 안에서
-  `setInterval`로 3초마다 인덱스를 돌립니다. **흔한 실수**: `useEffect`의 cleanup
-  함수(`return () => clearInterval(id)`)를 빼먹으면, 페이지를 벗어났다가 다시 들어올 때마다
-  interval이 하나씩 더 쌓여서 결국 문구가 미친 듯이 빠르게 바뀝니다. 꼭 정리해주세요.
-- **계좌 카드 전체가 클릭 영역**: `AccountCard`에 `onClick`을 카드 전체 `div`에 걸었습니다.
-  그 안에 있는 "이체" 버튼까지 같이 눌려서 상세 페이지로 이동해버리는 게 실제로는 버그입니다.
-  제대로 하려면 버튼 클릭 핸들러에서 `e.stopPropagation()`을 호출해 이벤트 버블링을
-  막아야 합니다 (연습 범위라 일부러 생략, 주석으로 남겨둠).
-- **리스트 렌더링**: `mockAccounts.map(...)` 할 때 `key`를 꼭 고유한 값(`account.id`)으로
-  줘야 합니다. `index`를 key로 쓰면 리스트 순서가 바뀔 때 React가 엉뚱한 DOM을 재사용해서
-  애니메이션이 깨지거나 state가 섞이는 버그가 생길 수 있어요.
+`Splash.tsx`는 `phase: "launch" | "logo" | "brand"` 상태 하나만 갖고, 타이머로 단계를 넘깁니다.
+실제 움직임은 전부 CSS가 `.splash--logo`, `.splash--brand` 클래스에 반응해서 처리합니다.
 
-### 2. 계좌 상세 (`pages/AccountDetailPage.tsx`)
+- **앱 실행 애니메이션**: `clip-path: inset(... round 48px)` → `inset(0 round 0)`.
+  작은 둥근 사각형이 화면 전체로 펼쳐지는 효과를 요소 크기 변경 없이(리플로우 없이) 냄.
+- **B가 작아지며 워드마크가 펼쳐짐**: B는 `transform: scale(2.2) → scale(1)`,
+  워드마크는 `max-width: 0 → 200px`. 부모가 `justify-content: center`라서 워드마크 폭이
+  늘어나면 **B가 자동으로 왼쪽으로 밀려남** — B 위치를 따로 계산할 필요가 없음.
+- **흔한 버그**: `App`에서 `onDone={() => setBoot("loading")}`처럼 화살표 함수를 바로 넘기면
+  App이 리렌더될 때마다 새 함수 → Splash의 `useEffect([onDone])`가 다시 돌아서 **타이머가 리셋**됨.
+  그래서 `useCallback`으로 고정. (effect 의존성에 함수가 들어가면 항상 의심할 것)
 
-- **URL 파라미터로 데이터 찾기**: `useParams()`로 `:accountId`를 꺼내서
-  `mockAccounts.find(a => a.id === accountId)`로 찾습니다. **이 find가 실패할 수 있다는 것**
-  (오타 URL, 존재하지 않는 계좌 등)을 꼭 처리해야 합니다 — `account`가 `undefined`인 채로
-  `account.balanceWon`을 읽으면 바로 런타임 에러가 납니다. 그래서 `if (!account) return ...`을
-  제일 먼저 둡니다.
-- **거래내역 필터링**: 전체 `mockTransactions`에서 `tx.accountId === accountId`인 것만
-  걸러서 `TransactionList`에 넘깁니다. 이 필터링을 컴포넌트가 아니라 **페이지에서** 하는 이유는,
-  `TransactionList`를 "주어진 배열을 그릴 뿐"인 순수한 컴포넌트로 유지하기 위해서입니다 —
-  나중에 다른 화면에서도 재사용하기 쉬워집니다.
+## 2. 홈 — "두 번에 나눠 그리기"와 끼어드는 애니메이션
 
-### 3. 거래내역 그룹핑 (`components/TransactionList.tsx`)
+### 2단계 렌더
+첫 진입 때만 `wave 1 → wave 2`. 모듈 변수 `booted`로 "이미 한 번 켜졌는지"를 기억해서
+상세에서 뒤로 왔을 땐 처음부터 wave 2로 그림. (state는 언마운트되면 사라지므로 모듈 변수)
 
-가장 "로직"이 들어간 부분입니다.
+### 높이가 0에서 자연스럽게 펼쳐지는 애니메이션 (`Collapse`)
+`height: auto`는 transition이 안 됩니다. 대신:
 
-```ts
-function groupByDate(transactions: Transaction[]): [string, Transaction[]][] {
-  const grouped = transactions.reduce<Record<string, Transaction[]>>((acc, tx) => {
-    (acc[tx.date] ??= []).push(tx);
-    return acc;
-  }, {});
-  return Object.entries(grouped);
-}
+```css
+.collapsible { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 320ms; }
+.collapsible--closed { grid-template-rows: 0fr; }
+.collapsible > * { overflow: hidden; min-height: 0; }
 ```
 
-- `acc[tx.date] ??= []`는 `acc[tx.date] = acc[tx.date] ?? []`의 축약형입니다
-  ("해당 키가 없으면 빈 배열로 초기화"). 처음 보면 낯설 수 있는데, "그룹핑" 패턴에서
-  정말 자주 나오는 관용구라 익혀두면 좋습니다.
-- **날짜 재정렬이 필요 없는 이유**: mock 데이터가 이미 최신순으로 정렬돼서 들어오기 때문에,
-  `reduce`로 순서대로 쌓으면 그룹의 등장 순서도 자연히 최신순이 됩니다. 만약 데이터가
-  정렬 안 된 채로 온다면, `Object.entries(grouped)`를 날짜 기준으로 `.sort()`까지
-  해줘야 맞습니다.
-- **더 짧은 대안**: ES2024+ 환경이면 `Object.groupBy(transactions, tx => tx.date)`
-  한 줄로 끝낼 수 있습니다. 이 프로젝트의 TypeScript 타입 설정이 아직 그 API 타입을
-  완전히 지원하지 않을 수 있어서 호환성 걱정 없는 `reduce` 버전을 썼습니다. 타입스크립트
-  lib을 `ES2024`로 올리고 직접 바꿔보는 것도 좋은 연습이 됩니다.
+`0fr ↔ 1fr`은 애니메이션이 됩니다. 광고 등장, 광고 닫기(X), AI 목표적금 닫기, 카드 섹션 등장에 전부 재사용.
+예전 방식인 `max-height: 500px` 트릭은 실제 높이와 차이만큼 타이밍이 어긋나서 덜 자연스러움.
 
-### 4. 거래 상세 (`pages/TransactionDetailPage.tsx`)
+### AI pill — 방문할 때마다 다음 문구
+- **틀리기 쉬운 지점 ①**: 렌더 중에 `visits++` → 개발 모드 StrictMode는 컴포넌트를 **두 번 렌더**하므로 2씩 증가.
+- **틀리기 쉬운 지점 ②**: `location.key`로 방문을 구분 → 뒤로가기는 **같은 히스토리 항목**으로 돌아가서 key가 똑같음.
+  (실제로 이 버그가 났었음: 재방문해도 문구가 안 바뀜)
+- **정답**: effect 안에서 증가 + `useRef` 가드. StrictMode는 effect를 "마운트→정리→마운트"로 두 번 돌리지만
+  ref 값은 그 사이에 유지되므로 `if (counted.current) return`으로 한 번만 셈.
+- 재방문 연출: `previous`(이전 문구) → `spinner` → `typing` 3단계 상태.
 
-- **key-value 리스트를 배열로 뽑아서 map 돌리기**: "카드정보", "주소", "전화번호"처럼
-  **있을 때만 보여줘야 하는 항목**이 섞여 있어서, JSX에 `{detail.cardInfo && <div>...}`를
-  4번 반복해서 쓰는 대신 `buildRows()` 함수에서 조건부로 배열에 `push`하고
-  한 번에 `.map()`으로 렌더링했습니다. **왜 이게 더 나은가**: 항목이 하나 더 늘어나도
-  JSX를 안 건드리고 배열에 한 줄만 추가하면 되고, "레이아웃(map)"과 "어떤 데이터를
-  보여줄지(배열 구성)"가 분리돼서 나중에 디자인만 바꾸기도 쉽습니다.
-- **입력창 글자수 제한**: `onChange`에서 `e.target.value.slice(0, 20)`으로 20자를
-  넘으면 잘라버립니다. `maxLength={20}` 속성만으로도 브라우저가 입력을 막아주긴 하지만,
-  붙여넣기(paste)로 20자를 초과해서 넣는 경우까지 막으려면 JS 쪽에서도 자르는 게 안전합니다.
+### 타이핑 효과 (`useTypewriter`)
+`setInterval`로 보여줄 글자 수를 1씩 늘림. 문자열을 `Array.from(text)`로 쪼개는 이유:
+`text.slice()`는 UTF-16 단위라 이모지 같은 문자가 반으로 잘림. (한글 완성형은 괜찮지만 습관으로)
+`\n`이 포함된 문구는 CSS `white-space: pre-line`으로 줄바꿈.
 
-## 공통 패턴
+### 이벤트 버블링
+계좌 행 전체가 클릭 영역인데 안에 `이체` 버튼이 있음 → 버튼 `onClick`에서 `e.stopPropagation()`.
+안 하면 이체 버튼을 눌러도 상세 페이지로 넘어감.
 
-- **`lib/format.ts`**: `formatWon`/`signedFormatWon`처럼 "숫자 → 화면에 보여줄 문자열"
-  변환을 컴포넌트 밖으로 빼뒀습니다. 컴포넌트 3곳(`AccountCard`, `TransactionItem`,
-  `TransactionDetailPage`)에서 똑같은 포맷팅 로직을 복붙하지 않게 하기 위함 — "같은 로직이
-  3번 이상 반복되면 함수로 뽑는다"는 기준을 하나의 예시로 보여주는 겁니다.
-- **`components/Icon.tsx`**: 아이콘 라이브러리를 설치하는 대신 `name` prop으로 SVG
-  path를 스위치하는 패턴을 썼습니다. 아이콘이 10개 안팎일 땐 이 방식이 번들 크기도 작고
-  의존성도 안 늘어서 괜찮지만, 아이콘이 많아지거나 디자이너가 주기적으로 아이콘을
-  추가한다면 `lucide-react` 같은 라이브러리로 바꾸는 게 유지보수에 낫습니다.
+### 탭하면 스피너 → 이동
+`setPressing(id)` 후 `setTimeout(navigate, 300)`. 사용자에게 "눌렸다"는 피드백을 먼저 주고 이동.
 
-## 자주 하는 실수 체크리스트
+## 3. 로딩 UI — 가짜 서버 + 스켈레톤
 
-- [ ] `useParams()`로 받은 값이 `undefined`일 수 있다는 걸 타입/런타임 양쪽에서 처리했는가
-- [ ] 리스트 렌더링 시 `key`를 `index`가 아니라 고유 id로 줬는가
-- [ ] `useEffect` 안에서 `setInterval`/`setTimeout`/이벤트 리스너를 등록했으면 cleanup을 했는가
-- [ ] 음수/양수 금액 색상 분기를 금액 부호로 했는가 (하드코딩한 거래 타입 문자열로 분기하면
-      데이터가 바뀔 때 깨지기 쉬움)
-- [ ] 클릭 가능한 영역 안에 또 다른 클릭 가능한 버튼이 있으면 이벤트 버블링을 고려했는가
+`mockApi.ts`의 모든 함수는 `setTimeout`으로 지연된 Promise를 돌려줌. 화면은 "데이터는 늦게 온다"는
+전제로 짜야 하고, 그래야 스켈레톤/스피너를 연습할 수 있음.
+
+`useAsync`의 `cancelled` 플래그: 응답이 오기 전에 화면을 떠나면(뒤로가기 연타) 언마운트된
+컴포넌트에 `setState` 하지 않도록. 요청 A가 늦게 오고 요청 B가 먼저 오는 **레이스 컨디션**도 같은 원리로 막힘.
+
+스켈레톤의 반짝임: `linear-gradient` 배경을 `background-size: 200%`로 키우고 `background-position`을 이동.
+
+## 4. 계좌 상세 — 스크롤 연동 효과
+
+- `useScrollTop`이 스크롤 위치를 state로 줌. `requestAnimationFrame`으로 묶어서
+  스크롤 이벤트(초당 수십~수백 번)마다 리렌더되는 걸 프레임당 1번으로 제한.
+- 일러스트: `opacity = 1 - scrollTop / 160`, `translateY(scrollTop * 0.35)` → 스크롤보다 느리게 움직여 패럴랙스.
+- **실제로 났던 버그**: 처음엔 `useScrollTop(ref)` + `useEffect(..., [ref])`로 짰는데, 로딩 중엔
+  스켈레톤이 렌더돼서 `ref.current`가 null → 본문이 나중에 생겨도 ref 객체는 같아서 effect가 다시 안 돎
+  → 스크롤 리스너가 영영 안 붙음. 해결: `useState`를 **콜백 ref**로 써서 요소 자체를 의존성으로.
+  ```tsx
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
+  const top = useScrollTop(el);
+  return <div ref={setEl}>...
+  ```
+- 헤더는 `position: sticky`. 스크롤 40px 넘으면 배경색을 깔아서 내용이 비치지 않게.
+
+## 5. 전체 내역 — 맨 위로 버튼, 누름 하이라이트
+
+- `맨 위로`: `scrollTop > 320`일 때 클래스 토글 → `opacity`/`translateY` transition.
+  `pointer-events: none`을 같이 줘야 안 보일 때 클릭이 안 먹힘. 누르면 `scrollTo({ top: 0, behavior: "smooth" })`.
+- 행을 누르면 `activeId`로 160ms 회색 유지 후 이동. `:active`만 쓰면 손을 떼는 순간 사라져서
+  영상처럼 "눌린 채로 넘어가는" 느낌이 안 남.
+
+## 6. 거래 상세 — 미리 아는 데이터는 먼저 그리기
+
+목록에서 이동할 때 `navigate(url, { state: { tx } })`로 요약 데이터를 같이 넘김.
+상세 화면은 그걸로 **태그/제목을 즉시** 그리고, 나머지만 스피너 → 영상과 동일한 순서.
+새로고침하면 state가 없으니 API 응답으로 그림(둘 다 대응).
+
+행 목록은 `groups()` 함수가 배열로 만들고 `.filter(row => row.value)`로 없는 항목(주소 등)을 뺌 →
+JSX에 `{d.address && ...}`를 반복하지 않아도 됨.
+
+## 7. 데이터 — 저장하지 말고 계산하기
+
+`db.ts`는 "거래 후 잔액"을 저장하지 않고 현재 잔액에서 거꾸로 빼가며 계산.
+잔액을 데이터마다 손으로 적으면 하나만 틀려도 전체가 어긋남. 계산 가능한 값은 계산.
+
+## 8. 상태바 색 바꾸기 — Context
+
+화면마다 상태바 색이 다름(홈=검정, 상세=라벤더, mini=베이지). 각 화면이 `useStatusBar(bg, fg)`를
+호출하면 Context를 통해 `PhoneFrame`의 상태바가 바뀜. 화면이 상태바 컴포넌트를 직접 알 필요가 없는 구조.
+
+## 체크리스트
+
+- [ ] effect 의존성에 함수가 있으면 `useCallback`으로 고정했는가
+- [ ] `setTimeout`/`setInterval`/이벤트 리스너는 cleanup에서 해제했는가
+- [ ] StrictMode에서 두 번 실행돼도 결과가 같은가 (카운터, API 호출)
+- [ ] 나중에 생기는 DOM 요소에 리스너를 붙일 때 콜백 ref를 썼는가
+- [ ] `height: auto` 애니메이션이 필요하면 grid `0fr ↔ 1fr`
+- [ ] 클릭 영역 안의 버튼은 `stopPropagation`
+- [ ] 비동기 응답이 언마운트 후에 와도 안전한가

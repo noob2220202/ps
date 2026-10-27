@@ -1,0 +1,176 @@
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+
+/* 영상 프레임에서 스포이드로 뽑은 색 */
+:root {
+  --yellow: #ffe100;
+  --yellow-pressed: #e8cd00;
+
+  --dark-bg: #1f1f1f;
+  --dark-surface: #262626;
+  --dark-btn: #363636;
+  --dark-nav: #2d2d2d;
+  --dark-line: #3a3a3a;
+  --dark-sub: #8a898c;
+
+  --beige-card: #c4bbac;
+  --beige-btn: #b0aaa1;
+  --beige-icon: #b3aeab;
+  --beige-page: #c3b9ad;
+  --beige-page-btn: #b9b0a3;
+
+  --light-bg: #f5f4f7;
+  --light-btn: #f2f2f4;
+  --lavender: #efe6fc;
+  --text: #202020;
+  --sub: #858585;
+  --line: #ececec;
+  --blue: #1f63b5;
+  --navy: #333957;
+  --red: #ea2029;
+
+  --frame-w: 360px;
+  --frame-h: 800px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  background: #e9e9ec;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ---------- 폰 프레임 ---------- */
+.phone {
+  position: relative;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  margin: 24px auto;
+  border-radius: 36px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 10px #111,
+    0 0 0 11px #333,
+    0 30px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.phone__viewport {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 진짜 폰 화면 크기면 프레임 없이 꽉 채움 (상태바는 실제 폰 것을 씀) */
+@media (max-width: 500px) {
+  body {
+    background: #000;
+  }
+  .phone {
+    width: 100%;
+    height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .statusbar {
+    display: none !important;
+  }
+}
+
+/* ---------- 스크린 공통 ---------- */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  animation: screen-in 220ms ease-out;
+}
+.screen::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 누르면 살짝 작아지고 어두워지는 효과 (영상에서 카드 누를 때) */
+.pressable {
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    background-color 120ms ease;
+}
+.pressable:active {
+  transform: scale(0.975);
+  filter: brightness(0.9);
+}
+
+.row-press:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- 스켈레톤 ---------- */
+.skel {
+  background: linear-gradient(90deg, #f0f0f2 0%, #f7f7f9 40%, #f0f0f2 80%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- 접히는 애니메이션 (광고/배너 닫기) ---------- */
+.collapsible {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 320ms ease,
+    opacity 220ms ease;
+}
+.collapsible > * {
+  overflow: hidden;
+  min-height: 0;
+}
+.collapsible--closed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.fade-up {
+  animation: fade-up 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

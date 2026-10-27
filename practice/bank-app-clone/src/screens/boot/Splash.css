@@ -1,0 +1,112 @@
+.splash {
+  position: absolute;
+  inset: 0;
+  background: var(--yellow);
+  animation: launch var(--launch, 350ms) cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+/* 런처 아이콘 자리에서 둥근 사각형이 화면 전체로 펼쳐지는 앱 실행 애니메이션 */
+@keyframes launch {
+  from {
+    clip-path: inset(6% 4% 52% 52% round 48px);
+  }
+  to {
+    clip-path: inset(0 round 0);
+  }
+}
+
+.splash__brand {
+  position: absolute;
+  top: 37%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* B는 처음에 2.2배 크기로 있다가 brand 단계에서 1배로 줄어든다 */
+.splash__b {
+  display: inline-flex;
+  opacity: 0;
+  transform: scale(2.2);
+  transition:
+    transform 450ms cubic-bezier(0.3, 0.7, 0.2, 1),
+    opacity 250ms ease;
+}
+.splash--logo .splash__b {
+  opacity: 1;
+  animation: pop 300ms ease-out;
+}
+.splash--brand .splash__b {
+  opacity: 1;
+  transform: scale(1);
+}
+@keyframes pop {
+  from {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* 워드마크는 폭 0에서 펼쳐짐 → 중앙정렬이라 B가 자연스럽게 왼쪽으로 밀려남 */
+.splash__wordmark {
+  display: inline-flex;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  padding-left: 0;
+  transition:
+    max-width 500ms cubic-bezier(0.3, 0.7, 0.2, 1) 150ms,
+    opacity 300ms ease 200ms,
+    padding-left 500ms ease 150ms;
+}
+.splash--brand .splash__wordmark {
+  max-width: 200px;
+  opacity: 1;
+  padding-left: 9px;
+}
+
+.splash__ad {
+  position: absolute;
+  top: 58.5%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 400ms ease 250ms,
+    transform 400ms ease 250ms;
+}
+.splash--brand .splash__ad {
+  opacity: 1;
+  transform: none;
+}
+
+.splash__ad-text {
+  margin: 12px 0 14px;
+  font-size: 13px;
+  color: #222;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.splash__ad-badge {
+  font-size: 8px;
+  font-weight: 600;
+  color: #9a8a1c;
+  border: 1px solid #c7b42a;
+  border-radius: 4px;
+  padding: 1px 3px;
+}
+
+.splash__ad-photo {
+  width: 250px;
+  height: 154px;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+}

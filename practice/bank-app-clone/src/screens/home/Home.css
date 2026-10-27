@@ -1,0 +1,380 @@
+.home {
+  position: absolute;
+  inset: 0;
+  background: var(--dark-bg);
+  color: #fff;
+}
+
+.home__scroll {
+  padding-bottom: 72px;
+}
+
+/* ---------- 헤더 ---------- */
+.home__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px 0 15px;
+  min-height: 70px;
+}
+
+.home__name {
+  margin: 8px 0 0 9px;
+  font-size: 20px;
+  font-weight: 700;
+  animation: screen-in 200ms ease-out;
+}
+
+.home__bell {
+  position: relative;
+  margin-top: 6px;
+  color: #fff;
+}
+.red-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.home__bell-dot {
+  top: 1px;
+  right: 1px;
+}
+
+/* ---------- AI 배너(pill) ---------- */
+.ai-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 260px;
+  min-height: 40px;
+  padding: 8px 14px 8px 11px;
+  border-radius: 20px;
+  background: var(--dark-surface);
+  animation: screen-in 200ms ease-out;
+}
+.ai-pill--two {
+  border-radius: 22px;
+  padding: 9px 12px 9px 11px;
+}
+.ai-pill__icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  flex-shrink: 0;
+}
+.ai-pill__text {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+.ai-pill__close {
+  align-self: flex-start;
+  margin: 3px 0 0 2px;
+  color: #6c6c6c;
+}
+
+/* ---------- 광고 ---------- */
+.ad {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 28px 47px 22px 34px;
+}
+.ad__text {
+  display: flex;
+  flex-direction: column;
+  font-size: 13.5px;
+  line-height: 1.38;
+}
+.ad__when {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: #9a9a9a;
+}
+.ad__cta {
+  align-self: flex-start;
+  margin-top: 13px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  background: var(--dark-btn);
+  font-size: 12px;
+  font-weight: 600;
+}
+.ad__media {
+  position: relative;
+  padding-top: 6px;
+}
+.ad__photo {
+  width: 116px;
+  height: 85px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+}
+.ad__badge {
+  position: absolute;
+  right: -11px;
+  bottom: -16px;
+  font-size: 6.5px;
+  color: #8a8a8a;
+  border: 1px solid #5a5a5a;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.ad__close {
+  position: absolute;
+  top: 18px;
+  right: 16px;
+  color: #c9c9c9;
+}
+
+/* ---------- 계좌 ---------- */
+.mini-card {
+  margin: 8px 15px 0;
+  height: 86px;
+  padding: 0 17px;
+  border-radius: 22px;
+  background: var(--beige-card);
+  color: #1c1c1c;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  cursor: pointer;
+}
+
+.accounts {
+  margin: 8px 15px 0;
+  padding: 6px 0 14px;
+  border-radius: 22px;
+  background: var(--dark-surface);
+}
+
+.acct {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 17px;
+  cursor: pointer;
+}
+.row-press-dark:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+.acct--flush {
+  padding: 10px 0;
+}
+
+.acct__hand {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #3a3a3a;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+}
+.acct__placeholder-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #333;
+}
+
+.acct__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.acct__balance {
+  font-size: 16.5px;
+  font-weight: 700;
+}
+.acct__promo-title {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.acct__sub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--dark-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.acct__sub--beige {
+  color: #5f584d;
+}
+.acct__spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -11px 0 0 -11px;
+}
+.acct__dismiss,
+.acct__chev {
+  color: #6a6a6a;
+}
+
+.star {
+  color: #f7c600;
+  font-size: 13px;
+}
+.outline-badge {
+  font-size: 8.5px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  color: #b0b0b0;
+}
+
+.pill-btn {
+  flex-shrink: 0;
+  height: 35px;
+  padding: 0 15px;
+  border-radius: 18px;
+  background: var(--dark-btn);
+  font-size: 13px;
+  font-weight: 700;
+}
+.pill-btn--beige {
+  background: var(--beige-btn);
+  color: #1c1c1c;
+}
+.pill-btn--sm {
+  height: 30px;
+  padding: 0 11px;
+  font-size: 12px;
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px 0 17px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 33px;
+  padding: 0 11px;
+  border-radius: 17px;
+  border: 1px solid var(--dark-line);
+  font-size: 12.5px;
+}
+.chips__divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 16px;
+  margin: 0 3px;
+  background: #4a4a4a;
+}
+
+/* ---------- 카드/기타 섹션 ---------- */
+.dark-card {
+  margin: 12px 15px 0;
+  padding: 16px 17px 12px;
+  border-radius: 22px;
+  background: var(--dark-surface);
+}
+.dark-card__title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.dark-card__title svg {
+  color: #7a7a7a;
+}
+.spend {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 10px;
+}
+
+.add-product {
+  margin: 12px 15px 0;
+  width: calc(100% - 30px);
+  height: 46px;
+  border-radius: 16px;
+  background: var(--dark-surface);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.home__footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 26px 0 30px;
+  color: #a0a0a0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.home__footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.home__footer-divider {
+  width: 1px;
+  height: 12px;
+  background: #4a4a4a;
+}
+
+/* ---------- 하단 탭바 ---------- */
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 66px;
+  padding-bottom: 10px;
+  display: flex;
+  border-radius: 18px 18px 0 0;
+  background: var(--dark-nav);
+  z-index: 5;
+}
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 10.5px;
+  color: #e8e8e8;
+}
+.bottom-nav__icon {
+  position: relative;
+  display: flex;
+}
+.bottom-nav__dot {
+  top: -1px;
+  right: -3px;
+}
