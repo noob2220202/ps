@@ -1,12 +1,26 @@
 import type { GroupAccount } from "../types/bank";
-
-// SPEC.md의 "Home 화면 > 모임 관리" 참고 (보너스 과제)
-// 요구사항: 모임 이름, 멤버 수, 회비 미납 인원이 있으면 안내 문구 표시
+import "./GroupAccountCard.css";
 
 interface GroupAccountCardProps {
   group: GroupAccount;
 }
 
 export function GroupAccountCard({ group }: GroupAccountCardProps) {
-  return <div>TODO: GroupAccountCard 구현 ({group.name})</div>;
+  return (
+    <div className="group-card">
+      <div className="group-card__title">모임 관리</div>
+      <div className="group-card__row">
+        <span>🙂 모임 멤버</span>
+        <span className="group-card__value">{group.memberCount}명 참여 중</span>
+      </div>
+      {group.unpaidDuesCount > 0 && (
+        <div className="group-card__row">
+          <span>🧾 회비 입금현황</span>
+          <span className="group-card__value group-card__value--alert">
+            {group.unpaidDuesCount}명 미납
+          </span>
+        </div>
+      )}
+    </div>
+  );
 }

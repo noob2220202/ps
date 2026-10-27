@@ -1,0 +1,55 @@
+.account-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+}
+
+.account-detail__header button {
+  background: none;
+  border: none;
+  color: #f3f4f6;
+  cursor: pointer;
+  display: flex;
+}
+
+.account-detail__balance-section {
+  padding: 8px 20px 24px;
+}
+
+.account-detail__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.account-detail__balance {
+  font-size: 34px;
+  font-weight: 800;
+  margin: 12px 0 20px;
+}
+
+.account-detail__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.account-detail__action-btn {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: none;
+  background: #1e1f27;
+  color: #f3f4f6;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-detail__section-title {
+  font-size: 15px;
+  font-weight: 700;
+  padding: 8px 20px;
+}

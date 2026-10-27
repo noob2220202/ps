@@ -12,7 +12,7 @@ export const mockAccounts: Account[] = [
   { id: "acc-mini", nickname: "민수 mini", balanceWon: 0, isStarred: false },
   {
     id: "acc-main",
-    nickname: "한도계좌",
+    nickname: "입출금통장",
     balanceWon: 452_300,
     isStarred: true,
     badge: "한도계좌",
@@ -76,6 +76,24 @@ export const mockTransactionDetails: Record<string, TransactionDetail> = {
     cardInfo: "프렌즈 체크카드 (1234)",
     merchantAddress: "서울 강남구 테헤란로 123",
     merchantPhone: "02)123-4567",
+  },
+  "tx-2": {
+    ...mockTransactions[1],
+    transactedAt: "2026.10.27 08:40:11",
+    transactionType: "자동이체출금",
+  },
+  "tx-3": {
+    ...mockTransactions[2],
+    transactedAt: "2026.10.26 19:20:47",
+    transactionType: "체크카드결제",
+    cardInfo: "프렌즈 체크카드 (1234)",
+    merchantAddress: "서울 마포구 양화로 45",
+    merchantPhone: "02)987-6543",
+  },
+  "tx-4": {
+    ...mockTransactions[3],
+    transactedAt: "2026.10.24 05:40:00",
+    transactionType: "이자지급",
   },
 };
 

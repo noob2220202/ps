@@ -1,0 +1,35 @@
+.card-spend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e1f27;
+  border-radius: 16px;
+  margin: 8px 16px;
+  padding: 16px;
+}
+
+.card-spend__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-spend__label {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.card-spend__amount {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card-spend__btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #2a2b33;
+  color: #f3f4f6;
+  font-size: 13px;
+  cursor: pointer;
+}

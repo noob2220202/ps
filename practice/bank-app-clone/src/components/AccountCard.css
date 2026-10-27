@@ -1,0 +1,83 @@
+.account-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin: 8px 16px;
+  border-radius: 16px;
+  background: #1e1f27;
+  cursor: pointer;
+}
+
+.account-card--starred {
+  background: #d8d2c4;
+  color: #16171d;
+}
+
+.account-card__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2a2b33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.account-card--starred .account-card__avatar {
+  background: #efe9db;
+}
+
+.account-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.account-card--starred .account-card__name-row {
+  color: #6b6350;
+}
+
+.account-card__star {
+  color: #e0b84c;
+}
+
+.account-card__badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #2a2b33;
+}
+
+.account-card--starred .account-card__badge {
+  background: #c9c0ac;
+}
+
+.account-card__balance {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.account-card__transfer-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #2a2b33;
+  color: #f3f4f6;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.account-card--starred .account-card__transfer-btn {
+  background: #16171d;
+  color: #f3f4f6;
+}
