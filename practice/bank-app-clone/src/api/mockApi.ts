@@ -1,5 +1,5 @@
 import { TIMING } from "../config/timing";
-import { ACCOUNTS, TRANSACTIONS, toDetail } from "./db";
+import { ACCOUNTS, MONTHLY_CARD_SPEND, TRANSACTIONS, toDetail } from "./db";
 import type { Account, HomeData, Transaction, TransactionDetail } from "./types";
 
 // 실제 서버처럼 지연을 주는 가짜 API. 화면은 "데이터가 늦게 온다"는 전제로 짜야
@@ -12,7 +12,7 @@ export const api = {
     wait(
       {
         accounts: ACCOUNTS,
-        monthlyCardSpend: 203_070,
+        monthlyCardSpend: MONTHLY_CARD_SPEND,
         ad: { title: "AND2BLE", subtitle: "미니 2집 발매", when: "10월 27일 오후 6시", cta: "MV 보러가기" },
         aiPromo: { title: "AI 목표적금 출시", desc: "최고 연 5% 받고 목표 지원금까지" },
       },
