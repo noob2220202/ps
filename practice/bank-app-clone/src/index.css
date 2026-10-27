@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  background: #0b0b10;
+}
+
+#root {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100svh;
+  background: #16171d;
+  color: #f3f4f6;
+}
+
+.screen {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
