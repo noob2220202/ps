@@ -109,7 +109,9 @@ export function AccountDetailScreen() {
           </div>
         </div>
         <div className="balance-card__actions">
-          <button className="light-btn pressable">이체하기</button>
+          <button className="light-btn pressable" onClick={() => navigate(`/transfer?from=${accountId}`)}>
+            이체하기
+          </button>
           <button className="light-btn pressable">채우기</button>
         </div>
       </section>

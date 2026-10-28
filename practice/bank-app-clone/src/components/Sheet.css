@@ -1,0 +1,142 @@
+.sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.sheet--open {
+  pointer-events: auto;
+}
+.sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+.sheet--open .sheet__backdrop {
+  opacity: 0.5;
+}
+.sheet__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 26px 26px 0 0;
+  background: #fff;
+  color: #1c1c1c;
+  padding-bottom: var(--safe-bottom);
+  transform: translate3d(0, 100%, 0);
+  transition: transform 340ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.sheet--open .sheet__panel {
+  transform: translate3d(0, 0, 0);
+}
+
+/* ---------- 알림창 ---------- */
+.dialog {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  animation: dialog-fade 180ms ease-out;
+}
+.dialog__box {
+  width: 78%;
+  border-radius: 16px;
+  background: #fff;
+  color: #1c1c1c;
+  overflow: hidden;
+  text-align: center;
+  animation: dialog-pop 200ms cubic-bezier(0.2, 0.9, 0.25, 1.2);
+}
+.dialog__box p {
+  margin: 0;
+  padding: 28px 22px 24px;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+.dialog__box button {
+  width: 100%;
+  height: 52px;
+  border-top: 1px solid #eee;
+  font-size: 15px;
+  font-weight: 700;
+}
+@keyframes dialog-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes dialog-pop {
+  from {
+    transform: scale(0.92);
+  }
+}
+
+/* ---------- 키패드 ---------- */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 14px;
+}
+.keypad__key {
+  position: relative;
+  display: grid;
+  place-items: center;
+  font-size: 25px;
+  font-weight: 400;
+  color: #222;
+}
+.keypad__key > * {
+  position: relative;
+}
+/* 누르면 숫자 뒤에 연회색 원이 퍼짐 (영상) — transform/opacity만 */
+.keypad__key::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-radius: 50%;
+  background: #f2f2f2;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+.keypad__key:active::before {
+  opacity: 1;
+  transform: scale(1);
+  transition-duration: 60ms;
+}
+
+/* 노란 큰 버튼 (다음, 확인, 이체하기) */
+.cta {
+  height: 56px;
+  border-radius: 12px;
+  background: var(--yellow);
+  color: #1c1c1c;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 150ms;
+}
+.cta:disabled {
+  background: #e8e8e8;
+  color: #a8a8a8;
+}
+.cta:not(:disabled):active {
+  background: var(--yellow-pressed);
+}
+.cta--gray {
+  background: #f0f0f0;
+}

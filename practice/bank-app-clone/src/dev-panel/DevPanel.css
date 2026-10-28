@@ -263,17 +263,6 @@
   padding: 10px 12px;
   text-align: left;
 }
-.acct-edit__kb {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: #1c1c1c;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  flex-shrink: 0;
-}
 .acct-edit__name {
   flex: 1;
   min-width: 0;
@@ -298,33 +287,45 @@
   background: var(--home-card);
 }
 
-/* 은행 고르기 격자 */
+/* 은행 고르기: 고른 은행 버튼 + 펼치면 은행선택 목록 */
 .add-bank {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.bank-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+.bank-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 14px 0 10px;
+  border-radius: 12px;
+  background: var(--home-btn);
+  text-align: left;
 }
-.bank-grid__item {
+.bank-select strong {
+  flex: 1;
+  font-size: 14px;
+}
+.bank-select__picker {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  padding: 10px 2px 8px;
-  border-radius: 12px;
-  border: 1.5px solid transparent;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--home-sub);
+  max-height: 360px;
+  border-radius: 14px;
+  background: #fff;
+  color: #1c1c1c;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--home-line);
 }
-.bank-grid__item.on {
-  border-color: var(--home-text);
-  background: var(--home-btn);
-  color: var(--home-text);
+.bank-select__picker .bank-sheet__title {
+  display: none;
+}
+.bank-select__picker .bank-sheet__search {
+  margin: 12px 12px 6px;
+  height: 44px;
+}
+.bank-select__picker .bank-sheet__list {
+  padding: 0 12px 12px;
 }
 
 .btn--in {
@@ -373,7 +374,6 @@
 }
 
 .tx-row {
-
   display: flex;
   align-items: center;
   gap: 8px;

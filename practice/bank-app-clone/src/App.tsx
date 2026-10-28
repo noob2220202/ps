@@ -11,6 +11,9 @@ import { HistoryScreen } from "./screens/history/HistoryScreen";
 import { TxDetailScreen } from "./screens/tx/TxDetailScreen";
 import { MiniScreen } from "./screens/mini/MiniScreen";
 import { BankAccountScreen } from "./screens/bank/BankAccountScreen";
+import { TransferScreen } from "./screens/transfer/TransferScreen";
+import { AmountScreen } from "./screens/transfer/AmountScreen";
+import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
 
 type Boot = "splash" | "loading" | "ready";
 
@@ -23,6 +26,9 @@ const renderRoute = (location: Location) => (
     <Route path="/account/:accountId/tx/:txId" element={<TxDetailScreen />} />
     <Route path="/mini" element={<MiniScreen />} />
     <Route path="/bank/:accountId" element={<BankAccountScreen />} />
+    <Route path="/transfer" element={<TransferScreen />} />
+    <Route path="/transfer/amount" element={<AmountScreen />} />
+    <Route path="/transfer/done" element={<TransferDoneScreen />} />
   </Routes>
 );
 

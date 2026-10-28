@@ -39,6 +39,33 @@ db.exec(`
     tag        TEXT NOT NULL
   );
   CREATE INDEX IF NOT EXISTS idx_tx_account_at ON transactions (account_id, at DESC);
+
+  -- 받는 분 (🔔 패널에서 미리 등록). 이체할 때 계좌번호를 넣으면 여기서 예금주 이름을 찾는다
+  -- (진짜 은행은 금융결제원 망으로 상대 은행에 물어보지만, 여기선 이 표가 "다른 은행들" 역할)
+  CREATE TABLE IF NOT EXISTS payees (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    bank_code TEXT NOT NULL,
+    number    TEXT NOT NULL,               -- 숫자만 (하이픈 없이)
+    holder    TEXT NOT NULL,               -- 예금주
+    favorite  INTEGER NOT NULL DEFAULT 0,  -- 최근 이체 목록의 ☆
+    UNIQUE (bank_code, number)
+  );
+
+  -- 이체 기록. 보낸 쪽 출금 거래(out_tx_id), 내 계좌로 보냈으면 받은 쪽 입금 거래(in_tx_id)와 연결
+  CREATE TABLE IF NOT EXISTS transfers (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    bank_code       TEXT NOT NULL,
+    number          TEXT NOT NULL,         -- 숫자만
+    holder          TEXT NOT NULL,         -- 보낼 당시의 예금주 이름
+    amount          INTEGER NOT NULL CHECK (amount > 0),
+    memo_to         TEXT,                  -- 받는 분에게 표기
+    memo_me         TEXT,                  -- 나에게 표기
+    at              TEXT NOT NULL,
+    out_tx_id       INTEGER REFERENCES transactions(id) ON DELETE SET NULL,
+    in_tx_id        INTEGER REFERENCES transactions(id) ON DELETE SET NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_transfers_at ON transfers (at DESC);
 `);
 
 // 여러 쿼리를 "전부 성공 아니면 전부 취소"로 묶기 (잔액 변경 + 거래 기록이 따로 놀면 안 되니까)
@@ -77,9 +104,28 @@ const SEED_TX = [
   ["2026-10-18T12:00:00", "홍길동", 100000, "#이체"],
 ];
 
+// 받는 분 예시 (전부 가상의 이름/번호)
+const SEED_PAYEES = [
+  ["nh", "3510000000011", "김민지"],
+  ["nh", "3520000000022", "이서준"],
+  ["nh", "3560000000033", "박하늘(샘플마트)"],
+  ["hana", "12345678901234", "최예시"],
+  ["toss", "100000000001", "정테스트"],
+  ["shinhan", "110000000001", "한샘플"],
+  ["kakao", "3333000000099", "오카카"],
+];
+// 최근 이체 목록이 비어 있지 않게 예전 이체 몇 건 (입출금통장에서 보냄)
+const SEED_TRANSFERS = [
+  ["2026-10-24T18:20:00", "nh", "3560000000033", "박하늘(샘플마트)", 23000],
+  ["2026-10-25T11:05:00", "nh", "3520000000022", "이서준", 5000],
+  ["2026-10-26T20:40:00", "nh", "3510000000011", "김민지", 10000],
+];
+
 export function seed() {
   transaction(() => {
-    db.exec("DELETE FROM transactions; DELETE FROM accounts; DELETE FROM profile; DELETE FROM sqlite_sequence;");
+    db.exec(
+      "DELETE FROM transfers; DELETE FROM payees; DELETE FROM transactions; DELETE FROM accounts; DELETE FROM profile; DELETE FROM sqlite_sequence;",
+    );
     db.prepare("INSERT INTO profile VALUES (1, ?, ?, ?)").run("홍길동", "0000-00-0000000", "0000");
     const acc = db.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, badge, sort) VALUES (?, ?, ?, ?, ?, ?, ?)");
     acc.run("mini", "mini", null, null, 0, null, 0);
@@ -87,6 +133,15 @@ export function seed() {
     acc.run("nh", "external", "nh", "302-0000-0000-00", 0, null, 2);
     const tx = db.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
     for (const row of SEED_TX) tx.run(...row);
+    const payee = db.prepare("INSERT INTO payees (bank_code, number, holder) VALUES (?, ?, ?)");
+    for (const row of SEED_PAYEES) payee.run(...row);
+    const tr = db.prepare(
+      "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",
+    );
+    for (const [at, bank, number, holder, amount] of SEED_TRANSFERS) {
+      const out = tx.run(at, holder, -amount, "#이체");
+      tr.run(bank, number, holder, amount, at, out.lastInsertRowid);
+    }
   });
 }
 

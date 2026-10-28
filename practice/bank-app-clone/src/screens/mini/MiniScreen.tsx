@@ -31,7 +31,9 @@ export function MiniScreen() {
         <div className="mini__number">{mini.number}</div>
         <strong className="mini__balance">{account.data ? won(mini.balance) : "\u00a0"}</strong>
         <div className="mini__actions">
-          <button className="mini__btn pressable">이체하기</button>
+          <button className="mini__btn pressable" onClick={() => navigate("/transfer?from=mini")}>
+            이체하기
+          </button>
           <button className="mini__btn pressable">
             용돈요청
             <span className="mini__new">NEW</span>

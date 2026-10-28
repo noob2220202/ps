@@ -2,21 +2,23 @@ import { useRef, useState, type ReactNode } from "react";
 import { ApiError } from "../api/client";
 import { api, formatAccountNumber, paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
-import type { Account, Bank, HomeData, Transaction, TxTag } from "../api/types";
+import type { Account, Bank, HomeData, Payee, Transaction, TxTag } from "../api/types";
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
+import { BankPicker } from "../screens/transfer/TransferScreen";
 import "./DevPanel.css";
 
 // 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
-// 계좌 추가·삭제, 잔액, 거래내역, 내 정보 같은 데이터 관리는 전부 여기서 버튼/숫자 입력으로 한다.
+// 계좌 추가·삭제, 잔액, 거래내역, 받는 분, 내 정보 같은 데이터 관리는 전부 여기서 버튼/숫자 입력으로 한다.
 
-type Tab = "basic" | "accounts" | "tx";
+type Tab = "basic" | "accounts" | "payees" | "tx";
 const TABS: [Tab, string][] = [
   ["basic", "기본"],
   ["accounts", "계좌"],
+  ["payees", "받는 분"],
   ["tx", "거래"],
 ];
 
@@ -64,6 +66,7 @@ export function DevPanel({ open, onClose }: { open: boolean; onClose: () => void
         <div className="dev-panel__body">
           {open && tab === "basic" && <BasicTab run={run} />}
           {open && tab === "accounts" && <AccountsTab run={run} />}
+          {open && tab === "payees" && <PayeesTab run={run} />}
           {open && tab === "tx" && <TxTab run={run} />}
         </div>
         {toast && <div className={`dev-toast ${toast.error ? "dev-toast--error" : ""}`}>{toast.text}</div>}
@@ -201,7 +204,7 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
-        {account.bank ? <BankIcon bank={account.bank} size={30} /> : <span className="acct-edit__kb">B</span>}
+        <BankIcon bank={account.bank} size={30} />
         <span className="acct-edit__name">
           <strong>{accountName(account)}</strong>
           <small>{account.number}</small>
@@ -246,32 +249,57 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   );
 }
 
+// 은행 고르기: 고른 은행을 보여주는 버튼 → 누르면 이체 화면과 같은 '은행선택' 목록(검색 가능)이 펼쳐짐
+function BankSelect({ banks, value, onChange, exclude }: { banks: Bank[]; value: Bank; onChange: (b: Bank) => void; exclude?: string[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" className="bank-select" onClick={() => setOpen(!open)}>
+        <BankIcon bank={value} size={30} />
+        <strong>{value.name}</strong>
+        <Icon name={open ? "chevron-down" : "chevron-right"} size={16} stroke={2} />
+      </button>
+      {open && (
+        <div className="bank-select__picker">
+          <BankPicker
+            banks={banks}
+            exclude={exclude}
+            onPick={(b) => {
+              onChange(b);
+              setOpen(false);
+            }}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+// 은행 형식대로 하이픈 넣은 계좌번호 입력칸 (형식 모르는 은행은 숫자만)
+function NumberInput({ bank, value, onChange }: { bank: Bank; value: string; onChange: (v: string) => void }) {
+  const placeholder = bank.pattern ? bank.pattern.map((n) => "0".repeat(n)).join("-") : "숫자 10~14자리";
+  return <input value={value} inputMode="numeric" placeholder={placeholder} onChange={(e) => onChange(formatAccountNumber(bank.pattern, e.target.value).slice(0, 20))} />;
+}
+
 function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
-  const [code, setCode] = useState(banks[0].code);
+  const [bank, setBank] = useState(banks.find((b) => b.code === "kb") ?? banks[1]);
   const [number, setNumber] = useState("");
   const [balance, setBalance] = useState(0);
-  const bank = banks.find((b) => b.code === code)!;
-  const placeholder = bank.pattern?.map((n) => "0".repeat(n)).join("-");
 
   return (
     <div className="add-bank">
-      <div className="bank-grid">
-        {banks.map((b) => (
-          <button
-            key={b.code}
-            className={`bank-grid__item ${b.code === code ? "on" : ""}`}
-            onClick={() => {
-              setCode(b.code);
-              setNumber("");
-            }}
-          >
-            <BankIcon bank={b} size={32} />
-            <span>{b.name}</span>
-          </button>
-        ))}
-      </div>
+      {/* 카카오뱅크 계좌는 mini·입출금통장이라 여기선 뺀다 */}
+      <BankSelect
+        banks={banks}
+        value={bank}
+        exclude={["kakao"]}
+        onChange={(b) => {
+          setBank(b);
+          setNumber("");
+        }}
+      />
       <Field label={`${bank.name} 계좌번호`}>
-        <input value={number} inputMode="numeric" placeholder={placeholder} onChange={(e) => setNumber(formatAccountNumber(bank.pattern, e.target.value))} />
+        <NumberInput bank={bank} value={number} onChange={setNumber} />
       </Field>
       <Field label="시작 잔액">
         <MoneyInput value={balance} onChange={setBalance} quick={[10000, 100000, 1000000]} />
@@ -279,13 +307,112 @@ function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
       <button
         className="btn"
         onClick={async () => {
-          if (await run(() => api.addBankAccount({ bankCode: code, number, balance }), `${bank.name} 계좌를 추가했어요`)) {
+          if (await run(() => api.addBankAccount({ bankCode: bank.code, number, balance }), `${bank.name} 계좌를 추가했어요`)) {
             setNumber("");
             setBalance(0);
           }
         }}
       >
         계좌 추가
+      </button>
+    </div>
+  );
+}
+
+// ---------- 받는 분: 이체할 때 계좌번호로 찾을 "다른 사람 계좌" ----------
+function PayeesTab({ run }: { run: Run }) {
+  const payees = useApi<Payee[]>(paths.payees);
+  const banks = useApi<Bank[]>(paths.banks);
+  if (payees.status !== "done" || banks.status !== "done") return <div className="tab">불러오는 중…</div>;
+  return (
+    <div className="tab">
+      <p className="tab__hint">
+        이체 화면에서 계좌번호를 입력하면 여기 등록된 이름이 나와요. 등록 안 된 계좌는 "계좌정보를 확인해 주세요"가 떠요.
+        (내 계좌는 등록하지 않아도 돼요)
+      </p>
+      <h3 className="tab__h tab__h--first">받는 분 {payees.data.length}명</h3>
+      {payees.data.map((p) => (
+        <PayeeEditor key={p.id} payee={p} run={run} />
+      ))}
+      <h3 className="tab__h">받는 분 등록</h3>
+      <AddPayee banks={banks.data} run={run} />
+    </div>
+  );
+}
+
+function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
+  const [open, setOpen] = useState(false);
+  const [holder, setHolder] = useState(payee.holder);
+  const [number, setNumber] = useState(formatAccountNumber(payee.bank.pattern, payee.number));
+  return (
+    <div className="acct-edit">
+      <button className="acct-edit__head" onClick={() => setOpen(!open)}>
+        <BankIcon bank={payee.bank} size={30} />
+        <span className="acct-edit__name">
+          <strong>
+            {payee.holder} {payee.favorite && "★"}
+          </strong>
+          <small>
+            {payee.bank.short} {payee.number}
+          </small>
+        </span>
+        <Icon name={open ? "chevron-down" : "chevron-right"} size={16} stroke={2} />
+      </button>
+      {open && (
+        <div className="acct-edit__body">
+          <Field label="예금주 이름">
+            <input value={holder} maxLength={20} onChange={(e) => setHolder(e.target.value)} />
+          </Field>
+          <Field label="계좌번호">
+            <NumberInput bank={payee.bank} value={number} onChange={setNumber} />
+          </Field>
+          <div className="row">
+            <button className="btn btn--sm" onClick={() => run(() => api.updatePayee(payee.id, { holder, number }), "받는 분 정보를 바꿨어요")}>
+              저장
+            </button>
+            <button
+              className="btn btn--sm btn--danger"
+              onClick={() => confirm(`${payee.holder}님을 받는 분에서 지울까요?`) && run(() => api.deletePayee(payee.id), "받는 분을 지웠어요")}
+            >
+              삭제
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
+  const [bank, setBank] = useState(banks.find((b) => b.code === "nh") ?? banks[0]);
+  const [number, setNumber] = useState("");
+  const [holder, setHolder] = useState("");
+  return (
+    <div className="add-bank">
+      <BankSelect
+        banks={banks}
+        value={bank}
+        onChange={(b) => {
+          setBank(b);
+          setNumber("");
+        }}
+      />
+      <Field label={`${bank.name} 계좌번호`}>
+        <NumberInput bank={bank} value={number} onChange={setNumber} />
+      </Field>
+      <Field label="예금주 이름">
+        <input value={holder} maxLength={20} placeholder="예: 김민지" onChange={(e) => setHolder(e.target.value)} />
+      </Field>
+      <button
+        className="btn"
+        onClick={async () => {
+          if (await run(() => api.addPayee({ bankCode: bank.code, number, holder }), `${holder}님을 등록했어요`)) {
+            setNumber("");
+            setHolder("");
+          }
+        }}
+      >
+        받는 분 등록
       </button>
     </div>
   );

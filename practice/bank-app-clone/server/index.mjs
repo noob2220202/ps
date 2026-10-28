@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { db, seed, transaction } from "./db.mjs";
-import { BANKS, bankByCode, digitCount, formatAccountNumber } from "./banks.mjs";
+import { BANKS, bankByCode, bankInfo, checkNumber, digitsOf, formatAccountNumber } from "./banks.mjs";
 
 // ===== 백엔드 서버 (Express + SQLite) =====
 // npm start → 이 파일 하나가 API(/api/...)와 빌드된 화면(dist/)을 같은 포트(기본 9101)로 제공한다.
@@ -25,6 +25,7 @@ class HttpError extends Error {
   }
 }
 const bad = (message, fields) => new HttpError(400, "VALIDATION", message, fields);
+const conflict = (message, fields) => new HttpError(409, "CONFLICT", message, fields);
 const notFound = (what) => new HttpError(404, "NOT_FOUND", `${what}을(를) 찾을 수 없어요`);
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -38,8 +39,12 @@ const getProfile = () => {
   return { userName: p.user_name, miniAccountNo: p.mini_account_no, cardLast4: p.card_last4 };
 };
 
+// mini는 한도가 있다 (영상: "일 200,000원 (월 1,000,000원)")
+const MINI_LIMIT = { daily: 200_000, monthly: 1_000_000 };
+
 function toAccount(row, profile = getProfile()) {
-  const bank = row.bank_code ? bankByCode(row.bank_code) : undefined;
+  // 카카오뱅크 계좌(mini, 입출금)도 이체 화면에선 "카카오뱅크 3333-..."로 보이므로 은행 정보를 붙인다
+  const bank = bankByCode(row.bank_code ?? "kakao");
   const label =
     row.kind === "mini" ? `${profile.userName} mini` : row.kind === "main" ? "입출금통장" : `${profile.userName}의 ${bank?.name ?? "다른 은행"} 계좌`;
   return {
@@ -49,7 +54,8 @@ function toAccount(row, profile = getProfile()) {
     balance: row.balance,
     ...(row.badge && { badge: row.badge }),
     number: row.kind === "mini" ? profile.miniAccountNo : row.number ?? undefined,
-    ...(bank && { bank: { code: bank.code, name: bank.name, short: bank.short, color: bank.color, text: bank.text } }),
+    bank: bankInfo(bank),
+    ...(row.kind === "mini" && { limit: MINI_LIMIT }),
   };
 }
 
@@ -121,7 +127,7 @@ app.get("/api/home", (_req, res) => {
   });
 });
 
-app.get("/api/banks", (_req, res) => res.json(BANKS));
+app.get("/api/banks", (_req, res) => res.json(BANKS.map(bankInfo)));
 
 app.get("/api/profile", (_req, res) => res.json(getProfile()));
 
@@ -149,14 +155,16 @@ app.post("/api/accounts", (req, res) => {
   const bank = bankByCode(bankCode);
   const fields = {};
   if (!bank) fields.bankCode = "은행을 골라 주세요";
-  const digits = String(number ?? "").replace(/\D/g, "");
-  if (bank && digits.length !== digitCount(bankCode)) fields.number = `${bank.name} 계좌번호는 숫자 ${digitCount(bankCode)}자리예요`;
+  else if (bank.code === "kakao") fields.bankCode = "카카오뱅크 계좌는 mini·입출금통장이에요";
+  const digits = digitsOf(number);
+  const numberError = bank && checkNumber(bank, digits);
+  if (numberError) fields.number = numberError;
   if (!Number.isInteger(balance) || balance < 0 || balance > 1_000_000_000) fields.balance = "0원 이상 10억원 이하";
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
 
   const formatted = formatAccountNumber(bankCode, digits);
   if (db.prepare("SELECT 1 FROM accounts WHERE bank_code = ? AND number = ?").get(bankCode, formatted))
-    throw bad("이미 추가된 계좌예요", { number: "이미 추가된 계좌예요" });
+    throw conflict("이미 추가된 계좌예요", { number: "이미 추가된 계좌예요" });
 
   const id = `bank-${randomUUID().slice(0, 8)}`;
   const sort = db.prepare("SELECT COALESCE(MAX(sort), 0) + 1 AS s FROM accounts").get().s;
@@ -179,9 +187,9 @@ app.patch("/api/accounts/:id", (req, res) => {
   let formatted = row.number;
   if (number !== undefined) {
     if (row.kind !== "external") throw bad("다른 은행 계좌만 계좌번호를 바꿀 수 있어요");
-    const digits = String(number).replace(/\D/g, "");
-    if (digits.length !== digitCount(row.bank_code))
-      throw bad("입력값을 확인해 주세요", { number: `숫자 ${digitCount(row.bank_code)}자리` });
+    const digits = digitsOf(number);
+    const numberError = checkNumber(bankByCode(row.bank_code), digits);
+    if (numberError) throw bad(numberError, { number: numberError });
     formatted = formatAccountNumber(row.bank_code, digits);
   }
   db.prepare("UPDATE accounts SET balance = ?, number = ? WHERE id = ?").run(balance ?? row.balance, formatted, row.id);
@@ -252,6 +260,168 @@ app.delete("/api/transactions/:id", (req, res) => {
     db.prepare("UPDATE accounts SET balance = balance - ? WHERE id = ?").run(t.amount, t.account_id);
   });
   res.status(204).end();
+});
+
+// ---------- 받는 분 (🔔 패널에서 관리) ----------
+const toPayee = (p) => ({
+  id: String(p.id),
+  bank: bankInfo(bankByCode(p.bank_code)),
+  number: p.number,
+  holder: p.holder,
+  favorite: !!p.favorite,
+});
+
+function findPayee(id) {
+  const p = db.prepare("SELECT * FROM payees WHERE id = ?").get(Number(id));
+  if (!p) throw notFound("받는 분");
+  return p;
+}
+
+// 내 계좌 중 (은행, 숫자) 가 같은 것
+function myAccountByNumber(bankCode, digits) {
+  const profile = getProfile();
+  return db
+    .prepare("SELECT * FROM accounts")
+    .all()
+    .find((a) => (a.bank_code ?? "kakao") === bankCode && digitsOf(a.kind === "mini" ? profile.miniAccountNo : a.number) === digits);
+}
+
+function checkPayee({ bankCode, number, holder }, current) {
+  const bank = bankByCode(bankCode ?? current?.bank_code);
+  const fields = {};
+  if (!bank) fields.bankCode = "은행을 골라 주세요";
+  const digits = digitsOf(number ?? current?.number);
+  const numberError = bank && checkNumber(bank, digits);
+  if (numberError) fields.number = numberError;
+  const name = String(holder ?? current?.holder ?? "").trim();
+  if (!name || name.length > 20) fields.holder = "이름은 1~20자";
+  if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
+  if (myAccountByNumber(bank.code, digits)) throw conflict("내 계좌예요. 받는 분으로 등록할 필요 없어요", { number: "내 계좌" });
+  const dup = db.prepare("SELECT id FROM payees WHERE bank_code = ? AND number = ?").get(bank.code, digits);
+  if (dup && dup.id !== current?.id) throw conflict("이미 등록된 계좌예요", { number: "이미 등록된 계좌" });
+  return { bankCode: bank.code, digits, name };
+}
+
+app.get("/api/payees", (_req, res) => res.json(db.prepare("SELECT * FROM payees ORDER BY holder").all().map(toPayee)));
+
+app.post("/api/payees", (req, res) => {
+  const { bankCode, digits, name } = checkPayee(req.body ?? {});
+  const r = db.prepare("INSERT INTO payees (bank_code, number, holder) VALUES (?, ?, ?)").run(bankCode, digits, name);
+  res.status(201).json(toPayee(findPayee(r.lastInsertRowid)));
+});
+
+app.patch("/api/payees/:id", (req, res) => {
+  const p = findPayee(req.params.id);
+  const body = req.body ?? {};
+  const { bankCode, digits, name } = checkPayee(body, p);
+  const favorite = body.favorite === undefined ? p.favorite : body.favorite ? 1 : 0;
+  db.prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ? WHERE id = ?").run(bankCode, digits, name, favorite, p.id);
+  res.json(toPayee(findPayee(p.id)));
+});
+
+app.delete("/api/payees/:id", (req, res) => {
+  db.prepare("DELETE FROM payees WHERE id = ?").run(findPayee(req.params.id).id);
+  res.status(204).end();
+});
+
+// ---------- 이체 ----------
+// 받는 계좌 찾기: 내 계좌 → 등록된 받는 분 순서. 없으면 404 (진짜 앱의 "계좌정보를 확인해 주세요")
+function findRecipient(bankCode, number) {
+  const bank = bankByCode(bankCode);
+  if (!bank) throw bad("은행을 골라 주세요", { bankCode: "은행을 골라 주세요" });
+  const digits = digitsOf(number);
+  const mine = myAccountByNumber(bank.code, digits);
+  if (mine) return { bank: bankInfo(bank), number: digits, holder: getProfile().userName, accountId: mine.id };
+  const p = db.prepare("SELECT * FROM payees WHERE bank_code = ? AND number = ?").get(bank.code, digits);
+  if (p) return { ...toPayee(p), payeeId: String(p.id) };
+  throw new HttpError(404, "ACCOUNT_NOT_FOUND", "입력하신 계좌정보를 확인해 주세요");
+}
+
+app.get("/api/transfer/lookup", (req, res) => res.json(findRecipient(req.query.bank, req.query.number)));
+
+// 이체 첫 화면: 내 계좌(보내는 계좌 빼고) + 최근 이체한 사람
+app.get("/api/transfer/recipients", (req, res) => {
+  const profile = getProfile();
+  const from = String(req.query.from ?? "");
+  const mine = db
+    .prepare("SELECT * FROM accounts WHERE id != ? ORDER BY sort, rowid")
+    .all(from)
+    .map((a) => {
+      const acc = toAccount(a, profile);
+      return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName };
+    });
+  // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이
+  const recent = db
+    .prepare(
+      `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite
+         FROM transfers t LEFT JOIN payees p ON p.bank_code = t.bank_code AND p.number = t.number
+        GROUP BY t.bank_code, t.number ORDER BY last_at DESC LIMIT 20`,
+    )
+    .all()
+    .filter((r) => !myAccountByNumber(r.bank_code, r.number))
+    .map((r) => ({
+      bank: bankInfo(bankByCode(r.bank_code)),
+      number: r.number,
+      holder: r.holder,
+      ...(r.payee_id && { payeeId: String(r.payee_id), favorite: !!r.favorite }),
+    }));
+  res.json({ mine, recent });
+});
+
+// mini 한도: 오늘/이번 달 mini에서 보낸 합계
+function miniSent(prefix) {
+  return db.prepare("SELECT COALESCE(SUM(amount), 0) AS s FROM transfers WHERE from_account_id = 'mini' AND at LIKE ?").get(`${prefix}%`).s;
+}
+
+app.post("/api/transfers", (req, res) => {
+  const { fromAccountId, bankCode, number, amount, memoTo, memoMe } = req.body ?? {};
+  const from = findAccount(fromAccountId);
+  const to = findRecipient(bankCode, number);
+  const fields = {};
+  if (!Number.isInteger(amount) || amount <= 0) fields.amount = "보낼 금액을 입력해 주세요";
+  else if (amount > 10_000_000) fields.amount = "한 번에 1천만원까지";
+  for (const [k, v] of Object.entries({ memoTo, memoMe }))
+    if (v !== undefined && (typeof v !== "string" || v.trim().length > 20)) fields[k] = "20자 이하";
+  if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
+  if (to.accountId === from.id) throw bad("같은 계좌로는 보낼 수 없어요");
+  if (from.balance < amount)
+    throw new HttpError(400, "INSUFFICIENT_BALANCE", `출금 가능 금액(${from.balance.toLocaleString("ko-KR")}원)을 넘었어요`);
+
+  const at = nowIso();
+  if (from.kind === "mini") {
+    if (miniSent(at.slice(0, 10)) + amount > MINI_LIMIT.daily) throw new HttpError(400, "LIMIT_EXCEEDED", "mini 하루 이체 한도(200,000원)를 넘었어요");
+    if (miniSent(at.slice(0, 7)) + amount > MINI_LIMIT.monthly) throw new HttpError(400, "LIMIT_EXCEEDED", "mini 한 달 이체 한도(1,000,000원)를 넘었어요");
+  }
+
+  const me = getProfile().userName;
+  const memoToText = memoTo?.trim() || me; // 받는 분 통장에 찍힐 이름 (기본: 내 이름)
+  const memoMeText = memoMe?.trim() || to.holder; // 내 통장에 찍힐 이름 (기본: 받는 분 이름)
+
+  // 출금 + (내 계좌면) 입금 + 이체 기록 → 하나라도 실패하면 전부 취소
+  const id = transaction(() => {
+    const insertTx = db.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES (?, ?, ?, ?, '#이체')");
+    const addBalance = db.prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?");
+    const out = insertTx.run(from.id, at, memoMeText, -amount).lastInsertRowid;
+    addBalance.run(-amount, from.id);
+    let inTx = null;
+    if (to.accountId) {
+      inTx = insertTx.run(to.accountId, at, memoToText, amount).lastInsertRowid;
+      addBalance.run(amount, to.accountId);
+    }
+    return db
+      .prepare(
+        "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, memo_to, memo_me, at, out_tx_id, in_tx_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      )
+      .run(from.id, to.bank.code, to.number, to.holder, amount, memoTo?.trim() || null, memoMe?.trim() || null, at, out, inTx).lastInsertRowid;
+  });
+  res.status(201).json({
+    id: String(id),
+    fromAccountId: from.id,
+    to,
+    amount,
+    at,
+    balanceAfter: findAccount(from.id).balance,
+  });
 });
 
 app.post("/api/reset", (_req, res) => {

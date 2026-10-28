@@ -13,9 +13,9 @@ src/
   dev-panel/   종 버튼 관리 패널 (모든 데이터 수정은 여기서만)
   assets/      Asset 슬롯 + Fluent 기본 에셋, local/(실제 에셋, 커밋 안 됨)
   hooks/       useAsync, useTypewriter, useScrollTop, useStatusBar
-  lib/         format.ts (금액 포맷, 날짜 그룹핑)
-  components/  PhoneFrame, TxList, Icon, art(로고/일러스트/스피너 SVG)
-  screens/     boot / home / account / history / tx / mini / bank(다른 은행 계좌)
+  lib/         format.ts (금액 포맷, 날짜 그룹핑) · keypad.ts (키패드 입력 계산)
+  components/  PhoneFrame, TxList, Icon, Sheet(시트·키패드·알림창), BankIcon, art(로고/일러스트/스피너 SVG)
+  screens/     boot / home / account / history / tx / mini / bank(다른 은행 계좌) / transfer(이체)
 ```
 
 **타이밍을 한 파일에 모은 이유**: 영상과 비교하며 속도를 맞출 때 컴포넌트를 돌아다니지 않고
@@ -290,6 +290,9 @@ ffmpeg만으로: 자르기(`crop`) → 확대(`lanczos`) → 원형 마스크(`g
 profile      (id=1, user_name, mini_account_no, card_last4)
 accounts     (id, kind: mini|main|external, bank_code, number, balance, badge, sort)
 transactions (id, account_id → accounts ON DELETE CASCADE, at, merchant, amount, tag)
+payees       (id, bank_code, number, holder, favorite, UNIQUE(bank_code, number))
+transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holder, amount, memo_to, memo_me, at,
+              out_tx_id → transactions SET NULL, in_tx_id → transactions SET NULL)
 ```
 - **CASCADE**: 다른 은행 계좌를 지우면 그 계좌의 거래도 DB가 알아서 같이 지움
 - **트랜잭션**: 거래 추가 = "거래 INSERT + 잔액 UPDATE" 두 문장. `transaction(fn)`으로 묶어서 둘 중 하나만 되는 일이 없게
@@ -308,6 +311,11 @@ transactions (id, account_id → accounts ON DELETE CASCADE, at, merchant, amoun
 | GET | `/api/accounts/:id/transactions` | 거래내역 (`?limit=`) | 200 |
 | POST | `/api/accounts/:id/transactions` | 입금/출금 만들기 | **201**, 400, 400(잔액 부족) |
 | GET / DELETE | `/api/transactions/:id` | 거래 상세 / 삭제(잔액 되돌림) | 200, **204**, 404 |
+| GET / POST | `/api/payees` | 받는 분 목록 / 등록 `{bankCode, number, holder}` | 200, **201**, 400, 409(중복·내 계좌) |
+| PATCH / DELETE | `/api/payees/:id` | 이름·번호·☆ 수정 / 삭제 | 200, **204** |
+| GET | `/api/transfer/recipients?from=` | 이체 첫 화면: 내 계좌 + 최근 이체 | 200 |
+| GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 | 200, **404**(ACCOUNT_NOT_FOUND) |
+| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?}` | **201**, 400(잔액 부족·한도 초과) |
 | POST | `/api/reset` | 초기 데이터로 | 204 |
 
 에러는 항상 `{ code, message, fields? }` 모양 → 패널이 `message`를 그대로 토스트로 띄움.
@@ -325,7 +333,8 @@ transactions (id, account_id → accounts ON DELETE CASCADE, at, merchant, amoun
 ### 🔔 관리 패널 — "버튼과 숫자 입력만"
 화면(홈, 계좌, 거래 상세)은 **보기 전용**이고, 바꾸는 건 전부 종 버튼 패널에서 합니다.
 - **기본**: Galaxy/iPhone, 시스템/라이트/다크, 이름·mini 계좌번호·카드 끝 4자리, 처음 상태로 되돌리기
-- **계좌**: 계좌를 눌러 펼치면 잔액 수정, 다른 은행이면 계좌번호 수정·삭제. 아래 은행 격자에서 골라 새 계좌 추가
+- **계좌**: 계좌를 눌러 펼치면 잔액 수정, 다른 은행이면 계좌번호 수정·삭제. 은행선택 목록(이체 화면과 같은 컴포넌트)에서 골라 새 계좌 추가
+- **받는 분**: 이체 때 계좌번호로 찾을 상대 계좌(은행·번호·예금주) 관리
 - **거래**: 계좌 칩 → 금액(+1천/+5천/+1만/+5만) → 거래처 칩 → 종류 → 입금하기/출금하기. 최근 거래 ✕로 삭제
 
 입력칸이 숫자만 받고 자동으로 `-`·`,`를 넣는 이유: "형식 맞추기"를 사용자에게 시키지 않기.
@@ -357,3 +366,39 @@ animation: cash-sweep 10s linear infinite;  /* 0~24%(2.4초)만 100%→0%로 이
 배너 이미지는 흰 배경째 잘려 있습니다. `mix-blend-mode: multiply`는 흰색을 투명처럼 만들어 주는데,
 **부모에 `will-change: transform`이 있으면 독립 레이어(투명 배경)가 생겨서 섞일 대상이 없어 효과가 사라집니다.**
 레이어에 배경색을 깔아서 해결. (결국 실제 앱 배경이 흰색이라 지금은 자연스럽게 맞음)
+
+## 14. 이체 — 예금주 조회와 "전부 아니면 전무" (`screens/transfer/`, `server/index.mjs`)
+
+### 화면 흐름 (영상 2026-10-28)
+```
+홈 [이체] ─▶ /transfer?from=mini        내 계좌 / 최근 이체 / [+ 계좌번호 직접입력]
+              └ 시트: 은행선택 → 계좌번호(키패드) → GET /api/transfer/lookup → 예금주 이름
+           ─▶ /transfer/amount (state: {from, to})   금액 키패드 → [다음] → 표기 2줄 → [다음] → 확인 시트
+           ─▶ POST /api/transfers ─▶ /transfer/done (replace)   [확인] = navigate(-2) → 홈
+```
+- **받는 분 정보는 주소가 아니라 `location.state`로** 넘김: 이름·은행·번호 묶음이라 URL에 넣기 번거롭고,
+  ScreenStack이 화면마다 자기 location을 들고 있어서 뒤로 갔다 와도 그대로 남음.
+  새로고침하면 state가 없으니 홈으로 돌려보냄
+- **완료 화면은 replace**: 완료 후 뒤로가기로 금액 화면에 돌아가 "한 번 더 보내기"가 되면 안 되니까.
+  기록이 [홈, 이체, 완료]가 되므로 확인 = `navigate(-2)`
+- **시트는 항상 DOM에 두고 transform으로만 올리고 내림** (`components/Sheet.tsx`) → 닫힐 때도 애니메이션.
+  시트가 열리면 `useStatusBar("#808080")`로 상태바까지 어둡게 (영상처럼)
+- **키패드 입력 계산은 순수 함수 하나**(`lib/keypad.ts`의 `applyKey`): 앞자리 0, 최대 길이, 지우기를 한 곳에서.
+  금액 화면(00 있음)과 계좌번호 시트(빈칸)가 같은 함수를 씀
+- **금액이 위아래로 안 움직이게**: "일 200,000원" 안내 줄이 사라져도 빈 줄로 자리를 남겨 둠
+
+### 예금주 조회를 어떻게 흉내 냈나
+진짜 은행은 계좌번호를 넣으면 금융결제원 망으로 상대 은행에 "이 계좌 주인 누구야?"를 물어봅니다.
+여기선 그 상대 은행 역할을 `payees` 표가 합니다. 🔔 패널에서 미리 등록한 계좌만 이름이 나오고,
+없으면 404 `ACCOUNT_NOT_FOUND` → "입력하신 계좌정보를 확인해 주세요". 내 계좌(mini·입출금·추가한 다른 은행)는 등록 없이 찾아짐.
+
+### 서버에서 꼭 다시 검사하는 것
+- 받는 분은 **화면이 보낸 이름을 믿지 않고** 서버가 (은행, 번호)로 다시 찾는다 → 이름 위조 불가
+- 잔액 부족, 같은 계좌로 보내기, 1천만원 초과, mini 하루 20만원/한 달 100만원 (`transfers`에서 오늘/이번 달 합계)
+- 출금 거래 + (내 계좌면) 입금 거래 + 잔액 두 군데 + 이체 기록 → **`transaction()` 하나로 묶음**.
+  중간에 하나라도 실패하면 전부 ROLLBACK → "돈은 빠졌는데 안 들어갔다"가 생길 수 없음
+- 통장에 찍히는 이름: 내 통장엔 `나에게 표기`(없으면 받는 분 이름), 받는 통장엔 `받는 분에게 표기`(없으면 내 이름)
+
+### 최근 이체 = 계산
+"최근 이체 목록"을 따로 저장하지 않고 `transfers`를 (은행, 번호)로 GROUP BY 해서 마지막 시각순으로 뽑음.
+☆는 받는 분(`payees.favorite`)에 저장 → 받는 분 등록이 지워진 상대는 별을 못 누름.

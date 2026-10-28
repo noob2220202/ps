@@ -24,7 +24,11 @@ import "./Home.css";
 // 상세에서 뒤로 왔을 땐 처음부터 완성된 화면.
 let booted = false;
 
-const stop = (e: MouseEvent) => e.stopPropagation();
+// 행 안의 "이체" 버튼: 행 클릭(상세로 이동)으로 번지지 않게 막고 이체 화면으로
+const stopThen = (fn: () => void) => (e: MouseEvent) => {
+  e.stopPropagation();
+  fn();
+};
 
 function Collapse({ open, children }: { open: boolean; children: ReactNode }) {
   return (
@@ -72,6 +76,8 @@ export function HomeScreen() {
     };
   }, [firstLoad]);
 
+  const toTransfer = (from: string) => stopThen(() => navigate(`/transfer?from=${from}`));
+
   // 누르면 행 위에 스피너가 잠깐 돌고 나서 이동 (영상 18초)
   const openWithSpinner = (id: string, to: string) => {
     setPressing(id);
@@ -114,7 +120,7 @@ export function HomeScreen() {
             <strong className="acct__balance">{won(mini.balance)}</strong>
             <span className="acct__sub acct__sub--beige">{mini.label}</span>
           </div>
-          <button className="pill-btn pill-btn--beige pressable" onClick={stop}>
+          <button className="pill-btn pill-btn--beige pressable" onClick={toTransfer(mini.id)}>
             이체
           </button>
         </div>
@@ -129,7 +135,7 @@ export function HomeScreen() {
                 <span className="outline-badge">{main.badge}</span>
               </span>
             </div>
-            <button className="pill-btn pressable" onClick={stop}>
+            <button className="pill-btn pressable" onClick={toTransfer(main.id)}>
               이체
             </button>
             {pressing === main.id && (
@@ -147,7 +153,7 @@ export function HomeScreen() {
                 <strong className="acct__balance">{banksResolved ? won(acc.balance) : "?원"}</strong>
                 <span className="acct__sub">{acc.label}</span>
               </div>
-              <button className="pill-btn pressable" onClick={stop}>
+              <button className="pill-btn pressable" onClick={toTransfer(acc.id)}>
                 이체
               </button>
             </div>

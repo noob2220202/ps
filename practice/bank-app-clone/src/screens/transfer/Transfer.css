@@ -1,0 +1,627 @@
+/* 영상(480px 폭 = 360dp) 기준으로 잰 값. 영상 px × 0.75 = CSS px */
+
+/* ---------- 이체 첫 화면 ---------- */
+.transfer {
+  background: #fff;
+  color: #1c1c1c;
+}
+.transfer__header {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+.transfer__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 0 22px;
+}
+.transfer__title h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+.transfer__ai {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.transfer__search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 18px 0;
+  padding: 0 0 8px 6px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #222;
+}
+.transfer__search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 15.5px;
+  color: #1c1c1c;
+}
+.transfer__search input::placeholder {
+  color: #b0b0b0;
+}
+.transfer__camera {
+  width: 52px;
+  height: 40px;
+  border-radius: 20px;
+  background: #f4f4f4;
+  display: grid;
+  place-items: center;
+  color: #111;
+}
+.transfer__tabs {
+  display: flex;
+  margin: 26px 18px 10px;
+}
+.transfer__tabs button {
+  flex: 1;
+  height: 25px;
+  border-radius: 13px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a8a8a;
+}
+.transfer__tabs button.on {
+  background: #f2f2f2;
+  color: #1c1c1c;
+}
+.transfer__section {
+  margin: 20px 22px 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.recipient {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px 10px 18px;
+  text-align: left;
+}
+.recipient__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.recipient__text strong {
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recipient__text strong .asset {
+  width: 16px;
+  height: 16px;
+}
+.recipient__text small {
+  font-size: 11px;
+  color: #8f8f8f;
+}
+.recipient__star {
+  color: #e9e9e9;
+  padding: 4px;
+}
+.recipient__star.on {
+  color: #ffc800;
+}
+.transfer__empty {
+  margin: 60px 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: #9a9a9a;
+  white-space: pre-line;
+}
+.transfer__spacer {
+  height: 96px; /* 아래 고정 버튼에 가리지 않게 */
+}
+.transfer__skel .recipient {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+/* 아래에 떠 있는 흰 카드 버튼 */
+.transfer__direct {
+  position: sticky;
+  bottom: 0;
+  padding: 0 16px calc(12px + var(--safe-bottom));
+  background: linear-gradient(to top, #fff 70%, rgba(255, 255, 255, 0));
+}
+.transfer__direct button {
+  width: 100%;
+  height: 56px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.1),
+    0 0 1px rgba(0, 0, 0, 0.12);
+  font-size: 14px;
+  font-weight: 700;
+}
+/* 목록이 짧아도 버튼은 화면 맨 아래 */
+.transfer {
+  display: flex;
+  flex-direction: column;
+}
+.transfer > .fade-in,
+.transfer > .transfer__empty,
+.transfer > .transfer__skel {
+  flex: 1 0 auto;
+}
+
+/* ---------- 은행선택 시트 ---------- */
+.bank-sheet {
+  height: calc(100% - 66px);
+}
+.bank-sheet__title {
+  margin: 34px 22px 18px;
+  font-size: 19px;
+  font-weight: 700;
+}
+.bank-sheet__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  margin: 0 18px 12px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: #f7f7f7;
+}
+.bank-sheet__search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+}
+.bank-sheet__search input::placeholder {
+  color: #a0a0a0;
+}
+.bank-sheet__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 18px 20px;
+  scrollbar-width: none;
+}
+.bank-sheet__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+}
+/* 은행과 증권사 사이 구분선 (영상) */
+.bank-sheet__grid + .bank-sheet__grid {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ececec;
+}
+.bank-sheet__item {
+  height: 48.5px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 14.5px;
+  text-align: left;
+  white-space: nowrap;
+}
+.bank-sheet__item:active {
+  opacity: 0.6;
+}
+
+/* ---------- 계좌번호 입력 시트 ---------- */
+.number-sheet {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 0 14px;
+}
+.number-sheet__bank {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 22px;
+  text-align: left;
+}
+.number-sheet__bank span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.number-sheet__bank strong {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14.5px;
+}
+.number-sheet__bank strong svg {
+  color: #777;
+}
+.number-sheet__bank small {
+  font-size: 11px;
+  color: #888;
+}
+.number-sheet__input {
+  height: 66px;
+  margin: 26px 16px 4px;
+  padding: 0 18px 0 22px;
+  border-radius: 12px;
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.number-sheet__placeholder {
+  font-weight: 500;
+  color: #b4b4b4;
+}
+.number-sheet__ok {
+  margin: 8px 15px 0;
+}
+
+/* 깜빡이는 입력 커서 */
+.caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: #222;
+  animation: caret-blink 1s steps(1) infinite;
+}
+.caret--big {
+  width: 2px;
+  height: 0.95em;
+  vertical-align: -0.08em;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------- 금액 입력 ---------- */
+.amount {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #1c1c1c;
+}
+.amount__header {
+  position: relative;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+.amount__to {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.amount__to strong {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.amount__to small {
+  font-size: 11px;
+  color: #888;
+}
+.amount__cancel {
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.amount__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+.amount__value {
+  font-size: 31px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.amount__value--empty {
+  color: #d6d6d6;
+  font-weight: 700;
+}
+.amount__hint {
+  margin: 30px 0 0;
+  font-size: 12px;
+  color: #333;
+}
+.amount__hint--error {
+  color: #ff4b4b;
+}
+.amount__bottom {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(15px + var(--safe-bottom));
+}
+.amount__source {
+  height: 40px;
+  margin: 0 28px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: #f6f6f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+.amount__source svg {
+  color: #aaa;
+}
+.amount__quick {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 13px 28px 8px;
+}
+.amount__quick button {
+  height: 28px;
+  border: 1px solid #e3e3e3;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.amount__quick button:active {
+  background: #f4f4f4;
+}
+.amount__memos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 11px 28px 0;
+  min-height: 327px; /* 키패드가 있던 자리만큼 → 버튼 위치 고정 */
+}
+.memo-row {
+  height: 45px;
+  padding: 0 18px;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.memo-row span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.memo-row em {
+  font-style: normal;
+}
+.memo-row__placeholder {
+  color: #9a9a9a;
+}
+.amount__next {
+  margin: 10px 15px 0;
+}
+.amount__sending {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 30;
+}
+
+/* 출금계좌 고르기 시트 */
+.pick-sheet__title {
+  margin: 28px 22px 10px;
+  font-size: 18px;
+}
+.pick-sheet__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px 18px;
+  overflow-y: auto;
+}
+.pick-sheet__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: left;
+}
+.pick-sheet__row span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pick-sheet__row strong {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.pick-sheet__row small {
+  font-size: 12px;
+  color: #888;
+}
+.pick-sheet__row.on {
+  background: #f6f6f6;
+}
+
+/* 표기 입력 시트 */
+.memo-sheet {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 22px 14px;
+}
+.memo-sheet__ok {
+  align-self: flex-end;
+  font-size: 14px;
+  font-weight: 700;
+}
+.memo-sheet label {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.memo-sheet__title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.memo-sheet__input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.memo-sheet__input input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 19px;
+  font-weight: 700;
+  color: #1c1c1c;
+}
+.memo-sheet__input input::placeholder {
+  color: #bdbdbd;
+}
+.memo-sheet__count {
+  align-self: flex-end;
+  margin-top: 30px;
+  font-size: 11.5px;
+  color: #999;
+}
+
+/* 이체 확인 시트 */
+.confirm-sheet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 34px 15px 14px;
+  text-align: center;
+}
+.confirm-sheet h2 {
+  margin: 20px 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.confirm-sheet p {
+  margin: 0 0 38px;
+  font-size: 11.5px;
+  color: #777;
+}
+.confirm-sheet__buttons {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 8px;
+}
+
+/* ---------- 완료 ---------- */
+.done {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #1c1c1c;
+}
+.done__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 26%;
+  text-align: center;
+}
+.done__check {
+  animation: done-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.done__check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: done-draw 380ms 220ms ease-out forwards;
+}
+@keyframes done-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+@keyframes done-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.done__body h1 {
+  margin: 22px 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.35;
+  animation: layer-fade 300ms 150ms both;
+}
+.done__amount {
+  color: #2f6ae0;
+}
+.done__account {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  font-size: 11.5px;
+  color: #8a8a8a;
+}
+.done__memo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 30px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  background: #f5f5f5;
+  font-size: 11px;
+  color: #999;
+}
+.done__bottom {
+  display: flex;
+  gap: 8px;
+  padding: 0 15px calc(15px + var(--safe-bottom));
+}
+.done__bottom .cta {
+  flex: 1;
+}
+.done__share {
+  width: 66px;
+  height: 56px;
+  border-radius: 12px;
+  background: #2e3a52;
+  color: #fff;
+  display: grid;
+  place-items: center;
+}

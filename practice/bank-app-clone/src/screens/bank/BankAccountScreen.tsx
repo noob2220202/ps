@@ -53,7 +53,9 @@ export function BankAccountScreen() {
             <span className="bank__number">{acc.number}</span>
             <strong className="bank__balance">{won(acc.balance)}</strong>
             <div className="bank__actions">
-              <button className="bank__btn pressable">이체하기</button>
+              <button className="bank__btn pressable" onClick={() => navigate(`/transfer?from=${accountId}`)}>
+                이체하기
+              </button>
               <button className="bank__btn pressable">가져오기</button>
             </div>
           </div>
