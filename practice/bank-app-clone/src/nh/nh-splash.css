@@ -1,0 +1,30 @@
+/* ---------- 시작 화면 ---------- */
+.nh-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.nh-splash--white {
+  background: #fff;
+}
+.nh-splash__nonghyup {
+  position: absolute;
+  top: 58px;
+}
+.nh-splash__tag {
+  margin: 0 0 6px;
+  font-size: 17px;
+  color: #e7e9ee;
+}
+.nh-splash__dots {
+  margin-top: 26px;
+}
+.nh-splash__ma {
+  position: absolute;
+  bottom: 56px;
+}
+.nh-splash__fallback-word {
+  font-size: 40px;
+  color: #fff;
+}

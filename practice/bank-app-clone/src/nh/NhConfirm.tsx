@@ -10,6 +10,7 @@ import { Icon } from "../components/icons/Icon";
 import { EditRow, NhBankIcon, NhDots, NhHeader, NhImg } from "./common";
 import { nhWon } from "./hangul";
 import type { NhConfirmState } from "./NhSend";
+import "./nh-confirm.css";
 
 export interface NhDoneState {
   result: TransferResult;

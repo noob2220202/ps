@@ -1,0 +1,170 @@
+/* ---------- 홈 ---------- */
+.nh-home {
+  padding-bottom: 30px;
+}
+.nh-home__top {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  height: 48px;
+  padding: 2px 8px 0;
+}
+.nh-home__account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 22px;
+  height: 36px;
+}
+.nh-home__name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.nh-home__tools {
+  display: flex;
+  color: #d5d8dd;
+}
+.nh-home__balance {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 0 22px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.nh-home__hero {
+  position: relative;
+  margin-top: 4px;
+  aspect-ratio: 720 / 422;
+}
+.nh-home__char {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+}
+.nh-home__char.poke {
+  animation: nh-poke 0.4s ease;
+}
+@keyframes nh-poke {
+  40% {
+    transform: scale(1.04, 0.96) translateY(4px);
+  }
+}
+.nh-home__char-hit {
+  position: absolute;
+  left: 120px;
+  top: 40px;
+  width: 120px;
+  height: 130px;
+}
+.nh-home__char-fallback {
+  font-size: 90px;
+}
+.nh-home__tip {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 8px 0 10px;
+  border-radius: 15px;
+  background: #fff;
+  color: #1c1c1c;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.nh-home__tip button {
+  display: grid;
+  color: #888 !important;
+}
+.nh-home__menu {
+  position: relative;
+  display: flex;
+  margin: 0 22px;
+  height: 90px;
+  border-radius: 16px;
+  background: var(--nh-card);
+}
+.nh-home__menu button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #e4e7eb;
+}
+.nh-home__koks {
+  display: flex;
+  gap: 11px;
+  margin: 26px 22px 0;
+}
+.nh-kok {
+  flex: 1;
+  position: relative;
+  height: 114px;
+  border-radius: 16px;
+  background: var(--nh-card);
+  text-align: left;
+}
+.nh-kok b {
+  position: absolute;
+  left: 15px;
+  top: 17px;
+  font-size: 14.5px;
+}
+.nh-kok__img {
+  position: absolute;
+  right: 20px;
+  bottom: 16px;
+}
+.nh-home__banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 19px 22px 0;
+  height: 104px;
+  padding: 0 4px 0 19px;
+  border-radius: 14px;
+  background: #e3effb;
+  color: #1d1d1f !important;
+  text-align: left;
+}
+.nh-home__banner small {
+  display: block;
+  font-size: 13.5px;
+  color: #555b63;
+}
+.nh-home__banner b {
+  display: block;
+  margin-top: 5px;
+  font-size: 15px;
+  line-height: 1.38;
+}
+.nh-home__bgset {
+  margin: 26px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  font-size: 13.5px;
+  color: var(--nh-sub);
+}
+.nh-home__bgset i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #dfe8ff;
+}

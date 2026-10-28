@@ -1,0 +1,44 @@
+/* 은행선택 */
+.nh-banks__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 22px 18px;
+  height: 46px;
+  padding: 0 4px 0 6px;
+  border-bottom: 1px solid var(--nh-line);
+  color: #e3e6ea;
+}
+.nh-banks__search input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+}
+.nh-banks__search input::placeholder {
+  color: var(--nh-sub);
+}
+.nh-banks__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 14px 18px 24px;
+}
+.nh-banks__grid button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 80px;
+  border-radius: 10px;
+  background: var(--nh-card);
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: center;
+  padding: 0 4px;
+}

@@ -8,6 +8,7 @@ import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo } from "./loading";
 import { NhImg } from "./common";
 import { nhWon } from "./hangul";
+import "./nh-txdetail.css";
 
 const MEMO_CHIPS = ["용돈", "식비", "회비", "생활비", "교통비", "월세"];
 

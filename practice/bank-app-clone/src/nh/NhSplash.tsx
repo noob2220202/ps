@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStatusBar } from "../hooks/useStatusBar";
 import { NhAppIcon, NhDots, NhImg } from "./common";
+import "./nh-splash.css";
 
 // 콕뱅크 시작 (녹화 0~4초): 흰 화면에 콕 아이콘 → 어두운 화면 "금융, 정보, 쇼핑을 한 번에 / NH콕뱅크" + 점 3개.
 // 실제 앱은 이다음 간편비밀번호 로그인이 있지만 연습용이라 건너뜀

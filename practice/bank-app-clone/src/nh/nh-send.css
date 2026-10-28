@@ -1,0 +1,166 @@
+/* ---------- 콕송금 (녹화1 17초 프레임에서 잰 값: 480px × 0.75, 상태바 25px 뺌) ---------- */
+.nh-send {
+  overflow: hidden;
+}
+.nh-send__from {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 16px 0 22px;
+}
+.nh-send__from > .nh-img {
+  margin-top: 7px;
+}
+.nh-send__from-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nh-send__from-text b {
+  font-size: 17px;
+  font-weight: 600;
+}
+.nh-send__from-text small,
+.nh-send__mini small {
+  font-size: 14px;
+  color: var(--nh-sub);
+}
+.nh-send__from > svg {
+  margin-top: 10px;
+  color: #c9ced6;
+}
+.nh-send__from-balance {
+  width: 100%;
+  text-align: right;
+  margin-top: 2px;
+  color: var(--nh-blue);
+  font-size: 15.5px;
+  font-weight: 700;
+}
+.nh-send__chev {
+  display: block;
+  margin: 26px auto 0;
+  color: var(--nh-teal);
+}
+.nh-send__who {
+  margin: 22px 0 22px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+}
+.nh-send__bank,
+.nh-send__number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 22px;
+  height: 46px;
+  padding: 0 6px 0 8px;
+  border-bottom: 1px solid var(--nh-line);
+  font-size: 17px;
+}
+.nh-send__bank {
+  margin-top: 14px;
+  font-weight: 600;
+}
+.nh-send__number {
+  color: var(--nh-sub);
+  font-size: 16.5px;
+}
+.nh-send__number > button:first-child {
+  flex: 1;
+  height: 100%;
+  text-align: left;
+  color: inherit;
+}
+.nh-send__number.filled {
+  color: #fff;
+  font-size: 16px;
+}
+.nh-send__quick {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 10px 22px 0 0;
+  font-size: 14px;
+  color: #c3c8d0 !important;
+}
+.nh-send__mini {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 4px 16px 0 22px;
+  color: #c9ced6;
+}
+.nh-send__mini span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nh-send__mini b {
+  color: var(--nh-blue);
+  font-size: 13.5px;
+}
+.nh-send__to {
+  padding: 12px 22px 0;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.nh-send__to p {
+  margin: 0;
+  color: #c9ced6;
+}
+.nh-send__to u {
+  color: #fff;
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+.nh-send__to small {
+  font-size: 13.5px;
+  color: var(--nh-sub);
+}
+.nh-send__how {
+  margin: 30px 0 14px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+.nh-send__amount-box {
+  margin: 0 22px;
+  height: 46px;
+  border-radius: 8px;
+  border: 1px solid var(--nh-line);
+  font-size: 18px;
+  font-weight: 700;
+}
+.nh-send__amount-box i {
+  font-style: normal;
+  color: #8a919c;
+}
+.nh-send__limit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 22px 0;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: var(--nh-card);
+  font-size: 13px;
+}
+.nh-send__limit span {
+  color: #d9dce1;
+}
+.nh-send__memo {
+  margin: 30px 22px 0;
+}
+.nh-send__more {
+  margin: 12px 22px 0;
+  text-align: right;
+  font-size: 12.5px;
+  color: var(--nh-sub);
+}

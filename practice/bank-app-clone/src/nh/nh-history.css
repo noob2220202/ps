@@ -1,0 +1,199 @@
+/* ---------- 계좌별 거래내역 ---------- */
+.nh-history__account {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px 14px 0 19px;
+}
+.nh-history__icon {
+  position: relative;
+  margin-top: 4px;
+}
+.nh-history__name {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nh-history__name b {
+  font-size: 16px;
+}
+.nh-history__name button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--nh-sub) !important;
+}
+.nh-history__dots {
+  font-size: 18px;
+  color: #c9ced6;
+}
+.nh-history__balance {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px 0;
+}
+.nh-history__balance b {
+  font-size: 20px;
+  font-weight: 800;
+}
+.nh-lock--ring {
+  width: 28px;
+  height: 28px;
+  background: none;
+  box-shadow: inset 0 0 0 1px #555c66;
+}
+.nh-history__chips {
+  display: flex;
+  gap: 8px;
+  padding: 22px 0 56px 19px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nh-history__chips button {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 17px;
+  background: #253141;
+  font-size: 14px;
+  color: #dfe2e7;
+}
+.nh-history__chips button.send {
+  background: #1b1d22;
+  box-shadow:
+    inset 0 0 0 1px #2c3038,
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  padding-left: 14px;
+}
+.nh-history__list {
+  position: relative;
+  flex: 1;
+  padding: 30px 0 30px;
+  background: #18171c;
+  /* 위쪽(계좌 영역)과 경계: 실제 앱은 목록 영역 위로 어두운 그림자 띠 */
+  box-shadow: 0 -10px 18px rgba(0, 0, 0, 0.45);
+}
+.nh-history__view {
+  position: absolute;
+  top: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  padding: 2px;
+  border-radius: 16px;
+  background: #253141;
+}
+.nh-history__view button {
+  width: 40px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #5f6b7b;
+}
+.nh-history__view button.on {
+  background: #18171c;
+  box-shadow: inset 0 0 0 1.5px #c9ced6;
+  color: #fff;
+}
+.nh-history__range {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% - 46px);
+  margin: 26px 23px 0;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 21px;
+  background: #253141;
+  font-size: 13px;
+}
+.nh-history__range span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nh-history__sort {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px 10px 25px;
+  font-size: 13.5px;
+}
+.nh-history__sort span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nh-tx {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 46px);
+  margin: 0 23px;
+  padding: 24px 0 22px;
+  border-bottom: 1px solid #262a31;
+  text-align: left;
+}
+.nh-tx__left,
+.nh-tx__right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nh-tx__right {
+  align-items: flex-end;
+}
+.nh-tx small {
+  font-size: 12.5px;
+  color: var(--nh-sub);
+}
+.nh-tx b {
+  font-size: 16px;
+  font-weight: 500;
+}
+.nh-tx__right b {
+  font-size: 18px;
+  font-weight: 800;
+}
+.nh-tx small.out {
+  color: var(--nh-red);
+}
+.nh-tx small.in,
+.nh-tx b.in {
+  color: var(--nh-blue);
+}
+.nh-pick {
+  padding: 0 0 20px;
+}
+.nh-pick button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 20px;
+  text-align: left;
+}
+.nh-pick button.on {
+  background: rgba(255, 255, 255, 0.05);
+}
+.nh-pick span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nh-pick small {
+  color: var(--nh-sub);
+  font-size: 12px;
+}
+.nh-pick em {
+  font-style: normal;
+  font-weight: 700;
+}

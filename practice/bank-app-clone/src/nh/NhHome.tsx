@@ -8,6 +8,7 @@ import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo } from "./loading";
 import { LockIcon, NhImg } from "./common";
 import { nhWon } from "./hangul";
+import "./nh-home.css";
 
 let tooltipClosed = false; // "콕! 눌러 캐릭터를 바꿔보세요" 한 번 닫으면 이번 세션 동안 안 보임
 

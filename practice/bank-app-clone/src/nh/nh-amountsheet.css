@@ -1,0 +1,46 @@
+/* 금액 시트 */
+.nh-amount__value {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+  height: 36px;
+  font-size: 22px;
+  font-weight: 800;
+}
+.nh-amount__value.error {
+  color: var(--nh-red);
+}
+.nh-amount__value.empty {
+  color: #6c7480;
+  font-weight: 700;
+}
+.nh-amount__value button {
+  display: grid;
+  margin-left: 8px;
+}
+.nh-amount__hint {
+  min-height: 16px;
+  margin: 4px 0 12px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--nh-sub);
+}
+.nh-amount__hint.error {
+  white-space: pre-line;
+  line-height: 1.4;
+}
+.nh-chips {
+  display: flex;
+  gap: 5px;
+  padding: 0 16px 6px;
+}
+.nh-chips button {
+  flex: 1;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #4a5361;
+  font-size: 11.5px;
+  color: #dfe2e7;
+}

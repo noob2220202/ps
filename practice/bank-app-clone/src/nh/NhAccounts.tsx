@@ -10,6 +10,8 @@ import { useNhGo } from "./loading";
 import { applyKey } from "../lib/keypad";
 import { BackArrowKey, NhAccountIcon, NhHeader } from "./common";
 import { nhWon } from "./hangul";
+import "./nh-accounts.css";
+import "./nh-numbersheet.css";
 
 // 전체계좌 조회: 계좌마다 카드 (이름·번호·잔액) + [거래내역][송금]. "넓게" 켜면 카드 사이 간격이 넓어짐
 export function NhAccounts() {

@@ -1,0 +1,35 @@
+/* 계좌번호 시트 */
+.nh-number__bank {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+}
+.nh-number__box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 22px 14px;
+  height: 52px;
+  border-radius: 8px;
+  border: 1.5px solid #3a4250;
+  font-size: 20px;
+  font-weight: 600;
+}
+.nh-number__box.on {
+  border-color: var(--nh-teal);
+}
+.nh-number__box i {
+  font-style: normal;
+  color: #7f8692;
+}
+.nh-number__box span + button {
+  margin-left: 8px;
+  display: grid;
+}
+.nh-number__box button svg,
+.nh-amount__value button svg {
+  width: 14px;
+  height: 14px;
+}

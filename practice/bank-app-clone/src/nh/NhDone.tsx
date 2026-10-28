@@ -8,6 +8,7 @@ import { NhImg } from "./common";
 import { nhWon } from "./hangul";
 import { Row } from "./NhConfirm";
 import type { NhDoneState } from "./NhConfirm";
+import "./nh-done.css";
 
 // 송금 완료 (녹화2 30~36초): 동전 "송금 할게요" → 초록 체크 "송금 했어요", 상세보기, 메시지 보내기, [☰][송금계속][확인]
 export function NhDone() {

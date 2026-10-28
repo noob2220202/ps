@@ -1,0 +1,112 @@
+/* ---------- 송금 완료 ---------- */
+.nh-done__body {
+  padding-top: 86px;
+  text-align: center;
+}
+.nh-done__mark {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+}
+.nh-done__mark > * {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transition:
+    transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1),
+    opacity 0.25s;
+}
+.nh-done__coin {
+  animation: nh-coin 0.9s ease-in-out infinite alternate;
+}
+@keyframes nh-coin {
+  to {
+    transform: rotateY(160deg);
+  }
+}
+.nh-done__check {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #6fe0ea, #1a9fb2);
+  opacity: 0;
+  transform: scale(0.4);
+}
+.nh-done__mark--done .nh-done__coin {
+  opacity: 0;
+  animation: none;
+}
+.nh-done__mark--done .nh-done__check {
+  opacity: 1;
+  transform: none;
+}
+.nh-done h2 {
+  margin: 22px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.nh-done__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--nh-sub) !important;
+}
+.nh-done__rows {
+  margin: 14px 20px 0;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: var(--nh-card);
+  text-align: left;
+}
+.nh-done__rows .nh-row {
+  font-size: 12.5px;
+  padding: 7px 0;
+}
+.nh-done__msg {
+  margin-top: auto;
+  padding-top: 30px;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+.nh-done__msg.hide {
+  opacity: 0;
+}
+.nh-done__msg p {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.nh-done__msg div {
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+}
+.nh-done__msg button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #d5d8dd !important;
+}
+.nh-bottom--done {
+  margin-top: 0;
+}
+.nh-done__menu {
+  flex: 0 0 42px !important;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+.nh-bottom--done .nh-btn {
+  height: 42px;
+  border-radius: 8px;
+  font-size: 14.5px;
+}

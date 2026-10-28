@@ -9,6 +9,7 @@ import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo } from "./loading";
 import { HomeLine, LockIcon, NhAccountIcon, NhImg } from "./common";
 import { nhWon } from "./hangul";
+import "./nh-history.css";
 
 type Filter = "all" | "in" | "out";
 const FILTER_LABEL: Record<Filter, string> = { all: "입출금", in: "입금", out: "출금" };
