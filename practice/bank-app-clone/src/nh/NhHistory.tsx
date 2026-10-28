@@ -6,6 +6,7 @@ import { useApi } from "../api/useApi";
 import { Icon } from "../components/icons/Icon";
 import { Sheet } from "../components/Sheet";
 import { useStatusBar } from "../hooks/useStatusBar";
+import { useNhGo } from "./loading";
 import { HomeLine, LockIcon, NhAccountIcon, NhImg } from "./common";
 import { nhWon } from "./hangul";
 
@@ -26,6 +27,7 @@ function monthRange() {
 export function NhHistory() {
   const { accountId = "main" } = useParams();
   const navigate = useNavigate();
+  const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
   const home = useApi<HomeData>(paths.home);
   const account = useApi<Account>(paths.account(accountId));
   const txs = useApi<Transaction[]>(paths.transactions(accountId));
@@ -51,7 +53,7 @@ export function NhHistory() {
           <button className="nh-icon-btn" aria-label="홈" onClick={() => navigate("/")}>
             <HomeLine />
           </button>
-          <button className="nh-icon-btn" aria-label="전체계좌" onClick={() => navigate("/accounts")}>
+          <button className="nh-icon-btn" aria-label="전체계좌" onClick={() => go("/accounts")}>
             <Icon name="menu" size={24} stroke={1.7} />
           </button>
         </span>
@@ -84,7 +86,7 @@ export function NhHistory() {
         <b>{a ? (hidden ? "잔액보기" : nhWon(a.balance)) : " "}</b>
       </div>
       <div className="nh-history__chips">
-        <button className="send" onClick={() => navigate(`/send?from=${accountId}`)}>
+        <button className="send" onClick={() => go(`/send?from=${accountId}`)}>
           <NhImg name="nh-chip-send" w={20} h={20} fallback={<span>🪙</span>} /> 송금
         </button>
         <button onClick={() => setFilter("out")}>송금한 내역</button>
@@ -117,7 +119,7 @@ export function NhHistory() {
           </span>
         </div>
         {rows.map((t) => (
-          <button key={t.id} className="nh-tx" onClick={() => navigate(`/tx/${t.id}`)}>
+          <button key={t.id} className="nh-tx" onClick={() => go(`/tx/${t.id}`)}>
             <span className="nh-tx__left">
               <small>{t.at.replace("T", " ").replaceAll("-", ".")}</small>
               <b>{t.merchant}</b>
@@ -141,7 +143,7 @@ export function NhHistory() {
               className={x.id === accountId ? "on" : ""}
               onClick={() => {
                 setPick(null);
-                if (x.id !== accountId) navigate(`/history/${x.id}`, { replace: true });
+                if (x.id !== accountId) go(`/history/${x.id}`, { replace: true });
               }}
             >
               <NhAccountIcon size={28} />

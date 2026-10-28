@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Icon } from "../components/icons/Icon";
 import { DevPanel } from "../dev-panel/DevPanel";
 import { useStatusBar } from "../hooks/useStatusBar";
+import { useNhGo } from "./loading";
 import { LockIcon, NhImg } from "./common";
 import { nhWon } from "./hangul";
 
@@ -14,7 +14,7 @@ let tooltipClosed = false; // "콕! 눌러 캐릭터를 바꿔보세요" 한 번
 // 콕뱅크 홈 (스크린샷 2026-10-28 9:48): 대표계좌 잔액, 캐릭터, 콕송금/내계좌조회/콕조르기/콕더치페이, 지식콕·금융콕, 배너
 export function NhHome() {
   useStatusBar("#18171c", "light");
-  const navigate = useNavigate();
+  const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
   const home = useApi<HomeData>(paths.home);
   const [panelOpen, setPanelOpen] = useState(false);
   const [tip, setTip] = useState(!tooltipClosed);
@@ -31,13 +31,13 @@ export function NhHome() {
           <button className="nh-icon-btn" aria-label="관리 패널" onClick={() => setPanelOpen(true)}>
             <Icon name="bell" size={23} stroke={1.7} />
           </button>
-          <button className="nh-icon-btn" aria-label="메뉴" onClick={() => navigate("/accounts")}>
+          <button className="nh-icon-btn" aria-label="메뉴" onClick={() => go("/accounts")}>
             <Icon name="menu" size={24} stroke={1.7} />
           </button>
         </div>
 
         <div className="nh-home__account">
-          <button className="nh-home__name" onClick={() => main && navigate(`/history/${main.id}`)}>
+          <button className="nh-home__name" onClick={() => main && go(`/history/${main.id}`)}>
             {main?.label ?? " "} <Icon name="chevron-down" size={18} stroke={2} />
           </button>
           <span className="nh-home__tools">
@@ -49,7 +49,7 @@ export function NhHome() {
             </button>
           </span>
         </div>
-        <button className="nh-home__balance" onClick={() => main && navigate(`/history/${main.id}`)}>
+        <button className="nh-home__balance" onClick={() => main && go(`/history/${main.id}`)}>
           <span className="nh-lock">
             <LockIcon size={17} />
           </span>
@@ -80,8 +80,8 @@ export function NhHome() {
         <nav className="nh-home__menu">
           {(
             [
-              ["send", "콕송금", () => main && navigate(`/send?from=${main.id}`), "⚡"],
-              ["myaccount", "내계좌조회", () => navigate("/accounts"), "🏦"],
+              ["send", "콕송금", () => main && go(`/send?from=${main.id}`), "⚡"],
+              ["myaccount", "내계좌조회", () => go("/accounts"), "🏦"],
               ["poke", "콕조르기", undefined, "💙"],
               ["dutch", "콕더치페이", undefined, "➗"],
             ] as const

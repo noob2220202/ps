@@ -68,6 +68,18 @@ def cutout_on(img, box, bg, tol=18, also=()):
     return Image.fromarray(a.astype(np.uint8))
 
 
+def circle(img, cx, cy, d):
+    """(cx, cy) 중심 지름 d 원만 남기고 바깥은 투명 (가장자리는 4배로 그려서 부드럽게)"""
+    r = d / 2
+    box = (round(cx - r) - 1, round(cy - r) - 1, round(cx + r) + 1, round(cy + r) + 1)
+    out = img.crop(box).convert("RGBA")
+    big = Image.new("L", (out.width * 4, out.height * 4), 0)
+    from PIL import ImageDraw
+    ImageDraw.Draw(big).ellipse([4 * (cx - r - box[0]), 4 * (cy - r - box[1]), 4 * (cx + r - box[0]), 4 * (cy + r - box[1])], fill=255)
+    out.putalpha(big.resize(out.size, Image.LANCZOS))
+    return out
+
+
 def main(args):
     OUT.mkdir(parents=True, exist_ok=True)
     if args.home:  # 홈 스크린샷 720px
@@ -95,6 +107,9 @@ def main(args):
             save(f.crop((118, 412, 362, 498)), "nh-wordmark.png")
             save(f.crop((196, 108, 284, 160)), "nh-nonghyup.png")  # 새로운 대한민국 농협
             save(f.crop((198, 896, 282, 952)), "nh-ma.png")
+            f = frame(args.video1, 17.5, tmp)  # 콕송금 최근송금 목록
+            save(circle(f, 52, 950, 45), "nh-bank.png")  # 목록의 농협 아이콘 (노란 동그라미)
+            save(cutout_on(f, (28, 124, 62, 157), PAGE, 20), "nh-account-plain.png")  # 출금계좌 아이콘 (별 없음)
         if args.video2:  # 녹화2: 송금 확인·완료
             f = frame(args.video2, 26.5, tmp)
             save(f.crop((204, 514, 276, 588)), "nh-shield.png")  # 시트 바탕(#2c3540) 그대로

@@ -6,6 +6,7 @@ import type { HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Dialog, Keypad } from "../components/Sheet";
 import { useStatusBar } from "../hooks/useStatusBar";
+import { useNhGo } from "./loading";
 import { applyKey } from "../lib/keypad";
 import { BackArrowKey, NhAccountIcon, NhHeader } from "./common";
 import { nhWon } from "./hangul";
@@ -13,6 +14,7 @@ import { nhWon } from "./hangul";
 // 전체계좌 조회: 계좌마다 카드 (이름·번호·잔액) + [거래내역][송금]. "넓게" 켜면 카드 사이 간격이 넓어짐
 export function NhAccounts() {
   const navigate = useNavigate();
+  const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
   const home = useApi<HomeData>(paths.home);
   const [wide, setWide] = useState(false);
   useStatusBar("#18171c", "light");
@@ -36,7 +38,7 @@ export function NhAccounts() {
       <div className={`nh-accounts__list ${wide ? "wide" : ""}`}>
         {accounts.map((a) => (
           <div key={a.id} className="nh-acard">
-            <button className="nh-acard__top" onClick={() => navigate(`/history/${a.id}`)}>
+            <button className="nh-acard__top" onClick={() => go(`/history/${a.id}`)}>
               <NhAccountIcon size={28} />
               <span>
                 <b>{a.label}</b>
@@ -45,12 +47,12 @@ export function NhAccounts() {
             </button>
             <p className="nh-acard__balance">{nhWon(a.balance)}</p>
             <div className="nh-acard__btns">
-              <button onClick={() => navigate(`/history/${a.id}`)}>거래내역</button>
-              <button onClick={() => navigate(`/send?from=${a.id}`)}>송금</button>
+              <button onClick={() => go(`/history/${a.id}`)}>거래내역</button>
+              <button onClick={() => go(`/send?from=${a.id}`)}>송금</button>
             </div>
           </div>
         ))}
-        <button className="nh-accounts__add" onClick={() => navigate("/register")}>
+        <button className="nh-accounts__add" onClick={() => go("/register")}>
           + 농협계좌 등록
         </button>
       </div>

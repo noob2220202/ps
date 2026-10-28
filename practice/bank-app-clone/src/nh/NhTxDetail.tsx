@@ -5,6 +5,7 @@ import type { TransactionDetail } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Icon } from "../components/icons/Icon";
 import { useStatusBar } from "../hooks/useStatusBar";
+import { useNhGo } from "./loading";
 import { NhImg } from "./common";
 import { nhWon } from "./hangul";
 
@@ -14,6 +15,7 @@ const MEMO_CHIPS = ["용돈", "식비", "회비", "생활비", "교통비", "월
 export function NhTxDetail() {
   const { txId = "" } = useParams();
   const navigate = useNavigate();
+  const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
   const tx = useApi<TransactionDetail>(paths.transaction(txId));
   const [memo, setMemo] = useState<string | null>(null); // null = 아직 안 고침 (서버 값 그대로)
   const [copied, setCopied] = useState(false);
@@ -30,7 +32,7 @@ export function NhTxDetail() {
 
   if (!t) return <div className="screen nh" />;
   const out = t.amount < 0;
-  const sendAgain = () => t.transfer && navigate(`/send?from=${t.accountId}&bank=${t.transfer.bank.code}&number=${t.transfer.number}`);
+  const sendAgain = () => t.transfer && go(`/send?from=${t.accountId}&bank=${t.transfer.bank.code}&number=${t.transfer.number}`);
 
   return (
     <div className="screen nh nh-txd">

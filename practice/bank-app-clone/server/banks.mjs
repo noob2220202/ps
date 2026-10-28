@@ -11,7 +11,8 @@ export const BANKS = [
   B("kb", "국민은행", "국민", "#766B66", [6, 2, 6]),
   B("ibk", "기업은행", "기업", "#09469E", [3, 6, 2, 3]),
   // 농협은 13자리(농협은행 3-4-4-2)와 14자리(지역 농축협 6-2-6) 두 가지
-  { ...B("nh", "농협은행", "농협", "#399F56", [3, 4, 4, 2]), alt: [6, 2, 6] },
+  // 농협: 13자리(352-0000-0000-00), 14자리 농축협(000000-00-000000), 11자리 농협은행(000-00-000000)
+  { ...B("nh", "농협은행", "농협", "#399F56", [3, 4, 4, 2]), alts: [[6, 2, 6], [3, 2, 6]] },
   B("shinhan", "신한은행", "신한", "#0740F5", [3, 3, 6]),
   B("im", "iM뱅크", "iM뱅크", "#08C5A3"),
   B("kdb", "산업은행", "산업", "#08337B"),
@@ -79,11 +80,12 @@ export const digitsOf = (raw) => String(raw ?? "").replace(/\D/g, "");
 // 은행 형식에 맞는 계좌번호인지. 틀리면 화면에 보여줄 메시지, 맞으면 null
 const sum = (p) => p.reduce((a, b) => a + b, 0);
 // 자리수에 맞는 형식 (농협처럼 형식이 두 가지인 은행이 있음)
-const patternFor = (bank, digits) => [bank.pattern, bank.alt].find((p) => p && sum(p) === digits.length) ?? bank.pattern;
+const patterns = (bank) => [bank.pattern, ...(bank.alts ?? [])].filter(Boolean);
+const patternFor = (bank, digits) => patterns(bank).find((p) => sum(p) === digits.length) ?? bank.pattern;
 
 export function checkNumber(bank, digits) {
   if (bank.pattern) {
-    const ok = [bank.pattern, bank.alt].filter(Boolean).map(sum);
+    const ok = patterns(bank).map(sum);
     return ok.includes(digits.length) ? null : `${bank.name} 계좌번호는 숫자 ${ok.join(" 또는 ")}자리예요`;
   }
   return digits.length >= 10 && digits.length <= 14 ? null : "계좌번호는 숫자 10~14자리예요";
@@ -106,4 +108,4 @@ export function formatAccountNumber(code, raw) {
 }
 
 // 응답에 넣을 은행 정보
-export const bankInfo = (bank) => ({ code: bank.code, name: bank.name, short: bank.short, color: bank.color, section: bank.section, ...(bank.pattern && { pattern: bank.pattern }), ...(bank.alt && { alt: bank.alt }) });
+export const bankInfo = (bank) => ({ code: bank.code, name: bank.name, short: bank.short, color: bank.color, section: bank.section, ...(bank.pattern && { pattern: bank.pattern }), ...(bank.alts && { alt: bank.alts[0] }) });

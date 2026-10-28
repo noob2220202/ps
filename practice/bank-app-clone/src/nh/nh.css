@@ -174,6 +174,65 @@
   display: flex;
   flex-direction: column;
 }
+/* 세로로 눌려 줄어들지 않게 (overflow가 있는 칸은 min-height가 0이라 내용보다 작아질 수 있음) */
+.screen.nh > * {
+  flex-shrink: 0;
+}
+.nh-bank-icon {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.nh-bank-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scale(1.1); /* 가장자리 흰 테두리를 원 밖으로 */
+}
+.nh-seg--box {
+  align-self: center;
+  padding: 2px;
+  border-radius: 20px;
+  background: #262d37;
+}
+.nh-seg--box button {
+  height: 38px;
+  padding: 0 22px;
+  border-radius: 19px;
+  font-size: 16.5px;
+  color: #e3e6ea;
+}
+.nh-pill-tabs {
+  display: flex;
+  margin: 0 18px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #253141;
+}
+.nh-pill-tabs button {
+  flex: 1;
+  height: 38px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #dfe2e7;
+}
+.nh-pill-tabs button.on {
+  background: #18171c;
+  box-shadow: inset 0 0 0 1px #2e3540;
+  color: #fff;
+  font-weight: 600;
+}
+/* 버튼 누른 뒤 다음 화면 전까지: 화면 전체 어둡게 + 점 3개 */
+.nh-loading--global {
+  background: rgba(0, 0, 0, 0.5);
+  animation: nh-fade 0.15s ease-out;
+}
+@keyframes nh-fade {
+  from {
+    opacity: 0;
+  }
+}
 .nh-purple {
   color: var(--nh-purple);
 }
@@ -600,7 +659,7 @@
   background: #dfe8ff;
 }
 
-/* ---------- 콕송금 ---------- */
+/* ---------- 콕송금 (녹화1 17초 프레임에서 잰 값: 480px × 0.75, 상태바 25px 뺌) ---------- */
 .nh-send {
   overflow: hidden;
 }
@@ -609,62 +668,68 @@
   align-items: flex-start;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 6px 16px 0 14px;
+  padding: 4px 16px 0 22px;
+}
+.nh-send__from > .nh-img {
+  margin-top: 7px;
 }
 .nh-send__from-text {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 .nh-send__from-text b {
-  font-size: 14px;
+  font-size: 17px;
+  font-weight: 600;
 }
 .nh-send__from-text small,
 .nh-send__mini small {
-  font-size: 11.5px;
+  font-size: 14px;
   color: var(--nh-sub);
 }
 .nh-send__from > svg {
-  margin-top: 4px;
-  color: var(--nh-sub);
+  margin-top: 10px;
+  color: #c9ced6;
 }
 .nh-send__from-balance {
   width: 100%;
   text-align: right;
-  margin-top: 4px;
+  margin-top: 2px;
   color: var(--nh-blue);
-  font-size: 13px;
+  font-size: 15.5px;
   font-weight: 700;
 }
 .nh-send__chev {
   display: block;
-  margin: 10px auto 0;
+  margin: 26px auto 0;
   color: var(--nh-teal);
 }
 .nh-send__who {
-  margin: 16px 0 18px;
+  margin: 22px 0 22px;
   text-align: center;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 700;
 }
-.nh-send__bank {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 18px 16px 0 20px;
-  height: 36px;
-  font-size: 14.5px;
-  font-weight: 700;
-}
+.nh-send__bank,
 .nh-send__number {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin: 4px 16px 0 20px;
-  height: 40px;
-  font-size: 14.5px;
+  margin: 0 22px;
+  height: 46px;
+  padding: 0 6px 0 8px;
+  border-bottom: 1px solid var(--nh-line);
+  font-size: 17px;
+}
+.nh-send__bank {
+  margin-top: 14px;
+  font-weight: 600;
+}
+.nh-send__number {
   color: var(--nh-sub);
+  font-size: 16.5px;
 }
 .nh-send__number > button:first-child {
   flex: 1;
@@ -678,63 +743,72 @@
 }
 .nh-send__quick {
   align-self: flex-end;
-  margin: 6px 16px 0 0;
-  font-size: 11.5px;
-  color: var(--nh-sub) !important;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 10px 22px 0 0;
+  font-size: 14px;
+  color: #c3c8d0 !important;
 }
 .nh-rlist {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  top: 375px;
+  top: 425px;
   z-index: 3;
   display: flex;
   flex-direction: column;
-  border-radius: 18px 18px 0 0;
+  border-radius: 20px 20px 0 0;
   background: var(--nh-sheet2);
   transition: top 0.32s cubic-bezier(0.2, 0.9, 0.25, 1);
 }
 .nh-rlist.open {
-  top: 60px;
+  top: 40px;
 }
 .nh-rlist__handle {
-  height: 22px;
+  height: 26px;
   flex-shrink: 0;
+  display: grid;
+  place-items: center;
 }
 .nh-rlist__handle::before {
   content: "";
-  display: block;
-  width: 32px;
+  width: 36px;
   height: 4px;
-  margin: 0 auto;
   border-radius: 2px;
   background: #4d5562;
 }
 .nh-rlist__tabs {
   display: flex;
-  margin: 0 18px;
+  margin: 6px 22px 0;
   padding: 3px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #151b23;
 }
 .nh-rlist__tabs button {
   flex: 1;
-  height: 32px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  color: #c3c8d0;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 15.5px;
+  color: #fff;
 }
 .nh-rlist__tabs button.on {
-  background: #2c3644;
-  color: #fff;
+  background: #18171c;
   font-weight: 700;
 }
 .nh-rlist__tools {
   display: flex;
   justify-content: space-between;
-  padding: 14px 20px 6px;
+  align-items: center;
+  padding: 16px 24px 6px;
   color: #c9ced6;
+}
+.nh-rlist__reg {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
 }
 .nh-rlist__rows {
   flex: 1;
@@ -744,56 +818,64 @@
 .nh-rlist__row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 11px 20px 11px 18px;
+  gap: 12px;
+  padding: 13px 22px 17px;
   cursor: pointer;
 }
 .nh-rlist__row:active {
   background: rgba(255, 255, 255, 0.04);
 }
-.nh-rlist__row > span {
+.nh-rlist__text {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 .nh-rlist__row b {
-  font-size: 13.5px;
+  font-size: 16.5px;
+  font-weight: 600;
 }
 .nh-rlist__row small {
-  font-size: 11.5px;
+  font-size: 14px;
   color: var(--nh-sub);
 }
 .nh-rlist__plus {
   align-self: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
   border-radius: 6px;
   background: #e8eaee;
   color: #1e2732 !important;
 }
+.nh-rlist__bal {
+  align-self: flex-end;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--nh-blue);
+}
 .nh-send__mini {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 4px 16px 0 14px;
-  color: var(--nh-sub);
+  padding: 4px 16px 0 22px;
+  color: #c9ced6;
 }
 .nh-send__mini span {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 .nh-send__mini b {
   color: var(--nh-blue);
-  font-size: 12px;
+  font-size: 13.5px;
 }
 .nh-send__to {
-  padding: 10px 14px 0;
-  font-size: 13.5px;
-  line-height: 1.5;
+  padding: 12px 22px 0;
+  font-size: 15px;
+  line-height: 1.55;
 }
 .nh-send__to p {
   margin: 0;
@@ -805,21 +887,21 @@
   text-underline-offset: 3px;
 }
 .nh-send__to small {
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--nh-sub);
 }
 .nh-send__how {
   margin: 30px 0 14px;
   text-align: center;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
 }
 .nh-send__amount-box {
-  margin: 0 16px;
-  height: 40px;
+  margin: 0 22px;
+  height: 46px;
   border-radius: 8px;
   border: 1px solid var(--nh-line);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
 }
 .nh-send__amount-box i {
@@ -830,29 +912,24 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 12px 16px 0;
-  height: 34px;
+  margin: 12px 22px 0;
+  height: 40px;
   padding: 0 14px;
   border-radius: 8px;
   background: var(--nh-card);
-  font-size: 12px;
+  font-size: 13px;
 }
 .nh-send__limit span {
   color: #d9dce1;
 }
 .nh-send__memo {
-  margin: 30px 16px 0;
+  margin: 30px 22px 0;
 }
 .nh-send__more {
-  margin: 12px 16px 0;
+  margin: 12px 22px 0;
   text-align: right;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--nh-sub);
-}
-.nh-send__busy {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
 }
 
 /* 계좌번호 시트 */
@@ -860,35 +937,29 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .nh-number__box {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 8px 16px 14px;
-  height: 46px;
+  margin: 8px 22px 14px;
+  height: 52px;
   border-radius: 8px;
-  border: 1.5px solid var(--nh-teal);
-  font-size: 18px;
+  border: 1.5px solid #3a4250;
+  font-size: 20px;
   font-weight: 600;
+}
+.nh-number__box.on {
+  border-color: var(--nh-teal);
 }
 .nh-number__box i {
   font-style: normal;
   color: #7f8692;
 }
-.nh-number__box button {
-  position: absolute;
-  right: 0;
-  left: 0;
-  margin: 0 auto;
-  width: 0;
-}
 .nh-number__box span + button {
-  position: static;
-  width: auto;
-  margin: 0 0 0 8px;
+  margin-left: 8px;
   display: grid;
 }
 .nh-number__box button svg,
@@ -908,6 +979,9 @@
   font-size: 22px;
   font-weight: 800;
 }
+.nh-amount__value.error {
+  color: var(--nh-red);
+}
 .nh-amount__value.empty {
   color: #6c7480;
   font-weight: 700;
@@ -920,11 +994,12 @@
   min-height: 16px;
   margin: 4px 0 12px;
   text-align: center;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--nh-sub);
 }
 .nh-amount__hint.error {
-  color: var(--nh-red);
+  white-space: pre-line;
+  line-height: 1.4;
 }
 .nh-chips {
   display: flex;
@@ -945,38 +1020,41 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 4px 16px 12px;
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 10px;
-  background: var(--nh-field);
-  color: var(--nh-sub);
+  margin: 8px 22px 18px;
+  height: 46px;
+  padding: 0 4px 0 6px;
+  border-bottom: 1px solid var(--nh-line);
+  color: #e3e6ea;
 }
 .nh-banks__search input {
   flex: 1;
+  min-width: 0;
   background: none;
   border: 0;
   outline: 0;
   color: #fff;
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
+}
+.nh-banks__search input::placeholder {
+  color: var(--nh-sub);
 }
 .nh-banks__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  padding: 16px;
+  padding: 14px 18px 24px;
 }
 .nh-banks__grid button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  height: 84px;
   justify-content: center;
+  gap: 7px;
+  height: 80px;
   border-radius: 10px;
   background: var(--nh-card);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.25;
   text-align: center;
   padding: 0 4px;
@@ -1322,7 +1400,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 26px 14px 0 19px;
+  padding: 20px 14px 0 19px;
 }
 .nh-history__icon {
   position: relative;
@@ -1368,7 +1446,7 @@
 .nh-history__chips {
   display: flex;
   gap: 8px;
-  padding: 22px 0 28px 19px;
+  padding: 22px 0 56px 19px;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -1394,13 +1472,14 @@
 .nh-history__list {
   position: relative;
   flex: 1;
-  padding: 26px 0 30px;
+  padding: 30px 0 30px;
   background: #18171c;
-  box-shadow: 0 -1px 0 #22262d;
+  /* 위쪽(계좌 영역)과 경계: 실제 앱은 목록 영역 위로 어두운 그림자 띠 */
+  box-shadow: 0 -10px 18px rgba(0, 0, 0, 0.45);
 }
 .nh-history__view {
   position: absolute;
-  top: -15px;
+  top: -17px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -1410,10 +1489,10 @@
 }
 .nh-history__view button {
   width: 40px;
-  height: 26px;
+  height: 31px;
   display: grid;
   place-items: center;
-  border-radius: 13px;
+  border-radius: 16px;
   color: #5f6b7b;
 }
 .nh-history__view button.on {
@@ -1426,10 +1505,10 @@
   justify-content: space-between;
   align-items: center;
   width: calc(100% - 46px);
-  margin: 18px 23px 0;
-  height: 40px;
+  margin: 26px 23px 0;
+  height: 42px;
   padding: 0 18px;
-  border-radius: 20px;
+  border-radius: 21px;
   background: #253141;
   font-size: 13px;
 }
@@ -1455,7 +1534,7 @@
   justify-content: space-between;
   width: calc(100% - 46px);
   margin: 0 23px;
-  padding: 18px 0;
+  padding: 24px 0 22px;
   border-bottom: 1px solid #262a31;
   text-align: left;
 }
@@ -1473,10 +1552,11 @@
   color: var(--nh-sub);
 }
 .nh-tx b {
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
 }
 .nh-tx__right b {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
 }
 .nh-tx small.out {

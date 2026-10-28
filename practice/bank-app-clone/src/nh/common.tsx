@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { localAsset } from "../assets/Asset";
+import type { Bank } from "../api/types";
+import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
+import { useNhLoading } from "./loading";
 import "./nh.css";
 
 // 콕뱅크 화면들이 같이 쓰는 조각. 이미지는 src/assets/local/nh-*.png (scripts/extract-nh.py) 가 있으면 그걸, 없으면 대체 그림
@@ -42,16 +45,48 @@ export function NhAppIcon({ size = 46 }: { size?: number }) {
   );
 }
 
-// 노란 농협 계좌 아이콘 (+ 대표계좌 별)
-export function NhAccountIcon({ size = 26 }: { size?: number }) {
+// 노란 농협 계좌 아이콘 (+ 대표계좌 별). plain: 별 없는 것 (콕송금 출금계좌)
+export function NhAccountIcon({ size = 26, plain = false }: { size?: number; plain?: boolean }) {
   return (
     <NhImg
-      name="nh-account"
+      name={plain && localAsset("nh-account-plain") ? "nh-account-plain" : "nh-account"}
       w={size}
       h={size}
       className="nh-account-icon"
       fallback={<span style={{ fontSize: size * 0.55 }}>🟡</span>}
     />
+  );
+}
+
+// 은행 동그라미 아이콘. 카카오뱅크에서 잘라 온 로고는 가장자리에 흰 테두리가 남아 있어서
+// 어두운 콕뱅크 화면에선 살짝 확대해서 원 밖으로 잘라냄. 농협은 콕뱅크의 노란 동그라미(nh-bank)
+export function NhBankIcon({ bank, size = 34 }: { bank: Bank; size?: number }) {
+  const logo = localAsset(bank.code === "nh" ? "nh-bank" : `bank-${bank.code}`);
+  if (!logo) return <BankIcon bank={bank} size={size} />;
+  return (
+    <span className="nh-bank-icon" style={{ width: size, height: size }}>
+      <img src={logo} alt={bank.name} draggable={false} />
+    </span>
+  );
+}
+
+// '빠른송금' 앞 아이콘: 회색 원호 + 노란 번개 (녹화에서 18px라 잘라 쓰면 흐려서 직접 그림)
+export function QuickSendIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+      <path d="M13.5 4.2A7 7 0 1 0 12 16.6" fill="none" stroke="#7d8794" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M14.6 6.5 10.8 11.6h2.6l-1.6 5.4 4.4-6.1h-2.7l1.4-4.4Z" fill="#ffc21a" />
+    </svg>
+  );
+}
+
+// 화면 전체를 어둡게 + 점 3개 (useNhGo / withNhLoading 이 켬). App이 콕뱅크일 때 한 장만 그림
+export function NhLoadingLayer() {
+  if (!useNhLoading()) return null;
+  return (
+    <div className="nh-loading nh-loading--global">
+      <NhDots size={9} />
+    </div>
   );
 }
 

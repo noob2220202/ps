@@ -112,6 +112,7 @@ export interface MyAccountRecipient {
   bank: Bank;
   number?: string;
   holder: string;
+  balance: number;
 }
 
 export interface TransferRecipients {

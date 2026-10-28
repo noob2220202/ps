@@ -452,16 +452,16 @@ function findRecipient(bankCode, number) {
 
 app.get("/api/transfer/lookup", (req, res) => res.json(findRecipient(req.query.bank, req.query.number)));
 
-// 이체 첫 화면: 내 계좌(보내는 계좌 빼고) + 최근 이체한 사람
+// 이체 첫 화면: 내 계좌(보내는 계좌 빼고 — 콕뱅크 '내계좌' 탭은 보내는 계좌도 잔액과 함께 보여줌) + 최근 이체한 사람
 app.get("/api/transfer/recipients", (req, res) => {
   const profile = getProfile();
   const from = String(req.query.from ?? "");
   const mine = db()
     .prepare("SELECT * FROM accounts WHERE id != ? ORDER BY sort, rowid")
-    .all(from)
+    .all(APP === "nh" ? "" : from)
     .map((a) => {
       const acc = toAccount(a, profile);
-      return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName };
+      return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName, balance: acc.balance };
     });
   // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이
   const recent = db()

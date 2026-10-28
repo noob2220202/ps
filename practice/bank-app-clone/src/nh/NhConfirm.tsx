@@ -6,10 +6,8 @@ import type { HomeData, TransferResult } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Dialog, Sheet } from "../components/Sheet";
 import { useStatusBar } from "../hooks/useStatusBar";
-import { nhShort } from "./banks";
-import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
-import { EditRow, NhDots, NhHeader, NhImg } from "./common";
+import { EditRow, NhBankIcon, NhDots, NhHeader, NhImg } from "./common";
 import { nhWon } from "./hangul";
 import type { NhConfirmState } from "./NhSend";
 
@@ -73,7 +71,7 @@ export function NhConfirm() {
           송금 할까요?
         </h2>
         <p className="nh-confirm__bank">
-          <BankIcon bank={to.bank} size={18} /> {nhShort(to.bank)}
+          <NhBankIcon bank={to.bank} size={18} /> {to.bank.name}
           {to.number}
         </p>
         <dl className="nh-box nh-confirm__from">
@@ -126,8 +124,8 @@ export function NhConfirm() {
         </button>
       </Sheet>
       {sending && (
-        <div className="nh-loading">
-          <NhDots size={11} />
+        <div className="nh-loading nh-loading--global">
+          <NhDots size={9} />
         </div>
       )}
       <Dialog message={error} onClose={() => setError(null)} />

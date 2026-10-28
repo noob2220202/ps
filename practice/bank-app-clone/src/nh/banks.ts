@@ -37,6 +37,21 @@ export function nhBankList(banks: Bank[], section: "bank" | "securities"): NhBan
   });
 }
 
-// 콕뱅크 목록의 짧은 은행 이름 ("농축협 000000-00-000000", "카카오 7777…", "하나 0000…")
-export const nhShort = (bank: Pick<Bank, "code" | "short">) =>
-  ({ nh: "농협은행", kakao: "카카오", toss: "토스뱅크", kbank: "케이뱅크" })[bank.code] ?? bank.short;
+// 콕뱅크 목록의 은행 이름 + 계좌번호 ("농협 505033-52-074088", "농협은행 637-12-454571", "카카오 7777…", "신한 1400…").
+// 농협만 하이픈을 넣음: 11자리는 "농협은행", 13·14자리는 "농협" (녹화1 17~20초 최근송금 목록)
+const NH_NAME: Record<string, string> = { kakao: "카카오", toss: "토스뱅크", kbank: "케이뱅크" };
+const NH_SHAPE: Record<number, number[]> = { 11: [3, 2, 6], 13: [3, 4, 4, 2], 14: [6, 2, 6] };
+
+export function nhNumber(number: string) {
+  const d = number.replace(/\D/g, "");
+  const shape = NH_SHAPE[d.length];
+  if (!shape) return d;
+  let i = 0;
+  return shape.map((n) => d.slice(i, (i += n))).join("-");
+}
+
+export function nhAccountLine(bank: Pick<Bank, "code" | "short">, number: string) {
+  const d = number.replace(/\D/g, "");
+  if (bank.code !== "nh") return `${NH_NAME[bank.code] ?? bank.short} ${d}`;
+  return `${d.length === 11 ? "농협은행" : "농협"} ${nhNumber(d)}`;
+}

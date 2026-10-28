@@ -17,6 +17,7 @@ import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
 import { ProfilePicker } from "./profile/ProfilePicker";
 import { APP, currentProfileId } from "./profile/session";
 import { NhSplash } from "./nh/NhSplash";
+import { NhLoadingLayer } from "./nh/common";
 import { NhHome } from "./nh/NhHome";
 import { NhSend } from "./nh/NhSend";
 import { NhConfirm } from "./nh/NhConfirm";
@@ -78,6 +79,7 @@ export default function App() {
         {boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
         {boot === "loading" && <BootLoading onDone={toReady} />}
         {boot === "ready" && <ScreenStack render={APP === "nh" ? renderNhRoute : renderRoute} />}
+        {APP === "nh" && <NhLoadingLayer />}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />

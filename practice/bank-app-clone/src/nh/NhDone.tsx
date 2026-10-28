@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useStatusBar } from "../hooks/useStatusBar";
+import { useNhGo } from "./loading";
 import { Icon } from "../components/icons/Icon";
-import { nhShort } from "./banks";
+import { nhAccountLine } from "./banks";
 import { NhImg } from "./common";
 import { nhWon } from "./hangul";
 import { Row } from "./NhConfirm";
@@ -11,6 +12,7 @@ import type { NhDoneState } from "./NhConfirm";
 // 송금 완료 (녹화2 30~36초): 동전 "송금 할게요" → 초록 체크 "송금 했어요", 상세보기, 메시지 보내기, [☰][송금계속][확인]
 export function NhDone() {
   const navigate = useNavigate();
+  const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
   const state = useLocation().state as NhDoneState | null;
   const [done, setDone] = useState(false);
   const [detail, setDetail] = useState(false);
@@ -49,7 +51,7 @@ export function NhDone() {
         )}
         {detail && (
           <dl className="nh-rows nh-done__rows">
-            <Row k="받는 분" v={`${nhShort(to.bank)} ${to.number}`} />
+            <Row k="받는 분" v={nhAccountLine(to.bank, to.number)} />
             <Row k="송금일시" v={result.at.replace("T", " ").replaceAll("-", ".")} />
             <Row k="받는계좌 표시" v={memoTo} />
             <Row k="내계좌 표시" v={memoMe} />
@@ -76,10 +78,10 @@ export function NhDone() {
         </div>
       </div>
       <div className="nh-bottom nh-bottom--done">
-        <button className="nh-btn nh-btn--line nh-done__menu" aria-label="메뉴" onClick={() => navigate(`/history/${result.fromAccountId}`)}>
+        <button className="nh-btn nh-btn--line nh-done__menu" aria-label="메뉴" onClick={() => go(`/history/${result.fromAccountId}`)}>
           <Icon name="menu" size={22} stroke={1.8} />
         </button>
-        <button className="nh-btn nh-btn--outline-purple" onClick={() => navigate(`/send?from=${result.fromAccountId}`, { replace: true })}>
+        <button className="nh-btn nh-btn--outline-purple" onClick={() => go(`/send?from=${result.fromAccountId}`, { replace: true })}>
           송금계속
         </button>
         <button className="nh-btn" onClick={() => navigate("/")}>
