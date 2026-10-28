@@ -470,18 +470,24 @@ React 상태가 아니라 DOM 속성이라 **새로고침 없이** 바로 바뀌
 
 폰 브라우저는 `getDisplayMedia`가 없어서 녹화 불가 → 버튼 대신 "폰 자체 화면녹화를 쓰세요" 안내.
 
-## 19. 두 번째 앱 (NH 콕뱅크) — 같은 서버, 다른 DB 파일 (`src/nh/`, `server/db.mjs`)
+## 19. 두 번째 앱 (NH 콕뱅크) — 같은 코드, 서버(포트)만 따로 (`src/nh/`, `server/db.mjs`)
 
-### 데이터: 앱마다 파일을 하나 더
-프로필마다 DB 파일을 나눈 방법(15번)을 한 번 더 썼습니다. 콕뱅크는 `profiles/<id>.nh.db`.
-화면은 요청에 `X-App: nh` 헤더를 붙이고(`api/client.ts`), 서버 미들웨어가 헤더를 보고 그 파일을 열어
-`runWithDb`로 넘깁니다. 그래서 **API 코드는 거의 그대로** — `/api/home`, `/api/transfers`가 두 앱에서 똑같이 동작하고
-데이터만 다릅니다. 앱마다 다른 것만 `db().app === "nh"`로 분기(1일 송금 한도, 받는 분 목록의 `dailyRemaining`).
-`SEEDS = { kakao: {...}, nh: {...} }` — 되돌리기(`/api/reset`)도 앱에 맞는 예시 데이터로.
+### 서버 하나 = 앱 하나
+처음엔 프로필 화면에서 앱을 고르고 `X-App` 헤더로 DB를 나눴는데, 두 앱을 **포트로 완전히 분리**하는 쪽으로 바꿨습니다.
+`APP=nh`(또는 `--app nh`)로 띄우면 그 서버는 콕뱅크만: 데이터 폴더가 `server/data-nh/`라서 프로필 목록부터 따로.
+**API 코드는 그대로** — `/api/home`, `/api/transfers`가 두 앱에서 똑같이 동작하고 데이터만 다릅니다.
+앱마다 다른 것만 `db().app === "nh"`로 분기(1일 송금 한도, 받는 분 목록의 `dailyRemaining`).
+`SEEDS = { kakao: {...}, nh: {...} }` — 새 프로필, 되돌리기(`/api/reset`), 첫 실행 예시 데이터가 앱에 맞게.
+
+### 화면은 빌드 하나 — 어느 앱인지는 서버가 HTML에 끼워 줌
+`npm run build` 결과(dist)는 두 서버가 같이 씁니다. 서버가 `index.html`을 줄 때
+`<script>window.__BANK_APP__ = "nh"</script>`를 넣고(`express.static(..., { index: false })`로 `/`도 직접 처리),
+화면은 `session.ts`의 `APP` 상수로 읽습니다. 개발 서버(Vite)엔 이 단계가 없어서 `npm run dev:nh`가 `VITE_APP=nh`를 넣어 줍니다.
+포트가 다르면 브라우저 입장에선 **다른 사이트(origin)** 라서 sessionStorage·localStorage(고른 프로필, 기기, 테마)도 저절로 따로.
 
 ### 화면: 라우트 묶음을 통째로 바꾸기
-`App.tsx`는 고른 앱에 따라 `ScreenStack`에 다른 `render` 함수(`renderRoute` / `renderNhRoute`)를 줍니다.
-`key={app}`을 붙여서 앱이 바뀌면 화면 기록도 새로 시작. 주소(`/send`, `/history/:id`)는 겹쳐도 됩니다 — 한 번에 한 앱만 그려지니까.
+`App.tsx`는 `APP`에 따라 `ScreenStack`에 다른 `render` 함수(`renderRoute` / `renderNhRoute`)를 줍니다.
+주소(`/send`, `/history/:id`)는 겹쳐도 됩니다 — 한 서버에선 한 앱만 그려지니까.
 
 ### 한 화면이 단계별로 바뀌는 송금 (`NhSend`)
 카카오뱅크 이체는 화면마다 주소가 달랐지만, 콕뱅크 영상은 **같은 화면의 위쪽이 바뀌고 시트가 올라오는** 구조라

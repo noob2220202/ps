@@ -15,7 +15,7 @@ import { TransferScreen } from "./screens/transfer/TransferScreen";
 import { AmountScreen } from "./screens/transfer/AmountScreen";
 import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
 import { ProfilePicker } from "./profile/ProfilePicker";
-import { currentApp, currentProfileId, type AppName } from "./profile/session";
+import { APP, currentProfileId } from "./profile/session";
 import { NhSplash } from "./nh/NhSplash";
 import { NhHome } from "./nh/NhHome";
 import { NhSend } from "./nh/NhSend";
@@ -43,7 +43,7 @@ const renderRoute = (location: Location) => (
   </Routes>
 );
 
-// NH 콕뱅크 (프로필 고르기에서 앱을 NH콕뱅크로 고르면). 데이터도 카카오뱅크와 따로
+// NH 콕뱅크 (APP=nh 로 띄운 서버, 9103). 데이터도 카카오뱅크와 따로
 const renderNhRoute = (location: Location) => (
   <Routes location={location}>
     <Route path="/" element={<NhHome />} />
@@ -63,9 +63,7 @@ const skipSplash = new URLSearchParams(location.search).has("skip");
 export default function App() {
   // 이번 세션에 고른 프로필이 없으면 프로필 고르기부터
   const [boot, setBoot] = useState<Boot>(!currentProfileId() ? "pick" : skipSplash ? "ready" : "splash");
-  const [app, setApp] = useState<AppName>(currentApp);
-  const toSplash = useCallback((picked: AppName) => {
-    setApp(picked);
+  const toSplash = useCallback(() => {
     prefetch(paths.home); // 스플래시 도는 동안 그 프로필의 홈 데이터를 미리 받아 둠
     setBoot(skipSplash ? "ready" : "splash");
   }, []);
@@ -77,9 +75,9 @@ export default function App() {
     <StatusBarProvider>
       <PhoneFrame>
         {boot === "pick" && <ProfilePicker onEnter={toSplash} />}
-        {boot === "splash" && (app === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
+        {boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
         {boot === "loading" && <BootLoading onDone={toReady} />}
-        {boot === "ready" && <ScreenStack key={app} render={app === "nh" ? renderNhRoute : renderRoute} />}
+        {boot === "ready" && <ScreenStack render={APP === "nh" ? renderNhRoute : renderRoute} />}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />

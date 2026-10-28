@@ -1,6 +1,6 @@
 import express from "express";
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -14,7 +14,7 @@ import {
   registry,
   removeProfileDb,
   runWithDb,
-  APPS,
+  APP,
   SEEDS,
   transaction,
 } from "./db.mjs";
@@ -136,7 +136,7 @@ app.post("/api/profiles", (req, res) => {
   if (registry.prepare("SELECT COUNT(*) AS n FROM profiles").get().n >= MAX_PROFILES) throw bad(`프로필은 ${MAX_PROFILES}개까지 만들 수 있어요`);
   const id = newProfileId();
   // 두 앱 모두 빈 상태로 (카카오뱅크 통장 0원 / 콕뱅크 자립예탁금 0원)
-  for (const app of APPS) SEEDS[app].empty(profileDb(id, app), String(name).trim());
+  SEEDS[APP].empty(profileDb(id), String(name).trim());
   registry
     .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))")
     .run(id, String(name).trim(), avatar, color);
@@ -168,10 +168,7 @@ app.use("/api", (req, _res, next) => {
   if (req.path === "/profiles" || req.path.startsWith("/profiles/")) return next();
   const id = req.get("X-Profile");
   if (!id) throw new HttpError(400, "PROFILE_REQUIRED", "프로필을 먼저 골라 주세요");
-  // X-App: nh 이면 같은 프로필의 콕뱅크 DB (없으면 카카오뱅크)
-  const app = req.get("X-App") ?? "kakao";
-  if (!APPS.includes(app)) throw bad("X-App은 kakao 또는 nh");
-  runWithDb(profileDb(findProfile(id).id, app), next);
+  runWithDb(profileDb(findProfile(id).id), next);
 });
 
 // ---------- 화면용 API ----------
@@ -554,11 +551,15 @@ app.use((err, _req, res, _next) => {
 // ---------- 빌드된 화면 제공 (npm run build 후) ----------
 const dist = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
 if (existsSync(dist)) {
-  app.use(express.static(dist));
+  // 화면은 두 앱이 같은 빌드를 쓰고, 어느 앱인지는 index.html에 끼워 넣어 알려준다 (window.__BANK_APP__)
+  const html = readFileSync(resolve(dist, "index.html"), "utf8")
+    .replace(/<title>.*<\/title>/, `<title>${APP === "nh" ? "NH콕뱅크" : "카카오뱅크"} 클론 연습</title>`)
+    .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};</script></head>`);
+  app.use(express.static(dist, { index: false })); // "/" 도 아래에서 (index.html을 그대로 주면 앱 정보가 빠짐)
   // /account/main 같은 주소로 바로 들어와도 index.html을 줘야 화면 쪽 라우터가 처리할 수 있다
-  app.get("/{*path}", (_req, res) => res.sendFile(resolve(dist, "index.html")));
+  app.get("/{*path}", (_req, res) => res.type("html").send(html));
 }
 
 const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : 9101));
-app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));
+const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : APP === "nh" ? 9103 : 9101));
+app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${APP}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));

@@ -12,7 +12,7 @@ import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { currentApp, currentProfileId, setCurrentProfile } from "../profile/session";
+import { APP, currentProfileId, setCurrentProfile } from "../profile/session";
 import "./DevPanel.css";
 
 // 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
@@ -131,7 +131,7 @@ function MoneyInput({ value, onChange, quick = [1000, 10000, 100000] }: { value:
 }
 
 // 콕뱅크는 대표계좌도 이름(자립예탁금 등)으로
-const accountName = (a: Account) => (a.kind !== "main" ? a.bank.name : currentApp() === "nh" ? a.label : "카카오뱅크 통장");
+const accountName = (a: Account) => (a.kind !== "main" ? a.bank.name : APP === "nh" ? a.label : "카카오뱅크 통장");
 
 // ---------- 기본: 기기 / 테마 / 내 정보 ----------
 function BasicTab({ run, onClose }: { run: Run; onClose: () => void }) {
@@ -273,7 +273,7 @@ function AccountsTab({ run }: { run: Run }) {
         <AccountEditor key={a.id} account={a} bank={banks.data.find((b) => b.code === a.bank?.code)} run={run} />
       ))}
       {/* 이번달 쓴 돈·캐시백은 카카오뱅크 홈에만 있음 */}
-      {currentApp() === "kakao" && (
+      {APP === "kakao" && (
         <>
           <h3 className="tab__h">카드</h3>
           <CardEditor key={`${home.data.profile.cardSpend}-${home.data.profile.cashbackCount}`} home={home.data} run={run} />
@@ -320,7 +320,7 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
           >
             잔액 저장
           </button>
-          {account.kind === "main" && currentApp() === "kakao" && (
+          {account.kind === "main" && APP === "kakao" && (
             <>
               <Field label="세이프박스 (홈 카드 아래 칩)">
                 <MoneyInput value={safebox} onChange={setSafeDraft} quick={[10000, 100000, 1000000]} />

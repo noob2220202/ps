@@ -19,22 +19,12 @@ export function setCurrentProfile(id: string | null) {
   }
 }
 
-// 어느 앱으로 들어왔는지 (프로필 고르기 화면에서 선택). 데이터는 앱마다 따로 → 요청에 X-App 헤더로 알림
+// 이 서버가 어느 앱인지. 서버 하나는 앱 하나만 연다 (카카오뱅크 9101, 콕뱅크 9103 — 데이터도 따로)
+// 배포 땐 서버가 index.html에 window.__BANK_APP__ 을 넣어 주고, 개발 땐 VITE_APP=nh (npm run dev:nh)
 export type AppName = "kakao" | "nh";
-const APP_KEY = "app";
-
-export function currentApp(): AppName {
-  try {
-    return sessionStorage.getItem(APP_KEY) === "nh" ? "nh" : "kakao";
-  } catch {
-    return "kakao";
+declare global {
+  interface Window {
+    __BANK_APP__?: AppName;
   }
 }
-
-export function setCurrentApp(app: AppName) {
-  try {
-    sessionStorage.setItem(APP_KEY, app);
-  } catch {
-    // 이번 페이지에서만
-  }
-}
+export const APP: AppName = (window.__BANK_APP__ ?? import.meta.env.VITE_APP) === "nh" ? "nh" : "kakao";

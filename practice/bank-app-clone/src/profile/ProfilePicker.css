@@ -28,7 +28,7 @@
   display: grid;
   grid-template-columns: repeat(2, 120px);
   gap: 26px 34px;
-  margin-top: 30px;
+  margin-top: 44px;
 }
 .picker__item {
   display: flex;
@@ -158,44 +158,4 @@
   font-size: 14px;
   font-weight: 600;
   color: #e5484d;
-}
-
-/* 앱 고르기: 카카오뱅크 / NH콕뱅크 */
-.picker__apps {
-  display: flex;
-  gap: 4px;
-  margin-top: 22px;
-  padding: 4px;
-  border-radius: 14px;
-  background: var(--home-btn);
-}
-.picker__apps button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--home-sub);
-}
-.picker__apps button.on {
-  background: var(--home-card);
-  color: var(--home-text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-}
-.picker__apps img {
-  border-radius: 6px;
-  object-fit: contain;
-}
-.picker__nh-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  background: #1aa58a;
-  color: #fff;
-  font-size: 10px;
-  display: grid;
-  place-items: center;
 }

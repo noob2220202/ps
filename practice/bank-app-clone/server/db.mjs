@@ -8,11 +8,16 @@ import { fileURLToPath } from "node:url";
 // SQLite 데이터베이스. Node 22에 내장된 node:sqlite 를 써서 따로 설치할 게 없다.
 // 넷플릭스 프로필처럼 프로필마다 DB 파일이 따로 있다 → 계좌·거래·받는 분이 서로 섞이지 않음
 //   server/data/app.db             프로필 목록 (이름, 아바타, 갤럭시/아이폰·테마 설정)
-//   server/data/profiles/<id>.db   그 프로필의 카카오뱅크 데이터
-//   server/data/profiles/<id>.nh.db  그 프로필의 NH 콕뱅크 데이터 (두 앱은 서로 따로. 표 모양은 같아서 API를 같이 씀)
+//   server/data/profiles/<id>.db   그 프로필의 은행 데이터
+// 서버 하나는 앱 하나만: 기본은 카카오뱅크, APP=nh (또는 --app nh) 면 NH 콕뱅크.
+// 콕뱅크 서버는 데이터 폴더도 따로 (server/data-nh/ — 프로필 목록부터 전부 따로). 표 모양은 같아서 API는 같이 씀
 // (.gitignore 처리 — 내 데이터는 내 서버에만)
+export const APPS = ["kakao", "nh"];
+const appArg = process.argv.indexOf("--app");
+export const APP = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
+if (!APPS.includes(APP)) throw new Error(`APP은 kakao 또는 nh (지금: ${APP})`);
 const here = dirname(fileURLToPath(import.meta.url));
-const DATA = process.env.DATA_DIR ?? resolve(here, "data");
+const DATA = process.env.DATA_DIR ?? resolve(here, APP === "nh" ? "data-nh" : "data");
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });
 
 // ---------- 프로필 목록 ----------
@@ -37,8 +42,7 @@ export const newProfileId = () => `p${randomUUID().replaceAll("-", "").slice(0, 
 
 // id가 파일 이름이 되므로 형식을 꼭 검사 ("../../etc/passwd" 같은 값으로 다른 파일을 열지 못하게)
 export const isProfileId = (id) => typeof id === "string" && /^p[0-9a-f]{8}$/.test(id);
-export const APPS = ["kakao", "nh"];
-const profileFile = (id, app = "kakao") => resolve(DATA, "profiles", app === "nh" ? `${id}.nh.db` : `${id}.db`);
+const profileFile = (id) => resolve(DATA, "profiles", `${id}.db`);
 
 // ---------- 프로필별 은행 DB ----------
 const SCHEMA = `
@@ -101,30 +105,25 @@ const SCHEMA = `
 
 const opened = new Map(); // 열어 둔 DB 연결 재사용 (요청마다 파일을 열면 느림)
 
-// app: "kakao" | "nh". 처음 여는 콕뱅크 DB는 예시 데이터로 채운다 (새 프로필은 만들 때 빈 상태로 미리 채움)
-export function profileDb(id, app = "kakao") {
-  if (!isProfileId(id) || !APPS.includes(app)) throw new Error(`bad profile: ${id} ${app}`);
-  const key = `${id}:${app}`;
-  let d = opened.get(key);
+export function profileDb(id) {
+  if (!isProfileId(id)) throw new Error(`bad profile: ${id}`);
+  let d = opened.get(id);
   if (!d) {
-    d = new DatabaseSync(profileFile(id, app));
+    d = new DatabaseSync(profileFile(id));
     d.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;");
     d.exec(SCHEMA);
     migrate(d);
-    d.app = app; // 어느 앱 DB인지 (송금 한도 등 앱마다 다른 규칙에 씀)
-    opened.set(key, d);
-    if (app === "nh" && !d.prepare("SELECT 1 FROM profile").get()) seedNhExample(d);
+    d.app = APP; // 어느 앱 DB인지 (송금 한도 등 앱마다 다른 규칙에 씀)
+    opened.set(id, d);
   }
   return d;
 }
 
 export function removeProfileDb(id) {
   if (!isProfileId(id)) return;
-  for (const app of APPS) {
-    opened.get(`${id}:${app}`)?.close();
-    opened.delete(`${id}:${app}`);
-    for (const ext of ["", "-wal", "-shm"]) rmSync(profileFile(id, app) + ext, { force: true });
-  }
+  opened.get(id)?.close();
+  opened.delete(id);
+  for (const ext of ["", "-wal", "-shm"]) rmSync(profileFile(id) + ext, { force: true });
 }
 
 // 지금 요청이 쓰는 DB. 서버가 요청마다 runWithDb(그 프로필 DB, ...)로 감싸 두면
@@ -315,9 +314,9 @@ export const SEEDS = {
 if (!registry.prepare("SELECT 1 FROM profiles").get()) {
   const id = newProfileId();
   const legacy = resolve(DATA, "bank.db");
-  if (existsSync(legacy)) for (const ext of ["", "-wal", "-shm"]) if (existsSync(legacy + ext)) renameSync(legacy + ext, profileFile(id) + ext);
+  if (APP === "kakao" && existsSync(legacy)) for (const ext of ["", "-wal", "-shm"]) if (existsSync(legacy + ext)) renameSync(legacy + ext, profileFile(id) + ext);
   const d = profileDb(id);
-  if (!d.prepare("SELECT 1 FROM profile").get()) seedExample(d);
+  if (!d.prepare("SELECT 1 FROM profile").get()) SEEDS[APP].example(d, "홍길동");
   const name = d.prepare("SELECT user_name FROM profile").get().user_name;
   registry
     .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, 'boy', ?, datetime('now', 'localtime'))")

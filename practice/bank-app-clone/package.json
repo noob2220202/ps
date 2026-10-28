@@ -7,8 +7,10 @@
     "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "node --watch --disable-warning=ExperimentalWarning server/index.mjs --port 8787",
     "dev:web": "vite",
+    "dev:nh": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app nh --port 8788\" \"vite --mode nh --port 5174\"",
     "build": "tsc -b && vite build",
     "start": "node --disable-warning=ExperimentalWarning server/index.mjs",
+    "start:nh": "node --disable-warning=ExperimentalWarning server/index.mjs --app nh",
     "lint": "oxlint"
   },
   "dependencies": {
