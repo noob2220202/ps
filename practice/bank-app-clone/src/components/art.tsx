@@ -1,13 +1,15 @@
 import "./art.css";
 
+// 카카오뱅크 B. 실제 앱 아이콘을 8배로 키워 줄마다 잰 윤곽(70×88 기준)으로 그림:
+// 위·아래 배가 똑같이 꽉 차고(오른쪽 끝 70), 가운데 허리만 60까지 들어감. 세로 홈은 두 배를 길게 관통
 export function BMark({ size = 70, color = "#000", hole = "var(--yellow)" }: { size?: number; color?: string; hole?: string }) {
   return (
     <svg width={size} height={(size * 88) / 70} viewBox="0 0 70 88" aria-hidden>
       <path
         fill={color}
-        d="M0 5a5 5 0 0 1 5-5h40c9 0 15 6 15 15v14c0 6-3 10-7 12 10 3 17 10 17 22v6c0 13-9 19-22 19H5a5 5 0 0 1-5-5Z"
+        d="M4 0H46C60 0 70 9 70 21V27C70 35 65 40 60.5 43.8C65 47.5 70 52 70 60V66C70 79 60 88 47 88H4Q0 88 0 84V4Q0 0 4 0Z"
       />
-      <rect x="27" y="20" width="9" height="40" rx="1" fill={hole} />
+      <rect x="28.5" y="23" width="9.2" height="42" rx="0.6" fill={hole} />
     </svg>
   );
 }
