@@ -126,7 +126,7 @@ function MoneyInput({ value, onChange, quick = [1000, 10000, 100000] }: { value:
   );
 }
 
-const accountName = (a: Account) => (a.kind === "main" ? "입출금통장" : a.kind === "mini" ? "mini" : a.bank?.name ?? a.label);
+const accountName = (a: Account) => (a.kind === "main" ? "카카오뱅크 통장" : a.bank.name);
 
 // ---------- 기본: 기기 / 테마 / 내 정보 ----------
 function BasicTab({ run }: { run: Run }) {
@@ -137,7 +137,6 @@ function BasicTab({ run }: { run: Run }) {
 
 function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
   const [name, setName] = useState(initial.profile.userName);
-  const [miniNo, setMiniNo] = useState(initial.profile.miniAccountNo);
   const [card, setCard] = useState(initial.profile.cardLast4);
   // 기기/테마는 앱 전체가 처음 켤 때 정해지므로 저장 후 다시 연다
   const reopen = (query: string) => location.assign(`/?${query}&skip`);
@@ -155,13 +154,10 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
       <Field label="이름">
         <input value={name} onChange={(e) => setName(e.target.value)} maxLength={10} />
       </Field>
-      <Field label="mini 계좌번호">
-        <input value={miniNo} inputMode="numeric" onChange={(e) => setMiniNo(formatAccountNumber([4, 2, 7], e.target.value))} placeholder="0000-00-0000000" />
-      </Field>
       <Field label="카드 끝 4자리">
         <input value={card} inputMode="numeric" maxLength={4} onChange={(e) => setCard(e.target.value.replace(/\D/g, ""))} />
       </Field>
-      <button className="btn" onClick={() => run(() => api.updateProfile({ userName: name, miniAccountNo: miniNo, cardLast4: card }), "내 정보를 저장했어요")}>
+      <button className="btn" onClick={() => run(() => api.updateProfile({ userName: name, cardLast4: card }), "내 정보를 저장했어요")}>
         저장
       </button>
 
@@ -197,6 +193,8 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   // (effect로 서버 값을 state에 복사하지 않아도 거래가 추가되면 자동으로 최신 잔액이 보임)
   const [draft, setDraft] = useState<number | null>(null);
   const balance = draft ?? account.balance;
+  const [safeDraft, setSafeDraft] = useState<number | null>(null);
+  const safebox = safeDraft ?? account.safebox ?? 0;
   const [number, setNumber] = useState(account.number ?? "");
   const [openEdit, setOpenEdit] = useState(false);
 
@@ -225,6 +223,21 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
           >
             잔액 저장
           </button>
+          {account.kind === "main" && (
+            <>
+              <Field label="세이프박스 (홈 카드 아래 칩)">
+                <MoneyInput value={safebox} onChange={setSafeDraft} quick={[10000, 100000, 1000000]} />
+              </Field>
+              <button
+                className="btn btn--sm"
+                onClick={async () => {
+                  if (await run(() => api.updateAccount(account.id, { safebox }), "세이프박스 금액을 바꿨어요")) setSafeDraft(null);
+                }}
+              >
+                세이프박스 저장
+              </button>
+            </>
+          )}
           {external && (
             <>
               <Field label="계좌번호">
@@ -288,7 +301,7 @@ function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
 
   return (
     <div className="add-bank">
-      {/* 카카오뱅크 계좌는 mini·입출금통장이라 여기선 뺀다 */}
+      {/* 카카오뱅크 통장은 이미 있으니 여기선 뺀다 */}
       <BankSelect
         banks={banks}
         value={bank}

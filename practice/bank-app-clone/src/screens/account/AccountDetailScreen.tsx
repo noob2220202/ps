@@ -9,9 +9,9 @@ import { useStatusBar } from "../../hooks/useStatusBar";
 import { useTypewriter } from "../../hooks/useTypewriter";
 import { won } from "../../lib/format";
 import { Asset } from "../../assets/Asset";
-import { Icon } from "../../components/icons/Icon";
 import { BackButton, GearButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
+import { BMark } from "../../components/art";
 import "./AccountDetail.css";
 
 // 타이핑은 글자마다 state가 바뀐다. 화면 컴포넌트에서 바로 쓰면 한 글자마다 화면 "전체"가
@@ -99,10 +99,12 @@ export function AccountDetailScreen() {
 
       <section className="balance-card">
         <div className="balance-card__top">
-          <Asset slot="hand-tile" />
+          <span className="balance-card__icon">
+            <BMark size={17} color="#1c1c1c" hole="var(--yellow)" />
+          </span>
           <div>
             <div className="balance-card__meta">
-              <Asset slot="star" />
+              <span>{account.data.label}</span>
               <span className="outline-badge outline-badge--light">계좌번호</span>
             </div>
             <strong className="balance-card__amount">{won(account.data.balance)}</strong>
@@ -126,21 +128,6 @@ export function AccountDetailScreen() {
         onSelect={(tx) => navigate(`/account/${accountId}/tx/${tx.id}`, { state: { tx } })}
       />
 
-      <div className="section-head">
-        <h2>모임 관리</h2>
-      </div>
-      <section className="moim-card">
-        <button className="moim-card__row row-press">
-          <Asset slot="moim-member" />
-          <span className="moim-card__label">모임 멤버</span>
-          <span className="moim-card__value">2명 참여 중</span>
-        </button>
-        <button className="moim-card__row row-press">
-          <Asset slot="moim-dues" />
-          <span className="moim-card__label">회비 입금현황</span>
-          <Icon name="chevron-right" size={16} className="moim-card__chev" />
-        </button>
-      </section>
     </div>
   );
 }

@@ -23,7 +23,7 @@ const QUICK: [string, number][] = [
   ["+10만", 100_000],
 ];
 
-// "홍길동 mini (0000) : 0원" — 계좌번호 끝 4자리
+// "홍길동의 통장 (0000) : 0원" — 계좌번호 끝 4자리
 const sourceText = (a: Account) => `${a.label} (${(a.number ?? "").replace(/\D/g, "").slice(-4)}) : ${won(a.balance)}`;
 
 type SheetName = "from" | "memoTo" | "memoMe" | "confirm" | null;
@@ -103,11 +103,7 @@ export function AmountScreen() {
         )}
         {/* 안내 줄은 비어 있어도 자리를 차지 → 금액이 위아래로 움직이지 않게 */}
         <p className={`amount__hint ${over ? "amount__hint--error" : ""}`}>
-          {over
-            ? `출금 가능 금액(${won(from!.balance)})을 넘었어요`
-            : !amount && from?.limit
-              ? `일 ${nf.format(from.limit.daily)}원 (월 ${nf.format(from.limit.monthly)}원)`
-              : "\u00a0"}
+          {over ? `출금 가능 금액(${won(from!.balance)})을 넘었어요` : "\u00a0"}
         </p>
       </div>
 

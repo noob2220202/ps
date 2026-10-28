@@ -13,6 +13,7 @@ import { THEME } from "../../platform/theme";
 import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { Spinner } from "../../components/Spinner";
+import { BMark } from "../../components/art";
 import { BankIcon } from "../../components/BankIcon";
 import { AiPill } from "./AiPill";
 import { BannerCarousel } from "./BannerCarousel";
@@ -93,7 +94,6 @@ export function HomeScreen() {
   if (home.status === "loading") return <div className="home" />;
   const data = home.data;
   // 계좌 종류별로 나눠서 그린다 (다른 은행 계좌는 몇 개든 가능)
-  const mini = data.accounts.find((a) => a.kind === "mini")!;
   const main = data.accounts.find((a) => a.kind === "main")!;
   const externals = data.accounts.filter((a) => a.kind === "external");
   const full = wave === 2;
@@ -114,37 +114,36 @@ export function HomeScreen() {
           <BannerCarousel banners={data.banners} />
         </Collapse>
 
-        <div className="mini-card pressable" onClick={() => navigate("/mini")}>
-          <Asset slot="mini-b" />
-          <div className="acct__text">
-            <strong className="acct__balance">{won(mini.balance)}</strong>
-            <span className="acct__sub acct__sub--beige">{mini.label}</span>
+        {/* 카카오뱅크 3333 통장: 노랑→민트 그라데이션 카드 (실제 앱 스크린샷) */}
+        <div className="main-card" onClick={() => openWithSpinner(main.id, "/account/main")}>
+          <div className="main-card__row">
+            <span className="main-card__icon">
+              <BMark size={17} color="#1c1c1c" hole="var(--yellow)" />
+            </span>
+            <div className="acct__text">
+              <strong className="acct__balance">{won(main.balance)}</strong>
+              <span className="acct__sub">{main.label}</span>
+            </div>
+            <button className="pill-btn main-card__btn pressable" onClick={toTransfer(main.id)}>
+              이체
+            </button>
           </div>
-          <button className="pill-btn pill-btn--beige pressable" onClick={toTransfer(mini.id)}>
-            이체
-          </button>
+          <div className="main-card__chips">
+            <button className="main-card__chip" onClick={stopThen(() => {})}>
+              세이프박스 <span>{won(main.safebox ?? 0)}</span>
+            </button>
+            <button className="main-card__chip" onClick={stopThen(() => {})}>
+              저금통 <span className="main-card__cup">☕</span>
+            </button>
+          </div>
+          {pressing === main.id && (
+            <span className="acct__spinner">
+              <Spinner size={22} color="#8a8a8a" />
+            </span>
+          )}
         </div>
 
         <section className="home-card accounts">
-          <div className="acct row-press-home" onClick={() => openWithSpinner(main.id, "/account/main")}>
-            <Asset slot="hand" />
-            <div className="acct__text">
-              <strong className="acct__balance">{won(main.balance)}</strong>
-              <span className="acct__sub">
-                <Asset slot="star" />
-                <span className="outline-badge">{main.badge}</span>
-              </span>
-            </div>
-            <button className="pill-btn pressable" onClick={toTransfer(main.id)}>
-              이체
-            </button>
-            {pressing === main.id && (
-              <span className="acct__spinner">
-                <Spinner size={22} color="#8a8a8a" />
-              </span>
-            )}
-          </div>
-
           {/* 다른 은행 계좌들 (🔔 패널에서 추가/삭제). 첫 진입 땐 영상처럼 잠깐 "?원" 후 잔액 표시 */}
           {externals.map((acc) => (
             <div key={acc.id} className="acct row-press-home" onClick={() => navigate(`/bank/${acc.id}`)}>

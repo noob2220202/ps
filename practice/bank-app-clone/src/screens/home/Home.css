@@ -204,17 +204,68 @@
 }
 
 /* ---------- 계좌 ---------- */
-.mini-card {
+/* 카카오뱅크 3333 통장 카드: 유리 같은 그라데이션 + 그라데이션 테두리 (실제 앱 스크린샷)
+   테두리 그라데이션: 안쪽 배경(padding-box)과 테두리 배경(border-box)을 두 겹으로 깔고 border는 투명 */
+.main-card {
+  position: relative;
   margin: 8px 15px 0;
-  height: 87px;
-  padding: 0 17px;
-  border-radius: 23px;
-  background: var(--beige-card);
-  color: #1c1c1c;
+  padding: 16px 0 14px;
+  border: 1.5px solid transparent;
+  border-radius: 24px;
+  background:
+    linear-gradient(130deg, #fff3a3 0%, #fff8d6 30%, #ffffff 58%, #f3fbfd 78%, #d8f4fa 100%) padding-box,
+    linear-gradient(130deg, #ffe55c 0%, #e8f39a 45%, #a8ecd9 75%, #7fd8ee 100%) border-box;
+  color: var(--home-text);
+  cursor: pointer;
+}
+[data-theme="dark"] .main-card {
+  background:
+    linear-gradient(130deg, #7e7320 0%, #5a5323 32%, #383626 58%, #2c2f30 78%, #233a42 100%) padding-box,
+    linear-gradient(130deg, #b3a21e 0%, #6d6a2a 45%, #3b5a4a 75%, #2e8ba3 100%) border-box;
+}
+.main-card:active {
+  filter: brightness(0.97);
+}
+.main-card__row {
   display: flex;
   align-items: center;
   gap: 12px;
-  cursor: pointer;
+  padding: 0 15px 0 15px;
+}
+.main-card__icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--yellow);
+  display: grid;
+  place-items: center;
+}
+/* 카드 위 버튼은 반투명 → 그라데이션이 살짝 비침 */
+.main-card__btn {
+  background: color-mix(in srgb, var(--home-btn) 85%, transparent);
+}
+.main-card__chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 0 15px;
+}
+.main-card__chip {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--home-text) 14%, transparent);
+  background: color-mix(in srgb, var(--home-card) 45%, transparent);
+  font-size: 12.5px;
+  color: var(--home-text);
+}
+.main-card__cup {
+  font-size: 14px;
+  line-height: 1;
 }
 
 .accounts {
@@ -266,9 +317,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.acct__sub--beige {
-  color: #625b4f;
-}
 .acct__spinner {
   position: absolute;
   left: 50%;
@@ -301,10 +349,6 @@
   color: var(--home-text);
   font-size: 14px;
   font-weight: 700;
-}
-.pill-btn--beige {
-  background: var(--beige-btn);
-  color: #1c1c1c;
 }
 
 .chips {

@@ -68,7 +68,7 @@ export function BankAccountScreen() {
         )}
       </div>
 
-      <div className="mini__search">
+      <div className="bank__search">
         <Icon name="search" size={20} stroke={2} />
         <button className="search-box__filter">
           3개월 · 전체 · 최신 <Icon name="chevron-down" size={14} stroke={1.6} />
@@ -76,7 +76,7 @@ export function BankAccountScreen() {
       </div>
 
       {txs.status === "loading" ? (
-        <div className="mini__spinner">
+        <div className="bank__spinner">
           <Spinner size={18} color="#9a9a9a" />
         </div>
       ) : txs.status === "error" ? (

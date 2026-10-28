@@ -4,7 +4,6 @@ import { ApiError } from "../../api/client";
 import { accountLine, api, paths } from "../../api/endpoints";
 import type { Bank, Recipient, TransferRecipients } from "../../api/types";
 import { useApi } from "../../api/useApi";
-import { Asset } from "../../assets/Asset";
 import { BankIcon } from "../../components/BankIcon";
 import { AiDiamond, ArcSpinner } from "../../components/art";
 import { BackButton } from "../../components/NavButtons";
@@ -87,8 +86,7 @@ export function TransferScreen() {
             >
               <BankIcon bank={m.bank} size={42} />
               <span className="recipient__text">
-                {/* 입출금통장은 이름 대신 ⭐ (영상) */}
-                <strong>{m.kind === "main" ? <Asset slot="star" /> : m.label}</strong>
+                <strong>{m.label}</strong>
                 <small>{accountLine(m.bank, m.number)}</small>
               </span>
             </button>

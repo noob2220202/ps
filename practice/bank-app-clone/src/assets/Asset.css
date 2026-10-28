@@ -28,9 +28,6 @@
   border-radius: 50%;
   background: var(--home-icon-bg);
 }
-.asset--mini-b {
-  background: var(--beige-icon);
-}
 .asset--ai-saving {
   background: var(--home-promo-bg);
 }
@@ -53,11 +50,6 @@
 .asset--ai-diamond {
   width: 18px;
   height: 18px;
-}
-.asset--moim-member,
-.asset--moim-dues {
-  width: 22px;
-  height: 22px;
 }
 
 /* 카드 썸네일: 세로로 선 카드 (기본 이미지는 가로 카드라 90도 돌림) */

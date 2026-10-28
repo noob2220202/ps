@@ -3,12 +3,11 @@
 export type TxTag = "#체크카드" | "#자동이체" | "#예금이자" | "#이체";
 export const TX_TAGS: TxTag[] = ["#체크카드", "#자동이체", "#예금이자", "#이체"];
 
-// "mini", "main"은 고정, 다른 은행 계좌는 서버가 만든 id ("nh", "bank-1a2b3c4d" ...)
+// "main"(카카오뱅크 3333 통장)은 고정, 다른 은행 계좌는 서버가 만든 id ("nh", "bank-1a2b3c4d" ...)
 export type AccountId = string;
 
 export interface Profile {
   userName: string;
-  miniAccountNo: string; // 0000-00-0000000
   cardLast4: string;
 }
 
@@ -23,13 +22,13 @@ export interface Bank {
 
 export interface Account {
   id: AccountId;
-  kind: "mini" | "main" | "external";
+  kind: "main" | "external";
   label: string;
   balance: number;
   badge?: string;
   number?: string;
-  bank: Bank; // mini·입출금통장은 카카오뱅크
-  limit?: { daily: number; monthly: number }; // mini 이체 한도
+  bank: Bank; // main은 카카오뱅크
+  safebox?: number; // 세이프박스 (main만, 통장 잔액과 별도)
 }
 
 export interface NewBankAccount {

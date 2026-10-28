@@ -1,13 +1,11 @@
 import type { ReactNode } from "react";
 import { THEME } from "../platform/theme";
-import { AiDiamond, AlbumLogo, BMark } from "../components/art";
+import { AiDiamond, AlbumLogo } from "../components/art";
 import wave from "./fluent/wave.png";
 import target from "./fluent/target.png";
 import coin from "./fluent/coin.png";
 import card from "./fluent/card.png";
 import bus from "./fluent/bus.png";
-import grin from "./fluent/grin.png";
-import banknote from "./fluent/banknote.png";
 import boy from "./fluent/boy.png";
 import girl from "./fluent/girl.png";
 import child from "./fluent/child.png";
@@ -27,7 +25,6 @@ import "./Asset.css";
 //  3) 아래 FALLBACK (저장소에 포함된 무료 에셋: Microsoft Fluent 3D 이모지, MIT)
 // 순서로 찾는다. 실제 이미지는 scripts/extract-assets.sh 로 화면 녹화에서 잘라 만들 수 있다.
 export type Slot =
-  | "mini-b"
   | "hand"
   | "hand-tile"
   | "ai-saving"
@@ -36,8 +33,6 @@ export type Slot =
   | "tmoney"
   | "coin"
   | "ai-diamond"
-  | "moim-member"
-  | "moim-dues"
   | "friends"
   | "friends-avatar"
   | "banner-and2ble"
@@ -64,7 +59,6 @@ const emoji = (src: string, scale = 0.62) => (
 );
 
 const FALLBACK: Record<Slot, () => ReactNode> = {
-  "mini-b": () => <BMark size={12} color="#fff" hole="var(--beige-icon)" />,
   hand: () => emoji(wave),
   "hand-tile": () => emoji(wave),
   "ai-saving": () => emoji(target),
@@ -73,8 +67,6 @@ const FALLBACK: Record<Slot, () => ReactNode> = {
   tmoney: () => emoji(bus),
   coin: () => emoji(coin, 1),
   "ai-diamond": () => <AiDiamond size={18} />,
-  "moim-member": () => emoji(grin, 1),
-  "moim-dues": () => emoji(banknote, 1),
   friends: () => (
     <span className="asset__friends">
       <img src={girl} alt="" className="asset__friend asset__friend--left" />

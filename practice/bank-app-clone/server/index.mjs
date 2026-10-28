@@ -35,27 +35,23 @@ function nowIso() {
 }
 
 const getProfile = () => {
-  const p = db.prepare("SELECT user_name, mini_account_no, card_last4 FROM profile WHERE id = 1").get();
-  return { userName: p.user_name, miniAccountNo: p.mini_account_no, cardLast4: p.card_last4 };
+  const p = db.prepare("SELECT user_name, card_last4 FROM profile WHERE id = 1").get();
+  return { userName: p.user_name, cardLast4: p.card_last4 };
 };
 
-// mini는 한도가 있다 (영상: "일 200,000원 (월 1,000,000원)")
-const MINI_LIMIT = { daily: 200_000, monthly: 1_000_000 };
-
 function toAccount(row, profile = getProfile()) {
-  // 카카오뱅크 계좌(mini, 입출금)도 이체 화면에선 "카카오뱅크 3333-..."로 보이므로 은행 정보를 붙인다
+  // 카카오뱅크 3333 통장도 이체 화면에선 "카카오뱅크 3333-..."로 보이므로 은행 정보를 붙인다
   const bank = bankByCode(row.bank_code ?? "kakao");
-  const label =
-    row.kind === "mini" ? `${profile.userName} mini` : row.kind === "main" ? "입출금통장" : `${profile.userName}의 ${bank?.name ?? "다른 은행"} 계좌`;
+  const label = row.kind === "main" ? `${profile.userName}의 통장` : `${profile.userName}의 ${bank?.name ?? "다른 은행"} 계좌`;
   return {
     id: row.id,
     kind: row.kind,
     label,
     balance: row.balance,
     ...(row.badge && { badge: row.badge }),
-    number: row.kind === "mini" ? profile.miniAccountNo : row.number ?? undefined,
+    number: row.number ?? undefined,
     bank: bankInfo(bank),
-    ...(row.kind === "mini" && { limit: MINI_LIMIT }),
+    ...(row.kind === "main" && { safebox: row.safebox }),
   };
 }
 
@@ -132,16 +128,14 @@ app.get("/api/banks", (_req, res) => res.json(BANKS.map(bankInfo)));
 app.get("/api/profile", (_req, res) => res.json(getProfile()));
 
 app.patch("/api/profile", (req, res) => {
-  const { userName, miniAccountNo, cardLast4 } = req.body ?? {};
+  const { userName, cardLast4 } = req.body ?? {};
   const fields = {};
   if (userName !== undefined && !/^.{1,10}$/u.test(String(userName).trim())) fields.userName = "이름은 1~10자";
-  if (miniAccountNo !== undefined && !/^\d{4}-\d{2}-\d{7}$/.test(miniAccountNo)) fields.miniAccountNo = "0000-00-0000000 형식";
   if (cardLast4 !== undefined && !/^\d{4}$/.test(cardLast4)) fields.cardLast4 = "숫자 4자리";
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   const p = getProfile();
-  db.prepare("UPDATE profile SET user_name = ?, mini_account_no = ?, card_last4 = ? WHERE id = 1").run(
+  db.prepare("UPDATE profile SET user_name = ?, card_last4 = ? WHERE id = 1").run(
     userName !== undefined ? String(userName).trim() : p.userName,
-    miniAccountNo ?? p.miniAccountNo,
     cardLast4 ?? p.cardLast4,
   );
   res.json(getProfile());
@@ -155,7 +149,7 @@ app.post("/api/accounts", (req, res) => {
   const bank = bankByCode(bankCode);
   const fields = {};
   if (!bank) fields.bankCode = "은행을 골라 주세요";
-  else if (bank.code === "kakao") fields.bankCode = "카카오뱅크 계좌는 mini·입출금통장이에요";
+  else if (bank.code === "kakao") fields.bankCode = "카카오뱅크 통장은 이미 있어요";
   const digits = digitsOf(number);
   const numberError = bank && checkNumber(bank, digits);
   if (numberError) fields.number = numberError;
@@ -181,9 +175,11 @@ app.post("/api/accounts", (req, res) => {
 // 잔액/계좌번호 수정
 app.patch("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  const { balance, number } = req.body ?? {};
-  if (balance !== undefined && (!Number.isInteger(balance) || balance < 0 || balance > 1_000_000_000))
-    throw bad("입력값을 확인해 주세요", { balance: "0원 이상 10억원 이하" });
+  const { balance, number, safebox } = req.body ?? {};
+  const money = (v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 1_000_000_000);
+  if (!money(balance)) throw bad("입력값을 확인해 주세요", { balance: "0원 이상 10억원 이하" });
+  if (!money(safebox)) throw bad("입력값을 확인해 주세요", { safebox: "0원 이상 10억원 이하" });
+  if (safebox !== undefined && row.kind !== "main") throw bad("세이프박스는 카카오뱅크 통장에만 있어요");
   let formatted = row.number;
   if (number !== undefined) {
     if (row.kind !== "external") throw bad("다른 은행 계좌만 계좌번호를 바꿀 수 있어요");
@@ -192,14 +188,19 @@ app.patch("/api/accounts/:id", (req, res) => {
     if (numberError) throw bad(numberError, { number: numberError });
     formatted = formatAccountNumber(row.bank_code, digits);
   }
-  db.prepare("UPDATE accounts SET balance = ?, number = ? WHERE id = ?").run(balance ?? row.balance, formatted, row.id);
+  db.prepare("UPDATE accounts SET balance = ?, number = ?, safebox = ? WHERE id = ?").run(
+    balance ?? row.balance,
+    formatted,
+    safebox ?? row.safebox,
+    row.id,
+  );
   res.json(toAccount(findAccount(row.id)));
 });
 
 // 다른 은행 계좌 삭제 (거래내역도 ON DELETE CASCADE로 같이 지워짐)
 app.delete("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  if (row.kind !== "external") throw bad("카카오뱅크 계좌는 여기서 지울 수 없어요");
+  if (row.kind !== "external") throw bad("카카오뱅크 통장은 지울 수 없어요");
   db.prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
   res.status(204).end();
 });
@@ -279,11 +280,10 @@ function findPayee(id) {
 
 // 내 계좌 중 (은행, 숫자) 가 같은 것
 function myAccountByNumber(bankCode, digits) {
-  const profile = getProfile();
   return db
     .prepare("SELECT * FROM accounts")
     .all()
-    .find((a) => (a.bank_code ?? "kakao") === bankCode && digitsOf(a.kind === "mini" ? profile.miniAccountNo : a.number) === digits);
+    .find((a) => (a.bank_code ?? "kakao") === bankCode && digitsOf(a.number) === digits);
 }
 
 function checkPayee({ bankCode, number, holder }, current) {
@@ -368,11 +368,6 @@ app.get("/api/transfer/recipients", (req, res) => {
   res.json({ mine, recent });
 });
 
-// mini 한도: 오늘/이번 달 mini에서 보낸 합계
-function miniSent(prefix) {
-  return db.prepare("SELECT COALESCE(SUM(amount), 0) AS s FROM transfers WHERE from_account_id = 'mini' AND at LIKE ?").get(`${prefix}%`).s;
-}
-
 app.post("/api/transfers", (req, res) => {
   const { fromAccountId, bankCode, number, amount, memoTo, memoMe } = req.body ?? {};
   const from = findAccount(fromAccountId);
@@ -388,10 +383,6 @@ app.post("/api/transfers", (req, res) => {
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `출금 가능 금액(${from.balance.toLocaleString("ko-KR")}원)을 넘었어요`);
 
   const at = nowIso();
-  if (from.kind === "mini") {
-    if (miniSent(at.slice(0, 10)) + amount > MINI_LIMIT.daily) throw new HttpError(400, "LIMIT_EXCEEDED", "mini 하루 이체 한도(200,000원)를 넘었어요");
-    if (miniSent(at.slice(0, 7)) + amount > MINI_LIMIT.monthly) throw new HttpError(400, "LIMIT_EXCEEDED", "mini 한 달 이체 한도(1,000,000원)를 넘었어요");
-  }
 
   const me = getProfile().userName;
   const memoToText = memoTo?.trim() || me; // 받는 분 통장에 찍힐 이름 (기본: 내 이름)

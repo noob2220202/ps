@@ -82,19 +82,21 @@
   align-items: center;
   gap: 14px;
 }
-.balance-card__hand {
+.balance-card__icon {
   width: 34px;
   height: 34px;
-  border-radius: 10px;
-  background: #f4f4f6;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--yellow);
   display: grid;
   place-items: center;
-  font-size: 18px;
 }
 .balance-card__meta {
   display: flex;
   align-items: center;
   gap: 5px;
+  font-size: 13px;
+  color: #555;
 }
 .outline-badge--light {
   border-color: #cfcfcf;
@@ -134,37 +136,6 @@
 .section-head button {
   font-size: 12.5px;
   color: #888;
-}
-
-.moim-card {
-  margin: 0 17px;
-  padding: 8px 0;
-  border-radius: 20px;
-  background: #fff;
-}
-.moim-card__row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 20px;
-  font-size: 13.5px;
-  font-weight: 600;
-  text-align: left;
-}
-.moim-card__emoji {
-  font-size: 18px;
-}
-.moim-card__label {
-  flex: 1;
-}
-.moim-card__value {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: #2a7de1;
-}
-.moim-card__chev {
-  color: #b5b5b5;
 }
 
 .detail__friends {

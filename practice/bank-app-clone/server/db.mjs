@@ -16,17 +16,17 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS profile (
     id              INTEGER PRIMARY KEY CHECK (id = 1),  -- 사용자 1명뿐
     user_name       TEXT NOT NULL,
-    mini_account_no TEXT NOT NULL,
     card_last4      TEXT NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS accounts (
     id         TEXT PRIMARY KEY,
-    kind       TEXT NOT NULL CHECK (kind IN ('mini', 'main', 'external')),
+    kind       TEXT NOT NULL CHECK (kind IN ('main', 'external')), -- main = 카카오뱅크 3333 통장
     bank_code  TEXT,                       -- 다른 은행 계좌일 때만 (kb, shinhan, ...)
     number     TEXT,                       -- 계좌번호 (하이픈 포함)
     balance    INTEGER NOT NULL DEFAULT 0, -- 원 단위 정수 (돈은 소수점 없이!)
     badge      TEXT,
+    safebox    INTEGER NOT NULL DEFAULT 0, -- 세이프박스 (통장 잔액과 따로 보관하는 돈, main만)
     sort       INTEGER NOT NULL DEFAULT 0  -- 홈 화면 표시 순서
   );
 
@@ -67,6 +67,18 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_transfers_at ON transfers (at DESC);
 `);
+
+// ---------- 예전 DB 고치기 (마이그레이션) ----------
+// 이미 만들어진 bank.db는 CREATE TABLE IF NOT EXISTS 로는 안 바뀐다 → 달라진 점만 직접 반영
+const columns = (table) => db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+if (!columns("accounts").includes("safebox")) db.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");
+if (columns("profile").includes("mini_account_no")) {
+  // mini 계좌 삭제: 거래·이체 기록은 ON DELETE CASCADE로 같이 지워지고, mini로 "보낸" 기록만 따로 정리
+  const mini = db.prepare("SELECT mini_account_no AS no FROM profile").get();
+  if (mini) db.prepare("DELETE FROM transfers WHERE bank_code = 'kakao' AND number = ?").run(mini.no.replace(/\D/g, ""));
+  db.exec("DELETE FROM accounts WHERE kind = 'mini'; ALTER TABLE profile DROP COLUMN mini_account_no;");
+}
+db.exec("UPDATE accounts SET badge = NULL WHERE kind = 'main'"); // 예전 "한도계좌" 뱃지(모임통장 표시) 제거
 
 // 여러 쿼리를 "전부 성공 아니면 전부 취소"로 묶기 (잔액 변경 + 거래 기록이 따로 놀면 안 되니까)
 export function transaction(fn) {
@@ -126,11 +138,10 @@ export function seed() {
     db.exec(
       "DELETE FROM transfers; DELETE FROM payees; DELETE FROM transactions; DELETE FROM accounts; DELETE FROM profile; DELETE FROM sqlite_sequence;",
     );
-    db.prepare("INSERT INTO profile VALUES (1, ?, ?, ?)").run("홍길동", "0000-00-0000000", "0000");
-    const acc = db.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, badge, sort) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    acc.run("mini", "mini", null, null, 0, null, 0);
-    acc.run("main", "main", null, "3333-00-0000000", 500000, "한도계좌", 1);
-    acc.run("nh", "external", "nh", "302-0000-0000-00", 0, null, 2);
+    db.prepare("INSERT INTO profile (id, user_name, card_last4) VALUES (1, ?, ?)").run("홍길동", "0000");
+    const acc = db.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, safebox, sort) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    acc.run("main", "main", null, "3333-00-0000000", 500000, 100000, 1);
+    acc.run("nh", "external", "nh", "302-0000-0000-00", 0, 0, 2);
     const tx = db.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
     for (const row of SEED_TX) tx.run(...row);
     const payee = db.prepare("INSERT INTO payees (bank_code, number, holder) VALUES (?, ?, ?)");

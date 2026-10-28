@@ -27,7 +27,7 @@ export const paths = {
 export const api = {
   updateProfile: (patch: Partial<Profile>) => http.patch<Profile>(paths.profile, patch),
   addBankAccount: (body: NewBankAccount) => http.post<Account>("/api/accounts", body),
-  updateAccount: (id: string, patch: { balance?: number; number?: string }) => http.patch<Account>(paths.account(id), patch),
+  updateAccount: (id: string, patch: { balance?: number; number?: string; safebox?: number }) => http.patch<Account>(paths.account(id), patch),
   deleteAccount: (id: string) => http.delete(paths.account(id)),
   createTransaction: (accountId: string, body: NewTransaction) =>
     http.post<Transaction>(paths.transactions(accountId), body),
