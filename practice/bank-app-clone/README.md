@@ -16,6 +16,7 @@ npm run dev        # API 서버 + 화면 동시 실행 → http://localhost:5173
 
 ```bash
 npm ci
+./scripts/fetch-bank-icons.sh          # 은행 앱 아이콘 받기 (선택)
 npm run build
 npm start                              # http://서버IP:9101
 # 꺼지지 않게: pm2 start "npm start" --name bank   (pm2 save 로 재부팅 후에도)
@@ -52,7 +53,12 @@ push 화면 전환, 왼쪽 가장자리 스와이프 뒤로가기가 들어가 �
 저장소에는 무료 에셋(Microsoft Fluent 3D 이모지, MIT)만 들어 있습니다.
 농협 로고, 카드 이미지, 티머니 로고, 캐릭터, 광고 사진 같은 **실제 이미지는 `src/assets/local/`에 넣으면**
 자동으로 대신 쓰입니다 (`.gitignore` 처리돼 커밋되지 않음).
-은행 로고는 `bank-<코드>.png`(예: `bank-shinhan.png`, 코드는 `server/banks.mjs`)로 넣으면 색 동그라미 대신 쓰입니다.
+은행 아이콘은 각 은행 공식 앱의 Play 스토어 아이콘을 받아서 씁니다 (없으면 대표색 동그라미):
+
+```bash
+./scripts/fetch-bank-icons.sh   # src/assets/local/bank-<코드>.png 12개 (이미 있는 건 건너뜀, FORCE=1 이면 전부 새로)
+npm run build
+```
 
 ```bash
 # 화면 녹화 + 라이트모드 홈 스크린샷에서 자동으로 잘라내기 (ffmpeg 필요)
