@@ -1,107 +1,270 @@
-/* 콕송금 아래 최근송금 / 내계좌 / 자주쓰는 목록 */
-.nh-rlist {
+/* ---------- 콕송금 아래 최근송금 / 내계좌 / 자주쓰는 시트 (담당 send-who).
+   녹화1 16.3~17.4초(접힘)·18.5~19.2초(펼침)·22.5~23.9초(내계좌)·24~25.4초(자주쓰는)에서 잰 값. y 는 시트 위 끝 기준 ---------- */
+.nh-rl {
   position: absolute;
   left: 0;
   right: 0;
+  top: 47.84px; /* 펼친 위치 = 헤더 바로 아래(녹화 94.8px). 접히면 translateY(403.66) → 앱 위 451.5 */
   bottom: 0;
-  top: 425px;
   z-index: 3;
   display: flex;
   flex-direction: column;
-  border-radius: 20px 20px 0 0;
-  background: var(--nh-sheet2);
-  transition: top 0.32s cubic-bezier(0.2, 0.9, 0.25, 1);
+  border-radius: 24px 24px 0 0;
+  background: var(--nh-sheet);
+  /* 펼치기·접기: 녹화1 25.37~25.90초 접힘을 프레임마다 맞춤 (516ms. 천천히 출발 → 가운데 1.7px/ms → 끝에서 길게 감속,
+     598.9 → 599.8 까지 내려앉는 꼬리까지). cubic-bezier 로는 꼬리가 20~30ms 일찍 끝나서 linear() 로 (rms 2.7px@480) */
+  transition: transform 516ms
+    linear(0, 0.0024 5%, 0.0159 10%, 0.0523 18%, 0.1648 30%, 0.4242 45%, 0.6901 60%, 0.8564 72%, 0.952 82%, 0.9901 90%, 0.999 95%, 1);
+  touch-action: none;
 }
-.nh-rlist.open {
-  top: 40px;
+/* 처음 나타날 때: 앞 화면 707dp(녹화 884px)에서 108ms 만에 올라옴. 녹화1 15.619~15.682초 835.2 → 789.6 → 682.9 → 599.9px,
+   녹화2 2.615~2.729초 835.2 → 683.2 → 657.2 → 636.3 → 608.9 → 602.2 → 600.1px 를 함께 맞춤 (rms 9.7px, 두 녹화끼리도 30px 다름).
+   녹화2 에만 있는 884px 에서 46ms 멈춤(녹화1 에는 없음)은 따라 하지 않음 */
+.nh-rl--rise {
+  animation: nh-rl-rise 108ms cubic-bezier(0.5, 0.58, 0.19, 0.8) both;
 }
-.nh-rlist__handle {
-  height: 26px;
+.nh-rl button {
+  letter-spacing: -0.005em; /* button 기본값 normal(0) 을 덮음. 탭 글자 폭이 참고와 ±0.3px */
+}
+.nh-rl.dragging {
+  transition: none;
+}
+@keyframes nh-rl-rise {
+  from {
+    translate: 0 227.7px; /* 접힌 위치(폰 위 479.5) → 707.2 */
+  }
+}
+
+/* 손잡이 36 × 4, 위에서 12. 끄는 영역은 위 32 */
+.nh-rl__grab {
   flex-shrink: 0;
-  display: grid;
-  place-items: center;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  cursor: grab;
 }
-.nh-rlist__handle::before {
+.nh-rl__handle {
+  width: 96px;
+  height: 32px;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding-top: 12px;
+}
+.nh-rl__handle::before {
   content: "";
   width: 36px;
   height: 4px;
   border-radius: 2px;
-  background: #4d5562;
+  background: var(--nh-handle);
 }
-.nh-rlist__tabs {
+
+.nh-rl__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+.nh-rl__scroll::-webkit-scrollbar {
+  display: none;
+}
+.nh-rl__scroll.locked {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* 탭 묶음: x 24~360, 시트 위 40~88 (스크롤하면 32 에 붙음), 모서리 12, 안쪽 4. 선택 탭 #18171c 모서리 9 */
+.nh-rl__tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  touch-action: none;
   display: flex;
-  margin: 6px 22px 0;
-  padding: 3px;
-  border-radius: 10px;
-  background: #151b23;
+  margin: 8px 24px 0;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--nh-sheet2);
 }
-.nh-rlist__tabs button {
+.nh-rl .nh-rl__tabs button {
   flex: 1;
   height: 40px;
-  border-radius: 8px;
-  font-size: 15.5px;
-  color: #fff;
+  padding-bottom: 0.8px;
+  border-radius: 9px;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--nh-text);
 }
-.nh-rlist__tabs button.on {
-  background: #18171c;
-  font-weight: 700;
+.nh-rl__tabs button > span {
+  display: inline-block;
+  transform: translateY(0.6px); /* 글자 줄은 정수 px 로 맞춰지므로 남는 0.6 은 transform 으로 */
 }
-.nh-rlist__tools {
+.nh-rl .nh-rl__tabs button.on {
+  background: var(--nh-bg);
+  box-shadow:
+    0 0 0 0.7px #2b333d,
+    0 0 2.5px 0.6px rgba(46, 55, 66, 0.85);
+}
+
+/* 검색 · 휴지통 / 등록 / 톱니: 높이 60, 아이콘 중심 y 30 (시트 위 118) */
+.nh-rl__tools {
+  position: relative;
+  height: 60px;
+  color: var(--nh-text);
+}
+.nh-rl__tools > button {
+  position: absolute;
+  top: 18px;
+  height: 24px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 24px 6px;
-  color: #c9ced6;
 }
-.nh-rlist__reg {
+.nh-rl__tools > .nh-rl__search {
+  left: 31.25px;
+  top: 17.65px;
+}
+.nh-rl .nh-rl__trash {
+  left: 336.4px;
+  top: 18px;
+  color: var(--nh-chip-text);
+}
+.nh-rl .nh-rl__reg {
+  left: 306px;
+  gap: 2.3px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--nh-chip-text);
+}
+.nh-rl__tools > .nh-rl__gear {
+  left: 328px;
+  top: 17.8px;
+}
+
+/* 목록 한 줄: 높이 100 (녹화 125px, 기기 px 반올림으로 ±0.5px 흔들림). 아이콘 36 (x 24, 위 14.4) · 이름 18/500 · 계좌 15/400 · 날짜 15/400 · + 24 (오른쪽 24) */
+.nh-rl__row {
+  position: relative;
+  height: 100px;
+  padding: 14.4px 24px 0;
   display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 13px;
-}
-.nh-rlist__rows {
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-.nh-rlist__row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 13px 22px 17px;
+  gap: 8px;
   cursor: pointer;
 }
-.nh-rlist__row:active {
-  background: rgba(255, 255, 255, 0.04);
+.nh-rl__rows--fav .nh-rl__row {
+  height: 80px;
 }
-.nh-rlist__text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.nh-rl__icon {
+  flex-shrink: 0;
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 11.2px;
 }
-.nh-rlist__row b {
-  font-size: 16.5px;
-  font-weight: 600;
-}
-.nh-rlist__row small {
-  font-size: 14px;
-  color: var(--nh-sub);
-}
-.nh-rlist__plus {
-  align-self: center;
-  width: 22px;
-  height: 22px;
+.nh-rl__icon--other {
   display: grid;
   place-items: center;
-  border-radius: 6px;
-  background: #e8eaee;
-  color: #1e2732 !important;
+  background: #f6f7fb;
 }
-.nh-rlist__bal {
-  align-self: flex-end;
+.nh-rl__text {
+  flex: 1;
+  min-width: 0;
+  margin-top: -5.85px;
+  display: flex;
+  flex-direction: column;
+}
+.nh-rl__text b {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nh-rl__text small {
+  margin-top: 2.35px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--nh-sub);
+  white-space: nowrap;
+}
+.nh-rl__text .nh-rl__at {
+  margin-top: 2.5px;
+  color: #8a939e;
+}
+.nh-rl .nh-rl__plus {
+  position: absolute;
+  right: 24px;
+  top: 31.2px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff;
+  color: #77838f;
+}
+.nh-rl__plus svg {
+  width: 24px;
+  height: 24px;
+}
+.nh-rl__bal {
+  position: absolute;
+  right: 24px;
+  top: 59.8px;
   font-style: normal;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px; /* 같은 '0원'을 바꿔 찍어 보면 16/400 이 폭·높이·잉크 양 모두 ±0.1px */
+  line-height: 22px;
+  font-weight: 400;
   color: var(--nh-blue);
+}
+.nh-rl__star {
+  position: absolute;
+  right: 24px;
+  top: 19.75px;
+}
+
+/* 자주쓰는이 비었을 때(로딩 중에도 잠깐 보임): 흰 공 48 · 문구 · 밑줄 링크 */
+.nh-rl__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8.2px;
+}
+.nh-rl__empty i {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eff4f8; /* 그림이 없을 때 */
+}
+.nh-rl__empty p {
+  margin: 20.4px 0 0;
+  transform: translateY(0.25px);
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 500;
+}
+.nh-rl .nh-rl__empty button {
+  margin-top: 23.6px;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--nh-sub);
+  letter-spacing: -0.01em;
+  position: relative;
+}
+/* 밑줄 1.6dp (녹화 y 457·458 두 줄이 모두 밝기 162, x 166.7~312.8 = 버튼 폭). text-decoration 굵기·위치는 정수 px 로
+   맞춰져서 (1px 이면 흐리고 2px 이면 넘침) 따로 그림: 위 19 → 19.6, 높이 2 → 1.6 을 transform 으로 */
+.nh-rl .nh-rl__empty button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 19px;
+  height: 2px;
+  background: currentColor;
+  transform-origin: 0 0;
+  transform: translateY(0.6px) scaleY(0.8);
+}
+.nh-rl__none {
+  margin: 40px 0;
+  text-align: center;
+  color: var(--nh-faint);
+  font-size: 16px;
 }

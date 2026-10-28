@@ -1,199 +1,525 @@
-/* ---------- 계좌별 거래내역 ---------- */
-.nh-history__account {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 20px 14px 0 19px;
+/* ---------- 계좌별 거래내역 ----------
+   값은 실제 스크린샷(shot-history 720px, ÷1.875)과 녹화2(480px, ×0.8)에서 잰 것. 표: scratchpad work/history/spec.md
+   세로 위치는 화면(상태바 아래) 기준 dp. 헤더 0–48, 탭 48–96 */
+.nh-hist {
+  /* '송금' 칩·보기 토글 둘레의 밝은 번짐 (아래로 치우침). 스크린샷 밝기 단면(칩 위·아래·옆, 토글)에 두 겹 그림자를 맞춘 값 (오차 rmse 0.8/255) */
+  --hist-glow: 0 4px 10px rgba(255, 255, 255, 0.045), 0 3px 28px rgba(255, 255, 255, 0.06);
 }
-.nh-history__icon {
-  position: relative;
-  margin-top: 4px;
+.nh-hist.screen {
+  overflow: hidden;
 }
-.nh-history__name {
-  flex: 1;
+/* 공용 헤더 제목이 이 화면에서 스크린샷보다 3px@720 아래 → 이 화면에서만 올림 (잉크 y 82–109) */
+.nh-hist .nh-header h1 {
+  margin-top: -1px;
+}
+/* 헤더·탭 아래만 스크롤 (시트·막이 스크롤과 함께 움직이지 않게) */
+.nh-hist__scroll {
+  flex: 1 1 auto !important;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
-.nh-history__name b {
-  font-size: 16px;
+.nh-hist__scroll::-webkit-scrollbar {
+  display: none;
 }
-.nh-history__name button {
+.nh-hist__scroll > * {
+  flex-shrink: 0;
+}
+
+/* 탭: 17/500, 선택 #f6f7fb + 2dp 흰 밑줄(글자폭+8.5×2), 비선택 #7e8691, 아래 1dp #2c353e */
+.nh-hist__tabs {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  height: 47.72px; /* 밑줄·구분선 아래끝 = 스크린샷 232px */
+  padding: 0 0 0 23.47px;
+  background: var(--nh-bg);
+  box-shadow: inset 0 -1px 0 var(--nh-line);
+}
+.nh-hist__tabs button {
+  position: relative;
+  padding: 0 8.5px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 47.47px;
+  color: var(--nh-faint) !important;
+}
+/* 실제 화면의 탭 사이 간격은 기기 픽셀 반올림 때문에 조금씩 다름 (글자 잉크 x 61/189/384/487/589 px) */
+.nh-hist__tabs button:nth-child(2) {
+  margin-left: -1.07px;
+}
+.nh-hist__tabs button:nth-child(3) {
+  margin-left: -0.53px;
+}
+.nh-hist__tabs button:nth-child(4) {
+  margin-left: 1.07px;
+}
+.nh-hist__tabs button.on {
+  color: var(--nh-text) !important;
+}
+.nh-hist__tabs button.on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #fff;
+}
+
+/* 계좌: 아이콘 36dp(x 20) + 별, 이름 18/500 (x 64), 은행·번호 15/400 #9ca4ae + ⌄, 오른쪽 ⋮ (점 3dp, 간격 6, x 360) */
+.nh-hist__acct {
+  position: relative;
+  height: 108.28px; /* 95.72 → 204 */
+}
+.nh-hist__icon {
+  position: absolute;
+  left: 19.6px;
+  top: 26.15px;
+}
+.nh-hist__name {
+  position: absolute;
+  left: 64px;
+  top: 24.9px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.nh-hist__name b {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nh-hist__name button {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  margin-top: 5px;
+  font-size: 15px;
+  line-height: 20px;
   color: var(--nh-sub) !important;
 }
-.nh-history__dots {
-  font-size: 18px;
-  color: #c9ced6;
+.nh-hist__chev {
+  margin-left: 5.1px;
+  color: #cdd2d8;
 }
-.nh-history__balance {
+.nh-hist__more {
+  position: absolute;
+  left: 358px; /* 점 중심 x 360, y 117.5 / 123.6 / 129.8 */
+  top: 20px;
+  display: block;
+  color: #8b939e !important;
+}
+.nh-hist__more svg {
+  display: block;
+}
+
+/* 잔액: 0.5dp #454952 동그라미 30dp(중심 x 305) + 열린 자물쇠 #cdd2d8, 0원 21/600 (오른쪽 20) */
+.nh-hist__bal {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 12px;
-  padding: 40px 20px 0;
+  gap: 12.4px;
+  height: 57.6px; /* 204 → 261.6 */
+  padding: 0 20px 13.47px 0;
 }
-.nh-history__balance b {
-  font-size: 20px;
-  font-weight: 800;
+.nh-hist__lock {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 0.5333px solid var(--nh-outline-btn); /* 스크린샷 1px */
+  color: #cdd2d8 !important;
 }
-.nh-lock--ring {
-  width: 28px;
-  height: 28px;
-  background: none;
-  box-shadow: inset 0 0 0 1px #555c66;
+.nh-hist__bal b {
+  position: relative;
+  top: -0.5px;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 25px;
 }
-.nh-history__chips {
+
+/* 칩 줄: 위 4.9 · 아래 10.1 여백에서 번짐이 잘림, 오른쪽 끝 13dp 페이드 후 잘림(x 364.5) */
+.nh-hist__chips {
   display: flex;
   gap: 8px;
-  padding: 22px 0 56px 19px;
+  margin-right: 19.5px;
+  padding: 5.16px 0 9.84px 20.27px;
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 13.3px);
+  mask-image: linear-gradient(to left, transparent, #000 13.3px);
 }
-.nh-history__chips button {
+.nh-hist__chips::-webkit-scrollbar {
+  display: none;
+}
+.nh-hist__chips button {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 17px;
-  background: #253141;
-  font-size: 14px;
-  color: #dfe2e7;
+  height: 36px;
+  padding: 0 15.43px 1.6px;
+  border-radius: 18px;
+  background: var(--nh-field);
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--nh-chip-text) !important;
 }
-.nh-history__chips button.send {
-  background: #1b1d22;
-  box-shadow:
-    inset 0 0 0 1px #2c3038,
-    0 4px 10px rgba(0, 0, 0, 0.4);
-  padding-left: 14px;
+.nh-hist__chips button.send {
+  padding: 0 15.16px 1.6px 13.87px;
+  background: var(--nh-bg);
+  border: 0.5px solid var(--nh-outline);
+  box-shadow: var(--hist-glow);
 }
-.nh-history__list {
+.nh-hist__chips button.send .nh-img {
+  margin: 1.6px 3.2px 0 0;
+}
+
+/* 아래 목록판: 윗변 밝은 띠(+12 → 20dp 동안 0), 보기 토글이 윗변 가운데에 걸침 */
+.nh-hist__list {
   position: relative;
-  flex: 1;
-  padding: 30px 0 30px;
-  background: #18171c;
-  /* 위쪽(계좌 영역)과 경계: 실제 앱은 목록 영역 위로 어두운 그림자 띠 */
-  box-shadow: 0 -10px 18px rgba(0, 0, 0, 0.45);
+  flex: 1 0 auto !important;
+  margin-top: 50.36px; /* 312.6 → 362.9 */
+  padding: 48.05px 0 30px; /* 필터바 410.9 */
+  background:
+    linear-gradient(
+        rgba(255, 255, 255, 0.056),
+        rgba(255, 255, 255, 0.05) 1.6px,
+        rgba(255, 255, 255, 0.045) 2.7px,
+        rgba(255, 255, 255, 0.035) 4.3px,
+        rgba(255, 255, 255, 0.026) 6.4px,
+        rgba(255, 255, 255, 0.02) 8.5px,
+        rgba(255, 255, 255, 0.016) 11.7px,
+        rgba(255, 255, 255, 0.007) 15.5px,
+        rgba(255, 255, 255, 0) 21px
+      )
+      no-repeat top / 100% 21px,
+    var(--nh-bg);
 }
-.nh-history__view {
+/* 보기 토글 89×32: 묶음 #1f2933 + 0.5dp #2d343c, 선택(목록) 44dp 원 = 바탕 #18171c + 1dp #cdd2d8 */
+.nh-hist__view {
   position: absolute;
-  top: -17px;
+  top: -16.16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  padding: 2px;
+  width: 89px;
+  height: 32px;
   border-radius: 16px;
-  background: #253141;
+  background: var(--nh-field);
+  box-shadow:
+    inset 0 0 0 0.5px #2d343c,
+    var(--hist-glow);
 }
-.nh-history__view button {
-  width: 40px;
-  height: 31px;
+.nh-hist__view button {
+  flex: 1;
   display: grid;
   place-items: center;
   border-radius: 16px;
-  color: #5f6b7b;
+  color: #616f7c !important;
 }
-.nh-history__view button.on {
-  background: #18171c;
-  box-shadow: inset 0 0 0 1.5px #c9ced6;
-  color: #fff;
+.nh-hist__view button.on {
+  flex: 0 0 44px;
+  background: var(--nh-bg);
+  box-shadow: inset 0 0 0 1px #cdd2d8;
+  color: #cdd2d8 !important;
 }
-.nh-history__range {
+.nh-hist__view svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 기간 필터바 336×44, 반경 22, #1f2933. 날짜/조건 15/400 #cbd2da, 슬라이더 아이콘 20dp */
+.nh-hist__range {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: calc(100% - 46px);
-  margin: 26px 23px 0;
-  height: 42px;
-  padding: 0 18px;
-  border-radius: 21px;
-  background: #253141;
-  font-size: 13px;
+  width: calc(100% - 48px);
+  height: 43.73px;
+  margin: 0 24px;
+  padding: 0 21.8px 0 20.3px;
+  border-radius: 22px;
+  background: var(--nh-field);
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--nh-chip-text) !important;
 }
-.nh-history__range span:last-child {
+.nh-hist__cond {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10.43px;
 }
-.nh-history__sort {
+.nh-hist__range i {
+  margin-left: 1.6px;
+  font-style: normal;
+}
+.nh-hist__range svg {
+  position: relative;
+  top: -0.3px;
+  color: #f6f7fb;
+}
+
+/* 검색(돋보기 중심 x 35.7) · 최근거래순 16/500 #cdd2d8 + ⌄ 1.4dp #8f949f (잉크 오른쪽 354.1) */
+.nh-hist__sort {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 14px 24px 10px 25px;
-  font-size: 13.5px;
-}
-.nh-history__sort span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.nh-tx {
-  display: flex;
-  justify-content: space-between;
-  width: calc(100% - 46px);
-  margin: 0 23px;
-  padding: 24px 0 22px;
-  border-bottom: 1px solid #262a31;
-  text-align: left;
-}
-.nh-tx__left,
-.nh-tx__right {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.nh-tx__right {
-  align-items: flex-end;
-}
-.nh-tx small {
-  font-size: 12.5px;
-  color: var(--nh-sub);
-}
-.nh-tx b {
+  height: 47.95px; /* 454.7 → 502.7 */
+  padding: 0 51.86px 0 0;
   font-size: 16px;
   font-weight: 500;
+  line-height: 20px;
+  color: #cdd2d8;
 }
-.nh-tx__right b {
-  font-size: 18px;
-  font-weight: 800;
+.nh-hist__sort > svg {
+  position: absolute;
+  left: 25.07px;
+  top: 13.34px;
+  width: 24px;
+  height: 24px;
+  color: #f6f7fb;
 }
-.nh-tx small.out {
-  color: var(--nh-red);
+.nh-hist__sort > span {
+  margin-top: -1px;
 }
-.nh-tx small.in,
-.nh-tx b.in {
-  color: var(--nh-blue);
+.nh-hist__sort span svg {
+  position: absolute;
+  right: 28.76px;
+  top: 18.2px;
+  color: #8f949f;
 }
-.nh-pick {
-  padding: 0 0 20px;
+/* 날짜: 실제 화면은 숫자·점·물결이 조금 더 촘촘함 (17자 6px@720 좁음) */
+.nh-hist__date,
+.nh-hist__txl small,
+.nh-hist__no {
+  letter-spacing: -0.017em;
 }
-.nh-pick button {
+
+/* 거래 줄: 높이 115.2(0.5dp #212328 구분선 포함), 좌우 24 */
+.nh-hist__tx {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 12px 20px;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: calc(100% - 48px);
+  height: 115.2px;
+  margin: 0 24px;
+  padding-top: 19.33px;
+  border-bottom: 0.5333px solid var(--nh-hair); /* 스크린샷 1px */
   text-align: left;
 }
-.nh-pick button.on {
-  background: rgba(255, 255, 255, 0.05);
-}
-.nh-pick span {
-  flex: 1;
+.nh-hist__txl,
+.nh-hist__txr {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
-.nh-pick small {
+.nh-hist__txr {
+  align-items: flex-end;
+}
+.nh-hist__tx small {
+  font-size: 15px;
+  line-height: 20px;
+}
+.nh-hist__txl small {
+  color: var(--nh-placeholder);
+}
+.nh-hist__txl b {
+  margin-top: 5.6px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nh-hist__txr b {
+  margin-top: 4.13px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.nh-hist__txr small:last-child {
+  margin-top: 7.07px;
   color: var(--nh-sub);
-  font-size: 12px;
 }
-.nh-pick em {
+.nh-hist__txr small span {
+  font-size: 16px;
+}
+.nh-hist__tx small.out {
+  color: var(--nh-red);
+}
+.nh-hist__tx small.in,
+.nh-hist__tx b.in {
+  color: var(--nh-blue);
+}
+
+/* ---------- 계좌선택 시트 (녹화2 56초) ----------
+   높이 391.1(시트 위 447.2 ~ 제스처바 838.3), 막 0.5. 로딩(점 3개) 뒤 막 85ms → 약 240ms 뒤 시트 250ms */
+.nh .sheet--hist.sheet--open .sheet__panel {
+  transition:
+    transform 250ms cubic-bezier(0.42, 0.76, 0.78, 1) 240ms,
+    opacity 0s 240ms;
+}
+.nh-hpick {
+  height: 391.1px;
+}
+.nh-hpick__head {
+  position: relative;
+  height: 79.6px;
+  padding-top: 29.6px; /* 탭 묶음 위 45.6 (손잡이 12+4 아래) */
+}
+/* [계좌선택|직접입력] 묶음 #1f2933 + 0.5dp #414c57, 선택 #cbd2da 알약(글자 #161b23), 비선택 글자 #98a1ac */
+.nh-hpick__tabs {
+  display: inline-flex;
+  margin-left: 24px;
+  height: 38.2px;
+  border-radius: 19.1px;
+  background: var(--nh-sheet2);
+  box-shadow: inset 0 0 0 0.5px var(--nh-input-line);
+}
+.nh-hpick__tabs button {
+  padding: 3.2px 15.85px 0;
+  border-radius: 19.1px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #a0a9b4 !important;
+}
+.nh-hpick__tabs button.on {
+  background: var(--nh-chip-text);
+  color: #161b23 !important;
+}
+.nh-hpick__close {
+  position: absolute;
+  right: 16px;
+  top: 16px; /* X 중심 (348, 시트 위 + 56) */
+}
+.nh-hpick__close svg {
+  width: 24px;
+  height: 24px;
+}
+.nh-hpick__list {
+  flex: 1;
+  overflow-y: auto;
+}
+.nh-hpick__row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 17.5px 24px 0 24.05px;
+  cursor: pointer;
+}
+.nh-hpick__icon {
+  margin-top: 2.5px;
+}
+.nh-hpick__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: -3.2px 0 0 7.4px;
+}
+.nh-hpick__info b {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nh-hpick__info > span {
+  display: flex;
+  align-items: center;
+  margin-top: 3.2px;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--nh-sub);
+}
+/* '복사' 꼬리표 33.6×22.4, 0.5dp 테두리, 13/500 */
+.nh-hpick__copy {
+  height: 22.4px;
+  margin-left: 3.5px;
+  position: relative;
+  top: 1.2px;
+  padding: 0 5px;
+  border-radius: 11.2px;
+  border: 0.5px solid var(--nh-input-line);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--nh-chip-text) !important;
+}
+.nh-hpick__info em {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 20px;
   font-style: normal;
-  font-weight: 700;
+  color: var(--nh-blue);
+}
+.nh-hpick__check {
+  position: absolute;
+  left: 339.44px;
+  top: 43.84px; /* 시트 위 + 139.4 */
+  color: var(--nh-purple);
+}
+.nh-hpick__check svg {
+  display: block;
+}
+/* 아래 버튼 48dp, 17/500. 계좌 등록 = 보라 테두리, 아래 32 */
+.nh-hpick__btn {
+  display: block;
+  width: calc(100% - 48px);
+  height: 48px;
+  margin: 0 24px;
+  font-size: 17px;
+}
+.nh-hpick__btn--add {
+  margin-bottom: 32px;
+}
+/* 직접입력: 입력칸(밑줄 1dp #414c57, 시트 위 148), 안내 15/400, 확인 버튼 시트 위 218 */
+.nh-hpick__field {
+  display: block;
+  margin: 8.4px 24px 0;
+  border-bottom: 1px solid var(--nh-input-line);
+}
+.nh-hpick__field input {
+  display: block;
+  width: 100%;
+  height: 44px;
+  padding: 0 8px 4.8px;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--nh-text);
+  font: inherit;
+  font-size: 18px;
+  letter-spacing: inherit;
+}
+.nh-hpick__field input::placeholder {
+  color: #9299a5;
+  letter-spacing: 0;
+}
+.nh-hpick__note {
+  display: flex;
+  align-items: center;
+  gap: 4.6px;
+  margin: 8.4px 24px 0 25px;
+  font-size: 15px;
+  line-height: 20px;
+  color: #8c929b;
+}
+.nh-hpick__note svg {
+  color: #5f6a75;
+}
+.nh-hpick__btn--ok {
+  margin-top: 40.8px;
+}
+/* 조회조건(기간 필터바를 누르면) — 참고 화면에 없어 같은 시트 모양으로 */
+.nh-hpick--filter {
+  height: auto;
+}
+.nh-hpick__head h2 {
+  margin: 0 0 0 24px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 38px;
+}
+.nh-hpick__tabs--filter {
+  align-self: flex-start;
+  margin-bottom: 32px;
 }

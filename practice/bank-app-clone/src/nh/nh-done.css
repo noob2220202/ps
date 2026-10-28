@@ -1,112 +1,221 @@
-/* ---------- 송금 완료 ---------- */
-.nh-done__body {
-  padding-top: 86px;
-  text-align: center;
-}
-.nh-done__mark {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  margin: 0 auto;
-}
-.nh-done__mark > * {
+/* ---------- 송금 완료 (녹화2 30.15~32.8초, 480px 녹화 × 0.8 = dp) ---------- */
+/* 동전·체크: 녹화에서 잘라 온 80×88 칸 (가운데 x 192, 체크 원 지름 61) */
+.nh-dn-mark {
   position: absolute;
-  inset: 0;
-  margin: auto;
-  transition:
-    transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1),
-    opacity 0.25s;
+  left: 152px;
+  top: 87.2px;
+  width: 80px;
+  height: 88px;
 }
-.nh-done__coin {
-  animation: nh-coin 0.9s ease-in-out infinite alternate;
+.nh-dn-mark--sprite {
+  background-repeat: no-repeat;
+  background-position-y: 0;
 }
-@keyframes nh-coin {
-  to {
-    transform: rotateY(160deg);
-  }
-}
-.nh-done__check {
-  width: 54px;
-  height: 54px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: linear-gradient(160deg, #6fe0ea, #1a9fb2);
-  opacity: 0;
-  transform: scale(0.4);
-}
-.nh-done__mark--done .nh-done__coin {
-  opacity: 0;
-  animation: none;
-}
-.nh-done__mark--done .nh-done__check {
-  opacity: 1;
-  transform: none;
-}
-.nh-done h2 {
-  margin: 22px 0 0;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-.nh-done__more {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  margin-top: 16px;
-  font-size: 12px;
-  color: var(--nh-sub) !important;
-}
-.nh-done__rows {
-  margin: 14px 20px 0;
-  padding: 6px 14px;
-  border-radius: 10px;
-  background: var(--nh-card);
-  text-align: left;
-}
-.nh-done__rows .nh-row {
-  font-size: 12.5px;
-  padding: 7px 0;
-}
-.nh-done__msg {
-  margin-top: auto;
-  padding-top: 30px;
-  text-align: center;
-  transition: opacity 0.3s;
-}
-.nh-done__msg.hide {
-  opacity: 0;
-}
-.nh-done__msg p {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 700;
-}
-.nh-done__msg div {
-  display: flex;
-  justify-content: center;
-  gap: 26px;
-}
-.nh-done__msg button {
+
+/* 제목 24/600 ("님에게"만 400), 줄 34 */
+.nh-dn__title {
+  margin: 186.7px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: #d5d8dd !important;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 34px;
 }
-.nh-bottom--done {
+.nh-dn__title > span {
+  font-weight: 400;
+  margin-top: 1px;
+  margin-bottom: -1px;
+}
+/* 실제 앱도 이 줄이 가운데보다 1.6 왼쪽 */
+.nh-dn__title > b:last-child {
+  position: relative;
+  left: -2px;
+}
+.nh-dn__title b {
+  font-weight: 600;
+}
+/* "할게요"(보라) → "했어요": 둘이 20dp 간격으로 같이 위로 올라가며 엇갈려 사라지고 나타남 (+1.51s, 430ms) */
+.nh-dn__word {
+  position: relative;
+  display: inline-block;
+}
+.nh-dn__did,
+.nh-dn__will {
+  display: inline-block;
+  animation-duration: 430ms, 470ms;
+  animation-timing-function: cubic-bezier(0.3, 0.3, 0.3, 0.9), cubic-bezier(0.3, 0.1, 0.3, 1);
+  animation-delay: 1522ms, 1512ms;
+  animation-fill-mode: both;
+}
+.nh-dn__did {
+  animation-name: nh-dn-did-move, nh-dn-did-fade;
+}
+.nh-dn__will {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--nh-purple);
+  animation-name: nh-dn-will-move, nh-dn-will-fade;
+}
+@keyframes nh-dn-did-move {
+  from {
+    transform: translateY(20px);
+  }
+}
+@keyframes nh-dn-did-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes nh-dn-will-move {
+  to {
+    transform: translateY(-20px);
+  }
+}
+@keyframes nh-dn-will-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 상세보기·메시지 보내기·아래 버튼: +2.01s 부터 440ms 동안 나타남 */
+.nh-dn__late {
+  animation: nh-dn-late 440ms cubic-bezier(0.3, 0.2, 0.3, 0.9) 2012ms both;
+}
+@keyframes nh-dn-late {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+  1% {
+    visibility: visible;
+  }
+}
+/* 상세보기 › : 16/400 #9ca4ae */
+.nh-dn__more {
+  margin: 18px auto 0;
+  position: relative;
+  left: 0.8px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+  color: #9e9da2 !important; /* 완료 화면 회색은 파란 기 없음 */
+}
+.nh-dn__chev {
+  color: #5b5a5f;
+  transition: transform 0.2s;
+}
+.nh-dn__more--open .nh-dn__chev {
+  transform: rotate(90deg);
+}
+.nh-dn__rows {
+  margin: 12px 24px 0;
+  padding: 20px 20px 19px;
+  border-radius: 12px;
+  background: var(--nh-confirm-card);
+  font-size: 17px;
+  line-height: 24px;
+}
+.nh-dn__rows > div {
+  display: flex;
+  justify-content: space-between;
+}
+.nh-dn__rows > div + div {
+  margin-top: 12px;
+}
+.nh-dn__rows dt {
+  color: #cdd0dc;
+}
+.nh-dn__rows dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* 메시지 보내기 17/600, 타일 51.2 칸(둥근 사각 48 + 바탕), 이름 16/400 */
+.nh-dn__msg {
+  margin-top: auto;
+  margin-bottom: 16.4px;
+  text-align: center;
+}
+.nh-bottom.nh-dn__bottom {
   margin-top: 0;
 }
-.nh-done__menu {
-  flex: 0 0 42px !important;
-  height: 42px;
+.nh-dn__bottom .nh-btn:not(.nh-btn--square) {
+  padding-bottom: 2.4px;
+}
+.nh-dn__msg p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.nh-dn__msg > div {
+  position: relative;
+  height: 90px;
+  margin-top: 19px;
+}
+.nh-dn__msg button {
+  position: absolute;
+  top: 0;
+  width: 93.2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 16px;
+  line-height: 22px;
+  color: #c6c6cb !important;
+}
+.nh-dn__msg button:nth-child(1) {
+  left: 51px;
+}
+.nh-dn__msg button:nth-child(2) {
+  left: 144px;
+}
+.nh-dn__msg button:nth-child(3) {
+  left: 237.4px;
+}
+.nh-dn__msg button .nh-img {
+  margin-bottom: 5.2px;
+}
+.nh-dn__msg button:nth-child(1) {
+  padding-left: 1.2px;
+}
+
+/* 대체 그림 (스프라이트가 없을 때) */
+.nh-dn-mark--css > * {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+.nh-dn-mark__coin {
+  animation: nh-dn-coin 1.4s step-end both;
+}
+@keyframes nh-dn-coin {
+  0% {
+    opacity: 0;
+  }
+  7% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+}
+.nh-dn-mark__check {
+  width: 61px;
+  height: 61px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #a5e5ec, #0a9aa8);
+  animation: nh-dn-check 300ms ease-out 1420ms both;
 }
-.nh-bottom--done .nh-btn {
-  height: 42px;
-  border-radius: 8px;
-  font-size: 14.5px;
+@keyframes nh-dn-check {
+  from {
+    opacity: 0;
+    transform: scale(0.6, 0.3) translateY(20px);
+  }
 }

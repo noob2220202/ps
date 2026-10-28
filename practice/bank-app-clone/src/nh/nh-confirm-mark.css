@@ -1,0 +1,81 @@
+/* 송금 완료: 동전 회전 → 청록 체크 (scripts/nh-crops/confirm.py 가 만듦. 손으로 고치지 말 것)
+   녹화2 30.245~32.330초 프레임 72칸, 칸 80×88dp, 시각 기준 30.147초 (완료 화면이 뜬 때) */
+.nh-dn-mark--sprite {
+  background-size: 5760px 88px;
+  animation: nh-dn-mark 2183ms step-end both;
+}
+@keyframes nh-dn-mark {
+  0.000% { background-position-x: 0px; }
+  4.489% { background-position-x: -80px; }
+  9.079% { background-position-x: -160px; }
+  13.271% { background-position-x: -240px; }
+  14.045% { background-position-x: -320px; }
+  16.422% { background-position-x: -400px; }
+  18.836% { background-position-x: -480px; }
+  19.496% { background-position-x: -560px; }
+  22.497% { background-position-x: -640px; }
+  23.133% { background-position-x: -720px; }
+  25.483% { background-position-x: -800px; }
+  26.216% { background-position-x: -880px; }
+  28.594% { background-position-x: -960px; }
+  29.327% { background-position-x: -1040px; }
+  30.857% { background-position-x: -1120px; }
+  31.658% { background-position-x: -1200px; }
+  32.341% { background-position-x: -1280px; }
+  34.659% { background-position-x: -1360px; }
+  35.410% { background-position-x: -1440px; }
+  38.520% { background-position-x: -1520px; }
+  39.153% { background-position-x: -1600px; }
+  40.834% { background-position-x: -1680px; }
+  41.567% { background-position-x: -1760px; }
+  43.825% { background-position-x: -1840px; }
+  44.567% { background-position-x: -1920px; }
+  47.668% { background-position-x: -2000px; }
+  48.433% { background-position-x: -2080px; }
+  52.982% { background-position-x: -2160px; }
+  65.273% { background-position-x: -2240px; }
+  65.937% { background-position-x: -2320px; }
+  66.720% { background-position-x: -2400px; }
+  67.485% { background-position-x: -2480px; }
+  68.236% { background-position-x: -2560px; }
+  69.721% { background-position-x: -2640px; }
+  70.518% { background-position-x: -2720px; }
+  71.461% { background-position-x: -2800px; }
+  72.121% { background-position-x: -2880px; }
+  72.822% { background-position-x: -2960px; }
+  73.587% { background-position-x: -3040px; }
+  74.393% { background-position-x: -3120px; }
+  75.135% { background-position-x: -3200px; }
+  75.941% { background-position-x: -3280px; }
+  76.674% { background-position-x: -3360px; }
+  77.389% { background-position-x: -3440px; }
+  78.149% { background-position-x: -3520px; }
+  78.905% { background-position-x: -3600px; }
+  79.684% { background-position-x: -3680px; }
+  80.454% { background-position-x: -3760px; }
+  81.214% { background-position-x: -3840px; }
+  82.066% { background-position-x: -3920px; }
+  82.771% { background-position-x: -4000px; }
+  83.559% { background-position-x: -4080px; }
+  84.297% { background-position-x: -4160px; }
+  85.025% { background-position-x: -4240px; }
+  85.827% { background-position-x: -4320px; }
+  86.578% { background-position-x: -4400px; }
+  87.265% { background-position-x: -4480px; }
+  87.907% { background-position-x: -4560px; }
+  88.749% { background-position-x: -4640px; }
+  89.647% { background-position-x: -4720px; }
+  90.362% { background-position-x: -4800px; }
+  91.086% { background-position-x: -4880px; }
+  91.938% { background-position-x: -4960px; }
+  92.689% { background-position-x: -5040px; }
+  93.472% { background-position-x: -5120px; }
+  94.219% { background-position-x: -5200px; }
+  94.929% { background-position-x: -5280px; }
+  95.772% { background-position-x: -5360px; }
+  96.601% { background-position-x: -5440px; }
+  97.320% { background-position-x: -5520px; }
+  98.035% { background-position-x: -5600px; }
+  98.827% { background-position-x: -5680px; }
+  100% { background-position-x: -5680px; }
+}

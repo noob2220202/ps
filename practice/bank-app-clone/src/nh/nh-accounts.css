@@ -1,128 +1,531 @@
-/* ---------- 전체계좌 ---------- */
-.nh-accounts__summary {
+/* ---------- 전체계좌 조회 ----------
+   값은 실제 스크린샷(shot-accounts 720px, ÷1.875)과 녹화2 38.25~39.7초(480px, ×0.8)에서 잰 것. 표: scratchpad work/accounts/spec.md
+   세로 위치는 화면 맨 위(상태바 28 포함) 기준 dp. 헤더 28–76 */
+.nh-accts {
+  /* 보기 토글 둘레의 밝은 번짐 (거래내역 보기 토글과 같은 부품) */
+  --accts-glow:
+    0 4px 10px rgba(255, 255, 255, 0.045), 0 3px 28px rgba(255, 255, 255, 0.06);
+}
+.nh-accts.screen {
+  overflow: hidden;
+}
+/* 공용 헤더 제목이 스크린샷보다 3px@720 아래 (잉크 y 85 → 82) → 이 화면에서만 올림 */
+.nh-accts .nh-header h1 {
+  position: relative;
+  top: -1.33px;
+}
+/* 헤더 아래만 스크롤 */
+.nh-accts__scroll {
+  flex: 1 1 auto !important;
+  min-height: 0;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 18px 14px;
-  font-size: 14px;
-  color: var(--nh-sub);
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
-.nh-accounts__summary b {
-  color: #fff;
-}
-.nh-accounts__total {
-  flex: 1;
-  color: #fff;
-  font-weight: 700;
-}
-.nh-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-.nh-toggle input {
+.nh-accts__scroll::-webkit-scrollbar {
   display: none;
 }
-.nh-toggle i {
-  position: relative;
-  width: 38px;
-  height: 22px;
-  border-radius: 11px;
-  background: #434c59;
-  transition: background 0.2s;
+.nh-accts__scroll > * {
+  flex-shrink: 0;
 }
-.nh-toggle i::after {
-  content: "";
-  position: absolute;
-  left: 3px;
-  top: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform 0.2s;
-}
-.nh-toggle input:checked + i {
-  background: var(--nh-teal);
-}
-.nh-toggle input:checked + i::after {
-  transform: translateX(16px);
-}
-.nh-accounts__list {
+
+/* 총액 줄: 잠금 동그라미 30 (99.73–129.73, 중심 x 277.9) · '0원' 24/600 · ? 18 (오른쪽 24) */
+.nh-accts__total {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0 16px 30px;
-}
-.nh-accounts__list.wide {
-  gap: 20px;
-}
-.nh-acard {
-  padding: 16px;
-  border-radius: 14px;
-  background: var(--nh-card);
-}
-.nh-acard__top {
-  display: flex;
+  justify-content: flex-end;
   align-items: center;
-  gap: 10px;
-  text-align: left;
+  height: 30px;
+  margin-top: 23.73px;
+  padding-right: 25.03px;
 }
-.nh-acard__top span {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.nh-accts__lock svg {
+  translate: 0 0.8px;
 }
-.nh-acard__top b {
-  font-size: 15px;
+.nh-accts__lock {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #2f2e33;
+  box-shadow: inset 0 0 0 0.5333px var(--nh-outline-btn); /* 스크린샷 가장자리 1px #454a50 */
+  color: #cdd2d8 !important;
+  position: relative;
+  top: -0.53px;
 }
-.nh-acard__top small {
+.nh-accts__total > b {
+  position: relative;
+  top: 1.4px;
+  margin-left: 7.47px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 28px;
+}
+.nh-accts__q {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #616f7c;
+  color: var(--nh-bg);
   font-size: 12.5px;
-  color: var(--nh-sub);
+  font-weight: 600;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: 0;
 }
-.nh-acard__balance {
-  margin: 16px 0;
-  text-align: right;
-  font-size: 22px;
-  font-weight: 800;
+.nh-accts__total .nh-accts__q {
+  position: relative;
+  top: 1.27px;
+  margin-left: 4.87px;
 }
-.nh-accounts__list.wide .nh-acard__balance {
-  margin: 30px 0;
-}
-.nh-acard__btns {
+
+/* 필터 칩: 높이 36 (152–188), 반경 18, 사이 8. 선택 = 밝은 회색 알약 + 어두운 글자. 오른쪽 끝 13.3dp 페이드 후 잘림(x 360) */
+.nh-accts__chips {
   display: flex;
   gap: 8px;
+  margin: 21.74px 24px 0 0;
+  padding-left: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 13.3px);
+  mask-image: linear-gradient(to left, transparent, #000 13.3px);
+}
+.nh-accts__chips::-webkit-scrollbar {
+  display: none;
+}
+.nh-accts__chips button {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 15.77px 1px;
+  border-radius: 18px;
+  background: var(--nh-field);
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--nh-chip-text) !important;
+}
+.nh-accts__chips button.on {
+  background: var(--nh-chip-text);
+  color: var(--nh-bg) !important;
+}
+
+/* 목록판: 윗변(237.87)에서 밝은 띠가 17dp 동안 옅어짐, 보기 토글이 윗변 가운데에 걸침 */
+.nh-accts__panel {
+  position: relative;
+  flex: 1 0 auto !important;
+  display: flex;
+  flex-direction: column;
+  margin-top: 50.4px; /* 187.47 → 237.87 */
+  padding-bottom: 32px;
+  background:
+    linear-gradient(
+        rgba(255, 255, 255, 0.052),
+        rgba(255, 255, 255, 0.045) 2.13px,
+        rgba(255, 255, 255, 0.039) 3.73px,
+        rgba(255, 255, 255, 0.035) 4.8px,
+        rgba(255, 255, 255, 0.03) 5.87px,
+        rgba(255, 255, 255, 0.026) 6.93px,
+        rgba(255, 255, 255, 0.022) 8px,
+        rgba(255, 255, 255, 0.017) 9.07px,
+        rgba(255, 255, 255, 0.013) 11.2px,
+        rgba(255, 255, 255, 0.009) 12.27px,
+        rgba(255, 255, 255, 0.004) 13.87px,
+        rgba(255, 255, 255, 0) 17.07px
+      )
+      no-repeat top / 100% 17.07px,
+    var(--nh-bg);
+}
+/* 보기 토글 89×32 (가운데 x 192): 묶음 #1f2933 + 0.5dp #2d343c, 선택 44dp 원 = 바탕 + 1dp #cdd2d8 */
+.nh-accts__view {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  width: 89px;
+  height: 32px;
+  border-radius: 16px;
+  background: var(--nh-field);
+  box-shadow:
+    inset 0 0 0 0.5px #2d343c,
+    var(--accts-glow);
+}
+.nh-accts__view button {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #616f7c !important;
+}
+.nh-accts__view button.on {
+  flex: 0 0 44px;
+  background: var(--nh-bg);
+  box-shadow: inset 0 0 0 1px #cdd2d8;
+  color: #cdd2d8 !important;
+}
+.nh-accts__view button:not(.on) svg {
+  transform: translate(-0.47px, -1.6px);
+}
+.nh-accts__view svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 넓게 줄: 토글 53.33×22.4, 위 273.87, 오른쪽 24 */
+.nh-accts__wide {
+  display: flex;
+  justify-content: flex-end;
+  height: 22.4px;
+  margin-top: 36px;
+  padding-right: 23.73px;
+}
+/* 토글: 켜짐 보라 #768afb + '넓게' 13/600 흰색(왼쪽 9.9) + 오른쪽 검은 손잡이 13.33 (오른쪽 4.5), 손잡이 아래로 밝은 번짐 */
+.nh-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 53.33px;
+  height: 22.4px;
+  border-radius: 11.2px;
+  background: #3e4b5a;
+  transition: background-color 0.2s;
+}
+.nh-switch span {
+  position: absolute;
+  top: 0;
+  right: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 22.4px;
+  color: #cbd2da;
+  transition:
+    right 0.2s,
+    color 0.2s;
+}
+.nh-switch i {
+  position: absolute;
+  top: 4.53px;
+  left: 4.53px;
+  width: 13.33px;
+  height: 13.33px;
+  border-radius: 50%;
+  background: var(--nh-bg);
+  box-shadow:
+    0 2px 3px rgba(255, 255, 255, 0.14),
+    0 4px 8px rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
+}
+.nh-switch.on {
+  background: var(--nh-purple);
+}
+.nh-switch.on span {
+  right: 22.3px;
+  color: #fff;
+}
+.nh-switch.on i {
+  transform: translateX(30.94px);
+}
+
+/* ---------- 섹션 (입출금 / 예적금·신탁 / 대출 / 펀드 / 외화 / 카드) ----------
+   머리 56.53 (글자 세로 가운데 = 카드 위 − 28.27), 카드 아래 35.73 → 0.5dp #24272e 구분선 → 다음 머리 */
+.nh-accts__secs {
+  margin-top: 15.2px; /* 넓게 아래 296.27 → 첫 머리 311.47 */
+}
+.nh-asec {
+  margin: 0 24px;
+  padding-bottom: 35.73px;
+}
+.nh-asec + .nh-asec {
+  box-shadow: inset 0 0.5333px #24272e; /* 스크린샷 1px */
+  padding-top: 3.04px;
+}
+/* 둘째 섹션부터 머리 글자가 카드 위 − 28.53 (첫 섹션은 − 28.0) */
+.nh-asec + .nh-asec .nh-asec__head {
+  height: 57.87px;
+}
+.nh-asec__head {
+  display: flex;
+  align-items: center;
+  height: 56.53px;
+  cursor: pointer;
+}
+.nh-asec__head h2 {
+  display: flex;
+  align-items: center;
+  margin: 0 auto 0 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #cdd2d8;
+}
+.nh-asec__head h2 em {
+  margin-left: 3.93px;
+  font-style: normal;
+  color: var(--nh-blue);
+}
+.nh-asec__head > b {
+  position: relative;
+  top: -0.27px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #e4e7ec;
+}
+.nh-asec__none {
+  font-weight: 500 !important;
+  color: var(--nh-sub) !important;
+}
+.nh-asec__q {
+  margin-left: 6px;
+}
+.nh-asec__switch {
+  display: flex;
+  margin-left: 12px;
+}
+.nh-asec__chev {
+  flex-shrink: 0;
+  margin: 0 0.03px 0 8.07px;
+  color: #535f6b;
+  translate: 0 -0.8px;
+  transition: transform 0.2s;
+}
+.nh-asec__chev.down {
+  transform: rotate(180deg);
+}
+
+/* ---------- 계좌 카드: 336 × 237.33, 0.5dp #2f343a 테두리만, 반경 16 ---------- */
+.nh-acard {
+  position: relative;
+  height: 237.33px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 0.5333px var(--nh-outline);
+}
+.nh-acard + .nh-acard {
+  margin-top: 12px;
+}
+/* ⋮ : 점 중심 카드 왼쪽+311.7, 위+22.4 / 28.5 / 34.7, #8b939e */
+.nh-acard__more {
+  position: absolute;
+  left: 299.7px;
+  top: 10.4px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 36px;
+  color: #8b939e !important;
+}
+.nh-acard__more svg {
+  display: block;
+}
+/* 아이콘(+별) 42.67 × 41.6: 카드 왼쪽+11.2, 위+51.2 */
+.nh-acard__icon {
+  position: absolute;
+  left: 11px;
+  top: 51.2px;
+}
+/* 이름 18/500 (잉크 왼쪽 카드+56.5, 위+51.7) / 은행·번호 15/400 #9ca4ae + 자세히 */
+.nh-acard__name {
+  position: absolute;
+  left: 56.94px;
+  top: 48.77px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.nh-acard__name > b {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nh-acard__name > span {
+  display: flex;
+  align-items: center;
+  margin-top: 4.4px;
+  height: 22px;
+}
+.nh-acard__no {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--nh-sub);
+  letter-spacing: -0.012em;
+}
+/* 자세히: 44.3 × 21.9 알약, 0.5dp #454952, 13/500 #cdd2d8 */
+.nh-acard__tag {
+  display: grid;
+  place-items: center;
+  height: 21.87px;
+  margin: 0.53px 0 0 4.2px;
+  padding: 0 6.5px 0.3px;
+  border-radius: 11px;
+  box-shadow: inset 0 0 0 0.5333px var(--nh-outline-btn);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #cdd2d8 !important;
+}
+/* 잔액 21/600 파랑: 잉크 오른끝 카드 오른쪽 −13.3, 잉크 가운데 위+152.8 */
+.nh-acard__bal {
+  position: absolute;
+  right: 12px;
+  top: 139.9px;
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 25px;
+  letter-spacing: 0.02em;
+  color: var(--nh-blue);
+}
+/* 가로줄 1dp #212832 (위+188.8, 좌우 12.5) · [거래내역 │ 송금] 반씩, 세로줄 1dp × 12.27 #2c353e */
+.nh-acard__btns {
+  position: absolute;
+  left: 12.5px;
+  right: 12.5px;
+  top: 188.77px;
+  display: flex;
+  align-items: center;
+  height: 46.5px;
+  padding-top: 0.53px;
+  border-top: 1px solid #212832;
 }
 .nh-acard__btns button {
   flex: 1;
-  height: 40px;
-  border-radius: 8px;
-  background: #36414e;
-  font-size: 14px;
-  font-weight: 600;
+  height: 100%;
+  padding-bottom: 1.6px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 20px;
 }
-.nh-accounts__add {
-  height: 50px;
-  border-radius: 14px;
-  border: 1px dashed #4a5361;
-  font-size: 14px;
+.nh-acard__btns button:first-child {
+  margin-left: -12.5px;
+}
+.nh-acard__btns button:last-of-type {
+  margin-right: -12.5px;
+}
+.nh-acard__btns i {
+  flex: 0 0 1px;
+  height: 12.27px;
+  margin-top: -1.03px;
+  background: var(--nh-line);
+}
+
+/* 넓게 끔: 카드 사이·안쪽 여백을 줄인 모양 (참고 자료에 없음) */
+.nh-accts__secs.narrow .nh-acard:not(.nh-acard--empty) {
+  height: 176px;
+}
+.nh-accts__secs.narrow .nh-acard__icon {
+  top: 18px;
+}
+.nh-accts__secs.narrow .nh-acard__name {
+  top: 14.5px;
+}
+.nh-accts__secs.narrow .nh-acard__more {
+  top: -6px;
+}
+.nh-accts__secs.narrow .nh-acard__bal {
+  top: 82px;
+}
+.nh-accts__secs.narrow .nh-acard__btns {
+  top: 127px;
+}
+
+/* 빈 섹션 카드: 흰 공 48(위+16.5) · 문구 17/500 · 상품 링크 16/400 */
+.nh-acard--empty {
+  height: 166px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nh-acard__ball {
+  position: relative;
+  margin-top: 14.93px;
+}
+.nh-acard__ball i {
+  position: absolute;
+  top: 23.07px;
+  left: calc(50% - 2.4px);
+  width: 4.8px;
+  height: 4.8px;
+  border-radius: 50%;
+  background: #7c9194;
+  opacity: 0;
+  animation: nh-acard-dot 400ms ease-out forwards;
+}
+.nh-acard__ball i:nth-of-type(1) {
+  margin-left: -9.07px;
+  animation-delay: 60ms;
+}
+.nh-acard__ball i:nth-of-type(2) {
+  margin-left: -0.27px;
+  animation-delay: 385ms;
+}
+.nh-acard__ball i:nth-of-type(3) {
+  margin-left: 8.53px;
+  animation-delay: 725ms;
+}
+@keyframes nh-acard-dot {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.nh-acard--empty > b {
+  margin-top: 19.63px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 20px;
+}
+.nh-acard__shop {
+  margin-top: 17.63px;
+  font-size: 16px;
+  line-height: 20px;
   color: var(--nh-sub) !important;
 }
 
-/* 농협계좌 등록 */
-.nh-register__title {
-  margin: 20px 20px 24px;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.45;
-  white-space: pre-line;
+/* 목록 보기: 테두리 없이 한 줄씩 */
+.nh-arow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 72px;
+  text-align: left;
 }
-.nh-register__hint {
-  margin: -6px 18px 0;
-  font-size: 12.5px;
+.nh-arow__icon {
+  margin-left: -4px;
+}
+.nh-arow__info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-left: 8px;
+}
+.nh-arow__info b {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nh-arow__info span {
+  margin-top: 3px;
+  font-size: 15px;
+  line-height: 20px;
   color: var(--nh-sub);
 }
-.nh-register__pad {
-  margin-top: auto;
+.nh-arow em {
+  font-style: normal;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--nh-blue);
+}
+
+/* 맨 아래 '콕에 등록된 계좌 보기' (녹화2 38.25: 24–360 × 48, 보라 테두리) */
+.nh-accts__reg {
+  height: 48px;
+  margin: 8px 24px 0;
+  font-size: 17px;
 }

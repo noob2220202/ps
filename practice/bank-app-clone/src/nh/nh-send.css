@@ -1,91 +1,264 @@
-/* ---------- 콕송금 (녹화1 17초 프레임에서 잰 값: 480px × 0.75, 상태바 25px 뺌) ---------- */
+/* ---------- 콕송금 첫 화면 (담당 send-who). 녹화1 16.3~17.4초(멈춘 프레임 평균)에서 잰 값: 녹화 px × 0.8 = dp.
+   y 는 헤더 아래(앱 위 48dp)를 0 으로 둔 값. 최근송금 시트는 nh-recipients.css ---------- */
 .nh-send {
   overflow: hidden;
 }
-.nh-send__from {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 4px 16px 0 22px;
+.nh-sw {
+  position: relative;
+  height: 403.5px; /* 시트가 접혔을 때 위쪽 끝(앱 위 451.5)까지 */
 }
-.nh-send__from > .nh-img {
-  margin-top: 7px;
+.nh-sw > * {
+  position: absolute;
 }
-.nh-send__from-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* button 은 브라우저 기본 letter-spacing 이 normal(0) 이라 .nh 값이 안 내려옴. 참고와 폭을 맞춰 보면
+   이 화면 버튼 글자(계좌번호 입력·NH농협·휴대전화·빠른송금)는 −0.005em 일 때 ±0.5px 안 (−0.01em 이면 0.8~1px 좁음) */
+.nh-sw button {
+  letter-spacing: -0.005em;
 }
-.nh-send__from-text b {
-  font-size: 17px;
-  font-weight: 600;
+
+/* 출금계좌: 아이콘 24 (x 24, y 24) · 이름 18/500 · 번호 15/400 · ⌄ 중심 (348, 36) · 잔액 17.5/600 오른쪽 24 */
+.nh-sw__from {
+  inset: 0 0 auto;
+  height: 98px;
 }
-.nh-send__from-text small,
-.nh-send__mini small {
-  font-size: 14px;
+.nh-sw__from > * {
+  position: absolute;
+}
+.nh-sw__from > .nh-img {
+  left: 24px;
+  top: 24px;
+  border-radius: 0;
+}
+.nh-sw__from b {
+  left: 56px;
+  top: 13px;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 500;
+}
+.nh-sw__from small {
+  left: 56px;
+  top: 39.6px;
+  font-size: 15px;
+  line-height: 20px;
   color: var(--nh-sub);
 }
-.nh-send__from > svg {
-  margin-top: 10px;
-  color: #c9ced6;
+.nh-sw__from .nh-sw__chev {
+  left: 335.65px;
+  top: 24.45px;
 }
-.nh-send__from-balance {
-  width: 100%;
-  text-align: right;
-  margin-top: 2px;
+.nh-sw__from em {
+  right: 23.8px;
+  top: 65px;
+  font-style: normal;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
   color: var(--nh-blue);
-  font-size: 15.5px;
-  font-weight: 700;
+  transform: translate(-0.45px, 0.45px); /* 글자 줄은 정수 px 로 맞춰지므로 남는 만큼 */
 }
-.nh-send__chev {
+.nh-sw__chev {
+  color: var(--nh-chip-text);
+}
+
+/* 청록 ⌄⌄: 큰 꺾쇠 꼭짓점(선 중심)이 (191.8, 131.4) = 녹화 (239.75, 259.35)px. 꼭짓점을 원점으로 칸마다 옮기고 키움 */
+.nh-sw__kok {
+  left: 179.8px;
+  top: 119.4px;
+  width: 24px;
+  height: 24px;
+}
+.nh-sw__kok i {
+  position: absolute;
+  inset: 0;
+  animation: 1.5s linear 0.1s infinite both;
+}
+.nh-sw__kok svg {
   display: block;
-  margin: 26px auto 0;
-  color: var(--nh-teal);
+  overflow: visible;
+  transform-origin: 12px 12px;
+  animation: 1.5s linear 0.1s infinite both;
 }
-.nh-send__who {
-  margin: 22px 0 22px;
+.nh-sw__kok > .nh-sw__kok-a {
+  animation-name: nh-sw-kok-fade-in;
+}
+.nh-sw__kok .nh-sw__kok-a svg {
+  animation-name: nh-sw-kok-a;
+}
+.nh-sw__kok .nh-sw__kok-b svg {
+  animation-name: nh-sw-kok-b;
+}
+.nh-sw__kok > .nh-sw__kok-c {
+  animation-name: nh-sw-kok-fade-out;
+}
+.nh-sw__kok .nh-sw__kok-c svg {
+  animation-name: nh-sw-kok-c;
+}
+/* 한 주기 1.5s. 녹화1 16.80~17.95초·25.80~27.30초 두 주기의 프레임을 위상 30개(0.05s 간격)로 평균내고, 같은 위상으로 멈춘
+   꺾쇠 30벌을 한 번에 찍어 위·아래 칸 밝기, 전체 밝기, 세로 중심, 픽셀 차이가 함께 가장 작아지게 맞춘 값
+   (전체 밝기 rms 646 → 378 / 24000, 아래 칸 rms 26, 위 칸 49):
+   a 새 꺾쇠: 0.20s 부터 맨 위 칸에서 서서히 진해지며(1.28s 에 다 진해짐) 0.43~1.19s 에 작은 칸으로 내려옴
+   b 작은 → 큰: 0~1.30s
+   c 큰 → 아래: 0.04~0.61s 에 흐려지며 0~0.62s 에 2.8dp 내려감 */
+@keyframes nh-sw-kok-a {
+  0%,
+  28.47% {
+    transform: translateY(-12.92px) scale(0.565);
+    animation-timing-function: cubic-bezier(0.154, 0.029, 0.58, 0.86);
+  }
+  79.33%,
+  100% {
+    transform: translateY(-8.6px) scale(0.67);
+  }
+}
+@keyframes nh-sw-kok-b {
+  0% {
+    transform: translateY(-8.6px) scale(0.67);
+    animation-timing-function: cubic-bezier(0.316, 0.151, 0.594, 0.992);
+  }
+  86.68%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes nh-sw-kok-c {
+  0% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0.398, 0.063, 0.683, 1);
+  }
+  41.50%,
+  100% {
+    transform: translateY(2.84px) scale(1.007);
+  }
+}
+@keyframes nh-sw-kok-fade-in {
+  0%,
+  13.31% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.392, 0.327, 0.437, 0.937);
+  }
+  85.50%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes nh-sw-kok-fade-out {
+  0%,
+  2.69% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.007, 0.004, 0.965, 0.952);
+  }
+  40.38%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 누구에게 보낼까요? 24/600, 가운데 */
+.nh-sw__who {
+  left: 0;
+  right: 0;
+  top: 161.7px;
+  margin: 0;
   text-align: center;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  transform: translateY(-0.6px);
 }
-.nh-send__bank,
-.nh-send__number {
+
+/* 계좌 / 휴대전화: 묶음 168.2 × 40 (x 107.8), 선택 알약 69 × 40 보라 */
+.nh-sw__seg {
+  left: 107.8px;
+  top: 218.4px;
+  width: 168.2px;
+  height: 40px;
+  display: flex;
+  border-radius: 20px;
+  background: var(--nh-field);
+}
+.nh-sw .nh-sw__seg button {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--nh-chip-text);
+}
+.nh-sw .nh-sw__seg button.on {
+  flex: 0 0 69px;
+  padding-left: 1px;
+  background: var(--nh-purple);
+  color: #fff;
+}
+
+/* 은행 줄 / 계좌번호 줄: x 24~360, 높이 48 (밑줄 1dp 포함), 글자 왼쪽 안쪽 8 */
+.nh-sw__row {
+  left: 24px;
+  right: 24px;
+  height: 48px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  margin: 0 22px;
-  height: 46px;
-  padding: 0 6px 0 8px;
-  border-bottom: 1px solid var(--nh-line);
-  font-size: 17px;
+  padding: 0 8px 1px 8px;
+  border-bottom: 1px solid #25242a;
 }
-.nh-send__bank {
-  margin-top: 14px;
-  font-weight: 600;
+.nh-sw__bank {
+  top: 270px;
+  justify-content: space-between;
+  padding-right: 8.35px; /* ⌄ 24 상자 중심이 x 339.65 */
+  font-size: 18px;
+  font-weight: 500;
 }
-.nh-send__number {
-  color: var(--nh-sub);
-  font-size: 16.5px;
+.nh-sw__bank > span {
+  position: relative;
+  top: -0.66px;
 }
-.nh-send__number > button:first-child {
+.nh-sw__bank > svg {
+  transform: translateY(0.45px); /* top 으로 옮기면 정수 px 로 맞춰져서 transform 으로 */
+}
+/* 입력칸 글자는 18/500 (입력된 14자리 번호: 500 이면 잉크 양 ×0.997·폭 −0.3px, 400 이면 ×0.84 에 숫자 사이를 0.25dp 벌려야 폭이 맞음.
+   안내문 '계좌번호 입력'도 같은 칸이라 500: 잉크 양 ×1.045, 400 은 ×0.87) */
+.nh-sw__number {
+  top: 318px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--nh-placeholder);
+}
+.nh-sw .nh-sw__number > button:first-child {
   flex: 1;
   height: 100%;
   text-align: left;
   color: inherit;
+  transform: translateY(-0.35px);
 }
-.nh-send__number.filled {
-  color: #fff;
-  font-size: 16px;
+.nh-sw__number.filled {
+  color: var(--nh-text);
 }
-.nh-send__quick {
-  align-self: flex-end;
+/* 지우기 ×: 은행 줄 ⌄ 와 같은 24 상자 (중심 x 339.8) */
+.nh-sw .nh-sw__clear {
+  transform: translateY(0.75px);
+  display: grid;
+  margin-right: 0.2px;
+}
+
+/* 빠른송금: 아이콘 + 16/400, 오른쪽 24 */
+.nh-sw .nh-sw__quick {
+  right: 24px;
+  top: 377.6px;
+  height: 24px;
   display: flex;
   align-items: center;
-  gap: 3px;
-  margin: 10px 22px 0 0;
+  gap: 5.6px;
+  font-size: 16px;
+  color: var(--nh-sub);
+}
+.nh-sw__quick svg {
+  margin-right: -1px;
+}
+
+/* 받는 분을 고른 뒤 단계(NhSendAmount, 담당 amount)가 같이 쓰는 줄 */
+.nh-send__mini small {
   font-size: 14px;
-  color: #c3c8d0 !important;
+  color: var(--nh-sub);
 }

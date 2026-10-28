@@ -1,46 +1,151 @@
-/* 금액 시트 */
-.nh-amount__value {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  margin-top: 4px;
-  height: 36px;
-  font-size: 22px;
-  font-weight: 800;
+/* 금액 시트 (담당 amount). 녹화2 16.3~17.4초·녹화1 59~61.6초 정지 프레임 평균에서 잰 값: 녹화 px × 0.8 = dp.
+   y 는 시트 윗변(열렸을 때 화면 위 247.9)을 0 으로 둔 값. 키패드 위까지 231.4 */
+.nh-as {
+  position: relative;
+  flex-shrink: 0;
+  height: 231.4px;
 }
-.nh-amount__value.error {
+.nh-as > * {
+  position: absolute;
+}
+
+/* X: 중심 (347.3, 38.2) — 헤더 X 와 같은 글리프 */
+.nh-as__close {
+  top: 26.2px;
+  right: 23.9px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--nh-text);
+}
+
+/* 금액 입력(32/600 #8e96a2, 녹화 #8d95a1) / 입력값(32/600 흰색, 잔액 부족이면 빨강). 줄 가운데 y 87.1 */
+.nh-as__value {
+  left: 0;
+  right: 0;
+  top: 65.1px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  line-height: 44px;
+  font-weight: 600;
+  letter-spacing: 0; /* '금액 입력' 폭 143px@480 = 자간 0 */
+  color: #8e96a2;
+}
+/* 값이 있을 때: [숫자][원][11.1][ⓧ 16] 묶음이 가운데에서 7.2 오른쪽 (실측: '1' 시작 164.8, ⓧ 끝 233.6).
+   커서는 숫자 끝에 겹쳐 그려짐 (자리 차지 안 함, '원' 의 ㅇ 왼쪽을 살짝 덮음) */
+.nh-as__value.filled {
+  padding-left: 14.4px;
+  letter-spacing: -0.01em;
+  color: var(--nh-text);
+}
+.nh-as__value.error {
   color: var(--nh-red);
 }
-.nh-amount__value.empty {
-  color: #6c7480;
-  font-weight: 700;
+/* 커서: 밝은 청록 #00d9be (버튼 청록보다 밝음, 한 프레임 값 #02d9be~#09d7c4) 2 × 37.8, 0.5초 보이고 0.5초 숨음
+   (녹화1 60.27~61.64초, 녹화2 16.89~17.39초) */
+.nh-as__caret {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  width: 2px;
+  height: 37.8px;
+  margin-right: -2px;
+  background: #00d9be;
+  animation: nh-amt-blink 1s steps(1) infinite;
 }
-.nh-amount__value button {
+@keyframes nh-amt-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ⓧ: 지름 16. 시트 위 원 #535e6b · × #c8d3de / 화면 위 원 #2b343c · × #cbd2da */
+.nh-amt-clear {
+  flex-shrink: 0;
   display: grid;
-  margin-left: 8px;
+  width: 16px;
+  height: 16px;
 }
-.nh-amount__hint {
-  min-height: 16px;
-  margin: 4px 0 12px;
+.nh-amt-clear svg {
+  display: block;
+}
+.nh-amt-clear--sheet {
+  margin-left: 11.1px;
+}
+.nh-amt-clear--sheet circle {
+  fill: #535e6b;
+}
+.nh-amt-clear--sheet path {
+  stroke: #c8d3de;
+}
+
+/* 일원 / 두 줄 안내: 14/400, 가운데 y 129.3 (한 줄이든 두 줄이든 같은 가운데) */
+.nh-as__hint {
+  left: 0;
+  right: 0;
+  top: 129.3px;
+  margin: 0;
+  transform: translateY(-50%);
   text-align: center;
-  font-size: 12.5px;
-  color: var(--nh-sub);
-}
-.nh-amount__hint.error {
   white-space: pre-line;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 16.5px;
+  letter-spacing: -0.015em;
+  color: #86919c;
 }
-.nh-chips {
+
+/* 빠른금액: 5칸 (62.4 × 36.3, 사이 6), 위 183.4, 테두리 1dp #414c57, 모서리 10, 14/500 */
+.nh-as__chips {
+  left: 24px;
+  right: 24px;
+  top: 183.4px;
   display: flex;
-  gap: 5px;
-  padding: 0 16px 6px;
+  gap: 6px;
 }
-.nh-chips button {
+.nh-as__chips button {
   flex: 1;
-  height: 28px;
-  border-radius: 6px;
-  border: 1px solid #4a5361;
-  font-size: 11.5px;
-  color: #dfe2e7;
+  height: 36.3px;
+  border-radius: 10px;
+  border: 1px solid var(--nh-input-line);
+  font-size: 14px;
+  font-weight: 500;
+  color: #cdd7e2;
+}
+
+/* 다음: 키패드 아래 9.2, 아래 25.8 (계좌번호 시트보다 1.5 위) */
+.nh-amount .nh-sheet-btn {
+  margin: 9.2px 24px 25.8px;
+}
+
+/* ---------- 키패드 시트 열림/닫힘 (NhSend 가 패널에 nh-amt-sheet 를 붙임) ----------
+   닫힘 (녹화2 금액 시트 17.50~17.70초, 계좌번호 시트 13.60~13.72초 같은 곡선): 끝까지 내려가지 않고
+   176dp 를 가속하며(cubic-bezier(.4,0,1,1) 205ms) 내려가면서 같은 곡선으로 200ms 동안 투명해짐 → 다 사라진 뒤 아래로 숨김.
+   막·상태바는 200ms 직선 (공용 규칙). */
+.nh .sheet:not(.sheet--open) .sheet__panel.nh-amt-sheet {
+  transition: none;
+}
+.nh .sheet:not(.sheet--open) .sheet__panel.nh-amt-sheet.nh-amt-closing {
+  transform: translate3d(0, 176px, 0);
+  opacity: 0;
+  transition:
+    transform 205ms cubic-bezier(0.4, 0, 1, 1),
+    opacity 200ms cubic-bezier(0.4, 0, 1, 1);
+}
+/* 금액 시트 열림 (녹화2 15.98~16.39초): 아래에서 410ms cubic-bezier(.2,1,.4,1) (rmse 0.004),
+   불투명도 0→1 은 220ms easeOutCubic (37ms 에 0.5, 100ms 에 0.83, 200ms 에 1). 막은 245ms 직선 0→0.6 (공용) */
+.nh .sheet--open .sheet__panel.nh-amt-sheet--open-slow {
+  transition:
+    transform 410ms cubic-bezier(0.2, 1, 0.4, 1),
+    opacity 220ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+/* 상태바 (폰 프레임): 키패드 시트 막과 같이 열릴 때 245ms·닫힐 때 200ms 직선 */
+.phone:has(.nh-send .sheet--keypad) .statusbar {
+  transition: background-color 200ms linear;
+}
+.phone:has(.nh-send .sheet--keypad.sheet--open) .statusbar {
+  transition: background-color 245ms linear;
 }

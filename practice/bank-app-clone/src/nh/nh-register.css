@@ -1,0 +1,260 @@
+/* ---------- 농협계좌 등록 ----------
+   녹화2 61.46~65.2초(480px, ×0.8)에서 잰 값. 표: scratchpad work/accounts/spec.md
+   세로 위치는 화면 맨 위(상태바 28 포함) 기준 dp. 헤더 28–76, 아래 버튼 760–814 */
+.nh-reg.screen {
+  overflow: hidden;
+}
+/* 공용 헤더 제목이 실제보다 1.6dp 아래 → 이 화면에서만 올림 (전체계좌 조회와 같음) */
+.nh-reg .nh-header h1 {
+  position: relative;
+  top: -1.33px;
+}
+.nh-reg__scroll {
+  flex: 1 1 auto !important;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.nh-reg__scroll::-webkit-scrollbar {
+  display: none;
+}
+.nh-reg__scroll > * {
+  flex-shrink: 0;
+}
+
+/* 제목 24/400 + 굵은 낱말 600, 줄 간격 31.2 (잉크 위 102.4, x 24.8) */
+.nh-reg__title {
+  margin: 22.5px 24px 0 24.8px;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 31.2px;
+}
+.nh-reg__title b {
+  font-weight: 600;
+}
+
+/* 빈 상태: 캐릭터 104 × 89.6 (위 233.6, 가운데) · '조회된 농협 계좌가 없습니다.' 17/600 · 안내 16/400 */
+.nh-reg__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 72.7px;
+  text-align: center;
+}
+.nh-reg__char {
+  margin-left: 1.6px;
+  animation: nh-reg-char 0s 80ms both; /* 화면이 뜨고 80ms 뒤에 나타남 (녹화2 61.48 → 61.56) */
+}
+@keyframes nh-reg-char {
+  from {
+    opacity: 0;
+  }
+}
+.nh-reg__empty > b {
+  margin-top: 21.7px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.nh-reg__empty p {
+  margin: 12.4px 0 0;
+  font-size: 16px;
+  line-height: 21.2px;
+  letter-spacing: -0.015em;
+  color: #8c929b; /* 녹화 심지 #888d95 (보조 글자 #9ca4ae 보다 어두움) */
+}
+.nh-reg__empty p button {
+  font: inherit;
+  color: var(--nh-purple) !important;
+}
+
+/* 직접입력으로 찾은 계좌 (연습용: 실제 화면은 참고 자료에 없음 — 거래내역 계좌선택 시트 줄 모양) */
+.nh-reg__found {
+  margin: 48px 24px 0;
+}
+.nh-reg__acct {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 16px;
+  border: 0.5333px solid var(--nh-outline);
+  border-radius: 16px;
+  text-align: left;
+}
+.nh-reg__acct.on {
+  border-color: var(--nh-purple);
+}
+.nh-reg__acct > span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.nh-reg__acct b {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nh-reg__acct span span {
+  margin-top: 3px;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--nh-sub);
+}
+.nh-reg__acct em {
+  margin-top: 6px;
+  font-style: normal;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--nh-blue);
+}
+.nh-reg__acct i {
+  align-self: center;
+  color: var(--nh-purple);
+}
+
+/* 계좌 직접입력 조회: 24–360 × 48 (위 452.4), 0.5dp 보라 테두리, 17/500 보라 */
+.nh-reg__direct {
+  height: 48px;
+  margin: 30.5px 24px 0;
+  font-size: 17px;
+}
+/* 굵은 구분 띠 6.4 (532–538.4), #1f2933, 화면 전체 폭 */
+.nh-reg__band {
+  height: 6.4px;
+  margin-top: 32.4px;
+  background: var(--nh-field);
+}
+
+/* 확인하세요: 확성기 24 + 17/600, 오른쪽 ^ (중심 x 348). 안내 3개 15/400 #9ca4ae, 강조 보라 */
+.nh-reg__note {
+  padding: 0 24px 24px;
+}
+.nh-reg__note-head {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 44px;
+  margin-top: 20.4px;
+}
+.nh-reg__note-head > .nh-img {
+  translate: 0 -0.8px;
+}
+.nh-reg__note-head b {
+  margin: 0 auto 0 5.6px;
+  font-size: 17px;
+  letter-spacing: -0.03em;
+  color: #e4e7ec;
+  font-weight: 600;
+  line-height: 22px;
+}
+.nh-reg__note-head .nh-asec__chev {
+  translate: 0 0.8px;
+  margin-right: -0.5px;
+  color: #8c929b;
+}
+.nh-reg__note ul {
+  margin: 3.4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.nh-reg__note li {
+  position: relative;
+  padding-left: 12px;
+  font-size: 15px;
+  line-height: 21.6px;
+  color: #8c929b;
+}
+.nh-reg__note li + li {
+  margin-top: 7.2px;
+}
+.nh-reg__note li::before {
+  content: "";
+  position: absolute;
+  left: 0.6px;
+  top: 6.8px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #8b929e;
+}
+.nh-reg__note em {
+  font-style: normal;
+  color: var(--nh-purple);
+}
+
+/* 아래 버튼 글자: 공용 버튼보다 1.6dp 위 (녹화2 62.5 '취소'·'다음' 잉크 972–993 px) */
+.nh-reg .nh-bottom .nh-btn {
+  padding-bottom: 3.2px;
+}
+
+/* ---------- 계좌 직접입력 시트 (콕송금 계좌번호 시트와 같은 모양: 머리 76.8 · 입력칸 60.8 · 키패드 68 × 4 · 다음 52) ---------- */
+.nh-reg-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76.8px;
+  padding: 0 16px 0 24px;
+}
+.nh-reg-sheet__head b {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--nh-chip-text);
+}
+.nh-reg-sheet__head .nh-icon-btn svg {
+  width: 24px;
+  height: 24px;
+}
+.nh-reg-sheet__box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60.8px;
+  margin: 0 24px 20px;
+  border: 1px solid var(--nh-input-line);
+  border-radius: 14px;
+}
+.nh-reg-sheet__box.on {
+  border: 2px solid var(--nh-teal);
+}
+.nh-reg-sheet__ph {
+  padding-bottom: 1.1px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: #8c929f;
+}
+.nh-reg-sheet__val {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 25.95px;
+  font-size: 24.6px;
+  font-weight: 600;
+  color: var(--nh-text);
+  white-space: nowrap;
+}
+.nh-reg-sheet__caret {
+  width: 2px;
+  height: 29px;
+  margin-left: 0.8px;
+  background: #00d1be;
+  animation: nh-reg-blink 1s steps(1) infinite;
+}
+@keyframes nh-reg-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.nh-reg-sheet__clear {
+  display: grid;
+  margin-left: 15.95px;
+}
+.nh-reg-sheet .nh-sheet-btn {
+  margin-top: 8.5px;
+}
+.nh-reg-sheet .keypad__key--kok > svg {
+  transform: translateY(-1.2px);
+}

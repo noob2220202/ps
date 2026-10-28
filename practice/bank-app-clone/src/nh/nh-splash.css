@@ -1,30 +1,300 @@
-/* ---------- 시작 화면 ---------- */
-.nh-splash {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.nh-splash--white {
-  background: #fff;
-}
-.nh-splash__nonghyup {
+/* ---------- 콕뱅크 시작화면 (녹화1 0.80~5.35초, 위치는 녹화 px × 0.8) ---------- */
+.nh-splash > * {
   position: absolute;
-  top: 58px;
 }
+.nh-splash__px {
+  transform-origin: 0 0;
+}
+/* 녹화와 같은 배율(1dp = 1.25 기기 px)이면 잘라 온 픽셀 그대로 */
+@media (resolution: 1.25dppx) {
+  .nh-splash__px img {
+    image-rendering: pixelated;
+  }
+}
+
+/* "금융, 정보, 쇼핑을 한 번에" (녹화 잉크 x 125–355, y 380–403) */
 .nh-splash__tag {
-  margin: 0 0 6px;
-  font-size: 17px;
-  color: #e7e9ee;
+  left: 0;
+  right: 0;
+  top: 272px;
+  margin: 0;
+  padding-left: 1px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: 0.01em;
+  color: #f6f7fb;
 }
+.nh-splash__tag b {
+  font-weight: 600;
+}
+
+/* 'NH'·'뱅크'가 먼저(1755ms부터 347ms, 천천히 시작), '콕'이 나중에(2140ms부터 326ms, 천천히 시작·끝) 사라짐.
+   불투명도는 녹화 프레임마다 잰 값 (|픽셀 − 바탕| 합의 비율) */
+.nh-splash__word--nh,
+.nh-splash__word--bank {
+  animation: nh-splash-out-nh 347ms linear 1755ms both;
+}
+.nh-splash__word--kok {
+  animation: nh-splash-out-kok 326ms linear 2140ms both;
+}
+@keyframes nh-splash-out-nh {
+  0% {
+    opacity: 1;
+  }
+  14.1% {
+    opacity: 0.95;
+  }
+  22.5% {
+    opacity: 0.855;
+  }
+  36.9% {
+    opacity: 0.72;
+  }
+  53% {
+    opacity: 0.555;
+  }
+  65.4% {
+    opacity: 0.386;
+  }
+  80.7% {
+    opacity: 0.2;
+  }
+  94.8% {
+    opacity: 0.036;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes nh-splash-out-kok {
+  0% {
+    opacity: 1;
+  }
+  9.2% {
+    opacity: 0.957;
+  }
+  19% {
+    opacity: 0.866;
+  }
+  33.4% {
+    opacity: 0.64;
+  }
+  48.8% {
+    opacity: 0.4;
+  }
+  58.9% {
+    opacity: 0.263;
+  }
+  69.3% {
+    opacity: 0.151;
+  }
+  79.8% {
+    opacity: 0.074;
+  }
+  90.8% {
+    opacity: 0.024;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .nh-splash__dots {
-  margin-top: 26px;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform: translateY(-1.15px); /* 녹화 점 가운데 y 538.6 (로딩 막보다 1.6dp 위) */
 }
-.nh-splash__ma {
+/* 점 가운데 x 녹화 208.7 / 239.1 / 271.6 (공용 점보다 가운데 점이 0.3dp 오른쪽) */
+.nh-splash__dots .nh-dots i:nth-child(2) {
+  margin-left: calc(var(--d) * 0.913 + 0.33px);
+}
+.nh-splash__dots .nh-dots i:nth-child(3) {
+  margin-left: calc(var(--d) * 1.047 - 0.1px);
+}
+
+/* 시작화면 동안 상태바: 색이 서서히 바뀌지 않고 바로 (실제 앱), 어두운 화면 처음 168ms 는 아이콘이 #08070c (안 보임) */
+.phone:has(.nh-splash) .statusbar {
+  transition: none;
+}
+.phone:has(.nh-splash--fade) .statusbar,
+.phone:has(.nh-splash--brand) .statusbar {
+  color: #08070c;
+}
+/* 제스처바 덮개: 1218ms 까지 검정, 380ms 동안 걷힘 (손잡이 0 → #5d5d5d, 점점 느려지게) */
+.nh-splash__navcover {
   position: absolute;
-  bottom: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15px;
+  z-index: 55; /* 제스처바(50) 위, 흰 창(60) 아래 */
+  background: #000;
+  pointer-events: none;
+  animation: nh-splash-uncover 380ms cubic-bezier(0.333, 0.667, 0.667, 1) 1218ms both;
 }
-.nh-splash__fallback-word {
+@keyframes nh-splash-uncover {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- 흰 창 (안드로이드 앱 실행 애니메이션, 폰 전체를 덮음) ---------- */
+.nh-splash__launch {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background: #151d26; /* 창 바깥 = 홈 화면(런처) 바탕 */
+  transition: opacity 25ms linear;
+}
+.nh-splash__launch--white {
+  background: none;
+}
+.nh-splash__launch--fade {
+  background: none;
+  opacity: 0;
+}
+.nh-splash__window {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  clip-path: inset(0);
+  /* 녹화 0.80~1.05초 프레임마다 잰 창 위치 (녹화 px × 0.8). 처음엔 런처 아이콘 자리(192, 280)에서 */
+  animation: nh-launch-window 249ms linear backwards;
+}
+.nh-splash__launch--white .nh-splash__window,
+.nh-splash__launch--fade .nh-splash__window {
+  clip-path: inset(28px 0 0); /* 840ms 부터 상태바 자리는 아래 덮개(sbcover)가 걷히며 보임 */
+}
+/* 상태바 자리 흰 덮개: 녹화 868~968ms 프레임의 상태바 밝기 변화에 맞춘 840ms 부터 125ms, 점점 느려지게 */
+.nh-splash__sbcover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28px;
+  background: #fff;
+  animation: nh-splash-uncover 125ms cubic-bezier(0.333, 0.667, 0.667, 1) both;
+}
+@keyframes nh-launch-window {
+  0% {
+    clip-path: inset(257.6px 169.6px 550.93px 169.6px round 22px);
+  }
+  8% {
+    clip-path: inset(196.8px 108.8px 486.93px 108.8px round 70px);
+  }
+  16.5% {
+    clip-path: inset(147.2px 73.6px 363.73px 72.8px round 72px);
+  }
+  21% {
+    clip-path: inset(94.4px 51.2px 240.53px 51.2px round 88px);
+  }
+  30% {
+    clip-path: inset(45.6px 36.8px 115.73px 36px round 75px);
+  }
+  35% {
+    clip-path: inset(32px 26.4px 82.13px 25.6px round 60px);
+  }
+  45% {
+    clip-path: inset(24px 19.2px 58.93px 18.4px round 51px);
+  }
+  53% {
+    clip-path: inset(15.2px 13.6px 40.53px 12.8px round 44px);
+  }
+  67.5% {
+    clip-path: inset(10.4px 8.8px 26.13px 8px round 41px);
+  }
+  73% {
+    clip-path: inset(6.4px 6.4px 16.53px 4.8px round 38px);
+  }
+  81% {
+    clip-path: inset(3.2px 4px 9.33px 3.2px round 35px);
+  }
+  89% {
+    clip-path: inset(1.6px 2.4px 5.33px 1.6px round 33px);
+  }
+  93% {
+    clip-path: inset(0.8px 1.6px 2.93px 0.8px round 31px);
+  }
+  100% {
+    clip-path: inset(0 round 0);
+  }
+}
+/* 아이콘: 창과 함께 작게(0.2배) 위에서 시작해 제자리로 (녹화 프레임마다 잰 크기·가운데) */
+.nh-splash__icon {
+  left: 150px;
+  top: 387px;
+  width: 77px;
+  height: 77px;
+  position: absolute;
+  animation: nh-launch-icon 249ms linear backwards;
+}
+.nh-splash__icon .nh-splash__px {
+  position: absolute;
+}
+@keyframes nh-launch-icon {
+  0% {
+    transform: translateY(-145.6px) scale(0.2);
+  }
+  8% {
+    transform: translateY(-104px) scale(0.24);
+  }
+  16.5% {
+    transform: translateY(-68.8px) scale(0.39);
+  }
+  21% {
+    transform: translateY(-48px) scale(0.61);
+  }
+  30% {
+    transform: translateY(-34px) scale(0.8);
+  }
+  35% {
+    transform: translateY(-24px) scale(0.85);
+  }
+  45% {
+    transform: translateY(-16.8px) scale(0.9);
+  }
+  53% {
+    transform: translateY(-11.2px) scale(0.93);
+  }
+  67.5% {
+    transform: translateY(-6.8px) scale(0.96);
+  }
+  73% {
+    transform: translateY(-4.4px) scale(0.98);
+  }
+  81% {
+    transform: translateY(-2.4px) scale(0.98);
+  }
+  89% {
+    transform: translateY(-1.2px) scale(0.99);
+  }
+  100% {
+    transform: none;
+  }
+}
+.nh-splash__icon-fallback {
   font-size: 40px;
-  color: #fff;
+  color: #12a17c;
+}
+/* 흰 화면일 때 아래 제스처바 손잡이: 432ms 부터 440ms 동안 흰색 → #afafaf (ease-out cubic), 녹화 y 1054.0~1059.25 (843.2dp, 높이 4.2).
+   상자는 1 CSS px 단위로 그려지므로 843 · 4px 상자를 transform 으로 옮기고 늘림 */
+.nh-splash__handle {
+  position: absolute;
+  left: 50%;
+  top: 843px;
+  width: 115.2px;
+  height: 4px;
+  margin-left: -57.6px;
+  border-radius: 2px;
+  background: #afafaf;
+  transform: translateY(0.2px) scaleY(1.05);
+  transform-origin: 0 0;
+  animation: nh-splash-handle 440ms cubic-bezier(0.333, 1, 0.667, 1) 432ms backwards;
+}
+@keyframes nh-splash-handle {
+  from {
+    background: #fff;
+  }
 }

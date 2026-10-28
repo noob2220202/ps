@@ -1,44 +1,113 @@
-/* 은행선택 */
+/* 은행선택 — 녹화1 29.5~48초에서 잰 값 (녹화 px × 0.8 = dp). 측정표: scratchpad work/picker/spec.md
+   헤더(X)는 고정, 그 아래 전체(검색·탭·타일)가 스크롤. 위치는 화면 위(상태바 포함)에서 dp */
+.screen.nh-banks {
+  overflow: hidden;
+  animation: nh-banks-in 300ms cubic-bezier(0, 0.5, 0.5, 1); /* 녹화2 4.53~4.79초 */
+}
+@keyframes nh-banks-in {
+  from {
+    opacity: 0;
+  }
+}
+.nh-banks__scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding-bottom: 40px; /* 마지막 줄 아래 40 (녹화1 34.5초, 끝까지 내린 상태) */
+}
+.nh-banks__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 검색칸: 위 100~148, 글자 x 32 (18px/400), 밑줄 0.5dp #2f2e33, 돋보기 고리 중심 (331.5, 122.8) */
 .nh-banks__search {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 8px 22px 18px;
-  height: 46px;
-  padding: 0 4px 0 6px;
-  border-bottom: 1px solid var(--nh-line);
-  color: #e3e6ea;
+  height: 48px;
+  margin: 24px 24px 0;
+  padding: 0 16px 0 8px;
+  border-bottom: 0.5px solid #2f2e33;
+  color: var(--nh-text);
 }
 .nh-banks__search input {
   flex: 1;
   min-width: 0;
+  height: 100%;
+  padding: 0;
   background: none;
   border: 0;
   outline: 0;
-  color: #fff;
+  color: var(--nh-text);
   font: inherit;
-  font-size: 15px;
+  padding-bottom: 1.7px; /* 실제보다 0.4 아래에 그려져서 */
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0; /* 안내 문구 폭이 자간 0일 때와 맞음 (271px@480) */
 }
 .nh-banks__search input::placeholder {
-  color: var(--nh-sub);
+  color: var(--nh-placeholder);
+  opacity: 1;
 }
+.nh-banks__search svg {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+/* 은행/증권사 탭 묶음: 168~216 (48), 좌우 24, 바탕 #1f2933, 모서리 12, 안쪽 4. 선택 = #18171c 알약 (40, 모서리 8) */
+.nh-banks__tabs {
+  display: flex;
+  height: 48px;
+  margin: 20px 24px 0;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--nh-sheet2);
+}
+.nh-banks__tabs button {
+  flex: 1;
+  height: 40px;
+  padding-bottom: 1.2px; /* 글자 잉크 가운데가 알약 가운데보다 0.7 위 (녹화1 30초) */
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em; /* button은 .nh의 자간을 물려받지 않음 */
+  color: var(--nh-text);
+}
+.nh-banks__tabs button.on {
+  background: var(--nh-bg);
+  box-shadow:
+    0 0 0 0.5px #2f343a,
+    0 0 5px rgba(255, 255, 255, 0.07);
+}
+
+/* 타일: 3칸 106.67 × 86 (두 줄 이름이면 97.8), 사이 8, 모서리 12, 바탕 #20252d.
+   안쪽 위아래 11.7 + 아이콘 36 + 이름(15px, 줄 18.9) — 남는 높이는 위·사이·아래에 똑같이 나눔 (안드로이드 spread 체인) */
 .nh-banks__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  padding: 14px 18px 24px;
+  margin: 11.4px 24px 0;
 }
 .nh-banks__grid button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
-  height: 80px;
-  border-radius: 10px;
-  background: var(--nh-card);
-  font-size: 13px;
-  line-height: 1.25;
+  justify-content: space-evenly;
+  min-height: 86px;
+  padding: 11.7px 8px;
+  border-radius: 12px;
+  background: var(--nh-tile);
+}
+.nh-banks__grid span {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 18.9px;
+  letter-spacing: -0.01em; /* 이게 없으면 '카카오페이증권'(7자)이 두 줄이 됨 */
   text-align: center;
-  padding: 0 4px;
+  word-break: break-all; /* "아이엠뱅크(대 / 구은행)", "뱅크오브아메리 / 카" 처럼 글자 단위로 줄바꿈 */
+}
+.nh-bank-sq {
+  display: block;
+  flex-shrink: 0;
 }

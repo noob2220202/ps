@@ -1,92 +1,236 @@
-/* ---------- 송금 확인 ---------- */
-.nh-confirm__body {
-  padding-bottom: 20px;
+/* ---------- 송금 확인 (녹화2 24.5초, 480px 녹화 × 0.8 = dp) ---------- */
+/* 제목 24/600 ("님에게"만 400), 줄 간격 34 (첫 줄 아래만 35.4) */
+.nh-cf__title {
+  margin: 19.5px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 34px;
 }
-.nh-confirm h2 {
-  margin: 10px 0 0;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.5;
+.nh-cf__title > span {
+  font-weight: 400;
+  margin-bottom: 1.4px;
 }
-.nh-confirm__bank {
+.nh-cf__title b {
+  font-weight: 600;
+}
+.nh-cf__title > b:last-child {
+  margin-top: -0.4px;
+}
+/* 받는 은행 아이콘(24, 둥근 사각) + "하나은행 번호" 17/400 #9ca4ae, 가운데 */
+.nh-cf__bank {
+  margin: 18.66px 0 0;
+  height: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  margin: 14px 0 26px;
-  font-size: 12.5px;
+  gap: 8px;
+  font-size: 17px;
   color: var(--nh-sub);
 }
-.nh-confirm__from {
-  padding: 6px 14px;
-  margin: 0 16px;
+.nh-cf__bank > span {
+  position: relative;
+  top: -0.6px;
 }
-.nh-confirm__from .nh-row {
-  font-size: 13px;
+.nh-cf__bank-icon {
+  position: relative;
+  top: 0.6px;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 6px;
 }
-.nh-confirm__from dd {
-  font-weight: 700;
-  line-height: 1.45;
+/* 출금계좌·수수료: 남색 상자 #1d1f2f, 모서리 12, 안쪽 20, 이름 17/400 · 값 17/500 (줄 24) */
+.nh-cf__from {
+  margin: 41.55px 24px 0;
+  padding: 19.25px 20px 20.35px;
+  border-radius: 12px;
+  background: var(--nh-confirm-card);
+  font-size: 17px;
+  line-height: 24px;
 }
-.nh-confirm__memo {
-  margin: 12px 16px 0;
+.nh-cf__from > div {
+  display: flex;
+  justify-content: space-between;
 }
-.nh-confirm__phishing {
+.nh-cf__from > div + div {
+  margin-top: 15.1px;
+}
+.nh-cf__from dt {
+  color: #cdd0dc;
+}
+.nh-cf__from dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 500;
+}
+/* 표시·메모 상자: 바탕 없음, 0.5 테두리 #2f343a, 모서리 12. 선 사이 51.57 / 51.2 / 50.4
+   (크롬은 0.5px border를 1px로 올려 그리므로 선은 box-shadow 로 그림) */
+.nh-cf__memo {
+  box-sizing: border-box;
+  height: 153.67px;
+  margin: 15.5px 24px 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 0.5px var(--nh-outline);
+}
+.nh-cf__row {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   align-items: center;
-  gap: 2px;
-  margin: 14px 16px 0 auto;
-  font-size: 12px;
+  padding: 0 17px 0 16.55px;
+}
+.nh-cf__row:nth-child(1) {
+  flex: 0 0 52px;
+}
+.nh-cf__row:nth-child(2) {
+  flex: 0 0 50.77px;
+}
+.nh-cf__row + .nh-cf__row {
+  box-shadow: inset 0 0.5px 0 var(--nh-outline);
+}
+.nh-cf__row > span {
+  flex-shrink: 0;
+  position: relative;
+  top: -1.3px;
+  font-size: 16px;
+  color: var(--nh-sub);
+}
+.nh-cf__row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: right;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--nh-text);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.nh-cf__row input::placeholder {
+  color: var(--nh-placeholder);
+}
+/* ⓧ 원 16.4 (#2b343c, × #cbd2da), 값과 3.1 */
+.nh-cf__clear {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 20.8px;
+  height: 20.8px;
+  margin: 0 0.4px 0 3.7px;
+  position: relative;
+  top: 1px;
+}
+.nh-cf__clear svg {
+  display: block;
+}
+/* 보이스피싱 유의안내 › : 16/400 #9ca4ae, 오른쪽 */
+.nh-cf__phish {
+  align-self: flex-end;
+  margin: 19.2px 22px 0 0;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
   color: var(--nh-sub) !important;
 }
-.nh-verify {
-  padding: 26px 0 8px;
+.nh-cf__chev {
+  margin-left: 0;
+  color: #59616d;
+}
+/* 송금 중 0.48초 동안 화면이 검게 (실제 앱의 화면 전환) — 점 3개 막 아래 */
+/* 버튼 글자: 녹화에선 버튼 가운데보다 1.2 위 (송금 확인·완료 아래 버튼. 받는 분 확인 시트 버튼은 가운데) */
+.nh-cf__bottom .nh-btn {
+  padding-bottom: 2.4px;
+}
+.nh-cf__black {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background: #000;
+}
+
+/* ---------- 받는 분 확인 시트 (녹화2 27.0초) : 시트 위 388.5dp, 손잡이 없음, 막 0.5 ---------- */
+.nh-vf {
   align-items: center;
+  padding: 0 0 30.4px;
 }
-.nh-verify .nh-sheet-title {
-  margin: 14px 0 18px;
+.nh-vf__shield {
+  margin-top: 26.7px;
+  position: relative;
+  left: 0.6px;
 }
-.nh-verify__box {
+.nh-vf__title {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 25.6px;
+}
+/* 이름 상자: #313f56, 높이 85, 모서리 12, 이름 32/600 */
+.nh-vf__name {
   align-self: stretch;
+  height: 85px;
+  margin: 20px 24px 0;
   display: grid;
   place-items: center;
-  margin: 0 16px;
-  height: 52px;
-  border-radius: 8px;
-  background: #303d57;
-  font-size: 19px;
-  font-weight: 700;
+  border-radius: 12px;
+  background: var(--nh-verify);
+  font-size: 32px;
+  font-weight: 600;
 }
-.nh-verify__warn {
+/* 빨간 경고: 원 20 (가운데 x 34.4) + 15.5/400 #e44547 */
+.nh-vf__warn {
   align-self: stretch;
+  margin: 12px 24px 0;
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin: 10px 16px 18px;
+  gap: 3.6px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
   color: var(--nh-red);
-  font-size: 11.5px;
 }
-.nh-verify__warn i {
-  width: 14px;
-  height: 14px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--nh-red);
-  color: #1f252d;
-  font-style: normal;
-  font-size: 10px;
-  font-weight: 900;
+.nh-vf__warn-icon {
+  flex-shrink: 0;
+  margin-left: 0.4px;
 }
-.nh-verify .nh-sheet-btn {
+.nh-vf__send {
   align-self: stretch;
-  margin-top: 0;
+  margin: 31.6px 24px 0;
 }
-.nh-verify__again {
-  margin: 4px 0 12px;
-  font-size: 12.5px;
-  color: #c9ced6 !important;
+.nh-vf__again {
+  margin: 22px 0 0;
+  font-size: 15.8px;
+  line-height: 24px;
+  color: #9ca7b4 !important;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
+}
+/* 이 시트는 닫힐 때 62ms 만에 48dp 내려가며(직선) 사라지고 막도 같이 걷힘 (녹화2 27.915~27.98: +21ms 18px α.65 / +38 34px α.38 / +53 55px α.12).
+   다 사라진 뒤에 원래 자리(100% 아래)로 옮겨 둠 → 다시 열 때는 아래에서 올라옴 */
+.nh .sheet--nhverify:not(.sheet--open) .sheet__panel {
+  translate: 0 48px;
+  transition:
+    translate 62ms linear,
+    opacity 62ms linear,
+    transform 0s linear 62ms;
+}
+/* 열릴 때: 막(85ms)이 시작되고 205ms 뒤에 올라옴 (녹화2 25.872 막 → 26.085 시트 → 26.338 끝) */
+.nh .sheet--nhverify.sheet--open .sheet__panel {
+  transition:
+    transform 250ms cubic-bezier(0.42, 0.76, 0.78, 1) 205ms,
+    opacity 200ms,
+    translate 0s;
+}
+.nh .sheet--nhverify:not(.sheet--open) .sheet__backdrop {
+  transition: opacity 62ms linear;
 }

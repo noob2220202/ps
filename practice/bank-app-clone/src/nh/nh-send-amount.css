@@ -1,76 +1,252 @@
-/* 콕송금 받는 분을 고른 뒤: 얼마를 보낼까요? / 표시 내용 */
-.nh-send__mini {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 4px 16px 0 22px;
-  color: #c9ced6;
+/* 콕송금 받는 분을 고른 뒤 (담당 amount). 녹화2 14.4~15.8초(얼마를), 18~19.8초(표시 내용), 녹화1 62~63.6초(잔액 부족)
+   정지 프레임 평균에서 잰 값: 녹화 px × 0.8 = dp. 주석의 y 는 화면 위(상태바 위 끝) 기준, 헤더 아래 = 76 */
+.nh-sa {
+  flex-shrink: 0;
+  padding: 10px 0 0;
 }
-.nh-send__mini span {
+
+/* 출금계좌 (작게): 16/400 #9ca4ae '농축협 352-…' (잉크 위 89.9) / 16/600 파랑 잔액 (113.8), 줄 24 · ⌄ 중심 (347.5, 109.1) */
+.nh-sa__from {
+  position: relative;
+  padding: 0 24px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.nh-sa__from p {
+  margin: 0;
+  color: var(--nh-sub);
+}
+.nh-sa__from p span {
+  margin-left: 0.8px;
+  letter-spacing: 0; /* 숫자 폭 169.5px@480 = 자간 0 */
+}
+.nh-sa__from b {
+  display: block;
+  font-weight: 600;
+  color: var(--nh-blue);
+}
+.nh-sa__chev {
+  display: block;
+  color: #949399;
+}
+.nh-sa__from .nh-sa__chev {
+  position: absolute;
+  left: 335.5px;
+  top: 10.8px;
+}
+
+/* 받는 분: 19/600 이름(밑줄) + 님에게 19/400 / (표시 내용 단계) 1원(밑줄)을 보낼게요 / 17/400 은행+번호. 줄 26.5 */
+.nh-sa__to {
+  margin-top: 6.2px;
+  padding: 0 24px;
+  font-size: 19px;
+  line-height: 26.5px;
+  color: var(--nh-sub);
+}
+.nh-sa__to p {
+  margin: 0;
+}
+/* 밑줄: 1.1 두께, 이름은 기준선 아래 6.6, 금액은 4.7 (실측. 두 줄이 다름) */
+.nh-sa__to u {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--nh-text);
+  cursor: pointer;
+  background: linear-gradient(currentColor, currentColor) no-repeat left bottom / 100% 1.27px;
+}
+.nh-sa__name {
+  padding-bottom: 1.7px;
+}
+.nh-sa__amt {
+  padding-bottom: 0.32px;
+}
+/* 은행+번호 줄은 윗줄에 1.1 붙음 */
+.nh-sa__to .nh-sa__acct {
+  margin-top: -1.1px;
+  font-size: 17px;
+}
+.nh-sa__acct span {
+  margin-left: 2.4px;
+}
+
+/* 얼마를 보낼까요? 24/600 가운데 (잉크 위 246.8) */
+.nh-sa__how {
+  margin: 49.9px 0 0;
+  text-align: center;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+/* 0.5dp 선(#2f343a)은 SVG(.nh-sa__ol, NhSaOutline)로 그림: 0.5px border·box-shadow 는 크롬에서 두 행으로 갈림 */
+.nh-sa__ol {
+  position: absolute;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--nh-outline);
+  stroke-width: 0.5333px;
+}
+
+/* 금액 상자: x 24~360, 선 바깥 294.4~355.2 (녹화 선 행 368 / 443, 720 에서 552 / 665), 모서리 12. 금액 입력 26/600 (가운데보다 1.65 위) */
+.nh-sa__box {
+  box-sizing: border-box;
+  height: 60.8px;
+  margin: 20.42px 24px 0;
+  padding-bottom: 3.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 12px;
+  font-size: 26px;
+  font-weight: 600;
+  color: #92929b;
+  cursor: pointer;
+}
+/* 금액이 있으면 [1원][3.9][ⓧ 16] 묶음이 가운데에서 2.4 왼쪽 (실측 '1' 시작 162.7, ⓧ 200.5~216.5) */
+.nh-sa__box.filled {
+  padding: 1px 4.8px 0 0;
+  color: var(--nh-text);
+}
+.nh-sa__box.error {
+  color: var(--nh-red);
+}
+.nh-amt-clear--page circle {
+  fill: #2b343c;
+}
+.nh-amt-clear--page path {
+  stroke: #cbd2da;
+}
+.nh-sa__box .nh-amt-clear {
+  margin-left: 3.9px;
+}
+
+/* 잔액 부족 안내 (상자 아래): 15/400 두 줄, 줄 19.5, 가운데 */
+.nh-sa__error {
+  margin: 12.7px 0 -1.36px;
+  text-align: center;
+  white-space: pre-line;
+  font-size: 15px;
+  line-height: 19.5px;
+  color: #82858f;
+}
+
+/* 1일 송금 잔여한도: x 24~360, 위 387.2, 높이 52.8, #20252d, 모서리 17. 16/400 흰색 · ? 원 18 (#606e7c) · 16/600 금액 */
+.nh-sa__limit {
+  height: 52.8px;
+  margin: 32px 24px 0;
+  padding: 0 20px 1.7px;
+  display: flex;
+  align-items: center;
+  border-radius: 17px;
+  background: var(--nh-tile);
+  font-size: 16px;
+  color: var(--nh-text);
+}
+.nh-sa__q {
+  width: 18px;
+  height: 18px;
+  margin-left: 4.8px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #606e7c;
+  color: var(--nh-tile);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.nh-sa__limit b {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+/* 표시 내용 상자: 선 바깥 268.267 / 319.467 / 371.2 (녹화 선 행 335 / 399 / 463, 간격 51.2 · 51.73), 모서리 12 */
+.nh-sa__memo {
+  box-sizing: border-box;
+  height: 102.933px;
+  margin: 49.677px 24px 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  position: relative;
+  border-radius: 12px;
 }
-.nh-send__mini b {
-  color: var(--nh-blue);
-  font-size: 13.5px;
-}
-.nh-send__to {
-  padding: 12px 22px 0;
-  font-size: 15px;
-  line-height: 1.55;
-}
-.nh-send__to p {
-  margin: 0;
-  color: #c9ced6;
-}
-.nh-send__to u {
-  color: #fff;
-  font-weight: 700;
-  text-underline-offset: 3px;
-}
-.nh-send__to small {
-  font-size: 13.5px;
-  color: var(--nh-sub);
-}
-.nh-send__how {
-  margin: 30px 0 14px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-}
-.nh-send__amount-box {
-  margin: 0 22px;
-  height: 46px;
-  border-radius: 8px;
-  border: 1px solid var(--nh-line);
-  font-size: 18px;
-  font-weight: 700;
-}
-.nh-send__amount-box i {
-  font-style: normal;
-  color: #8a919c;
-}
-.nh-send__limit {
+.nh-sa__row {
+  box-sizing: border-box;
+  flex: 0 0 51.2px;
+  min-height: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 12px 22px 0;
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 8px;
-  background: var(--nh-card);
-  font-size: 13px;
+  padding: 0 16px 0 16.55px;
 }
-.nh-send__limit span {
-  color: #d9dce1;
+.nh-sa__row + .nh-sa__row {
+  flex: 1 1 0;
 }
-.nh-send__memo {
-  margin: 30px 22px 0;
-}
-.nh-send__more {
-  margin: 12px 22px 0;
-  text-align: right;
-  font-size: 12.5px;
+/* 이름은 입력값보다 1.8 위 */
+.nh-sa__row > span {
+  flex-shrink: 0;
+  position: relative;
+  top: -1.8px;
+  font-size: 16px;
   color: var(--nh-sub);
+}
+.nh-sa__row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: right;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--nh-text);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.nh-sa__row input::placeholder {
+  color: var(--nh-placeholder);
+}
+/* ⓧ 상자 20.8 (원 16.4 가운데), 입력값과 3.1, 오른쪽 끝에서 17 */
+.nh-sa__row .nh-amt-clear {
+  width: 20.8px;
+  height: 20.8px;
+  position: relative;
+  top: 1px;
+  margin: 0 1px 0 3.1px;
+  place-items: center;
+}
+.nh-sa__row .nh-amt-clear svg {
+  width: 16.4px;
+  height: 16.4px;
+}
+
+/* 상세 정보 ⌄: 16/400 #9ca4ae, 잉크 오른쪽 332.5 · 청록 ⌄ 중심 (347.5, 397.4) */
+.nh-sa__more {
+  margin: 16.3px 0 0;
+  padding-right: 24.5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--nh-sub);
+}
+.nh-sa__more .nh-sa__chev {
+  margin-left: 2.6px;
+  transform: translateY(-1.19px);
+  color: #36a6a8;
+}
+
+/* 다음: 왼쪽 32 · 오른쪽 24 (실제 앱이 비대칭) */
+.nh-sa__bottom {
+  padding-left: 32px;
+  padding-bottom: 24.4px;
+}
+/* '다음' 글자 잉크가 버튼 가운데보다 1.25 위 (녹화2 18~19.8초) */
+.nh-sa__bottom .nh-btn {
+  padding-bottom: 0.9px;
 }

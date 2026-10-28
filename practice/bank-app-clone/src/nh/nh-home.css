@@ -1,56 +1,194 @@
-/* ---------- 홈 ---------- */
+/* ---------- 콕뱅크 홈 ----------
+   값은 홈 스크린샷(720px, 1dp = 1.875px)·녹화1 10~13초(말풍선)·녹화2 36초(스켈레톤)에서 잰 dp.
+   top 은 상태바 아래(화면 위 28dp)부터. 측정표: scratchpad work/home/spec.md */
+/* .screen 이 이미 absolute(inset 0)·세로 스크롤. 안의 것은 모두 잰 자리에 absolute (화면이 짧으면 스크롤) */
 .nh-home {
-  padding-bottom: 30px;
+  /* 캐릭터 뒤 빛: 원형 직선 그라데이션 (중심 화면 191.73, 340.37dp / 반지름 188.85dp / #2f4f74 → 바탕) */
+  background: radial-gradient(circle 188.85px at 191.73px 312.37px, #2f4f74, #18171c) local;
 }
-.nh-home__top {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-  height: 48px;
-  padding: 2px 8px 0;
-}
-.nh-home__account {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8px 0 22px;
-  height: 36px;
-}
-.nh-home__name {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 17px;
-  font-weight: 700;
-}
-.nh-home__tools {
-  display: flex;
-  color: #d5d8dd;
-}
-.nh-home__balance {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 2px 0 0 22px;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-.nh-home__hero {
-  position: relative;
-  margin-top: 4px;
-  aspect-ratio: 720 / 422;
-}
-.nh-home__char {
+.nh-home > * {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
 }
-.nh-home__char.poke {
+.nh-home__icon {
+  color: var(--nh-text);
+  pointer-events: none;
+  overflow: visible;
+}
+.nh-home__menu-icon {
+  left: 336px;
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  color: var(--nh-text);
+  pointer-events: none;
+}
+.nh-home__menu-icon svg {
+  display: block;
+}
+.nh-home__hit {
+  z-index: 3;
+}
+
+/* 계좌 이름 + ⌄ (19px/600), 오른쪽 새로고침·⋮ */
+/* 글자는 top 을 정수로 두고 나머지를 translate 로 (소수 top 은 1 CSS px 단위로 반올림됨) */
+.nh-home__name {
+  left: 24px;
+  top: 48px;
+  transform: translateY(0.3px);
+  display: flex;
+  align-items: center;
+  height: 24px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.0175em;
+  white-space: nowrap;
+}
+.nh-home__chev {
+  position: relative;
+  top: 0;
+  width: 19.73px; /* 37px */
+  height: 16px; /* 30px */
+  margin-left: 4.5px;
+  fill: none;
+  stroke: #a6a7ab;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.nh-home__late1 {
+  color: #cbcdd1;
+  animation: nh-home-late 0s 33ms both;
+}
+.nh-home__late2 {
+  color: #8b93a0;
+  animation: nh-home-late 0s 50ms both;
+}
+@keyframes nh-home-late {
+  from {
+    visibility: hidden;
+  }
+}
+
+/* 잠금 동그라미: 스크린샷 x 45~98, y 210~262 (53 × 52 기기 px = 28.27 × 27.73dp), 반경 12.28 (둥근 사각에 가까운 원),
+   0.5dp(기기 1px) 밝은 테 + 둘레 옅은 빛. 동그라미·테·자물쇠는 SVG(LockCircle), 빛만 이 상자의 그림자 */
+/* 빛: 그림자는 상자 안쪽엔 안 그려지므로 상자를 동그라미보다 작게(26 × 26) 두고 spread 1px 로 동그라미 바깥선(45~98 × 210~262)에 맞춤 */
+.nh-home__lock {
+  left: 25px;
+  top: 85px;
+  width: 26px;
+  height: 26px;
+  border-radius: 11.28px;
+  box-shadow: 0.133px -0.133px 10px 1px rgba(255, 255, 255, 0.085);
+  pointer-events: none;
+}
+.nh-home__lock-svg {
+  left: 24px;
+  top: 84px;
+  width: 32px; /* 60 기기 px = viewBox 60 */
+  height: 32px;
+  color: #cdd2d8;
+  pointer-events: none;
+}
+.nh-home__lock-glyph {
+  animation: nh-home-late 0s 16ms both;
+}
+/* 잔액: 숫자 32px, '원' 24px (둘 다 600, 글자 아래선 맞춤) */
+.nh-home__balance {
+  left: 59.8px;
+  top: 82px;
+  display: flex;
+  align-items: baseline;
+  height: 32px;
+  line-height: 32px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.nh-home__balance b {
+  font-size: 32px;
+  font-weight: 600;
+}
+.nh-home__balance span {
+  position: relative;
+  top: -2.4px; /* 실제 앱은 '원'이 숫자 아래선보다 2.4dp 위 */
+  margin-left: 1px;
+  font-size: 24px;
+}
+
+/* 들어올 때 잠깐 보이는 회색 상자 (녹화1 9.835~9.999초, 녹화2 35.968~36.115초): 바탕 #29343f 위로 밝은 띠가 왼→오.
+   띠는 상자마다 상자 폭 기준 (두 상자의 띠가 같은 비율 자리): 폭 = 상자 폭, 가장 밝은 곳(#3f4853)이 띠의 60% 자리,
+   양쪽으로 직선으로 바탕색까지. 상자 폭의 0.93배/초로 움직임 (2.15초에 -100% → +100%).
+   띠 세기: 처음 0.32초는 0.7, 0.75초까지 다 밝아짐 (녹화2 의 들어오는 띠는 녹화1 보다 옅음) */
+.nh-home__skel {
+  left: 24px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #29343f;
+}
+.nh-home__skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(63, 72, 83, 0), #3f4853 60%, rgba(63, 72, 83, 0));
+  /* 다른 화면에 갔다 온 홈 (녹화2): 띠가 막 왼쪽 끝으로 들어오는 중 */
+  animation: nh-home-shimmer 2150ms linear -30ms infinite;
+}
+/* 앱 켜고 처음 들어온 홈 (녹화1): 띠가 이미 상자 가운데쯤(가장 밝은 곳 0.44)에서 보이고, 50ms 움직인 뒤
+   실제 앱은 화면을 그리느라 110ms 멈춤 → translate 로 그만큼 되돌려 멈춘 것처럼 (그 뒤엔 그 자리에서 계속) */
+.nh-home__skel--first::after {
+  animation:
+    nh-home-shimmer 2150ms linear -912ms infinite,
+    nh-home-shimmer-hold 160ms linear forwards;
+}
+.nh-home__skel--1 {
+  top: 47.8px;
+  width: 154px;
+  height: 24px;
+}
+.nh-home__skel--2 {
+  top: 76px;
+  width: 180px;
+  height: 44.8px;
+}
+@keyframes nh-home-shimmer {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.7;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+}
+@keyframes nh-home-shimmer-hold {
+  0%,
+  31.25% {
+    translate: 0;
+  }
+  100% {
+    translate: -10.2% 0;
+  }
+}
+
+/* 그림 (스크린샷 px 자리 그대로, Px 컴포넌트) */
+.nh-home__px {
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+/* 참고 화면과 같은 배율(1dp = 1.875 기기 px)이면 잘라 온 픽셀을 그대로 (보간으로 흐려지지 않게) */
+@media (resolution: 1.875dppx) {
+  .nh-home__px img {
+    image-rendering: pixelated;
+  }
+}
+/* 캐릭터 (스크린샷 x 248–473, y 384–650) */
+.nh-home__char .poke {
   animation: nh-poke 0.4s ease;
 }
 @keyframes nh-poke {
@@ -58,113 +196,202 @@
     transform: scale(1.04, 0.96) translateY(4px);
   }
 }
-.nh-home__char-hit {
-  position: absolute;
-  left: 120px;
-  top: 40px;
-  width: 120px;
-  height: 130px;
-}
 .nh-home__char-fallback {
   font-size: 90px;
 }
+
+/* 말풍선 (녹화1 480px: 알약 x 75.26–404.65, y 196.0–247.0 → 263.5 × 40.8dp, 꼬리 오른쪽 아래). 바탕·꼬리·빛은 SVG */
 .nh-home__tip {
-  position: absolute;
-  left: 50%;
-  top: 6px;
-  transform: translateX(-50%);
+  left: 60px;
+  top: 128px;
+  transform: translate(0.4px, 0.8px); /* 화면 60.4, 156.8dp (안의 글자·이모지·X 기준) */
+  width: 263.6px;
+  height: 40.78px;
+  z-index: 4;
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 30px;
-  padding: 0 8px 0 10px;
-  border-radius: 15px;
-  background: #fff;
-  color: #1c1c1c;
-  font-size: 12.5px;
+  padding-left: 10.2px;
+  color: var(--nh-text);
+  font-size: 16px;
   white-space: nowrap;
 }
-.nh-home__tip button {
-  display: grid;
-  color: #888 !important;
+.nh-home__tip-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 264px;
+  height: 49px;
+  overflow: visible;
+  pointer-events: none;
 }
-.nh-home__menu {
+.nh-home__tip-emoji {
+  width: 25.6px;
+  height: 25.6px;
+  margin-left: 0.3px;
+  transform: translateY(-0.6px);
+}
+.nh-home__tip > span {
   position: relative;
-  display: flex;
-  margin: 0 22px;
-  height: 90px;
-  border-radius: 16px;
-  background: var(--nh-card);
+  top: -1px;
+  left: -0.6px;
+  margin-left: 2.4px;
+  letter-spacing: -0.01em;
+}
+.nh-home__tip b {
+  font-weight: 600;
+  color: var(--nh-purple);
+}
+.nh-home__tip button {
+  position: absolute;
+  right: 12px;
+  top: 7px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: #9ca4ae;
+}
+.nh-home__tip button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  transform: translate(-0.65px, -0.6px); /* X 잉크 중심 녹화 374.2, 218.5 */
+}
+/* 메뉴카드: 336 × 97.15, 반경 20, 반투명(0.74) 가로 그라데이션 → 뒤의 빛이 비침 */
+.nh-home__menu {
+  left: 24px;
+  top: 350.09px;
+  width: 336px;
+  height: 97.15px;
+  border-radius: 20px; /* 바탕·테는 SVG(.nh-home__cards) */
 }
 .nh-home__menu button {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 13.5px;
-  color: #e4e7eb;
+  position: absolute;
+  top: 0;
+  width: 78.58px;
+  height: 100%;
+  color: #cad3db;
+  font-size: 16px;
+}
+.nh-home__menu button > span {
+  position: absolute;
+  left: 50%;
+  top: 56px;
+  transform: translate(-50%, 0.4px);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  line-height: 20px;
+}
+/* 실제 글자 가운데가 칸 가운데보다 조금 왼쪽 (스크린샷 잉크 중심 x 138.5 / 287.2) */
+.nh-home__menu button:nth-child(1) > span {
+  transform: translate(calc(-50% - 0.8px), 0.4px);
+}
+.nh-home__menu button:nth-child(2) > span {
+  transform: translate(calc(-50% - 0.3px), 0.4px);
+}
+
+/* 메뉴카드·지식콕·금융콕·배너 바탕 (SVG, 스크린샷 px 좌표): CSS 상자는 1 CSS px 단위로 그려져 기기 1px 테가 반쯤 걸치기 때문.
+   지식콕·금융콕: 162.13 × 122.13 (304 × 229 기기 px), 사이 11.73, 반경 20, 가로 그라데이션 #28323b → #222a32, 0.5dp 테.
+   여기 버튼들은 글자·누르는 자리 */
+.nh-home__cards {
+  left: 24px;
+  top: 340px; /* 기기 690px */
+  width: 336px; /* 630 기기 px */
+  height: 392px; /* 735 기기 px */
+  pointer-events: none;
 }
 .nh-home__koks {
+  left: 24px;
+  top: 474.89px;
+  width: 336px;
   display: flex;
-  gap: 11px;
-  margin: 26px 22px 0;
+  justify-content: space-between;
 }
-.nh-kok {
-  flex: 1;
+.nh-home__kok {
   position: relative;
-  height: 114px;
-  border-radius: 16px;
-  background: var(--nh-card);
+  width: 162.26px;
+  height: 122.23px;
+  border-radius: 20px;
   text-align: left;
 }
-.nh-kok b {
+.nh-home__kok b {
   position: absolute;
-  left: 15px;
-  top: 17px;
-  font-size: 14.5px;
+  left: 16.24px;
+  top: 18.05px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 20px;
 }
-.nh-kok__img {
-  position: absolute;
-  right: 20px;
-  bottom: 16px;
-}
+
+/* 배너: 336 × 111.47, 반경 12, #e3effb */
 .nh-home__banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 19px 22px 0;
-  height: 104px;
-  padding: 0 4px 0 19px;
-  border-radius: 14px;
-  background: #e3effb;
-  color: #1d1d1f !important;
+  left: 24px;
+  top: 616.8px;
+  width: 336px;
+  height: 111.47px;
+  border-radius: 12px; /* 바탕은 SVG(.nh-home__cards) */
   text-align: left;
 }
 .nh-home__banner small {
-  display: block;
-  font-size: 13.5px;
-  color: #555b63;
+  position: absolute;
+  left: 20.5px;
+  top: 21px;
+  transform: translateY(-0.25px);
+  font-size: 16.3px;
+  font-weight: 420; /* 실제는 500 보다 가는 획 (잉크 합 135k 에 맞춤) */
+  letter-spacing: -0.0103em;
+  line-height: 20px;
+  color: #5b6571;
+  white-space: nowrap;
 }
 .nh-home__banner b {
-  display: block;
-  margin-top: 5px;
-  font-size: 15px;
-  line-height: 1.38;
+  position: absolute;
+  left: 20.5px;
+  top: 45px;
+  transform: translateY(0.6px);
+  font-size: 18.3px;
+  font-weight: 625; /* 잉크 합이 실제(535k)와 같아지는 굵기 */
+  line-height: 22.4px;
+  color: #1f2933;
+  white-space: nowrap;
 }
+
+.nh-home__banner .nh-home__banner-l2 {
+  left: 21.03px;
+  top: 67px;
+  transform: translateY(0.9px);
+}
+/* '~' 는 실제 앱에서 X 에 더 붙고 조금 위 (스크린샷 잉크 중심 174.3, 1356.8) */
+.nh-home__tilde {
+  display: inline-block;
+  font-style: normal;
+  transform: translate(-0.7px, -0.95px);
+}
+
+/* 배경색상 설정 (16px/500) + 12dp 점 #c9e0ff */
 .nh-home__bgset {
-  margin: 26px 0 0;
+  left: 0;
+  right: 0;
+  top: 753.5px;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 5px;
-  font-size: 13.5px;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0;
   color: var(--nh-sub);
 }
 .nh-home__bgset i {
-  width: 11px;
-  height: 11px;
+  position: relative;
+  top: -0.8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #dfe8ff;
+  background: #c9e0ff;
 }

@@ -1,10 +1,79 @@
-/* 계좌번호 시트 */
+/* 계좌번호 시트 — 녹화1 27.6~56초, 녹화2 6~12초에서 잰 값 (녹화 px × 0.8 = dp). 측정표: scratchpad work/picker/spec.md
+   시트 위 323.2(화면 위에서) → 머리줄 76.8 → 입력칸 60.8 → 20 → 키패드 68×4 → 9 → 다음 52 → 24 → 제스처바 */
+
+/* 머리줄: 은행 아이콘(24, x 24) + 이름 + ⌄, 오른쪽 X — 세로 가운데가 시트 위 + 38.4 */
+.nh-number .nh-number__head {
+  height: 76.8px;
+  padding: 0 16px 0 24px;
+}
 .nh-number__bank {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 15px;
+  height: 48px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0; /* '하나은행' 폭이 자간 0일 때와 맞음 (78px@480) */
+  color: var(--nh-chip-text) !important;
 }
+.nh-number__bank > span {
+  margin-left: 4.6px;
+}
+.nh-number__bank svg {
+  margin-left: 6.8px;
+  color: var(--nh-faint);
+}
+.nh-number__bank .nh-bank-sq,
+.nh-number__bank .nh-bank-icon {
+  flex-shrink: 0;
+}
+
+/* 입력칸: 24~360 × 60.8, 모서리 14. 비었을 때 1dp #414c57 + '계좌번호 입력'(24px/600 #8c929f) 가운데,
+   입력 중 2dp #0195a3 + 숫자(24.6px/600) · 커서 · ⓧ 를 한 묶음으로 (왼쪽에 25.95 빈자리를 둔 채) 가운데 */
+.nh-number .nh-number__box {
+  height: 60.8px;
+  margin: 0 24px 20px;
+  border: 1px solid var(--nh-input-line);
+  border-radius: 14px;
+}
+.nh-number .nh-number__box.on {
+  border: 2px solid var(--nh-teal);
+}
+.nh-number__ph {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: #8c929f; /* 녹화 심지 #898f9c + 굵은 글자 손실(키패드 숫자로 잼 −2) */
+  padding-bottom: 1.1px; /* 잉크가 실제보다 0.55 아래에 그려져서 */
+}
+.nh-number__val {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 25.95px;
+  font-size: 24.6px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--nh-text);
+  white-space: nowrap;
+}
+/* 커서: 2 × 29, #00d1be, 0.5초마다 깜빡임. 마지막 숫자 잉크 오른끝과 커서 오른끝이 같음 */
+.nh-number__caret {
+  width: 2px;
+  margin-left: -2.8px;
+  height: 29px;
+  background: #00d1be;
+  animation: nh-number-blink 1s steps(1) infinite;
+}
+@keyframes nh-number-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.nh-number__clear {
+  display: grid;
+  margin-left: 15.95px;
+}
+
+/* 농협계좌 등록 화면(NhAccounts)도 이 칸 모양을 같이 씀 — 예전 모양 그대로 둠 */
 .nh-number__box {
   position: relative;
   display: flex;
@@ -24,12 +93,13 @@
   font-style: normal;
   color: #7f8692;
 }
-.nh-number__box span + button {
-  margin-left: 8px;
-  display: grid;
+
+/* 키패드 아래 → 다음 버튼 8.5 (공용 9보다 0.5 작게 해야 시트 위가 323.2에 맞음) */
+.nh-number .nh-sheet-btn {
+  margin-top: 8.5px;
 }
-.nh-number__box button svg,
-.nh-amount__value button svg {
-  width: 14px;
-  height: 14px;
+
+/* '콕' 글리프: 실제는 줄 가운데(숫자 '0'과 같은 높이 가운데). 공용 키 padding-top 1px 때문에 1.2 아래로 내려가 있어서 */
+.nh-number .keypad__key--kok > svg {
+  transform: translateY(-1.2px);
 }
