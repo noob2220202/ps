@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# 로컬 전용 이미지 (광고 사진 등, 커밋 금지)
+# 로컬 전용 실제 에셋 (브랜드 로고, 광고 사진 등 — 커밋 금지)
 public/local/
+src/assets/local/*
+!src/assets/local/README.md

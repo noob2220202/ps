@@ -1,8 +1,10 @@
+/* 치수는 실제 앱 스크린샷(720px 폭 = 360pt @2x)에서 px ÷ 2 로 잰 값.
+   색은 global.css의 --home-* 토큰 (라이트/다크 테마) */
 .home {
   position: absolute;
   inset: 0;
-  background: var(--dark-bg);
-  color: #fff;
+  background: var(--home-bg);
+  color: var(--home-text);
 }
 
 .home__scroll {
@@ -17,18 +19,16 @@
   padding: 14px 16px 0 15px;
   min-height: 70px;
 }
-
 .home__name {
   margin: 8px 0 0 9px;
   font-size: 20px;
   font-weight: 700;
   animation: screen-in 200ms ease-out;
 }
-
 .home__bell {
   position: relative;
   margin-top: 6px;
-  color: #fff;
+  color: var(--home-text);
 }
 .red-dot {
   position: absolute;
@@ -51,8 +51,11 @@
   min-height: 40px;
   padding: 8px 14px 8px 11px;
   border-radius: 20px;
-  background: var(--dark-surface);
+  background: var(--home-pill);
   animation: screen-in 200ms ease-out;
+}
+[data-theme="light"] .ai-pill {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 .ai-pill--two {
   border-radius: 22px;
@@ -73,7 +76,7 @@
 .ai-pill__close {
   align-self: flex-start;
   margin: 3px 0 0 2px;
-  color: #6c6c6c;
+  color: var(--home-faint);
 }
 
 /* ---------- 광고 ---------- */
@@ -92,7 +95,7 @@
 .ad__when {
   margin-top: 2px;
   font-size: 11.5px;
-  color: #9a9a9a;
+  color: var(--home-sub);
 }
 .ad__cta {
   align-self: flex-start;
@@ -100,7 +103,7 @@
   height: 32px;
   padding: 0 12px;
   border-radius: 16px;
-  background: var(--dark-btn);
+  background: var(--home-btn);
   font-size: 12px;
   font-weight: 600;
 }
@@ -111,17 +114,14 @@
 .ad__photo {
   width: 116px;
   height: 85px;
-  border-radius: 12px;
-  object-fit: cover;
-  display: block;
 }
 .ad__badge {
   position: absolute;
   right: -11px;
   bottom: -16px;
   font-size: 6.5px;
-  color: #8a8a8a;
-  border: 1px solid #5a5a5a;
+  color: var(--home-sub);
+  border: 1px solid var(--home-line);
   border-radius: 3px;
   padding: 0 2px;
 }
@@ -129,61 +129,56 @@
   position: absolute;
   top: 18px;
   right: 16px;
-  color: #c9c9c9;
+  color: var(--home-sub);
+}
+
+/* ---------- 카드(흰/어두운 박스) 공통 ---------- */
+.home-card {
+  margin: 8px 15px 0;
+  border-radius: 22px;
+  background: var(--home-card);
+}
+[data-theme="light"] .home-card,
+[data-theme="light"] .add-product {
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.03);
 }
 
 /* ---------- 계좌 ---------- */
 .mini-card {
   margin: 8px 15px 0;
-  height: 86px;
+  height: 87px;
   padding: 0 17px;
-  border-radius: 22px;
+  border-radius: 23px;
   background: var(--beige-card);
   color: #1c1c1c;
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   cursor: pointer;
 }
 
 .accounts {
-  margin: 8px 15px 0;
-  padding: 6px 0 14px;
-  border-radius: 22px;
-  background: var(--dark-surface);
+  padding: 12px 0 20px;
 }
 
 .acct {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 12px 17px;
+  gap: 12px;
+  padding: 9.5px 17px;
   cursor: pointer;
 }
-.row-press-dark:active {
-  background: rgba(255, 255, 255, 0.05);
-}
-.acct--flush {
-  padding: 10px 0;
+.row-press-home:active {
+  background: color-mix(in srgb, var(--home-text) 5%, transparent);
 }
 
-.acct__hand {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: #3a3a3a;
-  display: grid;
-  place-items: center;
-  font-size: 19px;
-}
 .acct__placeholder-icon {
   width: 34px;
   height: 34px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #333;
+  background: var(--home-icon-bg);
 }
 
 .acct__text {
@@ -191,28 +186,28 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 .acct__balance {
-  font-size: 16.5px;
+  font-size: 17.5px;
   font-weight: 700;
+  letter-spacing: -0.3px;
 }
-.acct__promo-title {
-  font-size: 14.5px;
-  font-weight: 700;
+.acct__balance--promo {
+  font-size: 16.5px;
 }
 .acct__sub {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12.5px;
-  color: var(--dark-sub);
+  gap: 5px;
+  font-size: 13.5px;
+  color: var(--home-sub);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .acct__sub--beige {
-  color: #5f584d;
+  color: #625b4f;
 }
 .acct__spinner {
   position: absolute;
@@ -220,9 +215,9 @@
   top: 50%;
   margin: -11px 0 0 -11px;
 }
-.acct__dismiss,
-.acct__chev {
-  color: #6a6a6a;
+.acct__dismiss {
+  color: var(--home-faint);
+  margin-right: 10px;
 }
 
 .star {
@@ -230,36 +225,32 @@
   font-size: 13px;
 }
 .outline-badge {
-  font-size: 8.5px;
-  padding: 1px 5px;
-  border-radius: 8px;
-  border: 1px solid #555;
-  color: #b0b0b0;
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: 9px;
+  border: 1px solid var(--home-badge-line);
+  color: var(--home-badge-text);
 }
 
 .pill-btn {
   flex-shrink: 0;
-  height: 35px;
-  padding: 0 15px;
-  border-radius: 18px;
-  background: var(--dark-btn);
-  font-size: 13px;
+  height: 33px;
+  padding: 0 17px;
+  border-radius: 17px;
+  background: var(--home-btn);
+  color: var(--home-text);
+  font-size: 14px;
   font-weight: 700;
 }
 .pill-btn--beige {
   background: var(--beige-btn);
   color: #1c1c1c;
 }
-.pill-btn--sm {
-  height: 30px;
-  padding: 0 11px;
-  font-size: 12px;
-}
 
 .chips {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   padding: 8px 15px 0 17px;
   overflow-x: auto;
   scrollbar-width: none;
@@ -272,58 +263,97 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  height: 33px;
-  padding: 0 11px;
-  border-radius: 17px;
-  border: 1px solid var(--dark-line);
+  height: 32px;
+  padding: 0 9px 0 10px;
+  border-radius: 16px;
+  border: 1px solid var(--home-line);
   font-size: 12.5px;
 }
 .chips__divider {
   flex-shrink: 0;
   width: 1px;
-  height: 16px;
-  margin: 0 3px;
-  background: #4a4a4a;
+  height: 17px;
+  margin: 0 4px;
+  background: var(--home-line);
 }
 
-/* ---------- 카드/기타 섹션 ---------- */
-.dark-card {
-  margin: 12px 15px 0;
-  padding: 16px 17px 12px;
-  border-radius: 22px;
-  background: var(--dark-surface);
+/* ---------- 카드 섹션 (카드 · 현금 돌려받을 기회 · 티머니) ---------- */
+.card-section {
+  margin-top: 9px;
+  padding: 27px 17px 26px;
 }
-.dark-card__title {
+.card-section__title {
   margin: 0;
   display: flex;
   align-items: center;
   gap: 2px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
 }
-.dark-card__title svg {
-  color: #7a7a7a;
+.card-section__title svg {
+  color: var(--home-faint);
 }
+
 .spend {
   display: flex;
   align-items: center;
-  gap: 13px;
-  margin-top: 10px;
+  gap: 15px;
+  margin-top: 18px;
+  padding-left: 3px;
+}
+/* 카드 썸네일에 달린 끈: 썸네일 아래에서 "현금 돌려받을" 줄 끝까지 내려온다 */
+.spend__thumb {
+  position: relative;
+  display: flex;
+  margin-right: 2px;
+}
+.spend__thumb::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 45px;
+  margin-left: -1px;
+  background: var(--home-lanyard);
+}
+
+.cashback {
+  margin: 19px 0 0 46px;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.cashback__hl {
+  color: #f5d70a;
+}
+
+.tmoney {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 34px;
+}
+.tmoney .asset {
+  margin-right: 12px;
+}
+.tmoney__title {
+  flex: 1;
+  font-size: 17.5px;
+  font-weight: 700;
 }
 
 .add-product {
-  margin: 12px 15px 0;
+  margin: 10px 15px 0;
   width: calc(100% - 30px);
-  height: 46px;
-  border-radius: 16px;
-  background: var(--dark-surface);
+  height: 48px;
+  border-radius: 24px;
+  background: var(--home-card);
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #e5e5e5;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .home__footer {
@@ -332,7 +362,7 @@
   align-items: center;
   gap: 14px;
   padding: 26px 0 30px;
-  color: #a0a0a0;
+  color: var(--home-sub);
   font-size: 13px;
   font-weight: 600;
 }
@@ -344,21 +374,24 @@
 .home__footer-divider {
   width: 1px;
   height: 12px;
-  background: #4a4a4a;
+  background: var(--home-line);
 }
 
-/* ---------- 하단 탭바 ---------- */
+/* ---------- 하단 탭바 (안드로이드) ---------- */
 .bottom-nav {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 66px;
-  padding-bottom: 10px;
+  height: 72px;
+  padding-bottom: 12px;
   display: flex;
   border-radius: 18px 18px 0 0;
-  background: var(--dark-nav);
+  background: var(--home-nav);
   z-index: 5;
+}
+[data-theme="light"] .bottom-nav {
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
 }
 .bottom-nav__item {
   flex: 1;
@@ -366,9 +399,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  font-size: 10.5px;
-  color: #e8e8e8;
+  gap: 3px;
+  font-size: 11.5px;
+  color: var(--home-nav-fg);
 }
 .bottom-nav__icon {
   position: relative;
@@ -392,12 +425,12 @@
   height: 62px;
   padding: 4px;
   border-radius: 31px;
-  background: rgba(46, 46, 48, 0.62);
+  background: var(--home-glass);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   backdrop-filter: blur(16px) saturate(180%);
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.35),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
+    0 10px 30px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 0.5px color-mix(in srgb, var(--home-text) 14%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
   overflow: hidden;
   transition: width 380ms cubic-bezier(0.3, 1.2, 0.4, 1);
@@ -407,23 +440,20 @@
   gap: 1px;
   font-size: 10px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.82);
   border-radius: 27px;
   transition:
     flex 380ms cubic-bezier(0.3, 1.2, 0.4, 1),
     opacity 200ms;
   min-width: 0;
 }
-/* 선택된 탭: 유리 위에 한 겹 더 밝은 캡슐 */
+/* 선택된 탭: 유리 위에 한 겹 더 진한 캡슐 */
 [data-os="ios"] .bottom-nav__item--active {
-  background: rgba(255, 255, 255, 0.13);
-  color: #fff;
+  background: color-mix(in srgb, var(--home-text) 10%, transparent);
 }
 [data-os="ios"] .bottom-nav__icon svg {
   width: 22px;
   height: 22px;
 }
-
 [data-os="ios"] .bottom-nav--min {
   width: 62px;
 }

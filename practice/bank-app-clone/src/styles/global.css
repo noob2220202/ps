@@ -33,6 +33,45 @@
   --safe-bottom: 0px; /* 홈 인디케이터 영역. 실제 아이폰에선 env()로 덮어씀 */
 }
 
+/* ---------- 홈 테마 (실제 앱은 시스템 다크모드를 따름) ----------
+   다크 = 화면 녹화에서, 라이트 = 스크린샷에서 스포이드로 뽑은 값 */
+[data-theme="dark"] {
+  --home-bg: #1f1f1f;
+  --home-card: #262626;
+  --home-btn: #363636;
+  --home-text: #ffffff;
+  --home-sub: #8a898c;
+  --home-faint: #6a6a6a;
+  --home-line: #3a3a3a;
+  --home-icon-bg: #383838;
+  --home-promo-bg: #3d4a42;
+  --home-nav: #2d2d2d;
+  --home-nav-fg: #e8e8e8;
+  --home-badge-line: #555555;
+  --home-badge-text: #b0b0b0;
+  --home-lanyard: #4a4a4a;
+  --home-pill: #262626;
+  --home-glass: rgba(46, 46, 48, 0.62);
+}
+[data-theme="light"] {
+  --home-bg: #f4f4f4;
+  --home-card: #ffffff;
+  --home-btn: #f5f5f5;
+  --home-text: #212121;
+  --home-sub: #656565;
+  --home-faint: #cccccc;
+  --home-line: #d9d9d9;
+  --home-icon-bg: #f5f5f5;
+  --home-promo-bg: #ebf9ec;
+  --home-nav: #ffffff;
+  --home-nav-fg: #111111;
+  --home-badge-line: #d0d0d0;
+  --home-badge-text: #8f8f8f;
+  --home-lanyard: #e6e6e6;
+  --home-pill: #ffffff;
+  --home-glass: rgba(255, 255, 255, 0.7);
+}
+
 /* iPhone 17 Pro: 402 x 874pt, 하단 안전영역 34pt */
 [data-os="ios"] {
   --frame-w: 402px;

@@ -14,7 +14,7 @@ export function BottomNav({ minimized = false }: { minimized?: boolean }) {
       {TABS.map((t) => (
         <button key={t.label} className={`bottom-nav__item ${t.label === "홈" ? "bottom-nav__item--active" : ""}`}>
           <span className="bottom-nav__icon">
-            <Icon name={t.icon} size={23} stroke={1.8} />
+            <Icon name={t.icon} size={24} stroke={2} />
             {t.dot && <span className="red-dot bottom-nav__dot" />}
           </span>
           <span className="bottom-nav__label">{t.label}</span>

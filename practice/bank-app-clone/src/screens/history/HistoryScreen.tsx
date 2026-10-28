@@ -5,7 +5,7 @@ import type { Transaction } from "../../api/types";
 import { useAsync } from "../../hooks/useAsync";
 import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
-import { FriendsAvatar } from "../../components/art";
+import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { BackButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
@@ -65,7 +65,7 @@ export function HistoryScreen() {
       <Header onBack={() => navigate(-1)} />
 
       <div className="history__summary">
-        <FriendsAvatar size={52} />
+        <Asset slot="friends-avatar" />
         <strong className="history__balance">
           {account ? account.balance.toLocaleString("ko-KR") : 0}
           <span>원</span>

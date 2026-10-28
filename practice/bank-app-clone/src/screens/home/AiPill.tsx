@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { TIMING } from "../../config/timing";
 import { useTypewriter } from "../../hooks/useTypewriter";
-import { AiDiamond, CoinIcon, RingSpinner } from "../../components/art";
+import { RingSpinner } from "../../components/art";
+import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { useLayerActive } from "../../platform/LayerContext";
 
@@ -62,9 +63,9 @@ export function AiPill({ ready }: { ready: boolean }) {
         {stage === "spinner" ? (
           <RingSpinner size={20} />
         ) : shown.icon === "ai" ? (
-          <AiDiamond size={18} />
+          <Asset slot="ai-diamond" />
         ) : (
-          <CoinIcon size={20} />
+          <Asset slot="coin" />
         )}
       </span>
       {text && <span className="ai-pill__text">{text}</span>}

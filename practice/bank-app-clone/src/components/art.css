@@ -22,23 +22,6 @@
   line-height: 1;
 }
 
-.friends-avatar {
-  border-radius: 50%;
-  background: #f2e4fe;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.mini-b-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--beige-icon);
-  display: grid;
-  place-items: center;
-}
-
 /* 노랑/초록/파랑 그라데이션 링이 도는 스피너 (AI 배너 문구 바뀔 때) */
 .ring-spinner {
   display: inline-block;

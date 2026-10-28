@@ -53,6 +53,8 @@
 }
 
 .detail__pill {
+  position: relative;
+  z-index: 1; /* 캐릭터 이미지 위에 걸쳐 보이도록 */
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -163,4 +165,13 @@
 }
 .moim-card__chev {
   color: #b5b5b5;
+}
+
+.detail__friends {
+  width: 167px;
+  height: 110px;
+}
+/* 실제 일러스트는 말풍선 바로 위에서 잘려 있으므로 거의 안 겹치게 (기본 에셋은 많이 겹쳐야 자연스러움) */
+.detail__friends.asset--local + .detail__pill {
+  margin-top: -1px;
 }

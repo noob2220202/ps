@@ -31,6 +31,7 @@ export interface Account {
 export interface HomeData {
   accounts: Account[];
   monthlyCardSpend: number;
+  cashbackCount: number;
   ad: { title: string; subtitle: string; when: string; cta: string };
   aiPromo: { title: string; desc: string };
 }

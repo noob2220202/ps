@@ -6,7 +6,7 @@ import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { useTypewriter } from "../../hooks/useTypewriter";
 import { won } from "../../lib/format";
-import { AiDiamond, FriendsIllustration } from "../../components/art";
+import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { BackButton, GearButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
@@ -75,19 +75,19 @@ export function AccountDetailScreen() {
       <div
         className="detail__hero" ref={heroRef}
       >
-        <FriendsIllustration width={212} />
+        <Asset slot="friends" className="detail__friends" />
         <div className="detail__pill">
-          <AiDiamond size={17} />
+          <Asset slot="ai-diamond" />
           <TypedText text="지난 달보다 얼마나 더 썼을까요?" />
         </div>
       </div>
 
       <section className="balance-card">
         <div className="balance-card__top">
-          <span className="balance-card__hand">👋</span>
+          <Asset slot="hand-tile" />
           <div>
             <div className="balance-card__meta">
-              <span className="star">★</span>
+              <Asset slot="star" />
               <span className="outline-badge outline-badge--light">계좌번호</span>
             </div>
             <strong className="balance-card__amount">{won(account.balance)}</strong>
@@ -114,12 +114,12 @@ export function AccountDetailScreen() {
       </div>
       <section className="moim-card">
         <button className="moim-card__row row-press">
-          <span className="moim-card__emoji">😀</span>
+          <Asset slot="moim-member" />
           <span className="moim-card__label">모임 멤버</span>
           <span className="moim-card__value">2명 참여 중</span>
         </button>
         <button className="moim-card__row row-press">
-          <span className="moim-card__emoji">💵</span>
+          <Asset slot="moim-dues" />
           <span className="moim-card__label">회비 입금현황</span>
           <Icon name="chevron-right" size={16} className="moim-card__chev" />
         </button>

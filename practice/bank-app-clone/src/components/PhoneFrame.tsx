@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { OS } from "../platform/platform";
+import { THEME } from "../platform/theme";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -70,16 +71,26 @@ export function PhoneFrame({ children }: { children: ReactNode }) {
   );
 }
 
-// PC에서만 보이는 기기 전환 스위치 (선택은 localStorage에 기억됨)
+// PC에서만 보이는 기기/테마 전환 스위치 (선택은 localStorage에 기억됨)
 export function OsSwitch() {
   return (
-    <nav className="os-switch">
-      <a href="/?os=android" className={OS === "android" ? "on" : ""}>
-        Galaxy
-      </a>
-      <a href="/?os=ios" className={OS === "ios" ? "on" : ""}>
-        iPhone
-      </a>
-    </nav>
+    <div className="switches">
+      <nav className="os-switch">
+        <a href="/?os=android" className={OS === "android" ? "on" : ""}>
+          Galaxy
+        </a>
+        <a href="/?os=ios" className={OS === "ios" ? "on" : ""}>
+          iPhone
+        </a>
+      </nav>
+      <nav className="os-switch">
+        <a href="/?theme=light" className={THEME === "light" ? "on" : ""}>
+          라이트
+        </a>
+        <a href="/?theme=dark" className={THEME === "dark" ? "on" : ""}>
+          다크
+        </a>
+      </nav>
+    </div>
   );
 }

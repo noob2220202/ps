@@ -9,14 +9,8 @@ import { useStatusBar } from "../../hooks/useStatusBar";
 import { useScrollFrame } from "../../hooks/useScrollTop";
 import { OS } from "../../platform/platform";
 import { won } from "../../lib/format";
-import {
-  AiSavingIcon,
-  CardThumb,
-  CashbackIcon,
-  MiniBIcon,
-  NhIcon,
-  TmoneyIcon,
-} from "../../components/art";
+import { THEME } from "../../platform/theme";
+import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { Spinner } from "../../components/Spinner";
 import { AiPill } from "./AiPill";
@@ -39,7 +33,7 @@ function Collapse({ open, children }: { open: boolean; children: ReactNode }) {
 }
 
 export function HomeScreen() {
-  useStatusBar("var(--dark-bg)", "light");
+  useStatusBar("var(--home-bg)", THEME === "dark" ? "light" : "dark");
   const navigate = useNavigate();
   const home = useAsync(api.home, []);
 
@@ -103,7 +97,7 @@ export function HomeScreen() {
         </Collapse>
 
         <div className="mini-card pressable" onClick={() => navigate("/mini")}>
-          <MiniBIcon />
+          <Asset slot="mini-b" />
           <div className="acct__text">
             <strong className="acct__balance">{won(mini.balance)}</strong>
             <span className="acct__sub acct__sub--beige">{mini.label}</span>
@@ -113,13 +107,13 @@ export function HomeScreen() {
           </button>
         </div>
 
-        <div className="accounts">
-          <div className="acct row-press-dark" onClick={() => openWithSpinner(main.id, "/account/main")}>
-            <span className="acct__hand">👋</span>
+        <section className="home-card accounts">
+          <div className="acct row-press-home" onClick={() => openWithSpinner(main.id, "/account/main")}>
+            <Asset slot="hand" />
             <div className="acct__text">
               <strong className="acct__balance">{won(main.balance)}</strong>
               <span className="acct__sub">
-                <span className="star">★</span>
+                <Asset slot="star" />
                 <span className="outline-badge">{main.badge}</span>
               </span>
             </div>
@@ -134,7 +128,7 @@ export function HomeScreen() {
           </div>
 
           <div className="acct">
-            {nhResolved ? <NhIcon /> : <span className="acct__placeholder-icon" />}
+            {nhResolved ? <Asset slot="bank-nh" /> : <span className="acct__placeholder-icon" />}
             <div className="acct__text">
               <strong className="acct__balance">{nhResolved ? won(nh.balance) : "?원"}</strong>
               <span className="acct__sub">{nh.label}</span>
@@ -144,13 +138,13 @@ export function HomeScreen() {
 
           <Collapse open={full && promoOpen}>
             <div className="acct">
-              <AiSavingIcon />
+              <Asset slot="ai-saving" />
               <div className="acct__text">
-                <strong className="acct__promo-title">{data.aiPromo.title}</strong>
+                <strong className="acct__balance acct__balance--promo">{data.aiPromo.title}</strong>
                 <span className="acct__sub">{data.aiPromo.desc}</span>
               </div>
               <button className="acct__dismiss" aria-label="닫기" onClick={() => setPromoOpen(false)}>
-                <Icon name="close" size={18} stroke={1.6} />
+                <Icon name="close" size={20} stroke={1.6} />
               </button>
             </div>
           </Collapse>
@@ -166,44 +160,39 @@ export function HomeScreen() {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         <Collapse open={full}>
-          <section className="dark-card">
-            <h2 className="dark-card__title">
-              카드 <Icon name="chevron-right" size={16} stroke={2} />
+          {/* 스크린샷 기준: 카드 · 현금 돌려받을 기회 · 티머니가 한 카드 안에 있다.
+              카드 썸네일에 달린 끈(::after)이 아래 "현금 돌려받을" 줄까지 내려온다 */}
+          <section className="home-card card-section">
+            <h2 className="card-section__title">
+              카드 <Icon name="chevron-right" size={17} stroke={2} />
             </h2>
             <div className="spend">
-              <CardThumb />
+              <span className="spend__thumb">
+                <Asset slot="card" />
+              </span>
               <div className="acct__text">
                 <strong className="acct__balance">{won(data.monthlyCardSpend)}</strong>
                 <span className="acct__sub">이번달 쓴 돈</span>
               </div>
               <button className="pill-btn pressable">내역 보기</button>
             </div>
-          </section>
-
-          <section className="dark-card">
-            <div className="acct acct--flush">
-              <CashbackIcon />
-              <div className="acct__text">
-                <strong className="acct__promo-title">현금 돌려받을 기회 4건이 있어요</strong>
-              </div>
-              <Icon name="chevron-right" size={18} stroke={1.8} className="acct__chev" />
-            </div>
-            <div className="acct acct--flush">
-              <TmoneyIcon />
-              <div className="acct__text">
-                <strong className="acct__promo-title">티머니 잔액</strong>
-              </div>
-              <button className="pill-btn pill-btn--sm pressable">조회</button>
-              <button className="pill-btn pill-btn--sm pressable">충전</button>
+            <p className="cashback">
+              <span className="cashback__hl">현</span>금 돌려받을 기회 {data.cashbackCount}건이 있어요
+            </p>
+            <div className="tmoney">
+              <Asset slot="tmoney" />
+              <strong className="tmoney__title">티머니 잔액</strong>
+              <button className="pill-btn pressable">조회</button>
+              <button className="pill-btn pressable">충전</button>
             </div>
           </section>
         </Collapse>
 
         <button className="add-product pressable">
-          <Icon name="plus" size={18} stroke={2} /> 상품 추가
+          <Icon name="plus" size={20} stroke={2} /> 상품 추가
         </button>
 
         <div className="home__footer">

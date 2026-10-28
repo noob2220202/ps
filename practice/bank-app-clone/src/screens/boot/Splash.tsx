@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { TIMING } from "../../config/timing";
 import { useStatusBar } from "../../hooks/useStatusBar";
-import { AdPhoto, AlbumLogo, BMark, Wordmark } from "../../components/art";
+import { AlbumLogo, BMark, Wordmark } from "../../components/art";
+import { Asset } from "../../assets/Asset";
 import "./Splash.css";
 
 type Phase = "launch" | "logo" | "brand";
@@ -52,7 +53,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
         <p className="splash__ad-text">
           10.27 미니 2집 발매 <span className="splash__ad-badge">AD</span>
         </p>
-        <AdPhoto className="splash__ad-photo" />
+        <Asset slot="ad" className="splash__ad-photo" />
       </div>
     </div>
   );
