@@ -23,10 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-# 로컬 전용 실제 에셋 (브랜드 로고, 광고 사진 등 — 커밋 금지)
+# 실제 에셋(src/assets/local/)은 저장소가 비공개라 커밋함. 다시 공개로 바꿀 땐 아래 줄을 되살려서 빼야 함
 public/local/
-src/assets/local/*
-!src/assets/local/README.md
+# src/assets/local/*
+# !src/assets/local/README.md
 
 # 서버 데이터베이스 (내 데이터)
 server/data/
