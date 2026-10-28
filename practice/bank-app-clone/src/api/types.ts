@@ -47,6 +47,7 @@ export interface Account {
 
 export interface NewBankAccount {
   bankCode: string;
+  name?: string; // 계좌 이름 (콕뱅크: 저축예금 등)
   number: string;
   balance: number;
 }

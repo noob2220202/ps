@@ -436,3 +436,22 @@
 .btn:disabled {
   opacity: 0.4;
 }
+
+/* 콕뱅크: 다크 + 보라 버튼 (변수만 바꿔 끼움) */
+.dev-panel--nh {
+  --home-card: #1f2630;
+  --home-btn: #2c3540;
+  --home-line: #353e4a;
+  --home-text: #ffffff;
+  --home-sub: #9ba2ac;
+  --yellow: #7589fb;
+  --yellow-pressed: #5f73e6;
+  color-scheme: dark;
+}
+.dev-panel--nh .btn:not(.btn--danger):not(.btn--in):not(.btn--out) {
+  color: #fff;
+}
+.dev-panel--nh input,
+.dev-panel--nh select {
+  color: #fff;
+}

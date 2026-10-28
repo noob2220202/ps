@@ -70,6 +70,10 @@ function toAccount(row, profile = getProfile()) {
   };
 }
 
+// 계좌 이름 (콕뱅크 "자립예탁금" 같은). 안 보내면 그대로
+const checkName = (name) =>
+  name === undefined ? null : typeof name !== "string" || !name.trim() || name.trim().length > 20 ? "계좌 이름은 1~20자" : null;
+
 function findAccount(id) {
   const row = db().prepare("SELECT * FROM accounts WHERE id = ?").get(id);
   if (!row) throw notFound("계좌");
@@ -232,11 +236,15 @@ app.get("/api/accounts/:id", (req, res) => res.json(toAccount(findAccount(req.pa
 
 // 다른 은행 계좌 추가
 app.post("/api/accounts", (req, res) => {
-  const { bankCode, number, balance = 0 } = req.body ?? {};
+  // 콕뱅크 서버는 농협 계좌만 (은행을 안 보내면 농협). 계좌 이름(저축예금 등)도 정할 수 있음
+  const { bankCode = APP === "nh" ? "nh" : undefined, number, balance = 0, name } = req.body ?? {};
   const bank = bankByCode(bankCode);
   const fields = {};
   if (!bank) fields.bankCode = "은행을 골라 주세요";
   else if (bank.code === "kakao") fields.bankCode = "카카오뱅크 통장은 이미 있어요";
+  else if (APP === "nh" && bank.code !== "nh") fields.bankCode = "콕뱅크에는 농협 계좌만 추가할 수 있어요";
+  const nameError = checkName(name);
+  if (nameError) fields.name = nameError;
   const digits = digitsOf(number);
   const numberError = bank && checkNumber(bank, digits);
   if (numberError) fields.number = numberError;
@@ -249,12 +257,13 @@ app.post("/api/accounts", (req, res) => {
 
   const id = `bank-${randomUUID().slice(0, 8)}`;
   const sort = db().prepare("SELECT COALESCE(MAX(sort), 0) + 1 AS s FROM accounts").get().s;
-  db().prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, sort) VALUES (?, 'external', ?, ?, ?, ?)").run(
+  db().prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, sort, name) VALUES (?, 'external', ?, ?, ?, ?, ?)").run(
     id,
     bankCode,
     formatted,
     balance,
     sort,
+    name?.trim() || (APP === "nh" ? "저축예금" : null),
   );
   res.status(201).json(toAccount(findAccount(id)));
 });
@@ -262,23 +271,27 @@ app.post("/api/accounts", (req, res) => {
 // 잔액/계좌번호 수정
 app.patch("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  const { balance, number, safebox } = req.body ?? {};
+  const { balance, number, safebox, name } = req.body ?? {};
+  const nameError = checkName(name);
+  if (nameError) throw bad(nameError, { name: nameError });
   const money = (v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 1_000_000_000);
   if (!money(balance)) throw bad("입력값을 확인해 주세요", { balance: "0원 이상 10억원 이하" });
   if (!money(safebox)) throw bad("입력값을 확인해 주세요", { safebox: "0원 이상 10억원 이하" });
   if (safebox !== undefined && row.kind !== "main") throw bad("세이프박스는 카카오뱅크 통장에만 있어요");
   let formatted = row.number;
   if (number !== undefined) {
-    if (row.kind !== "external") throw bad("다른 은행 계좌만 계좌번호를 바꿀 수 있어요");
+    // 카카오뱅크 통장 번호는 고정, 콕뱅크는 대표계좌 번호도 바꿀 수 있음
+    if (row.kind !== "external" && APP !== "nh") throw bad("다른 은행 계좌만 계좌번호를 바꿀 수 있어요");
     const digits = digitsOf(number);
     const numberError = checkNumber(bankByCode(row.bank_code), digits);
     if (numberError) throw bad(numberError, { number: numberError });
     formatted = formatAccountNumber(row.bank_code, digits);
   }
-  db().prepare("UPDATE accounts SET balance = ?, number = ?, safebox = ? WHERE id = ?").run(
+  db().prepare("UPDATE accounts SET balance = ?, number = ?, safebox = ?, name = ? WHERE id = ?").run(
     balance ?? row.balance,
     formatted,
     safebox ?? row.safebox,
+    name === undefined ? row.name : name.trim(),
     row.id,
   );
   res.json(toAccount(findAccount(row.id)));

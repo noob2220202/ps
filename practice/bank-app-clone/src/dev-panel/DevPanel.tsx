@@ -50,7 +50,7 @@ export function DevPanel({ open, onClose }: { open: boolean; onClose: () => void
   };
 
   return (
-    <div className={`dev-panel ${open ? "dev-panel--open" : ""}`} aria-hidden={!open}>
+    <div className={`dev-panel ${open ? "dev-panel--open" : ""} ${APP === "nh" ? "dev-panel--nh" : ""}`} aria-hidden={!open}>
       <div className="dev-panel__backdrop" onClick={onClose} />
       <section className="dev-panel__sheet" role="dialog" aria-label="관리 패널">
         <div className="dev-panel__grabber" />
@@ -130,8 +130,8 @@ function MoneyInput({ value, onChange, quick = [1000, 10000, 100000] }: { value:
   );
 }
 
-// 콕뱅크는 대표계좌도 이름(자립예탁금 등)으로
-const accountName = (a: Account) => (a.kind !== "main" ? a.bank.name : APP === "nh" ? a.label : "카카오뱅크 통장");
+// 콕뱅크는 계좌마다 이름(자립예탁금, 저축예금 등)으로
+const accountName = (a: Account) => (APP === "nh" ? a.label : a.kind !== "main" ? a.bank.name : "카카오뱅크 통장");
 
 // ---------- 기본: 기기 / 테마 / 내 정보 ----------
 function BasicTab({ run, onClose }: { run: Run; onClose: () => void }) {
@@ -154,17 +154,22 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
       </Field>
       <CaptureToggle />
       <RecordButton onStart={onClose} />
-      <Field label="테마">
-        <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
-      </Field>
+      {/* 콕뱅크는 다크 화면뿐이라 테마 없음 */}
+      {APP === "kakao" && (
+        <Field label="테마">
+          <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
+        </Field>
+      )}
 
       <h3 className="tab__h">내 정보</h3>
       <Field label="이름">
         <input value={name} onChange={(e) => setName(e.target.value)} maxLength={10} />
       </Field>
-      <Field label="카드 끝 4자리">
-        <input value={card} inputMode="numeric" maxLength={4} onChange={(e) => setCard(e.target.value.replace(/\D/g, ""))} />
-      </Field>
+      {APP === "kakao" && (
+        <Field label="카드 끝 4자리">
+          <input value={card} inputMode="numeric" maxLength={4} onChange={(e) => setCard(e.target.value.replace(/\D/g, ""))} />
+        </Field>
+      )}
       <button className="btn" onClick={() => run(() => api.updateProfile({ userName: name, cardLast4: card }), "내 정보를 저장했어요")}>
         저장
       </button>
@@ -279,8 +284,18 @@ function AccountsTab({ run }: { run: Run }) {
           <CardEditor key={`${home.data.profile.cardSpend}-${home.data.profile.cashbackCount}`} home={home.data} run={run} />
         </>
       )}
-      <h3 className="tab__h">다른 은행 계좌 추가</h3>
-      <AddBankAccount banks={banks.data} run={run} />
+      {/* 콕뱅크는 농협 계좌만 */}
+      {APP === "nh" ? (
+        <>
+          <h3 className="tab__h">농협 계좌 추가</h3>
+          <AddNhAccount run={run} />
+        </>
+      ) : (
+        <>
+          <h3 className="tab__h">다른 은행 계좌 추가</h3>
+          <AddBankAccount banks={banks.data} run={run} />
+        </>
+      )}
     </div>
   );
 }
@@ -293,9 +308,11 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   const [safeDraft, setSafeDraft] = useState<number | null>(null);
   const safebox = safeDraft ?? account.safebox ?? 0;
   const [number, setNumber] = useState(account.number ?? "");
+  const [label, setLabel] = useState(account.label);
   const [openEdit, setOpenEdit] = useState(false);
 
   const external = account.kind === "external";
+  const nh = APP === "nh"; // 콕뱅크: 계좌 이름·번호를 대표계좌까지 전부 바꿀 수 있음
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
@@ -335,21 +352,38 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
               </button>
             </>
           )}
-          {external && (
+          {nh && (
+            <>
+              <Field label="계좌 이름 (홈·내역에 보이는 이름)">
+                <input value={label} maxLength={20} placeholder="자립예탁금" onChange={(e) => setLabel(e.target.value)} />
+              </Field>
+              <button className="btn btn--sm" onClick={() => run(() => api.updateAccount(account.id, { name: label }), "계좌 이름을 바꿨어요")}>
+                이름 저장
+              </button>
+            </>
+          )}
+          {(external || nh) && (
             <>
               <Field label="계좌번호">
-                <input value={number} inputMode="numeric" onChange={(e) => setNumber(formatAccountNumber(bank?.pattern, e.target.value))} />
+                {nh ? (
+                  // 농협은 13자리(352-0000-0000-00)와 14자리(000000-00-000000) 둘 다 → 숫자만 받고 서버가 하이픈을 넣음
+                  <input value={number} inputMode="numeric" placeholder="숫자 13~14자리" onChange={(e) => setNumber(e.target.value.replace(/[^\d-]/g, "").slice(0, 17))} />
+                ) : (
+                  <input value={number} inputMode="numeric" onChange={(e) => setNumber(formatAccountNumber(bank?.pattern, e.target.value))} />
+                )}
               </Field>
               <div className="row">
                 <button className="btn btn--sm" onClick={() => run(() => api.updateAccount(account.id, { number }), "계좌번호를 바꿨어요")}>
                   계좌번호 저장
                 </button>
-                <button
-                  className="btn btn--sm btn--danger"
-                  onClick={() => confirm(`${account.label}를 삭제할까요?\n거래내역도 함께 지워져요.`) && run(() => api.deleteAccount(account.id), "계좌를 삭제했어요")}
-                >
-                  계좌 삭제
-                </button>
+                {external && (
+                  <button
+                    className="btn btn--sm btn--danger"
+                    onClick={() => confirm(`${account.label}를 삭제할까요?\n거래내역도 함께 지워져요.`) && run(() => api.deleteAccount(account.id), "계좌를 삭제했어요")}
+                  >
+                    계좌 삭제
+                  </button>
+                )}
               </div>
             </>
           )}
@@ -458,6 +492,38 @@ function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
         className="btn"
         onClick={async () => {
           if (await run(() => api.addBankAccount({ bankCode: bank.code, number, balance }), `${bank.name} 계좌를 추가했어요`)) {
+            setNumber("");
+            setBalance(0);
+          }
+        }}
+      >
+        계좌 추가
+      </button>
+    </div>
+  );
+}
+
+// 콕뱅크: 농협 계좌 추가 (은행 고르기 없음)
+function AddNhAccount({ run }: { run: Run }) {
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [balance, setBalance] = useState(0);
+  return (
+    <div className="add-bank">
+      <Field label="계좌 이름">
+        <input value={name} maxLength={20} placeholder="저축예금" onChange={(e) => setName(e.target.value)} />
+      </Field>
+      <Field label="농협 계좌번호 (농축협 14자리 / 농협은행 13자리)">
+        <input value={number} inputMode="numeric" placeholder="숫자만" onChange={(e) => setNumber(e.target.value.replace(/\D/g, "").slice(0, 14))} />
+      </Field>
+      <Field label="시작 잔액">
+        <MoneyInput value={balance} onChange={setBalance} quick={[10000, 100000, 1000000]} />
+      </Field>
+      <button
+        className="btn"
+        onClick={async () => {
+          if (await run(() => api.addBankAccount({ bankCode: "nh", name: name.trim() || undefined, number, balance }), "농협 계좌를 추가했어요")) {
+            setName("");
             setNumber("");
             setBalance(0);
           }
