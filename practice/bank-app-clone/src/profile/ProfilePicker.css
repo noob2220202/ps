@@ -10,14 +10,6 @@
 .picker__brand {
   margin-top: 13%;
 }
-.picker__logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--yellow);
-  display: grid;
-  place-items: center;
-}
 .picker__title {
   margin: 22px 0 8px;
   font-size: 22px;

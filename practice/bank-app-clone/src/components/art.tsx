@@ -14,6 +14,16 @@ export function BMark({ size = 70, color = "#000", hole = "var(--yellow)" }: { s
   );
 }
 
+// 노란 동그라미 + B (홈 맨 위 카드, 통장 상세, 이체 목록의 카카오뱅크 …).
+// 실제 앱(공식 스크린샷)에서 B 폭은 동그라미의 약 37% → 그보다 크면 꽉 차서 어색해 보임
+export function KakaoCircle({ size }: { size: number }) {
+  return (
+    <span className="kakao-circle" style={{ width: size, height: size }}>
+      <BMark size={size * 0.37} color="#1c1c1c" hole="var(--yellow)" />
+    </span>
+  );
+}
+
 export function Wordmark({ height = 30 }: { height?: number }) {
   return (
     <span className="wordmark" style={{ fontSize: height }}>

@@ -236,15 +236,6 @@
   gap: 12px;
   padding: 0 15px 0 15px;
 }
-.main-card__icon {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--yellow);
-  display: grid;
-  place-items: center;
-}
 /* 카드 위 버튼은 반투명 → 그라데이션이 살짝 비침 */
 .main-card__btn {
   background: color-mix(in srgb, var(--home-btn) 85%, transparent);

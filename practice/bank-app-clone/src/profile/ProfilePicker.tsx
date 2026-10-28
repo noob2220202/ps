@@ -5,7 +5,7 @@ import type { AppProfile } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Dialog, Sheet } from "../components/Sheet";
 import { Spinner } from "../components/Spinner";
-import { BMark } from "../components/art";
+import { KakaoCircle } from "../components/art";
 import { Icon } from "../components/icons/Icon";
 import { useStatusBar } from "../hooks/useStatusBar";
 import { OS } from "../platform/platform";
@@ -39,9 +39,7 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
   return (
     <div className="screen picker">
       <div className="picker__brand">
-        <span className="picker__logo">
-          <BMark size={20} color="#1c1c1c" hole="var(--yellow)" />
-        </span>
+        <KakaoCircle size={46} />
       </div>
       <h1 className="picker__title">{managing ? "프로필 관리" : "누구의 은행을 열까요?"}</h1>
       <p className="picker__desc">{managing ? "수정할 프로필을 눌러 주세요" : "프로필마다 계좌와 거래내역이 따로 저장돼요"}</p>

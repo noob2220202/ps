@@ -1,6 +1,6 @@
 import type { Bank } from "../api/types";
 import { localAsset } from "../assets/Asset";
-import { BMark } from "./art";
+import { KakaoCircle } from "./art";
 
 // 다른 은행 아이콘. src/assets/local/bank-<code>.png 가 있으면 그 로고를,
 // 없으면 은행 대표색 원 + 짧은 이름을 그린다 (로고는 상표라 저장소엔 안 넣음).
@@ -25,12 +25,7 @@ export function BankIcon({ bank, size = 34 }: { bank: Bank; size?: number }) {
       />
     );
   // 카카오뱅크는 노란 원 + B 로고를 직접 그릴 수 있다
-  if (bank.code === "kakao")
-    return (
-      <span aria-label={bank.name} style={{ width: size, height: size, flexShrink: 0, borderRadius: "50%", background: "var(--yellow)", display: "grid", placeItems: "center" }}>
-        <BMark size={size * 0.5} color="#1c1c1c" hole="var(--yellow)" />
-      </span>
-    );
+  if (bank.code === "kakao") return <KakaoCircle size={size} />;
   const mark = bank.short.replace(/(은행|증권|투자)$/, "").slice(0, 3);
   const fontSize = size * (mark.length >= 3 ? 0.27 : mark.length === 2 ? 0.33 : 0.46);
   return (

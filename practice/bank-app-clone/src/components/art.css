@@ -58,3 +58,11 @@
     stroke-dashoffset: -124;
   }
 }
+
+.kakao-circle {
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--yellow);
+  display: grid;
+  place-items: center;
+}

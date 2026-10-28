@@ -11,7 +11,7 @@ import { won } from "../../lib/format";
 import { Asset } from "../../assets/Asset";
 import { BackButton, GearButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
-import { BMark } from "../../components/art";
+import { KakaoCircle } from "../../components/art";
 import "./AccountDetail.css";
 
 // 타이핑은 글자마다 state가 바뀐다. 화면 컴포넌트에서 바로 쓰면 한 글자마다 화면 "전체"가
@@ -99,9 +99,7 @@ export function AccountDetailScreen() {
 
       <section className="balance-card">
         <div className="balance-card__top">
-          <span className="balance-card__icon">
-            <BMark size={17} color="#1c1c1c" hole="var(--yellow)" />
-          </span>
+          <KakaoCircle size={34} />
           <div>
             <div className="balance-card__meta">
               <span>{account.data.label}</span>

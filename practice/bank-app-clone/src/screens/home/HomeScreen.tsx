@@ -13,7 +13,7 @@ import { THEME } from "../../platform/theme";
 import { Asset, localAsset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { Spinner } from "../../components/Spinner";
-import { BMark } from "../../components/art";
+import { KakaoCircle } from "../../components/art";
 import { BankIcon } from "../../components/BankIcon";
 import { AiPill } from "./AiPill";
 import { BannerCarousel } from "./BannerCarousel";
@@ -119,9 +119,7 @@ export function HomeScreen() {
         {/* 카카오뱅크 3333 통장: 노랑→민트 그라데이션 카드 (실제 앱 스크린샷) */}
         <div className="main-card" onClick={() => openWithSpinner(main.id, "/account/main")}>
           <div className="main-card__row">
-            <span className="main-card__icon">
-              <BMark size={17} color="#1c1c1c" hole="var(--yellow)" />
-            </span>
+            <KakaoCircle size={34} />
             <div className="acct__text">
               <strong className="acct__balance">{won(main.balance)}</strong>
               <span className="acct__sub">{main.label}</span>
