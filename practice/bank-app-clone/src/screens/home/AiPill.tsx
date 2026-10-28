@@ -7,6 +7,8 @@ import { Icon } from "../../components/icons/Icon";
 import { useLayerActive } from "../../platform/LayerContext";
 
 const MESSAGES = [
+  { icon: "ai", text: "코스피 7천, 다시 올 수 있을까요?", closable: false },
+  { icon: "ai", text: "국내 반도체주 시총 상위 종목 흐름은?", closable: false },
   { icon: "ai", text: "원금 지키는 펀드, 정말 가능할까요?", closable: false },
   { icon: "coin", text: "지난 달, 모임통장\n어디에 제일 많이 썼을까요?", closable: true },
   { icon: "coin", text: "회비 안 낸 모임멤버\n한 번에 모아봤어요", closable: true },

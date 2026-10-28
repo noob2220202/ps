@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { api } from "../../api/mockApi";
+import { useApi } from "../../api/useApi";
+import { paths } from "../../api/endpoints";
+import type { Account } from "../../api/types";
+import { ErrorState } from "../../components/ErrorState";
 import type { Transaction } from "../../api/types";
-import { useAsync } from "../../hooks/useAsync";
 import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { Asset } from "../../assets/Asset";
@@ -46,13 +48,19 @@ export function HistoryScreen() {
   const [activeId, setActiveId] = useState<string | null>(null);
   useStatusBar("#fff", "dark");
 
-  const state = useAsync(
-    () => Promise.all([api.account(accountId), api.transactions(accountId)]),
-    [accountId],
-  );
+  const account = useApi<Account>(paths.account(accountId));
+  const txList = useApi<Transaction[]>(paths.transactions(accountId));
+  const failed = account.status === "error" ? account : txList.status === "error" ? txList : null;
 
-  if (state.status === "loading") return <HistorySkeleton onBack={() => navigate(-1)} />;
-  const [account, txs] = state.data;
+  if (failed)
+    return (
+      <div className="screen history">
+        <Header onBack={() => navigate(-1)} />
+        <ErrorState error={failed.error} onRetry={() => (account.retry(), txList.retry())} />
+      </div>
+    );
+  if (account.status !== "done" || txList.status !== "done") return <HistorySkeleton onBack={() => navigate(-1)} />;
+  const txs = txList.data;
 
   // 누른 행을 잠깐 회색으로 유지한 뒤 이동 (영상 27.25초)
   const open = (tx: Transaction) => {
@@ -67,7 +75,7 @@ export function HistoryScreen() {
       <div className="history__summary">
         <Asset slot="friends-avatar" />
         <strong className="history__balance">
-          {account ? account.balance.toLocaleString("ko-KR") : 0}
+          {account.data.balance.toLocaleString("ko-KR")}
           <span>원</span>
         </strong>
       </div>

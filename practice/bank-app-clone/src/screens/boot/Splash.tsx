@@ -53,7 +53,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
         <p className="splash__ad-text">
           10.27 미니 2집 발매 <span className="splash__ad-badge">AD</span>
         </p>
-        <Asset slot="ad" className="splash__ad-photo" />
+        <Asset slot="banner-and2ble" className="splash__ad-photo" />
       </div>
     </div>
   );

@@ -52,9 +52,10 @@
   --home-lanyard: #4a4a4a;
   --home-pill: #262626;
   --home-glass: rgba(46, 46, 48, 0.62);
+  --home-ad-bg: #262626;
 }
 [data-theme="light"] {
-  --home-bg: #f4f4f4;
+  --home-bg: #ffffff; /* 카드 사이가 회색으로 보이는 건 페이지가 아니라 카드 그림자 때문 */
   --home-card: #ffffff;
   --home-btn: #f5f5f5;
   --home-text: #212121;
@@ -70,6 +71,7 @@
   --home-lanyard: #e6e6e6;
   --home-pill: #ffffff;
   --home-glass: rgba(255, 255, 255, 0.7);
+  --home-ad-bg: #f6f6f6;
 }
 
 /* iPhone 17 Pro: 402 x 874pt, 하단 안전영역 34pt */

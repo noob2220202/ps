@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { api } from "../../api/mockApi";
-import { useAsync } from "../../hooks/useAsync";
+import { useApi } from "../../api/useApi";
+import { paths } from "../../api/endpoints";
+import type { Account, Transaction } from "../../api/types";
+import { ErrorState } from "../../components/ErrorState";
 import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { useTypewriter } from "../../hooks/useTypewriter";
@@ -52,17 +54,30 @@ export function AccountDetailScreen() {
     setScrolled(top > 40); // on/off가 바뀔 때만 리렌더
   });
 
-  const state = useAsync(
-    () => Promise.all([api.account(accountId), api.transactions(accountId)]),
-    [accountId],
-  );
-  const loaded = state.status === "done";
+  // 요청 2개를 동시에 보내고(병렬), 둘 다 오면 그린다
+  const account = useApi<Account>(paths.account(accountId));
+  const txList = useApi<Transaction[]>(paths.transactions(accountId));
+  const loaded = account.status === "done" && txList.status === "done";
   useStatusBar(loaded && !scrolled ? "#f1e9fd" : "var(--light-bg)", "dark");
 
+  const failed = account.status === "error" ? account : txList.status === "error" ? txList : null;
+  if (failed)
+    return (
+      <div className="screen detail">
+        <header className="detail__header">
+          <BackButton onClick={() => navigate(-1)} />
+        </header>
+        <ErrorState
+          error={failed.error}
+          onRetry={() => {
+            account.retry();
+            txList.retry();
+          }}
+        />
+      </div>
+    );
   if (!loaded) return <DetailSkeleton onBack={() => navigate(-1)} />;
-  const [account, txs] = state.data;
-  if (!account) return <div className="screen detail">계좌를 찾을 수 없습니다.</div>;
-
+  const txs = txList.data;
 
   return (
     <div className="screen detail" ref={setScrollEl}>
@@ -90,7 +105,7 @@ export function AccountDetailScreen() {
               <Asset slot="star" />
               <span className="outline-badge outline-badge--light">계좌번호</span>
             </div>
-            <strong className="balance-card__amount">{won(account.balance)}</strong>
+            <strong className="balance-card__amount">{won(account.data.balance)}</strong>
           </div>
         </div>
         <div className="balance-card__actions">

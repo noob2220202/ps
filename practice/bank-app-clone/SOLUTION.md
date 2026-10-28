@@ -7,8 +7,11 @@
 
 ```
 src/
-  config/      profile.ts(이름·계좌번호), timing.ts(모든 애니메이션 타이밍)
-  api/         db.ts(가짜 데이터) + mockApi.ts(지연을 주는 가짜 서버)
+  config/      timing.ts(모든 애니메이션 타이밍)
+  api/         types.ts(API 계약) · client.ts(fetch 래퍼) · useApi.ts(캐시) · endpoints.ts(주소 모음)
+  mock-server/ db.ts(가짜 DB, localStorage) · server.ts(fetch 가로채는 가짜 REST 서버)
+  dev-panel/   종 버튼 개발자 패널
+  assets/      Asset 슬롯 + Fluent 기본 에셋, local/(실제 에셋, 커밋 안 됨)
   hooks/       useAsync, useTypewriter, useScrollTop, useStatusBar
   lib/         format.ts (금액 포맷, 날짜 그룹핑)
   components/  PhoneFrame, TxList, Icon, art(로고/일러스트/스피너 SVG)
@@ -115,7 +118,7 @@ JSX에 `{d.address && ...}`를 반복하지 않아도 됨.
 
 ## 7. 데이터 — 저장하지 말고 계산하기
 
-`db.ts`는 "거래 후 잔액"을 저장하지 않고 현재 잔액에서 거꾸로 빼가며 계산.
+가짜 서버(`mock-server/server.ts`)는 "거래 후 잔액"을 저장하지 않고 현재 잔액에서 거꾸로 빼가며 계산.
 잔액을 데이터마다 손으로 적으면 하나만 틀려도 전체가 어긋남. 계산 가능한 값은 계산.
 
 ## 8. 상태바 색 바꾸기 — Context
@@ -267,3 +270,70 @@ ffmpeg만으로: 자르기(`crop`) → 확대(`lanczos`) → 원형 마스크(`g
 ### 실제 이미지와 기본 이미지의 "모양 차이" 흡수
 잘라낸 캐릭터 일러스트는 말풍선 바로 위에서 잘려 있지만, 기본 에셋(이모지 3개)은 말풍선과 많이 겹쳐야 자연스럽습니다.
 `.asset--local` 클래스로 어떤 게 들어왔는지 CSS가 알 수 있게 해서 겹침 정도를 다르게 줬습니다.
+
+---
+
+## 12. 가짜 REST 서버로 API 연습하기 (`src/mock-server/`, `src/api/`)
+
+### 구조
+```
+화면 ──useApi("/api/home")──▶ fetch ──(가로챔)──▶ mock-server/server.ts ──▶ db.ts (localStorage)
+개발자 패널 ──api.createTransaction()──▶ fetch POST /api/accounts/main/transactions ──▶ 201 Created
+```
+화면은 **진짜 서버와 똑같이** `fetch` + JSON + HTTP 상태코드로만 통신합니다. `main.tsx`의
+`installMockServer()` 한 줄만 지우고 `client.ts`의 `BASE`를 진짜 서버 주소로 바꾸면 그대로 실서비스 구조.
+
+### API 목록
+| 메서드 | 주소 | 하는 일 | 대표 응답 |
+|---|---|---|---|
+| GET | `/api/home` | 홈 화면 데이터 한 번에 | 200 |
+| GET / PATCH | `/api/profile` | 이름·계좌번호·카드번호 | 200, 400(형식 오류) |
+| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액 수정 | 200, 404 |
+| GET | `/api/accounts/:id/transactions` | 거래내역 (`?limit=`) | 200 |
+| POST | `/api/accounts/:id/transactions` | 거래 만들기 | **201**, 400, 400(잔액 부족) |
+| GET / DELETE | `/api/transactions/:id` | 거래 상세 / 삭제 | 200, **204**, 404 |
+| POST | `/api/reset` | 초기 데이터로 | 204 |
+| GET / PATCH | `/api/dev/settings` | 지연(ms)·실패 확률 | 200 |
+
+에러는 항상 `{ code, message, fields? }` 모양 → 화면이 `fields.merchant` 같은 걸 입력칸 아래에 바로 보여줄 수 있음.
+
+### 연습 포인트
+- **상태코드 의미**: 만들기 성공은 200이 아니라 201, 지워서 돌려줄 게 없으면 204, 입력 잘못은 400, 없으면 404
+- **서버 검증**: 화면에서 막아도 서버가 다시 검사해야 함 (금액 0, 1천만원 초과, 잔액 부족, 빈 거래처…)
+- **파생 데이터**: "거래 후 잔액"은 저장하지 않고 서버가 계산 → 거래를 지우거나 잔액을 바꿔도 내역이 항상 맞음
+- **로딩/에러 UI**: 패널에서 지연 2초 / 실패 50%로 바꾸고 화면을 돌아다녀 보세요
+- **캐시 무효화**: POST/PATCH/DELETE 성공 → `invalidate()` → `useApi`를 쓰는 모든 화면이 자동으로 다시 요청.
+  (React Query의 `invalidateQueries`, SWR의 `mutate`가 하는 일과 같음)
+- **stale-while-revalidate**: 한 번 받은 데이터는 캐시에서 즉시 보여주고 뒤에서 새로 받음 → 두 번째 방문부터 로딩 없음.
+  스플래시 동안 `prefetch("/api/home")` 해 두어서 홈은 처음부터 바로 뜸
+
+### 왜 MSW(Mock Service Worker)가 아니라 fetch를 직접 감쌌나
+MSW는 서비스워커를 쓰는데, 서비스워커는 **HTTPS나 localhost에서만** 동작합니다. VPS에 `http://IP:9101`로 띄우면
+막히므로, `window.fetch`를 감싸는 방식(같은 원리를 더 단순하게)으로 했습니다. HTTPS 환경이면 MSW로 바꿔보는 것도 좋은 연습.
+
+### 개발자 패널에서 effect로 폼 채우지 않기
+"데이터가 오면 `useEffect`에서 `setForm(data)`"은 흔하지만, 렌더가 한 번 더 일어나고 재요청 때 입력 중인 값을
+덮어쓸 수 있습니다. 대신 데이터가 올 때까지 기다렸다가 `<ProfileForm initial={data} />`를 그리고
+`useState(() => initial로 계산)`으로 초기값을 정합니다.
+
+## 13. 새 영상 디테일 구현 방법
+
+### 글자 위를 지나가는 색 띠 (`.cashback__sweep`)
+```css
+background: linear-gradient(90deg, 글자색 0 22%, 노랑, 초록, 하늘, 파랑, 하늘, 초록, 노랑, 글자색 78% 100%);
+background-size: 400% 100%;      /* 그라데이션을 글자 폭의 4배로 */
+-webkit-background-clip: text;   /* 배경을 글자 모양으로 오려냄 */
+color: transparent;
+animation: cash-sweep 10s linear infinite;  /* 0~24%(2.4초)만 100%→0%로 이동, 나머지는 멈춤 */
+```
+양 끝이 원래 글자색이라 멈춰 있을 땐 그냥 검은 글씨. 다크 모드에선 `var(--home-text)`가 흰색이라 그대로 동작.
+
+### 무한 루프 캐러셀
+`[마지막 복제, 1, 2, 3, 첫 번째 복제]`로 깔고, 복제본에 도착하면 `transitionend`에서 애니메이션을 끈 채
+진짜 위치로 순간이동. 자동 넘김 타이머는 `index`가 바뀔 때마다 새로 걸어서, 손으로 넘긴 직후 바로 또 넘어가지 않게.
+드래그 중엔 리렌더 없이 DOM transform만 직접 바꿈 (10번 성능 해설과 같은 원리).
+
+### 흰 배경 이미지 녹이기 + 함정
+배너 이미지는 흰 배경째 잘려 있습니다. `mix-blend-mode: multiply`는 흰색을 투명처럼 만들어 주는데,
+**부모에 `will-change: transform`이 있으면 독립 레이어(투명 배경)가 생겨서 섞일 대상이 없어 효과가 사라집니다.**
+레이어에 배경색을 깔아서 해결. (결국 실제 앱 배경이 흰색이라 지금은 자연스럽게 맞음)

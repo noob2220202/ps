@@ -44,18 +44,33 @@
 
 /* ---------- AI 배너(pill) ---------- */
 .ai-pill {
+  position: relative;
+  isolation: isolate; /* ::before 글로우를 이 pill 뒤(z-index:-1)에 가두기 */
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  max-width: 260px;
-  min-height: 40px;
-  padding: 8px 14px 8px 11px;
+  max-width: 270px;
+  min-height: 42px;
+  padding: 8px 17px 8px 13px;
   border-radius: 20px;
   background: var(--home-pill);
   animation: screen-in 200ms ease-out;
 }
-[data-theme="light"] .ai-pill {
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+[data-theme="light"] .ai-pill::before {
+  content: "";
+  position: absolute;
+  inset: -5px -7px;
+  z-index: -1;
+  border-radius: 30px;
+  background: linear-gradient(90deg, rgba(120, 190, 255, 0.28), rgba(200, 235, 255, 0.2) 40%, rgba(255, 240, 160, 0.34) 85%);
+  filter: blur(8px);
+  animation: glow-breathe 4s ease-in-out infinite alternate;
+}
+@keyframes glow-breathe {
+  to {
+    opacity: 0.6;
+    transform: scale(0.97);
+  }
 }
 .ai-pill--two {
   border-radius: 22px;
@@ -68,7 +83,7 @@
   flex-shrink: 0;
 }
 .ai-pill__text {
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 600;
   line-height: 1.45;
   white-space: pre-line;
@@ -79,57 +94,100 @@
   color: var(--home-faint);
 }
 
-/* ---------- 광고 ---------- */
-.ad {
+/* ---------- 상단 배너 캐러셀 (새 영상 기준, 480px 영상 × 0.75) ---------- */
+.carousel {
   position: relative;
-  display: flex;
-  justify-content: space-between;
-  padding: 28px 47px 22px 34px;
+  padding: 8px 0 6px;
 }
-.ad__text {
+.carousel__dots {
+  position: absolute;
+  top: 6px;
+  right: 17px;
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+}
+.carousel__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #999;
+  transition: background-color 200ms;
+}
+.carousel__dot--on {
+  background: var(--home-text);
+}
+.carousel__viewport {
+  overflow: hidden;
+  touch-action: pan-y; /* 세로 스크롤은 그대로, 가로 드래그는 캐러셀이 받음 */
+}
+.carousel__track {
+  display: flex;
+  will-change: transform;
+  /* will-change는 독립 레이어(투명 배경)를 만들어서 안의 multiply가 섞일 대상이 없어진다 → 배경색을 깔아 줌 */
+  background: var(--home-bg);
+}
+.banner {
+  position: relative;
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px 0 33px;
+  min-height: 82px;
+  user-select: none;
+}
+.banner__text {
   display: flex;
   flex-direction: column;
-  font-size: 13.5px;
-  line-height: 1.38;
+  align-items: flex-start;
+  gap: 10px;
 }
-.ad__when {
-  margin-top: 2px;
-  font-size: 11.5px;
-  color: var(--home-sub);
+.banner__title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  white-space: pre-line;
 }
-.ad__cta {
-  align-self: flex-start;
-  margin-top: 13px;
-  height: 32px;
+.banner__cta {
+  height: 21px;
+  padding: 0 7px;
+  border-radius: 10px;
+  background: #fff4b2;
+  color: #6f6a08;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.banner__cta--ad {
+  height: 30px;
   padding: 0 12px;
-  border-radius: 16px;
+  border-radius: 15px;
   background: var(--home-btn);
+  color: var(--home-text);
   font-size: 12px;
-  font-weight: 600;
 }
-.ad__media {
-  position: relative;
-  padding-top: 6px;
+.banner__image {
+  border-radius: 12px;
 }
-.ad__photo {
+/* 실제 배너 이미지는 흰 배경째 잘려 있다. 곱하기(multiply) 합성은 흰색을 "투명"처럼 만들어서
+   연회색 페이지 위에서도 네모난 흰 상자가 안 보이게 한다 (라이트 테마에서만 — 다크에선 반대로 어두워짐) */
+[data-theme="light"] .banner__image.asset--local img,
+[data-theme="light"] .shortcuts .asset--local img {
+  mix-blend-mode: multiply;
+}
+.asset--banner-and2ble.banner__image {
   width: 116px;
   height: 85px;
 }
-.ad__badge {
+.banner__ad {
   position: absolute;
-  right: -11px;
-  bottom: -16px;
+  right: 18px;
+  bottom: -8px;
   font-size: 6.5px;
   color: var(--home-sub);
   border: 1px solid var(--home-line);
   border-radius: 3px;
   padding: 0 2px;
-}
-.ad__close {
-  position: absolute;
-  top: 18px;
-  right: 16px;
-  color: var(--home-sub);
 }
 
 /* ---------- 카드(흰/어두운 박스) 공통 ---------- */
@@ -140,7 +198,9 @@
 }
 [data-theme="light"] .home-card,
 [data-theme="light"] .add-product {
-  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.055),
+    0 0 0 0.5px rgba(0, 0, 0, 0.025);
 }
 
 /* ---------- 계좌 ---------- */
@@ -323,8 +383,37 @@
   font-size: 14.5px;
   font-weight: 700;
 }
-.cashback__hl {
-  color: #f5d70a;
+/* 노랑→초록→하늘→파랑→하늘→초록→노랑 띠를 양옆 기본 글자색 사이에 넣고, 배경을 4배로 늘려
+   오른쪽 끝(기본색)에서 왼쪽 끝(기본색)까지 미끄러지게 하면 색 띠가 글자 위를 한 번 지나간다.
+   10초 중 앞 2초만 움직이고 나머지는 멈춤 (영상과 같은 주기) */
+.cashback__sweep {
+  background: linear-gradient(
+    90deg,
+    var(--home-text) 0 22%,
+    #f6d40a 28%,
+    #8fd94e 38%,
+    #22c7d6 47%,
+    #1e8fff 50%,
+    #22c7d6 53%,
+    #8fd94e 62%,
+    #f6d40a 72%,
+    var(--home-text) 78% 100%
+  );
+  background-size: 400% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: cash-sweep 10s 1.2s linear infinite;
+}
+@keyframes cash-sweep {
+  0% {
+    background-position: 100% 0;
+  }
+  24%,
+  100% {
+    background-position: 0% 0;
+  }
 }
 
 .tmoney {
@@ -371,6 +460,70 @@
   align-items: center;
   gap: 5px;
 }
+.shortcuts {
+  margin-top: 12px;
+  padding: 10px 0;
+}
+.shortcuts__row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 20px;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.native-ad {
+  position: relative;
+  margin: 32px 15px 0;
+  min-height: 78px;
+  padding: 0 14px 0 20px;
+  border-radius: 12px;
+  background: var(--home-ad-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.native-ad__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.native-ad__source {
+  font-size: 10.5px;
+  color: var(--home-sub);
+}
+.native-ad__title {
+  font-size: 16.5px;
+  font-weight: 700;
+}
+.native-ad__sponsor {
+  font-size: 9.5px;
+  color: var(--home-faint);
+}
+.native-ad__badge {
+  border: 1px solid var(--home-faint);
+  border-radius: 3px;
+  padding: 0 2px;
+  font-size: 7px;
+}
+.native-ad__info {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid #7386a5;
+  color: #7386a5;
+  font-size: 8px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
 .home__footer-divider {
   width: 1px;
   height: 12px;

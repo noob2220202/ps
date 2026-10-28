@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../../api/mockApi";
+import { useApi } from "../../api/useApi";
+import { paths } from "../../api/endpoints";
 import type { HomeData } from "../../api/types";
-import { PROFILE } from "../../config/profile";
 import { TIMING } from "../../config/timing";
-import { useAsync } from "../../hooks/useAsync";
+import { ErrorState } from "../../components/ErrorState";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { useScrollFrame } from "../../hooks/useScrollTop";
 import { OS } from "../../platform/platform";
@@ -14,7 +14,8 @@ import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { Spinner } from "../../components/Spinner";
 import { AiPill } from "./AiPill";
-import { AdBanner } from "./AdBanner";
+import { BannerCarousel } from "./BannerCarousel";
+import { DevPanel } from "../../dev-panel/DevPanel";
 import { BottomNav } from "./BottomNav";
 import "./Home.css";
 
@@ -35,12 +36,12 @@ function Collapse({ open, children }: { open: boolean; children: ReactNode }) {
 export function HomeScreen() {
   useStatusBar("var(--home-bg)", THEME === "dark" ? "light" : "dark");
   const navigate = useNavigate();
-  const home = useAsync(api.home, []);
+  const home = useApi<HomeData>(paths.home);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const [firstLoad] = useState(() => !booted);
   const [wave, setWave] = useState(firstLoad ? 1 : 2);
   const [nhResolved, setNhResolved] = useState(!firstLoad);
-  const [adOpen, setAdOpen] = useState(true);
   const [promoOpen, setPromoOpen] = useState(true);
   const [pressing, setPressing] = useState<string | null>(null);
 
@@ -76,8 +77,14 @@ export function HomeScreen() {
     setTimeout(() => navigate(to), TIMING.pressDelay);
   };
 
+  if (home.status === "error")
+    return (
+      <div className="home">
+        <ErrorState error={home.error} onRetry={home.retry} />
+      </div>
+    );
   if (home.status === "loading") return <div className="home" />;
-  const data: HomeData = home.data;
+  const data = home.data;
   const [mini, main, nh] = data.accounts;
   const full = wave === 2;
 
@@ -85,15 +92,16 @@ export function HomeScreen() {
     <div className="home">
       <div className="screen home__scroll" ref={setScrollEl}>
         <header className="home__header">
-          {full ? <AiPill ready={full} /> : <h1 className="home__name">{PROFILE.userName}</h1>}
-          <button className="home__bell" aria-label="알림">
+          {full ? <AiPill ready={full} /> : <h1 className="home__name">{data.profile.userName}</h1>}
+          {/* 실제 앱에선 알림함. 여기선 연습용 개발자 패널(기기/테마 전환, 데이터 편집, API 로그) */}
+          <button className="home__bell" aria-label="개발자 패널" onClick={() => setPanelOpen(true)}>
             <Icon name="bell" size={24} stroke={1.8} />
             <span className="red-dot home__bell-dot" />
           </button>
         </header>
 
-        <Collapse open={full && adOpen}>
-          <AdBanner ad={data.ad} onClose={() => setAdOpen(false)} />
+        <Collapse open={full}>
+          <BannerCarousel banners={data.banners} />
         </Collapse>
 
         <div className="mini-card pressable" onClick={() => navigate("/mini")}>
@@ -179,8 +187,9 @@ export function HomeScreen() {
               </div>
               <button className="pill-btn pressable">내역 보기</button>
             </div>
+            {/* 영상: 약 10초마다 노랑→초록→하늘 색 띠가 글자 위를 지나간다 (background-clip: text) */}
             <p className="cashback">
-              <span className="cashback__hl">현</span>금 돌려받을 기회 {data.cashbackCount}건이 있어요
+              <span className="cashback__sweep">현금 돌려받을 기회 {data.cashbackCount}건</span>이 있어요
             </p>
             <div className="tmoney">
               <Asset slot="tmoney" />
@@ -204,9 +213,32 @@ export function HomeScreen() {
             <Icon name="sliders" size={16} stroke={2} /> 화면 편집
           </button>
         </div>
+
+        {/* 영상 아래쪽: 바로가기 카드 + 네이티브 광고 */}
+        <section className="home-card shortcuts">
+          {data.shortcuts.map((s) => (
+            <button key={s.id} className="shortcuts__row row-press-home">
+              <Asset slot={s.icon} />
+              {s.label}
+            </button>
+          ))}
+        </section>
+
+        <section className="native-ad">
+          <div className="native-ad__text">
+            <span className="native-ad__source">{data.nativeAd.source} ›</span>
+            <strong className="native-ad__title">{data.nativeAd.title}</strong>
+            <span className="native-ad__sponsor">
+              <span className="native-ad__badge">AD</span> {data.nativeAd.sponsor}
+            </span>
+          </div>
+          <Asset slot="ad-shoe" className="native-ad__image" />
+          <span className="native-ad__info" aria-label="광고 정보">?</span>
+        </section>
       </div>
 
       <BottomNav minimized={navMin} />
+      <DevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   );
 }

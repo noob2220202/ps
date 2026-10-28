@@ -13,6 +13,12 @@ import boy from "./fluent/boy.png";
 import girl from "./fluent/girl.png";
 import child from "./fluent/child.png";
 import star from "./fluent/star.png";
+import calendar from "./fluent/calendar.png";
+import building from "./fluent/building.png";
+import idCard from "./fluent/id-card.png";
+import grandma from "./fluent/grandma.png";
+import shoe from "./fluent/shoe.png";
+import moneyBag from "./fluent/money-bag.png";
 import "./Asset.css";
 
 // 화면에 들어가는 이미지 "자리(slot)" 목록.
@@ -36,7 +42,15 @@ export type Slot =
   | "moim-dues"
   | "friends"
   | "friends-avatar"
-  | "ad";
+  | "banner-and2ble"
+  | "banner-mcard"
+  | "banner-volunteer"
+  | "banner-pcbang"
+  | "shortcut-timetable"
+  | "shortcut-subsidy"
+  | "shortcut-id"
+  | "shortcut-mini26"
+  | "ad-shoe";
 
 // import.meta.glob은 "빌드할 때" 폴더를 훑어서 있는 파일만 번들에 넣는다.
 // 그래서 실행 중에 없는 파일을 요청(404)하거나, 대체 이미지로 바뀌며 깜빡이는 일이 없다.
@@ -76,12 +90,20 @@ const FALLBACK: Record<Slot, () => ReactNode> = {
       <img src={child} alt="" className="asset__friend asset__friend--front" />
     </span>
   ),
-  ad: () => (
+  "banner-and2ble": () => (
     <span className="asset__ad-fallback">
       <AlbumLogo size={22} />
       <small>MINI ALBUM</small>
     </span>
   ),
+  "banner-mcard": () => emoji(card, 0.8),
+  "banner-volunteer": () => emoji(grandma, 0.8),
+  "banner-pcbang": () => emoji(coin, 0.8),
+  "shortcut-timetable": () => emoji(calendar, 1),
+  "shortcut-subsidy": () => emoji(building, 1),
+  "shortcut-id": () => emoji(idCard, 1),
+  "shortcut-mini26": () => emoji(moneyBag, 1),
+  "ad-shoe": () => emoji(shoe, 0.6),
 };
 
 export function Asset({ slot, className = "" }: { slot: Slot; className?: string }) {

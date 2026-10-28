@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { api } from "../../api/mockApi";
+import { useApi } from "../../api/useApi";
+import { paths } from "../../api/endpoints";
+import { ErrorState } from "../../components/ErrorState";
 import type { Transaction, TransactionDetail } from "../../api/types";
-import { useAsync } from "../../hooks/useAsync";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { signedWon, won } from "../../lib/format";
 import { Spinner } from "../../components/Spinner";
@@ -66,7 +67,7 @@ export function TxDetailScreen() {
   const navigate = useNavigate();
   // 목록에서 넘겨준 거래 요약(state)이 있으면 제목부터 바로 그림 → 상세만 로딩
   const preview = (useLocation().state as { tx?: Transaction } | null)?.tx;
-  const detail = useAsync(() => api.transaction(txId), [txId]);
+  const detail = useApi<TransactionDetail>(paths.transaction(txId));
   useStatusBar("#fff", "dark");
 
   const head = detail.status === "done" ? detail.data : preview;
@@ -85,8 +86,12 @@ export function TxDetailScreen() {
         <div className="tx__loading">
           <Spinner size={24} color="#b8b8b8" />
         </div>
-      ) : !detail.data ? (
-        <p className="tx__empty">거래 정보를 찾을 수 없습니다.</p>
+      ) : detail.status === "error" ? (
+        detail.error.status === 404 ? (
+          <p className="tx__empty">거래 정보를 찾을 수 없습니다.</p>
+        ) : (
+          <ErrorState error={detail.error} onRetry={detail.retry} />
+        )
       ) : (
         <div className="tx__body fade-in">
           {groups(detail.data).map((rows, i) => (

@@ -110,7 +110,7 @@
 }
 
 /* ---------- 광고 사진 ---------- */
-.asset--ad {
+.asset--banner-and2ble {
   border-radius: 12px;
   background: #ecebe8;
 }
@@ -130,4 +130,23 @@
   font-size: 9px;
   letter-spacing: 0.2em;
   color: #333;
+}
+
+/* ---------- 홈 배너 이미지 / 바로가기 아이콘 / 광고 상품 ---------- */
+.asset--banner-mcard,
+.asset--banner-volunteer,
+.asset--banner-pcbang {
+  width: 86px;
+  height: 75px;
+}
+.asset--shortcut-timetable,
+.asset--shortcut-subsidy,
+.asset--shortcut-id,
+.asset--shortcut-mini26 {
+  width: 26px;
+  height: 26px;
+}
+.asset--ad-shoe {
+  width: 104px;
+  height: 56px;
 }
