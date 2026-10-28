@@ -3,7 +3,7 @@ import { Icon } from "../components/icons/Icon";
 import { Keypad } from "../components/Sheet";
 import { applyKey } from "../lib/keypad";
 import { nhBankList } from "./banks";
-import { BackArrowKey, ClearDot, NhBankIcon } from "./common";
+import { BackArrowKey, ClearDot, NhBankIcon, NhKokKey } from "./common";
 import "./nh-numbersheet.css";
 
 // ---------- 계좌번호 시트: [은행 ⌄] [X] / 입력칸 / 키패드(콕) / 다음 ----------
@@ -45,7 +45,7 @@ export function NhNumberSheet({
           </button>
         )}
       </div>
-      <Keypad kok rowHeight={57} back={<BackArrowKey />} onKey={(k) => onChange(applyKey(digits, k, 16))} />
+      <Keypad kok kokLabel={<NhKokKey />} rowHeight={68} back={<BackArrowKey />} onKey={(k) => onChange(applyKey(digits, k, 16))} />
       <button className="nh-btn nh-btn--teal nh-sheet-btn" disabled={digits.length < 10} onClick={onDone}>
         다음
       </button>

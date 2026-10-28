@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { localAsset } from "../assets/Asset";
 import type { Bank } from "../api/types";
 import { BankIcon } from "../components/BankIcon";
-import { Icon } from "../components/icons/Icon";
 import { useNhLoading } from "./loading";
 import "./nh.css";
 
@@ -80,20 +79,23 @@ export function QuickSendIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-// 화면 전체를 어둡게 + 점 3개 (useNhGo / withNhLoading 이 켬). App이 콕뱅크일 때 한 장만 그림
+// 폰 전체(상태바 포함)를 어둡게 + 점 3개 (useNhGo / withNhLoading 이 켬). App이 PhoneFrame 위에 한 장만 그림
 export function NhLoadingLayer() {
   if (!useNhLoading()) return null;
   return (
-    <div className="nh-loading nh-loading--global">
-      <NhDots size={9} />
+    <div className="nh-loading nh-loading--phone">
+      <span>
+        <NhDots />
+      </span>
     </div>
   );
 }
 
 // 파랑·노랑·초록 점 3개가 통통 튀는 로딩 (콕뱅크 공통)
-export function NhDots({ size = 9 }: { size?: number }) {
+// size를 안 주면 실제 크기(지름 12.7)
+export function NhDots({ size }: { size?: number }) {
   return (
-    <span className="nh-dots" style={{ ["--d" as string]: `${size}px` }}>
+    <span className="nh-dots" style={size ? { ["--d" as string]: `${size}px` } : undefined}>
       <i />
       <i />
       <i />
@@ -101,24 +103,27 @@ export function NhDots({ size = 9 }: { size?: number }) {
   );
 }
 
+// 상단 헤더 (높이 48). 아이콘은 실제 앱에서 잰 모양: 각진 선끝, 굵기 1.5~1.6, 24px 상자 중심 x 36 / 308 / 348
 export function NhHeader({
   title,
   onBack,
   onClose,
   home,
   menu,
+  onMenu,
 }: {
   title?: string;
   onBack?: () => void;
   onClose?: () => void;
   home?: () => void;
   menu?: boolean;
+  onMenu?: () => void;
 }) {
   return (
     <header className="nh-header">
       {onBack && (
         <button className="nh-icon-btn" aria-label="뒤로" onClick={onBack}>
-          <Icon name="back" size={24} stroke={1.8} />
+          <NhBackIcon />
         </button>
       )}
       {title && <h1>{title}</h1>}
@@ -128,18 +133,75 @@ export function NhHeader({
             <HomeLine />
           </button>
         )}
-        {menu && (
-          <button className="nh-icon-btn" aria-label="메뉴">
-            <Icon name="menu" size={24} stroke={1.7} />
+        {(menu || onMenu) && (
+          <button className="nh-icon-btn" aria-label="메뉴" onClick={onMenu}>
+            <NhMenuIcon />
           </button>
         )}
         {onClose && (
           <button className="nh-icon-btn" aria-label="닫기" onClick={onClose}>
-            <Icon name="close" size={24} stroke={1.6} />
+            <NhCloseIcon />
           </button>
         )}
       </span>
     </header>
+  );
+}
+
+export function NhBackIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+      <path d="M19.75 12H5.2M11.6 5.6 5.2 12l6.4 6.4" />
+    </svg>
+  );
+}
+
+export function NhMenuIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <path d="M2.2 5h19.6M2.2 12h19.6M2.2 19h19.6" />
+    </svg>
+  );
+}
+
+export function NhCloseIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <path d="M4.8 4.8 19.2 19.2M19.2 4.8 4.8 19.2" />
+    </svg>
+  );
+}
+
+// 공유 (거래상세 왼쪽 아래 정사각 버튼)
+export function NhShareIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <circle cx="5.1" cy="11.2" r="3.3" />
+      <circle cx="18.4" cy="3.8" r="3.3" />
+      <circle cx="18.4" cy="18.6" r="3.3" />
+      <path d="M8 9.6l7.5-4.2M8 12.8l7.5 4.2" />
+    </svg>
+  );
+}
+
+// 송금 완료 왼쪽 아래 '=' (두 줄)
+export function NhEqualsIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <path d="M1.45 6.7h21.1M1.45 17.3h21.1" />
+    </svg>
+  );
+}
+
+// 키패드 '콕' 키: 글자가 아니라 그림 (ㅋ 가운데 획이 사선). 18.4 × 27.2, 굵기 2.4
+export function NhKokKey() {
+  return (
+    <svg width="18.4" height="27.2" viewBox="0 0 18.4 27.2" fill="none" stroke="currentColor" strokeWidth="2.4" aria-label="콕">
+      <path d="M0.4 1.2H11.2a1.6 1.6 0 0 1 1.6 1.6V10.8" />
+      <path d="M0.4 6.8H9.4L2 13" />
+      <path d="M0 14H18.4" />
+      <path d="M0.4 18.8H11.2a1.6 1.6 0 0 1 1.6 1.6V27.2" />
+    </svg>
   );
 }
 
@@ -158,11 +220,12 @@ export function EditRow({ label, value, placeholder, onChange }: { label: string
   );
 }
 
+// 홈 (18dp 폭, 굵기 1.5, 둥근 모서리, 가운데 문)
 export function HomeLine() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" aria-hidden>
-      <path d="M4 10.5 12 4l8 6.5V20H4Z" />
-      <path d="M10 20v-5h4v5" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden>
+      <path d="M3 9.1 12 2.75l9 6.35v9.9a1.75 1.75 0 0 1-1.75 1.75H4.75A1.75 1.75 0 0 1 3 19Z" />
+      <path d="M9 20.75v-7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v7" />
     </svg>
   );
 }
@@ -186,10 +249,11 @@ export function ClearDot() {
   );
 }
 
+// 키패드 지우기 ← (21.6 × 16, 굵기 2.4, 각진 끝)
 export function BackArrowKey() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M20 12H5m6-7-7 7 7 7" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden>
+      <path d="M22.8 12H2.6M8.8 4.9 2.2 12l6.6 7.1" />
     </svg>
   );
 }

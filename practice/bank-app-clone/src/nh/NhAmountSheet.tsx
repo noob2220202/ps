@@ -61,7 +61,7 @@ export function NhAmountSheet({
         ))}
         <button onClick={() => setRaw(String(Math.min(balance, remaining)))}>전액</button>
       </div>
-      <Keypad doubleZero rowHeight={57} back={<BackArrowKey />} onKey={(k) => setRaw((v) => applyKey(v, k, 8))} />
+      <Keypad doubleZero rowHeight={68} back={<BackArrowKey />} onKey={(k) => setRaw((v) => applyKey(v, k, 8))} />
       <button className="nh-btn nh-btn--teal nh-sheet-btn" disabled={!amount || !!error} onClick={() => onDone(amount)}>
         다음
       </button>

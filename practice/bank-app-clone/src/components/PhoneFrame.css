@@ -143,3 +143,27 @@
     display: none;
   }
 }
+
+/* 콕뱅크(갤럭시 384dp): 상태바 28, 아래 제스처바 15 (검정 + 115×4.3 회색 손잡이, 위에서 5.3) */
+html[data-app="nh"] .statusbar--android {
+  height: 28px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.phone__navbar {
+  position: relative;
+  flex-shrink: 0;
+  height: 15px;
+  background: #000;
+  z-index: 50;
+}
+.phone__navbar i {
+  position: absolute;
+  top: 5.3px;
+  left: 50%;
+  width: 115.2px;
+  height: 4.3px;
+  margin-left: -57.6px;
+  border-radius: 2.2px;
+  background: #5d5d5d;
+}

@@ -6,7 +6,7 @@ import { useApi } from "../api/useApi";
 import { Icon } from "../components/icons/Icon";
 import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo } from "./loading";
-import { NhImg } from "./common";
+import { NhImg, NhShareIcon } from "./common";
 import { nhWon } from "./hangul";
 import "./nh-txdetail.css";
 
@@ -130,13 +130,8 @@ export function NhTxDetail() {
         )}
       </div>
       <div className="nh-bottom">
-        <button className="nh-btn nh-btn--line nh-done__menu" aria-label="공유">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-            <circle cx="17.5" cy="5.5" r="2.5" />
-            <circle cx="6.5" cy="12" r="2.5" />
-            <circle cx="17.5" cy="18.5" r="2.5" />
-            <path d="m8.7 10.8 6.6-4m-6.6 6.4 6.6 4" />
-          </svg>
+        <button className="nh-btn nh-btn--line nh-btn--square" aria-label="공유">
+          <NhShareIcon />
         </button>
         <button className="nh-btn" onClick={() => navigate(-1)}>
           확인

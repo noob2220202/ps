@@ -141,7 +141,7 @@ export function NhSend() {
         />
       )}
 
-      <Sheet open={sheet === "number"} onClose={() => setSheet(null)} className="nh-number">
+      <Sheet open={sheet === "number"} onClose={() => setSheet(null)} className="nh-number nh-sheet--keypad" kind="keypad">
         {bank && (
           <NhNumberSheet
             bank={bank}
@@ -156,7 +156,7 @@ export function NhSend() {
           />
         )}
       </Sheet>
-      <Sheet open={sheet === "amount"} onClose={() => setSheet(null)} className="nh-amount">
+      <Sheet open={sheet === "amount"} onClose={() => setSheet(null)} className="nh-amount nh-sheet--keypad" kind="keypad">
         {to && account && (
           <NhAmountSheet
             key={`${to.bank.code}-${to.number}`}

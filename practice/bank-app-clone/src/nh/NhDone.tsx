@@ -4,7 +4,7 @@ import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo } from "./loading";
 import { Icon } from "../components/icons/Icon";
 import { nhAccountLine } from "./banks";
-import { NhImg } from "./common";
+import { NhEqualsIcon, NhImg } from "./common";
 import { nhWon } from "./hangul";
 import { Row } from "./NhConfirm";
 import type { NhDoneState } from "./NhConfirm";
@@ -79,8 +79,8 @@ export function NhDone() {
         </div>
       </div>
       <div className="nh-bottom nh-bottom--done">
-        <button className="nh-btn nh-btn--line nh-done__menu" aria-label="메뉴" onClick={() => go(`/history/${result.fromAccountId}`)}>
-          <Icon name="menu" size={22} stroke={1.8} />
+        <button className="nh-btn nh-btn--line nh-btn--square" aria-label="메뉴" onClick={() => go(`/history/${result.fromAccountId}`)}>
+          <NhEqualsIcon />
         </button>
         <button className="nh-btn nh-btn--outline-purple" onClick={() => go(`/send?from=${result.fromAccountId}`, { replace: true })}>
           송금계속

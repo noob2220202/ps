@@ -10,14 +10,16 @@ export function Sheet({
   onClose,
   children,
   className = "",
+  kind,
 }: {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  kind?: string; // 시트 종류 (바깥 div에 sheet--<kind>. 콕뱅크 키패드 시트는 막·속도가 다름)
 }) {
   return (
-    <div className={`sheet ${open ? "sheet--open" : ""}`} aria-hidden={!open}>
+    <div className={`sheet ${open ? "sheet--open" : ""} ${kind ? `sheet--${kind}` : ""}`} aria-hidden={!open}>
       <div className="sheet__backdrop" onClick={onClose} />
       <section className={`sheet__panel ${className}`} role="dialog">
         {children}
@@ -27,7 +29,19 @@ export function Sheet({
 }
 
 // 가운데 뜨는 알림창 (계좌를 못 찾았을 때, 한도 초과 …). onCancel을 주면 [취소][확인] 두 버튼
-export function Dialog({ message, onClose, onCancel }: { message: string | null; onClose: () => void; onCancel?: () => void }) {
+export function Dialog({
+  message,
+  onClose,
+  onCancel,
+  okLabel = "확인",
+  cancelLabel = "취소",
+}: {
+  message: string | null;
+  onClose: () => void;
+  onCancel?: () => void;
+  okLabel?: string;
+  cancelLabel?: string;
+}) {
   if (!message) return null;
   return (
     <div className="dialog">
@@ -36,10 +50,10 @@ export function Dialog({ message, onClose, onCancel }: { message: string | null;
         <div className="dialog__buttons">
           {onCancel && (
             <button className="dialog__cancel" onClick={onCancel}>
-              취소
+              {cancelLabel}
             </button>
           )}
-          <button onClick={onClose}>확인</button>
+          <button onClick={onClose}>{okLabel}</button>
         </div>
       </div>
     </div>
@@ -53,20 +67,22 @@ export function Keypad({
   kok = false,
   rowHeight = 60,
   back,
+  kokLabel = "콕",
 }: {
   onKey: (k: PadKey) => void;
   doubleZero?: boolean;
   kok?: boolean;
   rowHeight?: number;
   back?: ReactNode; // 지우기 키 모양 (기본: ⌫)
+  kokLabel?: ReactNode; // '콕' 키 모양 (콕뱅크는 그림 글리프)
 }) {
   const keys: (PadKey | null)[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", doubleZero ? "00" : kok ? "kok" : null, "0", "back"];
   return (
     <div className="keypad" style={{ gridAutoRows: rowHeight }}>
       {keys.map((k, i) =>
         k ? (
-          <button key={k} className="keypad__key" onClick={() => onKey(k)} aria-label={k === "back" ? "지우기" : k}>
-            {k === "back" ? (back ?? <BackspaceIcon />) : k === "kok" ? "콕" : k}
+          <button key={k} className={`keypad__key keypad__key--${k}`} data-key={k} onClick={() => onKey(k)} aria-label={k === "back" ? "지우기" : k === "kok" ? "콕" : k}>
+            {k === "back" ? (back ?? <BackspaceIcon />) : k === "kok" ? kokLabel : k}
           </button>
         ) : (
           <span key={`empty-${i}`} />

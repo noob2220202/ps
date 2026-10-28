@@ -4,7 +4,7 @@ import "./platform/capture";
 import { prefetch } from "./api/useApi";
 import { api, paths } from "./api/endpoints";
 import { ApiError } from "./api/client";
-import { currentProfileId, setCurrentProfile } from "./profile/session";
+import { APP, currentProfileId, setCurrentProfile } from "./profile/session";
 import { OS } from "./platform/platform";
 import { THEME_CHOICE } from "./platform/theme";
 import { StrictMode } from "react";
@@ -12,6 +12,9 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "./styles/global.css";
 import App from "./App.tsx";
+
+// 콕뱅크 서버면 <html data-app="nh"> → 폰 프레임 크기 등 CSS가 바뀜
+document.documentElement.dataset.app = APP;
 
 const profile = currentProfileId();
 if (profile) {

@@ -7,7 +7,8 @@ import { useApi } from "../api/useApi";
 import { Dialog, Sheet } from "../components/Sheet";
 import { useStatusBar } from "../hooks/useStatusBar";
 import { Icon } from "../components/icons/Icon";
-import { EditRow, NhBankIcon, NhDots, NhHeader, NhImg } from "./common";
+import { EditRow, NhBankIcon, NhHeader, NhImg } from "./common";
+import { withNhLoading } from "./loading";
 import { nhWon } from "./hangul";
 import type { NhConfirmState } from "./NhSend";
 import "./nh-confirm.css";
@@ -43,14 +44,15 @@ export function NhConfirm() {
     setVerify(false);
     setSending(true);
     try {
-      const result = await api.transfer({
+      // 송금 중: 폰 전체가 어두워지고 점 3개 (녹화2 28~30초)
+      const result = await withNhLoading(() => api.transfer({
         fromAccountId: from,
         bankCode: to.bank.code,
         number: to.number,
         amount,
         memoTo: memoTo.trim() || undefined,
         memoMe: memoMe.trim() || undefined,
-      });
+      }));
       if (memo.trim()) await api.updateMemo(result.outTxId, memo.trim()).catch(() => {});
       // 확인 화면을 완료 화면으로 바꿔 끼움 → 완료에서 뒤로 가면 송금 화면
       navigate("/send/done", { replace: true, state: { result, memoTo: memoTo.trim() || me, memoMe: memoMe.trim() || to.holder } satisfies NhDoneState });
@@ -124,11 +126,6 @@ export function NhConfirm() {
           받는 분을 다시 입력할게요.
         </button>
       </Sheet>
-      {sending && (
-        <div className="nh-loading nh-loading--global">
-          <NhDots size={9} />
-        </div>
-      )}
       <Dialog message={error} onClose={() => setError(null)} />
     </div>
   );

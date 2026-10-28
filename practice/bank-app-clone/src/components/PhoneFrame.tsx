@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { OS } from "../platform/platform";
 import { THEME } from "../platform/theme";
+import { APP } from "../profile/session";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -59,14 +60,24 @@ function StatusBar() {
   );
 }
 
-export function PhoneFrame({ children }: { children: ReactNode }) {
+// overlay: 상태바까지 폰 전체를 덮는 것 (콕뱅크 로딩 막)
+export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay?: ReactNode }) {
   const { fg } = useStatusBarStyle();
+  // 콕뱅크(갤럭시): 실제 화면처럼 아래 15dp 검은 제스처바 + 회색 손잡이를 따로 둠
+  const navbar = APP === "nh" && OS === "android";
   return (
     <div className={`phone phone--${OS}`}>
       {OS === "ios" && <div className="dynamic-island" />}
       <StatusBar />
       <div className="phone__viewport">{children}</div>
-      <div className={`phone__home-indicator phone__home-indicator--${fg}`} />
+      {navbar ? (
+        <div className="phone__navbar">
+          <i />
+        </div>
+      ) : (
+        <div className={`phone__home-indicator phone__home-indicator--${fg}`} />
+      )}
+      {overlay}
     </div>
   );
 }

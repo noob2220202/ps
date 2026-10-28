@@ -74,12 +74,11 @@ export default function App() {
 
   return (
     <StatusBarProvider>
-      <PhoneFrame>
+      <PhoneFrame overlay={APP === "nh" ? <NhLoadingLayer /> : undefined}>
         {boot === "pick" && <ProfilePicker onEnter={toSplash} />}
         {boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
         {boot === "loading" && <BootLoading onDone={toReady} />}
         {boot === "ready" && <ScreenStack render={APP === "nh" ? renderNhRoute : renderRoute} />}
-        {APP === "nh" && <NhLoadingLayer />}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />
