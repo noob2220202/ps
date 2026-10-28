@@ -2,13 +2,15 @@ import { useRef, useState, type ReactNode } from "react";
 import { ApiError } from "../api/client";
 import { api, formatAccountNumber, paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
-import type { Account, Bank, HomeData, Payee, Transaction, TxTag } from "../api/types";
+import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TxTag } from "../api/types";
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
+import { ProfileAvatar } from "../profile/ProfileAvatar";
+import { currentProfileId, setCurrentProfile } from "../profile/session";
 import "./DevPanel.css";
 
 // 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
@@ -143,6 +145,7 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
 
   return (
     <div className="tab">
+      <CurrentProfile />
       <Field label="기기">
         <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
       </Field>
@@ -161,11 +164,44 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
         저장
       </button>
 
+      <h3 className="tab__h">이 프로필 데이터</h3>
+      <div className="row">
+        <button
+          className="btn btn--sm btn--danger"
+          onClick={() => confirm("계좌·거래내역·받는 분을 모두 지우고 빈 상태(통장 0원)로 만들까요?") && run(() => api.reset("empty"), "빈 상태로 만들었어요")}
+        >
+          빈 상태로
+        </button>
+        <button
+          className="btn btn--sm btn--danger"
+          onClick={() => confirm("지금 데이터를 지우고 홍길동 예시 데이터로 채울까요?") && run(() => api.reset("example"), "예시 데이터로 채웠어요")}
+        >
+          예시 데이터로
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// 지금 프로필 + 바꾸기 (sessionStorage를 비우고 다시 열면 프로필 고르기 화면)
+function CurrentProfile() {
+  const list = useApi<AppProfile[]>(paths.profiles);
+  const me = list.data?.find((p) => p.id === currentProfileId());
+  return (
+    <div className="current-profile">
+      {me ? <ProfileAvatar profile={me} size={40} /> : <span className="current-profile__blank" />}
+      <span className="current-profile__name">
+        <small>지금 프로필</small>
+        <strong>{me?.name ?? "…"}</strong>
+      </span>
       <button
-        className="btn btn--danger"
-        onClick={() => confirm("이름·계좌·거래내역을 처음 상태로 되돌릴까요?") && run(api.reset, "처음 상태로 되돌렸어요")}
+        className="btn btn--sm"
+        onClick={() => {
+          setCurrentProfile(null);
+          location.assign("/");
+        }}
       >
-        처음 상태로 되돌리기
+        프로필 바꾸기
       </button>
     </div>
   );

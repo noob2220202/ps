@@ -13,8 +13,12 @@ import { BankAccountScreen } from "./screens/bank/BankAccountScreen";
 import { TransferScreen } from "./screens/transfer/TransferScreen";
 import { AmountScreen } from "./screens/transfer/AmountScreen";
 import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
+import { ProfilePicker } from "./profile/ProfilePicker";
+import { currentProfileId } from "./profile/session";
+import { prefetch } from "./api/useApi";
+import { paths } from "./api/endpoints";
 
-type Boot = "splash" | "loading" | "ready";
+type Boot = "pick" | "splash" | "loading" | "ready";
 
 // ScreenStack이 화면마다 "그 화면의 주소"로 이 함수를 불러서 그린다
 const renderRoute = (location: Location) => (
@@ -34,7 +38,12 @@ const renderRoute = (location: Location) => (
 const skipSplash = new URLSearchParams(location.search).has("skip");
 
 export default function App() {
-  const [boot, setBoot] = useState<Boot>(skipSplash ? "ready" : "splash");
+  // 이번 세션에 고른 프로필이 없으면 프로필 고르기부터
+  const [boot, setBoot] = useState<Boot>(!currentProfileId() ? "pick" : skipSplash ? "ready" : "splash");
+  const toSplash = useCallback(() => {
+    prefetch(paths.home); // 스플래시 도는 동안 그 프로필의 홈 데이터를 미리 받아 둠
+    setBoot(skipSplash ? "ready" : "splash");
+  }, []);
   // onDone이 렌더마다 새 함수면 Splash의 effect가 다시 돌아서 타이머가 리셋됨 → useCallback
   const toLoading = useCallback(() => setBoot("loading"), []);
   const toReady = useCallback(() => setBoot("ready"), []);
@@ -42,6 +51,7 @@ export default function App() {
   return (
     <StatusBarProvider>
       <PhoneFrame>
+        {boot === "pick" && <ProfilePicker onEnter={toSplash} />}
         {boot === "splash" && <Splash onDone={toLoading} />}
         {boot === "loading" && <BootLoading onDone={toReady} />}
         {boot === "ready" && <ScreenStack render={renderRoute} />}

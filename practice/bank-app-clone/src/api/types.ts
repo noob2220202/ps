@@ -6,6 +6,18 @@ export const TX_TAGS: TxTag[] = ["#체크카드", "#자동이체", "#예금이�
 // "main"(카카오뱅크 3333 통장)은 고정, 다른 은행 계좌는 서버가 만든 id ("nh", "bank-1a2b3c4d" ...)
 export type AccountId = string;
 
+// 접속할 때 고르는 프로필 (넷플릭스 프로필처럼). 프로필마다 은행 데이터가 따로 있다
+export type AvatarName = "boy" | "girl" | "child" | "grandma" | "wave" | "star" | "coin" | "money-bag";
+export interface AppProfile {
+  id: string;
+  name: string;
+  avatar: AvatarName;
+  color: string;
+  os?: "android" | "ios"; // 이 프로필로 마지막에 본 기기
+  theme?: "light" | "dark" | "system";
+}
+
+// 앱 안의 "내 정보" (지금 고른 프로필의 DB에 들어 있음)
 export interface Profile {
   userName: string;
   cardLast4: string;
@@ -137,7 +149,7 @@ export interface NewTransaction {
 
 // ----- 에러 응답 -----
 export interface ApiErrorBody {
-  code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";
+  code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "PROFILE_REQUIRED" | "PROFILE_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";
   message: string;
   fields?: Record<string, string>; // 입력값별 에러 메시지
 }

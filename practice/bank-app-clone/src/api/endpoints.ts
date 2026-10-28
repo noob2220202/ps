@@ -1,6 +1,7 @@
 import { http } from "./client";
 import type {
   Account,
+  AppProfile,
   NewBankAccount,
   NewTransaction,
   NewTransfer,
@@ -20,6 +21,7 @@ export const paths = {
   transactions: (accountId: string) => `/api/accounts/${accountId}/transactions`,
   transaction: (txId: string) => `/api/transactions/${txId}`,
   payees: "/api/payees",
+  profiles: "/api/profiles",
   recipients: (from: string) => `/api/transfer/recipients?from=${encodeURIComponent(from)}`,
 };
 
@@ -32,7 +34,12 @@ export const api = {
   createTransaction: (accountId: string, body: NewTransaction) =>
     http.post<Transaction>(paths.transactions(accountId), body),
   deleteTransaction: (txId: string) => http.delete(paths.transaction(txId)),
-  reset: () => http.post<void>("/api/reset"),
+  reset: (mode: "empty" | "example") => http.post<void>("/api/reset", { mode }),
+
+  // 프로필 (접속할 때 고르는 것)
+  addProfile: (body: Pick<AppProfile, "name" | "avatar" | "color">) => http.post<AppProfile>(paths.profiles, body),
+  updateProfileCard: (id: string, patch: Partial<Omit<AppProfile, "id">>) => http.patch<AppProfile>(`${paths.profiles}/${id}`, patch),
+  deleteProfile: (id: string) => http.delete(`${paths.profiles}/${id}`),
 
   // 받는 분 (🔔 패널)
   addPayee: (body: { bankCode: string; number: string; holder: string }) => http.post<Payee>(paths.payees, body),

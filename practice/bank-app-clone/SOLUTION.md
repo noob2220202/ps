@@ -11,6 +11,7 @@ src/
   config/      timing.ts(모든 애니메이션 타이밍)
   api/         types.ts(API 계약) · client.ts(fetch 래퍼) · useApi.ts(캐시) · endpoints.ts(주소 모음)
   dev-panel/   종 버튼 관리 패널 (모든 데이터 수정은 여기서만)
+  profile/     접속할 때 프로필 고르기 (ProfilePicker, 아바타, sessionStorage)
   assets/      Asset 슬롯 + Fluent 기본 에셋, local/(실제 에셋, 커밋 안 됨)
   hooks/       useAsync, useTypewriter, useScrollTop, useStatusBar
   lib/         format.ts (금액 포맷, 날짜 그룹핑) · keypad.ts (키패드 입력 계산)
@@ -277,7 +278,7 @@ ffmpeg만으로: 자르기(`crop`) → 확대(`lanczos`) → 원형 마스크(`g
 
 ### 구조
 ```
-화면 ──useApi("/api/home")──▶ fetch ──▶ Express (server/index.mjs) ──▶ SQLite (server/data/bank.db)
+화면 ──useApi("/api/home")──▶ fetch (+헤더 X-Profile) ──▶ Express (server/index.mjs) ──▶ SQLite (server/data/profiles/<id>.db)
 🔔 패널 ──api.addBankAccount()──▶ POST /api/accounts ──▶ 201 Created
 ```
 - 개발: `npm run dev` = API 서버(8787) + Vite(5173) 동시 실행. Vite가 `/api`를 8787로 넘겨줌(`vite.config.ts`의 proxy)
@@ -332,7 +333,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 
 ### 🔔 관리 패널 — "버튼과 숫자 입력만"
 화면(홈, 계좌, 거래 상세)은 **보기 전용**이고, 바꾸는 건 전부 종 버튼 패널에서 합니다.
-- **기본**: Galaxy/iPhone, 시스템/라이트/다크, 이름·카드 끝 4자리, 처음 상태로 되돌리기
+- **기본**: 지금 프로필·프로필 바꾸기, Galaxy/iPhone, 시스템/라이트/다크, 이름·카드 끝 4자리, 빈 상태로/예시 데이터로
 - **계좌**: 계좌를 눌러 펼치면 잔액 수정, 다른 은행이면 계좌번호 수정·삭제. 은행선택 목록(이체 화면과 같은 컴포넌트)에서 골라 새 계좌 추가
 - **받는 분**: 이체 때 계좌번호로 찾을 상대 계좌(은행·번호·예금주) 관리
 - **거래**: 계좌 칩 → 금액(+1천/+5천/+1만/+5만) → 거래처 칩 → 종류 → 입금하기/출금하기. 최근 거래 ✕로 삭제
@@ -408,3 +409,31 @@ mini를 없애고 세이프박스를 추가하면서 테이블 모양이 바뀌�
 아무것도 안 하므로, VPS에 있던 bank.db는 `db.mjs` 맨 위에서 `PRAGMA table_info`로 컬럼을 확인하고
 `ALTER TABLE ... ADD COLUMN safebox` / `DROP COLUMN mini_account_no` + mini 계좌 삭제(CASCADE로 거래도 정리)를 직접 실행합니다.
 진짜 서비스에선 이걸 번호 붙은 마이그레이션 파일(001_..., 002_...)로 관리합니다.
+
+## 15. 프로필 — 넷플릭스처럼 고르고, 프로필마다 따로 저장 (`src/profile/`, `server/db.mjs`)
+
+### 데이터를 어떻게 나눴나: 프로필마다 DB 파일 하나
+```
+server/data/app.db               profiles(id, name, avatar, color, os, theme, created_at)
+server/data/profiles/p1a2b3c4.db  그 프로필의 profile/accounts/transactions/payees/transfers
+```
+- 다른 방법은 모든 표에 `profile_id` 칸을 넣는 것. 그러면 **모든 쿼리에 `WHERE profile_id = ?`를 빠짐없이** 붙여야 하고,
+  하나라도 빼먹으면 다른 프로필 데이터가 보임. 파일을 나누면 기존 쿼리를 그대로 쓸 수 있고, 삭제도 파일 지우기로 끝
+- 대신 프로필끼리 데이터를 합쳐 보는 기능(전체 통계 등)은 어려워짐 → 이 앱엔 필요 없어서 파일 분리를 택함
+
+### 요청마다 "어느 DB?" — 헤더 + AsyncLocalStorage
+- 화면은 모든 요청에 `X-Profile: <id>` 헤더를 붙임 (`api/client.ts`)
+- 서버 미들웨어가 헤더로 그 프로필 DB를 열고 `runWithDb(그 DB, next)`로 나머지 처리를 감쌈.
+  그 안에서 불리는 함수들은 그냥 `db()`만 부르면 지금 요청의 DB가 나옴 (Node의 `AsyncLocalStorage`:
+  요청 하나의 흐름을 따라다니는 "보이지 않는 인자". `setTimeout`으로 미뤄도 따라감)
+- **id가 파일 이름이 되므로 형식 검사 필수**: `/^p[0-9a-f]{8}$/`. 안 하면 `X-Profile: ../../server/x` 같은 값으로
+  엉뚱한 파일을 열 수 있음 (경로 조작 공격)
+- DB 연결은 `Map`에 열어 두고 재사용. 프로필을 지울 때는 연결을 닫은 뒤 `-wal`, `-shm` 파일까지 지움
+
+### 화면 쪽: 언제 다시 고르게 하나
+- 고른 프로필 id는 **sessionStorage**: 탭을 닫으면 사라짐 → 다음에 들어오면 다시 고르기(넷플릭스처럼).
+  새로고침은 같은 세션이라 유지됨
+- 기기/테마는 앱이 켜질 때 한 번 정해지는 값(`OS`, `THEME` 상수)이라, 프로필 설정이 지금과 다르면
+  `/?os=…&theme=…`로 **다시 불러와서** 적용. 켜질 때마다 지금 설정을 그 프로필에 PATCH 해 두므로
+  스위치나 🔔에서 바꾼 것도 자동으로 그 프로필에 저장됨
+- 쓰던 프로필이 다른 창에서 지워졌으면 그 PATCH가 404 → 프로필 고르기로 돌려보냄

@@ -3,7 +3,21 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { db, seed, transaction } from "./db.mjs";
+import {
+  AVATARS,
+  COLORS,
+  MAX_PROFILES,
+  db,
+  isProfileId,
+  newProfileId,
+  profileDb,
+  registry,
+  removeProfileDb,
+  runWithDb,
+  seedEmpty,
+  seedExample,
+  transaction,
+} from "./db.mjs";
 import { BANKS, bankByCode, bankInfo, checkNumber, digitsOf, formatAccountNumber } from "./banks.mjs";
 
 // ===== 백엔드 서버 (Express + SQLite) =====
@@ -35,7 +49,7 @@ function nowIso() {
 }
 
 const getProfile = () => {
-  const p = db.prepare("SELECT user_name, card_last4 FROM profile WHERE id = 1").get();
+  const p = db().prepare("SELECT user_name, card_last4 FROM profile WHERE id = 1").get();
   return { userName: p.user_name, cardLast4: p.card_last4 };
 };
 
@@ -56,7 +70,7 @@ function toAccount(row, profile = getProfile()) {
 }
 
 function findAccount(id) {
-  const row = db.prepare("SELECT * FROM accounts WHERE id = ?").get(id);
+  const row = db().prepare("SELECT * FROM accounts WHERE id = ?").get(id);
   if (!row) throw notFound("계좌");
   return row;
 }
@@ -64,7 +78,7 @@ function findAccount(id) {
 // "거래 후 잔액"은 저장하지 않고, 현재 잔액에서 최신 거래부터 거꾸로 빼며 계산
 function listTransactions(accountId) {
   let balance = findAccount(accountId).balance;
-  return db
+  return db()
     .prepare("SELECT * FROM transactions WHERE account_id = ? ORDER BY at DESC, id DESC")
     .all(accountId)
     .map((t) => {
@@ -93,12 +107,74 @@ function toTransaction(t, balanceAfter) {
 const TAGS = ["#체크카드", "#자동이체", "#예금이자", "#이체"];
 const KIND_BY_TAG = { "#체크카드": "체크카드결제", "#자동이체": "자동이체", "#예금이자": "예금이자", "#이체": "이체" };
 
+// ---------- 프로필 (넷플릭스처럼 접속하면 고르기) ----------
+// 프로필 목록 API는 어느 프로필에도 속하지 않음. 나머지 /api 요청은 헤더 X-Profile 의 프로필 DB로 처리
+const toProfile = (r) => ({ id: r.id, name: r.name, avatar: r.avatar, color: r.color, os: r.os ?? undefined, theme: r.theme ?? undefined });
+const findProfile = (id) => {
+  const r = isProfileId(id) && registry.prepare("SELECT * FROM profiles WHERE id = ?").get(id);
+  if (!r) throw new HttpError(404, "PROFILE_NOT_FOUND", "없는 프로필이에요");
+  return r;
+};
+function checkProfileFields({ name, avatar, color, os, theme }) {
+  const fields = {};
+  if (name !== undefined && !/^.{1,10}$/u.test(String(name).trim())) fields.name = "이름은 1~10자";
+  if (avatar !== undefined && !AVATARS.includes(avatar)) fields.avatar = "알 수 없는 아바타";
+  if (color !== undefined && !COLORS.includes(color)) fields.color = "알 수 없는 색";
+  if (os !== undefined && !["android", "ios"].includes(os)) fields.os = "android 또는 ios";
+  if (theme !== undefined && !["light", "dark", "system"].includes(theme)) fields.theme = "light, dark, system 중 하나";
+  if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
+}
+
+app.get("/api/profiles", (_req, res) => res.json(registry.prepare("SELECT * FROM profiles ORDER BY created_at, rowid").all().map(toProfile)));
+
+// 새 프로필: 빈 상태(카카오뱅크 통장 0원)로 시작
+app.post("/api/profiles", (req, res) => {
+  const { name, avatar = AVATARS[0], color = COLORS[0] } = req.body ?? {};
+  if (name === undefined) throw bad("이름을 입력해 주세요", { name: "이름을 입력해 주세요" });
+  checkProfileFields({ name, avatar, color });
+  if (registry.prepare("SELECT COUNT(*) AS n FROM profiles").get().n >= MAX_PROFILES) throw bad(`프로필은 ${MAX_PROFILES}개까지 만들 수 있어요`);
+  const id = newProfileId();
+  seedEmpty(profileDb(id), String(name).trim());
+  registry
+    .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))")
+    .run(id, String(name).trim(), avatar, color);
+  res.status(201).json(toProfile(findProfile(id)));
+});
+
+// 이름·아바타 수정, 그리고 이 프로필의 기기/테마 설정 저장
+app.patch("/api/profiles/:id", (req, res) => {
+  const p = findProfile(req.params.id);
+  const body = req.body ?? {};
+  checkProfileFields(body);
+  const next = { ...p, ...Object.fromEntries(Object.entries(body).filter(([k, v]) => v !== undefined && k in p)) };
+  registry
+    .prepare("UPDATE profiles SET name = ?, avatar = ?, color = ?, os = ?, theme = ? WHERE id = ?")
+    .run(String(next.name).trim(), next.avatar, next.color, next.os, next.theme, p.id);
+  res.json(toProfile(findProfile(p.id)));
+});
+
+// 삭제: 그 프로필의 DB 파일까지 지움 (마지막 하나는 못 지움)
+app.delete("/api/profiles/:id", (req, res) => {
+  const p = findProfile(req.params.id);
+  if (registry.prepare("SELECT COUNT(*) AS n FROM profiles").get().n <= 1) throw bad("프로필이 하나는 있어야 해요");
+  registry.prepare("DELETE FROM profiles WHERE id = ?").run(p.id);
+  removeProfileDb(p.id);
+  res.status(204).end();
+});
+
+app.use("/api", (req, _res, next) => {
+  if (req.path === "/profiles" || req.path.startsWith("/profiles/")) return next();
+  const id = req.get("X-Profile");
+  if (!id) throw new HttpError(400, "PROFILE_REQUIRED", "프로필을 먼저 골라 주세요");
+  runWithDb(profileDb(findProfile(id).id), next);
+});
+
 // ---------- 화면용 API ----------
 app.get("/api/home", (_req, res) => {
   const profile = getProfile();
-  const accounts = db.prepare("SELECT * FROM accounts ORDER BY sort, rowid").all();
+  const accounts = db().prepare("SELECT * FROM accounts ORDER BY sort, rowid").all();
   const month = nowIso().slice(0, 7);
-  const spend = db
+  const spend = db()
     .prepare("SELECT COALESCE(-SUM(amount), 0) AS s FROM transactions WHERE tag = '#체크카드' AND amount < 0 AND at LIKE ?")
     .get(`${month}%`).s;
   res.json({
@@ -134,7 +210,7 @@ app.patch("/api/profile", (req, res) => {
   if (cardLast4 !== undefined && !/^\d{4}$/.test(cardLast4)) fields.cardLast4 = "숫자 4자리";
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   const p = getProfile();
-  db.prepare("UPDATE profile SET user_name = ?, card_last4 = ? WHERE id = 1").run(
+  db().prepare("UPDATE profile SET user_name = ?, card_last4 = ? WHERE id = 1").run(
     userName !== undefined ? String(userName).trim() : p.userName,
     cardLast4 ?? p.cardLast4,
   );
@@ -157,12 +233,12 @@ app.post("/api/accounts", (req, res) => {
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
 
   const formatted = formatAccountNumber(bankCode, digits);
-  if (db.prepare("SELECT 1 FROM accounts WHERE bank_code = ? AND number = ?").get(bankCode, formatted))
+  if (db().prepare("SELECT 1 FROM accounts WHERE bank_code = ? AND number = ?").get(bankCode, formatted))
     throw conflict("이미 추가된 계좌예요", { number: "이미 추가된 계좌예요" });
 
   const id = `bank-${randomUUID().slice(0, 8)}`;
-  const sort = db.prepare("SELECT COALESCE(MAX(sort), 0) + 1 AS s FROM accounts").get().s;
-  db.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, sort) VALUES (?, 'external', ?, ?, ?, ?)").run(
+  const sort = db().prepare("SELECT COALESCE(MAX(sort), 0) + 1 AS s FROM accounts").get().s;
+  db().prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, sort) VALUES (?, 'external', ?, ?, ?, ?)").run(
     id,
     bankCode,
     formatted,
@@ -188,7 +264,7 @@ app.patch("/api/accounts/:id", (req, res) => {
     if (numberError) throw bad(numberError, { number: numberError });
     formatted = formatAccountNumber(row.bank_code, digits);
   }
-  db.prepare("UPDATE accounts SET balance = ?, number = ?, safebox = ? WHERE id = ?").run(
+  db().prepare("UPDATE accounts SET balance = ?, number = ?, safebox = ? WHERE id = ?").run(
     balance ?? row.balance,
     formatted,
     safebox ?? row.safebox,
@@ -201,7 +277,7 @@ app.patch("/api/accounts/:id", (req, res) => {
 app.delete("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
   if (row.kind !== "external") throw bad("카카오뱅크 통장은 지울 수 없어요");
-  db.prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
+  db().prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
   res.status(204).end();
 });
 
@@ -226,17 +302,17 @@ app.post("/api/accounts/:id/transactions", (req, res) => {
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `잔액이 부족해요 (현재 ${row.balance.toLocaleString("ko-KR")}원)`);
 
   const id = transaction(() => {
-    const r = db
+    const r = db()
       .prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES (?, ?, ?, ?, ?)")
       .run(row.id, at ? String(at).slice(0, 19).padEnd(19, ":00") : nowIso(), merchant.trim(), amount, tag);
-    db.prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?").run(amount, row.id);
+    db().prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?").run(amount, row.id);
     return String(r.lastInsertRowid);
   });
   res.status(201).json(listTransactions(row.id).find((t) => t.id === id));
 });
 
 function findTx(id) {
-  const t = db.prepare("SELECT * FROM transactions WHERE id = ?").get(Number(id));
+  const t = db().prepare("SELECT * FROM transactions WHERE id = ?").get(Number(id));
   if (!t) throw notFound("거래");
   return t;
 }
@@ -257,8 +333,8 @@ app.get("/api/transactions/:id", (req, res) => {
 app.delete("/api/transactions/:id", (req, res) => {
   const t = findTx(req.params.id);
   transaction(() => {
-    db.prepare("DELETE FROM transactions WHERE id = ?").run(t.id);
-    db.prepare("UPDATE accounts SET balance = balance - ? WHERE id = ?").run(t.amount, t.account_id);
+    db().prepare("DELETE FROM transactions WHERE id = ?").run(t.id);
+    db().prepare("UPDATE accounts SET balance = balance - ? WHERE id = ?").run(t.amount, t.account_id);
   });
   res.status(204).end();
 });
@@ -273,14 +349,14 @@ const toPayee = (p) => ({
 });
 
 function findPayee(id) {
-  const p = db.prepare("SELECT * FROM payees WHERE id = ?").get(Number(id));
+  const p = db().prepare("SELECT * FROM payees WHERE id = ?").get(Number(id));
   if (!p) throw notFound("받는 분");
   return p;
 }
 
 // 내 계좌 중 (은행, 숫자) 가 같은 것
 function myAccountByNumber(bankCode, digits) {
-  return db
+  return db()
     .prepare("SELECT * FROM accounts")
     .all()
     .find((a) => (a.bank_code ?? "kakao") === bankCode && digitsOf(a.number) === digits);
@@ -297,16 +373,16 @@ function checkPayee({ bankCode, number, holder }, current) {
   if (!name || name.length > 20) fields.holder = "이름은 1~20자";
   if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
   if (myAccountByNumber(bank.code, digits)) throw conflict("내 계좌예요. 받는 분으로 등록할 필요 없어요", { number: "내 계좌" });
-  const dup = db.prepare("SELECT id FROM payees WHERE bank_code = ? AND number = ?").get(bank.code, digits);
+  const dup = db().prepare("SELECT id FROM payees WHERE bank_code = ? AND number = ?").get(bank.code, digits);
   if (dup && dup.id !== current?.id) throw conflict("이미 등록된 계좌예요", { number: "이미 등록된 계좌" });
   return { bankCode: bank.code, digits, name };
 }
 
-app.get("/api/payees", (_req, res) => res.json(db.prepare("SELECT * FROM payees ORDER BY holder").all().map(toPayee)));
+app.get("/api/payees", (_req, res) => res.json(db().prepare("SELECT * FROM payees ORDER BY holder").all().map(toPayee)));
 
 app.post("/api/payees", (req, res) => {
   const { bankCode, digits, name } = checkPayee(req.body ?? {});
-  const r = db.prepare("INSERT INTO payees (bank_code, number, holder) VALUES (?, ?, ?)").run(bankCode, digits, name);
+  const r = db().prepare("INSERT INTO payees (bank_code, number, holder) VALUES (?, ?, ?)").run(bankCode, digits, name);
   res.status(201).json(toPayee(findPayee(r.lastInsertRowid)));
 });
 
@@ -315,12 +391,12 @@ app.patch("/api/payees/:id", (req, res) => {
   const body = req.body ?? {};
   const { bankCode, digits, name } = checkPayee(body, p);
   const favorite = body.favorite === undefined ? p.favorite : body.favorite ? 1 : 0;
-  db.prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ? WHERE id = ?").run(bankCode, digits, name, favorite, p.id);
+  db().prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ? WHERE id = ?").run(bankCode, digits, name, favorite, p.id);
   res.json(toPayee(findPayee(p.id)));
 });
 
 app.delete("/api/payees/:id", (req, res) => {
-  db.prepare("DELETE FROM payees WHERE id = ?").run(findPayee(req.params.id).id);
+  db().prepare("DELETE FROM payees WHERE id = ?").run(findPayee(req.params.id).id);
   res.status(204).end();
 });
 
@@ -332,7 +408,7 @@ function findRecipient(bankCode, number) {
   const digits = digitsOf(number);
   const mine = myAccountByNumber(bank.code, digits);
   if (mine) return { bank: bankInfo(bank), number: digits, holder: getProfile().userName, accountId: mine.id };
-  const p = db.prepare("SELECT * FROM payees WHERE bank_code = ? AND number = ?").get(bank.code, digits);
+  const p = db().prepare("SELECT * FROM payees WHERE bank_code = ? AND number = ?").get(bank.code, digits);
   if (p) return { ...toPayee(p), payeeId: String(p.id) };
   throw new HttpError(404, "ACCOUNT_NOT_FOUND", "입력하신 계좌정보를 확인해 주세요");
 }
@@ -343,7 +419,7 @@ app.get("/api/transfer/lookup", (req, res) => res.json(findRecipient(req.query.b
 app.get("/api/transfer/recipients", (req, res) => {
   const profile = getProfile();
   const from = String(req.query.from ?? "");
-  const mine = db
+  const mine = db()
     .prepare("SELECT * FROM accounts WHERE id != ? ORDER BY sort, rowid")
     .all(from)
     .map((a) => {
@@ -351,7 +427,7 @@ app.get("/api/transfer/recipients", (req, res) => {
       return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName };
     });
   // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이
-  const recent = db
+  const recent = db()
     .prepare(
       `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite
          FROM transfers t LEFT JOIN payees p ON p.bank_code = t.bank_code AND p.number = t.number
@@ -390,8 +466,8 @@ app.post("/api/transfers", (req, res) => {
 
   // 출금 + (내 계좌면) 입금 + 이체 기록 → 하나라도 실패하면 전부 취소
   const id = transaction(() => {
-    const insertTx = db.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES (?, ?, ?, ?, '#이체')");
-    const addBalance = db.prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?");
+    const insertTx = db().prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES (?, ?, ?, ?, '#이체')");
+    const addBalance = db().prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?");
     const out = insertTx.run(from.id, at, memoMeText, -amount).lastInsertRowid;
     addBalance.run(-amount, from.id);
     let inTx = null;
@@ -399,7 +475,7 @@ app.post("/api/transfers", (req, res) => {
       inTx = insertTx.run(to.accountId, at, memoToText, amount).lastInsertRowid;
       addBalance.run(amount, to.accountId);
     }
-    return db
+    return db()
       .prepare(
         "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, memo_to, memo_me, at, out_tx_id, in_tx_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       )
@@ -415,8 +491,12 @@ app.post("/api/transfers", (req, res) => {
   });
 });
 
-app.post("/api/reset", (_req, res) => {
-  seed();
+// 되돌리기: mode "empty" = 빈 상태(통장 0원), "example" = 홍길동 예시 데이터
+app.post("/api/reset", (req, res) => {
+  const mode = req.body?.mode ?? "example";
+  if (mode === "empty") seedEmpty(db(), getProfile().userName);
+  else if (mode === "example") seedExample(db());
+  else throw bad("mode는 empty 또는 example");
   res.status(204).end();
 });
 

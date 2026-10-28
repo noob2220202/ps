@@ -26,14 +26,21 @@ export function Sheet({
   );
 }
 
-// 가운데 뜨는 알림창 (계좌를 못 찾았을 때, 한도 초과 …)
-export function Dialog({ message, onClose }: { message: string | null; onClose: () => void }) {
+// 가운데 뜨는 알림창 (계좌를 못 찾았을 때, 한도 초과 …). onCancel을 주면 [취소][확인] 두 버튼
+export function Dialog({ message, onClose, onCancel }: { message: string | null; onClose: () => void; onCancel?: () => void }) {
   if (!message) return null;
   return (
     <div className="dialog">
       <div className="dialog__box" role="alertdialog">
         <p>{message}</p>
-        <button onClick={onClose}>확인</button>
+        <div className="dialog__buttons">
+          {onCancel && (
+            <button className="dialog__cancel" onClick={onCancel}>
+              취소
+            </button>
+          )}
+          <button onClick={onClose}>확인</button>
+        </div>
       </div>
     </div>
   );

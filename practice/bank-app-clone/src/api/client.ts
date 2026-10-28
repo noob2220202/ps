@@ -1,3 +1,4 @@
+import { currentProfileId } from "../profile/session";
 import type { ApiErrorBody } from "./types";
 
 // 서버가 2xx가 아닌 응답을 주면 이 에러를 던진다. status/code/fields로 화면이 에러를 구분해서 보여줄 수 있다.
@@ -17,9 +18,14 @@ export class ApiError extends Error {
 const BASE = "";
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  // 어느 프로필의 데이터인지 서버에 알려주는 헤더 (서버가 그 프로필의 DB 파일로 처리)
+  const profile = currentProfileId();
   const res = await fetch(BASE + path, {
     method,
-    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    headers: {
+      ...(body !== undefined && { "Content-Type": "application/json" }),
+      ...(profile && { "X-Profile": profile }),
+    },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
   const data = res.status === 204 ? undefined : await res.json().catch(() => undefined);

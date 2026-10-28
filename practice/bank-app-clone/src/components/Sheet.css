@@ -62,12 +62,19 @@
   line-height: 1.5;
   white-space: pre-line;
 }
-.dialog__box button {
-  width: 100%;
-  height: 52px;
+.dialog__buttons {
+  display: flex;
   border-top: 1px solid #eee;
+}
+.dialog__buttons button {
+  flex: 1;
+  height: 52px;
   font-size: 15px;
   font-weight: 700;
+}
+.dialog__cancel {
+  border-right: 1px solid #eee;
+  color: #888;
 }
 @keyframes dialog-fade {
   from {
