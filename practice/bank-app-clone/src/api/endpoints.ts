@@ -59,8 +59,10 @@ export const accountLine = (bank: { code: string; short: string; pattern?: numbe
   `${bank.short} ${bank.code === "kakao" ? formatAccountNumber(bank.pattern, number) : number.replace(/\D/g, "")}`;
 
 // 은행별 계좌번호 형식대로 하이픈 넣기: ("3,3,6", "110123456789") → "110-123-456789"
-export function formatAccountNumber(pattern: number[] | undefined, raw: string) {
+// alt: 기본 형식보다 숫자가 많으면 쓰는 두 번째 형식 (농축협 14자리)
+export function formatAccountNumber(pattern: number[] | undefined, raw: string, alt?: number[]) {
   const digits = raw.replace(/\D/g, "");
+  if (alt && pattern && digits.length > pattern.reduce((a, b) => a + b, 0)) pattern = alt;
   if (!pattern) return digits;
   const parts: string[] = [];
   let i = 0;

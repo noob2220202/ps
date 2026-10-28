@@ -106,4 +106,4 @@ export function formatAccountNumber(code, raw) {
 }
 
 // 응답에 넣을 은행 정보
-export const bankInfo = (bank) => ({ code: bank.code, name: bank.name, short: bank.short, color: bank.color, section: bank.section, ...(bank.pattern && { pattern: bank.pattern }) });
+export const bankInfo = (bank) => ({ code: bank.code, name: bank.name, short: bank.short, color: bank.color, section: bank.section, ...(bank.pattern && { pattern: bank.pattern }), ...(bank.alt && { alt: bank.alt }) });

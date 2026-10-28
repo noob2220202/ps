@@ -369,7 +369,7 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
                   // 농협은 13자리(352-0000-0000-00)와 14자리(000000-00-000000) 둘 다 → 숫자만 받고 서버가 하이픈을 넣음
                   <input value={number} inputMode="numeric" placeholder="숫자 13~14자리" onChange={(e) => setNumber(e.target.value.replace(/[^\d-]/g, "").slice(0, 17))} />
                 ) : (
-                  <input value={number} inputMode="numeric" onChange={(e) => setNumber(formatAccountNumber(bank?.pattern, e.target.value))} />
+                  <input value={number} inputMode="numeric" onChange={(e) => setNumber(formatAccountNumber(bank?.pattern, e.target.value, bank?.alt))} />
                 )}
               </Field>
               <div className="row">
@@ -461,8 +461,9 @@ function BankSelect({ banks, value, onChange, exclude }: { banks: Bank[]; value:
 
 // 은행 형식대로 하이픈 넣은 계좌번호 입력칸 (형식 모르는 은행은 숫자만)
 function NumberInput({ bank, value, onChange }: { bank: Bank; value: string; onChange: (v: string) => void }) {
-  const placeholder = bank.pattern ? bank.pattern.map((n) => "0".repeat(n)).join("-") : "숫자 10~14자리";
-  return <input value={value} inputMode="numeric" placeholder={placeholder} onChange={(e) => onChange(formatAccountNumber(bank.pattern, e.target.value).slice(0, 20))} />;
+  const shape = (p: number[]) => p.map((n) => "0".repeat(n)).join("-");
+  const placeholder = bank.pattern ? [bank.pattern, bank.alt].filter((p) => p).map((p) => shape(p!)).join(" 또는 ") : "숫자 10~14자리";
+  return <input value={value} inputMode="numeric" placeholder={placeholder} onChange={(e) => onChange(formatAccountNumber(bank.pattern, e.target.value, bank.alt).slice(0, 20))} />;
 }
 
 function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
@@ -559,7 +560,7 @@ function PayeesTab({ run }: { run: Run }) {
 function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
   const [open, setOpen] = useState(false);
   const [holder, setHolder] = useState(payee.holder);
-  const [number, setNumber] = useState(formatAccountNumber(payee.bank.pattern, payee.number));
+  const [number, setNumber] = useState(formatAccountNumber(payee.bank.pattern, payee.number, payee.bank.alt));
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpen(!open)}>

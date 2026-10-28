@@ -32,6 +32,7 @@ export interface Bank {
   color: string; // 동그라미 아이콘 대표색
   section: "bank" | "securities"; // 은행선택 목록에서 구분선 위/아래
   pattern?: number[]; // 계좌번호 자리수 묶음 (예: [3, 3, 6] → 000-000-000000). 없으면 10~14자리
+  alt?: number[]; // 자리수가 다른 두 번째 형식 (농협: 농협은행 13자리 [3,4,4,2] / 농축협 14자리 [6,2,6])
 }
 
 export interface Account {
