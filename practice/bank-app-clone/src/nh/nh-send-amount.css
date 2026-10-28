@@ -1,5 +1,13 @@
 /* 콕송금 받는 분을 고른 뒤 (담당 amount). 녹화2 14.4~15.8초(얼마를), 18~19.8초(표시 내용), 녹화1 62~63.6초(잔액 부족)
    정지 프레임 평균에서 잰 값: 녹화 px × 0.8 = dp. 주석의 y 는 화면 위(상태바 위 끝) 기준, 헤더 아래 = 76 */
+/* 공용 헤더 제목 '콕송금' 이 녹화(잉크 y 54.5~71.8px@480)보다 2dp 아래 → 금액·표시 내용 단계에서만 올림
+   (글자 줄은 정수 자리로 붙어 −1.2~−2.0 이 같은 자리: 480 에서 −0.5px. 전체계좌·계좌등록 화면도 같은 이유로 −1.33) */
+.nh-send--amount .nh-header h1,
+.nh-send--memo .nh-header h1 {
+  position: relative;
+  top: -1.6px;
+}
+
 .nh-sa {
   flex-shrink: 0;
   padding: 10px 0 0;
@@ -46,18 +54,33 @@
 .nh-sa__to p {
   margin: 0;
 }
-/* 밑줄: 1.1 두께, 이름은 기준선 아래 6.6, 금액은 4.7 (실측. 두 줄이 다름) */
+/* 밑줄 (글자 폭 그대로): 두께 1.15 (녹화 적분 1.42~1.46px), 가운데 이름 165.75 · 금액 190.27 (기준선 아래 6.6 / 4.7. 두 줄이 다름).
+   배경 그림은 정수 CSS px 로 붙어 두께가 1 로 그려지므로 1px 막대를 transform 으로 늘려 그림.
+   밑줄 뒤 글자('님에게', '을 보낼게요')는 밑줄 끝에서 0.85 더 떨어져 있음 */
 .nh-sa__to u {
+  position: relative;
+  margin-right: 0.85px;
   text-decoration: none;
   font-weight: 600;
   color: var(--nh-text);
   cursor: pointer;
-  background: linear-gradient(currentColor, currentColor) no-repeat left bottom / 100% 1.27px;
+}
+.nh-sa__to u::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: translateY(var(--nh-sa-ul, 0px)) scaleY(1.15);
 }
 .nh-sa__name {
+  --nh-sa-ul: 0.22px;
   padding-bottom: 1.7px;
 }
 .nh-sa__amt {
+  --nh-sa-ul: -0.18px;
   padding-bottom: 0.32px;
 }
 /* 은행+번호 줄은 윗줄에 1.1 붙음 */
@@ -107,7 +130,7 @@
 }
 /* 금액이 있으면 [1원][3.9][ⓧ 16] 묶음이 가운데에서 2.4 왼쪽 (실측 '1' 시작 162.7, ⓧ 200.5~216.5) */
 .nh-sa__box.filled {
-  padding: 1px 4.8px 0 0;
+  padding: 0.15px 4.8px 0 0;
   color: var(--nh-text);
 }
 .nh-sa__box.error {
@@ -123,9 +146,9 @@
   margin-left: 3.9px;
 }
 
-/* 잔액 부족 안내 (상자 아래): 15/400 두 줄, 줄 19.5, 가운데 */
+/* 잔액 부족 안내 (상자 아래 11.9): 15/400 두 줄, 줄 19.5, 가운데. 잔여한도 상자는 아래 줄 바닥에서 30.84 (위 436.96) */
 .nh-sa__error {
-  margin: 12.7px 0 -1.36px;
+  margin: 11.92px 0 -1.16px;
   text-align: center;
   white-space: pre-line;
   font-size: 15px;
@@ -140,24 +163,36 @@
   padding: 0 20px 1.7px;
   display: flex;
   align-items: center;
-  border-radius: 17px;
+  border-radius: 16.5px; /* 녹화 모서리 곡선(위·아래 각 행의 시작 x)에 17 보다 잘 맞음 */
   background: var(--nh-tile);
   font-size: 16px;
   color: var(--nh-text);
 }
-.nh-sa__q {
+/* ? 원: 녹화 원 x 160.1~177.9 · y 404.8~422.2 (지름 ≈17.6, 가운데 413.5 = 글자 줄 가운데보다 0.9 아래) #606e7c, '?' 13/700 상자색.
+   버튼 상자(18)는 위 404.0 에 두고(정수 자리) 원은 SVG 로 0.5 아래에 그림. 누르면 안내 알림창 */
+.nh-sa__limit .nh-sa__q {
+  position: relative;
+  top: 0.26px;
   width: 18px;
   height: 18px;
   margin-left: 4.8px;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  background: #606e7c;
+  padding-top: 1px;
   color: var(--nh-tile);
   font-size: 13px;
-  font-style: normal;
   font-weight: 700;
   letter-spacing: 0;
+}
+.nh-sa__q svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  fill: #606e7c;
+}
+.nh-sa__q span {
+  position: relative;
 }
 .nh-sa__limit b {
   margin-left: auto;
@@ -180,10 +215,17 @@
   min-height: 0;
   display: flex;
   align-items: center;
-  padding: 0 16px 0 16.55px;
+  padding: 0 16.7px 0 16.55px;
 }
 .nh-sa__row + .nh-sa__row {
   flex: 1 1 0;
+}
+/* 거래메모 줄이 열리면 (상세 정보 ⌄): 51.2 / 51.733 / 51.2 */
+.nh-sa__memo.open {
+  height: 154.133px;
+}
+.nh-sa__memo.open .nh-sa__row:nth-child(3) {
+  flex: 0 0 51.733px;
 }
 /* 이름은 입력값보다 1.8 위 */
 .nh-sa__row > span {
@@ -192,6 +234,10 @@
   top: -1.8px;
   font-size: 16px;
   color: var(--nh-sub);
+}
+/* 첫 줄 이름만 2.4 위 (글자 줄은 정수 자리로 붙어 −1.8 이면 녹화보다 1.1~1.7px 아래, −2.0~−2.8 이면 −0.9~−0.3) */
+.nh-sa__memo .nh-sa__row:nth-child(2) > span {
+  top: -2.4px;
 }
 .nh-sa__row input {
   flex: 1;
@@ -207,8 +253,10 @@
   font-weight: 500;
   letter-spacing: -0.01em;
 }
+/* 빈 칸 안내 '받는분 이름 표시' 는 자간 0 (−0.01em 이면 녹화보다 1.2dp 좁음) */
 .nh-sa__row input::placeholder {
   color: var(--nh-placeholder);
+  letter-spacing: 0;
 }
 /* ⓧ 상자 20.8 (원 16.4 가운데), 입력값과 3.1, 오른쪽 끝에서 17 */
 .nh-sa__row .nh-amt-clear {
@@ -224,15 +272,15 @@
   height: 16.4px;
 }
 
-/* 상세 정보 ⌄: 16/400 #9ca4ae, 잉크 오른쪽 332.5 · 청록 ⌄ 중심 (347.5, 397.4) */
-.nh-sa__more {
-  margin: 16.3px 0 0;
+/* 상세 정보 ⌄: 16/400 #9ca4ae, 잉크 오른쪽 332.5 · 청록 ⌄ 중심 (347.5, 397.4). 누르면 거래메모 줄이 열리고 ⌄ 가 뒤집힘 */
+.nh-sa .nh-sa__more {
+  margin: 16.3px 0 0 auto;
   padding-right: 24.5px;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   font-size: 16px;
   line-height: 24px;
+  letter-spacing: -0.01em;
   color: var(--nh-sub);
 }
 .nh-sa__more .nh-sa__chev {
@@ -240,13 +288,28 @@
   transform: translateY(-1.19px);
   color: #36a6a8;
 }
+.nh-sa__more.open .nh-sa__chev {
+  transform: translateY(-1.19px) rotate(180deg);
+}
 
-/* 다음: 왼쪽 32 · 오른쪽 24 (실제 앱이 비대칭) */
-.nh-sa__bottom {
+/* 다음: 왼쪽 32 · 오른쪽 24 (실제 앱이 비대칭).
+   공용 .nh-bottom 은 sticky 인데, 그러면 합성 레이어 끝(838.33 = 480 에서 1047.9px)에 보라 버튼 색이 한 행 번짐 (#232845) →
+   이 화면은 스크롤되지 않으므로 그냥 흐름대로 둠 (margin-top: auto 로 맨 아래) */
+.nh-bottom.nh-sa__bottom {
+  position: relative;
   padding-left: 32px;
   padding-bottom: 24.4px;
 }
 /* '다음' 글자 잉크가 버튼 가운데보다 1.25 위 (녹화2 18~19.8초) */
 .nh-sa__bottom .nh-btn {
   padding-bottom: 0.9px;
+}
+
+/* 계좌번호 → 금액 화면으로 넘어갈 때 3프레임(45ms) 동안 겹쳐 보이는 펼친 최근송금 목록 (녹화2 14.161~14.197초, 불투명도 ≈0.86) */
+.nh-sa-ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0.86;
+  pointer-events: none;
 }

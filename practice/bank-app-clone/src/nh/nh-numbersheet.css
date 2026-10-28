@@ -30,13 +30,16 @@
 /* 입력칸: 24~360 × 60.8, 모서리 14. 비었을 때 1dp #414c57 + '계좌번호 입력'(24px/600 #8c929f) 가운데,
    입력 중 2dp #0195a3 + 숫자(24.6px/600) · 커서 · ⓧ 를 한 묶음으로 (왼쪽에 25.95 빈자리를 둔 채) 가운데 */
 .nh-number .nh-number__box {
-  height: 60.8px;
-  margin: 0 24px 20px;
+  height: 60.3px; /* 녹화 테두리 바깥 400.35~460.65 (위 0.35 아래로, 아래 0.15 위로) — 키패드 위치는 그대로 */
+  margin: 0.35px 24px 20.15px;
   border: 1px solid var(--nh-input-line);
   border-radius: 14px;
 }
+/* 입력 중 테두리는 위·왼쪽이 굵고 아래·오른쪽이 얇음: 3.03 / 3.08 / 2.25 / 2.33px@480 (녹화1 50·56초, 녹화2 8초 모두 같음)
+   = 2.13dp 띠를 위·왼쪽으로 0.3 민 모양. border 는 Chrome 이 CSS px 정수로 내려 그려서(2.4 → 2) 안쪽 그림자로 그림 */
 .nh-number .nh-number__box.on {
-  border: 2px solid var(--nh-teal);
+  border: 0;
+  box-shadow: inset 0.3px 0.3px 0 2.13px var(--nh-teal);
 }
 .nh-number__ph {
   font-size: 24px;
@@ -55,10 +58,10 @@
   color: var(--nh-text);
   white-space: nowrap;
 }
-/* 커서: 2 × 29, #00d1be, 0.5초마다 깜빡임. 마지막 숫자 잉크 오른끝과 커서 오른끝이 같음 */
+/* 커서: 1.6 × 29, #00d1be, 0.5초마다 깜빡임. 커서 가운데가 ⓧ 가운데보다 34.9px@480(27.9dp) 왼쪽 (녹화 4장 평균) */
 .nh-number__caret {
-  width: 2px;
-  margin-left: -2.8px;
+  width: 1.6px; /* 1.25배 화면에서 정확히 2px (녹화 1.8~2.0px) */
+  margin-left: -1.1px;
   height: 29px;
   background: #00d1be;
   animation: nh-number-blink 1s steps(1) infinite;
@@ -70,7 +73,7 @@
 }
 .nh-number__clear {
   display: grid;
-  margin-left: 15.95px;
+  margin-left: 14.65px;
 }
 
 /* 농협계좌 등록 화면(NhAccounts)도 이 칸 모양을 같이 씀 — 예전 모양 그대로 둠 */
@@ -97,9 +100,17 @@
 /* 키패드 아래 → 다음 버튼 8.5 (공용 9보다 0.5 작게 해야 시트 위가 323.2에 맞음) */
 .nh-number .nh-sheet-btn {
   margin-top: 8.5px;
+  padding-bottom: 2px; /* '다음' 잉크 y 975.07–994.57px@480 — 가운데보다 1px 위 */
+}
+/* 2·3행 숫자는 칸 가운데보다 0.8 위 (녹화 '4' 729.3, '7' 810.5 — 눌림 원 중심 729.0 / 814.0 은 그대로) */
+.nh-number .keypad__key:nth-child(n + 4):nth-child(-n + 9) {
+  padding-top: 0;
+  padding-bottom: 0.6px;
 }
 
 /* '콕' 글리프: 실제는 줄 가운데(숫자 '0'과 같은 높이 가운데). 공용 키 padding-top 1px 때문에 1.2 아래로 내려가 있어서 */
 .nh-number .keypad__key--kok > svg {
   transform: translateY(-1.2px);
+  overflow: visible;
+  stroke-width: 2.65; /* 녹화 잉크량이 2.4 때보다 10% 많음 (획 3.5~3.7px@480) */
 }

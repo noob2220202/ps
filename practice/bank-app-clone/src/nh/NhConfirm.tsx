@@ -19,7 +19,7 @@ export interface NhDoneState {
   memoMe: string;
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 // 송금 처리 시간표 (녹화2 27.915~30.32초). 시트 버튼을 누르면 시트가 62ms 동안 사라지고 115ms 뒤 점 3개가 뜸 (28.029).
 // 아래는 점 3개가 뜬 때 기준 ms
@@ -27,6 +27,8 @@ const SEND = {
   afterSheet: 115,
   blackFrom: 210, // 막이 다 덮인 직후 화면 전체가 0.48초 동안 검게 됨 (28.238~28.715, 상태바까지)
   blackTo: 690,
+  // 검은 화면이 끝나면 막·점이 같이 걷혀 확인 화면이 밝게 보였다가 (28.715~), 점(28.76)과 막(28.79, 0→0.6 직선)이 다시 뜸
+  gap: 60,
   done: 2120, // 완료 화면으로 바뀜 (30.147). 막은 그 뒤 170ms 더 덮여 있음 (30.318)
   doneDim: 170,
 };
@@ -38,14 +40,14 @@ export function NhConfirm() {
   const navigate = useNavigate();
   const state = useLocation().state as NhConfirmState | null;
   const home = useApi<HomeData>(paths.home);
-  const [memo, setMemo] = useState("");
+  const [memo, setMemo] = useState(state?.memo ?? "");
   const [memoTo, setMemoTo] = useState(state?.memoTo ?? "");
-  const [memoMe, setMemoMe] = useState(state?.memoMe ?? "");
+  // 앞 단계에서 '내계좌에 표시'를 비워 두면 실제 앱은 받는 분 이름을 값으로 채워 보여줌 (녹화2 24.5초: 흰 글자 + ⓧ)
+  const [memoMe, setMemoMe] = useState(state?.memoMe || state?.to.holder || "");
   const [verify, setVerify] = useState(false);
-  const [sending, setSending] = useState(false);
+  const sending = useRef(false); // 송금 중 (두 번 누름 막기. 버튼 모양은 그대로)
   const [black, setBlack] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const timers = useRef<number[]>([]);
   // 받는 분 확인 시트의 막(0.5)은 상태바를 덮지 않음 (녹화2 27.0초 상태바 그대로 #17161b). 송금 중 검은 화면 때만 상태바도 검정
   useStatusBar(black ? "#000000" : "#18171c", "light");
   useEffect(() => {
@@ -55,45 +57,48 @@ export function NhConfirm() {
   useEffect(() => {
     const src = localAsset("nh-done-mark");
     if (src) new Image().src = src;
-    const ts = timers.current;
-    return () => ts.forEach((t) => window.clearTimeout(t));
   }, []);
   if (!state) return null;
   const { from, to, amount, recent } = state;
   const account = home.data?.accounts.find((a) => a.id === from);
   const me = home.data?.profile.userName ?? "";
 
-  const later = (ms: number, f: () => void) => timers.current.push(window.setTimeout(f, ms));
+  // 로딩은 두 번: 점 3개 → 막 → 검은 화면(0.48초) → 막·점 걷힘(밝은 확인 화면 60ms) → 다시 점 3개·막 → 완료 화면
+  // 송금하기 버튼은 그동안 보라색 그대로 (막 아래에서 어두워질 뿐, 비활성 회색으로 바뀌지 않음)
   const send = async () => {
-    if (sending) return;
+    if (sending.current) return;
+    sending.current = true;
     setVerify(false);
-    setSending(true);
     if (verify) await sleep(SEND.afterSheet);
-    later(SEND.blackFrom, () => setBlack(true));
-    later(SEND.blackTo, () => setBlack(false));
+    const transfer = api.transfer({
+      fromAccountId: from,
+      bankCode: to.bank.code,
+      number: to.number,
+      amount,
+      memoTo: memoTo.trim() || undefined,
+      memoMe: memoMe.trim() || undefined,
+    });
+    // 실패하면 시간표를 기다리지 않고 바로 멈춤 (성공하면 시간표대로)
+    const failed = transfer.then(() => new Promise<never>(() => {}));
+    const step = (ms: number) => Promise.race([sleep(ms), failed]);
     try {
       await withNhLoading(async () => {
-        const [result] = await Promise.all([
-          api.transfer({
-            fromAccountId: from,
-            bankCode: to.bank.code,
-            number: to.number,
-            amount,
-            memoTo: memoTo.trim() || undefined,
-            memoMe: memoMe.trim() || undefined,
-          }),
-          sleep(SEND.done),
-        ]);
+        await step(SEND.blackFrom);
+        setBlack(true);
+        await step(SEND.blackTo - SEND.blackFrom);
+        setBlack(false); // 검은 화면과 로딩이 같은 프레임에 걷힘
+      }, 0);
+      await step(SEND.gap);
+      await withNhLoading(async () => {
+        const [result] = await Promise.all([transfer, sleep(SEND.done - SEND.blackTo - SEND.gap)]);
         if (memo.trim()) await api.updateMemo(result.outTxId, memo.trim()).catch(() => {});
         // 확인 화면을 완료 화면으로 바꿔 끼움 → 완료에서 뒤로 가면 송금 화면
         navigate("/send/done", { replace: true, state: { result, memoTo: memoTo.trim() || me, memoMe: memoMe.trim() || to.holder } satisfies NhDoneState });
         await sleep(SEND.doneDim);
       }, 0);
     } catch (e) {
-      timers.current.forEach((t) => window.clearTimeout(t));
-      timers.current = [];
       setBlack(false);
-      setSending(false);
+      sending.current = false;
       setError(e instanceof ApiError ? e.message : "연결에 실패했어요");
     }
   };
@@ -141,7 +146,7 @@ export function NhConfirm() {
         <button className="nh-btn nh-btn--line" onClick={() => navigate(-1)}>
           취소
         </button>
-        <button className="nh-btn" disabled={sending} onClick={() => (recent ? send() : setVerify(true))}>
+        <button className="nh-btn" onClick={() => !sending.current && (recent ? send() : setVerify(true))}>
           송금하기
         </button>
       </div>
@@ -159,7 +164,7 @@ export function NhConfirm() {
           최근 6개월간 돈을 보낸 적이 없는 분이에요.
         </p>
         <button className="nh-btn nh-vf__send" onClick={send}>
-          {to.holder}님께 송금하기
+          <b>{to.holder}</b>님께 송금하기
         </button>
         <button className="nh-vf__again" onClick={() => navigate(-1)}>
           받는 분을 다시 입력할게요.

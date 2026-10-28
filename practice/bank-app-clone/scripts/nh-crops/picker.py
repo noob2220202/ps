@@ -22,6 +22,9 @@ from PIL import Image
 OUT = Path(__file__).resolve().parents[2] / "src/assets/local"
 TILE = np.array([31, 36, 44], float)  # 녹화에서 타일 바탕 (실제 #20252d)
 SIZE, BOX, RAD = 45, 44.6, 17.0  # 출력 px, 아이콘 한 변, 모서리 반경 (녹화 px)
+# 클론이 1.25배(480px) 화면에서 세 열의 아이콘을 그리는 정수 px (왼쪽). 자르는 창의 왼쪽을 여기에 맞추면
+# 클론 화면의 그 픽셀 = 녹화의 그 픽셀이 됨 (가운데 열 실제 왼쪽 217.3~217.8 → 218)
+COL_X = (74, 218, 361)
 
 # 정지 구간 (녹화1 초) → 아이콘 가운데 (녹화 px)
 STATES = {
@@ -114,11 +117,16 @@ def bilinear(img, x, y):
 
 
 def cut(img, cx, cy):
-    c = SIZE / 2
+    """(cx, cy) 가운데 아이콘을 45×45로. 다시 뽑지 않고 원본 픽셀을 그대로 복사함 (자르는 창의 왼쪽 위를 정수 px로):
+    소수 위치에서 bilinear 로 다시 뽑으면 반 픽셀만큼 흐려져서 (예전 판: 삼성증권 밝기 기울기 22.1 ← 원본 34.1).
+    대신 아이콘이 창 안에서 최대 0.5px 치우치므로 둥근 사각 틀(알파)은 실제 가운데에 맞춰 그림."""
+    ox, oy = round(cx - SIZE / 2), round(cy - SIZE / 2)  # 창의 왼쪽 위 (정수)
+    ox = min(COL_X, key=lambda x: abs(x - ox)) if min(abs(x - (cx - SIZE / 2)) for x in COL_X) < 1 else ox
+    c, cyc = cx - ox, cy - oy  # 창 안에서 아이콘 가운데
     yy, xx = np.mgrid[0:SIZE, 0:SIZE].astype(float) + 0.5
     # 둥근 사각까지의 안쪽 거리와 안쪽 방향 (가장자리 색을 안쪽 색으로 채우기 위해)
     h = BOX / 2
-    dx, dy = xx - c, yy - c
+    dx, dy = xx - c, yy - cyc
     qx = np.maximum(np.abs(dx) - (h - RAD), 0)
     qy = np.maximum(np.abs(dy) - (h - RAD), 0)
     corner = (qx > 0) & (qy > 0)
@@ -127,10 +135,10 @@ def cut(img, cx, cy):
     nx = np.where(corner, -np.sign(dx) * qx / np.maximum(qd, 1e-6), np.where(h - np.abs(dx) < h - np.abs(dy), -np.sign(dx), 0))
     ny = np.where(corner, -np.sign(dy) * qy / np.maximum(qd, 1e-6), np.where(h - np.abs(dx) < h - np.abs(dy), 0, -np.sign(dy)))
     push = np.clip(2.5 - dist, 0, None)  # 가장자리 1.8px(+흐림) 안쪽까지는 2.5px 안쪽 색을 씀
-    sx = xx + nx * push - c + cx
-    sy = yy + ny * push - c + cy
+    sx = xx + nx * push + ox  # push 가 0인 안쪽은 원본 픽셀 가운데 그대로 → 보간 없음
+    sy = yy + ny * push + oy
     rgb = bilinear(img, sx - 0.5, sy - 0.5)
-    alpha = rrect(c, c, SIZE)
+    alpha = rrect(c, cyc, SIZE)
     out = np.dstack([np.clip(rgb, 0, 255), alpha * 255]).round().astype(np.uint8)
     return Image.fromarray(out, "RGBA")
 

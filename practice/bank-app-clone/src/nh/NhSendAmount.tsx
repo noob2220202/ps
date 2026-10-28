@@ -108,7 +108,11 @@ export function NhSendAmount({
             <div className="nh-sa__limit">
               <span>1일 송금 잔여한도</span>
               <button className="nh-sa__q" aria-label="1일 송금 잔여한도 안내" onClick={onLimitInfo}>
-                ?
+                {/* 원은 SVG: 배경 원은 정수 CSS px 에 붙어 그려져 0.5dp 단위로 못 맞춤 */}
+                <svg width="18" height="18" aria-hidden>
+                  <circle cx="9" cy="9.5" r="8.8" />
+                </svg>
+                <span>?</span>
               </button>
               <b>{nhWon(remaining)}</b>
             </div>

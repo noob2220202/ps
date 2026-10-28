@@ -16,6 +16,16 @@ export function NhAmtClear() {
   );
 }
 
+// 빠른금액 칩 테두리 (1dp #414c57, 모서리 10). 녹화 선 가운데 y 539.73 / 583.75px (사이 35.2dp).
+// border 는 칩 상자를 정수 CSS px 에 붙여 그려 선 사이가 35 또는 36 이 되므로 SVG 로 그림 (SVG 원점 = 칩 위를 반올림한 정수 자리)
+function ChipOutline() {
+  return (
+    <svg className="nh-as__chipol" width="62.4" height="37" aria-hidden>
+      <rect x="0.5" y="0.78" width="61.4" height="35.22" rx="9.5" />
+    </svg>
+  );
+}
+
 const CHIPS = [
   [10_000, "+ 1만"],
   [50_000, "+ 5만"],
@@ -25,7 +35,7 @@ const CHIPS = [
 
 // ---------- 금액 시트 (녹화2 16~17.5초, 녹화1 59~61.6초) ----------
 // [X] / 금액 입력 → 1|원 ⓧ (커서 청록, 0.5초 깜빡) / 일원 · 잔액 부족이면 빨간 금액 + 두 줄 안내 /
-// +1만 +5만 +10만 +100만 전액 / 키패드(00) / 다음 (금액이 있으면 청록. 안내가 떠도 눌림 → 시트만 닫히고 화면에 안내)
+// +1만 +5만 +10만 +100만 전액 / 키패드(00, 행 68.25: 녹화 1→4행 255.4px) / 다음 (금액이 있으면 청록. 안내가 떠도 눌림 → 시트만 닫히고 화면에 안내)
 export function NhAmountSheet({
   initial,
   balance,
@@ -70,13 +80,17 @@ export function NhAmountSheet({
         <div className="nh-as__chips">
           {CHIPS.map(([n, label]) => (
             <button key={n} onClick={() => add(n)}>
+              <ChipOutline />
               {label}
             </button>
           ))}
-          <button onClick={() => set(String(Math.min(balance, remaining)))}>전액</button>
+          <button onClick={() => set(String(Math.min(balance, remaining)))}>
+            <ChipOutline />
+            전액
+          </button>
         </div>
       </div>
-      <Keypad doubleZero rowHeight={68} back={<BackArrowKey />} onKey={(k) => set(applyKey(raw, k, 8))} />
+      <Keypad doubleZero rowHeight={68.25} back={<BackArrowKey />} onKey={(k) => set(applyKey(raw, k, 8))} />
       <button className="nh-btn nh-btn--teal nh-sheet-btn" disabled={!amount} onClick={() => onDone(amount)}>
         다음
       </button>

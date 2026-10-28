@@ -1,11 +1,41 @@
 /* 은행선택 — 녹화1 29.5~48초에서 잰 값 (녹화 px × 0.8 = dp). 측정표: scratchpad work/picker/spec.md
    헤더(X)는 고정, 그 아래 전체(검색·탭·타일)가 스크롤. 위치는 화면 위(상태바 포함)에서 dp */
 .screen.nh-banks {
+  z-index: 45; /* 콕송금 위에 덮어 그림 (닫히는 중인 계좌번호 시트 40보다 위) */
   overflow: hidden;
-  animation: nh-banks-in 300ms cubic-bezier(0, 0.5, 0.5, 1); /* 녹화2 4.53~4.79초 */
+}
+/* 점 3개 로딩 동안은 안 보임 → 로딩이 걷히고 30ms 뒤 80ms 동안 나타남 (녹화1 29.54~29.62, 녹화2 4.58~4.63) */
+.nh-banks--loading {
+  visibility: hidden;
+}
+.nh-banks--in {
+  animation: nh-banks-in 80ms cubic-bezier(0, 0, 0.2, 1) var(--nh-show-gap) both;
 }
 @keyframes nh-banks-in {
   from {
+    opacity: 0;
+  }
+}
+/* 고르거나 X: 85ms 직선으로 사라짐 (녹화1 47.92~48.005) */
+.nh-banks--out {
+  pointer-events: none;
+  animation: nh-banks-out 85ms linear both;
+}
+@keyframes nh-banks-out {
+  to {
+    opacity: 0;
+  }
+}
+/* 처음 나타날 때 아이콘·돋보기가 늦게 뜸 (실제 앱은 이미지를 받는 대로 한 번에 툭) — 시각은 NhBankPicker.tsx ICON_AT */
+.nh-banks--fresh .nh-banks__grid button > :first-child {
+  animation: nh-banks-late var(--nh-icon-at) step-end;
+}
+.nh-banks--fresh .nh-banks__search svg {
+  animation: nh-banks-late var(--nh-search-at) step-end;
+}
+@keyframes nh-banks-late {
+  from,
+  to {
     opacity: 0;
   }
 }
@@ -21,15 +51,27 @@
   display: none;
 }
 
-/* 검색칸: 위 100~148, 글자 x 32 (18px/400), 밑줄 0.5dp #2f2e33, 돋보기 고리 중심 (331.5, 122.8) */
+/* 검색칸: 위 100~148, 글자 x 32 (18px/500), 밑줄 0.5dp #2f2e33, 돋보기 고리 중심 (331.5, 122.8) */
 .nh-banks__search {
+  position: relative;
   display: flex;
   align-items: center;
   height: 48px;
   margin: 24px 24px 0;
   padding: 0 16px 0 8px;
-  border-bottom: 0.5px solid #2f2e33;
   color: var(--nh-text);
+}
+/* 밑줄 0.5dp: border 0.5px 는 Chrome 이 기기 1px 이상으로 그려 두 배 밝아짐 → 1px 선을 반으로 줄여 실제 굵기만큼만 (녹화1 y 184 한 줄, 밝기 적분 +15) */
+.nh-banks__search::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #2f2e33;
+  transform: scaleY(0.5);
+  transform-origin: bottom;
 }
 .nh-banks__search input {
   flex: 1;
@@ -41,9 +83,10 @@
   outline: 0;
   color: var(--nh-text);
   font: inherit;
-  padding-bottom: 1.7px; /* 실제보다 0.4 아래에 그려져서 */
+  padding-bottom: 0.9px;
+  transform: translateY(-0.6px); /* 안내 문구 잉크 y 144.05–164.24 @480 (녹화1 46.3초). 입력칸 안 글자는 padding 으로는 2px 단위로만 움직여서 */
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 500; /* 획 굵기·잉크량이 400보다 500과 맞음 (세로 획 3.2~4.3px@480) */
   letter-spacing: 0; /* 안내 문구 폭이 자간 0일 때와 맞음 (271px@480) */
 }
 .nh-banks__search input::placeholder {
@@ -87,7 +130,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin: 11.4px 24px 0;
+  margin: 11.8px 24px 0; /* 첫 줄 위 227.4 (+0.4: 맨 위 상태에서 2~4번째 줄이 참고보다 1px 위에 있던 것을 반으로) */
 }
 .nh-banks__grid button {
   display: flex;
@@ -95,7 +138,7 @@
   align-items: center;
   justify-content: space-evenly;
   min-height: 86px;
-  padding: 11.7px 8px;
+  padding: 11.9px 8px 11.5px; /* 아이콘 위 = 타일 위 + 14.47 (참고 18.3px@480 = 14.6). 위아래 11.7 이면 0.3 위로 올라감 */
   border-radius: 12px;
   background: var(--nh-tile);
 }
@@ -106,6 +149,12 @@
   letter-spacing: -0.01em; /* 이게 없으면 '카카오페이증권'(7자)이 두 줄이 됨 */
   text-align: center;
   word-break: break-all; /* "아이엠뱅크(대 / 구은행)", "뱅크오브아메리 / 카" 처럼 글자 단위로 줄바꿈 */
+}
+/* 녹화(480px = 1.25배)에서 그대로 잘라 온 45px 아이콘(36dp): 1.25배 화면에선 기기 픽셀에 1:1로 (부드럽게 다시 뽑으면 반 픽셀 밀려 흐려짐) */
+@media (resolution: 1.25dppx) {
+  .nh-banks__grid .nh-bank-sq {
+    image-rendering: pixelated;
+  }
 }
 .nh-bank-sq {
   display: block;
