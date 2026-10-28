@@ -69,6 +69,8 @@ export interface TransactionDetail extends Transaction {
   cardInfo?: string;
   address?: string;
   phone?: string;
+  memo?: string; // 거래메모 (콕뱅크)
+  transfer?: { bank: Bank; number: string; holder: string }; // 내가 보낸 이체면 받은 계좌
 }
 
 export interface Banner {
@@ -112,7 +114,9 @@ export interface MyAccountRecipient {
 
 export interface TransferRecipients {
   mine: MyAccountRecipient[];
-  recent: Recipient[];
+  recent: (Recipient & { lastAt: string })[];
+  favorites: (Payee & { payeeId: string })[];
+  dailyRemaining?: number; // 콕뱅크만: 오늘 더 보낼 수 있는 금액
 }
 
 export interface Payee {
@@ -134,6 +138,7 @@ export interface NewTransfer {
 
 export interface TransferResult {
   id: string;
+  outTxId: string; // 내 통장 출금 거래 id
   fromAccountId: AccountId;
   to: Recipient;
   amount: number;

@@ -46,15 +46,27 @@ export function Dialog({ message, onClose, onCancel }: { message: string | null;
   );
 }
 
-// 숫자 키패드. 왼쪽 아래 칸은 금액 입력에선 "00", 계좌번호 입력에선 빈칸
-export function Keypad({ onKey, doubleZero = false, rowHeight = 60 }: { onKey: (k: PadKey) => void; doubleZero?: boolean; rowHeight?: number }) {
-  const keys: (PadKey | null)[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", doubleZero ? "00" : null, "0", "back"];
+// 숫자 키패드. 왼쪽 아래 칸은 금액 입력에선 "00", 계좌번호 입력에선 빈칸 (콕뱅크는 "콕")
+export function Keypad({
+  onKey,
+  doubleZero = false,
+  kok = false,
+  rowHeight = 60,
+  back,
+}: {
+  onKey: (k: PadKey) => void;
+  doubleZero?: boolean;
+  kok?: boolean;
+  rowHeight?: number;
+  back?: ReactNode; // 지우기 키 모양 (기본: ⌫)
+}) {
+  const keys: (PadKey | null)[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", doubleZero ? "00" : kok ? "kok" : null, "0", "back"];
   return (
     <div className="keypad" style={{ gridAutoRows: rowHeight }}>
       {keys.map((k, i) =>
         k ? (
           <button key={k} className="keypad__key" onClick={() => onKey(k)} aria-label={k === "back" ? "지우기" : k}>
-            {k === "back" ? <BackspaceIcon /> : k}
+            {k === "back" ? (back ?? <BackspaceIcon />) : k === "kok" ? "콕" : k}
           </button>
         ) : (
           <span key={`empty-${i}`} />

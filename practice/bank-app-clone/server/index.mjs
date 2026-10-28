@@ -14,8 +14,8 @@ import {
   registry,
   removeProfileDb,
   runWithDb,
-  seedEmpty,
-  seedExample,
+  APPS,
+  SEEDS,
   transaction,
 } from "./db.mjs";
 import { BANKS, bankByCode, bankInfo, checkNumber, digitsOf, formatAccountNumber } from "./banks.mjs";
@@ -56,7 +56,8 @@ const getProfile = () => {
 function toAccount(row, profile = getProfile()) {
   // 카카오뱅크 3333 통장도 이체 화면에선 "카카오뱅크 3333-..."로 보이므로 은행 정보를 붙인다
   const bank = bankByCode(row.bank_code ?? "kakao");
-  const label = row.kind === "main" ? `${profile.userName}의 통장` : `${profile.userName}의 ${bank?.name ?? "다른 은행"} 계좌`;
+  const label =
+    row.name ?? (row.kind === "main" ? `${profile.userName}의 통장` : `${profile.userName}의 ${bank?.name ?? "다른 은행"} 계좌`);
   return {
     id: row.id,
     kind: row.kind,
@@ -134,7 +135,8 @@ app.post("/api/profiles", (req, res) => {
   checkProfileFields({ name, avatar, color });
   if (registry.prepare("SELECT COUNT(*) AS n FROM profiles").get().n >= MAX_PROFILES) throw bad(`프로필은 ${MAX_PROFILES}개까지 만들 수 있어요`);
   const id = newProfileId();
-  seedEmpty(profileDb(id), String(name).trim());
+  // 두 앱 모두 빈 상태로 (카카오뱅크 통장 0원 / 콕뱅크 자립예탁금 0원)
+  for (const app of APPS) SEEDS[app].empty(profileDb(id, app), String(name).trim());
   registry
     .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))")
     .run(id, String(name).trim(), avatar, color);
@@ -166,7 +168,10 @@ app.use("/api", (req, _res, next) => {
   if (req.path === "/profiles" || req.path.startsWith("/profiles/")) return next();
   const id = req.get("X-Profile");
   if (!id) throw new HttpError(400, "PROFILE_REQUIRED", "프로필을 먼저 골라 주세요");
-  runWithDb(profileDb(findProfile(id).id), next);
+  // X-App: nh 이면 같은 프로필의 콕뱅크 DB (없으면 카카오뱅크)
+  const app = req.get("X-App") ?? "kakao";
+  if (!APPS.includes(app)) throw bad("X-App은 kakao 또는 nh");
+  runWithDb(profileDb(findProfile(id).id, app), next);
 });
 
 // ---------- 화면용 API ----------
@@ -330,12 +335,25 @@ app.get("/api/transactions/:id", (req, res) => {
   const t = findTx(req.params.id);
   const tx = listTransactions(t.account_id).find((x) => x.id === String(t.id));
   const card = tx.tag === "#체크카드";
+  const sent = db().prepare("SELECT * FROM transfers WHERE out_tx_id = ?").get(t.id);
   res.json({
     ...tx,
     transactedAt: `${tx.at.slice(0, 10).replaceAll("-", ".")} ${tx.at.slice(11, 19)}`,
     kind: KIND_BY_TAG[tx.tag],
     ...(card && { cardInfo: `체크카드 (${getProfile().cardLast4})`, address: "서울 예시구 샘플로 123", phone: "02)000-0000" }),
+    memo: t.memo ?? "",
+    // 내가 보낸 이체면 받은 은행/계좌 (콕뱅크 거래 상세의 입금은행·입금계좌)
+    ...(sent && { transfer: { bank: bankInfo(bankByCode(sent.bank_code)), number: sent.number, holder: sent.holder } }),
   });
+});
+
+// 거래메모 저장 (콕뱅크 거래 상세)
+app.patch("/api/transactions/:id", (req, res) => {
+  const t = findTx(req.params.id);
+  const memo = String(req.body?.memo ?? "").trim();
+  if (memo.length > 20) throw bad("거래메모는 20자 이하", { memo: "20자 이하" });
+  db().prepare("UPDATE transactions SET memo = ? WHERE id = ?").run(memo || null, t.id);
+  res.json({ id: String(t.id), memo });
 });
 
 // 거래 삭제 → 그 거래가 없던 일이 되므로 잔액도 되돌림
@@ -448,10 +466,21 @@ app.get("/api/transfer/recipients", (req, res) => {
       bank: bankInfo(bankByCode(r.bank_code)),
       number: r.number,
       holder: r.holder,
+      lastAt: r.last_at,
       ...(r.payee_id && { payeeId: String(r.payee_id), favorite: !!r.favorite }),
     }));
-  res.json({ mine, recent });
+  // 자주쓰는(☆ 누른 받는 분) — 콕뱅크 "자주쓰는" 탭
+  const favorites = db()
+    .prepare("SELECT * FROM payees WHERE favorite = 1 ORDER BY holder")
+    .all()
+    .map((p) => ({ ...toPayee(p), payeeId: String(p.id) }));
+  res.json({ mine, recent, favorites, ...(db().app === "nh" && { dailyRemaining: NH_DAILY_LIMIT - sentToday(from) }) });
 });
+
+// 콕뱅크 1일 송금 한도 (영상: "1일 송금 잔여한도 1,000,000원")
+const NH_DAILY_LIMIT = 1_000_000;
+const sentToday = (fromId) =>
+  db().prepare("SELECT COALESCE(SUM(amount), 0) AS s FROM transfers WHERE from_account_id = ? AND at LIKE ?").get(fromId, `${nowIso().slice(0, 10)}%`).s;
 
 app.post("/api/transfers", (req, res) => {
   const { fromAccountId, bankCode, number, amount, memoTo, memoMe } = req.body ?? {};
@@ -468,13 +497,15 @@ app.post("/api/transfers", (req, res) => {
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `출금 가능 금액(${from.balance.toLocaleString("ko-KR")}원)을 넘었어요`);
 
   const at = nowIso();
+  if (db().app === "nh" && sentToday(from.id) + amount > NH_DAILY_LIMIT)
+    throw new HttpError(400, "LIMIT_EXCEEDED", `1일 송금 한도(${NH_DAILY_LIMIT.toLocaleString("ko-KR")}원)를 넘었어요`);
 
   const me = getProfile().userName;
   const memoToText = memoTo?.trim() || me; // 받는 분 통장에 찍힐 이름 (기본: 내 이름)
   const memoMeText = memoMe?.trim() || to.holder; // 내 통장에 찍힐 이름 (기본: 받는 분 이름)
 
   // 출금 + (내 계좌면) 입금 + 이체 기록 → 하나라도 실패하면 전부 취소
-  const id = transaction(() => {
+  const { id, outTxId } = transaction(() => {
     const insertTx = db().prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES (?, ?, ?, ?, '#이체')");
     const addBalance = db().prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?");
     const out = insertTx.run(from.id, at, memoMeText, -amount).lastInsertRowid;
@@ -484,14 +515,16 @@ app.post("/api/transfers", (req, res) => {
       inTx = insertTx.run(to.accountId, at, memoToText, amount).lastInsertRowid;
       addBalance.run(amount, to.accountId);
     }
-    return db()
+    const r = db()
       .prepare(
         "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, memo_to, memo_me, at, out_tx_id, in_tx_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       )
-      .run(from.id, to.bank.code, to.number, to.holder, amount, memoTo?.trim() || null, memoMe?.trim() || null, at, out, inTx).lastInsertRowid;
+      .run(from.id, to.bank.code, to.number, to.holder, amount, memoTo?.trim() || null, memoMe?.trim() || null, at, out, inTx);
+    return { id: r.lastInsertRowid, outTxId: String(out) };
   });
   res.status(201).json({
     id: String(id),
+    outTxId, // 내 통장 출금 거래 id (콕뱅크 완료 화면 '상세보기', 거래메모 저장에 씀)
     fromAccountId: from.id,
     to,
     amount,
@@ -503,9 +536,8 @@ app.post("/api/transfers", (req, res) => {
 // 되돌리기: mode "empty" = 빈 상태(통장 0원), "example" = 홍길동 예시 데이터
 app.post("/api/reset", (req, res) => {
   const mode = req.body?.mode ?? "example";
-  if (mode === "empty") seedEmpty(db(), getProfile().userName);
-  else if (mode === "example") seedExample(db());
-  else throw bad("mode는 empty 또는 example");
+  if (mode !== "empty" && mode !== "example") throw bad("mode는 empty 또는 example");
+  SEEDS[db().app][mode](db(), getProfile().userName);
   res.status(204).end();
 });
 

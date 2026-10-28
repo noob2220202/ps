@@ -34,6 +34,7 @@ export const api = {
   createTransaction: (accountId: string, body: NewTransaction) =>
     http.post<Transaction>(paths.transactions(accountId), body),
   deleteTransaction: (txId: string) => http.delete(paths.transaction(txId)),
+  updateMemo: (txId: string, memo: string) => http.patch<{ id: string; memo: string }>(paths.transaction(txId), { memo }),
   reset: (mode: "empty" | "example") => http.post<void>("/api/reset", { mode }),
 
   // 프로필 (접속할 때 고르는 것)

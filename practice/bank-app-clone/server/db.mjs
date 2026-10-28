@@ -8,7 +8,8 @@ import { fileURLToPath } from "node:url";
 // SQLite 데이터베이스. Node 22에 내장된 node:sqlite 를 써서 따로 설치할 게 없다.
 // 넷플릭스 프로필처럼 프로필마다 DB 파일이 따로 있다 → 계좌·거래·받는 분이 서로 섞이지 않음
 //   server/data/app.db             프로필 목록 (이름, 아바타, 갤럭시/아이폰·테마 설정)
-//   server/data/profiles/<id>.db   그 프로필의 은행 데이터
+//   server/data/profiles/<id>.db   그 프로필의 카카오뱅크 데이터
+//   server/data/profiles/<id>.nh.db  그 프로필의 NH 콕뱅크 데이터 (두 앱은 서로 따로. 표 모양은 같아서 API를 같이 씀)
 // (.gitignore 처리 — 내 데이터는 내 서버에만)
 const here = dirname(fileURLToPath(import.meta.url));
 const DATA = process.env.DATA_DIR ?? resolve(here, "data");
@@ -36,7 +37,8 @@ export const newProfileId = () => `p${randomUUID().replaceAll("-", "").slice(0, 
 
 // id가 파일 이름이 되므로 형식을 꼭 검사 ("../../etc/passwd" 같은 값으로 다른 파일을 열지 못하게)
 export const isProfileId = (id) => typeof id === "string" && /^p[0-9a-f]{8}$/.test(id);
-const profileFile = (id) => resolve(DATA, "profiles", `${id}.db`);
+export const APPS = ["kakao", "nh"];
+const profileFile = (id, app = "kakao") => resolve(DATA, "profiles", app === "nh" ? `${id}.nh.db` : `${id}.db`);
 
 // ---------- 프로필별 은행 DB ----------
 const SCHEMA = `
@@ -99,24 +101,30 @@ const SCHEMA = `
 
 const opened = new Map(); // 열어 둔 DB 연결 재사용 (요청마다 파일을 열면 느림)
 
-export function profileDb(id) {
-  if (!isProfileId(id)) throw new Error(`bad profile id: ${id}`);
-  let d = opened.get(id);
+// app: "kakao" | "nh". 처음 여는 콕뱅크 DB는 예시 데이터로 채운다 (새 프로필은 만들 때 빈 상태로 미리 채움)
+export function profileDb(id, app = "kakao") {
+  if (!isProfileId(id) || !APPS.includes(app)) throw new Error(`bad profile: ${id} ${app}`);
+  const key = `${id}:${app}`;
+  let d = opened.get(key);
   if (!d) {
-    d = new DatabaseSync(profileFile(id));
+    d = new DatabaseSync(profileFile(id, app));
     d.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;");
     d.exec(SCHEMA);
     migrate(d);
-    opened.set(id, d);
+    d.app = app; // 어느 앱 DB인지 (송금 한도 등 앱마다 다른 규칙에 씀)
+    opened.set(key, d);
+    if (app === "nh" && !d.prepare("SELECT 1 FROM profile").get()) seedNhExample(d);
   }
   return d;
 }
 
 export function removeProfileDb(id) {
   if (!isProfileId(id)) return;
-  opened.get(id)?.close();
-  opened.delete(id);
-  for (const ext of ["", "-wal", "-shm"]) rmSync(profileFile(id) + ext, { force: true });
+  for (const app of APPS) {
+    opened.get(`${id}:${app}`)?.close();
+    opened.delete(`${id}:${app}`);
+    for (const ext of ["", "-wal", "-shm"]) rmSync(profileFile(id, app) + ext, { force: true });
+  }
 }
 
 // 지금 요청이 쓰는 DB. 서버가 요청마다 runWithDb(그 프로필 DB, ...)로 감싸 두면
@@ -133,6 +141,8 @@ export function db() {
 // 이미 만들어진 DB 파일은 CREATE TABLE IF NOT EXISTS 로는 안 바뀐다 → 달라진 점만 직접 반영
 function migrate(d) {
   const columns = (table) => d.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!columns("accounts").includes("name")) d.exec("ALTER TABLE accounts ADD COLUMN name TEXT"); // 상품 이름 (콕뱅크 "자립예탁금")
+  if (!columns("transactions").includes("memo")) d.exec("ALTER TABLE transactions ADD COLUMN memo TEXT"); // 콕뱅크 거래메모
   if (!columns("profile").includes("card_spend")) d.exec("ALTER TABLE profile ADD COLUMN card_spend INTEGER");
   if (!columns("profile").includes("cashback_count")) d.exec("ALTER TABLE profile ADD COLUMN cashback_count INTEGER NOT NULL DEFAULT 2");
   if (!columns("accounts").includes("safebox")) d.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");
@@ -233,6 +243,71 @@ export function seedEmpty(d, userName) {
     d.prepare("INSERT INTO accounts (id, kind, number, balance, safebox, sort) VALUES ('main', 'main', ?, 0, 0, 1)").run("3333-00-0000000");
   }, d);
 }
+
+// ---------- NH 콕뱅크 초기 데이터 (전부 가상) ----------
+const NH_NUMBER = "352-0000-0000-01"; // 내 자립예탁금 (농축협)
+const NH_PAYEES = [
+  ["kakao", "7777000000001", "김카카(미니)", 0],
+  ["nh", "50500052000011", "이농협", 0],
+  ["nh", "3550000000022", "주식회사 예시상품권", 0],
+  ["shinhan", "140000000001", "정신한", 0],
+  ["nh", "6370000000033", "장농협", 0],
+  ["woori", "1002000000044", "김우리", 0],
+  ["toss", "190000000055", "박토스", 0],
+  ["hana", "58700000000011", "최하나", 1],
+];
+// [시각, 은행, 번호, 이름, 금액] — 최근송금 목록용 예전 송금
+const NH_TRANSFERS = [
+  ["2025-05-14 08:11:48", "toss", "190000000055", "박토스", 1000],
+  ["2025-05-18 13:23:18", "woori", "1002000000044", "김우리", 1000],
+  ["2025-05-18 16:20:54", "nh", "6370000000033", "장농협", 1000],
+  ["2025-05-21 17:43:31", "shinhan", "140000000001", "정신한", 1000],
+  ["2025-05-22 18:28:22", "nh", "3550000000022", "주식회사 예시상품권", 1000],
+  ["2025-05-23 06:57:13", "nh", "50500052000011", "이농협", 1000],
+  ["2025-05-25 20:45:47", "kakao", "7777000000001", "김카카(미니)", 1000],
+];
+const NH_TX = [
+  ["2025-05-01T09:00:00", "홍길동", 30000, "#이체"],
+  ["2026-10-20T10:00:00", "홍길동", 50000, "#이체"],
+  ["2026-10-22T19:12:40", "예시마트", -12000, "#체크카드"],
+  ["2026-10-25T21:03:11", "김우리", -15000, "#이체"],
+];
+
+const nhBase = (d, userName, balance) => {
+  wipe(d);
+  d.prepare("INSERT INTO profile (id, user_name, card_last4) VALUES (1, ?, ?)").run(userName, "0000");
+  d.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, name, sort) VALUES ('main', 'main', 'nh', ?, ?, '자립예탁금', 1)").run(
+    NH_NUMBER,
+    balance,
+  );
+};
+
+export function seedNhExample(d, userName = "홍길동") {
+  transaction(() => {
+    nhBase(d, userName, 46000);
+    const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
+    for (const row of NH_TX) tx.run(...row);
+    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
+    for (const row of NH_PAYEES) payee.run(...row);
+    const tr = d.prepare(
+      "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",
+    );
+    for (const [at, bank, number, holder, amount] of NH_TRANSFERS) {
+      const iso = at.replace(" ", "T");
+      tr.run(bank, number, holder, amount, iso, tx.run(iso, holder, -amount, "#이체").lastInsertRowid);
+    }
+  }, d);
+}
+
+export function seedNhEmpty(d, userName) {
+  transaction(() => nhBase(d, userName, 0), d);
+}
+
+// 앱별 "예시 데이터로 / 빈 상태로"
+export const SEEDS = {
+  kakao: { example: (d) => seedExample(d), empty: seedEmpty },
+  nh: { example: (d, name) => seedNhExample(d, name), empty: seedNhEmpty },
+};
 
 // ---------- 처음 켤 때 ----------
 // 프로필이 하나도 없으면: 예전 버전의 server/data/bank.db 가 있으면 그걸 첫 프로필로 옮기고,

@@ -18,3 +18,23 @@ export function setCurrentProfile(id: string | null) {
     // 저장 못 하면 이번 페이지에서만 유효
   }
 }
+
+// 어느 앱으로 들어왔는지 (프로필 고르기 화면에서 선택). 데이터는 앱마다 따로 → 요청에 X-App 헤더로 알림
+export type AppName = "kakao" | "nh";
+const APP_KEY = "app";
+
+export function currentApp(): AppName {
+  try {
+    return sessionStorage.getItem(APP_KEY) === "nh" ? "nh" : "kakao";
+  } catch {
+    return "kakao";
+  }
+}
+
+export function setCurrentApp(app: AppName) {
+  try {
+    sessionStorage.setItem(APP_KEY, app);
+  } catch {
+    // 이번 페이지에서만
+  }
+}

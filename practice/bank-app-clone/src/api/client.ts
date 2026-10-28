@@ -1,4 +1,4 @@
-import { currentProfileId } from "../profile/session";
+import { currentApp, currentProfileId } from "../profile/session";
 import type { ApiErrorBody } from "./types";
 
 // 서버가 2xx가 아닌 응답을 주면 이 에러를 던진다. status/code/fields로 화면이 에러를 구분해서 보여줄 수 있다.
@@ -25,6 +25,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     headers: {
       ...(body !== undefined && { "Content-Type": "application/json" }),
       ...(profile && { "X-Profile": profile }),
+      ...(currentApp() === "nh" && { "X-App": "nh" }), // 콕뱅크면 그 프로필의 콕뱅크 DB
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
