@@ -124,20 +124,21 @@
 }
 
 /* ---------- 홈 배너 이미지 / 바로가기 아이콘 / 광고 상품 ---------- */
+/* 크기 = 스크린샷(720px = 2배)에서 자른 크기 ÷ 2. 배너 그림 셋은 같은 틀로 잘라서 위치가 실제와 같다 */
 .asset--banner-mcard,
-.asset--banner-volunteer,
-.asset--banner-pcbang {
-  width: 86px;
-  height: 75px;
+.asset--banner-pcbang,
+.asset--banner-friday {
+  width: 98px;
+  height: 77px;
 }
-.asset--shortcut-timetable,
 .asset--shortcut-subsidy,
-.asset--shortcut-id,
-.asset--shortcut-mini26 {
-  width: 26px;
-  height: 26px;
+.asset--shortcut-timetable,
+.asset--shortcut-allowance,
+.asset--shortcut-coupon {
+  width: 27px;
+  height: 27px;
 }
-.asset--ad-shoe {
-  width: 104px;
-  height: 56px;
+.asset--ad-product {
+  width: 97px;
+  height: 58px;
 }

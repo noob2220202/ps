@@ -86,11 +86,13 @@ npm run build
 npm run build
 ```
 
-홈 아이콘(농협·AI 목표적금·카드·티머니)은 라이트 모드 홈 **스크린샷**(720px)에서 더 선명하게 다시 자를 수 있습니다.
-카드·티머니는 바깥 배경만 투명하게 따서(누끼) 라이트/다크 둘 다 씁니다:
+홈 화면 이미지(농협·AI 목표적금·카드·티머니 아이콘, 배너 그림 3개, 바로가기 4개, 아래 광고)는
+**스크린샷**(720px, 녹화보다 1.5배 선명)에서 다시 자릅니다. 바깥 배경만 투명하게 따서(누끼) 라이트/다크 둘 다 씁니다:
 
 ```bash
-python3 scripts/extract-home-icons.py 홈_스크린샷.jpg   # Pillow, numpy 필요
+python3 scripts/extract-screenshots.py --home 라이트_홈.jpg --dark 다크_홈.jpg --bottom 홈_아래.jpg \
+  --banner-mcard 배너1.jpg --banner-pcbang 배너2.jpg --banner-friday 배너3.jpg      # Pillow, numpy 필요
+python3 scripts/extract-bank-icons.py 은행선택.mp4 은행선택_중간.jpg 은행선택_아래.jpg 은행선택_맨위.jpg
 ```
 
 이미 만들어 둔 에셋 묶음(zip)이 있으면 `src/assets/local/`에 풀고 `npm run build` 하면 됩니다.

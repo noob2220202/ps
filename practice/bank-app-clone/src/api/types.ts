@@ -75,7 +75,7 @@ export interface Banner {
   id: string;
   title: string; // 줄바꿈은 \n
   cta: string;
-  image: "banner-and2ble" | "banner-mcard" | "banner-volunteer" | "banner-pcbang";
+  image: "banner-and2ble" | "banner-mcard" | "banner-pcbang" | "banner-friday";
   ad?: boolean; // 유료 광고면 AD 뱃지
 }
 
@@ -86,7 +86,7 @@ export interface HomeData {
   cashbackCount: number;
   banners: Banner[];
   aiPromo: { title: string; desc: string };
-  shortcuts: { id: string; label: string; icon: "shortcut-timetable" | "shortcut-subsidy" | "shortcut-id" | "shortcut-mini26" }[];
+  shortcuts: { id: string; label: string; icon: "shortcut-subsidy" | "shortcut-timetable" | "shortcut-allowance" | "shortcut-coupon" }[];
   nativeAd: { source: string; title: string; sponsor: string };
 }
 

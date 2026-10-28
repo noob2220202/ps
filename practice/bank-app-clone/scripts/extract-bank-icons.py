@@ -2,7 +2,9 @@
 """카카오뱅크 '은행선택' 화면에서 은행/증권사 동그라미 아이콘을 잘라 src/assets/local/bank-<코드>.png 로 저장.
 결과물은 .gitignore 처리돼 커밋되지 않는다 (은행 로고는 상표).
 
-  python3 scripts/extract-bank-icons.py 은행선택_녹화.mp4 은행선택_스크린샷1.jpg 은행선택_스크린샷2.jpg
+  python3 scripts/extract-bank-icons.py 은행선택_녹화.mp4 은행선택_스크린샷1.jpg 은행선택_스크린샷2.jpg [은행선택_맨위_스크린샷.jpg]
+
+- 맨위 스크린샷(선택): 카카오뱅크~우체국이 보이는 스크린샷. 있으면 녹화 대신 이걸로 (1.5배 선명)
 
 - 녹화: 은행선택 시트가 맨 위(카카오뱅크~우체국)까지 보이는 녹화. 21~22초 구간을 평균 내서 압축 노이즈를 줄인다
 - 스크린샷1: 신협중앙회 ~ 현대차증권이 보이는 화면, 스크린샷2: 삼성증권 ~ 토스증권이 보이는 화면
@@ -81,7 +83,7 @@ def main_color(img):
     return "#%02X%02X%02X" % tuple(int(v) for v in ring)
 
 
-def sources(video, shot1, shot2, tmp):
+def sources(video, shot1, shot2, tmp, shot_top=None):
     frame = Path(tmp) / "picker.png"
     subprocess.run(
         ["ffmpeg", "-v", "error", "-y", "-ss", "21.0", "-t", "0.9", "-i", video,
@@ -92,14 +94,17 @@ def sources(video, shot1, shot2, tmp):
     # 녹화는 시트 제목+검색창 아래(30%)부터, 압축 노이즈가 있어서 기준을 높게 + 번진 흰 테두리 1px 깎기.
     # 스크린샷은 아주 옅은 배경(토스뱅크 등)도 잡히게 낮은 기준.
     # 해상도가 낮은 것부터 → 같은 코드는 뒤(스크린샷)가 덮어쓴다
-    return [(frame, VIDEO_ROWS, 0.29, 30, 1.2), (shot2, SHOT2_ROWS, 0.2, 12, 0), (shot1, SHOT1_ROWS, 0.2, 12, 0)]
+    out = [(frame, VIDEO_ROWS, 0.29, 30, 1.2), (shot2, SHOT2_ROWS, 0.2, 12, 0), (shot1, SHOT1_ROWS, 0.2, 12, 0)]
+    if shot_top:  # 녹화와 같은 은행들 → 뒤에 두면 같은 크기일 때 이걸로 덮어씀
+        out.append((shot_top, VIDEO_ROWS, 0.29, 12, 0))
+    return out
 
 
-def run(video, shot1, shot2):
+def run(video, shot1, shot2, shot_top=None):
     OUT.mkdir(parents=True, exist_ok=True)
     best = {}
     with tempfile.TemporaryDirectory() as tmp:
-        for path, cols, top, threshold, inset in sources(video, shot1, shot2, tmp):
+        for path, cols, top, threshold, inset in sources(video, shot1, shot2, tmp, shot_top):
             a = np.asarray(Image.open(path).convert("RGB")).astype(int)
             h, w = a.shape[:2]
             # 열 위치는 화면 폭 비율로
@@ -114,9 +119,9 @@ def run(video, shot1, shot2):
     colors = {}
     for code, (img, size) in sorted(best.items()):
         file = OUT / f"bank-{code}.png"
-        # 홈 화면 녹화에서 더 크게 잘라 둔 아이콘(농협 등)이 있으면 그걸 살린다
-        if file.exists() and Image.open(file).width > SIZE:
-            print(f"bank-{code}.png  (더 큰 이미지가 이미 있어서 건너뜀)")
+        # 이 스크립트가 만든 게 아닌 파일(크기가 SIZE가 아님 = 홈 화면에서 더 크게 잘라 둔 농협 등)은 살린다
+        if file.exists() and Image.open(file).width != SIZE:
+            print(f"bank-{code}.png  (홈 화면에서 자른 이미지가 있어서 건너뜀)")
             colors[code] = main_color(img)
             continue
         img.save(file)
@@ -127,6 +132,6 @@ def run(video, shot1, shot2):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
+    if len(sys.argv) not in (4, 5):
         sys.exit(__doc__)
     run(*sys.argv[1:])

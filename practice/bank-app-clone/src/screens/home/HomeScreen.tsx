@@ -10,7 +10,7 @@ import { useScrollFrame } from "../../hooks/useScrollTop";
 import { OS } from "../../platform/platform";
 import { won } from "../../lib/format";
 import { THEME } from "../../platform/theme";
-import { Asset } from "../../assets/Asset";
+import { Asset, localAsset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { Spinner } from "../../components/Spinner";
 import { BMark } from "../../components/art";
@@ -26,6 +26,8 @@ import "./Home.css";
 let booted = false;
 
 // 행 안의 "이체" 버튼: 행 클릭(상세로 이동)으로 번지지 않게 막고 이체 화면으로
+const adLogo = localAsset("ad-logo"); // 광고 출처 앞의 작은 로고 (있을 때만)
+
 const stopThen = (fn: () => void) => (e: MouseEvent) => {
   e.stopPropagation();
   fn();
@@ -240,13 +242,16 @@ export function HomeScreen() {
 
         <section className="native-ad">
           <div className="native-ad__text">
-            <span className="native-ad__source">{data.nativeAd.source} ›</span>
+            <span className="native-ad__source">
+              {adLogo && <img className="native-ad__logo" src={adLogo} alt="" />}
+              {data.nativeAd.source} ›
+            </span>
             <strong className="native-ad__title">{data.nativeAd.title}</strong>
             <span className="native-ad__sponsor">
               <span className="native-ad__badge">AD</span> {data.nativeAd.sponsor}
             </span>
           </div>
-          <Asset slot="ad-shoe" className="native-ad__image" />
+          <Asset slot="ad-product" className="native-ad__image" />
           <span className="native-ad__info" aria-label="광고 정보">?</span>
         </section>
       </div>

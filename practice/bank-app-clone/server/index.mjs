@@ -185,20 +185,20 @@ app.get("/api/home", (_req, res) => {
     accounts: accounts.map((a) => toAccount(a, profile)),
     monthlyCardSpend: spend,
     cashbackCount: profile.cashbackCount,
+    // 실제 앱 2026-10-28 12:09 스크린샷 순서 (점 3개)
     banners: [
       { id: "b1", title: "mini카드로 삼성월렛 이용하고\n2천 포인트 받아가기", cta: "삼성월렛으로 이동", image: "banner-mcard" },
-      { id: "b2", title: "우리 동네 가까운 봉사활동 찾기\n카카오뱅크에서 시작하세요", cta: "더 알아보기", image: "banner-volunteer" },
-      { id: "b3", title: "피카PC방 전용 결제 이벤트\nmini카드로 마일리지 받기", cta: "자세히 보기", image: "banner-pcbang" },
-      { id: "b4", title: "AND2BLE\n미니 2집 발매", cta: "MV 보러가기", image: "banner-and2ble", ad: true },
+      { id: "b2", title: "피카PC방 전용 결제 이벤트\nmini카드로 마일리지 받기", cta: "자세히 보기", image: "banner-pcbang" },
+      { id: "b3", title: "금요일이 다가온다!\n간식부터 용돈까지 혜택 받기", cta: "자세히 보기", image: "banner-friday" },
     ],
     aiPromo: { title: "AI 목표적금 출시", desc: "최고 연 5% 받고 목표 지원금까지" },
     shortcuts: [
-      { id: "s1", label: "우리학교 시간표", icon: "shortcut-timetable" },
-      { id: "s2", label: "정부지원금 찾기", icon: "shortcut-subsidy" },
-      { id: "s3", label: "모바일 신분증 이용하기", icon: "shortcut-id" },
-      { id: "s4", label: "mini 26일저금", icon: "shortcut-mini26" },
+      { id: "s1", label: "정부지원금 찾기", icon: "shortcut-subsidy" },
+      { id: "s2", label: "우리학교 시간표", icon: "shortcut-timetable" },
+      { id: "s3", label: "매일 용돈 받기", icon: "shortcut-allowance" },
+      { id: "s4", label: "50만원 넣고 금리쿠폰 받기", icon: "shortcut-coupon" },
     ],
-    nativeAd: { source: "쇼핑 앱에서 구매하기", title: "특가 탁구화", sponsor: "광고입니다" },
+    nativeAd: { source: "쿠팡 앱에서 구매하기", title: "로켓배송 오늘주문내일도착", sponsor: "Appier 광고입니다" },
   });
 });
 
