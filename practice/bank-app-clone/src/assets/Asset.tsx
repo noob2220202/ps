@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { THEME } from "../platform/theme";
 import { AiDiamond, AlbumLogo, BMark } from "../components/art";
 import wave from "./fluent/wave.png";
-import bank from "./fluent/bank.png";
 import target from "./fluent/target.png";
 import coin from "./fluent/coin.png";
 import card from "./fluent/card.png";
@@ -31,7 +30,6 @@ export type Slot =
   | "mini-b"
   | "hand"
   | "hand-tile"
-  | "bank-nh"
   | "ai-saving"
   | "star"
   | "card"
@@ -57,7 +55,9 @@ export type Slot =
 const files = import.meta.glob<string>("./local/*.{png,jpg,jpeg,webp}", { eager: true, import: "default" });
 const local = new Map(Object.entries(files).map(([path, url]) => [path.replace(/^.*\/|\.\w+$/g, ""), url]));
 
-const localUrl = (slot: Slot) => local.get(`${slot}.${THEME}`) ?? local.get(slot);
+// 슬롯 목록에 없는 이름(예: 은행 로고 "bank-shinhan")도 찾을 수 있게 문자열로 받는다
+export const localAsset = (name: string) => local.get(`${name}.${THEME}`) ?? local.get(name);
+const localUrl = (slot: Slot) => localAsset(slot);
 
 const emoji = (src: string, scale = 0.62) => (
   <img className="asset__emoji" src={src} alt="" style={{ width: `${scale * 100}%` }} draggable={false} />
@@ -67,7 +67,6 @@ const FALLBACK: Record<Slot, () => ReactNode> = {
   "mini-b": () => <BMark size={12} color="#fff" hole="var(--beige-icon)" />,
   hand: () => emoji(wave),
   "hand-tile": () => emoji(wave),
-  "bank-nh": () => emoji(bank),
   "ai-saving": () => emoji(target),
   star: () => emoji(star, 1),
   card: () => <img className="asset__card-fallback" src={card} alt="" draggable={false} />,

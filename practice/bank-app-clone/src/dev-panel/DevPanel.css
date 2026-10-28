@@ -186,27 +186,194 @@
   color: #e5484d;
 }
 
-/* 요청/응답 JSON 박스 */
-.result {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--home-btn);
-  font: 11px/1.5 ui-monospace, Menlo, Consolas, monospace;
-  white-space: pre-wrap;
-  word-break: break-all;
+.tab__h--first {
+  margin-top: 0;
 }
-.result--req {
+
+/* 금액 입력 + 빠른 더하기 버튼 */
+.money {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.money__box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--home-btn);
+}
+.money__box input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--home-text);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+}
+.money__box span {
+  font-size: 15px;
+  font-weight: 600;
+}
+.chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chips-row--wrap {
+  flex-wrap: wrap;
+}
+.chip-btn {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid var(--home-line);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.chip-btn.on {
+  border-color: transparent;
+  background: var(--home-text);
+  color: var(--home-card);
+}
+.chip-btn--ghost {
+  border-style: dashed;
   color: var(--home-sub);
 }
-.result--ok {
-  border-left: 3px solid #2fbf71;
+
+/* 계좌 목록 (눌러서 펼치기) */
+.acct-edit {
+  border-radius: 14px;
+  background: var(--home-btn);
 }
-.result--err {
-  border-left: 3px solid #e5484d;
+.acct-edit__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-align: left;
+}
+.acct-edit__kb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: #1c1c1c;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.acct-edit__name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.acct-edit__name small {
+  font-size: 11px;
+  color: var(--home-sub);
+}
+.acct-edit__bal {
+  font-weight: 700;
+}
+.acct-edit__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 12px 14px;
+}
+.acct-edit__body .money__box,
+.acct-edit__body input {
+  background: var(--home-card);
+}
+
+/* 은행 고르기 격자 */
+.add-bank {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bank-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.bank-grid__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 2px 8px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--home-sub);
+}
+.bank-grid__item.on {
+  border-color: var(--home-text);
+  background: var(--home-btn);
+  color: var(--home-text);
+}
+
+.btn--in {
+  flex: 1;
+  background: #2f8cff;
+  color: #fff;
+}
+.btn--out {
+  flex: 1;
+  background: #ff5a5f;
+  color: #fff;
+}
+.btn--in:active,
+.btn--out:active {
+  filter: brightness(0.9);
+  background-color: inherit;
+}
+
+/* 아래에서 잠깐 뜨는 알림 */
+.dev-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24px + var(--safe-bottom));
+  transform: translateX(-50%);
+  max-width: 85%;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: rgba(30, 30, 30, 0.92);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: toast-in 220ms ease-out;
+  pointer-events: none;
+}
+.dev-toast--error {
+  background: #e5484d;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
 }
 
 .tx-row {
+
   display: flex;
   align-items: center;
   gap: 8px;
@@ -225,51 +392,4 @@
 .tx-row button {
   color: var(--home-sub);
   padding: 4px;
-}
-
-.log__line {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 0;
-  font: 11px ui-monospace, Menlo, Consolas, monospace;
-  text-align: left;
-  border-bottom: 1px solid var(--home-line);
-}
-.log__time,
-.log__ms {
-  color: var(--home-sub);
-}
-.log__method {
-  font-weight: 700;
-  min-width: 44px;
-}
-.log__method--GET {
-  color: #2f8cff;
-}
-.log__method--POST {
-  color: #2fbf71;
-}
-.log__method--PATCH {
-  color: #e09b00;
-}
-.log__method--DELETE {
-  color: #e5484d;
-}
-.log__path {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.log__status {
-  font-weight: 700;
-  color: #2fbf71;
-}
-.log__status--err {
-  color: #e5484d;
-}
-.log .result {
-  margin: 6px 0 4px;
 }

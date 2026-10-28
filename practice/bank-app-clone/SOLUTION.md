@@ -6,16 +6,16 @@
 ## 폴더 구조
 
 ```
+server/        index.mjs(Express API + 빌드된 화면 서빙) · db.mjs(SQLite 스키마/초기값) · banks.mjs(은행 목록)
 src/
   config/      timing.ts(모든 애니메이션 타이밍)
   api/         types.ts(API 계약) · client.ts(fetch 래퍼) · useApi.ts(캐시) · endpoints.ts(주소 모음)
-  mock-server/ db.ts(가짜 DB, localStorage) · server.ts(fetch 가로채는 가짜 REST 서버)
-  dev-panel/   종 버튼 개발자 패널
+  dev-panel/   종 버튼 관리 패널 (모든 데이터 수정은 여기서만)
   assets/      Asset 슬롯 + Fluent 기본 에셋, local/(실제 에셋, 커밋 안 됨)
   hooks/       useAsync, useTypewriter, useScrollTop, useStatusBar
   lib/         format.ts (금액 포맷, 날짜 그룹핑)
   components/  PhoneFrame, TxList, Icon, art(로고/일러스트/스피너 SVG)
-  screens/     boot / home / account / history / tx / mini
+  screens/     boot / home / account / history / tx / mini / bank(다른 은행 계좌)
 ```
 
 **타이밍을 한 파일에 모은 이유**: 영상과 비교하며 속도를 맞출 때 컴포넌트를 돌아다니지 않고
@@ -75,9 +75,9 @@ src/
 ### 탭하면 스피너 → 이동
 `setPressing(id)` 후 `setTimeout(navigate, 300)`. 사용자에게 "눌렸다"는 피드백을 먼저 주고 이동.
 
-## 3. 로딩 UI — 가짜 서버 + 스켈레톤
+## 3. 로딩 UI — 서버 지연 + 스켈레톤
 
-`mockApi.ts`의 모든 함수는 `setTimeout`으로 지연된 Promise를 돌려줌. 화면은 "데이터는 늦게 온다"는
+백엔드는 GET 응답을 일부러 `API_DELAY_MS`(기본 250ms)만큼 늦게 보냄. 화면은 "데이터는 늦게 온다"는
 전제로 짜야 하고, 그래야 스켈레톤/스피너를 연습할 수 있음.
 
 `useAsync`의 `cancelled` 플래그: 응답이 오기 전에 화면을 떠나면(뒤로가기 연타) 언마운트된
@@ -118,7 +118,7 @@ JSX에 `{d.address && ...}`를 반복하지 않아도 됨.
 
 ## 7. 데이터 — 저장하지 말고 계산하기
 
-가짜 서버(`mock-server/server.ts`)는 "거래 후 잔액"을 저장하지 않고 현재 잔액에서 거꾸로 빼가며 계산.
+서버(`server/index.mjs`)는 "거래 후 잔액"을 저장하지 않고 현재 잔액에서 거꾸로 빼가며 계산.
 잔액을 데이터마다 손으로 적으면 하나만 틀려도 전체가 어긋남. 계산 가능한 값은 계산.
 
 ## 8. 상태바 색 바꾸기 — Context
@@ -273,48 +273,68 @@ ffmpeg만으로: 자르기(`crop`) → 확대(`lanczos`) → 원형 마스크(`g
 
 ---
 
-## 12. 가짜 REST 서버로 API 연습하기 (`src/mock-server/`, `src/api/`)
+## 12. 백엔드 — Express + SQLite (`server/`)
 
 ### 구조
 ```
-화면 ──useApi("/api/home")──▶ fetch ──(가로챔)──▶ mock-server/server.ts ──▶ db.ts (localStorage)
-개발자 패널 ──api.createTransaction()──▶ fetch POST /api/accounts/main/transactions ──▶ 201 Created
+화면 ──useApi("/api/home")──▶ fetch ──▶ Express (server/index.mjs) ──▶ SQLite (server/data/bank.db)
+🔔 패널 ──api.addBankAccount()──▶ POST /api/accounts ──▶ 201 Created
 ```
-화면은 **진짜 서버와 똑같이** `fetch` + JSON + HTTP 상태코드로만 통신합니다. `main.tsx`의
-`installMockServer()` 한 줄만 지우고 `client.ts`의 `BASE`를 진짜 서버 주소로 바꾸면 그대로 실서비스 구조.
+- 개발: `npm run dev` = API 서버(8787) + Vite(5173) 동시 실행. Vite가 `/api`를 8787로 넘겨줌(`vite.config.ts`의 proxy)
+- 배포: `npm run build` 후 `npm start` → **서버 하나(9101)** 가 `/api`와 `dist/` 화면을 같이 줌.
+  화면 주소(`/account/main` 등)로 바로 들어와도 `index.html`을 돌려줘서 새로고침이 안 깨짐(SPA fallback)
+- DB는 Node 22에 들어있는 `node:sqlite` 사용 → 설치할 네이티브 모듈 없음. 비어 있으면 홍길동 예시 데이터로 자동 채움
+
+### 테이블
+```
+profile      (id=1, user_name, mini_account_no, card_last4)
+accounts     (id, kind: mini|main|external, bank_code, number, balance, badge, sort)
+transactions (id, account_id → accounts ON DELETE CASCADE, at, merchant, amount, tag)
+```
+- **CASCADE**: 다른 은행 계좌를 지우면 그 계좌의 거래도 DB가 알아서 같이 지움
+- **트랜잭션**: 거래 추가 = "거래 INSERT + 잔액 UPDATE" 두 문장. `transaction(fn)`으로 묶어서 둘 중 하나만 되는 일이 없게
+- **은행별 규칙**은 `banks.mjs` 한 곳에: 이름, 대표색, 계좌번호 자릿수 패턴(신한 3-3-6, 국민 6-2-6 …).
+  서버는 숫자만 받아서 패턴대로 `-`를 넣어 저장 → 화면은 형식 걱정 없음
 
 ### API 목록
 | 메서드 | 주소 | 하는 일 | 대표 응답 |
 |---|---|---|---|
 | GET | `/api/home` | 홈 화면 데이터 한 번에 | 200 |
-| GET / PATCH | `/api/profile` | 이름·계좌번호·카드번호 | 200, 400(형식 오류) |
-| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액 수정 | 200, 404 |
+| GET | `/api/banks` | 추가할 수 있는 은행 목록 | 200 |
+| GET / PATCH | `/api/profile` | 이름·mini 계좌번호·카드 끝 4자리 | 200, 400(형식 오류) |
+| POST | `/api/accounts` | 다른 은행 계좌 추가 `{bankCode, number, balance}` | **201**, 400(자릿수), 409(중복) |
+| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액·계좌번호 수정 | 200, 404 |
+| DELETE | `/api/accounts/:id` | 다른 은행 계좌 삭제 (mini/입출금은 거부) | **204**, 400, 404 |
 | GET | `/api/accounts/:id/transactions` | 거래내역 (`?limit=`) | 200 |
-| POST | `/api/accounts/:id/transactions` | 거래 만들기 | **201**, 400, 400(잔액 부족) |
-| GET / DELETE | `/api/transactions/:id` | 거래 상세 / 삭제 | 200, **204**, 404 |
+| POST | `/api/accounts/:id/transactions` | 입금/출금 만들기 | **201**, 400, 400(잔액 부족) |
+| GET / DELETE | `/api/transactions/:id` | 거래 상세 / 삭제(잔액 되돌림) | 200, **204**, 404 |
 | POST | `/api/reset` | 초기 데이터로 | 204 |
-| GET / PATCH | `/api/dev/settings` | 지연(ms)·실패 확률 | 200 |
 
-에러는 항상 `{ code, message, fields? }` 모양 → 화면이 `fields.merchant` 같은 걸 입력칸 아래에 바로 보여줄 수 있음.
+에러는 항상 `{ code, message, fields? }` 모양 → 패널이 `message`를 그대로 토스트로 띄움.
 
 ### 연습 포인트
-- **상태코드 의미**: 만들기 성공은 200이 아니라 201, 지워서 돌려줄 게 없으면 204, 입력 잘못은 400, 없으면 404
-- **서버 검증**: 화면에서 막아도 서버가 다시 검사해야 함 (금액 0, 1천만원 초과, 잔액 부족, 빈 거래처…)
-- **파생 데이터**: "거래 후 잔액"은 저장하지 않고 서버가 계산 → 거래를 지우거나 잔액을 바꿔도 내역이 항상 맞음
-- **로딩/에러 UI**: 패널에서 지연 2초 / 실패 50%로 바꾸고 화면을 돌아다녀 보세요
-- **캐시 무효화**: POST/PATCH/DELETE 성공 → `invalidate()` → `useApi`를 쓰는 모든 화면이 자동으로 다시 요청.
+- **상태코드 의미**: 만들기 성공은 201, 지워서 돌려줄 게 없으면 204, 입력 잘못은 400, 없으면 404, 이미 있으면 409
+- **서버 검증**: 패널에서 막아도 서버가 다시 검사 (금액 0, 1천만원 초과, 잔액 부족, 계좌번호 자릿수, 중복 계좌…)
+  → `curl`로 직접 이상한 값을 보내보면 왜 필요한지 보임
+- **파생 데이터**: "거래 후 잔액"은 저장하지 않고 조회할 때 계산 → 거래를 지우거나 잔액을 바꿔도 내역이 항상 맞음
+- **캐시 무효화**: POST/PATCH/DELETE 성공 → `invalidate()` → `useApi`를 쓰는 모든 화면이 자동으로 다시 요청
   (React Query의 `invalidateQueries`, SWR의 `mutate`가 하는 일과 같음)
-- **stale-while-revalidate**: 한 번 받은 데이터는 캐시에서 즉시 보여주고 뒤에서 새로 받음 → 두 번째 방문부터 로딩 없음.
+- **stale-while-revalidate**: 한 번 받은 데이터는 캐시에서 즉시 보여주고 뒤에서 새로 받음.
   스플래시 동안 `prefetch("/api/home")` 해 두어서 홈은 처음부터 바로 뜸
 
-### 왜 MSW(Mock Service Worker)가 아니라 fetch를 직접 감쌌나
-MSW는 서비스워커를 쓰는데, 서비스워커는 **HTTPS나 localhost에서만** 동작합니다. VPS에 `http://IP:9101`로 띄우면
-막히므로, `window.fetch`를 감싸는 방식(같은 원리를 더 단순하게)으로 했습니다. HTTPS 환경이면 MSW로 바꿔보는 것도 좋은 연습.
+### 🔔 관리 패널 — "버튼과 숫자 입력만"
+화면(홈, 계좌, 거래 상세)은 **보기 전용**이고, 바꾸는 건 전부 종 버튼 패널에서 합니다.
+- **기본**: Galaxy/iPhone, 시스템/라이트/다크, 이름·mini 계좌번호·카드 끝 4자리, 처음 상태로 되돌리기
+- **계좌**: 계좌를 눌러 펼치면 잔액 수정, 다른 은행이면 계좌번호 수정·삭제. 아래 은행 격자에서 골라 새 계좌 추가
+- **거래**: 계좌 칩 → 금액(+1천/+5천/+1만/+5만) → 거래처 칩 → 종류 → 입금하기/출금하기. 최근 거래 ✕로 삭제
 
-### 개발자 패널에서 effect로 폼 채우지 않기
+입력칸이 숫자만 받고 자동으로 `-`·`,`를 넣는 이유: "형식 맞추기"를 사용자에게 시키지 않기.
+같은 패턴 배열(`[3,3,6]`)로 서버는 저장 형식을, 화면은 입력 중 표시를 만든다.
+
+### 수정 폼에서 effect로 값 채우지 않기
 "데이터가 오면 `useEffect`에서 `setForm(data)`"은 흔하지만, 렌더가 한 번 더 일어나고 재요청 때 입력 중인 값을
-덮어쓸 수 있습니다. 대신 데이터가 올 때까지 기다렸다가 `<ProfileForm initial={data} />`를 그리고
-`useState(() => initial로 계산)`으로 초기값을 정합니다.
+덮어쓸 수 있습니다. 대신 `draft` state를 `null`로 두고 `draft ?? account.balance`를 보여줌 →
+안 건드렸으면 서버 값, 건드리면 입력값. 저장하면 `setDraft(null)`.
 
 ## 13. 새 영상 디테일 구현 방법
 

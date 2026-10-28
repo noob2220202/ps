@@ -1,0 +1,65 @@
+.bank {
+  background: #fff;
+}
+.bank__top {
+  padding-bottom: 28px;
+  transition: background-color 300ms;
+}
+.bank__header {
+  height: 52px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+}
+.bank__header h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.bank__header-spacer {
+  width: 40px;
+}
+.bank__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 18px;
+}
+.bank__label {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #555;
+}
+.bank__number {
+  margin-top: 4px;
+  font-size: 13.5px;
+  color: #2a2a2a;
+  border-bottom: 1px solid #9a9a9a;
+  padding-bottom: 1px;
+  letter-spacing: 0.2px;
+}
+.bank__balance {
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: 800;
+}
+.bank__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+}
+.bank__btn {
+  width: 135px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 13px;
+  font-weight: 600;
+}
+.bank__empty {
+  margin-top: 140px;
+  text-align: center;
+  font-size: 13.5px;
+  color: #9a9a9a;
+}

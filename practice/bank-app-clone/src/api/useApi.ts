@@ -17,7 +17,10 @@ export type ApiState<T> =
   | { status: "error"; data?: undefined; error: ApiError; retry: () => void };
 
 export function prefetch(path: string) {
-  return http.get(path).then((data) => cache.set(path, data));
+  return http
+    .get(path)
+    .then((data) => cache.set(path, data))
+    .catch(() => {}); // 실패하면 화면이 열릴 때 다시 요청함
 }
 
 export function useApi<T>(path: string): ApiState<T> {

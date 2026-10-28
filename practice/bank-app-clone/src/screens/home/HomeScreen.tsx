@@ -13,6 +13,7 @@ import { THEME } from "../../platform/theme";
 import { Asset } from "../../assets/Asset";
 import { Icon } from "../../components/icons/Icon";
 import { Spinner } from "../../components/Spinner";
+import { BankIcon } from "../../components/BankIcon";
 import { AiPill } from "./AiPill";
 import { BannerCarousel } from "./BannerCarousel";
 import { DevPanel } from "../../dev-panel/DevPanel";
@@ -41,7 +42,7 @@ export function HomeScreen() {
 
   const [firstLoad] = useState(() => !booted);
   const [wave, setWave] = useState(firstLoad ? 1 : 2);
-  const [nhResolved, setNhResolved] = useState(!firstLoad);
+  const [banksResolved, setBanksResolved] = useState(!firstLoad);
   const [promoOpen, setPromoOpen] = useState(true);
   const [pressing, setPressing] = useState<string | null>(null);
 
@@ -64,7 +65,7 @@ export function HomeScreen() {
       setWave(2);
       booted = true;
     }, TIMING.homeSecondWave);
-    const b = setTimeout(() => setNhResolved(true), TIMING.balanceResolve);
+    const b = setTimeout(() => setBanksResolved(true), TIMING.balanceResolve);
     return () => {
       clearTimeout(a);
       clearTimeout(b);
@@ -85,7 +86,10 @@ export function HomeScreen() {
     );
   if (home.status === "loading") return <div className="home" />;
   const data = home.data;
-  const [mini, main, nh] = data.accounts;
+  // 계좌 종류별로 나눠서 그린다 (다른 은행 계좌는 몇 개든 가능)
+  const mini = data.accounts.find((a) => a.kind === "mini")!;
+  const main = data.accounts.find((a) => a.kind === "main")!;
+  const externals = data.accounts.filter((a) => a.kind === "external");
   const full = wave === 2;
 
   return (
@@ -135,14 +139,19 @@ export function HomeScreen() {
             )}
           </div>
 
-          <div className="acct">
-            {nhResolved ? <Asset slot="bank-nh" /> : <span className="acct__placeholder-icon" />}
-            <div className="acct__text">
-              <strong className="acct__balance">{nhResolved ? won(nh.balance) : "?원"}</strong>
-              <span className="acct__sub">{nh.label}</span>
+          {/* 다른 은행 계좌들 (🔔 패널에서 추가/삭제). 첫 진입 땐 영상처럼 잠깐 "?원" 후 잔액 표시 */}
+          {externals.map((acc) => (
+            <div key={acc.id} className="acct row-press-home" onClick={() => navigate(`/bank/${acc.id}`)}>
+              {banksResolved && acc.bank ? <BankIcon bank={acc.bank} /> : <span className="acct__placeholder-icon" />}
+              <div className="acct__text">
+                <strong className="acct__balance">{banksResolved ? won(acc.balance) : "?원"}</strong>
+                <span className="acct__sub">{acc.label}</span>
+              </div>
+              <button className="pill-btn pressable" onClick={stop}>
+                이체
+              </button>
             </div>
-            <button className="pill-btn pressable">이체</button>
-          </div>
+          ))}
 
           <Collapse open={full && promoOpen}>
             <div className="acct">

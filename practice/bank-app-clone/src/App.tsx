@@ -10,6 +10,7 @@ import { AccountDetailScreen } from "./screens/account/AccountDetailScreen";
 import { HistoryScreen } from "./screens/history/HistoryScreen";
 import { TxDetailScreen } from "./screens/tx/TxDetailScreen";
 import { MiniScreen } from "./screens/mini/MiniScreen";
+import { BankAccountScreen } from "./screens/bank/BankAccountScreen";
 
 type Boot = "splash" | "loading" | "ready";
 
@@ -21,6 +22,7 @@ const renderRoute = (location: Location) => (
     <Route path="/account/:accountId/history" element={<HistoryScreen />} />
     <Route path="/account/:accountId/tx/:txId" element={<TxDetailScreen />} />
     <Route path="/mini" element={<MiniScreen />} />
+    <Route path="/bank/:accountId" element={<BankAccountScreen />} />
   </Routes>
 );
 

@@ -3,12 +3,22 @@
 export type TxTag = "#체크카드" | "#자동이체" | "#예금이자" | "#이체";
 export const TX_TAGS: TxTag[] = ["#체크카드", "#자동이체", "#예금이자", "#이체"];
 
-export type AccountId = "mini" | "main" | "nh";
+// "mini", "main"은 고정, 다른 은행 계좌는 서버가 만든 id ("nh", "bank-1a2b3c4d" ...)
+export type AccountId = string;
 
 export interface Profile {
   userName: string;
   miniAccountNo: string; // 0000-00-0000000
   cardLast4: string;
+}
+
+export interface Bank {
+  code: string;
+  name: string; // "신한은행"
+  short: string; // 아이콘에 쓰는 짧은 이름 "신한"
+  color: string; // 대표색
+  text: string; // 아이콘 글자색
+  pattern?: number[]; // 계좌번호 자리수 묶음 (예: [3, 3, 6] → 000-000-000000)
 }
 
 export interface Account {
@@ -18,6 +28,13 @@ export interface Account {
   balance: number;
   badge?: string;
   number?: string;
+  bank?: Bank; // 다른 은행 계좌일 때만
+}
+
+export interface NewBankAccount {
+  bankCode: string;
+  number: string;
+  balance: number;
 }
 
 export interface Transaction {
@@ -74,8 +91,3 @@ export interface ApiErrorBody {
   fields?: Record<string, string>; // 입력값별 에러 메시지
 }
 
-// ----- 개발자 설정 -----
-export interface DevSettings {
-  latency: number; // ms
-  failRate: number; // 0~1
-}

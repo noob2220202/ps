@@ -1,36 +1,55 @@
-import { useEffect, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ApiError } from "../api/client";
-import { api, paths } from "../api/endpoints";
+import { api, formatAccountNumber, paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
-import { TX_TAGS, type AccountId, type DevSettings, type HomeData, type NewTransaction, type Transaction, type TxTag } from "../api/types";
+import type { Account, Bank, HomeData, Transaction, TxTag } from "../api/types";
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
-import { getLog, getLogVersion, subscribeLog } from "../mock-server/server";
+import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import "./DevPanel.css";
 
-// 종 버튼으로 여는 "개발자 패널".
-// 이 패널도 화면들과 똑같이 /api 로만 데이터를 바꾼다 → 요청/응답을 눈으로 보며 REST API를 연습하는 용도.
-// (API 로그 탭만 예외로 가짜 서버의 기록을 직접 읽음 — 브라우저 개발자도구의 Network 탭 역할)
+// 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
+// 계좌 추가·삭제, 잔액, 거래내역, 내 정보 같은 데이터 관리는 전부 여기서 버튼/숫자 입력으로 한다.
 
-type Tab = "settings" | "profile" | "tx" | "log";
+type Tab = "basic" | "accounts" | "tx";
 const TABS: [Tab, string][] = [
-  ["settings", "설정"],
-  ["profile", "내 정보"],
-  ["tx", "거래 만들기"],
-  ["log", "API 로그"],
+  ["basic", "기본"],
+  ["accounts", "계좌"],
+  ["tx", "거래"],
 ];
 
 export function DevPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [tab, setTab] = useState<Tab>("settings");
+  const [tab, setTab] = useState<Tab>("basic");
+  const [toast, setToast] = useState<{ text: string; error?: boolean } | null>(null);
+  const timer = useRef(0);
+
+  const notify = (text: string, error = false) => {
+    setToast({ text, error });
+    clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setToast(null), 2200);
+  };
+  // 서버 요청 → 성공 메시지 or 서버가 준 에러 메시지
+  const run = async (fn: () => Promise<unknown>, success: string) => {
+    try {
+      await fn();
+      notify(success);
+      return true;
+    } catch (e) {
+      const err = e instanceof ApiError ? e : null;
+      notify(err ? (err.fields ? Object.values(err.fields)[0] : err.message) : "연결에 실패했어요", true);
+      return false;
+    }
+  };
+
   return (
     <div className={`dev-panel ${open ? "dev-panel--open" : ""}`} aria-hidden={!open}>
       <div className="dev-panel__backdrop" onClick={onClose} />
-      <section className="dev-panel__sheet" role="dialog" aria-label="개발자 패널">
+      <section className="dev-panel__sheet" role="dialog" aria-label="관리 패널">
         <div className="dev-panel__grabber" />
         <header className="dev-panel__head">
-          <strong>개발자 패널</strong>
+          <strong>관리</strong>
           <button onClick={onClose} aria-label="닫기">
             <Icon name="close" size={20} stroke={2} />
           </button>
@@ -42,24 +61,25 @@ export function DevPanel({ open, onClose }: { open: boolean; onClose: () => void
             </button>
           ))}
         </nav>
-        {/* 닫혀 있을 땐 내용을 안 그림 → 숨은 패널이 API를 계속 호출하지 않게 */}
         <div className="dev-panel__body">
-          {open && tab === "settings" && <SettingsTab />}
-          {open && tab === "profile" && <ProfileTab />}
-          {open && tab === "tx" && <TxTab />}
-          {open && tab === "log" && <LogTab />}
+          {open && tab === "basic" && <BasicTab run={run} />}
+          {open && tab === "accounts" && <AccountsTab run={run} />}
+          {open && tab === "tx" && <TxTab run={run} />}
         </div>
+        {toast && <div className={`dev-toast ${toast.error ? "dev-toast--error" : ""}`}>{toast.text}</div>}
       </section>
     </div>
   );
 }
 
+type Run = (fn: () => Promise<unknown>, success: string) => Promise<boolean>;
+
 // ---------- 공통 조각 ----------
-function Segmented<T extends string | number>({ value, options, onChange }: { value: T; options: [T, string][]; onChange: (v: T) => void }) {
+function Segmented<T extends string>({ value, options, onChange }: { value: T; options: [T, string][]; onChange: (v: T) => void }) {
   return (
     <div className="seg">
       {options.map(([v, label]) => (
-        <button key={String(v)} type="button" className={v === value ? "on" : ""} onClick={() => onChange(v)}>
+        <button key={v} type="button" className={v === value ? "on" : ""} onClick={() => onChange(v)}>
           {label}
         </button>
       ))}
@@ -67,59 +87,57 @@ function Segmented<T extends string | number>({ value, options, onChange }: { va
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="field">
       <span className="field__label">{label}</span>
       {children}
-      {error && <span className="field__error">{error}</span>}
     </label>
   );
 }
 
-const json = (v: unknown) => JSON.stringify(v, null, 2);
-
-// 요청 결과를 "HTTP 응답"처럼 보여주는 박스
-type Result = { ok: true; status: number; body: unknown } | { ok: false; error: ApiError };
-function ResultBox({ result }: { result: Result | null }) {
-  if (!result) return null;
-  return result.ok ? (
-    <pre className="result result--ok">
-      {result.status} OK{"\n"}
-      {json(result.body)}
-    </pre>
-  ) : (
-    <pre className="result result--err">
-      {result.error.status} {result.error.code}
-      {"\n"}
-      {json({ message: result.error.message, fields: result.error.fields })}
-    </pre>
+// 금액 입력: 화면엔 "12,000" 처럼 콤마, 값은 숫자. 아래 버튼으로 더하기.
+function MoneyInput({ value, onChange, quick = [1000, 10000, 100000] }: { value: number; onChange: (n: number) => void; quick?: number[] }) {
+  return (
+    <div className="money">
+      <div className="money__box">
+        <input
+          inputMode="numeric"
+          value={value ? value.toLocaleString("ko-KR") : ""}
+          placeholder="0"
+          onChange={(e) => onChange(Math.min(Number(e.target.value.replace(/\D/g, "")) || 0, 1_000_000_000))}
+        />
+        <span>원</span>
+      </div>
+      <div className="chips-row">
+        {quick.map((q) => (
+          <button key={q} type="button" className="chip-btn" onClick={() => onChange(value + q)}>
+            +{q >= 10000 ? `${q / 10000}만` : `${q / 1000}천`}
+          </button>
+        ))}
+        <button type="button" className="chip-btn chip-btn--ghost" onClick={() => onChange(0)}>
+          지우기
+        </button>
+      </div>
+    </div>
   );
 }
 
-async function run(fn: () => Promise<unknown>, status = 200): Promise<Result> {
-  try {
-    return { ok: true, status, body: await fn() };
-  } catch (e) {
-    return { ok: false, error: e instanceof ApiError ? e : new ApiError(0, { message: String(e) }) };
-  }
+const accountName = (a: Account) => (a.kind === "main" ? "입출금통장" : a.kind === "mini" ? "mini" : a.bank?.name ?? a.label);
+
+// ---------- 기본: 기기 / 테마 / 내 정보 ----------
+function BasicTab({ run }: { run: Run }) {
+  const home = useApi<HomeData>(paths.home);
+  if (home.status !== "done") return <div className="tab">불러오는 중…</div>;
+  return <BasicForm run={run} initial={home.data} />;
 }
 
-// ---------- 설정 ----------
-function SettingsTab() {
-  const [settings, setSettings] = useState<DevSettings | null>(null);
-  const [latency, setLatency] = useState(0);
-  useEffect(() => {
-    api.getDevSettings().then((s) => {
-      setSettings(s);
-      setLatency(s.latency);
-    });
-  }, []);
-
-  // 기기/테마는 앱 전체 CSS·컴포넌트가 처음 켤 때 정해지므로, 저장 후 새로 연다
+function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
+  const [name, setName] = useState(initial.profile.userName);
+  const [miniNo, setMiniNo] = useState(initial.profile.miniAccountNo);
+  const [card, setCard] = useState(initial.profile.cardLast4);
+  // 기기/테마는 앱 전체가 처음 켤 때 정해지므로 저장 후 다시 연다
   const reopen = (query: string) => location.assign(`/?${query}&skip`);
-
-  const update = async (patch: Partial<DevSettings>) => setSettings(await api.updateDevSettings(patch));
 
   return (
     <div className="tab">
@@ -127,223 +145,234 @@ function SettingsTab() {
         <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
       </Field>
       <Field label="테마">
-        <Segmented
-          value={THEME_CHOICE}
-          options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]}
-          onChange={(v) => reopen(`theme=${v}`)}
-        />
+        <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
       </Field>
 
-      <h3 className="tab__h">가짜 서버</h3>
-      <Field label={`응답 지연: ${latency}ms`}>
-        <input
-          type="range"
-          min={0}
-          max={2000}
-          step={50}
-          value={latency}
-          onChange={(e) => setLatency(Number(e.target.value))}
-          onPointerUp={() => update({ latency })}
-          onKeyUp={() => update({ latency })}
-        />
+      <h3 className="tab__h">내 정보</h3>
+      <Field label="이름">
+        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={10} />
       </Field>
-      <Field label="실패 확률 (500 에러)">
-        <Segmented
-          value={settings?.failRate ?? 0}
-          options={[[0, "0%"], [0.1, "10%"], [0.3, "30%"], [0.5, "50%"]]}
-          onChange={(v) => update({ failRate: v })}
-        />
+      <Field label="mini 계좌번호">
+        <input value={miniNo} inputMode="numeric" onChange={(e) => setMiniNo(formatAccountNumber([4, 2, 7], e.target.value))} placeholder="0000-00-0000000" />
       </Field>
-      <p className="tab__hint">지연을 늘리면 스켈레톤·스피너를, 실패 확률을 올리면 "다시 시도" 화면을 직접 확인할 수 있어요.</p>
+      <Field label="카드 끝 4자리">
+        <input value={card} inputMode="numeric" maxLength={4} onChange={(e) => setCard(e.target.value.replace(/\D/g, ""))} />
+      </Field>
+      <button className="btn" onClick={() => run(() => api.updateProfile({ userName: name, miniAccountNo: miniNo, cardLast4: card }), "내 정보를 저장했어요")}>
+        저장
+      </button>
 
       <button
         className="btn btn--danger"
-        onClick={async () => {
-          if (confirm("이름·잔액·거래내역을 처음 상태로 되돌릴까요?")) await api.reset();
-        }}
+        onClick={() => confirm("이름·계좌·거래내역을 처음 상태로 되돌릴까요?") && run(api.reset, "처음 상태로 되돌렸어요")}
       >
-        데이터 초기화 (POST /api/reset)
+        처음 상태로 되돌리기
       </button>
     </div>
   );
 }
 
-// ---------- 내 정보 ----------
-function ProfileTab() {
+// ---------- 계좌: 잔액 수정 / 다른 은행 계좌 추가·삭제 ----------
+function AccountsTab({ run }: { run: Run }) {
   const home = useApi<HomeData>(paths.home);
-  if (home.status !== "done") return <div className="tab">불러오는 중…</div>;
-  // 데이터가 온 뒤에 폼을 그리고, 폼의 초기값은 props로 받는다.
-  // (effect 안에서 setForm으로 복사하면 렌더가 한 번 더 일어나고, 재요청 때 입력 중인 값을 덮어쓸 위험)
-  return <ProfileForm initial={home.data} />;
-}
-
-function ProfileForm({ initial }: { initial: HomeData }) {
-  const [form, setForm] = useState(() => {
-    const bal = (id: AccountId) => String(initial.accounts.find((a) => a.id === id)?.balance ?? 0);
-    return { ...initial.profile, main: bal("main"), nh: bal("nh") };
-  });
-  const [result, setResult] = useState<Result | null>(null);
-
-  const set = (k: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [k]: e.target.value });
-  const fields = result && !result.ok ? result.error.fields : undefined;
-
-  const saveProfile = async (e: FormEvent) => {
-    e.preventDefault();
-    const { userName, miniAccountNo, cardLast4 } = form;
-    setResult(await run(() => api.updateProfile({ userName, miniAccountNo, cardLast4 })));
-  };
-  const saveBalance = async (id: AccountId) => {
-    setResult(await run(() => api.updateBalance(id, Number(form[id as "main" | "nh"]))));
-  };
-
+  const banks = useApi<Bank[]>(paths.banks);
+  if (home.status !== "done" || banks.status !== "done") return <div className="tab">불러오는 중…</div>;
   return (
     <div className="tab">
-      <form onSubmit={saveProfile}>
-        <Field label="이름" error={fields?.userName}>
-          <input value={form.userName} onChange={set("userName")} maxLength={10} />
-        </Field>
-        <Field label="mini 계좌번호" error={fields?.miniAccountNo}>
-          <input value={form.miniAccountNo} onChange={set("miniAccountNo")} placeholder="0000-00-0000000" />
-        </Field>
-        <Field label="카드 끝 4자리" error={fields?.cardLast4}>
-          <input value={form.cardLast4} onChange={set("cardLast4")} inputMode="numeric" maxLength={4} />
-        </Field>
-        <button className="btn">저장 (PATCH /api/profile)</button>
-      </form>
-
-      <h3 className="tab__h">잔액</h3>
-      {(["main", "nh"] as const).map((id) => (
-        <div key={id} className="row">
-          <Field label={id === "main" ? "입출금통장" : "농협은행 계좌"} error={fields?.balance}>
-            <input value={form[id]} onChange={set(id)} inputMode="numeric" />
-          </Field>
-          <button type="button" className="btn btn--sm" onClick={() => saveBalance(id)}>
-            저장
-          </button>
-        </div>
+      <h3 className="tab__h tab__h--first">내 계좌</h3>
+      {home.data.accounts.map((a) => (
+        <AccountEditor key={a.id} account={a} bank={banks.data.find((b) => b.code === a.bank?.code)} run={run} />
       ))}
-      <p className="tab__hint">잔액을 바꾸면 거래내역의 "거래 후 잔액"도 새 잔액 기준으로 다시 계산돼요.</p>
-
-      <ResultBox result={result} />
+      <h3 className="tab__h">다른 은행 계좌 추가</h3>
+      <AddBankAccount banks={banks.data} run={run} />
     </div>
   );
 }
 
-// ---------- 거래 만들기 ----------
-const nowLocal = () => {
-  const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
-  return d.toISOString().slice(0, 16); // datetime-local 형식 "2026-10-28T09:30"
-};
+function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; run: Run }) {
+  // draft: 사용자가 고치기 시작한 값. 안 건드렸으면 null → 서버 잔액을 그대로 보여줌
+  // (effect로 서버 값을 state에 복사하지 않아도 거래가 추가되면 자동으로 최신 잔액이 보임)
+  const [draft, setDraft] = useState<number | null>(null);
+  const balance = draft ?? account.balance;
+  const [number, setNumber] = useState(account.number ?? "");
+  const [openEdit, setOpenEdit] = useState(false);
 
-function TxTab() {
-  const [accountId, setAccountId] = useState<AccountId>("main");
-  const [dir, setDir] = useState<"out" | "in">("out");
-  const [amount, setAmount] = useState("5000");
-  const [merchant, setMerchant] = useState("예시편의점");
+  const external = account.kind === "external";
+  return (
+    <div className="acct-edit">
+      <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
+        {account.bank ? <BankIcon bank={account.bank} size={30} /> : <span className="acct-edit__kb">B</span>}
+        <span className="acct-edit__name">
+          <strong>{accountName(account)}</strong>
+          <small>{account.number}</small>
+        </span>
+        <span className="acct-edit__bal">{won(account.balance)}</span>
+        <Icon name={openEdit ? "chevron-down" : "chevron-right"} size={16} stroke={2} />
+      </button>
+      {openEdit && (
+        <div className="acct-edit__body">
+          <Field label="잔액">
+            <MoneyInput value={balance} onChange={setDraft} quick={[10000, 100000, 1000000]} />
+          </Field>
+          <button
+            className="btn btn--sm"
+            onClick={async () => {
+              if (await run(() => api.updateAccount(account.id, { balance }), `${accountName(account)} 잔액을 바꿨어요`)) setDraft(null);
+            }}
+          >
+            잔액 저장
+          </button>
+          {external && (
+            <>
+              <Field label="계좌번호">
+                <input value={number} inputMode="numeric" onChange={(e) => setNumber(formatAccountNumber(bank?.pattern, e.target.value))} />
+              </Field>
+              <div className="row">
+                <button className="btn btn--sm" onClick={() => run(() => api.updateAccount(account.id, { number }), "계좌번호를 바꿨어요")}>
+                  계좌번호 저장
+                </button>
+                <button
+                  className="btn btn--sm btn--danger"
+                  onClick={() => confirm(`${account.label}를 삭제할까요?\n거래내역도 함께 지워져요.`) && run(() => api.deleteAccount(account.id), "계좌를 삭제했어요")}
+                >
+                  계좌 삭제
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
+  const [code, setCode] = useState(banks[0].code);
+  const [number, setNumber] = useState("");
+  const [balance, setBalance] = useState(0);
+  const bank = banks.find((b) => b.code === code)!;
+  const placeholder = bank.pattern?.map((n) => "0".repeat(n)).join("-");
+
+  return (
+    <div className="add-bank">
+      <div className="bank-grid">
+        {banks.map((b) => (
+          <button
+            key={b.code}
+            className={`bank-grid__item ${b.code === code ? "on" : ""}`}
+            onClick={() => {
+              setCode(b.code);
+              setNumber("");
+            }}
+          >
+            <BankIcon bank={b} size={32} />
+            <span>{b.name}</span>
+          </button>
+        ))}
+      </div>
+      <Field label={`${bank.name} 계좌번호`}>
+        <input value={number} inputMode="numeric" placeholder={placeholder} onChange={(e) => setNumber(formatAccountNumber(bank.pattern, e.target.value))} />
+      </Field>
+      <Field label="시작 잔액">
+        <MoneyInput value={balance} onChange={setBalance} quick={[10000, 100000, 1000000]} />
+      </Field>
+      <button
+        className="btn"
+        onClick={async () => {
+          if (await run(() => api.addBankAccount({ bankCode: code, number, balance }), `${bank.name} 계좌를 추가했어요`)) {
+            setNumber("");
+            setBalance(0);
+          }
+        }}
+      >
+        계좌 추가
+      </button>
+    </div>
+  );
+}
+
+// ---------- 거래: 계좌 고르고 → 금액·거래처 → 입금/출금 ----------
+const MERCHANTS = ["편의점", "카페", "배달앱", "마트", "교통", "월급", "용돈", "이체"];
+const TAGS: [TxTag, string][] = [
+  ["#체크카드", "체크카드"],
+  ["#자동이체", "자동이체"],
+  ["#이체", "이체"],
+  ["#예금이자", "이자"],
+];
+
+function TxTab({ run }: { run: Run }) {
+  const home = useApi<HomeData>(paths.home);
+  const [accountId, setAccountId] = useState("main");
+  const [amount, setAmount] = useState(5000);
+  const [merchant, setMerchant] = useState("편의점");
   const [tag, setTag] = useState<TxTag>("#체크카드");
-  const [at, setAt] = useState(nowLocal);
-  const [result, setResult] = useState<Result | null>(null);
   const list = useApi<Transaction[]>(paths.transactions(accountId));
 
-  const body: NewTransaction = {
-    merchant,
-    amount: (dir === "out" ? -1 : 1) * Math.abs(Math.round(Number(amount) || 0)),
-    tag,
-    at,
-  };
+  if (home.status !== "done") return <div className="tab">불러오는 중…</div>;
+  const accounts = home.data.accounts;
+  const current = accounts.find((a) => a.id === accountId) ?? accounts[0];
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    setResult(await run(() => api.createTransaction(accountId, body), 201));
-  };
-  const fields = result && !result.ok ? result.error.fields : undefined;
+  const send = (sign: 1 | -1) =>
+    run(
+      () => api.createTransaction(current.id, { merchant, amount: sign * amount, tag }),
+      `${merchant} ${won(amount)} ${sign > 0 ? "입금" : "출금"}했어요`,
+    );
 
   return (
     <div className="tab">
-      <form onSubmit={submit}>
-        <Field label="계좌">
-          <Segmented value={accountId} options={[["main", "입출금통장"], ["mini", "mini"]]} onChange={setAccountId} />
-        </Field>
-        <Field label="종류">
-          <Segmented value={dir} options={[["out", "출금 (-)"], ["in", "입금 (+)"]]} onChange={setDir} />
-        </Field>
-        <div className="row">
-          <Field label="금액" error={fields?.amount}>
-            <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="numeric" />
-          </Field>
-          <Field label="태그" error={fields?.tag}>
-            <select value={tag} onChange={(e) => setTag(e.target.value as TxTag)}>
-              {TX_TAGS.map((t) => (
-                <option key={t}>{t}</option>
-              ))}
-            </select>
-          </Field>
+      <Field label="계좌">
+        <div className="chips-row chips-row--wrap">
+          {accounts.map((a) => (
+            <button key={a.id} className={`chip-btn ${a.id === current.id ? "on" : ""}`} onClick={() => setAccountId(a.id)}>
+              {accountName(a)}
+            </button>
+          ))}
         </div>
-        <Field label="거래처" error={fields?.merchant}>
-          <input value={merchant} onChange={(e) => setMerchant(e.target.value)} maxLength={20} />
-        </Field>
-        <Field label="거래 시각" error={fields?.at}>
-          <input type="datetime-local" value={at} onChange={(e) => setAt(e.target.value)} />
-        </Field>
+      </Field>
+      <p className="tab__hint">
+        현재 잔액 <strong>{won(current.balance)}</strong>
+      </p>
 
-        <pre className="result result--req">
-          POST {paths.transactions(accountId)}
-          {"\n"}
-          {json(body)}
-        </pre>
-        <button className="btn">요청 보내기</button>
-      </form>
+      <Field label="금액">
+        <MoneyInput value={amount} onChange={setAmount} quick={[1000, 5000, 10000, 50000]} />
+      </Field>
+      <Field label="거래처">
+        <div className="chips-row chips-row--wrap">
+          {MERCHANTS.map((m) => (
+            <button key={m} type="button" className={`chip-btn ${m === merchant ? "on" : ""}`} onClick={() => setMerchant(m)}>
+              {m}
+            </button>
+          ))}
+        </div>
+        <input value={merchant} onChange={(e) => setMerchant(e.target.value)} maxLength={20} placeholder="직접 입력" />
+      </Field>
+      <Field label="거래 종류">
+        <Segmented value={tag} options={TAGS} onChange={setTag} />
+      </Field>
 
-      <ResultBox result={result} />
+      <div className="row">
+        <button className="btn btn--in" onClick={() => send(1)}>
+          입금하기 +
+        </button>
+        <button className="btn btn--out" onClick={() => send(-1)}>
+          출금하기 −
+        </button>
+      </div>
 
-      <h3 className="tab__h">최근 거래 (DELETE로 삭제)</h3>
+      <h3 className="tab__h">최근 거래</h3>
+      {list.status === "done" && list.data.length === 0 && <p className="tab__hint">거래가 없어요.</p>}
       {list.status === "done" &&
-        list.data.slice(0, 8).map((t) => (
+        list.data.slice(0, 10).map((t) => (
           <div key={t.id} className="tx-row">
             <span>
               {t.date} {t.merchant}
             </span>
             <span className={t.amount > 0 ? "tx-row__in" : ""}>{t.amount > 0 ? `+${won(t.amount)}` : won(t.amount)}</span>
-            <button
-              aria-label="삭제"
-              onClick={async () => setResult(await run(() => api.deleteTransaction(t.id), 204))}
-            >
+            <button aria-label="거래 삭제" onClick={() => run(() => api.deleteTransaction(t.id), "거래를 지웠어요")}>
               <Icon name="close" size={14} stroke={2} />
             </button>
           </div>
         ))}
-      {list.status === "done" && list.data.length === 0 && <p className="tab__hint">거래가 없어요.</p>}
-    </div>
-  );
-}
-
-// ---------- API 로그 ----------
-function LogTab() {
-  useSyncExternalStore(subscribeLog, getLogVersion);
-  const [openId, setOpenId] = useState<number | null>(null);
-  const entries = getLog();
-  return (
-    <div className="tab">
-      <p className="tab__hint">화면들이 보낸 요청이 최신순으로 쌓여요. 눌러서 요청/응답 내용을 보세요.</p>
-      {entries.length === 0 && <p className="tab__hint">아직 요청이 없어요.</p>}
-      {entries.map((e) => (
-        <div key={e.id} className="log">
-          <button className="log__line" onClick={() => setOpenId(openId === e.id ? null : e.id)}>
-            <span className="log__time">{e.at}</span>
-            <span className={`log__method log__method--${e.method}`}>{e.method}</span>
-            <span className="log__path">{e.path}</span>
-            <span className={`log__status ${e.status >= 400 ? "log__status--err" : ""}`}>{e.status}</span>
-            <span className="log__ms">{e.ms}ms</span>
-          </button>
-          {openId === e.id && (
-            <pre className="result">
-              {e.request !== undefined && `요청 본문\n${json(e.request)}\n\n`}
-              응답 본문{"\n"}
-              {e.response === undefined ? "(없음 — 204 No Content)" : json(e.response)}
-            </pre>
-          )}
-        </div>
-      ))}
     </div>
   );
 }
