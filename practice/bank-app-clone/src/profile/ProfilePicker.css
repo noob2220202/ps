@@ -7,6 +7,15 @@
   color: var(--home-text);
   padding: 0 24px calc(28px + var(--safe-bottom));
 }
+/* 콕뱅크 서버: 테마와 상관없이 콕뱅크 다크 색 */
+.picker--nh {
+  --home-bg: #18171c;
+  --home-text: #ffffff;
+  --home-sub: #9ba2ac;
+  --home-btn: #28323c;
+  --home-card: #1f2630;
+  --home-line: #353e4a;
+}
 .picker__brand {
   margin-top: 13%;
 }

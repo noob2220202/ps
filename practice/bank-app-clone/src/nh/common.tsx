@@ -16,6 +16,32 @@ export function NhImg({ name, w, h, fallback, className = "" }: { name: string; 
   return <img className={`nh-img ${className}`} src={src} alt="" width={w} height={h} draggable={false} />;
 }
 
+// 콕뱅크 앱 아이콘. 잘라낸 이미지(nh-app-icon)가 없으면 초록 그라데이션 + 흰 "콕"으로 그림
+export function NhAppIcon({ size = 46 }: { size?: number }) {
+  return (
+    <NhImg
+      name="nh-app-icon"
+      w={size}
+      h={size}
+      className="nh-app-icon"
+      fallback={
+        <svg width={size} height={size} viewBox="0 0 48 48" aria-label="NH콕뱅크">
+          <defs>
+            <linearGradient id="nh-app-g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#2bc46a" />
+              <stop offset="1" stopColor="#0b8f9e" />
+            </linearGradient>
+          </defs>
+          <rect width="48" height="48" rx="13" fill="url(#nh-app-g)" />
+          <text x="24" y="32" textAnchor="middle" fill="#fff" fontSize="22" fontWeight="800" fontFamily="inherit">
+            콕
+          </text>
+        </svg>
+      }
+    />
+  );
+}
+
 // 노란 농협 계좌 아이콘 (+ 대표계좌 별)
 export function NhAccountIcon({ size = 26 }: { size?: number }) {
   return (

@@ -13,16 +13,16 @@ import { THEME, THEME_CHOICE } from "../platform/theme";
 import { AVATAR_COLORS, AVATAR_NAMES } from "./avatars";
 import { ProfileAvatar } from "./ProfileAvatar";
 import { APP, setCurrentProfile } from "./session";
-import { localAsset } from "../assets/Asset";
+import { NhAppIcon } from "../nh/common";
 import "./ProfilePicker.css";
 
-const nhIcon = localAsset("nh-app-icon");
 const MAX = 5; // 서버 MAX_PROFILES 와 같게
 
 // 접속하면 제일 먼저 나오는 프로필 고르기 (넷플릭스 "누가 시청하나요?"를 카카오뱅크 느낌으로)
 // 프로필마다 은행 데이터(계좌·거래·받는 분)와 기기/테마 설정이 따로 저장된다.
 export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
-  useStatusBar("var(--home-bg)", THEME === "dark" ? "light" : "dark");
+  // 콕뱅크는 다크 화면뿐 → 프로필 고르기도 콕뱅크 바탕색
+  useStatusBar(APP === "nh" ? "#18171c" : "var(--home-bg)", APP === "nh" || THEME === "dark" ? "light" : "dark");
   const list = useApi<AppProfile[]>(paths.profiles);
   const [managing, setManaging] = useState(false);
   const [editing, setEditing] = useState<AppProfile | "new" | null>(null);
@@ -39,10 +39,10 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
 
   const profiles = list.data ?? [];
   return (
-    <div className="screen picker">
+    <div className={`screen picker ${APP === "nh" ? "picker--nh" : ""}`}>
       <div className="picker__brand">
         {/* 콕뱅크 서버면 콕 아이콘 */}
-        {APP === "nh" && nhIcon ? <img src={nhIcon} alt="" width={46} height={46} style={{ borderRadius: 12 }} /> : <KakaoCircle size={46} />}
+        {APP === "nh" ? <NhAppIcon size={46} /> : <KakaoCircle size={46} />}
       </div>
       <h1 className="picker__title">{managing ? "프로필 관리" : "누구의 은행을 열까요?"}</h1>
       <p className="picker__desc">{managing ? "수정할 프로필을 눌러 주세요" : "프로필마다 계좌와 거래내역이 따로 저장돼요"}</p>

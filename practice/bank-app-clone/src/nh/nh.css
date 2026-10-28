@@ -32,6 +32,9 @@
   display: grid;
   place-items: center;
 }
+.nh-app-icon {
+  border-radius: 26%;
+}
 .nh-account-icon {
   border-radius: 28%;
 }
@@ -420,16 +423,6 @@
 .nh-splash__ma {
   position: absolute;
   bottom: 56px;
-}
-.nh-splash__fallback-icon {
-  width: 69px;
-  height: 66px;
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  background: #13a24a;
-  color: #fff;
-  font-size: 26px;
 }
 .nh-splash__fallback-word {
   font-size: 40px;

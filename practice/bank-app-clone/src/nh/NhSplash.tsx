@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useStatusBar } from "../hooks/useStatusBar";
-import { NhDots, NhImg } from "./common";
+import { NhAppIcon, NhDots, NhImg } from "./common";
 
 // 콕뱅크 시작 (녹화 0~4초): 흰 화면에 콕 아이콘 → 어두운 화면 "금융, 정보, 쇼핑을 한 번에 / NH콕뱅크" + 점 3개.
 // 실제 앱은 이다음 간편비밀번호 로그인이 있지만 연습용이라 건너뜀
@@ -19,7 +19,7 @@ export function NhSplash({ onDone }: { onDone: () => void }) {
   if (phase === "icon")
     return (
       <div className="screen nh-splash nh-splash--white">
-        <NhImg name="nh-app-icon" w={69} h={66} className="nh-splash__icon" fallback={<b className="nh-splash__fallback-icon">콕</b>} />
+        <NhAppIcon size={68} />
       </div>
     );
   return (
