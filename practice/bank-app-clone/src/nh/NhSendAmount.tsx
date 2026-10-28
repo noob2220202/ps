@@ -2,7 +2,7 @@ import type { Account, Recipient } from "../api/types";
 import { Icon } from "../components/icons/Icon";
 import { EditRow } from "./common";
 import { nhWon } from "./hangul";
-import "./nh-send.css";
+import "./nh-send-amount.css";
 
 // 콕송금 받는 분을 고른 뒤: "얼마를 보낼까요?"(amount) → "1원을 보낼게요" 표시 내용(memo) (녹화2 12~24초)
 export function NhSendAmount({

@@ -37,7 +37,7 @@ registry.exec(`
 
 export const AVATARS = ["boy", "girl", "child", "grandma", "wave", "star", "coin", "money-bag"];
 export const COLORS = ["#FFE45C", "#BDEBD8", "#CFE3FF", "#FFD3DC", "#E2D9FF", "#FFDCC2"];
-export const MAX_PROFILES = 5;
+export const MAX_PROFILES = Number(process.env.MAX_PROFILES ?? 5); // 개발 중 여러 명이 따로 쓸 땐 환경변수로 늘림
 export const newProfileId = () => `p${randomUUID().replaceAll("-", "").slice(0, 8)}`;
 
 // id가 파일 이름이 되므로 형식을 꼭 검사 ("../../etc/passwd" 같은 값으로 다른 파일을 열지 못하게)
