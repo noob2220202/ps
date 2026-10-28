@@ -90,6 +90,10 @@
   transform: none;
 }
 
+.splash__ad-logo {
+  width: 104px; /* 원본(영상) 로고 폭 128px × 0.75 + 살짝 */
+  height: auto;
+}
 .splash__ad-text {
   margin: 12px 0 14px;
   font-size: 13px;

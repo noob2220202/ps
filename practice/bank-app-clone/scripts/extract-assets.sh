@@ -23,6 +23,8 @@ crop() { # BASE X Y W H
 CIRCLE="format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*clip(W/2-hypot(X-(W-1)/2,Y-(H-1)/2)+0.5,0,1)'"
 # 밝은 회색/흰 배경을 투명하게 → 어떤 테마 배경 위에도 올릴 수 있음
 KEY_LIGHT="format=rgba,colorkey=0xF5F5F5:0.07:0.05"
+# 노란 배경의 검은 글자 → 글자만 남기고 투명하게 (초록 채널이 노랑≈222, 검정≈0 이라 그걸로 진하기 계산)
+KEY_YELLOW="format=rgba,geq=r=17:g=17:b=17:a='255*clip((222-g(X,Y))/170,0,1)'"
 # 가장자리를 서서히 투명하게 (사각형으로 잘라낸 일러스트를 배경 그라데이션에 자연스럽게 녹임)
 FEATHER="format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*clip(min(X,W-1-X)/(W*0.14),0,1)*clip(min(Y,H-1-Y)/(H*0.14),0,1)'"
 
@@ -39,6 +41,7 @@ extract() {
 
 echo "▶ 화면 녹화에서 (기준폭 480)"
 extract banner-and2ble.jpg            "$VIDEO" 3.5   480  76 746 329 200 2
+extract album-logo.png      "$VIDEO" 3.5   480 170 625 142  47 4 "$KEY_YELLOW"
 extract friends.png         "$VIDEO" 20.0  480 126  98 223 147 2 "$FEATHER"
 extract friends-avatar.png  "$VIDEO" 22.4  480 204 151  72  72 2 "$CIRCLE"
 extract hand-tile.png       "$VIDEO" 20.0  480  48 343  45  45 3

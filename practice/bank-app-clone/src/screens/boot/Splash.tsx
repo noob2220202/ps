@@ -2,10 +2,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { TIMING } from "../../config/timing";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { AlbumLogo, BMark, Wordmark } from "../../components/art";
-import { Asset } from "../../assets/Asset";
+import { Asset, localAsset } from "../../assets/Asset";
 import "./Splash.css";
 
 type Phase = "launch" | "logo" | "brand";
+const albumLogo = localAsset("album-logo");
 
 // 영상 0~5초 구간: 노란 화면이 커지며 열림 → 큰 B → B가 작아지며 워드마크 + 광고 등장
 export function Splash({ onDone }: { onDone: () => void }) {
@@ -49,7 +50,8 @@ export function Splash({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="splash__ad">
-        <AlbumLogo size={30} />
+        {/* 앨범 로고는 특수 글자체라 글자로 흉내 내면 찌그러져 보임 → 녹화에서 잘라낸 이미지가 있으면 그걸로 */}
+        {albumLogo ? <img className="splash__ad-logo" src={albumLogo} alt="AND2BLE" /> : <AlbumLogo size={30} />}
         <p className="splash__ad-text">
           10.27 미니 2집 발매 <span className="splash__ad-badge">AD</span>
         </p>

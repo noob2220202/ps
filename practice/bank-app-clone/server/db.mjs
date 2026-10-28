@@ -43,7 +43,9 @@ const SCHEMA = `
   CREATE TABLE IF NOT EXISTS profile (
     id              INTEGER PRIMARY KEY CHECK (id = 1),  -- 사용자 1명뿐
     user_name       TEXT NOT NULL,
-    card_last4      TEXT NOT NULL
+    card_last4      TEXT NOT NULL,
+    card_spend      INTEGER,                              -- 이번달 쓴 돈 직접 입력값 (NULL이면 체크카드 거래 합계로 자동 계산)
+    cashback_count  INTEGER NOT NULL DEFAULT 2            -- "현금 돌려받을 기회 N건"
   );
 
   CREATE TABLE IF NOT EXISTS accounts (
@@ -131,6 +133,8 @@ export function db() {
 // 이미 만들어진 DB 파일은 CREATE TABLE IF NOT EXISTS 로는 안 바뀐다 → 달라진 점만 직접 반영
 function migrate(d) {
   const columns = (table) => d.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!columns("profile").includes("card_spend")) d.exec("ALTER TABLE profile ADD COLUMN card_spend INTEGER");
+  if (!columns("profile").includes("cashback_count")) d.exec("ALTER TABLE profile ADD COLUMN cashback_count INTEGER NOT NULL DEFAULT 2");
   if (!columns("accounts").includes("safebox")) d.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");
   if (columns("profile").includes("mini_account_no")) {
     // mini 계좌 삭제: 거래·이체 기록은 ON DELETE CASCADE로 같이 지워지고, mini로 "보낸" 기록만 따로 정리

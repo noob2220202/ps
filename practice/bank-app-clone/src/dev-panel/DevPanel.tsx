@@ -6,6 +6,7 @@ import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TxTag } f
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
+import { isCapture, setCapture } from "../platform/capture";
 import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
@@ -149,6 +150,7 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
       <Field label="기기">
         <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
       </Field>
+      <CaptureToggle />
       <Field label="테마">
         <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
       </Field>
@@ -180,6 +182,26 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
         </button>
       </div>
     </div>
+  );
+}
+
+// 캡쳐모드 켜고 끄기 (CSS만 바뀌므로 바로 적용)
+function CaptureToggle() {
+  const [on, setOn] = useState(isCapture);
+  return (
+    <Field label="캡쳐모드 (폰 테두리·아래 스위치 숨기기)">
+      <Segmented
+        value={on ? "on" : "off"}
+        options={[
+          ["off", "끄기"],
+          ["on", "켜기"],
+        ]}
+        onChange={(v) => {
+          setCapture(v === "on");
+          setOn(v === "on");
+        }}
+      />
+    </Field>
   );
 }
 
@@ -218,6 +240,8 @@ function AccountsTab({ run }: { run: Run }) {
       {home.data.accounts.map((a) => (
         <AccountEditor key={a.id} account={a} bank={banks.data.find((b) => b.code === a.bank?.code)} run={run} />
       ))}
+      <h3 className="tab__h">카드</h3>
+      <CardEditor key={`${home.data.profile.cardSpend}-${home.data.profile.cashbackCount}`} home={home.data} run={run} />
       <h3 className="tab__h">다른 은행 계좌 추가</h3>
       <AddBankAccount banks={banks.data} run={run} />
     </div>
@@ -294,6 +318,46 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// 홈 카드 섹션: "이번달 쓴 돈"(직접 입력 / 자동 계산) + "현금 돌려받을 기회 N건"
+function CardEditor({ home, run }: { home: HomeData; run: Run }) {
+  const auto = home.profile.cardSpend === null;
+  const [spend, setSpend] = useState(home.monthlyCardSpend);
+  const [count, setCount] = useState(home.profile.cashbackCount);
+  return (
+    <div className="add-bank">
+      <Field label={`이번달 쓴 돈 ${auto ? "(지금: 체크카드 거래 합계로 자동)" : "(지금: 직접 입력한 값)"}`}>
+        <MoneyInput value={spend} onChange={setSpend} quick={[10000, 100000, 1000000]} />
+      </Field>
+      <div className="row">
+        <button className="btn btn--sm" style={{ flex: 1 }} onClick={() => run(() => api.updateProfile({ cardSpend: spend }), "이번달 쓴 돈을 바꿨어요")}>
+          이 금액으로
+        </button>
+        <button
+          className="btn btn--sm btn--danger"
+          disabled={auto}
+          onClick={() => run(() => api.updateProfile({ cardSpend: null }), "체크카드 거래 합계로 계산해요")}
+        >
+          자동 계산으로
+        </button>
+      </div>
+      <Field label="현금 돌려받을 기회">
+        <div className="chips-row">
+          <button className="chip-btn" onClick={() => setCount(Math.max(0, count - 1))}>
+            −
+          </button>
+          <span className="count-value">{count}건</span>
+          <button className="chip-btn" onClick={() => setCount(Math.min(99, count + 1))}>
+            +
+          </button>
+          <button className="btn btn--sm" style={{ marginLeft: "auto" }} onClick={() => run(() => api.updateProfile({ cashbackCount: count }), `${count}건으로 바꿨어요`)}>
+            저장
+          </button>
+        </div>
+      </Field>
     </div>
   );
 }

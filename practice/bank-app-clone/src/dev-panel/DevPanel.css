@@ -425,3 +425,14 @@
   flex: 1;
   margin-top: 0;
 }
+
+.count-value {
+  min-width: 44px;
+  align-self: center;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+.btn:disabled {
+  opacity: 0.4;
+}

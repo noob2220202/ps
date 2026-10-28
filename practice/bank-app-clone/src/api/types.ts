@@ -20,6 +20,8 @@ export interface AppProfile {
 // 앱 안의 "내 정보" (지금 고른 프로필의 DB에 들어 있음)
 export interface Profile {
   userName: string;
+  cardSpend: number | null; // 이번달 쓴 돈 직접 입력값 (null = 체크카드 거래 합계로 자동)
+  cashbackCount: number; // 현금 돌려받을 기회 N건
   cardLast4: string;
 }
 

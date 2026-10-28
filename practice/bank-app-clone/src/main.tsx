@@ -1,5 +1,6 @@
 import "./platform/platform"; // 제일 먼저: <html data-os> 를 정해야 CSS가 맞게 적용됨
 import "./platform/theme";
+import "./platform/capture";
 import { prefetch } from "./api/useApi";
 import { api, paths } from "./api/endpoints";
 import { ApiError } from "./api/client";

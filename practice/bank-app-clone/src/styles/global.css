@@ -164,6 +164,19 @@ button {
   }
 }
 
+/* 캡쳐모드 (🔔 → 기본): 폰 테두리·그림자·둥근 모서리 없이 화면만 가운데에. 크기와 상태바는 그대로 */
+[data-capture="on"] body {
+  background: #000;
+}
+[data-capture="on"] .phone {
+  margin: max(0px, calc((100dvh - var(--frame-h)) / 2)) auto 0;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+[data-capture="on"] .switches {
+  display: none;
+}
+
 /* ---------- 스크린 공통 ---------- */
 .screen {
   position: absolute;

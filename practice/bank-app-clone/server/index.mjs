@@ -49,8 +49,8 @@ function nowIso() {
 }
 
 const getProfile = () => {
-  const p = db().prepare("SELECT user_name, card_last4 FROM profile WHERE id = 1").get();
-  return { userName: p.user_name, cardLast4: p.card_last4 };
+  const p = db().prepare("SELECT * FROM profile WHERE id = 1").get();
+  return { userName: p.user_name, cardLast4: p.card_last4, cardSpend: p.card_spend, cashbackCount: p.cashback_count };
 };
 
 function toAccount(row, profile = getProfile()) {
@@ -174,14 +174,17 @@ app.get("/api/home", (_req, res) => {
   const profile = getProfile();
   const accounts = db().prepare("SELECT * FROM accounts ORDER BY sort, rowid").all();
   const month = nowIso().slice(0, 7);
-  const spend = db()
-    .prepare("SELECT COALESCE(-SUM(amount), 0) AS s FROM transactions WHERE tag = '#체크카드' AND amount < 0 AND at LIKE ?")
-    .get(`${month}%`).s;
+  // 이번달 쓴 돈: 🔔에서 직접 넣은 값이 있으면 그것, 없으면 이번 달 체크카드 출금 합계
+  const spend =
+    profile.cardSpend ??
+    db()
+      .prepare("SELECT COALESCE(-SUM(amount), 0) AS s FROM transactions WHERE tag = '#체크카드' AND amount < 0 AND at LIKE ?")
+      .get(`${month}%`).s;
   res.json({
     profile,
     accounts: accounts.map((a) => toAccount(a, profile)),
     monthlyCardSpend: spend,
-    cashbackCount: 2,
+    cashbackCount: profile.cashbackCount,
     banners: [
       { id: "b1", title: "mini카드로 삼성월렛 이용하고\n2천 포인트 받아가기", cta: "삼성월렛으로 이동", image: "banner-mcard" },
       { id: "b2", title: "우리 동네 가까운 봉사활동 찾기\n카카오뱅크에서 시작하세요", cta: "더 알아보기", image: "banner-volunteer" },
@@ -204,15 +207,21 @@ app.get("/api/banks", (_req, res) => res.json(BANKS.map(bankInfo)));
 app.get("/api/profile", (_req, res) => res.json(getProfile()));
 
 app.patch("/api/profile", (req, res) => {
-  const { userName, cardLast4 } = req.body ?? {};
+  const { userName, cardLast4, cardSpend, cashbackCount } = req.body ?? {};
   const fields = {};
   if (userName !== undefined && !/^.{1,10}$/u.test(String(userName).trim())) fields.userName = "이름은 1~10자";
   if (cardLast4 !== undefined && !/^\d{4}$/.test(cardLast4)) fields.cardLast4 = "숫자 4자리";
+  // cardSpend: null = 자동 계산으로 되돌리기
+  if (cardSpend !== undefined && cardSpend !== null && !(Number.isInteger(cardSpend) && cardSpend >= 0 && cardSpend <= 1_000_000_000))
+    fields.cardSpend = "0원 이상 10억원 이하";
+  if (cashbackCount !== undefined && !(Number.isInteger(cashbackCount) && cashbackCount >= 0 && cashbackCount <= 99)) fields.cashbackCount = "0~99건";
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   const p = getProfile();
-  db().prepare("UPDATE profile SET user_name = ?, card_last4 = ? WHERE id = 1").run(
+  db().prepare("UPDATE profile SET user_name = ?, card_last4 = ?, card_spend = ?, cashback_count = ? WHERE id = 1").run(
     userName !== undefined ? String(userName).trim() : p.userName,
     cardLast4 ?? p.cardLast4,
+    cardSpend !== undefined ? cardSpend : p.cardSpend,
+    cashbackCount ?? p.cashbackCount,
   );
   res.json(getProfile());
 });
