@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Route, Routes, type Location } from "react-router-dom";
 import { OsSwitch, PhoneFrame } from "./components/PhoneFrame";
+import { RecordingBar } from "./components/RecordingBar";
 import { ScreenStack } from "./components/ScreenStack";
 import { StatusBarProvider } from "./hooks/useStatusBar";
 import { Splash } from "./screens/boot/Splash";
@@ -57,6 +58,7 @@ export default function App() {
         {boot === "ready" && <ScreenStack render={renderRoute} />}
       </PhoneFrame>
       <OsSwitch />
+      <RecordingBar />
     </StatusBarProvider>
   );
 }

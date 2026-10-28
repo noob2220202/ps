@@ -455,3 +455,17 @@ server/data/profiles/p1a2b3c4.db  그 프로필의 profile/accounts/transactions
 `<html data-capture="on">`만 붙이면 CSS가 폰 테두리·그림자·둥근 모서리·아래 스위치를 숨기고 화면을 가운데에 둠.
 React 상태가 아니라 DOM 속성이라 **새로고침 없이** 바로 바뀌고, localStorage에 기억해서 다시 열어도 유지
 (`src/platform/capture.ts`). 기기·테마도 같은 방식(`data-os`, `data-theme`)이라 규칙을 맞춤.
+
+## 18. 화면 녹화 — 탭 화면 받아서 폰만 자르기 (`src/platform/recorder.ts`)
+
+1. `navigator.mediaDevices.getDisplayMedia({ preferCurrentTab: true })` → 사용자가 "이 탭"을 허락하면 탭 화면 영상(MediaStream)
+   - 버튼 클릭 안에서 바로 불러야 함(보안상 사용자 동작 필요). 크기를 안 정하면 720p 정도로 낮춰 주므로 `width/height: { ideal: 큰 값 }`
+2. 폰 부분만 자르기
+   - 크롬/엣지 **Region Capture**: `CropTarget.fromElement(폰)` → `track.cropTo()` — 브라우저가 잘라 줘서 가장 선명하고 가벼움
+   - 그 밖의 브라우저: `<video>`로 받아 매 프레임 `<canvas>`에 폰 영역만 `drawImage` → `canvas.captureStream(60)`
+3. `MediaRecorder`로 녹화. `isTypeSupported`로 mp4(h264) → 안 되면 webm. 멈추면 Blob → `<a download>`로 저장
+   - 브라우저의 "공유 중지"로 멈춰도 `track`의 `ended` 이벤트에서 저장
+4. 녹화 상태는 React 바깥 모듈 변수 + `useSyncExternalStore` → 패널(시작)과 위쪽 막대(정지)가 따로 떨어져 있어도 같은 상태를 봄
+5. "녹화 중" 막대는 폰 바깥 `position: fixed` → 잘린 영역 밖이라 영상에 안 찍힘. 녹화하는 동안 캡쳐모드로 테두리도 숨김
+
+폰 브라우저는 `getDisplayMedia`가 없어서 녹화 불가 → 버튼 대신 "폰 자체 화면녹화를 쓰세요" 안내.

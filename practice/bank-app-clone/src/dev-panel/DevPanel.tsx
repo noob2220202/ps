@@ -7,6 +7,7 @@ import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { isCapture, setCapture } from "../platform/capture";
+import { canRecord, startRecording } from "../platform/recorder";
 import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
@@ -67,7 +68,7 @@ export function DevPanel({ open, onClose }: { open: boolean; onClose: () => void
           ))}
         </nav>
         <div className="dev-panel__body">
-          {open && tab === "basic" && <BasicTab run={run} />}
+          {open && tab === "basic" && <BasicTab run={run} onClose={onClose} />}
           {open && tab === "accounts" && <AccountsTab run={run} />}
           {open && tab === "payees" && <PayeesTab run={run} />}
           {open && tab === "tx" && <TxTab run={run} />}
@@ -132,13 +133,13 @@ function MoneyInput({ value, onChange, quick = [1000, 10000, 100000] }: { value:
 const accountName = (a: Account) => (a.kind === "main" ? "카카오뱅크 통장" : a.bank.name);
 
 // ---------- 기본: 기기 / 테마 / 내 정보 ----------
-function BasicTab({ run }: { run: Run }) {
+function BasicTab({ run, onClose }: { run: Run; onClose: () => void }) {
   const home = useApi<HomeData>(paths.home);
   if (home.status !== "done") return <div className="tab">불러오는 중…</div>;
-  return <BasicForm run={run} initial={home.data} />;
+  return <BasicForm run={run} initial={home.data} onClose={onClose} />;
 }
 
-function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
+function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onClose: () => void }) {
   const [name, setName] = useState(initial.profile.userName);
   const [card, setCard] = useState(initial.profile.cardLast4);
   // 기기/테마는 앱 전체가 처음 켤 때 정해지므로 저장 후 다시 연다
@@ -151,6 +152,7 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
         <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
       </Field>
       <CaptureToggle />
+      <RecordButton onStart={onClose} />
       <Field label="테마">
         <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
       </Field>
@@ -182,6 +184,35 @@ function BasicForm({ run, initial }: { run: Run; initial: HomeData }) {
         </button>
       </div>
     </div>
+  );
+}
+
+// 화면 녹화: 패널을 닫고 → 브라우저가 "이 탭 공유"를 물어보면 허용 → 폰 화면만 녹화.
+// 녹화하는 동안은 캡쳐모드로 테두리를 숨겼다가 끝나면 원래대로
+function RecordButton({ onStart }: { onStart: () => void }) {
+  if (!canRecord())
+    return (
+      <Field label="화면 녹화">
+        <p className="tab__hint">이 브라우저는 웹 화면 녹화를 지원하지 않아요. 폰에서는 폰 자체 화면녹화를 써 주세요. (PC 크롬/엣지 권장)</p>
+      </Field>
+    );
+  return (
+    <Field label="화면 녹화 (폰 화면만 잘라서 영상 파일로 저장)">
+      <button
+        className="btn btn--sm"
+        onClick={() => {
+          const phone = document.querySelector<HTMLElement>(".phone");
+          if (!phone) return;
+          const wasCapture = isCapture();
+          setCapture(true);
+          onStart();
+          startRecording(phone, () => setCapture(wasCapture));
+        }}
+      >
+        ● 녹화 시작
+      </button>
+      <p className="tab__hint">공유 창에서 "이 탭"을 고르면 시작돼요. 위쪽 막대의 정지를 누르면 영상 파일이 저장돼요. 화면 배율이 높은 모니터(레티나 등)일수록 선명해요.</p>
+    </Field>
   );
 }
 
