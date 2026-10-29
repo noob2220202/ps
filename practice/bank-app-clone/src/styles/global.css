@@ -181,10 +181,15 @@ button {
 [data-capture="on"] .switches {
   display: none;
 }
-/* 녹화 중: 폰 위에서 마우스 포인터 숨김 (영상에 커서가 안 찍히게). 누르기는 그대로 됨 */
-[data-recording="on"] .phone,
-[data-recording="on"] .phone * {
+/* 녹화 중(Element Capture): 진짜 포인터는 폰 위에서 숨기고 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
+   — 가짜 포인터는 폰 요소 밖에 있어서 녹화에 안 찍힘 (FakeCursor) */
+[data-fake-cursor="on"] .phone,
+[data-fake-cursor="on"] .phone * {
   cursor: none !important;
+}
+/* Element Capture 는 녹화할 요소가 따로 쌓임 맥락(stacking context)이어야 함 */
+.phone {
+  isolation: isolate;
 }
 
 /* ---------- 스크린 공통 ---------- */

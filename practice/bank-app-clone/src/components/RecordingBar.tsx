@@ -32,3 +32,32 @@ export function RecordingBar() {
     </div>
   );
 }
+
+// 녹화 중 가짜 마우스 포인터: 폰 위에선 진짜 포인터를 숨기고(녹화에 찍히므로) 이걸 대신 보여 줌.
+// 폰 요소 밖(페이지 맨 위)에 그려서 Element Capture 녹화엔 안 찍힘
+export function FakeCursor() {
+  const rec = useRecorder();
+  const on = rec.status === "recording" && rec.fakeCursor;
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    if (!on) return;
+    const move = (e: PointerEvent) => {
+      const phone = document.querySelector(".phone");
+      const over = !!phone && phone.contains(e.target as Node);
+      setPos(over ? { x: e.clientX, y: e.clientY } : null);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerdown", move);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerdown", move);
+      setPos(null);
+    };
+  }, [on]);
+  if (!on || !pos) return null;
+  return (
+    <svg className="fake-cursor" style={{ left: pos.x, top: pos.y }} width="20" height="26" viewBox="0 0 20 26" aria-hidden>
+      <path d="M1.5 1.5v19.2l5-4.6 3.4 7.6 3.3-1.5-3.3-7.4h6.8Z" fill="#fff" stroke="#000" strokeWidth="1.4" strokeLinejoin="round" />
+    </svg>
+  );
+}

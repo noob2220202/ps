@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Route, Routes, useNavigate, type Location } from "react-router-dom";
 import { OsSwitch, PhoneFrame } from "./components/PhoneFrame";
-import { RecordingBar } from "./components/RecordingBar";
+import { FakeCursor, RecordingBar } from "./components/RecordingBar";
 import { ScreenStack } from "./components/ScreenStack";
 import { StatusBarProvider } from "./hooks/useStatusBar";
 import { Splash } from "./screens/boot/Splash";
@@ -101,6 +101,7 @@ export default function App() {
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />
+      <FakeCursor />
     </StatusBarProvider>
   );
 }

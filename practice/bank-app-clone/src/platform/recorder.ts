@@ -10,15 +10,17 @@
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 
-type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean };
+type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
 
 let state: State = { status: "idle" };
 const listeners = new Set<() => void>();
 const set = (s: State) => {
   state = s;
-  // 녹화 중엔 폰 위에서 마우스 포인터를 숨김 (탭 녹화에 커서가 같이 찍혀서)
-  if (s.status === "recording") document.documentElement.dataset.recording = "on";
-  else delete document.documentElement.dataset.recording;
+  const d = document.documentElement.dataset;
+  if (s.status === "recording") d.recording = "on";
+  else delete d.recording;
+  if (s.status === "recording" && s.fakeCursor) d.fakeCursor = "on";
+  else delete d.fakeCursor;
   listeners.forEach((fn) => fn());
 };
 export const useRecorder = () =>
@@ -81,7 +83,9 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   const [track] = display.getVideoTracks();
   const surface = track.getSettings().displaySurface;
   const isThisTab = surface === "browser";
-  const regionCapture = isThisTab && "CropTarget" in window && "cropTo" in track;
+  // Element Capture (크롬 132+): 폰 요소와 그 안쪽만 녹화 — 폰 위에 겹친 다른 요소(가짜 포인터)는 안 찍힘
+  const elementCapture = isThisTab && "RestrictionTarget" in window && "restrictTo" in track;
+  const regionCapture = !elementCapture && isThisTab && "CropTarget" in window && "cropTo" in track;
   const wholeScreen = surface === "monitor" || (MOBILE && !isThisTab);
 
   // 모바일(화면 전체): 한 번 더 눌러 전체화면으로 → 그다음 시작
@@ -109,7 +113,19 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
 
   let recordStream: MediaStream = display;
   let cleanupCanvas = () => {};
-  if (regionCapture) {
+  let fakeCursor = false;
+  if (elementCapture) {
+    // 0) Element Capture: 진짜 포인터는 폰 위에서 숨기고(녹화에 찍히므로), 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
+    const W = window as unknown as { RestrictionTarget: { fromElement(el: Element): Promise<unknown> } };
+    try {
+      const restrictionTarget = await W.RestrictionTarget.fromElement(target);
+      await (track as unknown as { restrictTo(t: unknown): Promise<void> }).restrictTo(restrictionTarget);
+      fakeCursor = true;
+    } catch {
+      const W2 = window as unknown as { CropTarget?: { fromElement(el: Element): Promise<unknown> } };
+      if (W2.CropTarget && "cropTo" in track) await (track as unknown as { cropTo(t: unknown): Promise<void> }).cropTo(await W2.CropTarget.fromElement(target));
+    }
+  } else if (regionCapture) {
     // 1) Region Capture
     const W = window as unknown as { CropTarget: { fromElement(el: Element): Promise<unknown> } };
     const cropTarget = await W.CropTarget.fromElement(target);
@@ -179,7 +195,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
   await nextFrame();
   recorder.start();
-  set({ status: "recording", startedAt: Date.now(), fullscreen });
+  set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
   await sleep(600);
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { OS } from "../platform/platform";
-import { canRecord, recordPhone } from "../platform/recorder";
+import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
 import { THEME } from "../platform/theme";
 import { APP } from "../profile/session";
 import "./PhoneFrame.css";
@@ -67,9 +67,15 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
   const { fg } = useStatusBarStyle();
   // 콕뱅크(갤럭시): 실제 화면처럼 아래 15dp 검은 제스처바 + 회색 손잡이를 따로 둠
   const navbar = APP === "nh" && OS === "android";
+  const recording = useRecorder().status === "recording";
   return (
     <div className={`phone phone--${OS}`}>
-      {OS === "ios" && <div className="dynamic-island" />}
+      {/* 녹화 중엔 진짜 아이폰처럼 다이나믹 아일랜드 왼쪽에 빨간 녹화 표시 (영상에도 찍힘) */}
+      {OS === "ios" && (
+        <div className={`dynamic-island${recording ? " dynamic-island--rec" : ""}`}>
+          <i />
+        </div>
+      )}
       <StatusBar />
       <div className="phone__viewport">{children}</div>
       {navbar ? (

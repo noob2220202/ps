@@ -63,3 +63,11 @@
     left: 8px;
   }
 }
+
+/* 가짜 포인터 (녹화 중, 폰 위에서만) */
+.fake-cursor {
+  position: fixed;
+  z-index: 2000;
+  pointer-events: none;
+  translate: -1.5px -1.5px;
+}
