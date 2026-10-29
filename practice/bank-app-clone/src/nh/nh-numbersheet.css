@@ -32,6 +32,10 @@
 /* 입력칸: 24~360 × 60.8, 모서리 14. 비었을 때 1dp #414c57 + '계좌번호 입력'(24px/600 #8c929f) 가운데,
    입력 중 2dp #0195a3 + 숫자(24.6px/600) · 커서 · ⓧ 를 한 묶음으로 (왼쪽에 25.95 빈자리를 둔 채) 가운데 */
 .nh-number .nh-number__box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 60.3px; /* 녹화 테두리 바깥 400.35~460.65 (위 0.35 아래로, 아래 0.15 위로) — 키패드 위치는 그대로 */
   margin: 0.35px 24px 20.15px;
   border: 1px solid var(--nh-input-line);
