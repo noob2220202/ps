@@ -181,6 +181,11 @@ button {
 [data-capture="on"] .switches {
   display: none;
 }
+/* 녹화 중: 폰 위에서 마우스 포인터 숨김 (영상에 커서가 안 찍히게). 누르기는 그대로 됨 */
+[data-recording="on"] .phone,
+[data-recording="on"] .phone * {
+  cursor: none !important;
+}
 
 /* ---------- 스크린 공통 ---------- */
 .screen {

@@ -16,6 +16,9 @@ let state: State = { status: "idle" };
 const listeners = new Set<() => void>();
 const set = (s: State) => {
   state = s;
+  // 녹화 중엔 폰 위에서 마우스 포인터를 숨김 (탭 녹화에 커서가 같이 찍혀서)
+  if (s.status === "recording") document.documentElement.dataset.recording = "on";
+  else delete document.documentElement.dataset.recording;
   listeners.forEach((fn) => fn());
 };
 export const useRecorder = () =>
@@ -64,7 +67,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
       // 크기를 안 정하면 브라우저가 720p 정도로 낮춰서 줌 → 화면 원래 해상도까지 받도록 크게 요청
       video: MOBILE
         ? { frameRate: 60, width: { ideal: Math.round(screen.width * dpr) }, height: { ideal: Math.round(screen.height * dpr) } }
-        : { frameRate: 60, width: { ideal: 3840 }, height: { ideal: 2160 } },
+        : ({ frameRate: 60, width: { ideal: 3840 }, height: { ideal: 2160 }, cursor: "never" } as MediaTrackConstraints),
       audio: false,
       // 크롬: 지금 탭을 먼저 보여 주고, 다른 탭/창 대신 이 탭을 고르기 쉽게
       preferCurrentTab: true,
