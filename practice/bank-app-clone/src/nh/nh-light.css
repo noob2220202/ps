@@ -31,6 +31,15 @@ html[data-app="nh"][data-theme="light"] .phone {
   --nh-handle: #9ca6b1;
 }
 
+/* 시작화면은 라이트모드에서도 어두운 그대로 (로고·워드마크 그림을 어두운 녹화에서 잘라 왔고, 흰 글자)
+   — 토큰을 다크 값으로 되돌림 */
+html[data-theme="light"] .nh.nh-splash {
+  --nh-bg: #18171c;
+  --nh-text: #f6f7fb;
+  background: #18171c;
+  color: #f6f7fb;
+}
+
 /* ---------- 공용 ---------- */
 html[data-app="nh"][data-theme="light"] .statusbar--android.statusbar--dark {
   color: #4b4b4b;
