@@ -17,15 +17,35 @@ import "./nh-splash.css";
 // 그림·움직임은 CSS 애니메이션(시작화면이 뜬 순간부터)이고, 아래 단계는 JS 타이머로 바꿈.
 // JS 로 바꾼 단계는 effect·다시 그리기 때문에 화면에 ~22ms 늦게 나타나서 그만큼 앞당겨 둠
 const LAG = 22;
-const T = { statusBar: 840 - LAG, dark: 1017 - LAG, gone: 1045 - LAG, light: 1185 - LAG, done: 4554 - LAG };
+const T = {
+  statusBar: 840 - LAG,
+  dark: 1017 - LAG,
+  gone: 1045 - LAG,
+  light: 1185 - LAG,
+  done: 4554 - LAG,
+};
 type Phase = "launch" | "white" | "fade" | "brand" | "light";
 // 시작화면이 도는 동안 홈 그림을 미리 받아 풀어 둠 → 홈이 처음 뜰 때 무겁지 않아 스켈레톤이 실제처럼 ~160ms 만 보임
-const HOME_IMAGES = ["nh-hero", "nh-menu-send", "nh-menu-myaccount", "nh-menu-poke", "nh-menu-dutch", "nh-kok-bulb", "nh-kok-pig", "nh-banner-char", "nh-tip-emoji"];
+const HOME_IMAGES = [
+  "nh-account",
+  "nh-gh-rec-diary",
+  "nh-gh-rec-coin",
+  "nh-gh-banner-1",
+  "nh-gh-banner-2",
+  "nh-gh-tab-1",
+  "nh-gh-tab-2",
+  "nh-gh-tab-3",
+  "nh-gh-tab-4",
+  "nh-gh-tab-5",
+];
 
 export function NhSplash({ onDone }: { onDone: () => void }) {
   const [phase, setPhase] = useState<Phase>("launch");
   const dark = phase === "fade" || phase === "brand" || phase === "light";
-  useStatusBar(dark ? "#18171c" : "#ffffff", phase === "light" ? "light" : "dark");
+  useStatusBar(
+    dark ? "#18171c" : "#ffffff",
+    phase === "light" ? "light" : "dark",
+  );
   useEffect(() => {
     for (const name of HOME_IMAGES) {
       const src = localAsset(name);
@@ -55,13 +75,25 @@ export function NhSplash({ onDone }: { onDone: () => void }) {
       <p className="nh-splash__tag">
         금융, 정보, 쇼핑을 <b>한 번에</b>
       </p>
-      <Px at={[118, 430]} top={28} className="nh-splash__word nh-splash__word--nh">
+      <Px
+        at={[118, 430]}
+        top={28}
+        className="nh-splash__word nh-splash__word--nh"
+      >
         <NhImg name="nh-wordmark-nh" w={88} h={48} fallback={<b>NH</b>} />
       </Px>
-      <Px at={[206, 412]} top={28} className="nh-splash__word nh-splash__word--kok">
+      <Px
+        at={[206, 412]}
+        top={28}
+        className="nh-splash__word nh-splash__word--kok"
+      >
         <NhImg name="nh-wordmark-kok" w={73} h={86} fallback={<b>콕</b>} />
       </Px>
-      <Px at={[279, 427]} top={28} className="nh-splash__word nh-splash__word--bank">
+      <Px
+        at={[279, 427]}
+        top={28}
+        className="nh-splash__word nh-splash__word--bank"
+      >
         <NhImg name="nh-wordmark-bank" w={83} h={56} fallback={<b>뱅크</b>} />
       </Px>
       {/* 점 3개: 로딩 막과 같은 자리 (상태바 아래~제스처바 위의 가운데에서 0.8 위) */}
@@ -71,7 +103,9 @@ export function NhSplash({ onDone }: { onDone: () => void }) {
       <Px at={[196, 894]} top={28}>
         <NhImg name="nh-ma" w={88} h={60} fallback={null} />
       </Px>
-      {(phase === "launch" || phase === "white" || phase === "fade") && <Launch phase={phase} />}
+      {(phase === "launch" || phase === "white" || phase === "fade") && (
+        <Launch phase={phase} />
+      )}
       <NavCover />
     </div>
   );
@@ -93,7 +127,12 @@ function Launch({ phase }: { phase: "launch" | "white" | "fade" }) {
         {/* 아이콘 (녹화 1.5초 x 188~284, y 484~580) — 바깥 상자가 커지며 내려오는 애니메이션 */}
         <span className="nh-splash__icon">
           <Px at={[188, 484]} top={0} origin={[150, 387]}>
-            <NhImg name="nh-splash-icon" w={96} h={96} fallback={<b className="nh-splash__icon-fallback">콕</b>} />
+            <NhImg
+              name="nh-splash-icon"
+              w={96}
+              h={96}
+              fallback={<b className="nh-splash__icon-fallback">콕</b>}
+            />
           </Px>
         </span>
         <i className="nh-splash__handle" />
@@ -109,13 +148,29 @@ const S = 1.25; // 녹화 px / dp
 
 // 녹화(480px)에서 잘라 온 그림(안의 NhImg w/h = 그림 px)을 녹화 px 자리 (x, y)에 정확히: 정수 CSS px + translate + scale(0.8)
 // top: 부모 상자의 화면 위 위치(dp), origin: 부모가 이미 옮겨 둔 만큼(dp)
-function Px({ at: [x, y], top, origin: [ox, oy] = [0, 0], className = "", children }: { at: [number, number]; top: number; origin?: [number, number]; className?: string; children: ReactNode }) {
+function Px({
+  at: [x, y],
+  top,
+  origin: [ox, oy] = [0, 0],
+  className = "",
+  children,
+}: {
+  at: [number, number];
+  top: number;
+  origin?: [number, number];
+  className?: string;
+  children: ReactNode;
+}) {
   const l = Math.floor(x / S);
   const t = Math.floor(y / S);
   return (
     <span
       className={`nh-splash__px ${className}`}
-      style={{ left: l - ox, top: t - top - oy, transform: `translate(${(x / S - l).toFixed(4)}px, ${(y / S - t).toFixed(4)}px) scale(${1 / S})` }}
+      style={{
+        left: l - ox,
+        top: t - top - oy,
+        transform: `translate(${(x / S - l).toFixed(4)}px, ${(y / S - t).toFixed(4)}px) scale(${1 / S})`,
+      }}
     >
       {children}
     </span>

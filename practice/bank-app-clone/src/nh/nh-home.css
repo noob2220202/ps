@@ -1,397 +1,889 @@
-/* ---------- 콕뱅크 홈 ----------
-   값은 홈 스크린샷(720px, 1dp = 1.875px)·녹화1 10~13초(말풍선)·녹화2 36초(스켈레톤)에서 잰 dp.
-   top 은 상태바 아래(화면 위 28dp)부터. 측정표: scratchpad work/home/spec.md */
-/* .screen 이 이미 absolute(inset 0)·세로 스크롤. 안의 것은 모두 잰 자리에 absolute (화면이 짧으면 스크롤) */
-.nh-home {
-  /* 캐릭터 뒤 빛: 원형 직선 그라데이션 (중심 화면 191.73, 340.37dp / 반지름 188.85dp / #2f4f74 → 바탕) */
-  background: radial-gradient(circle 188.85px at 191.73px 312.37px, #2f4f74, #18171c) local;
-}
-.nh-home > * {
-  position: absolute;
-}
-.nh-home__icon {
-  color: var(--nh-text);
-  pointer-events: none;
-  overflow: visible;
-}
-.nh-home__menu-icon {
-  left: 336px;
-  top: 12px;
-  width: 24px;
-  height: 24px;
-  color: var(--nh-text);
-  pointer-events: none;
-}
-.nh-home__menu-icon svg {
-  display: block;
-}
-.nh-home__hit {
-  z-index: 3;
-}
-
-/* 계좌 이름 + ⌄ (19px/600), 오른쪽 새로고침·⋮ */
-/* 글자는 top 을 정수로 두고 나머지를 translate 로 (소수 top 은 1 CSS px 단위로 반올림됨) */
-.nh-home__name {
-  left: 24px;
-  top: 48px;
-  transform: translateY(0.3px);
-  display: flex;
-  align-items: center;
-  height: 24px;
-  font-size: 19px;
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: -0.0175em;
-  white-space: nowrap;
-}
-.nh-home__chev {
-  position: relative;
-  top: 0;
-  width: 19.73px; /* 37px */
-  height: 16px; /* 30px */
-  margin-left: 4.5px;
-  fill: none;
-  stroke: #a6a7ab;
-  stroke-width: 3.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.nh-home__late1 {
-  color: #cbcdd1;
-  animation: nh-home-late 0s 33ms both;
-}
-.nh-home__late2 {
-  color: #8b93a0;
-  animation: nh-home-late 0s 50ms both;
-}
-@keyframes nh-home-late {
-  from {
-    visibility: hidden;
-  }
-}
-
-/* 잠금 동그라미: 스크린샷 x 45~98, y 210~262 (53 × 52 기기 px = 28.27 × 27.73dp), 반경 12.28 (둥근 사각에 가까운 원),
-   0.5dp(기기 1px) 밝은 테 + 둘레 옅은 빛. 동그라미·테·자물쇠는 SVG(LockCircle), 빛만 이 상자의 그림자 */
-/* 빛: 그림자는 상자 안쪽엔 안 그려지므로 상자를 동그라미보다 작게(26 × 26) 두고 spread 1px 로 동그라미 바깥선(45~98 × 210~262)에 맞춤 */
-.nh-home__lock {
-  left: 25px;
-  top: 85px;
-  width: 26px;
-  height: 26px;
-  border-radius: 11.28px;
-  box-shadow: 0.133px -0.133px 10px 1px rgba(255, 255, 255, 0.085);
-  pointer-events: none;
-}
-.nh-home__lock-svg {
-  left: 24px;
-  top: 84px;
-  width: 32px; /* 60 기기 px = viewBox 60 */
-  height: 32px;
-  color: #cdd2d8;
-  pointer-events: none;
-}
-.nh-home__lock-glyph {
-  animation: nh-home-late 0s 16ms both;
-}
-/* 잔액: 숫자 32px, '원' 24px (둘 다 600, 글자 아래선 맞춤) */
-.nh-home__balance {
-  left: 59.8px;
-  top: 82px;
-  display: flex;
-  align-items: baseline;
-  height: 32px;
-  line-height: 32px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.nh-home__balance b {
-  font-size: 32px;
-  font-weight: 600;
-}
-.nh-home__balance span {
-  position: relative;
-  top: -2.4px; /* 실제 앱은 '원'이 숫자 아래선보다 2.4dp 위 */
-  margin-left: 1px;
-  font-size: 24px;
-}
-
-/* 들어올 때 잠깐 보이는 회색 상자 (녹화1 9.835~9.999초, 녹화2 35.968~36.115초): 바탕 #29343f 위로 밝은 띠가 왼→오.
-   띠는 상자마다 상자 폭 기준 (두 상자의 띠가 같은 비율 자리): 폭 = 상자 폭, 가장 밝은 곳(#3f4853)이 띠의 60% 자리,
-   양쪽으로 직선으로 바탕색까지. 상자 폭의 0.93배/초로 움직임 (2.15초에 -100% → +100%).
-   띠 세기: 처음 0.32초는 0.7, 0.75초까지 다 밝아짐 (녹화2 의 들어오는 띠는 녹화1 보다 옅음) */
-.nh-home__skel {
-  left: 24px;
-  overflow: hidden;
-  border-radius: 3px;
-  background: #29343f;
-}
-.nh-home__skel::after {
-  content: "";
+/* ---------- 콕뱅크 '일반' 홈 (다크) ----------
+   녹화3(480px, 1dp = 1.25px)에서 잰 dp. 녹화의 페이지 y(상태바 포함)에서 28 을 뺀 값이 화면 top.
+   글자 top: line-height 1 일 때 한글 잉크 가운데 = top + 0.54em 로 계산 (Pretendard) */
+.nh-gh-wrap {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(63, 72, 83, 0), #3f4853 60%, rgba(63, 72, 83, 0));
-  /* 다른 화면에 갔다 온 홈 (녹화2): 띠가 막 왼쪽 끝으로 들어오는 중 */
-  animation: nh-home-shimmer 2150ms linear -30ms infinite;
+  overflow: hidden;
+  background: #17161b;
 }
-/* 앱 켜고 처음 들어온 홈 (녹화1): 띠가 이미 상자 가운데쯤(가장 밝은 곳 0.44)에서 보이고, 50ms 움직인 뒤
-   실제 앱은 화면을 그리느라 110ms 멈춤 → translate 로 그만큼 되돌려 멈춘 것처럼 (그 뒤엔 그 자리에서 계속) */
-.nh-home__skel--first::after {
-  animation:
-    nh-home-shimmer 2150ms linear -912ms infinite,
-    nh-home-shimmer-hold 160ms linear forwards;
+.nh-gh {
+  background: #17161b;
+  scrollbar-width: none;
 }
-.nh-home__skel--1 {
-  top: 47.8px;
-  width: 154px;
-  height: 24px;
+.nh-gh::-webkit-scrollbar {
+  display: none;
 }
-.nh-home__skel--2 {
-  top: 76px;
-  width: 180px;
-  height: 44.8px;
+.nh-gh__page {
+  position: relative;
+  height: 1637.6px; /* 페이지 끝 1665.6 (제스처바 위) */
+  flex-shrink: 0;
 }
-@keyframes nh-home-shimmer {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0.7;
-  }
-  15% {
-    opacity: 0.7;
-  }
-  35% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 1;
-  }
-}
-@keyframes nh-home-shimmer-hold {
-  0%,
-  31.25% {
-    translate: 0;
-  }
-  100% {
-    translate: -10.2% 0;
-  }
-}
-
-/* 그림 (스크린샷 px 자리 그대로, Px 컴포넌트) */
-.nh-home__px {
-  pointer-events: none;
-  transform-origin: 0 0;
-}
-/* 참고 화면과 같은 배율(1dp = 1.875 기기 px)이면 잘라 온 픽셀을 그대로 (보간으로 흐려지지 않게) */
-@media (resolution: 1.875dppx) {
-  .nh-home__px img {
-    image-rendering: pixelated;
-  }
-}
-/* 캐릭터 (스크린샷 x 248–473, y 384–650) */
-.nh-home__char .poke {
-  animation: nh-poke 0.4s ease;
-}
-@keyframes nh-poke {
-  40% {
-    transform: scale(1.04, 0.96) translateY(4px);
-  }
-}
-.nh-home__char-fallback {
-  font-size: 90px;
-}
-
-/* 말풍선 (녹화1 480px: 알약 x 75.26–404.65, y 196.0–247.0 → 263.5 × 40.8dp, 꼬리 오른쪽 아래). 바탕·꼬리·빛은 SVG */
-.nh-home__tip {
-  left: 60px;
-  top: 128px;
-  transform: translate(0.4px, 0.8px); /* 화면 60.4, 156.8dp (안의 글자·이모지·X 기준) */
-  width: 263.6px;
-  height: 40.78px;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  padding-left: 10.2px;
-  color: var(--nh-text);
-  font-size: 16px;
-  white-space: nowrap;
-}
-.nh-home__tip-bg {
+.nh-gh__page > *,
+.nh-gh__top > *,
+.nh-gh__fin > *,
+.nh-gh__card > *,
+.nh-gh__wcard > *,
+.nh-gh__head > * {
   position: absolute;
+}
+/* .nh button(공용, 글자색 지정)보다 우선하도록 버튼 규칙은 .nh-gh-wrap 을 앞에 붙임 */
+:where(.nh-gh) button {
+  text-align: left;
+}
+.nh-gh__pic {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+}
+
+/* ---------- 맨 위 영역: 화면 0~322.4, 위 #17161b → 아래 #30353d, 아래 모서리 24 ---------- */
+.nh-gh__top {
   left: 0;
   top: 0;
-  z-index: -1;
-  width: 264px;
-  height: 49px;
-  overflow: visible;
-  pointer-events: none;
+  width: 384px;
+  height: 322.4px;
+  border-radius: 0 0 24px 24px;
+  background: linear-gradient(
+    #17161b 0,
+    #17171c 22px,
+    #1c1c24 72px,
+    #23262d 152px,
+    #2b3038 242px,
+    #30353d 317px
+  );
 }
-.nh-home__tip-emoji {
-  width: 25.6px;
-  height: 25.6px;
-  margin-left: 0.3px;
-  transform: translateY(-0.6px);
+
+/* NH농협(20/700, 흰색) · 청록 점 · 다른금융(18/400 #a6a6b0) — 잉크 가운데 y 73.6 / 75.2 */
+.nh-gh__tabs {
+  left: 0;
+  top: 0;
 }
-.nh-home__tip > span {
-  position: relative;
-  top: -1px;
-  left: -0.6px;
-  margin-left: 2.4px;
+.nh-gh__tabs button {
+  position: absolute;
+  white-space: nowrap;
+  line-height: 1;
   letter-spacing: -0.01em;
 }
-.nh-home__tip b {
-  font-weight: 600;
-  color: var(--nh-purple);
-}
-.nh-home__tip button {
-  position: absolute;
-  right: 12px;
-  top: 7px;
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  color: #9ca4ae;
-}
-.nh-home__tip button svg {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  transform: translate(-0.65px, -0.6px); /* X 잉크 중심 녹화 374.2, 218.5 */
-}
-/* 메뉴카드: 336 × 97.15, 반경 20, 반투명(0.74) 가로 그라데이션 → 뒤의 빛이 비침 */
-.nh-home__menu {
+.nh-gh__tabs button:first-child {
   left: 24px;
-  top: 350.09px;
-  width: 336px;
-  height: 97.15px;
-  border-radius: 20px; /* 바탕·테는 SVG(.nh-home__cards) */
+  top: 65.3px;
 }
-.nh-home__menu button {
-  position: absolute;
-  top: 0;
-  width: 78.58px;
-  height: 100%;
-  color: #cad3db;
-  font-size: 16px;
+.nh-gh__tabs button:last-child {
+  left: 101px;
+  top: 65.5px;
 }
-.nh-home__menu button > span {
-  position: absolute;
-  left: 50%;
-  top: 56px;
-  transform: translate(-50%, 0.4px);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  line-height: 20px;
-}
-/* 실제 글자 가운데가 칸 가운데보다 조금 왼쪽 (스크린샷 잉크 중심 x 138.5 / 287.2) */
-.nh-home__menu button:nth-child(1) > span {
-  transform: translate(calc(-50% - 0.8px), 0.4px);
-}
-.nh-home__menu button:nth-child(2) > span {
-  transform: translate(calc(-50% - 0.3px), 0.4px);
-}
-
-/* 메뉴카드·지식콕·금융콕·배너 바탕 (SVG, 스크린샷 px 좌표): CSS 상자는 1 CSS px 단위로 그려져 기기 1px 테가 반쯤 걸치기 때문.
-   지식콕·금융콕: 162.13 × 122.13 (304 × 229 기기 px), 사이 11.73, 반경 20, 가로 그라데이션 #28323b → #222a32, 0.5dp 테.
-   여기 버튼들은 글자·누르는 자리 */
-.nh-home__cards {
-  left: 24px;
-  top: 340px; /* 기기 690px */
-  width: 336px; /* 630 기기 px */
-  height: 392px; /* 735 기기 px */
-  pointer-events: none;
-}
-.nh-home__koks {
-  left: 24px;
-  top: 474.89px;
-  width: 336px;
-  display: flex;
-  justify-content: space-between;
-}
-.nh-home__kok {
-  position: relative;
-  width: 162.26px;
-  height: 122.23px;
-  border-radius: 20px;
-  text-align: left;
-}
-.nh-home__kok b {
-  position: absolute;
-  left: 16.24px;
-  top: 18.05px;
-  font-size: 17px;
-  font-weight: 500;
-  line-height: 20px;
-}
-
-/* 배너: 336 × 111.47, 반경 12, #e3effb */
-.nh-home__banner {
-  left: 24px;
-  top: 616.8px;
-  width: 336px;
-  height: 111.47px;
-  border-radius: 12px; /* 바탕은 SVG(.nh-home__cards) */
-  text-align: left;
-}
-.nh-home__banner small {
-  position: absolute;
-  left: 20.5px;
-  top: 21px;
-  transform: translateY(-0.25px);
-  font-size: 16.3px;
-  font-weight: 420; /* 실제는 500 보다 가는 획 (잉크 합 135k 에 맞춤) */
-  letter-spacing: -0.0103em;
-  line-height: 20px;
-  color: #5b6571;
-  white-space: nowrap;
-}
-.nh-home__banner b {
-  position: absolute;
-  left: 20.5px;
-  top: 45px;
-  transform: translateY(0.6px);
+.nh-gh__tabs button.on {
   font-size: 18.3px;
-  font-weight: 625; /* 잉크 합이 실제(535k)와 같아지는 굵기 */
-  line-height: 22.4px;
-  color: #1f2933;
+  font-weight: 700;
+  color: #fdfdff;
+}
+.nh-gh__tabs button:not(.on) {
+  font-size: 18px;
+  font-weight: 400;
+  color: #a6a6b0;
+}
+.nh-gh__tabs button:last-child.on {
+  top: 64.9px;
+}
+.nh-gh__tabs button:first-child:not(.on) {
+  top: 65.5px;
+}
+.nh-gh__tabs i {
+  position: absolute;
+  right: -7px;
+  top: -0.5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0495a0;
+}
+/* 전체계좌 > (16/400 #aaafb5, 꺾쇠 #6a6e76) */
+.nh-gh-wrap .nh-gh__all {
+  left: 282.3px;
+  top: 67.4px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #aaafb5;
+}
+.nh-gh__chev {
+  flex-shrink: 0;
+  color: #6a6e76;
+}
+.nh-gh__all .nh-gh__chev {
+  margin-left: 4.6px;
+}
+
+/* 계좌 카드: x 24~360, 화면 y 100.4~280.4, 모서리 20, 1px 테 */
+.nh-gh__cards {
+  left: 0;
+  top: 100.4px;
+  width: 384px;
+  height: 180px;
+  display: flex;
+  gap: 13px;
+  padding: 0 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.nh-gh__cards::-webkit-scrollbar {
+  display: none;
+}
+.nh-gh__cards > .nh-gh__card {
+  position: relative;
+  flex: 0 0 336px;
+  scroll-snap-align: center;
+}
+.nh-gh__card {
+  height: 180px;
+  border-radius: 20px;
+  background: linear-gradient(#262c36, #29313a);
+  box-shadow: inset 0 0 0 1px #343a43;
+}
+.nh-gh__card-icon {
+  left: 19px;
+  top: 16.5px;
+  width: 29px;
+  height: 29px;
+}
+.nh-gh__card-icon .nh-img {
+  display: block;
+}
+/* 계좌 이름 18/600 + ⌄ (11.2 × 7.2, #aeb3bd) */
+.nh-gh-wrap .nh-gh__name {
+  left: 52.6px;
+  top: 23.9px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+  color: #fbffff;
 }
-
-.nh-home__banner .nh-home__banner-l2 {
-  left: 21.03px;
-  top: 67px;
-  transform: translateY(0.9px);
+.nh-gh__schev {
+  flex-shrink: 0;
+  margin-left: 3px;
+  color: #aeb3bd;
 }
-/* '~' 는 실제 앱에서 X 에 더 붙고 조금 위 (스크린샷 잉크 중심 174.3, 1356.8) */
-.nh-home__tilde {
-  display: inline-block;
-  font-style: normal;
-  transform: translate(-0.7px, -0.95px);
+.nh-gh__num {
+  left: 51.8px;
+  top: 50.1px;
+  font-size: 14.65px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: #a3acb7;
 }
-
-/* 배경색상 설정 (16px/500) + 12dp 점 #c9e0ff */
-.nh-home__bgset {
+.nh-gh-wrap .nh-gh__refresh {
+  left: 259.2px;
+  top: 20.4px;
+  width: 24px;
+  height: 24px;
+  color: #ccd1d9;
+}
+.nh-gh__refresh svg,
+.nh-gh__lock svg {
+  display: block;
+}
+.nh-gh__more {
+  left: 301.2px;
+  top: 23.4px;
+  width: 4px;
+  height: 18px;
+  color: #9196a0;
+}
+.nh-gh__more svg {
+  display: block;
+}
+/* 잔액 24/700 + 🔒 버튼(32 × 32, 모서리 10, #3c444d) — 묶음이 카드 가운데 */
+.nh-gh__bal {
   left: 0;
   right: 0;
-  top: 753.5px;
-  margin: 0;
+  top: 80.8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-  letter-spacing: 0;
-  color: var(--nh-sub);
+  gap: 9.6px;
+  height: 32px;
 }
-.nh-home__bgset i {
+.nh-gh__bal b {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #fcffff;
+  cursor: pointer;
+}
+.nh-gh-wrap .nh-gh__lock {
+  width: 30.4px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #3c444d;
+  color: #ced6df;
+}
+.nh-gh__line {
+  left: 22px;
+  right: 22px;
+  top: 127.2px;
+  height: 1px;
+  background: #343d48;
+}
+.nh-gh-wrap .nh-gh__act {
+  top: 141.5px;
+  width: 140px;
+  text-align: center !important;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #f9fcff;
+}
+.nh-gh__act--hist {
+  left: 17.6px;
+}
+.nh-gh__act--send {
+  left: 177.2px;
+}
+.nh-gh__vsep {
+  left: 168.2px;
+  top: 147px;
+  width: 0.8px;
+  height: 10.4px;
+  background: #363e47;
+}
+.nh-gh__card--skel {
+  background: #262c36;
+}
+.nh-gh__card--empty {
+  left: 24px;
+  top: 100.4px;
+  width: 336px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.nh-gh__card--empty > * {
+  position: static;
+}
+.nh-gh__card--empty p {
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #c3cad3;
+}
+.nh-gh-wrap .nh-gh__card--empty button {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 18px;
+  background: #3c444d;
+  font-size: 15px;
+  color: #f6f7fb;
+}
+
+/* 등록계좌 (16/400 #9fa7b0, 밑줄) · 청록 ⌄ (19.2 × 7.2) · n/전체 */
+.nh-gh-wrap .nh-gh__reg {
+  left: 24px;
+  top: 294.4px;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #9fa7b0;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3.2px;
+}
+.nh-gh__regchev {
+  left: 181.7px;
+  top: 297.8px;
+  color: #13909c;
+}
+.nh-gh__count {
+  right: 24.8px;
+  top: 292.8px;
+  font-size: 16px;
+  line-height: 1;
+  color: #8b929b;
+}
+.nh-gh__count b,
+.nh-gh__kokcount b,
+.nh-gh__pager b {
+  font-weight: 500;
+  color: #fbfaff;
+}
+
+/* ---------- 콕추천 ---------- */
+.nh-gh__h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.nh-gh__h2--kok {
+  left: 24px;
+  top: 344.5px;
+}
+.nh-gh__kokcount {
+  right: 24.8px;
+  top: 346.4px;
+  font-size: 16px;
+  line-height: 1;
+  color: #8b8a90;
+}
+/* 카드 248 × 104.6, 사이 16, 가운데 카드 x 68. 흰 바탕, 모서리 20 */
+.nh-gh__rec {
+  left: 0;
+  top: 382.4px;
+  width: 384px;
+  height: 116.4px;
+  display: flex;
+  gap: 16px;
+  padding: 0 68px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 68px;
+  scrollbar-width: none;
+}
+.nh-gh__rec::-webkit-scrollbar {
+  display: none;
+}
+.nh-gh__reccard {
   position: relative;
-  top: -0.8px;
-  width: 12px;
-  height: 12px;
+  flex: 0 0 248px;
+  height: 116.4px;
+  scroll-snap-align: start;
+  clip-path: inset(5.9px 0 round 20px);
+  transition: clip-path 200ms ease;
+}
+.nh-gh__reccard.on {
+  clip-path: inset(0 0 round 20px);
+}
+.nh-gh__reccard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+}
+.nh-gh__reccard > b,
+.nh-gh__reccard > span,
+.nh-gh__reccard > em {
+  position: absolute;
+}
+.nh-gh__reccard > b {
+  left: 20px;
+  top: 23.4px;
+  font-size: 18.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #1d1e21;
+  white-space: nowrap;
+}
+.nh-gh__reccard > span {
+  left: 21px;
+  top: 52.2px;
+  font-size: 15.6px;
+  line-height: 21.2px;
+  letter-spacing: -0.01em;
+  color: #7d848c;
+  white-space: nowrap;
+  z-index: 1;
+}
+.nh-gh__ad {
+  right: 14px;
+  top: 12px;
+  padding: 0 2px;
+  border: 1px solid #c9ccd2;
+  border-radius: 4px;
+  font-size: 9px;
+  font-style: normal;
+  line-height: 11px;
+  color: #b8bcc3;
+}
+
+/* ---------- 광고 배너: x 24~360, 화면 y 519.2~661.6 (페이지 547.2~689.6), 모서리 22, 흰색. 3초마다 왼쪽으로 ---------- */
+.nh-gh__banner {
+  left: 24px;
+  top: 519.2px;
+  width: 336px;
+  height: 142.4px;
+  border-radius: 22px;
+  background: #fff;
+  overflow: hidden;
+}
+.nh-gh__banner-track {
+  display: flex;
+  height: 100%;
+  transition: transform 420ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+.nh-gh__banner-item {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+}
+.nh-gh__banner-item > span,
+.nh-gh__banner-item > b,
+.nh-gh__banner-item > em {
+  position: absolute;
+  white-space: nowrap;
+}
+.nh-gh__banner-cat {
+  left: 21.6px;
+  top: 24.5px;
+  font-size: 15.4px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.nh-gh__banner-item > b {
+  left: 21.6px;
+  top: 45px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  color: #2a2e35;
+}
+.nh-gh__banner-item > .nh-gh__link {
+  left: 21.6px;
+  top: 103.5px;
+  font-size: 16.8px;
+}
+.nh-gh__link {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #6b6e75;
+  white-space: nowrap;
+}
+.nh-gh__link .nh-gh__chev {
+  margin-left: -1px;
+  color: #9a9da4;
+}
+.nh-gh__ad--banner {
+  right: 14px;
+  top: 14.4px;
+}
+
+/* n/9 ⏸ (가운데) · 전체보기 > */
+.nh-gh__pager {
+  left: 171.8px;
+  top: 678.1px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1;
+  color: #8b8a90;
+}
+.nh-gh-wrap .nh-gh__pager button {
+  margin: -3.2px 0 0 7.4px;
+  color: #737277;
+}
+.nh-gh__pager svg {
+  display: block;
+}
+.nh-gh-wrap .nh-gh__seeall {
+  right: 33.8px;
+  top: 674.3px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #a3a6af;
+}
+.nh-gh__seeall .nh-gh__chev {
+  margin: 0 -6.4px 0 4.4px;
+  color: #5d6067;
+}
+
+/* ---------- 금융상품·마이데이터: 페이지 739.2 부터 바탕 #1e2732 ---------- */
+.nh-gh__fin {
+  left: 0;
+  top: 711.2px;
+  width: 384px;
+  height: 926.4px;
+  background: #1e2732;
+}
+.nh-gh__fin > .nh-gh__h2 {
+  left: 24px;
+}
+.nh-gh__wcard {
+  left: 24px;
+  width: 336px;
+  border-radius: 22px;
+  background: #fff;
+  overflow: hidden;
+}
+.nh-gh__wcard > b,
+.nh-gh__wcard > span {
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.nh-gh__wcard > b {
+  font-weight: 500;
+  color: #1c1e22;
+}
+.nh-gh__wcard > span {
+  color: #74767c;
+}
+/* 농협 생활 백서: 페이지 800.8~900.8 */
+.nh-gh__notice {
+  top: 61.6px;
+  height: 100px;
+}
+.nh-gh__notice > b {
+  left: 80px;
+  top: 19.7px;
+  font-size: 16.2px;
+}
+.nh-gh__notice > span {
+  left: 79.6px;
+  top: 45.7px;
+  font-size: 14.6px;
+}
+/* 적금 카드 (점 4개 = 4장, 손으로 넘김): 페이지 920.8~1124.8 */
+.nh-gh__savings {
+  left: 0;
+  top: 181.6px;
+  width: 384px;
+  height: 204px;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.nh-gh__savings::-webkit-scrollbar {
+  display: none;
+}
+.nh-gh__saving {
+  position: relative;
+  flex: 0 0 336px;
+  height: 204px;
+  margin: 0 24px;
+  scroll-snap-align: center;
+}
+.nh-gh__saving > span:first-child {
+  left: 20.8px;
+  top: 20.4px;
+  font-size: 14.4px;
+}
+.nh-gh__saving > b {
+  left: 20.8px;
+  top: 48.1px;
+  font-size: 18px;
+  line-height: 21.6px;
+}
+.nh-gh__saving-name {
+  left: 20.8px;
+  top: 104px;
+  font-size: 14.9px;
+}
+/* 점: 지름 7.2, 사이 2.8 — 지금 장 #aaaebb 채움, 나머지 #4a535e 테 */
+.nh-gh__dots {
+  left: 172.8px;
+  top: 402.4px;
+  display: flex;
+  gap: 2.8px;
+}
+.nh-gh__dots i {
+  position: static;
+  width: 7.2px;
+  height: 7.2px;
   border-radius: 50%;
-  background: #c9e0ff;
+  box-shadow: inset 0 0 0 1px #4a535e;
+}
+.nh-gh__dots i.on {
+  background: #aaaebb;
+  box-shadow: none;
+}
+/* 타일 162 × 123.4 (사이 12), 페이지 1173.6 / 1309.6 */
+.nh-gh__tile {
+  width: 162px;
+  height: 123.4px;
+}
+.nh-gh__tile > span {
+  left: 21.6px;
+  top: 25.2px;
+  font-size: 15.4px;
+  color: #808186;
+}
+.nh-gh__tile > b {
+  left: 20.8px;
+  top: 48.6px;
+  font-size: 17.3px;
+}
+/* 마이데이터 카드: 페이지 1493.6~1612 */
+.nh-gh__mydata {
+  top: 754.4px;
+  height: 118.4px;
+}
+.nh-gh__mydata > span:first-child {
+  left: 20.8px;
+  top: 23.8px;
+  font-size: 15.5px;
+}
+.nh-gh__mydata > b {
+  left: 21.6px;
+  top: 47.8px;
+  font-size: 18.5px;
+}
+.nh-gh__mydata > .nh-gh__link {
+  left: 22.4px;
+  top: 79.8px;
+  font-size: 15.5px;
+  color: #7a7c82;
+}
+
+/* ---------- 위 고정 줄 (큰글·아이콘) + 접힌 계좌 ---------- */
+.nh-gh__head {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 384px;
+  height: 48px;
+  z-index: 5;
+  pointer-events: none;
+}
+.nh-gh__head > * {
+  pointer-events: auto;
+}
+.nh-gh__head--scrolled {
+  background: #17161b;
+}
+.nh-gh__head--collapsed {
+  height: 217px;
+  background: none;
+}
+/* 큰글: 알약 x 24~92, y 12~37.6 (#1f2833), 동그라미 22.4 (#3d4a59), 글자 15/500 #d0d8e1 */
+.nh-gh-wrap .nh-gh__big {
+  left: 25.6px;
+  top: 11.6px;
+  width: 56px;
+  height: 26px;
+  border-radius: 13px;
+  background: #1f2833;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 21.2px;
+  padding-left: 28.4px;
+  color: #d0d8e1;
+  white-space: nowrap;
+}
+.nh-gh__big i {
+  position: absolute;
+  left: 1.6px;
+  top: 1.8px;
+  width: 22.4px;
+  height: 22.4px;
+  border-radius: 50%;
+  background: #3d4a59;
+  transition: transform 160ms ease;
+}
+.nh-gh__big.on {
+  background: #0b8f99;
+}
+.nh-gh__big.on i {
+  background: #fff;
+}
+.nh-gh-wrap .nh-gh__icon {
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  color: #fbfbff;
+}
+.nh-gh__icon svg {
+  display: block;
+}
+.nh-gh__icon--my {
+  left: 214.6px;
+  top: 11px;
+  width: 26px;
+  height: 26px;
+}
+.nh-gh__icon--my svg {
+  width: 26px;
+  height: 26px;
+}
+.nh-gh__icon--search {
+  left: 256.8px;
+}
+.nh-gh__icon--bell {
+  left: 296px;
+}
+.nh-gh-wrap .nh-gh__icon--menu {
+  left: 336px;
+  color: #ebecf1;
+}
+
+/* 접힌 계좌: 바탕(화면 0~217, 아래 모서리 24) + 카드 x 24~360, y 60~172 + 청록 ⌄ */
+.nh-gh__mini {
+  left: 0;
+  top: 0;
+  width: 384px;
+  height: 217px;
+  border-radius: 0 0 24px 24px;
+  background: linear-gradient(
+    #17161b 0,
+    #1a1c24 48px,
+    #22262e 120px,
+    #28323a 217px
+  );
+  animation: nh-gh-mini 180ms ease-out both;
+}
+@keyframes nh-gh-mini {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+.nh-gh__mini > * {
+  position: absolute;
+}
+.nh-gh__minicard {
+  left: 24px;
+  top: 60px;
+  width: 336px;
+  height: 112px;
+  border-radius: 20px;
+  background: linear-gradient(#292d36, #262e37);
+  box-shadow: inset 0 0 0 1px #343a43;
+}
+.nh-gh__minicard > * {
+  position: absolute;
+}
+.nh-gh__mini-icon {
+  left: 19px;
+  top: 16.1px;
+}
+.nh-gh__mini-icon .nh-img {
+  display: block;
+}
+.nh-gh-wrap .nh-gh__mini-num {
+  left: 53px;
+  top: 24.6px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #c9d0d8;
+  white-space: nowrap;
+}
+.nh-gh__mini-num .nh-gh__schev {
+  margin-left: 2px;
+  color: #9ea7b1;
+}
+.nh-gh__more--mini {
+  left: 301.2px;
+  top: 23px;
+}
+.nh-gh__mini-bal {
+  left: 0;
+  right: 0;
+  top: 57.8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7.2px;
+  height: 26.4px;
+}
+.nh-gh__mini-bal b {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+/* 송금: 52.4 × 26.4, 모서리 10, 카드보다 살짝 어두운 #232a34 */
+.nh-gh-wrap .nh-gh__mini-bal button {
+  height: 26.4px;
+  padding: 0 10.6px;
+  border-radius: 10px;
+  background: #232a34;
+  font-size: 17px;
+  line-height: 26.4px;
+  color: #d4dde7;
+}
+.nh-gh__minichev {
+  left: 182.5px;
+  top: 191.6px;
+  color: #13909c;
+}
+
+/* ---------- 아래 탭바: 화면 743~810.3, 위 모서리 20, #14171e. 아이콘 20dp 회색(마스크), 글자 14/500 #6a6f79 ---------- */
+.nh-gh__tabbar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 384px;
+  height: 67.3px;
+  z-index: 4;
+  display: flex;
+  padding: 0 8.6px;
+  border-radius: 20px 20px 0 0;
+  background: #15171e;
+  box-shadow: 0 -0.8px 0 #262f3a;
+  transition: transform 220ms ease;
+}
+.nh-gh__tabbar--hide {
+  transform: translateY(100%);
+}
+.nh-gh-wrap .nh-gh__tabbar button {
+  position: relative;
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #6a6f79;
+  text-align: center;
+  padding-top: 27.2px;
+  line-height: 1;
+}
+.nh-gh__tabbar i {
+  position: absolute;
+  left: 50%;
+  top: 9.6px;
+  width: 26.4px;
+  height: 25.6px;
+  margin-left: -13.2px;
+  background: #6a7282;
+  -webkit-mask: var(--m) center / 100% 100% no-repeat;
+  mask: var(--m) center / 100% 100% no-repeat;
+}
+
+/* ↑ 맨 위로: 지름 51, 화면 x 309~360, y 720~771, #17171b + 옅은 빛 */
+.nh-gh-wrap .nh-gh__top-btn {
+  position: absolute;
+  left: 309px;
+  top: 720px;
+  width: 51px;
+  height: 51px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #17171b;
+  box-shadow: 0 0 14px rgba(150, 160, 175, 0.18);
+  color: #c5c9d0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+.nh-gh__top-btn.on {
+  opacity: 1;
+  pointer-events: auto;
 }
