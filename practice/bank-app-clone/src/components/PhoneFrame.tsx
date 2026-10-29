@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { OS } from "../platform/platform";
+import { canRecord, recordPhone } from "../platform/recorder";
 import { THEME } from "../platform/theme";
 import { APP } from "../profile/session";
 import "./PhoneFrame.css";
@@ -103,6 +104,13 @@ export function OsSwitch() {
           다크
         </a>
       </nav>
+      {/* 녹화: 누르면 앱을 처음(시작화면)부터 다시 띄우며 폰 화면만 녹화 */}
+      {canRecord() && (
+        <button className="os-switch os-switch--rec" onClick={recordPhone}>
+          <i />
+          녹화
+        </button>
+      )}
     </div>
   );
 }

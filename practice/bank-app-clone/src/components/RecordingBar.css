@@ -36,3 +36,24 @@
     opacity: 0.3;
   }
 }
+
+/* 폰: 공유 허락 뒤 "화면을 누르면 녹화 시작" (페이지 전체를 덮는 버튼) */
+.rec-arm {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.82);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+.rec-arm small {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.75;
+}

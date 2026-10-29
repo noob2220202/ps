@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { stopRecording, useRecorder } from "../platform/recorder";
+import { beginArmed, stopRecording, useRecorder } from "../platform/recorder";
 import "./RecordingBar.css";
 
 // 녹화 중 표시 + 정지 버튼. 폰 바깥(페이지 맨 위)에 떠서 녹화 영상에는 안 찍힌다
@@ -12,7 +12,17 @@ export function RecordingBar() {
     const id = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(id);
   }, [recording]);
-  if (!recording) return null;
+  // 폰: 화면 공유를 허락한 뒤 한 번 더 눌러야 전체화면으로 시작 (전체화면은 누름 안에서만 켤 수 있음)
+  if (rec.status === "arming")
+    return (
+      <button className="rec-arm" onClick={beginArmed}>
+        <span className="rec-bar__dot" />
+        화면을 누르면 녹화 시작
+        <small>전체화면으로 바뀌고 앱이 처음부터 켜져요. 끝낼 때는 뒤로가기</small>
+      </button>
+    );
+  // 전체화면 녹화(폰) 중엔 막대를 숨김 — 끝내기는 뒤로가기(전체화면 나가기)
+  if (!recording || rec.fullscreen) return null;
   const sec = Math.max(0, Math.floor((now - rec.startedAt) / 1000));
   return (
     <div className="rec-bar" role="status">

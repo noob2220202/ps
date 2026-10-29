@@ -7,7 +7,7 @@ import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { isCapture, setCapture } from "../platform/capture";
-import { canRecord, startRecording } from "../platform/recorder";
+import { canRecord, recordPhone } from "../platform/recorder";
 import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
@@ -204,17 +204,16 @@ function RecordButton({ onStart }: { onStart: () => void }) {
       <button
         className="btn btn--sm"
         onClick={() => {
-          const phone = document.querySelector<HTMLElement>(".phone");
-          if (!phone) return;
-          const wasCapture = isCapture();
-          setCapture(true);
           onStart();
-          startRecording(phone, () => setCapture(wasCapture));
+          recordPhone();
         }}
       >
         ● 녹화 시작
       </button>
-      <p className="tab__hint">공유 창에서 "이 탭"을 고르면 시작돼요. 위쪽 막대의 정지를 누르면 영상 파일이 저장돼요. 화면 배율이 높은 모니터(레티나 등)일수록 선명해요.</p>
+      <p className="tab__hint">
+        폰 아래 [● 녹화] 버튼과 같아요. 녹화가 시작되면 앱이 시작화면부터 다시 켜져요. PC는 공유 창에서 "이 탭", 폰은 허용한 뒤 화면을 한 번 더 누르면
+        전체화면으로 시작돼요. 끝낼 때: PC는 위쪽 막대의 정지, 폰은 뒤로가기(전체화면 나가기)
+      </p>
     </Field>
   );
 }

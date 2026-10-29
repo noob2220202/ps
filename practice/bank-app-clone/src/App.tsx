@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { Route, Routes, type Location } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Route, Routes, useNavigate, type Location } from "react-router-dom";
 import { OsSwitch, PhoneFrame } from "./components/PhoneFrame";
 import { RecordingBar } from "./components/RecordingBar";
 import { ScreenStack } from "./components/ScreenStack";
@@ -28,8 +28,10 @@ import { NhTxDetail } from "./nh/NhTxDetail";
 import "./nh/nh-light.css"; // 콕뱅크 라이트모드 (화면 CSS 뒤에)
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
+import { RESTART_EVENT } from "./platform/recorder";
+import { useStatusBar } from "./hooks/useStatusBar";
 
-type Boot = "pick" | "splash" | "loading" | "ready";
+type Boot = "off" | "pick" | "splash" | "loading" | "ready";
 
 // ScreenStack이 화면마다 "그 화면의 주소"로 이 함수를 불러서 그린다
 const renderRoute = (location: Location) => (
@@ -72,10 +74,26 @@ export default function App() {
   // onDone이 렌더마다 새 함수면 Splash의 effect가 다시 돌아서 타이머가 리셋됨 → useCallback
   const toLoading = useCallback(() => setBoot("loading"), []);
   const toReady = useCallback(() => setBoot("ready"), []);
+  // 녹화 시작: 검은 화면(off) → 앱을 처음부터 (시작화면). 녹화에 앱이 켜지는 모습까지 찍히게
+  const navigate = useNavigate();
+  useEffect(() => {
+    const onRestart = (e: Event) => {
+      if ((e as CustomEvent).detail === "off") {
+        navigate("/", { replace: true });
+        setBoot("off");
+      } else {
+        prefetch(paths.home);
+        setBoot(currentProfileId() ? "splash" : "pick");
+      }
+    };
+    window.addEventListener(RESTART_EVENT, onRestart);
+    return () => window.removeEventListener(RESTART_EVENT, onRestart);
+  }, [navigate]);
 
   return (
     <StatusBarProvider>
       <PhoneFrame overlay={APP === "nh" ? <NhLoadingLayer /> : undefined}>
+        {boot === "off" && <PhoneOff />}
         {boot === "pick" && <ProfilePicker onEnter={toSplash} />}
         {boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
         {boot === "loading" && <BootLoading onDone={toReady} />}
@@ -85,4 +103,10 @@ export default function App() {
       <RecordingBar />
     </StatusBarProvider>
   );
+}
+
+// 앱이 꺼진 상태 (녹화 시작 직전): 검은 화면
+function PhoneOff() {
+  useStatusBar("#000000", "light");
+  return <div style={{ position: "absolute", inset: 0, background: "#000" }} />;
 }
