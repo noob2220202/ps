@@ -23,11 +23,12 @@
   align-items: center;
   gap: 4px;
 }
+/* 배터리: 아래에서부터 잔량만큼 채우고 나머지는 옅게 */
 .statusbar__battery {
   width: 7px;
   height: 11px;
   border-radius: 1.5px;
-  background: currentColor;
+  background: linear-gradient(to top, currentColor var(--lv, 62%), color-mix(in srgb, currentColor 35%, transparent) var(--lv, 62%));
 }
 
 /* ---------- iOS 상태바 (iPhone 17 Pro: 높이 54pt, 시간은 섬 왼쪽 공간의 가운데) ---------- */
@@ -72,6 +73,9 @@
 .ios-battery__level {
   border-radius: 2px;
   background: currentColor;
+}
+.ios-battery__level--low {
+  background: #ff3b30;
 }
 
 /* 다이내믹 아일랜드: 상태바 위에 떠 있는 검은 알약 */
@@ -130,8 +134,10 @@
 /* ---------- PC용 기기 전환 스위치 ---------- */
 .switches {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
+  max-width: 760px;
   margin: 18px auto 0;
 }
 .os-switch {
@@ -169,6 +175,47 @@
   height: 9px;
   border-radius: 50%;
   background: #ff3b30;
+}
+/* 배터리 · 시각 · 실제 시간 */
+.os-switch--status {
+  align-items: center;
+  gap: 4px;
+  padding: 3px 3px 3px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+.os-switch--status label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: 6px;
+}
+.os-switch--status input {
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  color: #111;
+  text-align: center;
+}
+.os-switch--status input[type="number"] {
+  width: 44px;
+}
+.os-switch--status input[type="time"] {
+  width: 112px;
+}
+.os-switch--status button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font: inherit;
+  color: #555;
+}
+.os-switch--status button.on {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 @media (max-width: 500px) {
   .switches {

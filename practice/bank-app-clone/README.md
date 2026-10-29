@@ -92,6 +92,11 @@ python3 scripts/nh-crops/txdetail.py --detail-out 출금상세_아래스크롤.j
 python3 scripts/nh-crops/accounts.py --accounts 전체계좌.jpg --register 녹화2_62.5초.png
 ```
 
+## 폰 아래 스위치 줄 (PC)
+
+`Galaxy/iPhone` · `라이트/다크` · 🔋 배터리 잔량(0~100) · 🕐 상태바 시각(정한 시각부터 흘러감) · `실제 시간`(지금 시각으로) · `● 녹화`.
+배터리·시각은 이 브라우저에 기억됨. 아이폰은 20% 이하면 배터리가 빨강
+
 ## ● 화면 녹화 (폰 아래 `Galaxy/iPhone · 라이트/다크` 옆 버튼)
 
 누르면 앱이 검은 화면 → **시작화면부터 다시 켜지면서** 폰 화면만 녹화됩니다 (앱 켜지는 모습까지).

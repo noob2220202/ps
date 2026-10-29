@@ -1,5 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
+import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { OS } from "../platform/platform";
 import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
 import { THEME } from "../platform/theme";
@@ -7,15 +8,12 @@ import { APP } from "../profile/session";
 import "./PhoneFrame.css";
 
 function useClock() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 10_000);
-    return () => clearInterval(id);
-  }, []);
+  const now = useNow();
   return `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
 function AndroidIcons() {
+  const { battery } = useDeviceStatus();
   return (
     <span className="statusbar__right">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -24,14 +22,15 @@ function AndroidIcons() {
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <path d="M3 20h3v-4H3Zm5 0h3v-8H8Zm5 0h3V8h-3Zm5 0h3V4h-3Z" />
       </svg>
-      <span>62%</span>
-      <span className="statusbar__battery" />
+      <span>{battery}%</span>
+      <span className="statusbar__battery" style={{ ["--lv" as string]: `${battery}%` }} />
     </span>
   );
 }
 
 // iOS 상태바: 셀룰러 4칸 + 와이파이 부채꼴 + 둥근 배터리(옅은 테두리, 잔량만큼 채움)
 function IosIcons() {
+  const { battery } = useDeviceStatus();
   return (
     <span className="statusbar__right statusbar__right--ios">
       <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden>
@@ -44,7 +43,7 @@ function IosIcons() {
         <path d="M8 2.4c2.4 0 4.6.9 6.3 2.5l1.2-1.3A10.6 10.6 0 0 0 8 .6 10.6 10.6 0 0 0 .5 3.6l1.2 1.3A9 9 0 0 1 8 2.4Zm0 3.5c1.5 0 2.9.6 4 1.6l1.2-1.3A7.4 7.4 0 0 0 8 4.1a7.4 7.4 0 0 0-5.2 2.1L4 7.5a5.7 5.7 0 0 1 4-1.6ZM8 12l2.6-2.8a3.7 3.7 0 0 0-5.2 0Z" />
       </svg>
       <span className="ios-battery">
-        <span className="ios-battery__level" style={{ width: "62%" }} />
+        <span className={`ios-battery__level${battery <= 20 ? " ios-battery__level--low" : ""}`} style={{ width: `${battery}%` }} />
       </span>
     </span>
   );
@@ -110,6 +109,7 @@ export function OsSwitch() {
           다크
         </a>
       </nav>
+      <DeviceStatusControls />
       {/* 녹화: 누르면 앱을 처음(시작화면)부터 다시 띄우며 폰 화면만 녹화 */}
       {canRecord() && (
         <button className="os-switch os-switch--rec" onClick={recordPhone}>
@@ -117,6 +117,40 @@ export function OsSwitch() {
           녹화
         </button>
       )}
+    </div>
+  );
+}
+
+// 배터리 잔량 · 시계(정한 시각부터 흐름) · 실제 시각으로
+function DeviceStatusControls() {
+  const { battery, offset } = useDeviceStatus();
+  const now = useNow();
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const [draft, setDraft] = useState<string | null>(null); // 시각 입력 중인 값
+  return (
+    <div className="os-switch os-switch--status">
+      <label title="배터리 잔량">
+        <span aria-hidden>🔋</span>
+        <input type="number" min={0} max={100} value={battery} onChange={(e) => e.target.value !== "" && setBattery(Number(e.target.value))} />%
+      </label>
+      <label title="상태바 시각 (정한 시각부터 흘러감)">
+        <span aria-hidden>🕐</span>
+        <input
+          type="time"
+          value={draft ?? hhmm}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={() => {
+            if (draft) setClock(draft);
+            setDraft(null);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          }}
+        />
+      </label>
+      <button className={offset === null ? "on" : ""} onClick={syncClock} title="실제 시각으로 맞추기">
+        실제 시간
+      </button>
     </div>
   );
 }
