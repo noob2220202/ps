@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
-"""NH 콕뱅크 화면 이미지를 스크린샷(720px)·녹화(480px)에서 잘라 src/assets/local/nh-*.png 로 저장.
+"""NH 콕뱅크 공용 이미지 몇 개를 스크린샷(720px)·녹화(480px)에서 잘라 src/assets/local/nh-*.png 로 저장.
 
-  python3 scripts/extract-nh.py --home 홈.jpg --history 계좌별거래내역.jpg --detail-out 출금상세.jpg \\
-                                --video1 녹화1.mp4 --video2 녹화2.mp4
+  python3 scripts/extract-nh.py --history 계좌별거래내역.jpg --video1 녹화1.mp4
 
-(2026-10-28 21:4x 스크린샷·녹화 기준) 필요: ffmpeg, Pillow, numpy
-
-콕뱅크는 다크 화면뿐이고 그림이 놓이는 바탕색이 정해져 있어서(페이지 #18171c, 메뉴 카드 #28323c …)
-대부분 사각형 그대로 자른다 → CSS 바탕색을 같은 색으로 맞추면 이음새가 안 보임.
-여러 바탕에 올라가는 계좌 아이콘만 바깥을 투명하게 딴다.
+화면별 정밀 이미지는 scripts/nh-crops/*.py (화면 담당별) 가 만든다. 필요: ffmpeg, Pillow, numpy
 """
 import argparse
 import subprocess
@@ -81,47 +76,25 @@ def circle(img, cx, cy, d):
 
 
 def main(args):
+    # 화면별 정밀 이미지는 scripts/nh-crops/<담당>.py 가 만든다 (홈·시작화면 home.py, 콕송금 send-who.py, 은행선택 picker.py,
+    # 송금 확인·완료 confirm.py, 거래내역 history.py, 거래상세 txdetail.py, 전체계좌·등록 accounts.py).
+    # 이 파일은 여러 화면이 같이 쓰는 몇 개만 만든다 — 예전 사각형 자르기를 여기서 다시 돌리면 정밀 이미지를 덮어쓰니 넣지 말 것.
     OUT.mkdir(parents=True, exist_ok=True)
-    if args.home:  # 홈 스크린샷 720px
-        img = load(args.home, 720)
-        save(img.crop((0, 290, 720, 712)), "nh-hero.png")  # 캐릭터 + 뒤 파란 빛 (페이지 바탕까지 포함)
-        # 카드 바탕이 위아래로 살짝 그라데이션이라 사각형으로 자르면 테두리가 보임 → 바깥을 투명하게
-        for name, x0, x1 in [("send", 112, 166), ("myaccount", 259, 314), ("poke", 405, 462), ("dutch", 553, 609)]:
-            save(cutout_on(img, (x0, 744, x1, 802), (40, 51, 62), 14), f"nh-menu-{name}.png")
-        save(cutout_on(img, (215, 1040, 345, 1160), (35, 43, 52), 22, [PAGE]), "nh-kok-bulb.png")  # 지식콕
-        save(cutout_on(img, (550, 1040, 674, 1160), (35, 43, 52), 22, [PAGE]), "nh-kok-pig.png")  # 금융콕
-        save(cutout_on(img, (415, 1212, 670, 1415), (227, 239, 251), 16, [PAGE]), "nh-banner-char.png")  # 배너 캐릭터
     if args.history:  # 계좌별 거래내역 스크린샷 720px
         img = load(args.history, 720)
-        save(cutout_on(img, (34, 274, 112, 352), (24, 23, 28)), "nh-account.png")  # 노란 농협 아이콘 + 별
-        save(img.crop((67, 566, 108, 607)), "nh-chip-send.png")  # '송금' 칩 앞 동전
-    if args.detail_out:  # 출금 거래 상세 스크린샷 720px
-        img = load(args.detail_out, 720)
-        save(img.crop((212, 1203, 308, 1299)), "nh-quick-register.png")  # 빠른송금 등록
-        save(img.crop((412, 1203, 508, 1299)), "nh-same-send.png")  # 동일내역 송금
+        # 노란 농협 아이콘 + 별 (아이콘 y 289–357, 별 위끝 281 → 아래가 잘리지 않게)
+        save(cutout_on(img, (34, 280, 112, 358), (24, 23, 28)), "nh-account.png")
     with tempfile.TemporaryDirectory() as tmp:
-        if args.video1:  # 녹화1 (480px): 시작 화면
+        if args.video1:  # 녹화1 (480px)
             f = frame(args.video1, 1.0, tmp)
-            save(f.crop((190, 486, 282, 574)), "nh-app-icon.png")  # 흰 바탕 위 콕 아이콘
-            f = frame(args.video1, 2.0, tmp)
-            save(f.crop((118, 412, 362, 498)), "nh-wordmark.png")
-            save(f.crop((196, 108, 284, 160)), "nh-nonghyup.png")  # 새로운 대한민국 농협
-            save(f.crop((198, 896, 282, 952)), "nh-ma.png")
+            save(f.crop((190, 486, 282, 574)), "nh-app-icon.png")  # 흰 바탕 위 콕 아이콘 (프로필 고르기 화면)
             f = frame(args.video1, 17.5, tmp)  # 콕송금 최근송금 목록
             save(circle(f, 52, 950, 45), "nh-bank.png")  # 목록의 농협 아이콘 (노란 동그라미)
             save(cutout_on(f, (28, 124, 62, 157), PAGE, 20), "nh-account-plain.png")  # 출금계좌 아이콘 (별 없음)
-        if args.video2:  # 녹화2: 송금 확인·완료
-            f = frame(args.video2, 26.5, tmp)
-            save(f.crop((204, 514, 276, 588)), "nh-shield.png")  # 시트 바탕(#2c3540) 그대로
-            f = frame(args.video2, 30.5, tmp)
-            save(f.crop((200, 165, 280, 250)), "nh-coin.png")
-            f = frame(args.video2, 34.5, tmp)
-            for name, x0 in [("card", 86), ("kakao", 203), ("mms", 319)]:
-                save(f.crop((x0, 799, x0 + 70, 867)), f"nh-msg-{name}.png")
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    for flag in ("home", "history", "detail-out", "video1", "video2"):
+    for flag in ("history", "video1"):
         ap.add_argument(f"--{flag}")
     main(ap.parse_args())

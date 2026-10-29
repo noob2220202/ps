@@ -256,9 +256,3 @@
 .nh-sw__quick svg {
   margin-right: -1px;
 }
-
-/* 받는 분을 고른 뒤 단계(NhSendAmount, 담당 amount)가 같이 쓰는 줄 */
-.nh-send__mini small {
-  font-size: 14px;
-  color: var(--nh-sub);
-}

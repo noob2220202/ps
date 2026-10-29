@@ -62,11 +62,15 @@
   padding: 0 16px;
   background: var(--nh-bg);
 }
+/* 제목: 순백 #ffffff (아이콘만 #f6f7fb), 잉크가 줄 가운데보다 약 1.4dp 위 (스크린샷 y 82–109px@720, 녹화 54.5–71.8px@480).
+   위치는 translate 로 (top/margin 은 기기 픽셀에 붙어서 반올림됨) */
 .nh-header h1 {
   margin: 0 0 0 8px;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.15px;
+  color: #fff;
+  translate: 0 -1.4px;
 }
 .nh-header__right {
   margin-left: auto;
@@ -185,14 +189,18 @@
   background: var(--nh-disabled); /* 시트 위 비활성 */
   color: var(--nh-disabled-text) !important;
 }
+/* 0.5dp 테두리: 크롬은 1px보다 얇은 border 를 1 CSS px(기기 1.875px)로 올려 그려서 두 배 진해짐 →
+   안쪽 그림자 0.5333px (= 스크린샷 기기 1px) 로 */
 .nh-btn--line {
   background: transparent;
-  border: 0.5px solid var(--nh-outline-btn);
+  border: 0;
+  box-shadow: inset 0 0 0 0.5333px var(--nh-outline-btn);
   color: var(--nh-chip-text) !important;
 }
 .nh-btn--outline-purple {
   background: transparent;
-  border: 0.5px solid var(--nh-purple);
+  border: 0;
+  box-shadow: inset 0 0 0 0.5333px var(--nh-purple);
   color: var(--nh-purple) !important;
 }
 /* 실제 앱은 누를 때 버튼 색이 안 바뀜 */
@@ -321,7 +329,8 @@
 }
 .nh .dialog__buttons .dialog__cancel {
   flex: 0 0 calc(40% - 4px);
-  border: 0.5px solid var(--nh-input-line);
+  border: 0;
+  box-shadow: inset 0 0 0 0.5333px var(--nh-input-line);
   background: transparent;
   color: var(--nh-chip-text);
 }
@@ -338,6 +347,10 @@
 }
 .nh .keypad__key--kok {
   color: var(--nh-chip-text);
+}
+/* '콕' 글리프는 '0'과 같은 줄 가운데 (키의 padding-top 1px 만큼 올림) */
+.nh .keypad__key--kok > svg {
+  transform: translateY(-1.2px);
 }
 .nh .keypad__key[data-key="00"] {
   letter-spacing: -0.5px;

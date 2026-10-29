@@ -65,12 +65,23 @@ push 화면 전환, 왼쪽 가장자리 스와이프 뒤로가기가 들어가 �
   - **받는 분**: 콕송금으로 보낼 상대 계좌 (하나은행 등 다른 은행으로도 보낼 수 있어서 은행은 전부 고를 수 있음)
   - **거래**, **기본**(프로필, 기기, 캡쳐모드, 녹화, 이름, 빈 상태로/예시 데이터로). 카카오뱅크 전용(테마, 카드, 세이프박스)은 없음
 
-화면 이미지(캐릭터, 메뉴 아이콘, 동전·방패 등, `src/assets/local/nh-*.png`)는 저장소가 비공개라 커밋돼 있습니다
-(없으면 대체 그림). 다시 만들려면 콕뱅크 스크린샷·녹화에서 자릅니다:
+**실제 앱과 픽셀 단위로 맞춤** (스크린샷 720px·녹화 480px 기준):
+Galaxy 폭 384dp(프레임 384 × 853.33), 글꼴 Pretendard, 색·크기·위치·글자 굵기, 0.5dp 선,
+화면 전환(안드로이드 80/100ms 페이드), 시트 열림/닫힘 곡선, 버튼 누르면 "어둡게 + 점 3개" 로딩(그 아래에서 다음 화면으로 바뀜)까지.
+남는 차이는 가짜 이름·계좌번호 글자, 상태바 시계 정도입니다.
+
+화면 이미지(캐릭터, 메뉴 아이콘, 은행 아이콘 61개, 동전·방패, 완료 애니메이션 등, `src/assets/local/nh-*.png`)는
+커밋돼 있습니다 (없으면 대체 그림). 다시 만들려면 콕뱅크 스크린샷·녹화에서 자릅니다 (필요: ffmpeg, Pillow, numpy):
 
 ```bash
-python3 scripts/extract-nh.py --home 홈.jpg --history 계좌별거래내역.jpg --detail-out 출금상세.jpg \
-                              --video1 시작화면녹화.mp4 --video2 송금녹화.mp4
+python3 scripts/extract-nh.py --history 계좌별거래내역.jpg --video1 녹화1.mp4   # 공용 (계좌·앱 아이콘 등)
+python3 scripts/nh-crops/home.py --home 홈.jpg --video1 녹화1.mp4               # 홈·시작화면
+python3 scripts/nh-crops/picker.py --video1 녹화1.mp4                           # 은행선택 아이콘
+python3 scripts/nh-crops/send-who.py 녹화1.mp4                                  # 누구에게 보낼까요?
+python3 scripts/nh-crops/confirm.py --video2 녹화2.mp4                          # 확인·완료
+python3 scripts/nh-crops/history.py --history 계좌별거래내역.jpg                # 거래내역
+python3 scripts/nh-crops/txdetail.py --detail-out 출금상세_아래스크롤.jpg        # 거래 상세
+python3 scripts/nh-crops/accounts.py --accounts 전체계좌.jpg --register 녹화2_62.5초.png
 ```
 
 ## 🔔 관리 패널 (홈 오른쪽 위 종 버튼)

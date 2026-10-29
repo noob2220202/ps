@@ -28,12 +28,26 @@ export async function withNhLoading<T>(fn: () => Promise<T> | T, minMs = 550): P
 
 export const useNhLoading = () => useSyncExternalStore(subscribeNhLoading, isNhLoading);
 
-// navigate 대신: 로딩을 보여준 다음 이동
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const nextPaint = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+// navigate 대신: 로딩을 보여준 다음, **막이 덮인 채로** 이동하고 새 화면이 그려진 뒤에 막을 걷음.
+// (녹화: 막 아래에서 이미 다음 화면으로 바뀌어 있고, 막이 걷히면 바로 밝은 새 화면 — v1 14.5~14.7초, v2 40.5~41.1초)
+// after: 이동한 뒤 막을 더 덮고 있을 시간(새 화면 전환 80ms + 여유)
 export function useNhGo() {
   const navigate = useNavigate();
   return useCallback(
-    (to: string, options?: NavigateOptions) => {
-      withNhLoading(() => undefined).then(() => navigate(to, options));
+    (to: string, options?: NavigateOptions & { minMs?: number; after?: number }) => {
+      count++;
+      emit();
+      sleep(options?.minMs ?? 550)
+        .then(() => navigate(to, options))
+        .then(() => sleep(options?.after ?? 90))
+        .then(nextPaint)
+        .finally(() => {
+          count--;
+          emit();
+        });
     },
     [navigate],
   );

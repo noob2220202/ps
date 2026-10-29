@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useNavigate, useParams, type NavigateOptions } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams, type NavigateOptions } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { Account, HomeData, Transaction } from "../api/types";
 import { prefetch, useApi } from "../api/useApi";
@@ -202,7 +202,9 @@ function HistoryScreen({ accountId }: { accountId: string }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [view, setView] = useState<"list" | "cal">("list");
   const [asc, setAsc] = useState(false); // 과거거래순
-  const [query, setQuery] = useState<string | null>(null); // 돋보기: null = 검색 닫힘
+  const [searchParams] = useSearchParams();
+  // 돋보기: null = 검색 닫힘. 거래 상세의 ''이름' 검색 ›'은 ?q=이름 으로 열려서 바로 걸러짐
+  const [query, setQuery] = useState<string | null>(() => searchParams.get("q"));
   const [menu, setMenu] = useState(false); // ⋮
   const [alerts, setAlerts] = useState(false); // 입출금알림 신청 여부 (모양만)
   const [pick, setPick] = useState<"account" | "filter" | null>(null);

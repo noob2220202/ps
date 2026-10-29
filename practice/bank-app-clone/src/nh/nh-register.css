@@ -4,11 +4,6 @@
 .nh-reg.screen {
   overflow: hidden;
 }
-/* 공용 헤더 제목이 실제보다 1.6dp 아래 → 이 화면에서만 올림 (전체계좌 조회와 같음) */
-.nh-reg .nh-header h1 {
-  position: relative;
-  top: -1.33px;
-}
 .nh-reg__scroll {
   flex: 1 1 auto !important;
   min-height: 0;

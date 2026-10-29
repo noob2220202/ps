@@ -193,14 +193,15 @@ export function NhEqualsIcon() {
   );
 }
 
-// 키패드 '콕' 키: 글자가 아니라 그림 (ㅋ 가운데 획이 사선). 18.4 × 27.2, 굵기 2.4
+// 키패드 '콕' 키: 글자가 아니라 그림 (ㅋ 가운데 획이 x 7.7에서 꺾여 사선으로 ㅡ에 붙음). 18.4 × 27.2, 굵기 2.85
+// (녹화1 '콕' 키 8장 평균에 맞춘 모양 — 계좌번호 시트의 글리프와 같음)
 export function NhKokKey() {
   return (
-    <svg width="18.4" height="27.2" viewBox="0 0 18.4 27.2" fill="none" stroke="currentColor" strokeWidth="2.4" aria-label="콕">
-      <path d="M0.4 1.2H11.2a1.6 1.6 0 0 1 1.6 1.6V10.8" />
-      <path d="M0.4 6.8H9.4L2 13" />
-      <path d="M0 14H18.4" />
-      <path d="M0.4 18.8H11.2a1.6 1.6 0 0 1 1.6 1.6V27.2" />
+    <svg width="18.4" height="27.2" viewBox="0 0 18.4 27.2" fill="none" stroke="currentColor" strokeWidth="2.85" aria-label="콕">
+      <path d="M0.45 1.05H11.25a1.7 1.7 0 0 1 1.7 1.7V10.6" />
+      <path d="M0.45 6.6H7.7L2.25 12.9" strokeLinejoin="round" />
+      <path d="M0.4 13.8H17.95" />
+      <path d="M0.45 18.45H11.3a1.7 1.7 0 0 1 1.7 1.7V26.8" />
     </svg>
   );
 }

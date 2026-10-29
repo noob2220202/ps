@@ -78,27 +78,6 @@
   margin-left: 14.65px;
 }
 
-/* 농협계좌 등록 화면(NhAccounts)도 이 칸 모양을 같이 씀 — 예전 모양 그대로 둠 */
-.nh-number__box {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 8px 22px 14px;
-  height: 52px;
-  border-radius: 8px;
-  border: 1.5px solid #3a4250;
-  font-size: 20px;
-  font-weight: 600;
-}
-.nh-number__box.on {
-  border-color: var(--nh-teal);
-}
-.nh-number__box i {
-  font-style: normal;
-  color: #7f8692;
-}
-
 /* 키패드 아래 → 다음 버튼 8.5 (공용 9보다 0.5 작게 해야 시트 위가 323.2에 맞음) */
 .nh-number .nh-sheet-btn {
   margin-top: 8.5px;

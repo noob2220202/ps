@@ -155,8 +155,12 @@
 }
 /* 상태바 (폰 프레임): 키패드 시트 막과 같이 열릴 때 245ms·닫힐 때 200ms 직선 */
 .phone:has(.nh-send .sheet--keypad) .statusbar {
-  transition: background-color 200ms linear;
+  transition:
+    background-color 200ms linear,
+    box-shadow 200ms linear;
 }
 .phone:has(.nh-send .sheet--keypad.sheet--open) .statusbar {
-  transition: background-color 245ms linear;
+  transition:
+    background-color 245ms linear,
+    box-shadow 245ms linear;
 }

@@ -53,7 +53,8 @@ function StatusBar() {
   const { bg, fg } = useStatusBarStyle();
   const time = useClock();
   return (
-    <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background: bg }}>
+    // 콕뱅크: 28px 상태바가 기기 52.5px 에서 끝나 반 픽셀에 어두운 이음새가 생김 → 같은 색 그림자 1px 로 덮음
+    <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background: bg, ...(APP === "nh" && { boxShadow: `0 1px 0 ${bg}` }) }}>
       <span className="statusbar__time">{time}</span>
       {OS === "ios" ? <IosIcons /> : <AndroidIcons />}
     </div>

@@ -9,6 +9,7 @@ import {
 import { useLocation, useNavigate, useNavigationType, type Location } from "react-router-dom";
 import { TIMING } from "../config/timing";
 import { OS } from "../platform/platform";
+import { APP } from "../profile/session";
 import { LayerContext } from "../platform/LayerContext";
 import "./ScreenStack.css";
 
@@ -17,6 +18,9 @@ type Render = (loc: Location) => ReactNode;
 
 const EDGE = 24; // 왼쪽 가장자리 몇 px 안에서 시작해야 스와이프로 인정할지
 const EASE = "cubic-bezier(.2,.8,.2,1)";
+// 콕뱅크(갤럭시) 녹화: 새 화면은 약 80ms 교차 페이드, 뒤로가기는 약 100ms 동안 나가는 화면이 흐려짐
+const NH_ANDROID = APP === "nh" && OS === "android";
+const navMs = (anim: Anim | null) => (NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS]);
 
 // 화면 내용은 loc/active가 그대로면 다시 그리지 않는다.
 // 드래그·전환 중 ScreenStack이 리렌더돼도 화면 트리 전체를 다시 계산하지 않게 하는 핵심.
@@ -64,8 +68,8 @@ export function ScreenStack({ render }: { render: Render }) {
     }
 
     // 스와이프로 이미 화면을 밀어냈으면 pop 애니메이션을 또 하지 않는다.
-    // 안드로이드(영상)는 뒤로가기가 즉시 바뀌므로 pop 애니메이션 없음.
-    if (skipAnim.current || (OS === "android" && anim === "pop")) anim = null;
+    // 안드로이드(카카오뱅크 영상)는 뒤로가기가 즉시 바뀌므로 pop 애니메이션 없음. 콕뱅크는 짧게 흐려짐.
+    if (skipAnim.current || (OS === "android" && anim === "pop" && !NH_ANDROID)) anim = null;
     skipAnim.current = false;
     drag.current = null;
     setDragging(false);
@@ -76,7 +80,7 @@ export function ScreenStack({ render }: { render: Render }) {
     const id = setTimeout(() => {
       setExiting(null);
       setEnterAnim(null);
-    }, TIMING.nav[OS]);
+    }, navMs(anim));
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
@@ -164,7 +168,7 @@ export function ScreenStack({ render }: { render: Render }) {
         <div
           key={l.loc.key}
           className={l.className}
-          style={{ ["--nav-ms" as string]: `${TIMING.nav[OS]}ms` }}
+          style={{ ["--nav-ms" as string]: `${navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
           {...(l.active && {
             onPointerDown,

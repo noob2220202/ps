@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { api, paths } from "../api/endpoints";
 import type { Bank, HomeData, Recipient, TransferRecipients } from "../api/types";
@@ -15,6 +15,7 @@ import { NhNumberSheet } from "./NhNumberSheet";
 import { NhRecipientList } from "./NhRecipientList";
 import { NhSendAmount } from "./NhSendAmount";
 import { NhSendWho } from "./NhSendWho";
+import { takeFresh, type NhSendRestore } from "./nhSendRestore";
 import "./nh-send.css";
 
 export interface NhConfirmState {
@@ -43,7 +44,15 @@ const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms));
 // 키패드 시트(계좌번호·금액)가 열리면 상태바도 막(0.6)과 같이 #0a090b 로 어두워짐 (녹화 #09080b)
 export function NhSend() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
+  // 송금 확인에서 X·취소로 돌아온 경우: 이동 직전 입력값으로 '보낼게요' 단계부터 (한 번만 읽음)
+  const [restore] = useState(() => {
+    const r = (location.state as { restore?: NhSendRestore } | null)?.restore;
+    return r && !takeFresh() ? r : null;
+  });
+  // 거래 상세 '동일내역 송금': ?bank=…&number=…&amount=… → 같은 계좌를 조회하면 금액도 채움
+  const presetAmount = Number(params.get("amount") ?? 0);
   const from = params.get("from") ?? "main";
   const home = useApi<HomeData>(paths.home);
   const data = useApi<TransferRecipients>(paths.recipients(from));
@@ -52,9 +61,9 @@ export function NhSend() {
   const me = home.data?.profile.userName ?? "";
 
   // 거래 상세의 '동일내역 송금'은 ?bank=…&number=… 로 은행·계좌번호를 채워서 옴
-  const [bankCode, setBankCode] = useState(params.get("bank") ?? "nh");
-  const [digits, setDigits] = useState(params.get("number") ?? "");
-  const [stage, setStage] = useState<"who" | "amount" | "memo">("who");
+  const [bankCode, setBankCode] = useState(restore?.bankCode ?? params.get("bank") ?? "nh");
+  const [digits, setDigits] = useState(restore?.digits ?? params.get("number") ?? "");
+  const [stage, setStage] = useState<"who" | "amount" | "memo">(restore ? "memo" : "who");
   const [sheet, setSheet] = useState<"number" | "amount" | null>(null);
   const [closing, setClosing] = useState<"number" | "amount" | null>(null); // 닫히는 중인 키패드 시트 (176dp 내려가며 200ms 투명해짐)
   const closeTimer = useRef(0);
@@ -62,12 +71,12 @@ export function NhSend() {
   const [picking, setPicking] = useState(false); // 은행선택 화면
   const [listOpen, setListOpen] = useState(false); // 최근송금 목록을 위로 끌어올림
   const [busy, setBusy] = useState(false); // 점 3개
-  const [to, setTo] = useState<Recipient | null>(null);
-  const [amount, setAmount] = useState(0);
-  const [memoTo, setMemoTo] = useState<string | null>(null); // null = 기본값(내 이름)
-  const [memoMe, setMemoMe] = useState("");
-  const [memo, setMemo] = useState(""); // 거래메모 (상세 정보 ⌄)
-  const [detail, setDetail] = useState(false);
+  const [to, setTo] = useState<Recipient | null>(restore?.to ?? null);
+  const [amount, setAmount] = useState(restore?.amount ?? 0);
+  const [memoTo, setMemoTo] = useState<string | null>(restore ? restore.memoTo : null); // null = 기본값(내 이름)
+  const [memoMe, setMemoMe] = useState(restore?.memoMe ?? "");
+  const [memo, setMemo] = useState(restore?.memo ?? ""); // 거래메모 (상세 정보 ⌄)
+  const [detail, setDetail] = useState(!!restore?.memo);
   const [ghost, setGhost] = useState(false); // 금액 화면으로 넘어갈 때 잠깐 겹쳐 보이는 펼친 최근송금 목록
   const [error, setError] = useState<string | null>(null);
   const bank = banks.data?.find((b) => b.code === bankCode) ?? null;
@@ -87,7 +96,7 @@ export function NhSend() {
   const pickRecipient = (r: Recipient) => {
     setTo(r);
     setListOpen(false);
-    setAmount(0);
+    setAmount(presetAmount && r.bank.code === params.get("bank") && r.number === params.get("number") ? presetAmount : 0);
     setMemo("");
     setDetail(false);
     setStage("amount");
@@ -129,108 +138,110 @@ export function NhSend() {
     const last = data.data?.recent.find((r) => r.bank.code === to.bank.code && r.number === to.number)?.lastAt;
     const recent = !!to.accountId || (!!last && Date.now() - Date.parse(last) < SIX_MONTHS);
     const state: NhConfirmState = { from, to, amount, memoTo: (memoTo ?? me).trim(), memoMe: memoMe.trim(), memo: memo.trim(), recent };
-    // 실제 앱도 여기서 화면이 어두워지고 점 3개가 잠깐 돈다
-    withNhLoading(() => undefined).then(() => navigate("/send/confirm", { state }));
+    const keep: NhSendRestore = { bankCode, digits, to, amount, memoTo, memoMe, memo };
+    // 실제 앱도 여기서 화면이 어두워지고 점 3개가 잠깐 돈다. 막 아래에서: 지금 입력값을 이 기록에 남기고 → 확인 화면으로
+    withNhLoading(() => undefined).then(() => {
+      navigate(location.pathname + location.search, { replace: true, state: { restore: keep } });
+      navigate("/send/confirm", { state });
+    });
   };
 
-  if (picking && banks.data)
-    return (
-      <NhBankPicker
-        banks={banks.data}
-        onClose={() => setPicking(false)}
-        onPick={(b) => {
-          setBankCode(b.code);
-          setDigits("");
-          setPicking(false);
-          setSheet("number");
-        }}
-      />
-    );
-
   return (
-    <div className={`screen nh nh-send nh-send--${stage === "who" || !to ? "who" : stage}`}>
-      <NhHeader title="콕송금" onBack={back} />
-      {stage === "who" || !to ? (
-        <NhSendWho
-          account={account}
-          bank={bank}
-          digits={digits}
-          busy={busy}
-          recipients={data.data}
-          listOpen={listOpen}
-          onPickBank={() => setPicking(true)}
-          onOpenNumber={() => setSheet("number")}
-          onClearDigits={() => setDigits("")}
-          onToggleList={() => setListOpen((o) => !o)}
-          onPickRecipient={(r) => (r.accountId === from ? setError("출금계좌와 같은 계좌로는 보낼 수 없어요.") : pickRecipient(r))}
-        />
-      ) : (
-        <NhSendAmount
-          account={account}
-          to={to}
-          stage={stage}
-          amount={amount}
-          remaining={data.data?.dailyRemaining ?? 1_000_000}
-          memoTo={memoTo ?? me}
-          memoMe={memoMe}
-          memo={memo}
-          detail={detail}
-          onMemoTo={setMemoTo}
-          onMemoMe={setMemoMe}
-          onMemo={setMemo}
-          onToggleDetail={() => setDetail((d) => !d)}
-          onOpenAmount={openAmount}
-          onClearAmount={() => setAmount(0)}
-          onLimitInfo={() => setError("1일 송금 잔여한도는 오늘 더 보낼 수 있는 금액이에요.\n이체한도는 전체메뉴 > 한도 조회·변경에서 바꿀 수 있어요.")}
-          onPickAgain={() => setStage("who")}
-          onAmountNext={() => setStage("memo")}
-          onNext={next}
-        />
-      )}
-      {ghost && stage === "amount" && (
-        <div className="nh-sa-ghost" aria-hidden>
-          <NhRecipientList open data={data.data} onToggle={() => undefined} onPick={() => undefined} appear="static" />
-        </div>
-      )}
-
-      <Sheet open={sheet === "number"} onClose={closeSheet} className={`nh-number nh-sheet--keypad nh-amt-sheet ${closing === "number" ? "nh-amt-closing" : ""}`} kind="keypad">
-        {bank && (
-          <NhNumberSheet
+    <>
+      <div className={`screen nh nh-send nh-send--${stage === "who" || !to ? "who" : stage}`}>
+        <NhHeader title="콕송금" onBack={back} />
+        {stage === "who" || !to ? (
+          <NhSendWho
+            account={account}
             bank={bank}
             digits={digits}
-            onChange={setDigits}
-            onBank={() => {
-              setSheet(null);
-              setPicking(true);
-            }}
-            onClose={closeSheet}
-            onDone={lookup}
+            busy={busy}
+            recipients={data.data}
+            listOpen={listOpen}
+            onPickBank={() => setPicking(true)}
+            onOpenNumber={() => setSheet("number")}
+            onClearDigits={() => setDigits("")}
+            onToggleList={() => setListOpen((o) => !o)}
+            onPickRecipient={(r) => (r.accountId === from ? setError("출금계좌와 같은 계좌로는 보낼 수 없어요.") : pickRecipient(r))}
           />
-        )}
-      </Sheet>
-      <Sheet
-        open={sheet === "amount"}
-        onClose={closeSheet}
-        className={`nh-amount nh-sheet--keypad nh-amt-sheet nh-amt-sheet--open-slow ${closing === "amount" ? "nh-amt-closing" : ""}`}
-        kind="keypad"
-      >
-        {to && account && (
-          <NhAmountSheet
-            key={`${to.bank.code}-${to.number}-${amountSeq}`}
-            initial={amount}
-            balance={account.balance}
+        ) : (
+          <NhSendAmount
+            account={account}
+            to={to}
+            stage={stage}
+            amount={amount}
             remaining={data.data?.dailyRemaining ?? 1_000_000}
-            onClose={closeSheet}
-            onDone={(n) => {
-              // 잔액 부족·한도 초과여도 '다음'은 눌림: 시트만 닫히고 화면 금액 상자 아래에 안내 (녹화1 61.6초)
-              setAmount(n);
-              closeSheet();
-              if (!amountError(n, account.balance, data.data?.dailyRemaining ?? 1_000_000)) setStage("memo");
-            }}
+            memoTo={memoTo ?? me}
+            memoMe={memoMe}
+            memo={memo}
+            detail={detail}
+            onMemoTo={setMemoTo}
+            onMemoMe={setMemoMe}
+            onMemo={setMemo}
+            onToggleDetail={() => setDetail((d) => !d)}
+            onOpenAmount={openAmount}
+            onClearAmount={() => setAmount(0)}
+            onLimitInfo={() => setError("1일 송금 잔여한도는 오늘 더 보낼 수 있는 금액이에요.\n이체한도는 전체메뉴 > 한도 조회·변경에서 바꿀 수 있어요.")}
+            onPickAgain={() => setStage("who")}
+            onAmountNext={() => setStage("memo")}
+            onNext={next}
           />
         )}
-      </Sheet>
-      <Dialog message={error} onClose={() => setError(null)} />
-    </div>
+        {ghost && stage === "amount" && (
+          <div className="nh-sa-ghost" aria-hidden>
+            <NhRecipientList open data={data.data} onToggle={() => undefined} onPick={() => undefined} appear="static" />
+          </div>
+        )}
+
+        <Sheet open={sheet === "number"} onClose={closeSheet} className={`nh-number nh-sheet--keypad nh-amt-sheet ${closing === "number" ? "nh-amt-closing" : ""}`} kind="keypad">
+          {bank && (
+            <NhNumberSheet
+              bank={bank}
+              digits={digits}
+              onChange={setDigits}
+              onBank={() => setPicking(true)}
+              onClose={closeSheet}
+              onDone={lookup}
+            />
+          )}
+        </Sheet>
+        <Sheet
+          open={sheet === "amount"}
+          onClose={closeSheet}
+          className={`nh-amount nh-sheet--keypad nh-amt-sheet nh-amt-sheet--open-slow ${closing === "amount" ? "nh-amt-closing" : ""}`}
+          kind="keypad"
+        >
+          {to && account && (
+            <NhAmountSheet
+              key={`${to.bank.code}-${to.number}-${amountSeq}`}
+              initial={amount}
+              balance={account.balance}
+              remaining={data.data?.dailyRemaining ?? 1_000_000}
+              onClose={closeSheet}
+              onDone={(n) => {
+                // 잔액 부족·한도 초과여도 '다음'은 눌림: 시트만 닫히고 화면 금액 상자 아래에 안내 (녹화1 61.6초)
+                setAmount(n);
+                closeSheet();
+                if (!amountError(n, account.balance, data.data?.dailyRemaining ?? 1_000_000)) setStage("memo");
+              }}
+            />
+          )}
+        </Sheet>
+        <Dialog message={error} onClose={() => setError(null)} />
+      </div>
+      {/* 은행선택은 콕송금 위에 덮어 그림 (콕송금은 그대로 남아 뒤에 보임). 고르면 85ms 사라진 뒤 185ms 있다가 계좌번호 시트가 올라옴 */}
+      {picking && (
+        <NhBankPicker
+          banks={banks.data}
+          onClose={() => setPicking(false)}
+          onPick={(b) => {
+            setPicking(false);
+            setBankCode(b.code);
+            setDigits("");
+            window.setTimeout(() => setSheet("number"), 185);
+          }}
+        />
+      )}
+    </>
   );
 }

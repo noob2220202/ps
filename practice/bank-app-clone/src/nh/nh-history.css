@@ -11,13 +11,6 @@
 .nh-hist.screen {
   overflow: hidden;
 }
-/* 공용 헤더 제목이 이 화면에서 스크린샷보다 아래 → 이 화면에서만 올림 (잉크 y 82–109).
-   글자색은 이 화면 제목만 순백 #ffffff (밝은 픽셀 전부 #ffffff, 아이콘은 #f6f7fb) */
-.nh-hist .nh-header h1 {
-  margin-top: -1px;
-  transform: translateY(-0.5333px);
-  color: #fff;
-}
 
 /* ---------- 화면 전환 (녹화2: 거래 줄 → 상세 43.30→43.38, 상세 → 뒤로 46.82→46.92 모두 약 85ms 교차 페이드.
    로딩(점 3개) 뒤에는 다음 화면이 페이드 없이 바로) ---------- */
@@ -33,22 +26,6 @@
     opacity: 0;
   }
 }
-/* 뒤로(안드로이드는 이전 화면이 바로 바뀜): 바탕색 막을 85ms 동안 걷어 내서 교차 페이드처럼 */
-[data-os="android"] .nh-hist--pop::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 60;
-  background: var(--nh-bg);
-  pointer-events: none;
-  animation: nh-hist-uncover 85ms linear forwards;
-}
-@keyframes nh-hist-uncover {
-  to {
-    opacity: 0;
-  }
-}
-
 .nh-hist-img {
   flex-shrink: 0;
   overflow: visible;

@@ -34,6 +34,18 @@
     opacity: 0;
   }
 }
+/* 콕뱅크(갤럭시): 새 화면 80ms 직선 교차 페이드, 뒤로가기는 나가는 화면이 100ms 동안 흐려짐 */
+html[data-app="nh"][data-os="android"] .layer--push-enter {
+  animation: layer-fade var(--nav-ms) linear both;
+}
+html[data-app="nh"][data-os="android"] .layer--pop-exit {
+  animation: layer-fade-out var(--nav-ms) linear both;
+}
+@keyframes layer-fade-out {
+  to {
+    opacity: 0;
+  }
+}
 
 /* ---------- iOS: 오른쪽에서 밀고 들어오는 push, 이전 화면은 30%만 왼쪽으로 + 살짝 어두워짐 ---------- */
 [data-os="ios"] .layer--push-enter,

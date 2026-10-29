@@ -9,11 +9,6 @@
 .nh-accts.screen {
   overflow: hidden;
 }
-/* 공용 헤더 제목: 스크린샷은 순백 #ffffff, 잉크 y 82–109 (공용 위치보다 0.9dp 위) */
-.nh-accts .nh-header h1 {
-  translate: 0 -1.3px;
-  color: #fff;
-}
 /* 헤더 아래만 스크롤 */
 .nh-accts__scroll {
   flex: 1 1 auto !important;
@@ -94,7 +89,11 @@
   padding-left: 24px;
   overflow-x: auto;
   scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 0.08), #000 14.5px);
+  -webkit-mask-image: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 0.08),
+    #000 14.5px
+  );
   mask-image: linear-gradient(to left, rgba(0, 0, 0, 0.08), #000 14.5px);
   translate: 0 0.53px; /* 알약 윗변이 스크린샷처럼 y 285 에 맞도록 (글자는 아래에서 되돌림) */
 }
@@ -317,6 +316,10 @@
 .nh-asec__none {
   font-weight: 500 !important;
   color: #8e8d93 !important; /* 녹화2 38.44 '미보유' */
+}
+/* 접힌 섹션: 머리 가운데 → 구분선 37.4 (녹화2 38.44 뼈대 프레임의 섹션 줄 간격) */
+.nh-asec.folded {
+  padding-bottom: 8.67px;
 }
 /* 카드 섹션: 머리 가운데 → '콕에 등록된 계좌 보기' 위까지 44.8 (녹화2 38.44: 글자 y 889 → 버튼 945 px@480) */
 .nh-asec--card {
@@ -651,7 +654,7 @@
 }
 
 /* ---------- 데이터가 오기 전 뼈대 (녹화2 38.25~38.53초, 480px ×0.8) ----------
-   총액 자리 막대 24–359.6 × 99.6–131.6, 섹션 머리는 74.4 간격(카드 62.4), 금액 막대 148 × 33.6 (대출은 147.6 + 포함 토글) */
+   총액 자리 막대 24–359.6 × 99.6–131.6, 섹션 머리는 74.4 간격(카드 65.6), 금액 막대 148 × 33.6 (대출은 147.6 + 포함 토글) */
 .nh-skel {
   display: block;
   flex-shrink: 0;
@@ -682,10 +685,10 @@
   cursor: default;
 }
 .nh-accts__secs.loading .nh-asec--card {
-  padding-bottom: 5.6px;
+  padding-bottom: 3.2px;
 }
 .nh-accts__secs.loading .nh-asec--card .nh-asec__head {
-  height: 62.4px;
+  height: 65.6px;
 }
 .nh-asec__skel {
   width: 148px;

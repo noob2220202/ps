@@ -1,5 +1,4 @@
-import { useCallback, useState } from "react";
-import type React from "react";
+import { useCallback, useState, type MouseEvent, type UIEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { api, paths } from "../api/endpoints";
@@ -125,7 +124,7 @@ function QMark({
   onClick,
 }: {
   className?: string;
-  onClick: (e: React.MouseEvent) => void;
+  onClick: (e: MouseEvent) => void;
 }) {
   return (
     <button
@@ -198,7 +197,13 @@ function EmptyCard({ shop, onShop }: { shop: string; onShop: () => void }) {
 }
 
 // 계좌 아이콘: 대표계좌(main)는 청록 별이 붙은 아이콘, 나머지(직접입력으로 등록한 계좌 등)는 별 없는 아이콘
-function AcctIcon({ account, className }: { account: Account; className: string }) {
+function AcctIcon({
+  account,
+  className,
+}: {
+  account: Account;
+  className: string;
+}) {
   return account.kind === "main" ? (
     <NhImg
       name="nh-accounts-acct"
@@ -257,12 +262,12 @@ export function NhAccounts() {
   const shown = SECTIONS.filter((s) => chip === "전체" || s.chip === chip);
   const toggle = (k: SecKey) =>
     setFolded((f) => (f.includes(k) ? f.filter((x) => x !== k) : [...f, k]));
-  const onChipsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+  const onChipsScroll = (e: UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     setChipsEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
   };
   // 카드 안 버튼은 카드 전체 누름(거래내역)과 겹치지 않게
-  const inCard = (f: () => void) => (e: React.MouseEvent) => {
+  const inCard = (f: () => void) => (e: MouseEvent) => {
     e.stopPropagation();
     f();
   };
@@ -295,7 +300,9 @@ export function NhAccounts() {
           className="nh-acard__more"
           aria-label="더보기"
           onClick={inCard(() =>
-            setInfo("계좌 이름 변경·순서 변경·숨기기는\n연습 앱에서 지원하지 않아요."),
+            setInfo(
+              "계좌 이름 변경·순서 변경·숨기기는\n연습 앱에서 지원하지 않아요.",
+            ),
           )}
         >
           <MoreDots />
@@ -418,7 +425,10 @@ export function NhAccounts() {
                 const list = inSec(s.key);
                 const open = ready && !folded.includes(s.key);
                 return (
-                  <section key={s.key} className={`nh-asec nh-asec--${s.key}`}>
+                  <section
+                    key={s.key}
+                    className={`nh-asec nh-asec--${s.key} ${ready && !open ? "folded" : ""}`}
+                  >
                     <div
                       className="nh-asec__head"
                       role="button"

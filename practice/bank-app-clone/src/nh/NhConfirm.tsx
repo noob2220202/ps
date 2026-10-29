@@ -12,6 +12,7 @@ import { withNhLoading } from "./loading";
 import { nhWon } from "./hangul";
 import type { NhConfirmState } from "./NhSend";
 import "./nh-confirm.css";
+import { sendFromScratchOnReturn } from "./nhSendRestore";
 
 export interface NhDoneState {
   result: TransferResult;
@@ -166,7 +167,13 @@ export function NhConfirm() {
         <button className="nh-btn nh-vf__send" onClick={send}>
           <b>{to.holder}</b>님께 송금하기
         </button>
-        <button className="nh-vf__again" onClick={() => navigate(-1)}>
+        <button
+          className="nh-vf__again"
+          onClick={() => {
+            sendFromScratchOnReturn(); // 콕송금을 처음 단계부터
+            navigate(-1);
+          }}
+        >
           받는 분을 다시 입력할게요.
         </button>
       </Sheet>
