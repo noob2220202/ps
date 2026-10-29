@@ -27,8 +27,8 @@ const SEND = {
   afterSheet: 115,
   blackFrom: 210, // 막이 다 덮인 직후 화면 전체가 0.48초 동안 검게 됨 (28.238~28.715, 상태바까지)
   blackTo: 690,
-  // 검은 화면이 끝나면 막·점이 같이 걷혀 확인 화면이 밝게 보였다가 (28.715~), 점(28.76)과 막(28.79, 0→0.6 직선)이 다시 뜸
-  gap: 60,
+  // 검은 화면이 끝나면 막·점이 같이 걷혀 확인 화면이 밝게 보였다가 (28.715~), 점(28.76)과 막(28.79, 0→0.6 200ms 직선)이 다시 뜸
+  gap: 50,
   done: 2120, // 완료 화면으로 바뀜 (30.147). 막은 그 뒤 170ms 더 덮여 있음 (30.318)
   doneDim: 170,
 };
@@ -208,10 +208,10 @@ function NhCfRow({ label, value, placeholder, onChange }: { label: string; value
   );
 }
 
-// 보이스피싱 유의안내 옆 › (5.6 × 11.2, 굵기 1.2, 진한 회색)
-function NhCfChevron() {
+// 보이스피싱 유의안내 옆 › (5.6 × 11.2, 굵기 1.5, 진한 회색)
+export function NhCfChevron({ className = "nh-cf__chev" }: { className?: string }) {
   return (
-    <svg className="nh-cf__chev" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden>
+    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
       <path d="M9.2 6.4 14.8 12l-5.6 5.6" />
     </svg>
   );

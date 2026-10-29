@@ -4,12 +4,12 @@
   z-index: 45; /* 콕송금 위에 덮어 그림 (닫히는 중인 계좌번호 시트 40보다 위) */
   overflow: hidden;
 }
-/* 점 3개 로딩 동안은 안 보임 → 로딩이 걷히고 30ms 뒤 80ms 동안 나타남 (녹화1 29.54~29.62, 녹화2 4.58~4.63) */
+/* 목록을 기다리는 점 3개 로딩 동안은 안 보임 → 나타남: 시트에서 열면 15ms 뒤 80ms, 콕송금에서 열면 바로 30ms (NhBankPicker.tsx SHOW_MS) */
 .nh-banks--loading {
   visibility: hidden;
 }
 .nh-banks--in {
-  animation: nh-banks-in 80ms cubic-bezier(0, 0, 0.2, 1) var(--nh-show-gap) both;
+  animation: nh-banks-in var(--nh-show-ms, 80ms) cubic-bezier(0, 0, 0.2, 1) var(--nh-show-gap) both;
 }
 @keyframes nh-banks-in {
   from {

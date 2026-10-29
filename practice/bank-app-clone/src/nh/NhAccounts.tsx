@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import type React from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { api, paths } from "../api/endpoints";
@@ -15,7 +16,18 @@ import "./nh-register.css";
 
 // 아이콘은 실제 화면(스크린샷 720px)에서 잰 모양을 24dp 상자에 옮긴 것 (scratchpad work/accounts/spec.md)
 
-// 잠금 동그라미 안 자물쇠 (열림 = 금액 보이는 중)
+// 뒤로: 앱 안에 이전 화면이 있으면 그리로, 주소로 바로 열었으면 정해 둔 화면으로 (앱 밖 기록으로 나가지 않게)
+function useNhBack(fallback: string) {
+  const navigate = useNavigate();
+  return useCallback(() => {
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate(fallback, { replace: true });
+  }, [navigate, fallback]);
+}
+
+// 잠금 동그라미 안 자물쇠 (열림 = 금액 보이는 중). 좌표는 동그라미 중심 = (12, 12).
+// 몸통 14.18 × 9.49 (선 중심), 위 모서리 2.6 · 아래 모서리 3.35, 고리 반지름 2.8 (오른쪽 끝은 고리 중심 높이에서 끝남)
 function Padlock({ open }: { open: boolean }) {
   return (
     <svg
@@ -25,18 +37,17 @@ function Padlock({ open }: { open: boolean }) {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
-      strokeLinecap="round"
       aria-hidden
     >
-      <rect x="5.15" y="10.4" width="13.7" height="9.23" rx="3.4" />
+      <path d="M7.51 10.51h8.98a2.6 2.6 0 0 1 2.6 2.6v3.54A3.35 3.35 0 0 1 15.74 20H8.26a3.35 3.35 0 0 1-3.35-3.35v-3.54a2.6 2.6 0 0 1 2.6-2.6Z" />
       <path
         d={
           open
-            ? "M9.07 10.4V7.68a2.93 2.93 0 0 1 5.86 0"
-            : "M9.07 10.4V7.68a2.93 2.93 0 0 1 5.86 0v2.72"
+            ? "M9.2 10.51V7.81a2.8 2.8 0 0 1 5.6 0"
+            : "M9.2 10.51V7.81a2.8 2.8 0 0 1 5.6 0v2.7"
         }
       />
-      <path d="M12 14.6v1.7" />
+      <path d="M12 14.3v1.85" strokeLinecap="round" />
     </svg>
   );
 }
@@ -53,8 +64,8 @@ function CardViewIcon() {
       strokeWidth="1.45"
       aria-hidden
     >
-      <rect x="3" y="7.75" width="11.3" height="10.15" rx="1.9" />
-      <path d="M18.85 4.9v6.1M16.75 8.75l2.1 2.35 2.1-2.35" />
+      <rect x="2.86" y="7.62" width="11.28" height="10.34" rx="1.6" />
+      <path d="M18.85 5.2v5.8M16.75 8.55l2.1 2.35 2.1-2.35" />
     </svg>
   );
 }
@@ -75,7 +86,8 @@ function ListViewIcon() {
   );
 }
 
-// 섹션 ^ (잉크 11.2 × 5.9, 굵기 1.5). 접히면 ⌄
+// 섹션 ^ : 굵기 1.91, 팔 기울기 1.15(가로/세로), 뾰족한 꼭대기. 팔 끝은 잉크 상자(10.88 × 6.12)에서 세로·가로로 잘림
+// (스크린샷 720px 섹션 머리 ^ 를 따라 그린 다각형). 접히면 ⌄
 function SecChevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -83,17 +95,15 @@ function SecChevron({ open }: { open: boolean }) {
       width="24"
       height="24"
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
+      fill="currentColor"
       aria-hidden
     >
-      <path d="M7 14.1 12 10.15l5 3.95" />
+      <path d="M12 8.884 17.44 13.615V15h-1.318L12 11.416 7.878 15H6.56v-1.385Z" />
     </svg>
   );
 }
 
-// 카드 오른쪽 위 ⋮ (점 지름 3.1, 간격 6.13)
+// 카드 오른쪽 위 ⋮ (점 지름 3.0, 간격 6.0 — 스크린샷 5.6px / 11.26px)
 function MoreDots() {
   return (
     <svg
@@ -103,18 +113,28 @@ function MoreDots() {
       fill="currentColor"
       aria-hidden
     >
-      <circle cx="2" cy="2" r="1.55" />
-      <circle cx="2" cy="8.13" r="1.55" />
-      <circle cx="2" cy="14.27" r="1.55" />
+      <circle cx="1.74" cy="2.26" r="1.5" />
+      <circle cx="1.74" cy="8.26" r="1.5" />
+      <circle cx="1.74" cy="14.26" r="1.5" />
     </svg>
   );
 }
 
-function QMark({ className = "" }: { className?: string }) {
+function QMark({
+  className = "",
+  onClick,
+}: {
+  className?: string;
+  onClick: (e: React.MouseEvent) => void;
+}) {
   return (
-    <span className={`nh-accts__q ${className}`} aria-hidden>
+    <button
+      className={`nh-accts__q ${className}`}
+      aria-label="도움말"
+      onClick={onClick}
+    >
       ?
-    </span>
+    </button>
   );
 }
 
@@ -158,7 +178,7 @@ const SECTIONS: { key: SecKey; title: string; chip: string; shop?: string }[] =
   ];
 
 // 빈 섹션: 흰 공(점 3개가 하나씩 나타남) + '계좌를 찾을 수 없어요.' + 상품 링크
-function EmptyCard({ shop }: { shop: string }) {
+function EmptyCard({ shop, onShop }: { shop: string; onShop: () => void }) {
   return (
     <div className="nh-acard nh-acard--empty">
       <span className="nh-acard__ball">
@@ -168,31 +188,84 @@ function EmptyCard({ shop }: { shop: string }) {
         <i />
       </span>
       <b>계좌를 찾을 수 없어요.</b>
-      <button className="nh-acard__shop">{shop}</button>
+      {shop && (
+        <button className="nh-acard__shop" onClick={onShop}>
+          {shop}
+        </button>
+      )}
     </div>
   );
 }
 
+// 계좌 아이콘: 대표계좌(main)는 청록 별이 붙은 아이콘, 나머지(직접입력으로 등록한 계좌 등)는 별 없는 아이콘
+function AcctIcon({ account, className }: { account: Account; className: string }) {
+  return account.kind === "main" ? (
+    <NhImg
+      name="nh-accounts-acct"
+      w={42.67}
+      h={41.6}
+      className={className}
+      fallback={<span>🟡</span>}
+    />
+  ) : (
+    <NhImg
+      name="nh-history-acct-plain"
+      w={37.33}
+      h={37.33}
+      className={`${className} ${className}--plain`}
+      fallback={<span>🟡</span>}
+    />
+  );
+}
+
+// 데이터가 오기 전 뼈대 막대 (녹화2 38.25~38.53초: 총액·섹션 금액 자리에 회색 막대)
+function Skel({ className }: { className: string }) {
+  return <span className={`nh-skel ${className}`} aria-hidden />;
+}
+
 // 전체계좌 조회 (스크린샷 2026-10-28 9:48, 녹화2 38.25~39.7초)
 // 위: 잠금 · 총액 · ?, 필터 칩, 보기 토글(카드/목록), 넓게 토글. 아래: 종류별 섹션(^ 로 접기) + 계좌 카드
+// 데이터가 오기 전에는 뼈대(회색 막대), 실패하면 오류 + 다시 시도
 export function NhAccounts() {
   const navigate = useNavigate();
   const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
+  const goBack = useNhBack("/");
   const home = useApi<HomeData>(paths.home);
   const [hidden, setHidden] = useState(false); // 자물쇠: 금액 가리기
   const [chip, setChip] = useState("전체");
+  const [chipsEnd, setChipsEnd] = useState(false); // 칩 줄을 끝까지 밀면 오른쪽 흐림을 없앰
   const [view, setView] = useState<"card" | "list">("card");
   const [wide, setWide] = useState(true); // 넓게 (참고 화면은 켜짐)
-  const [withLoan, setWithLoan] = useState(true); // 대출 '포함'
+  const [withLoan, setWithLoan] = useState(true); // 대출 '포함': 끄면 총액에서 대출 잔액을 뺌
   const [folded, setFolded] = useState<SecKey[]>([]);
+  const [info, setInfo] = useState<string | null>(null); // ?, ⋮, 상품 링크, ☰ 안내
   useStatusBar("#18171c", "light");
 
+  const ready = home.status === "done";
+  const failed = home.status === "error";
   const accounts = home.data?.accounts ?? [];
-  const total = accounts.reduce((s, a) => s + a.balance, 0);
+  const inSec = (k: SecKey) => (k === "dep" ? accounts : []); // 우리 데이터는 입출금 계좌만 있음
+  const sumOf = (k: SecKey) => inSec(k).reduce((n, a) => n + a.balance, 0);
+  const total = SECTIONS.reduce(
+    (n, sec) =>
+      sec.key === "card" || (sec.key === "loan" && !withLoan)
+        ? n
+        : n + sumOf(sec.key),
+    0,
+  );
   const money = (n: number) => (hidden ? "잔액보기" : nhWon(n));
   const shown = SECTIONS.filter((s) => chip === "전체" || s.chip === chip);
   const toggle = (k: SecKey) =>
     setFolded((f) => (f.includes(k) ? f.filter((x) => x !== k) : [...f, k]));
+  const onChipsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    setChipsEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
+  };
+  // 카드 안 버튼은 카드 전체 누름(거래내역)과 겹치지 않게
+  const inCard = (f: () => void) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    f();
+  };
 
   const card = (a: Account) =>
     view === "list" ? (
@@ -201,13 +274,7 @@ export function NhAccounts() {
         className="nh-arow"
         onClick={() => go(`/history/${a.id}`)}
       >
-        <NhImg
-          name="nh-accounts-acct"
-          w={42.67}
-          h={41.6}
-          className="nh-arow__icon"
-          fallback={<span>🟡</span>}
-        />
+        <AcctIcon account={a} className="nh-arow__icon" />
         <span className="nh-arow__info">
           <b>{a.label}</b>
           <span>농축협 {a.number}</span>
@@ -215,24 +282,32 @@ export function NhAccounts() {
         <em>{money(a.balance)}</em>
       </button>
     ) : (
-      <div key={a.id} className="nh-acard">
-        <button className="nh-acard__more" aria-label="더보기">
+      <div
+        key={a.id}
+        className="nh-acard"
+        role="link"
+        tabIndex={0}
+        aria-label={`${a.label} 거래내역`}
+        onClick={() => go(`/history/${a.id}`)}
+        onKeyDown={(e) => e.key === "Enter" && go(`/history/${a.id}`)}
+      >
+        <button
+          className="nh-acard__more"
+          aria-label="더보기"
+          onClick={inCard(() =>
+            setInfo("계좌 이름 변경·순서 변경·숨기기는\n연습 앱에서 지원하지 않아요."),
+          )}
+        >
           <MoreDots />
         </button>
-        <NhImg
-          name="nh-accounts-acct"
-          w={42.67}
-          h={41.6}
-          className="nh-acard__icon"
-          fallback={<span>🟡</span>}
-        />
+        <AcctIcon account={a} className="nh-acard__icon" />
         <span className="nh-acard__name">
           <b>{a.label}</b>
           <span>
             <span className="nh-acard__no">농축협 {a.number}</span>
             <button
               className="nh-acard__tag"
-              onClick={() => go(`/history/${a.id}`)}
+              onClick={inCard(() => go(`/history/${a.id}`))}
             >
               자세히
             </button>
@@ -240,9 +315,11 @@ export function NhAccounts() {
         </span>
         <p className="nh-acard__bal">{money(a.balance)}</p>
         <div className="nh-acard__btns">
-          <button onClick={() => go(`/history/${a.id}`)}>거래내역</button>
+          <button onClick={inCard(() => go(`/history/${a.id}`))}>
+            거래내역
+          </button>
           <i />
-          <button onClick={() => go(`/send?from=${a.id}`)}>송금</button>
+          <button onClick={inCard(() => go(`/send?from=${a.id}`))}>송금</button>
         </div>
       </div>
     );
@@ -251,32 +328,55 @@ export function NhAccounts() {
     <div className="screen nh nh-accts">
       <NhHeader
         title="전체계좌 조회"
-        onBack={() => navigate(-1)}
+        onBack={goBack}
         home={() => navigate("/")}
-        menu
+        onMenu={() => setInfo("전체메뉴는 연습 앱에서 지원하지 않아요.")}
       />
       <div className="nh-accts__scroll">
         <div className="nh-accts__total">
-          <button
-            className="nh-accts__lock"
-            aria-label={hidden ? "금액 보기" : "금액 가리기"}
-            onClick={() => setHidden((h) => !h)}
-          >
-            <Padlock open={!hidden} />
-          </button>
-          <b>{home.data ? money(total) : " "}</b>
-          <QMark />
+          {ready ? (
+            <>
+              <button
+                className="nh-accts__lock"
+                aria-label={hidden ? "금액 보기" : "금액 가리기"}
+                onClick={() => setHidden((h) => !h)}
+              >
+                <Padlock open={!hidden} />
+              </button>
+              <b>{money(total)}</b>
+              <QMark
+                onClick={() =>
+                  setInfo(
+                    "총액은 조회된 계좌 잔액의 합계예요.\n대출 '포함'을 끄면 대출 잔액은 빼고 보여줘요.",
+                  )
+                }
+              />
+            </>
+          ) : (
+            !failed && <Skel className="nh-accts__skel-total" />
+          )}
         </div>
-        <div className="nh-accts__chips" role="tablist">
+        <div
+          className={`nh-accts__chips ${chipsEnd ? "end" : ""}`}
+          role="tablist"
+          onScroll={onChipsScroll}
+        >
           {["전체", ...SECTIONS.map((s) => s.chip)].map((c) => (
             <button
               key={c}
               role="tab"
               aria-selected={chip === c}
               className={chip === c ? "on" : ""}
-              onClick={() => setChip(c)}
+              onClick={(e) => {
+                setChip(c);
+                e.currentTarget.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                  inline: "nearest",
+                });
+              }}
             >
-              {c}
+              <span>{c}</span>
             </button>
           ))}
         </div>
@@ -302,64 +402,95 @@ export function NhAccounts() {
             <NhSwitch label="넓게" on={wide} onChange={setWide} />
           </div>
 
-          <div
-            className={`nh-accts__secs ${wide ? "" : "narrow"} ${view === "list" ? "list" : ""}`}
-          >
-            {shown.map((s) => {
-              const list = s.key === "dep" ? accounts : [];
-              const open = !folded.includes(s.key);
-              const sum = list.reduce((n, a) => n + a.balance, 0);
-              return (
-                <section key={s.key} className={`nh-asec nh-asec--${s.key}`}>
-                  <div
-                    className="nh-asec__head"
-                    role="button"
-                    tabIndex={0}
-                    aria-expanded={open}
-                    onClick={() => toggle(s.key)}
-                  >
-                    <h2>
-                      {s.title}
-                      {s.key === "card" ? (
-                        <QMark className="nh-asec__q" />
-                      ) : (
-                        <em>{list.length}</em>
-                      )}
-                    </h2>
-                    {s.key === "card" ? (
-                      <b className="nh-asec__none">미보유</b>
-                    ) : (
-                      <>
-                        <b>{money(sum)}</b>
-                        {s.key === "loan" && (
-                          <span
-                            className="nh-asec__switch"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <NhSwitch
-                              label="포함"
-                              on={withLoan}
-                              onChange={setWithLoan}
-                            />
-                          </span>
+          {failed ? (
+            <div className="nh-accts__err">
+              <b>일시적인 오류가 발생했어요</b>
+              <span>계좌 정보를 불러오지 못했어요.</span>
+              <button className="nh-btn nh-btn--line" onClick={home.retry}>
+                다시 시도
+              </button>
+            </div>
+          ) : (
+            <div
+              className={`nh-accts__secs ${wide ? "" : "narrow"} ${view === "list" ? "list" : ""} ${ready ? "" : "loading"}`}
+            >
+              {shown.map((s) => {
+                const list = inSec(s.key);
+                const open = ready && !folded.includes(s.key);
+                return (
+                  <section key={s.key} className={`nh-asec nh-asec--${s.key}`}>
+                    <div
+                      className="nh-asec__head"
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={open}
+                      onClick={() => ready && toggle(s.key)}
+                      onKeyDown={(e) =>
+                        ready && e.key === "Enter" && toggle(s.key)
+                      }
+                    >
+                      <h2>
+                        {s.title}
+                        {s.key === "card" ? (
+                          <QMark
+                            className="nh-asec__q"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setInfo("콕뱅크에서 조회되는 카드가 없어요.");
+                            }}
+                          />
+                        ) : (
+                          ready && <em>{list.length}</em>
                         )}
-                      </>
-                    )}
-                    <SecChevron open={open} />
-                  </div>
-                  {open && s.key !== "card" && (
-                    <div className="nh-asec__body">
-                      {list.length ? (
-                        list.map(card)
+                      </h2>
+                      {s.key === "card" ? (
+                        <b className="nh-asec__none">미보유</b>
                       ) : (
-                        <EmptyCard shop={s.shop ?? ""} />
+                        <>
+                          {ready ? (
+                            <b>{money(sumOf(s.key))}</b>
+                          ) : (
+                            <Skel
+                              className={`nh-asec__skel ${s.key === "loan" ? "nh-asec__skel--short" : ""}`}
+                            />
+                          )}
+                          {s.key === "loan" && (
+                            <span
+                              className="nh-asec__switch"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <NhSwitch
+                                label="포함"
+                                on={withLoan}
+                                onChange={setWithLoan}
+                              />
+                            </span>
+                          )}
+                        </>
                       )}
+                      <SecChevron open={!ready || open} />
                     </div>
-                  )}
-                </section>
-              );
-            })}
-          </div>
+                    {open && s.key !== "card" && (
+                      <div className="nh-asec__body">
+                        {list.length ? (
+                          list.map(card)
+                        ) : (
+                          <EmptyCard
+                            shop={s.shop ?? ""}
+                            onShop={() =>
+                              setInfo(
+                                `${s.title} 상품 안내는\n연습 앱에서 지원하지 않아요.`,
+                              )
+                            }
+                          />
+                        )}
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
+          )}
           <button
             className="nh-btn nh-btn--outline-purple nh-accts__reg"
             onClick={() => go("/register")}
@@ -368,6 +499,7 @@ export function NhAccounts() {
           </button>
         </div>
       </div>
+      <Dialog message={info} onClose={() => setInfo(null)} />
     </div>
   );
 }
@@ -413,6 +545,8 @@ function CheckIcon() {
 
 export function NhRegister() {
   const navigate = useNavigate();
+  const go = useNhGo();
+  const goBack = useNhBack("/accounts");
   const [sheet, setSheet] = useState<"number" | "balance" | null>(null);
   const [digits, setDigits] = useState("");
   const [balance, setBalance] = useState("");
@@ -421,7 +555,7 @@ export function NhRegister() {
     balance: number;
   } | null>(null); // 직접입력으로 찾은 계좌
   const [noteOpen, setNoteOpen] = useState(true);
-  const [ask, setAsk] = useState(false); // 취소 알림창
+  const [ask, setAsk] = useState<"open" | "closing" | null>(null); // 취소 알림창
   const [error, setError] = useState<string | null>(null);
   useStatusBar(sheet ? "#0a090b" : "#18171c", "light");
 
@@ -452,17 +586,24 @@ export function NhRegister() {
         name: "저축예금",
       }),
     )
-      .then(() => navigate(-1))
+      .then(goBack)
       .catch((e) =>
         setError(e instanceof ApiError ? e.message : "연결에 실패했어요"),
       );
   };
-  // 예: 알림창이 닫히고 0.19초 뒤 점 3개 로딩 0.65초 → 이전 화면 (녹화2 64.36 → 64.55 → 65.19)
+  // 예 (녹화2 64.357 누름): 알림창이 0.1초 동안 흐려지며 사라짐(64.459) → 누른 뒤 0.155초에 점 3개 로딩(64.512)
+  // → 누른 뒤 0.836초에 이전 화면(65.193). 이전 화면이 나온 뒤에도 로딩 막이 조금 남아 있음(녹화 끝 65.28까지)
   const cancel = () => {
-    setAsk(false);
+    setAsk("closing");
+    window.setTimeout(() => setAsk(null), 100);
     window.setTimeout(
-      () => withNhLoading(() => undefined, 650).then(() => navigate(-1)),
-      190,
+      () =>
+        withNhLoading(async () => {
+          await new Promise((r) => setTimeout(r, 650)); // 화면이 바뀌어 보이기까지 한 프레임 더 걸림
+          goBack();
+          await new Promise((r) => setTimeout(r, 200));
+        }, 0),
+      155,
     );
   };
 
@@ -470,15 +611,18 @@ export function NhRegister() {
     <div className="screen nh nh-reg">
       <NhHeader
         title="농협계좌등록"
-        onBack={() => navigate(-1)}
+        onBack={goBack}
         home={() => navigate("/")}
-        menu
+        onMenu={() => go("/accounts")}
       />
       <div className="nh-reg__scroll">
         <h2 className="nh-reg__title">
-          콕뱅크에 <b>등록</b>할
-          <br />
-          <b>계좌</b>를 <b>선택</b>해 주세요
+          <span>
+            콕뱅크에 <b>등록</b>할
+          </span>
+          <span>
+            <b>계좌</b>를 <b>선택</b>해 주세요
+          </span>
         </h2>
         {found ? (
           <div className="nh-reg__found">
@@ -558,7 +702,7 @@ export function NhRegister() {
         </div>
       </div>
       <div className="nh-bottom nh-bottom--split">
-        <button className="nh-btn nh-btn--line" onClick={() => setAsk(true)}>
+        <button className="nh-btn nh-btn--line" onClick={() => setAsk("open")}>
           취소
         </button>
         <button className="nh-btn" disabled={!found} onClick={submit}>
@@ -647,13 +791,15 @@ export function NhRegister() {
         )}
       </Sheet>
 
-      <Dialog
-        message={ask ? "농협계좌 등록을 취소하시겠습니까?" : null}
-        onClose={cancel}
-        onCancel={() => setAsk(false)}
-        okLabel="예"
-        cancelLabel="아니오"
-      />
+      <div className={`nh-reg__ask ${ask === "closing" ? "closing" : ""}`}>
+        <Dialog
+          message={ask ? "농협계좌 등록을 취소하시겠습니까?" : null}
+          onClose={cancel}
+          onCancel={() => setAsk(null)}
+          okLabel="예"
+          cancelLabel="아니오"
+        />
+      </div>
       <Dialog message={error} onClose={() => setError(null)} />
     </div>
   );

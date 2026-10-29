@@ -2,9 +2,10 @@
    헤더(X, 48)는 위에 고정, 버튼 줄은 아래 고정, 가운데(.nh-txd__scroll)만 스크롤 (내용이 헤더 밑으로 들어가 잘림) */
 .nh-txd {
   /* 기기 1px (= 0.5333dp) 선. 크롬은 DPR 2 미만에서 0.5px border를 1 CSS px(기기 2px)로 올려 그림 →
-     곧은 선은 바탕 그림(0.5333px), 둥근 테두리는 안쪽 box-shadow 0.8px 로 그려야 기기 1px 한 줄이 됨 */
+     곧은 선은 바탕 그림(0.5333px), 둥근 테두리는 안쪽 box-shadow 0.5333px 로 그림.
+     상자 위치는 CSS px 단위로 맞춰지므로(720 캡쳐에서 기기 1.875px 격자) 한 줄로 또렷하지 않은 곳은
+     ::before 에 그린 테두리를 transform 으로 기기 px 에 맞춤 (아래 각 부분 주석) */
   --nh-txd-hair: 0.5333px;
-  --nh-txd-ring: 0.8px;
 }
 .screen.nh-txd {
   overflow: hidden;
@@ -37,18 +38,30 @@
   font-size: 25px;
   font-weight: 600;
 }
-/* 복사 꼬리표: 39.5 × 22, 기기 1px #454952 테두리, 글자 13/500 #cdd2d8 */
+/* 복사 꼬리표: 39.5 × 22, 기기 1px #454952 테두리, 글자 13/500 #cdd2d8.
+   테두리는 ::before (글자와 따로 기기 1px 단위로 옮기고 높이를 맞추려고) */
 .nh-txd__tag {
+  position: relative;
   flex-shrink: 0;
   height: 22px;
   margin-left: 4px;
   padding: 0 9px;
   border-radius: 11px;
-  box-shadow: inset 0 0 0 var(--nh-txd-ring) var(--nh-outline-btn);
   font-size: 13px;
   font-weight: 500;
   line-height: 21px;
   color: #cdd2d8 !important;
+  transform: var(--nh-txd-tag-t, none);
+}
+.nh-txd__tag::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--nh-txd-hair) var(--nh-outline-btn);
+  transform: var(--nh-txd-tag-ring, none);
+  transform-origin: 0 0;
+  pointer-events: none;
 }
 
 /* 섹션 제목 17/600 (거래메모 / 거래정보) */
@@ -69,6 +82,23 @@
   top: -0.75px;
   display: grid;
   margin-left: 8px;
+}
+.nh-txd__qmark {
+  display: grid;
+  place-items: center;
+  width: 18.13px;
+  height: 18.13px;
+  border-radius: 50%;
+  background: #606e7c;
+  color: #18171c;
+  padding-left: 0.3px;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  /* 기기 1px 맞춤: 동그라미 170~204 × 343~377px@720, 글자 잉크 중심 (187.6, 357.5) */
+  transform: translate(0.7px, 0.38px) scale(1.02);
 }
 
 /* 칩: 높이 36, 사이 8, 바탕 #1f2933, 글자 17/400 #cbd2da. 가로 스크롤, 오른쪽 끝 33dp 동안 바탕색으로 흐려짐 + ⌄ 동그라미 36 */
@@ -101,6 +131,14 @@
   letter-spacing: -0.005em;
   white-space: nowrap;
 }
+/* 글꼴 그리기 차이로 '생활/마트'는 실제보다 1dp 좁고 '경조사/모임'은 1dp 넓게 나옴 → 여백으로 맞춤
+   (칩 경계 173.8~354.2 / 368.8~574.9px@720, 글자 위치 ±0.3px) */
+.nh-txd__chip-list button:nth-child(2) {
+  padding: 0 16.6px 0 16px;
+}
+.nh-txd__chip-list button:nth-child(3) {
+  padding: 0 15.8px 0 14.8px;
+}
 .nh-txd__more-wrap {
   position: absolute;
   top: 0;
@@ -115,16 +153,30 @@
   pointer-events: none;
 }
 .nh-txd__more {
+  position: relative;
   width: 36px;
   height: 36px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 var(--nh-txd-ring) var(--nh-outline-btn);
   color: #46505c !important;
   pointer-events: auto;
 }
+/* 동그라미 테두리: 기기 1px #454952, 줄 413 / 480 × 608 / 674px@720 */
+.nh-txd__more::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 var(--nh-txd-hair) var(--nh-outline-btn);
+  transform: translateY(0.1px) scale(0.9926, 1.0135); /* 기기 1px 맞춤 (67 × 68px) */
+  transform-origin: 100% 0;
+  pointer-events: none;
+}
+/* ⌄ : 잉크 중심 (640.0, 445.8)px@720, 동그라미 가운데보다 1px 왼쪽 */
 .nh-txd__more svg {
+  --nh-txd-chev: translate(-0.55px, 0.34px);
+  transform: var(--nh-txd-chev);
   transition: transform 200ms;
 }
 /* 펼침: 칩을 여러 줄로 (실제 펼친 모양은 참고 자료에 없음) */
@@ -140,20 +192,33 @@
   background: none;
 }
 .nh-txd__chips.open .nh-txd__more svg {
-  transform: rotate(180deg);
+  transform: var(--nh-txd-chev) rotate(180deg);
 }
 
-/* 메모 칸: 336 × 76.3, 기기 1px #2f343a 테두리, 모서리 12, 글자 18/500 */
+/* 메모 칸: 336 × 76.3, 기기 1px #2f343a 테두리, 모서리 12, 글자 18/500.
+   테두리는 감싼 상자의 ::before 로 (textarea 에는 ::before 가 없음). 실제 테두리 줄은 503 / 645px@720 (143px) */
+.nh-txd__memo-box {
+  position: relative;
+  margin-top: 12px;
+}
+.nh-txd__memo-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 var(--nh-txd-hair) var(--nh-outline);
+  transform: translateY(0.12px) scaleY(1.004); /* 기기 1px 맞춤 (위 503 / 아래 645px@720, 한 줄) */
+  transform-origin: top;
+  pointer-events: none;
+}
 .nh-txd__memo {
   display: block;
   box-sizing: border-box;
   width: 100%;
   height: 76.3px;
-  margin-top: 12px;
   padding: 12.3px 20.5px;
   border: 0;
   border-radius: 12px;
-  box-shadow: inset 0 0 0 var(--nh-txd-ring) var(--nh-outline);
   background: none;
   outline: 0;
   resize: none;
@@ -175,18 +240,38 @@
   color: var(--nh-faint);
 }
 
-/* 거래정보 제목 + 기기 1px #f6f7fb 밑줄 */
+/* 거래정보 제목 (밑줄은 아래 표의 위쪽 선으로 그림 → 제목 글자만 따로 맞출 수 있게) */
 .nh-txd__h--info {
   margin-top: 80.9px;
   padding-bottom: 16.65px;
-  background: linear-gradient(var(--nh-text), var(--nh-text)) bottom / 100% var(--nh-txd-hair) no-repeat;
 }
 
-/* 표: 한 줄 48, 이름 17/400 #9ca4ae, 값 17/500 #f6f7fb, 아래 기기 1px #23262d */
+/* 표: 한 줄 48, 이름 17/400 #9ca4ae, 값 17/500 #f6f7fb. 위 기기 1px #f6f7fb (제목 밑줄), 아래 기기 1px #23262d */
 .nh-txd__rows {
   margin: 0;
   padding: 5.37px 0 6.57px;
-  background: linear-gradient(#23262d, #23262d) bottom / 100% var(--nh-txd-hair) no-repeat;
+  position: relative;
+}
+/* 위·아래 선: 바탕 그림 위치는 CSS px 격자(기기 1.875px)로 맞춰지므로, 한 줄로 또렷이 그려지는 자리에 두고
+   transform(기기 1px = 0.5333)으로 실제 줄(921 / 1350px@720)에 옮김 */
+.nh-txd__rows::before,
+.nh-txd__rows::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  pointer-events: none;
+}
+.nh-txd__rows::before {
+  top: -4px;
+  background: linear-gradient(var(--nh-text), var(--nh-text)) 0 2.5px / 100% var(--nh-txd-hair) no-repeat;
+  transform: translateY(1.0667px);
+}
+.nh-txd__rows::after {
+  bottom: -4px;
+  background: linear-gradient(#23262d, #23262d) 0 3.3px / 100% var(--nh-txd-hair) no-repeat;
+  transform: translateY(-0.1px);
 }
 .nh-txd__row {
   display: flex;
@@ -211,11 +296,12 @@
   font-weight: 500;
   text-align: right;
 }
-/* 거래일시·계좌번호 숫자: 다른 값보다 작고 굵음 (16.5/600, 글자 높이 22px@720) */
+/* 거래일시·계좌번호 숫자: 다른 값보다 작음 (16.5dp, 글자 높이 22px@720).
+   굵기 537·자간 0 이 잉크 양(2173 / 실제 2175)과 폭(395~671px)이 둘 다 맞음 (600은 9% 무겁고, 550은 1px 넓음) */
 .nh-txd__row .nh-txd__num {
   font-size: 16.5px;
-  font-weight: 600;
-  letter-spacing: -0.005em;
+  font-weight: 537;
+  letter-spacing: 0;
 }
 .nh-txd__sub {
   display: flex;
@@ -245,9 +331,18 @@
   margin-top: 4px;
 }
 .nh-txd__acct .nh-txd__tag {
-  position: relative;
   top: 0.8px;
   padding-top: 1px;
+}
+/* 꼬리표 기기 1px 맞춤: 금액 옆은 테두리 206/247 × 144/217px, 글자 중심 (179.4, 225.2)@720 (shot-txdetail-in-top),
+   계좌번호 옆은 테두리 1009/1049 × 601/674px, 글자 중심 (636.7, 1028.2) (shot-txdetail-out-bottom) */
+.nh-txd__amount .nh-txd__tag {
+  --nh-txd-tag-t: translate(-0.5333px, -0.5333px);
+  --nh-txd-tag-ring: translate(0.2667px, 0.6px) scale(0.9867, 1.03);
+}
+.nh-txd__acct .nh-txd__tag {
+  --nh-txd-tag-t: translateX(0.5333px);
+  --nh-txd-tag-ring: translateY(0.2px) scale(0.99, 1.006);
 }
 
 /* 빠른송금 등록 / 동일내역 송금: 동그라미 48 (그림), 글자 16/400 #cdd2d8 */
@@ -256,6 +351,10 @@
   justify-content: center;
   gap: 20px;
   padding: 40px 0 0;
+}
+/* 빠른송금 등록 그림은 글자 가운데보다 1px 왼쪽 (타일 왼쪽 끝 214.6px@720) */
+.nh-txd__quick .nh-img {
+  transform: translateX(-0.5867px);
 }
 .nh-txd__actions button {
   display: flex;
@@ -267,10 +366,26 @@
   color: #cdd2d8 !important;
 }
 
-/* 공유 버튼 테두리도 기기 1px 한 줄로 (공용 .nh-btn--line 은 0.5px border → 2px로 그려짐) */
+/* 공유 버튼 테두리도 기기 1px 한 줄로 (공용 .nh-btn--line 은 0.5px border → 2px로 그려짐).
+   아이콘은 #f6f7fb (공용 .nh-btn--line 글자색 #cbd2da 가 아님, shot-txdetail-in-top 공유 아이콘 심지 246,247,251) */
 .nh-txd__bottom .nh-btn--line {
   border: 0;
-  box-shadow: inset 0 0 0 var(--nh-txd-ring) var(--nh-outline-btn);
+  box-shadow: inset 0 0 0 var(--nh-txd-hair) var(--nh-outline-btn);
+  color: var(--nh-text) !important;
+}
+/* 버튼 위치: 실제는 1426~1527px@720 (760.53~814.4dp, 안드로이드가 54dp를 101px로 반올림).
+   레이아웃은 CSS px 단위로 맞춰지므로(760 → 1425px) 기기 1px(0.5333) 만큼 내려서 맞춤 */
+.nh-txd__bottom .nh-btn {
+  transform: translateY(var(--nh-txd-hair));
+}
+/* 확인 글자: 버튼 가운데보다 기기 2px 위 (글자 중심 1473.8px@720) */
+.nh-txd__bottom .nh-btn + .nh-btn {
+  padding-bottom: 2px;
+  padding-right: 1px;
+}
+/* 공유 아이콘: 버튼 가운데보다 기기 1px 아래, 41×44px@720 */
+.nh-txd__bottom .nh-btn--line svg {
+  transform: translateY(var(--nh-txd-hair)) scale(1.02);
 }
 
 /* 아래 버튼 줄: 버튼 위 8, 그 위로 24dp 동안 내용이 바탕색으로 흐려짐 (녹화2 49.0초) */
@@ -286,4 +401,61 @@
   height: 24px;
   background: linear-gradient(rgba(24, 23, 28, 0), var(--nh-bg));
   pointer-events: none;
+}
+
+/* 데이터가 늦게 오면(미리 받아 두지 못했을 때) 내용만 80ms 페이드인 (녹화2 43.30→43.38 목록→상세 전환 길이) */
+.nh-txd__scroll--in {
+  animation: nh-txd-in 80ms linear both;
+}
+@keyframes nh-txd-in {
+  from {
+    opacity: 0;
+  }
+}
+/* 불러오기 실패 (참고 화면 없음): 가운데 문구 + 다시 시도 */
+.nh-txd__error {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding-top: 200px;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--nh-sub);
+}
+.nh-txd__error p {
+  margin: 0;
+}
+.nh-txd__error .nh-txd__tag {
+  height: 32px;
+  margin: 0;
+  padding: 0 14px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 31px;
+}
+
+/* ---------- 기기 1px 맞춤 ----------
+   실제 화면은 기기 px(1dp = 1.875px) 단위로 반올림되고, 여기 레이아웃은 CSS px(= 기기 1.875px) 단위로 반올림돼서
+   글자·선이 ±1px 어긋나는 곳이 생김. 그런 곳만 transform 으로 기기 1px(0.5333) 단위로 옮김
+   (shot-txdetail-in-top / out-bottom 720px 에서 글자 잉크 중심을 비교해 잰 값) */
+.nh-txd__amount {
+  transform: translateY(var(--nh-txd-hair)); /* '+1원'·복사 +1px */
+}
+.nh-txd__h--memo,
+.nh-txd__h--info {
+  transform: translateY(calc(-1 * var(--nh-txd-hair))); /* 거래메모 / 거래정보 제목 −1px */
+}
+.nh-txd__row:first-child {
+  transform: translateY(var(--nh-txd-hair)); /* 거래일시 줄 +1px */
+}
+.nh-txd__search {
+  transform: translate(var(--nh-txd-hair), var(--nh-txd-hair)); /* ''이름' 검색' 글자 +1px, +1px */
+}
+.nh-txd__search svg {
+  transform: translate(calc(-1 * var(--nh-txd-hair)), -1.2833px); /* 검색 > 는 제자리에서 −1.4px */
+}
+/* 출금(MY 소비기록 줄이 있을 때): 그 줄과 아래 잔액·입금은행 줄 +1px (입금계좌 줄은 그대로) */
+.nh-txd__row--add .nh-txd__add,
+.nh-txd__row--add ~ .nh-txd__row:not(.nh-txd__row--acct) {
+  transform: translateY(var(--nh-txd-hair));
 }

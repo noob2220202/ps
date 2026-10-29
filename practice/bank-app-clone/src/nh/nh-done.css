@@ -12,6 +12,15 @@
   background-position-y: 0;
 }
 
+/* 왼쪽 위 ⌂ : 공용 헤더 아이콘 자리(중심 x 36, y 52). 늦게 나타나는 묶음과 같이 페이드 → 흐름에서 빼서 겹쳐 둠 */
+.nh-dn__head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: none;
+}
+
 /* 제목 24/600 ("님에게"만 400), 줄 34 */
 .nh-dn__title {
   margin: 186.7px 0 0;
@@ -57,6 +66,10 @@
   top: 0;
   color: var(--nh-purple);
   animation-name: nh-dn-will-move, nh-dn-will-fade;
+  /* 사라지기는 조금 더 길게 꼬리를 끎: 남은 불투명도 +1700 0.36 / +1800 0.15 / +1900 0.05 / +2000 0.013 (fr/done 보라 잉크) */
+  animation-duration: 430ms, 560ms;
+  animation-timing-function: cubic-bezier(0.3, 0.3, 0.3, 0.9), cubic-bezier(0.3, 0.3, 0.2, 1);
+  animation-delay: 1522ms, 1520ms;
 }
 @keyframes nh-dn-did-move {
   from {
@@ -106,6 +119,7 @@
 .nh-dn__chev {
   color: #5b5a5f;
   transition: transform 0.2s;
+  translate: 0.9px -0.8px; /* 녹화 › 무게중심 (275.1, 432.3)@480 */
 }
 .nh-dn__more--open .nh-dn__chev {
   transform: rotate(90deg);
@@ -145,6 +159,20 @@
 }
 .nh-dn__bottom .nh-btn:not(.nh-btn--square) {
   padding-bottom: 2.4px;
+}
+/* '=' 아이콘은 주 글자색 #f6f7fb (공용 .nh-btn--line 글자색 #cbd2da 를 물려받지 않게) */
+.nh-dn__bottom .nh-btn--square {
+  color: var(--nh-text) !important;
+}
+/* 0.5dp 테두리: 크롬은 0.5px border 를 1px 로 올려 그림 → 안쪽 그림자로. 녹화 선 적분에 맞춘 굵기
+   ('=' L38 R25 T44 B28 → 0.65, 송금계속 L101 R125 T106 B55 → 0.68) */
+.nh-dn__bottom .nh-btn--line {
+  border: 0;
+  box-shadow: inset 0 0 0 0.65px var(--nh-outline-btn);
+}
+.nh-dn__bottom .nh-btn--outline-purple {
+  border: 0;
+  box-shadow: inset 0 0 0 0.68px var(--nh-purple);
 }
 .nh-dn__msg p {
   margin: 0;
@@ -218,4 +246,9 @@
     opacity: 0;
     transform: scale(0.6, 0.3) translateY(20px);
   }
+}
+
+/* 완료 → 홈(⌂·확인): 홈이 로딩 막 아래에서 페이드 없이 바로 나타남 (녹화2 35.912). 공용 안드로이드 push 페이드 끄기 */
+[data-os="android"] .layer--push-exit:has(.nh-dn) + .layer--push-enter:has(.nh-home) {
+  animation: none;
 }

@@ -90,8 +90,10 @@
 .nh-cf__row:nth-child(2) {
   flex: 0 0 50.77px;
 }
+/* 안쪽 구분선 2개는 바깥 테두리(회색)와 달리 푸른 기가 있음: 녹화2 24.0~25.5 두 줄 적분 초과 RGB (10,22,38)·(9,25,39), 바깥 아래 (12,12,12).
+   밝기 적분은 #2f343a 와 같고 색만 푸름 → #263750 (계좌카드 안 가로줄 #202832 처럼 남색 계열) */
 .nh-cf__row + .nh-cf__row {
-  box-shadow: inset 0 0.5px 0 var(--nh-outline);
+  box-shadow: inset 0 0.5px 0 #263750;
 }
 .nh-cf__row > span {
   flex-shrink: 0;
@@ -144,12 +146,19 @@
 .nh-cf__chev {
   margin-left: 0;
   color: #59616d;
+  translate: 0.8px -0.45px; /* 녹화 › 무게중심 (437.0, 761.4)@480 */
 }
-/* 송금 중 0.48초 동안 화면이 검게 (실제 앱의 화면 전환) — 점 3개 막 아래 */
 /* 버튼 글자: 녹화에선 버튼 가운데보다 1.2 위 (송금 확인·완료 아래 버튼. 받는 분 확인 시트 버튼은 가운데) */
 .nh-cf__bottom .nh-btn {
   padding-bottom: 2.4px;
 }
+/* '취소' 0.5dp 테두리: 크롬은 0.5px border 를 1px 로 올려 그림(선이 2배 진함) → 안쪽 그림자로.
+   캡쳐 배율(1.25)에서 픽셀 맞춤 때문에 0.5 는 조금 옅게 나와서 녹화 선 적분(L36 R30 T41 B23)에 맞춘 0.65 */
+.nh-cf__bottom .nh-btn--line {
+  border: 0;
+  box-shadow: inset 0 0 0 0.65px var(--nh-outline-btn);
+}
+/* 송금 중 0.48초 동안 화면이 검게 (실제 앱의 화면 전환) — 점 3개 막 아래 */
 .nh-cf__black {
   position: absolute;
   inset: 0;
@@ -206,14 +215,28 @@
   align-self: stretch;
   margin: 31.6px 24px 0;
 }
+/* 이름만 600, '님께 송금하기'는 500 (확인 화면 제목처럼) */
+.nh-vf__send b {
+  font-weight: 600;
+}
 .nh-vf__again {
+  position: relative;
   margin: 22px 0 0;
   font-size: 15.8px;
   line-height: 24px;
   color: #9ca7b4 !important;
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px;
+}
+/* 밑줄 1.6dp: 녹화 열마다 밝기 적분 약 234 (글자색 한 줄 = 115 → 2.03px@480), 중심 y 1005.7@480.
+   크롬은 text-decoration-thickness 를 정수 px 로 반올림하고(1.15~1.4 → 1, 1.5 → 2) 얇은 상자 높이도 px 로 맞춰 그려서
+   높이 0 + 그림자 퍼짐 0.8 로 그림 (적분 230, 중심 1005.75) */
+.nh-vf__again::after {
+  content: "";
+  position: absolute;
+  left: 0.8px;
+  right: 0.8px;
+  bottom: 2.95px;
+  height: 0;
+  box-shadow: 0 0 0 0.8px currentColor;
 }
 /* 이 시트는 닫힐 때 62ms 만에 48dp 내려가며(직선) 사라지고 막도 같이 걷힘 (녹화2 27.915~27.98: +21ms 18px α.65 / +38 34px α.38 / +53 55px α.12).
    다 사라진 뒤에 원래 자리(100% 아래)로 옮겨 둠 → 다시 열 때는 아래에서 올라옴 */
@@ -233,4 +256,28 @@
 }
 .nh .sheet--nhverify:not(.sheet--open) .sheet__backdrop {
   transition: opacity 62ms linear;
+}
+
+/* ---------- 확인 화면으로 들어올 때 (녹화2 23.495~23.675) ----------
+   앞 화면의 로딩 막이 걷힌 뒤 115ms 동안 앞 화면(메모 단계)이 그대로 보이고, 62ms 동안 직선으로 교차 페이드
+   (k 23.626 0.36 / 23.642 0.44 / 23.655 0.68 / 23.675 1.0). 공용 안드로이드 push 페이드(240ms ease-out) 대신 */
+[data-os="android"] .layer--push-enter:has(> .nh-cf) {
+  animation: nh-cf-enter 177ms linear both;
+}
+@keyframes nh-cf-enter {
+  0%,
+  65% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- 이 화면·완료 화면 위의 점 3개 로딩 막 ----------
+   녹화2: 점이 뜨고 약 20ms 뒤 막이 0→0.6 을 약 200ms 동안 직선으로 덮음 (28.039~28.24, 28.788~28.99, 35.378~35.58).
+   공용(190ms, 점과 같이 시작)보다 조금 늦고 길게 */
+.phone:has(.nh-cf) .nh-loading--phone,
+.phone:has(.nh-dn) .nh-loading--phone {
+  animation: nh-fade 200ms linear 20ms backwards;
 }

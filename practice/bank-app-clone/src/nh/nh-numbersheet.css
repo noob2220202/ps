@@ -15,11 +15,13 @@
   letter-spacing: 0; /* '하나은행' 폭이 자간 0일 때와 맞음 (78px@480) */
   color: var(--nh-chip-text) !important;
 }
+/* 실제 글꼴은 한글이 Pretendard 보다 조금 넓음 ('하나은행' 글자 시작 67.2/87.7/106.7/127.1px@480, '협' 119.7) → 자간 0.2 로 반쯤 맞추고 ⌄ 자리는 그대로 */
 .nh-number__bank > span {
   margin-left: 4.6px;
+  letter-spacing: 0.2px;
 }
 .nh-number__bank svg {
-  margin-left: 6.8px;
+  margin-left: 6px;
   color: var(--nh-faint);
 }
 .nh-number__bank .nh-bank-sq,
@@ -108,9 +110,8 @@
   padding-bottom: 0.6px;
 }
 
-/* '콕' 글리프: 실제는 줄 가운데(숫자 '0'과 같은 높이 가운데). 공용 키 padding-top 1px 때문에 1.2 아래로 내려가 있어서 */
+/* '콕' 글리프(NhNumberSheet KokGlyph): 실제는 줄 가운데(숫자 '0'과 같은 높이 가운데). 공용 키 padding-top 1px 때문에 1.2 아래로 내려가 있어서 */
 .nh-number .keypad__key--kok > svg {
   transform: translateY(-1.2px);
   overflow: visible;
-  stroke-width: 2.65; /* 녹화 잉크량이 2.4 때보다 10% 많음 (획 3.5~3.7px@480) */
 }
