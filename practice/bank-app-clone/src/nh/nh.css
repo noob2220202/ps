@@ -627,3 +627,14 @@
   width: 14px;
   height: 14px;
 }
+
+/* 콕송금 헤더의 음성·스캔 아이콘: 다른 헤더 아이콘보다 옅은 회색, 위로 1.6 */
+.nh-header__tool {
+  color: #c3c8cf;
+}
+.nh-header__tool svg {
+  transform: translateY(-1.6px);
+}
+html[data-theme="light"] .nh-header__tool {
+  color: #4f5762;
+}

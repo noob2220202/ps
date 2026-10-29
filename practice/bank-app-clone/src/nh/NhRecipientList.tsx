@@ -23,7 +23,7 @@ type Row = Recipient & {
 };
 
 // 시트가 접혔을 때 내려가 있는 거리: 펼친 위치(헤더 아래, 앱 위 47.84) → 접힌 위치(앱 위 451.5)
-const COLLAPSED = 403.66;
+const COLLAPSED_AT = 403.66;
 
 // 탭을 바꿀 때 (녹화1 21.95초 내계좌, 23.895초 자주쓰는, 프레임 시간으로 잼. 누른 때부터 ms):
 //   내계좌: 바로 목록 비움 → 25 점 3개 + 막(공용 로딩, 막은 190ms 동안 짙어짐) → 570 막 걷힘 → 590 줄 나타남
@@ -45,6 +45,7 @@ export function NhRecipientList({
   appear,
   initialTab = "recent",
   onTab,
+  lower = 0,
 }: {
   open: boolean;
   onToggle: () => void;
@@ -53,7 +54,9 @@ export function NhRecipientList({
   appear: "rise" | "static" | null;
   initialTab?: Tab;
   onTab?: (t: Tab) => void;
+  lower?: number; // 접혔을 때 더 내려갈 거리 (잔액 0원이라 [+ 채우기] 줄이 높을 때 14.4)
 }) {
+  const COLLAPSED = COLLAPSED_AT + lower;
   const [tab, setTab] = useState<Tab>(initialTab);
   const [loading, setLoading] = useState(false);
   const [gearHidden, setGearHidden] = useState(false);

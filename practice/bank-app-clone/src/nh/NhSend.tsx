@@ -5,7 +5,6 @@ import { api, paths } from "../api/endpoints";
 import type { Bank, HomeData, Recipient, TransferRecipients } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Dialog, Sheet } from "../components/Sheet";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { NhHeader } from "./common";
 import { withNhLoading } from "./loading";
 import { NhAmountSheet } from "./NhAmountSheet";
@@ -17,6 +16,7 @@ import { NhSendAmount } from "./NhSendAmount";
 import { NhSendWho } from "./NhSendWho";
 import { takeFresh, type NhSendRestore } from "./nhSendRestore";
 import "./nh-send.css";
+import { useNhStatusBar } from "./theme";
 
 export interface NhConfirmState {
   from: string;
@@ -80,7 +80,7 @@ export function NhSend() {
   const [ghost, setGhost] = useState(false); // 금액 화면으로 넘어갈 때 잠깐 겹쳐 보이는 펼친 최근송금 목록
   const [error, setError] = useState<string | null>(null);
   const bank = banks.data?.find((b) => b.code === bankCode) ?? null;
-  useStatusBar(sheet ? "#0a090b" : "#18171c", "light");
+  useNhStatusBar("#18171c", { dim: !!sheet });
 
   const closeSheet = () => {
     if (!sheet) return;
@@ -149,7 +149,7 @@ export function NhSend() {
   return (
     <>
       <div className={`screen nh nh-send nh-send--${stage === "who" || !to ? "who" : stage}`}>
-        <NhHeader title="콕송금" onBack={back} />
+        <NhHeader title="콕송금" onBack={back} tools />
         {stage === "who" || !to ? (
           <NhSendWho
             account={account}

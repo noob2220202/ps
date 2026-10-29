@@ -4,11 +4,11 @@ import type { Account, HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { DevPanel } from "../dev-panel/DevPanel";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { nhAccountLine } from "./banks";
 import { NhAccountIcon, NhMenuIcon } from "./common";
 import { useNhGo } from "./loading";
 import "./nh-home.css";
+import { useNhStatusBar } from "./theme";
 
 // 콕뱅크 '일반' 홈 (다크모드). 녹화3(2026-10-29, 480px = 1dp 1.25px) + 앱스토어 공식 스크린샷(밝은 모드, 계좌 여러 개일 때 모양).
 // 위치는 화면 dp (top 0 = 상태바 아래). 녹화의 페이지 y 에서 28 을 뺀 값.
@@ -196,7 +196,7 @@ const TABS = ["상품", "마이데이터", "콕팜", "콕쇼핑", "콕혜택"];
 const COLLAPSE_AT = 140; // 이만큼 내리면 위 계좌 영역이 작은 카드로 접힘 (녹화: 큰 카드가 반쯤 가려질 때)
 
 export function NhHome() {
-  useStatusBar("#17161b", "light");
+  useNhStatusBar("#17161b");
   const go = useNhGo();
   const home = useApi<HomeData>(paths.home);
   const [panelOpen, setPanelOpen] = useState(false);

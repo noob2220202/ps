@@ -25,6 +25,7 @@ import { NhDone } from "./nh/NhDone";
 import { NhAccounts, NhRegister } from "./nh/NhAccounts";
 import { NhHistory } from "./nh/NhHistory";
 import { NhTxDetail } from "./nh/NhTxDetail";
+import "./nh/nh-light.css"; // 콕뱅크 라이트모드 (화면 CSS 뒤에)
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 

@@ -27,7 +27,13 @@ def crop_half(img, x0, y0, size):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--detail-out", required=True, help="출금 거래상세 맨 아래 스크린샷 (720×1600)")
+    ap.add_argument("--light-frame", help="라이트모드 녹화의 거래상세 맨 아래 프레임 (480×1066) → *-light.png")
     a = ap.parse_args()
+    if a.light_frame:  # 라이트모드: 같은 자리(dp 114.4 / 221.1, 642.9, 48)를 480px 프레임에서 (1 dp = 1.25 px)
+        lf = Image.open(a.light_frame).convert("RGB")
+        for name, x in (("nh-quick-register-light.png", 114.4), ("nh-same-send-light.png", 221.1)):
+            x0, y0 = round(x * 1.25), round(642.9 * 1.25)
+            lf.crop((x0, y0, x0 + 60, y0 + 60)).save(OUT / name)
     img = Image.open(a.detail_out).convert("RGB")
     assert img.width == 720, "720px 스크린샷이어야 함"
     for name, x0 in (("nh-quick-register.png", 214.5), ("nh-same-send.png", 414.5)):

@@ -58,6 +58,8 @@ push 화면 전환, 왼쪽 가장자리 스와이프 뒤로가기가 들어가 �
   계좌 카드(계좌가 여러 개면 옆으로 넘김, 🔒 잔액 숨기기, `거래내역 | 송금`) / `등록계좌` / 콕추천(가운데 카드가 커지는 가로 카드) /
   광고 배너 9개(3초마다 넘어감, ⏸) / 금융상품(적금 카드 4장, 타일 4개) / 마이데이터 / 아래 탭바.
   아래로 내리면 위 계좌 영역이 작은 카드(번호 ⌄, 잔액 `[송금]`)로 접혀 붙고, 탭바 대신 ↑ 버튼
+- **라이트/다크 모드**: 폰(브라우저) 설정을 따르고, 🔔 → 기본 → 테마에서 시스템/라이트/다크로 고정.
+  라이트 색은 라이트모드 녹화에서 화면마다 잰 값 (강조색이 보라가 아니라 청록)
 - **콕송금**: 은행선택(은행/증권사 탭) → 계좌번호(키패드에 `콕`) → "얼마를 보낼까요?"(+1만/+5만/+10만/+100만/전액, 한글 금액,
   1일 송금 잔여한도 100만원) → 받는계좌·내계좌 표시 → 확인(거래메모) → 6개월간 안 보낸 분이면 "한번 더 확인" 시트 → 완료.
   아래 `최근송금 / 내계좌 / 자주쓰는` 목록에서 바로 고를 수도 있음. 받는 분은 카카오뱅크처럼 🔔 → 받는 분에 먼저 등록
@@ -80,6 +82,8 @@ Galaxy 폭 384dp(프레임 384 × 853.33), 글꼴 Pretendard, 색·크기·위�
 python3 scripts/extract-nh.py --history 계좌별거래내역.jpg --video1 녹화1.mp4   # 공용 (계좌·앱 아이콘 등)
 python3 scripts/nh-crops/home.py --home 홈.jpg --video1 녹화1.mp4               # 시작화면 (+ 예전 청소년 홈 그림)
 python3 scripts/nh-crops/home-general.py --video3 일반홈녹화.mp4 --appstore 앱스토어_메인.png  # 일반 홈
+python3 scripts/nh-crops/txdetail.py --detail-out 출금상세.jpg --light-frame 라이트_상세_프레임.png  # 라이트용 아이콘
+python3 scripts/nh-crops/light-variants.py                                       # 다크에서 자른 그림의 라이트용(바탕만 교체)
 python3 scripts/nh-crops/picker.py --video1 녹화1.mp4                           # 은행선택 아이콘
 python3 scripts/nh-crops/send-who.py 녹화1.mp4                                  # 누구에게 보낼까요?
 python3 scripts/nh-crops/confirm.py --video2 녹화2.mp4                          # 확인·완료

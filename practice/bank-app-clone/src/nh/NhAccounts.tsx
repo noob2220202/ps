@@ -5,13 +5,13 @@ import { api, paths } from "../api/endpoints";
 import type { Account, HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Dialog, Keypad, Sheet } from "../components/Sheet";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { applyKey } from "../lib/keypad";
 import { BackArrowKey, NhCloseIcon, NhHeader, NhImg, NhKokKey } from "./common";
 import { nhWon } from "./hangul";
 import { useNhGo, withNhLoading } from "./loading";
 import "./nh-accounts.css";
 import "./nh-register.css";
+import { nhPic, useNhStatusBar } from "./theme";
 
 // 아이콘은 실제 화면(스크린샷 720px)에서 잰 모양을 24dp 상자에 옮긴 것 (scratchpad work/accounts/spec.md)
 
@@ -244,7 +244,7 @@ export function NhAccounts() {
   const [withLoan, setWithLoan] = useState(true); // 대출 '포함': 끄면 총액에서 대출 잔액을 뺌
   const [folded, setFolded] = useState<SecKey[]>([]);
   const [info, setInfo] = useState<string | null>(null); // ?, ⋮, 상품 링크, ☰ 안내
-  useStatusBar("#18171c", "light");
+  useNhStatusBar("#18171c");
 
   const ready = home.status === "done";
   const failed = home.status === "error";
@@ -567,7 +567,7 @@ export function NhRegister() {
   const [noteOpen, setNoteOpen] = useState(true);
   const [ask, setAsk] = useState<"open" | "closing" | null>(null); // 취소 알림창
   const [error, setError] = useState<string | null>(null);
-  useStatusBar(sheet ? "#0a090b" : "#18171c", "light");
+  useNhStatusBar("#18171c", { dim: !!sheet });
 
   const openDirect = () => {
     setDigits(found?.number ?? "");
@@ -685,7 +685,7 @@ export function NhRegister() {
             onClick={() => setNoteOpen((o) => !o)}
           >
             <NhImg
-              name="nh-register-notice"
+              name={nhPic("nh-register-notice")}
               w={24}
               h={24.8}
               fallback={<span>📢</span>}

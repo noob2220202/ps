@@ -154,12 +154,9 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
       </Field>
       <CaptureToggle />
       <RecordButton onStart={onClose} />
-      {/* 콕뱅크는 다크 화면뿐이라 테마 없음 */}
-      {APP === "kakao" && (
-        <Field label="테마">
-          <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
-        </Field>
-      )}
+      <Field label="테마">
+        <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
+      </Field>
 
       <h3 className="tab__h">내 정보</h3>
       <Field label="이름">

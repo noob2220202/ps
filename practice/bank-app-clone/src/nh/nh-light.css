@@ -1,0 +1,580 @@
+/* ---------- 콕뱅크 라이트모드 ----------
+   폰이 라이트모드이거나 🔔 패널에서 '라이트'를 고르면 <html data-theme="light">.
+   색은 라이트모드 녹화(2026-10-29 11:42, 480px)에서 화면마다 같은 자리를 재서 옮긴 값. 위치·크기는 다크와 같음.
+   다크와 크게 다른 점: 강조색이 보라(#768afb)가 아니라 청록(#0195a3).
+   (녹화에서 로딩·키패드 시트 때 화면 전체가 검정인 건 보안 화면을 녹화기가 가린 것 — 같은 날 다크 녹화도 그럼. 실제 폰에선 반투명 막) */
+html[data-theme="light"] .nh,
+html[data-app="nh"][data-theme="light"] .phone {
+  --nh-bg: #ffffff;
+  --nh-sheet: #ffffff;
+  --nh-sheet2: #edeef1;
+  --nh-field: #f4f5fa;
+  --nh-line: #e8eaed;
+  --nh-hair: #f1f2f4;
+  --nh-outline: #e1e3e7;
+  --nh-outline-btn: #d3d6db;
+  --nh-input-line: #d7dade;
+  --nh-text: #1f2630;
+  --nh-sub: #5c626a;
+  --nh-faint: #7e8692;
+  --nh-placeholder: #8f9198;
+  --nh-chip-text: #4b5059;
+  --nh-purple: #0195a3;
+  --nh-teal: #0195a3;
+  --nh-blue: #0195a3;
+  --nh-red: #e0474d;
+  --nh-disabled: #e4e5ea;
+  --nh-disabled-text: #b4b8bf;
+  --nh-confirm-card: #f4f5fa;
+  --nh-tile: #faf9fc;
+  --nh-verify: #eef1f5;
+  --nh-handle: #9ca6b1;
+}
+
+/* ---------- 공용 ---------- */
+html[data-app="nh"][data-theme="light"] .statusbar--android.statusbar--dark {
+  color: #4b4b4b;
+}
+html[data-theme="light"] .nh-header h1 {
+  color: #111;
+}
+html[data-theme="light"] .nh-btn:disabled {
+  background: var(--nh-disabled);
+  color: var(--nh-disabled-text) !important;
+}
+html[data-theme="light"] .nh .keypad__key::before {
+  background: #e9f4f6;
+}
+html[data-theme="light"] .nh-seg--box {
+  background: var(--nh-field);
+}
+html[data-theme="light"] .nh-seg--box button {
+  color: var(--nh-chip-text);
+}
+html[data-theme="light"] .nh-pill-tabs {
+  background: var(--nh-sheet2);
+}
+html[data-theme="light"] .nh-pill-tabs button {
+  color: #4b5059;
+}
+html[data-theme="light"] .nh-pill-tabs button.on {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  color: var(--nh-text);
+}
+html[data-theme="light"] .nh-tabs button.on {
+  color: var(--nh-text);
+  border-color: var(--nh-text);
+}
+html[data-theme="light"] .nh-edit-row input {
+  color: var(--nh-text);
+}
+html[data-theme="light"] .nh-lock {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--nh-outline-btn);
+  color: #394347;
+}
+html[data-theme="light"] .nh-q {
+  background: #8992a0;
+  color: #fff;
+}
+html[data-theme="light"] .nh-star {
+  box-shadow: 0 0 0 1.5px #fff;
+}
+
+/* ---------- 홈 ---------- */
+html[data-theme="light"] .nh-gh-wrap,
+html[data-theme="light"] .nh-gh {
+  background: #fff;
+}
+html[data-theme="light"] .nh-gh__top {
+  background: linear-gradient(
+    #f7f8f8 0,
+    #f2f6f8 32px,
+    #edf6f6 72px,
+    #e7f4f5 122px,
+    #e0f2f1 172px,
+    #dbf1f3 222px,
+    #d3eef1 272px,
+    #cdeff0 317px
+  );
+}
+html[data-theme="light"] .nh-gh__tabs button.on {
+  color: #152025;
+}
+html[data-theme="light"] .nh-gh__tabs button:not(.on) {
+  color: #505b5c;
+}
+html[data-theme="light"] .nh-gh__tabs i {
+  background: #009392;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__all {
+  color: #4e5a5e;
+}
+html[data-theme="light"] .nh-gh__chev {
+  color: #97a2a3;
+}
+html[data-theme="light"] .nh-gh__card,
+html[data-theme="light"] .nh-gh__minicard {
+  background: linear-gradient(#f7fbfd, #eff8fa);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 3px 12px rgba(20, 90, 100, 0.13);
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__name {
+  color: #181e21;
+}
+html[data-theme="light"] .nh-gh__schev {
+  color: #6a7073;
+}
+html[data-theme="light"] .nh-gh__num {
+  color: #4f575a;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__refresh {
+  color: #434c4e;
+}
+html[data-theme="light"] .nh-gh__more {
+  color: #606b6c;
+}
+html[data-theme="light"] .nh-gh__bal b {
+  color: #141c23;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__lock {
+  background: #f3f8fa;
+  box-shadow: inset 0 0 0 1px #dce6e9;
+  color: #394347;
+}
+html[data-theme="light"] .nh-gh__line {
+  background: #e1f0f3;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__act {
+  color: #151f21;
+}
+html[data-theme="light"] .nh-gh__vsep {
+  background: #dae7e8;
+}
+html[data-theme="light"] .nh-gh__card--skel {
+  background: #eef6f8;
+}
+html[data-theme="light"] .nh-gh__card--empty p {
+  color: #4f575a;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__card--empty button {
+  background: #e3eff3;
+  color: #1f2630;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__reg {
+  color: #425c62;
+}
+html[data-theme="light"] .nh-gh__regchev,
+html[data-theme="light"] .nh-gh__minichev {
+  color: #0a9084;
+}
+html[data-theme="light"] .nh-gh__count,
+html[data-theme="light"] .nh-gh__kokcount,
+html[data-theme="light"] .nh-gh__pager {
+  color: #8d8d92;
+}
+html[data-theme="light"] .nh-gh__count b,
+html[data-theme="light"] .nh-gh__kokcount b,
+html[data-theme="light"] .nh-gh__pager b {
+  color: #242328;
+}
+html[data-theme="light"] .nh-gh__h2 {
+  color: #1a1b20;
+}
+/* 흰 카드는 그대로 흰색, 둘레에 옅은 그림자 */
+html[data-theme="light"] .nh-gh__reccard::before,
+html[data-theme="light"] .nh-gh__banner,
+html[data-theme="light"] .nh-gh__wcard {
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+html[data-theme="light"] .nh-gh__reccard {
+  clip-path: none;
+}
+html[data-theme="light"] .nh-gh__reccard::before {
+  top: 5.9px;
+  bottom: 5.9px;
+  border-radius: 20px;
+  transition:
+    top 200ms ease,
+    bottom 200ms ease;
+}
+html[data-theme="light"] .nh-gh__reccard.on::before {
+  top: 0;
+  bottom: 0;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__pager button {
+  color: #8f8f8f;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__seeall {
+  color: #54585c;
+}
+html[data-theme="light"] .nh-gh__seeall .nh-gh__chev {
+  color: #9d9ea3;
+}
+html[data-theme="light"] .nh-gh__fin {
+  background: #f4f5fa;
+}
+html[data-theme="light"] .nh-gh__dots i {
+  box-shadow: inset 0 0 0 1px #c3c8cf;
+}
+html[data-theme="light"] .nh-gh__dots i.on {
+  background: #8a909a;
+}
+html[data-theme="light"] .nh-gh__head--scrolled {
+  background: #f7f8f8;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__big {
+  background: #f5f6fb;
+  box-shadow: inset 0 0 0 1px #e3e6eb;
+  color: #40434a;
+}
+html[data-theme="light"] .nh-gh__big i {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__icon,
+html[data-theme="light"] .nh-gh-wrap .nh-gh__icon--menu {
+  color: #172022;
+}
+html[data-theme="light"] .nh-gh__mini {
+  background: linear-gradient(
+    #f7f8f8 0,
+    #f4f9f9 12px,
+    #e9f4f5 52px,
+    #e2f2f3 120px,
+    #d7eff2 212px
+  );
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__mini-num {
+  color: #51585c;
+}
+html[data-theme="light"] .nh-gh__mini-num .nh-gh__schev {
+  color: #545f61;
+}
+html[data-theme="light"] .nh-gh__mini-bal b {
+  color: #0b1416;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__mini-bal button {
+  background: #e3eff3;
+  color: #4b5459;
+}
+html[data-theme="light"] .nh-gh__tabbar {
+  background: #fff;
+  box-shadow: 0 -0.8px 0 #eceef1;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__tabbar button {
+  color: #838890;
+}
+html[data-theme="light"] .nh-gh__tabbar i {
+  background: #7f8991;
+}
+html[data-theme="light"] .nh-gh-wrap .nh-gh__top-btn {
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
+  color: #3a3f46;
+}
+
+/* ---------- 계좌별 거래내역 ---------- */
+html[data-theme="light"] .nh-hist {
+  --hist-glow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+html[data-theme="light"] .nh-hist__tabs button.on::after {
+  background: var(--nh-text);
+}
+html[data-theme="light"] .nh-hist__chev {
+  color: #404a57;
+}
+html[data-theme="light"] .nh-hist__more {
+  color: #626c77 !important;
+}
+html[data-theme="light"] .nh-hist__menu {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+html[data-theme="light"] .nh-hist__lock {
+  color: #394347 !important;
+}
+html[data-theme="light"] .nh-hist__ring {
+  stroke: #d3d6db;
+}
+html[data-theme="light"] .nh-hist__chips button.on,
+html[data-theme="light"] .nh-hpick__tabs button.on,
+html[data-theme="light"] .nh-hcal__day.on span {
+  background: #1f2630;
+  color: #fff !important;
+}
+html[data-theme="light"] .nh-hist__chips button.send {
+  background: #fff;
+}
+/* 송금 칩: 테 대신 옅은 그림자 */
+html[data-theme="light"] .nh-hist__sendline rect {
+  stroke: none;
+}
+html[data-theme="light"] .nh-hist__chips button.send {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.13);
+}
+html[data-theme="light"] .nh-hist__list {
+  background: linear-gradient(#f4f4f4, #fff 14px);
+}
+html[data-theme="light"] .nh-hist__view {
+  box-shadow:
+    inset 0 0 0 0.5px #e6e8ec,
+    var(--hist-glow);
+}
+html[data-theme="light"] .nh-hist__view button {
+  color: #8b9098 !important;
+}
+html[data-theme="light"] .nh-hist__view button.on {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #3d4a59;
+  color: #3d4a59 !important;
+}
+html[data-theme="light"] .nh-hist__range svg,
+html[data-theme="light"] .nh-hist__sort--search > svg {
+  color: #20262e;
+}
+html[data-theme="light"] .nh-hist__sort {
+  color: #444a55;
+}
+html[data-theme="light"] .nh-hist__search {
+  color: #20262e !important;
+}
+html[data-theme="light"] .nh-hist__order svg {
+  color: #646c77;
+}
+html[data-theme="light"] .nh-hist__qclose,
+html[data-theme="light"] .nh-hcal__head button {
+  color: #444a55 !important;
+}
+html[data-theme="light"] .nh-hpick__tabs button {
+  color: #5c626a !important;
+}
+html[data-theme="light"] .nh-hpick__field input::placeholder {
+  color: #8f9198;
+}
+html[data-theme="light"] .nh-hpick__note {
+  color: #7a8089;
+}
+html[data-theme="light"] .nh-hpick__note svg {
+  color: #b3b8bf;
+}
+
+/* ---------- 거래 상세 ---------- */
+html[data-theme="light"] .nh-txd__tag {
+  color: #5a5a5f !important;
+}
+html[data-theme="light"] .nh-txd__qmark {
+  background: #8992a0;
+  color: #fff;
+}
+html[data-theme="light"] .nh-txd__more-wrap {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 33px);
+}
+html[data-theme="light"] .nh-txd__more {
+  color: #4b4d53 !important;
+}
+html[data-theme="light"] .nh-txd__rows::after {
+  background: linear-gradient(#eef0f2, #eef0f2) 0 3.3px / 100%
+    var(--nh-txd-hair) no-repeat;
+}
+html[data-theme="light"] .nh-txd__search svg {
+  color: #a3a4a7;
+}
+html[data-theme="light"] .nh-txd__add {
+  color: #74777b !important;
+}
+html[data-theme="light"] .nh-txd__actions button {
+  color: #5b5c5e !important;
+}
+html[data-theme="light"] .nh-txd__bottom::before {
+  background: linear-gradient(rgba(255, 255, 255, 0), #fff);
+}
+
+/* ---------- 콕송금: 누구에게 / 받는 분 목록 / 은행선택 / 계좌번호 / 금액 ---------- */
+html[data-theme="light"] .nh-sw__row {
+  border-bottom-color: #eceef1;
+}
+html[data-theme="light"] .nh-sw__chev {
+  color: #444850;
+}
+html[data-theme="light"] .nh-sw .nh-sw__quick {
+  color: #5a6169;
+}
+html[data-theme="light"] .nh-rl {
+  box-shadow: 0 -2px 14px rgba(0, 0, 0, 0.08);
+}
+html[data-theme="light"] .nh-rl .nh-rl__tabs button.on,
+html[data-theme="light"] .nh-banks__tabs button.on {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+html[data-theme="light"] .nh-rl__icon--other {
+  background: #f1f2f4;
+}
+html[data-theme="light"] .nh-rl__text .nh-rl__at {
+  color: #6c7078;
+}
+html[data-theme="light"] .nh-rl .nh-rl__plus {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #c9cdd3;
+  color: #888f99;
+}
+html[data-theme="light"] .nh-rl__empty i {
+  background: #eff4f8;
+}
+/* 흰 아이콘(농협·SC·iM 등)은 둘레에 옅은 테가 보임 */
+html[data-theme="light"] .nh-banks__grid .nh-bank-sq,
+html[data-theme="light"] .nh-rl .nh-bank-sq {
+  border-radius: 13.6px;
+  box-shadow: 0 0 0 0.6px #e4e5e8;
+}
+html[data-theme="light"] .nh-banks__search::after {
+  background: #e8eaed;
+}
+html[data-theme="light"] .nh-number__ph {
+  color: #9d9ea3;
+}
+html[data-theme="light"] .nh-number__caret,
+html[data-theme="light"] .nh-as__caret,
+html[data-theme="light"] .nh-reg-sheet__caret {
+  background: #0195a3;
+}
+html[data-theme="light"] .nh-sa__chev {
+  color: #444850;
+}
+html[data-theme="light"] .nh-sa__box:not(.filled) {
+  color: #8e9099;
+}
+html[data-theme="light"] .nh-amt-clear--page circle,
+html[data-theme="light"] .nh-amt-clear--sheet circle {
+  fill: #c9ced4;
+}
+html[data-theme="light"] .nh-amt-clear--page path,
+html[data-theme="light"] .nh-amt-clear--sheet path {
+  stroke: #fff;
+}
+html[data-theme="light"] .nh-sa__error,
+html[data-theme="light"] .nh-as__hint {
+  color: #87878c;
+}
+html[data-theme="light"] .nh-sa__limit {
+  background: #faf9fc;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+html[data-theme="light"] .nh-sa__q svg {
+  fill: #8591a0;
+}
+html[data-theme="light"] .nh-sa__limit .nh-sa__q {
+  color: #fff;
+}
+html[data-theme="light"] .nh-sa__more .nh-sa__chev {
+  color: #0195a3;
+}
+html[data-theme="light"] .nh-as__value:not(.filled) {
+  color: #8c8f98;
+}
+html[data-theme="light"] .nh-as__chips button {
+  color: #545a62;
+}
+html[data-theme="light"] .nh-as__chipol {
+  stroke: #d7dade;
+}
+
+/* ---------- 송금 확인·완료 (라이트 녹화엔 없음 → 같은 색 체계로) ---------- */
+html[data-theme="light"] .nh-cf__from dt,
+html[data-theme="light"] .nh-dn__rows dt {
+  color: #5c626a;
+}
+html[data-theme="light"] .nh-cf__row + .nh-cf__row {
+  box-shadow: inset 0 0.5px 0 #e1e3e7;
+}
+html[data-theme="light"] .nh-cf__chev,
+html[data-theme="light"] .nh-dn__chev {
+  color: #a3a6ab;
+}
+html[data-theme="light"] .nh-vf__again {
+  color: #6b727b !important;
+}
+html[data-theme="light"] .nh-dn__more {
+  color: #6b6e75 !important;
+}
+html[data-theme="light"] .nh-dn__msg button {
+  color: #4b5059 !important;
+}
+
+/* ---------- 전체계좌·농협계좌 등록 (라이트 녹화엔 없음 → 같은 색 체계로) ---------- */
+html[data-theme="light"] .nh-accts {
+  --accts-glow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+html[data-theme="light"] .nh-accts__lock {
+  background: #fff;
+  color: #394347 !important;
+}
+html[data-theme="light"] .nh-accts__q {
+  background: #8992a0;
+}
+html[data-theme="light"] .nh-accts__chips button.on {
+  background: #1f2630;
+  color: #fff !important;
+}
+html[data-theme="light"] .nh-accts__panel::before {
+  background: linear-gradient(#f4f4f4, #fff 14px);
+}
+html[data-theme="light"] .nh-accts__view {
+  box-shadow:
+    inset 0 0 0 0.5px #e6e8ec,
+    var(--accts-glow);
+}
+html[data-theme="light"] .nh-accts__view button {
+  color: #8b9098 !important;
+}
+html[data-theme="light"] .nh-accts__view button.on {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.0667px #3d4a59;
+  color: #3d4a59 !important;
+}
+html[data-theme="light"] .nh-switch {
+  background: #d7dade;
+}
+html[data-theme="light"] .nh-switch span {
+  color: #5c626a;
+}
+html[data-theme="light"] .nh-switch i {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+html[data-theme="light"] .nh-asec + .nh-asec::before {
+  background: #f1f2f4;
+}
+html[data-theme="light"] .nh-asec__head h2,
+html[data-theme="light"] .nh-asec__head > b,
+html[data-theme="light"] .nh-reg__note-head b {
+  color: #1f2630;
+}
+html[data-theme="light"] .nh-asec__none {
+  color: #7e8692 !important;
+}
+html[data-theme="light"] .nh-asec__chev {
+  color: #a3a6ab;
+}
+html[data-theme="light"] .nh-acard__more {
+  color: #626c77 !important;
+}
+html[data-theme="light"] .nh-acard__tag {
+  color: #5a5a5f !important;
+}
+html[data-theme="light"] .nh-acard__btns::before {
+  background: #eef0f2;
+}
+html[data-theme="light"] .nh-reg__empty p,
+html[data-theme="light"] .nh-reg__note li,
+html[data-theme="light"] .nh-reg__note-head .nh-asec__chev {
+  color: #6b727b;
+}
+html[data-theme="light"] .nh-reg__note li::before {
+  background: #9aa0a7;
+}
+html[data-theme="light"] .nh-reg-sheet__ph {
+  color: #9d9ea3;
+}

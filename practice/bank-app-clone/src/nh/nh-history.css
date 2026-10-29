@@ -236,6 +236,19 @@
   line-height: 25px;
   transform: translateY(0.5333px); /* 잉크 y 458–493 px */
 }
+/* [+ 채우기] 68 × 28, 잔액과 9.6 띄움, 모서리 8, 1dp 테 */
+.nh-hist__fill {
+  width: 68px;
+  height: 28px;
+  margin-left: -2.8px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--nh-outline-btn);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nh-chip-text);
+}
 
 /* 칩 줄: 위 4.9 · 아래 10.1 여백에서 번짐이 잘림, 오른쪽 끝 13dp 페이드 후 잘림(x 364.5) */
 .nh-hist__chips {

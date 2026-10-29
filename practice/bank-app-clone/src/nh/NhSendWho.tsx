@@ -100,7 +100,7 @@ export function NhSendWho({
   }, [busy]);
   return (
     <>
-      <div className="nh-sw">
+      <div className={`nh-sw${account?.balance === 0 ? " nh-sw--zero" : ""}`}>
         <FromAccount account={account} />
         {entry.kok && <KokArrows />}
         <h2 className="nh-sw__who">누구에게 보낼까요?</h2>
@@ -145,6 +145,7 @@ export function NhSendWho({
         appear={entry.sheet}
         initialTab={entry.again ? visit.tab : "recent"}
         onTab={(t) => (visit.tab = t)}
+        lower={account?.balance === 0 ? 14.4 : 0}
       />
     </>
   );
@@ -162,7 +163,9 @@ function FromAccount({ account }: { account?: Account }) {
       <b>{account?.label ?? " "}</b>
       <small>농축협 {account?.number}</small>
       <Chevron />
-      <em>{account ? nhWon(account.balance) : ""}</em>
+      <em className={account?.balance === 0 ? "nh-sw__zero" : ""}>{account ? nhWon(account.balance) : ""}</em>
+      {/* 잔액이 0원이면 옆에 [+ 채우기] (2026-10-29 녹화) */}
+      {account?.balance === 0 && <span className="nh-sw__fill">+ 채우기</span>}
     </div>
   );
 }

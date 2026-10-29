@@ -57,6 +57,27 @@
   color: var(--nh-blue);
   transform: translate(-0.45px, 0.45px); /* 글자 줄은 정수 px 로 맞춰지므로 남는 만큼 */
 }
+/* 잔액 0원: [+ 채우기] 68.6 × 28 (x 290.6~359.2, 위 64.1, 모서리 8, 1dp 테) 왼쪽으로 12 띄움 */
+.nh-sw__from em.nh-sw__zero {
+  right: 105.2px;
+}
+/* 이 줄이 높아지는 만큼(6.4) 아래 내용이 내려감 (2026-10-29 녹화, 0원일 때) */
+.nh-sw--zero > :not(.nh-sw__from) {
+  translate: 0 6.4px;
+}
+.nh-sw__fill {
+  right: 24.8px;
+  top: 64.1px;
+  width: 68.6px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--nh-outline-btn);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nh-chip-text);
+}
 .nh-sw__chev {
   color: var(--nh-chip-text);
 }

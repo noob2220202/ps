@@ -4,13 +4,13 @@ import type { HomeData } from "../api/types";
 import { paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo, withNhLoading } from "./loading";
 import { HomeLine, NhEqualsIcon, NhImg } from "./common";
 import { nhWon } from "./hangul";
 import { NhCfChevron, type NhDoneState } from "./NhConfirm";
 import "./nh-done.css";
 import "./nh-confirm-mark.css";
+import { nhPic, useNhStatusBar } from "./theme";
 
 // 송금 완료 (녹화2 30.15~36초). 화면이 뜬 때(T0) 기준:
 //   +95ms 동전이 보임(앞의 로딩 막은 +170ms에 걷힘) → +400 동전이 한 바퀴 돌고 → +1.1s 사라짐 →
@@ -31,8 +31,8 @@ export function NhDone() {
   const state = useLocation().state as NhDoneState | null;
   const home = useApi<HomeData>(paths.home);
   const [detail, setDetail] = useState(false);
-  const mark = localAsset("nh-done-mark");
-  useStatusBar("#18171c", "light");
+  const mark = localAsset(nhPic("nh-done-mark"));
+  useNhStatusBar("#18171c");
   useEffect(() => {
     if (!state) navigate("/", { replace: true });
   }, [state, navigate]);
@@ -64,7 +64,7 @@ export function NhDone() {
         <span className="nh-dn-mark nh-dn-mark--sprite" style={{ backgroundImage: `url(${mark})` }} />
       ) : (
         <span className="nh-dn-mark nh-dn-mark--css">
-          <NhImg name="nh-coin" w={60} h={64} className="nh-dn-mark__coin" fallback={<span style={{ fontSize: 44 }}>🪙</span>} />
+          <NhImg name={nhPic("nh-coin")} w={60} h={64} className="nh-dn-mark__coin" fallback={<span style={{ fontSize: 44 }}>🪙</span>} />
           <span className="nh-dn-mark__check">
             <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="m5 12.5 4.5 4.5L19 7.5" />
@@ -127,7 +127,7 @@ export function NhDone() {
             ] as const
           ).map(([k, label]) => (
             <button key={k}>
-              <NhImg name={`nh-msg-${k}`} w={51.2} h={51.2} fallback={<span>💬</span>} />
+              <NhImg name={nhPic(`nh-msg-${k}`)} w={51.2} h={51.2} fallback={<span>💬</span>} />
               {label}
             </button>
           ))}

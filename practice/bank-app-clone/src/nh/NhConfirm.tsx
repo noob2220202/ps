@@ -6,13 +6,13 @@ import type { Bank, HomeData, TransferResult } from "../api/types";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { Dialog, Sheet } from "../components/Sheet";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { NhBankIcon, NhHeader, NhImg } from "./common";
 import { withNhLoading } from "./loading";
 import { nhWon } from "./hangul";
 import type { NhConfirmState } from "./NhSend";
 import "./nh-confirm.css";
 import { sendFromScratchOnReturn } from "./nhSendRestore";
+import { nhPic, useNhStatusBar } from "./theme";
 
 export interface NhDoneState {
   result: TransferResult;
@@ -50,13 +50,13 @@ export function NhConfirm() {
   const [black, setBlack] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // 받는 분 확인 시트의 막(0.5)은 상태바를 덮지 않음 (녹화2 27.0초 상태바 그대로 #17161b). 송금 중 검은 화면 때만 상태바도 검정
-  useStatusBar(black ? "#000000" : "#18171c", "light");
+  useNhStatusBar("#18171c", { black });
   useEffect(() => {
     if (!state) navigate("/", { replace: true });
   }, [state, navigate]);
   // 완료 화면 그림(스프라이트)을 미리 받아 둠 → 완료 화면이 뜨자마자 동전이 보이게
   useEffect(() => {
-    const src = localAsset("nh-done-mark");
+    const src = localAsset(nhPic("nh-done-mark"));
     if (src) new Image().src = src;
   }, []);
   if (!state) return null;
@@ -153,7 +153,7 @@ export function NhConfirm() {
       </div>
 
       <Sheet open={verify} onClose={() => setVerify(false)} kind="nhverify" className="nh-vf">
-        <NhImg name="nh-shield" w={46.4} h={52.8} className="nh-vf__shield" fallback={<span style={{ fontSize: 36 }}>🛡️</span>} />
+        <NhImg name={nhPic("nh-shield")} w={46.4} h={52.8} className="nh-vf__shield" fallback={<span style={{ fontSize: 36 }}>🛡️</span>} />
         <h2 className="nh-vf__title">
           받는 분이 맞는지
           <br />

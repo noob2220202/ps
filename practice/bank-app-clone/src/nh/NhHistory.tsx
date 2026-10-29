@@ -5,12 +5,12 @@ import type { Account, HomeData, Transaction } from "../api/types";
 import { prefetch, useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { Dialog, Sheet } from "../components/Sheet";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { useLayerActive } from "../platform/LayerContext";
 import { useNhLoading, withNhLoading } from "./loading";
 import { NhCloseIcon, NhHeader } from "./common";
 import { nhWon } from "./hangul";
 import "./nh-history.css";
+import { useNhStatusBar } from "./theme";
 
 type Filter = "all" | "in" | "out" | "atm";
 const FILTER_LABEL: Record<Filter, string> = {
@@ -215,7 +215,7 @@ function HistoryScreen({ accountId }: { accountId: string }) {
   // 실제 앱: 로딩 막이 걷힌 뒤 약 130ms 있다가 거래 줄이 나타남(녹화2 41.105 → 41.233). 뒤로 돌아올 땐 바로
   // (iOS 스와이프 중 뒤에 깔려 그려질 때도 바로)
   const [ready, setReady] = useState(popped || !active);
-  useStatusBar("#18171c", "light"); // 계좌선택 시트가 열려도 상태바는 그대로 (녹화2 55.6~61)
+  useNhStatusBar("#18171c"); // 계좌선택 시트가 열려도 상태바는 그대로 (녹화2 55.6~61)
 
   // 로딩 막을 minMs 동안 보여 준 뒤 이동하고, 새 화면이 실제로 붙을 때까지(이 화면이 맨 위에서 내려가거나 사라질 때까지)
   // 막을 유지. 막이 먼저 걷히면 이전 화면이 몇 프레임 보임 (실제 앱은 막이 걷히는 프레임에 이미 새 화면)
@@ -392,6 +392,8 @@ function HistoryScreen({ accountId }: { accountId: string }) {
                 <Padlock open={!hidden} />
               </button>
               <b>{a ? (hidden ? "잔액보기" : nhWon(a.balance)) : " "}</b>
+              {/* 잔액이 0원이면 [+ 채우기] (2026-10-29 녹화) */}
+              {a?.balance === 0 && !hidden && <span className="nh-hist__fill">+ 채우기</span>}
             </div>
             <div className="nh-hist__chips">
               <button className="send" onClick={() => goLoad(`/send?from=${accountId}`)}>

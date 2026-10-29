@@ -111,6 +111,7 @@ export function NhHeader({
   home,
   menu,
   onMenu,
+  tools,
 }: {
   title?: string;
   onBack?: () => void;
@@ -118,6 +119,7 @@ export function NhHeader({
   home?: () => void;
   menu?: boolean;
   onMenu?: () => void;
+  tools?: boolean; // 콕송금: 음성·스캔 아이콘 (2026-10-29 녹화부터 보임)
 }) {
   return (
     <header className="nh-header">
@@ -128,6 +130,16 @@ export function NhHeader({
       )}
       {title && <h1>{title}</h1>}
       <span className="nh-header__right">
+        {tools && (
+          <>
+            <button className="nh-icon-btn nh-header__tool" aria-label="음성으로 송금">
+              <NhMicIcon />
+            </button>
+            <button className="nh-icon-btn nh-header__tool" aria-label="스캔">
+              <NhScanIcon />
+            </button>
+          </>
+        )}
         {home && (
           <button className="nh-icon-btn" aria-label="홈" onClick={home}>
             <HomeLine />
@@ -145,6 +157,24 @@ export function NhHeader({
         )}
       </span>
     </header>
+  );
+}
+
+// 마이크 (잉크 16 × 20, 상자 가운데 x 308·y 22.4) / 스캔 (네 귀퉁이 + 가운데 줄, 20 × 20, x 347.6)
+function NhMicIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden>
+      <rect x="8.6" y="1.75" width="6.8" height="11.6" rx="3.4" />
+      <path d="M4.75 9.9a7.25 7.25 0 0 0 14.5 0M12 17.15v3.6M8.7 20.75h6.6" />
+    </svg>
+  );
+}
+function NhScanIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden>
+      <path d="M2.75 7.4V5.25a2.5 2.5 0 0 1 2.5-2.5H7.4M16.6 2.75h2.15a2.5 2.5 0 0 1 2.5 2.5V7.4M21.25 16.6v2.15a2.5 2.5 0 0 1-2.5 2.5H16.6M7.4 21.25H5.25a2.5 2.5 0 0 1-2.5-2.5V16.6" />
+      <path d="M6.6 12h10.8" strokeWidth="1.7" />
+    </svg>
   );
 }
 

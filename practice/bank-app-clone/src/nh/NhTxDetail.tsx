@@ -5,11 +5,11 @@ import { http } from "../api/client";
 import type { Payee, TransactionDetail } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Dialog } from "../components/Sheet";
-import { useStatusBar } from "../hooks/useStatusBar";
 import { useNhGo } from "./loading";
 import { NhHeader, NhImg, NhShareIcon } from "./common";
 import { nhWon } from "./hangul";
 import "./nh-txdetail.css";
+import { NH_LIGHT, useNhStatusBar } from "./theme";
 
 // 거래메모 칩. 앞의 셋은 스크린샷 그대로, 나머지는 ⌄ 로 펼쳤을 때 (실제 목록은 확인 못 함)
 const MEMO_CHIPS = ["식비", "생활/마트", "경조사/모임", "쇼핑", "교통", "주거/통신", "의료/건강", "문화/여가", "교육", "용돈"];
@@ -31,7 +31,7 @@ export function NhTxDetail() {
   const [memo, setMemo] = useState<string | null>(null); // null = 아직 안 고침 (서버 값 그대로)
   const [chipsOpen, setChipsOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  useStatusBar("#18171c", "light");
+  useNhStatusBar("#18171c");
   const t = tx.data;
   const value = memo ?? t?.memo ?? "";
 
@@ -194,11 +194,11 @@ export function NhTxDetail() {
             <div className="nh-txd__actions">
               {/* 빠른송금(금액까지 저장해 두는 송금)은 우리 데이터에 없는 기능이라 모양만 */}
               <button className="nh-txd__quick">
-                <NhImg name="nh-quick-register" w={48} h={48} fallback={<span>⚡</span>} />
+                <NhImg name={NH_LIGHT ? "nh-quick-register-light" : "nh-quick-register"} w={48} h={48} fallback={<span>⚡</span>} />
                 빠른송금 등록
               </button>
               <button className="nh-txd__same" onClick={sendAgain}>
-                <NhImg name="nh-same-send" w={48} h={48} fallback={<span>₩</span>} />
+                <NhImg name={NH_LIGHT ? "nh-same-send-light" : "nh-same-send"} w={48} h={48} fallback={<span>₩</span>} />
                 동일내역 송금
               </button>
             </div>

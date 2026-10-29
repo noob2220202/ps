@@ -68,7 +68,7 @@ export function NhBankPicker({
   const ready = banks.length > 0;
   const [phase, setPhase] = useState<Phase>(ready ? "in" : "loading");
   const [fresh, setFresh] = useState(ready); // 막 나타난 참 (아이콘이 차례로 뜨는 동안)
-  const [tab, setTab] = useState<"bank" | "securities">("bank");
+  const [tab, setTab] = useState<"bank" | "securities" | "tax">("bank");
   const [query, setQuery] = useState("");
   const leaveTimer = useRef(0);
   const onCloseRef = useRef(onClose);
@@ -147,7 +147,7 @@ export function NhBankPicker({
   // 대소문자·띄어쓰기 상관없이, 화면 이름·은행 이름·줄임말 어디든 들어 있으면
   const q = query.replace(/\s/g, "").toLowerCase();
   const list = useMemo(
-    () => nhBankList(banks, tab).filter((b) => !q || [b.label, b.name, b.short].some((s) => s.replace(/\s/g, "").toLowerCase().includes(q))),
+    () => (tab === "tax" ? [] : nhBankList(banks, tab)).filter((b) => !q || [b.label, b.name, b.short].some((s) => s.replace(/\s/g, "").toLowerCase().includes(q))),
     [banks, tab, q],
   );
   return (
@@ -172,6 +172,9 @@ export function NhBankPicker({
           <button role="tab" aria-selected={tab === "securities"} className={tab === "securities" ? "on" : ""} onClick={() => setTab("securities")}>
             증권사
           </button>
+          <button role="tab" aria-selected={tab === "tax"} className={tab === "tax" ? "on" : ""} onClick={() => setTab("tax")}>
+            국세/지방세
+          </button>
         </div>
         <div className="nh-banks__grid">
           {list.map((b) => (
@@ -181,7 +184,11 @@ export function NhBankPicker({
             </button>
           ))}
         </div>
-        {!list.length && banks.length > 0 && <p className="nh-empty">검색 결과가 없어요.</p>}
+        {tab === "tax" ? (
+          <p className="nh-empty">국세·지방세 납부는 준비 중이에요.</p>
+        ) : (
+          !list.length && banks.length > 0 && <p className="nh-empty">검색 결과가 없어요.</p>
+        )}
       </div>
     </div>
   );
