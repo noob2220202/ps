@@ -267,40 +267,67 @@ html[data-app="hana"] .statusbar--android.statusbar--light {
 }
 
 /* ---------- i-ONE Bank 기기 (녹화 82d59fba, 384 × 832dp) ----------
-   상태바 0~29.4, 아래 3버튼 내비게이션 바 788~832 (44) — 흰 바탕, 구분선 없음. 아이콘 세로 가운데 810.1,
-   가로 가운데 Ⅲ 83.2 / ○ 190.9 / < 298.5 (화면 가운데 192 가 아니라 190.9 에 대칭 — 시스템 UI) */
+   상태바 0~29.4 (#fafafa), 아래 3버튼 내비게이션 바 788~832 (44) — 흰 바탕, 구분선 없음.
+   상태바 글자: Roboto 400 14px #5c5c5c, 기준선 y 20.2 (숫자 잉크 10.0~20.2). 시계 잉크 왼쪽 클론 25.2, "38%" 잉크 325.6~350.0,
+   배터리 352.6~359.9 (spec/home.md 2-1 을 정지 프레임에서 다시 잼). line-height 0 → 기준선 = top + 0.3418em */
 html[data-app="ibk"] .statusbar--android {
+  position: relative;
   height: 29.4px;
-  padding-left: 26.7px;
+  padding: 0;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
+  letter-spacing: 0;
+}
+html[data-app="ibk"] .statusbar--android.statusbar--dark {
+  color: #4f4f4f;
+}
+html[data-app="ibk"] .statusbar--android .statusbar__time {
+  position: absolute;
+  left: 23.77px;
+  top: 15.415px;
+  line-height: 0;
+}
+/* 오른쪽 아이콘은 384 × 29.4 SVG 한 장에 클론 좌표 그대로 (작은 svg 를 흐름에 놓으면 화면 픽셀에 붙어 0.5~1px 씩 튐) */
+.statusbar__right--ibk {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.ibk-sb-icons {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ibk-sb-pct {
+  position: absolute;
+  right: 33.55px;
+  top: 15.415px;
+  line-height: 0;
 }
 .phone__navbar--keys {
   height: 44px;
   background: #ffffff;
-  color: #5d5f62;
+  color: #8a8a8a;
   transform: none;
 }
-.navkey {
+.navkeys {
   position: absolute;
-  top: calc(22.1px - 8px);
-  display: block;
+  left: 0;
+  top: 0;
 }
-.navkey--recents {
-  left: calc(83.2px - 8px);
-}
-.navkey--home {
-  left: calc(190.9px - 8px);
-}
+/* 뒤로 누름 칸 (< 가운데 298.5). 누르는 동안 회색 둥근 바탕 (녹화 3.5초 부근, 모양은 대략) */
 .navkey--back {
-  left: calc(298.5px - 8px);
-}
-button.navkey {
-  display: flex;
-  padding: 8px;
-  margin: -8px;
+  position: absolute;
+  left: 268.5px;
+  top: 0;
+  width: 60px;
+  height: 44px;
   border: 0;
+  border-radius: 22px;
   background: none;
-  color: inherit;
   cursor: pointer;
+}
+.navkey--back:active {
+  background: rgba(0, 0, 0, 0.06);
 }

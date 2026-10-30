@@ -49,6 +49,41 @@ function IosIcons() {
   );
 }
 
+// i-ONE Bank 녹화 기기 상태바 오른쪽 (spec/home.md 2-1, 클론 x): "LTE⁺"(아래 옅은 ↑↓) 288.7~306.8 · 신호 막대 4개 310.3~319.8
+// · "38%" 325.6~350.0 · 세로 배터리 352.6~359.9 (위 꼭지, 위쪽 #bebebe · 아래 잔량만큼 #454545). 막대·글자 기준선 녹화 y 20.2
+function IbkIcons() {
+  const { battery } = useDeviceStatus();
+  const fill = Math.min(10.5, (battery / 100) * 10.5 + 0.5);
+  const shift = (String(battery).length - 2) * 7.86; // "100%" 처럼 글자가 길면 LTE·신호를 그만큼 왼쪽으로
+  return (
+    <span className="statusbar__right statusbar__right--ibk">
+      <svg className="ibk-sb-icons" width="384" height="29.4" viewBox="0 0 384 29.4" aria-hidden>
+        <g transform={`translate(${-shift} 0)`}>
+          <path
+            d="M290.55 9.7v5.35h3M293.18 10.25h4.49M295.72 10.25v5.4M302.36 10.25h-3.04v4.85h3.04M299.32 12.95h2.9M305.59 9.25v3.1M304.02 10.8h3.12"
+            fill="none"
+            stroke="#4d4d4d"
+            strokeWidth="1.35"
+          />
+          <path d="M294.45 21.1v-3.9m-1 1 1-1 1 1M298.36 17.2v3.9m-1-1 1 1 1-1" fill="none" stroke="#c9c9c9" strokeWidth="0.9" />
+          <g fill="#454545">
+            <rect x="310.4" y="17.6" width="1.27" height="2.7" />
+            <rect x="312.82" y="15.2" width="1.27" height="5.1" />
+            <rect x="315.7" y="12.3" width="1.27" height="8" />
+            <rect x="318.6" y="9.3" width="1.27" height="11" />
+          </g>
+        </g>
+        <g transform="translate(352.7 8.3)">
+          <rect x="1.76" width="3.42" height="2" rx="0.4" fill="#bcbcbc" />
+          <rect y="1.7" width="7.3" height="10.5" rx="0.9" fill="#c4c4c4" />
+          <path d={`M0 ${12.2 - fill}h7.3v${fill - 0.9}a.9.9 0 0 1-.9.9H.9a.9.9 0 0 1-.9-.9Z`} fill="#4a4a4a" />
+        </g>
+      </svg>
+      <span className="ibk-sb-pct">{battery}%</span>
+    </span>
+  );
+}
+
 function StatusBar() {
   const { bg, fg } = useStatusBarStyle();
   const time = useClock();
@@ -56,29 +91,28 @@ function StatusBar() {
     // 콕뱅크: 28px 상태바가 기기 52.5px 에서 끝나 반 픽셀에 어두운 이음새가 생김 → 같은 색 그림자 1px 로 덮음
     <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background: bg, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${bg}` }) }}>
       <span className="statusbar__time">{time}</span>
-      {OS === "ios" ? <IosIcons /> : <AndroidIcons />}
+      {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : <AndroidIcons />}
     </div>
   );
 }
 
-// i-ONE Bank 녹화 기기의 3버튼 내비게이션 바 (Ⅲ 최근 앱 · ▢ 홈 · < 뒤로, 흰 바탕 48dp). PC 에서 < 는 앱 안 뒤로가기
+// i-ONE Bank 녹화 기기의 3버튼 내비게이션 바 (Ⅲ 최근 앱 · ▢ 홈 · < 뒤로, 흰 바탕 44dp, 아이콘 #8a8a8a). spec/home.md 2-2 를
+// 녹화 정지 프레임에서 다시 잼 (클론 x, 바 위 기준 y): Ⅲ 막대 가운데 77.50 / 83.19 / 88.83, 15.4~29.05, 두께 1.8 (끝 각짐)
+// ▢ 선 중심 184.33~197.37 × 15.6~28.75, r 4.4, 1.62 / < 꼭짓점 (295.66, 22.17), 끝 (301.55, 16.1 · 28.2), 1.75 끝 둥글게.
+// PC 에서 < 는 앱 안 뒤로가기 (화면이 쌓아 둔 기록 칸 — 시트·이체 단계 — 이 있으면 그것부터)
 function NavKeys() {
   const back = () => {
-    if (((window.history.state as { idx?: number } | null)?.idx ?? 0) > 0) window.history.back();
+    const st = window.history.state as { idx?: number; ibkBack?: number } | null;
+    if ((st?.idx ?? 0) > 0 || (st?.ibkBack ?? 0) > 0) window.history.back();
   };
   return (
     <div className="phone__navbar phone__navbar--keys">
-      <svg className="navkey navkey--recents" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-        <path d="M2.5 2.5v11M8 2.5v11M13.5 2.5v11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <svg className="navkeys" width="384" height="44" viewBox="0 0 384 44" fill="none" stroke="currentColor" aria-hidden>
+        <path d="M77.5 15.4v13.65M83.19 15.4v13.65M88.83 15.4v13.65" strokeWidth="1.9" />
+        <rect x="184.33" y="15.6" width="13.04" height="13.15" rx="4.4" strokeWidth="1.8" />
+        <path d="M301.55 16.1 295.66 22.17l5.89 6.03" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      <svg className="navkey navkey--home" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-        <rect x="1.4" y="1.4" width="13.2" height="13.2" rx="5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      </svg>
-      <button className="navkey navkey--back" onClick={back} aria-label="뒤로">
-        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-          <path d="m10.5 2.5-5.5 5.5 5.5 5.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+      <button className="navkey navkey--back" onClick={back} aria-label="뒤로" />
     </div>
   );
 }

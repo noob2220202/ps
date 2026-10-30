@@ -11,6 +11,7 @@ import { TIMING } from "../config/timing";
 import { OS } from "../platform/platform";
 import { APP } from "../profile/session";
 import { LayerContext } from "../platform/LayerContext";
+import { IBK_ANIM_MS, ibkAnimFor, type IbkAnim } from "../ibk/nav";
 import "./ScreenStack.css";
 
 type Anim = "push" | "pop";
@@ -23,6 +24,9 @@ const EASE = "cubic-bezier(.2,.8,.2,1)";
 const NH_ANDROID = APP !== "kakao" && OS === "android";
 const HANA_ANDROID = APP === "hana" && OS === "android";
 const navMs = (anim: Anim | null) => (HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS]);
+// i-ONE Bank(갤럭시) 녹화: 화면 사이는 대부분 전환 없이 한 번에 바뀜(로딩 점·빈 바탕은 src/ibk/loading.ts).
+// 이동할 때 location.state.ibkAnim 으로 고른 곳만 밀기 (src/ibk/nav.ts: 메뉴 열기·닫기, 본문만 밀기)
+const IBK_ANDROID = APP === "ibk" && OS === "android";
 
 // 화면 내용은 loc/active가 그대로면 다시 그리지 않는다.
 // 드래그·전환 중 ScreenStack이 리렌더돼도 화면 트리 전체를 다시 계산하지 않게 하는 핵심.
@@ -41,6 +45,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const [entries, setEntries] = useState<Location[]>([location]);
   const [exiting, setExiting] = useState<{ loc: Location; anim: Anim } | null>(null);
   const [enterAnim, setEnterAnim] = useState<Anim | null>(null);
+  const [ibkAnim, setIbkAnim] = useState<IbkAnim | null>(null);
   // 드래그 "중인지"만 state. 손가락 위치(dx)는 매 프레임 바뀌므로 ref + DOM 직접 조작.
   const [dragging, setDragging] = useState(false);
   const skipAnim = useRef(false);
@@ -67,6 +72,25 @@ export function ScreenStack({ render }: { render: Render }) {
       setEntries((es) => [...es, location]);
     } else {
       setEntries((es) => [...es.slice(0, -1), location]);
+    }
+
+    if (IBK_ANDROID) {
+      const a = ibkAnimFor(navType, location, prevTop);
+      // menu-in: 새 화면이 위에서 밀려 들어오고 이전 화면은 밑에 그대로 / menu-out: 나가는 화면이 위에서 밀려 나감
+      // body-*: 나가는 화면은 바로 사라지고 새 화면의 본문(.ibk-body)만 밀려 들어옴
+      const layerAnim: Anim | null = a === "menu-in" ? "push" : a === "menu-out" ? "pop" : null;
+      drag.current = null;
+      setDragging(false);
+      setIbkAnim(a);
+      setEnterAnim(layerAnim);
+      setExiting(layerAnim ? { loc: prevTop, anim: layerAnim } : null);
+      if (!a) return;
+      const id = setTimeout(() => {
+        setExiting(null);
+        setEnterAnim(null);
+        setIbkAnim(null);
+      }, IBK_ANIM_MS[a]);
+      return () => clearTimeout(id);
     }
 
     // 스와이프로 이미 화면을 밀어냈으면 pop 애니메이션을 또 하지 않는다.
@@ -169,8 +193,8 @@ export function ScreenStack({ render }: { render: Render }) {
       {layers.map((l) => (
         <div
           key={l.loc.key}
-          className={l.className}
-          style={{ ["--nav-ms" as string]: `${navMs(exiting?.anim ?? enterAnim)}ms` }}
+          className={ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : l.className}
+          style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
           {...(l.active && {
             onPointerDown,

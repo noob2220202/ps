@@ -1,4 +1,4 @@
-/* i-ONE Bank 공용 (라이트만). 색은 녹화 82d59fba 에서 */
+/* i-ONE Bank 공용 (라이트만). 색·치수는 녹화 82d59fba 에서 (x 는 클론 좌표 = (녹화 x − 0.35) / 1.0242, y 는 앱 영역 = 녹화 y − 29.4) */
 
 /* 글꼴: 녹화 글자를 후보 글꼴로 그려 겹쳐 본 결과 숫자·영문은 Roboto(오차 17.5, Noto·Pretendard 30~50),
    한글은 Noto Sans KR 계열이 가장 가까움 → 안드로이드 시스템 글꼴을 쓰는 앱. 번들에 넣어 PC·아이폰에서도 같게 */
@@ -13,9 +13,687 @@
 
 .ibk {
   --ib-bg: #ffffff;
-  --ib-text: #222222;
-  --ib-blue: #4896eb; /* 이체·다음 버튼 */
+  --ib-text: #111111; /* 본문 검정 (획 가운데 #000~#111) */
+  --ib-blue: #4092ef; /* 다음·보내기·확인·공유하기 버튼 (평평한 넓은 면 평균 64,146,239) */
+  --ib-blue-press: #1f4daa; /* 버튼 누르고 있을 때 도달하는 색 (확인 3-7) */
+  --ib-off: #d2d6dc; /* 비활성 버튼 바탕 */
+  --ib-off-text: #6e7279; /* 비활성 버튼 글자 */
+  --ib-status: #fafafa; /* 상태바 · 빈 로딩 화면 */
+  --ib-mint: #eff4f3; /* 홈 바탕 · 세그먼트 · 회색 띠 · 기간 띠 */
+  --ib-line: #e8e9e9; /* 카드 테두리 · 구분선 */
+  --ib-dim: rgba(0, 0, 0, 0.6); /* 시트 딤 (흰 255 → 100) */
+  --ib-icon: #111111; /* 머리줄 선 아이콘 */
+  --ib-sub: #6f7277; /* 회색 보조 글자 */
+  --ib-press-row: #f4f5f8; /* 목록 행 눌림 바탕 */
   background: var(--ib-bg);
   color: var(--ib-text);
   font-family: Roboto, "Noto Sans KR", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  /* 앱 영역 위끝이 y 29.4 라서 transform 으로 놓은 것은 그 0.4 가 버려짐(정수로 붙음) → transform 의 y 에 더해 줄 값 */
+  --ib-y0: 0.4px;
+}
+html[data-os="ios"] .ibk {
+  --ib-y0: 0px;
+}
+/* 기준선 맞추기: line-height 0 이면 기준선 = 상자 top + 0.3418em (첫 글꼴 Roboto 의 (오름−내림)/2).
+   → top = 기준선 y − 0.3418 × 글자 크기 로 두면 녹화 기준선에 정확히 놓임 */
+.ibk-bl {
+  position: absolute;
+  margin: 0;
+  line-height: 0;
+  white-space: nowrap;
+}
+
+/* 선 아이콘: 크기를 바꿔도 선 두께는 그대로 */
+.ibk-icon {
+  display: block;
+  flex-shrink: 0;
+}
+.ibk-icon * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- 화면 틀: 머리줄 고정 + 아래 본문만 스크롤 ---------- */
+.ibk-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ib-bg);
+}
+.ibk-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.ibk-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- 머리줄 (높이 52 = 녹화 29.4~81.5, 흰색, 선·그림자 없음) ---------- */
+.ibk-header {
+  position: relative;
+  flex-shrink: 0;
+  height: 52px;
+  background: #fff;
+  color: var(--ib-icon);
+  z-index: 5;
+}
+/* ← : 꼭짓점 클론 (21.82, 녹화 55.5), 위 끝 (29.53, 47.6). 누르는 동안 흐려짐 (확인 3-1: 불투명도 0.45, who #a0a0a3) */
+.ibk-header__back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 52px;
+  color: inherit;
+}
+.ibk-header__back .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(21.82px, calc(18.2px + var(--ib-y0)));
+}
+.ibk-header__back:active .ibk-icon {
+  opacity: 0.42;
+}
+/* 제목: Noto Sans KR 600 16.5px, 글자 상자 왼쪽 52.2 (녹화 53.75), 기준선 녹화 61.45 → 앱 32.05 */
+.ibk-header__title {
+  position: absolute;
+  left: 51.7px;
+  top: 26.41px;
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 500;
+  line-height: 0;
+  letter-spacing: 0;
+  color: #000;
+  white-space: nowrap;
+}
+/* 오른쪽 아이콘: 44 × 52.2 누름 칸 가운데에 아이콘 (세로 가운데 녹화 55.5) */
+.ibk-header__icon {
+  position: absolute;
+  top: 0;
+  width: 44px;
+  height: 52px;
+  color: inherit;
+}
+.ibk-header__icon .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ibk-header__icon:active .ibk-icon {
+  opacity: 0.42;
+}
+/* '취소': 600 12.75px #5d5f64, 오른쪽 끝 365.6 (녹화 374.78), 기준선 녹화 60.5 → 앱 31.1 */
+.ibk-header__text {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 64px;
+  height: 52px;
+  color: #5d5f64;
+}
+.ibk-header__text > span {
+  position: absolute;
+  right: 18.4px;
+  top: 26.74px;
+  line-height: 0;
+  font-size: 12.75px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ibk-header__text:active > span {
+  opacity: 0.5;
+}
+
+/* ---------- 큰 파란 버튼 (다음 · 보내기 · 확인 · 공유하기) ----------
+   상자 녹화 x 18.9~375.0 → 클론 18.1~365.8, y 717.7~769.9 (높이 52.2, 앱 아래끝에서 18.1), r 11.5~12.
+   글자 Noto 600 16.5px 흰색 가운데 (보내기 기준선 녹화 749.5 = 버튼 위 + 31.8 → 아래 flex 가운데 정렬로 31.74).
+   누름 (보내기·완료 확인): 바탕이 ≈167ms 동안 #1f4daa 로 어두워지고, 떼면 ≈80ms 만에 돌아옴. 크기는 그대로
+   --scale (금액 '다음'·안내 '확인'): 누르는 동안 scale(0.96) 130ms + 바탕 #2c69c7, 떼면 크기는 바로 1 */
+.ibk-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52.2px;
+  border-radius: 12px;
+  background: var(--ib-blue);
+  color: #fff;
+  font-size: 16.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  transition: background-color 80ms ease-out;
+}
+.ibk-btn:active:not(:disabled) {
+  background: var(--ib-blue-press);
+  transition: background-color 167ms ease-out;
+}
+.ibk-btn:disabled {
+  background: var(--ib-off);
+  color: var(--ib-off-text);
+  cursor: default;
+}
+.ibk-btn--scale {
+  transition:
+    background-color 100ms ease-out,
+    transform 0ms;
+}
+.ibk-btn--scale:active:not(:disabled) {
+  transform: scale(0.96);
+  background: #2c69c7;
+  transition:
+    background-color 67ms ease-out,
+    transform 130ms ease-out;
+}
+/* 흰 바탕 테두리 버튼 (완료 '공유': 1px #8c8d90, 글자 500 16.75px 검정) — 누름은 녹화에 없음 */
+.ibk-btn--line {
+  background: #fff;
+  color: #000;
+  box-shadow: inset 0 0 0 1px #8c8d90;
+  font-size: 16.75px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.ibk-btn--line:active:not(:disabled) {
+  background: var(--ib-press-row);
+}
+/* 화면 아래 버튼 자리: 왼쪽·오른쪽 18.1, 아래 18.1. 두 개면 사이 7 (완료: 공유 104.8 + 확인 나머지) */
+.ibk-bottom {
+  position: absolute;
+  left: 18.1px;
+  right: 18.2px;
+  bottom: 18.1px;
+  display: flex;
+  gap: 7px;
+  z-index: 3;
+}
+.ibk-bottom > .ibk-btn {
+  flex: 1;
+}
+.ibk-bottom > .ibk-btn--line {
+  flex: 0 0 104.8px;
+}
+
+/* ---------- 로딩 점 (IbkSpinner) ----------
+   점 4개 ⌀8.8. 한 주기 1.5초에 반지름 0 → 12.1 → 0 (녹화 30fps 5주기 중앙값 표), 회전은 주기마다 시계 방향 180°
+   (cubic-bezier(.65,0,.35,.95) = 0.3s 8° · 0.7s 60° · 0.77s 90° · 1.03s 145° 에 맞춤). 나타날 때 100ms 페이드인(30% → 100%) */
+.ibk-spinner {
+  position: relative;
+  width: 0;
+  height: 0;
+  animation: ibk-spin-in 100ms linear both;
+}
+.ibk-spinner--out {
+  animation: ibk-spin-out 100ms linear both;
+}
+.ibk-spinner__rot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  animation: ibk-spin-rot 3s infinite;
+}
+.ibk-spinner i {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ibk-spinner b {
+  position: absolute;
+  left: -4.4px;
+  top: -4.4px;
+  width: 8.8px;
+  height: 8.8px;
+  border-radius: 50%;
+  animation: ibk-spin-r 1.5s linear infinite;
+}
+@keyframes ibk-spin-in {
+  from {
+    opacity: 0.3;
+  }
+}
+@keyframes ibk-spin-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ibk-spin-rot {
+  0% {
+    rotate: 0deg;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 0.95);
+  }
+  50% {
+    rotate: 180deg;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 0.95);
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
+@keyframes ibk-spin-r {
+  0% {
+    translate: 0 0;
+  }
+  7% {
+    translate: 0 -2px;
+  }
+  13% {
+    translate: 0 -4.6px;
+  }
+  20% {
+    translate: 0 -7.7px;
+  }
+  26% {
+    translate: 0 -9.9px;
+  }
+  33% {
+    translate: 0 -11px;
+  }
+  39% {
+    translate: 0 -11.7px;
+  }
+  46% {
+    translate: 0 -12px;
+  }
+  51% {
+    translate: 0 -12.1px;
+  }
+  59% {
+    translate: 0 -11.8px;
+  }
+  65% {
+    translate: 0 -11.4px;
+  }
+  72% {
+    translate: 0 -10.2px;
+  }
+  78% {
+    translate: 0 -7.6px;
+  }
+  85% {
+    translate: 0 -5.4px;
+  }
+  92% {
+    translate: 0 -2.4px;
+  }
+  97% {
+    translate: 0 -0.8px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+/* 폰 위 로딩 막 (IbkLoadingLayer): 앱 영역(상태바 29.4 아래 ~ 3버튼 바 위)만. 점은 앱 영역 한가운데 (클론 192, 녹화 y 408.8).
+   덮개가 있을 때만 누름을 막음 (점만 있을 땐 아래 화면이 그대로 보이고 눌림) */
+.ibk-loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 29.4px;
+  bottom: 44px;
+  z-index: 45;
+  pointer-events: none;
+  background: transparent;
+}
+.ibk-loading--cover {
+  pointer-events: auto;
+}
+.ibk-loading > .ibk-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+html[data-os="ios"] .ibk-loading {
+  top: 54px;
+  bottom: 0;
+}
+
+/* ---------- 바닥 시트 (IbkSheet) — history 4·5 ---------- */
+.ibk-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: transparent;
+}
+.ibk-sheet__dim {
+  position: absolute;
+  inset: 0;
+  background: var(--ib-dim);
+}
+.ibk-sheet__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 13.7px 13.7px 0 0 / 14px 14px 0 0;
+  background: #fff;
+  transform: translateY(100%);
+}
+.ibk-sheet--open .ibk-sheet__panel {
+  transform: none;
+  transition: transform 340ms cubic-bezier(0.5, 1, 0.89, 1);
+}
+.ibk-sheet--closing .ibk-sheet__panel {
+  transform: translateY(100%);
+  transition: transform 130ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ---------- 은행 로고 원 (IbkBankLogo) ---------- */
+.ibk-logo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.ibk-logo img {
+  display: block;
+  flex-shrink: 0;
+}
+.ibk-logo--empty {
+  background: #e1e5ea;
+}
+
+/* ---------- 본문만 미는 전환 (이체 단계 · 이체결과조회 ↔ 확인증) ----------
+   들어오는 본문은 내용 상자 x 22~362 창 안에서만 보임 (who 6.5·6.6, menu 4: "x 23–371 창") → clip-path 를 같이 움직여 창을 고정.
+   앞으로: 오른쪽에서 230ms cubic-bezier(.25,.6,.35,1) (금액 8-1) / 뒤로: 왼쪽에서 200ms cubic-bezier(.2,.2,.3,1) (금액 8-7) */
+.ibk-in-right {
+  animation: ibk-in-right 230ms cubic-bezier(0.25, 0.6, 0.35, 1) backwards;
+}
+.ibk-in-left {
+  animation: ibk-in-left 200ms cubic-bezier(0.2, 0.2, 0.3, 1) backwards;
+}
+@keyframes ibk-in-right {
+  from {
+    transform: translateX(100%);
+    clip-path: inset(0 calc(22px + 100%) 0 calc(22px - 100%));
+  }
+  to {
+    transform: none;
+    clip-path: inset(0 22px 0 22px);
+  }
+}
+@keyframes ibk-in-left {
+  from {
+    transform: translateX(-100%);
+    clip-path: inset(0 calc(22px - 100%) 0 calc(22px + 100%));
+  }
+  to {
+    transform: none;
+    clip-path: inset(0 22px 0 22px);
+  }
+}
+
+/* ---------- 알림창 (공용 Dialog 를 .ibk 안에서): 안내 화면(amount 7) 모양을 줄인 것 ----------
+   연파랑 원 '!' → 문구(16px 500 검정, 가운데) → 파란 '확인' (취소는 흰 테두리 버튼). 딤은 시트와 같은 rgba(0,0,0,.6) */
+.ibk .dialog {
+  background: var(--ib-dim);
+  animation: none;
+}
+.ibk .dialog__box {
+  width: calc(100% - 36.3px);
+  padding: 28px 18px 18px;
+  border-radius: 16px;
+  background: #fff;
+  color: #000;
+  animation: none;
+}
+.ibk .dialog__box::before {
+  content: "";
+  display: block;
+  width: 45.2px;
+  height: 45.2px;
+  margin: 0 auto 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45.2 45.2'%3E%3Ccircle cx='22.6' cy='22.6' r='22.6' fill='%23e2f0fd'/%3E%3Cpath d='M22.6 15.45v7.4' stroke='%234092ef' stroke-width='3.3' stroke-linecap='round'/%3E%3Ccircle cx='22.6' cy='30.1' r='1.8' fill='%234092ef'/%3E%3C/svg%3E")
+    no-repeat center / contain;
+}
+.ibk .dialog__box p {
+  padding: 0 4px 26px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #000;
+}
+.ibk .dialog__buttons {
+  gap: 7px;
+  border: 0;
+}
+.ibk .dialog__buttons button {
+  height: 52.2px;
+  border-radius: 12px;
+  background: var(--ib-blue);
+  color: #fff;
+  font-size: 16.5px;
+  font-weight: 600;
+}
+.ibk .dialog__buttons button:active {
+  background: var(--ib-blue-press);
+}
+.ibk .dialog__buttons .dialog__cancel {
+  border: 0;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #8c8d90;
+  color: #000;
+  font-weight: 500;
+}
+
+/* ---------- 안내(오류) 화면 (IbkNotice) — amount 7 (27.73~28.97초), 머리줄 없음 ---------- */
+.ibk-notice {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  text-align: center;
+}
+/* 원 지름 45.2, 가운데 (클론 191.5, 녹화 131.3) */
+.ibk-notice__icon {
+  position: absolute;
+  left: 168.9px;
+  top: 79.3px;
+}
+/* 20.5px 500 검정, 줄 간격 30, 1줄 기준선 녹화 197.4 */
+.ibk-notice__title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 145.95px;
+  margin: 0;
+  font-size: 20.5px;
+  font-weight: 500;
+  line-height: 30px;
+  color: #000;
+  white-space: pre-line;
+}
+/* 15px 400 #60656a, 줄 간격 22.5, 폭 22.1~361.9 안에서 글자 단위 줄바꿈 (`고/객센터`), 1줄 기준선 녹화 266.0 */
+.ibk-notice__msg {
+  position: absolute;
+  left: 22.1px;
+  right: 22.1px;
+  top: 220.2px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 22.5px;
+  color: #565b60;
+  word-break: break-all;
+}
+/* 오류코드 상자: 녹화 (23.3,324.5)→(370.5,375.5), 흰 바탕, 1px #e5e6e7, r12 */
+.ibk-notice__code {
+  position: absolute;
+  left: 22.4px;
+  right: 22.6px;
+  top: 295.1px;
+  height: 51px;
+  border: 1px solid #e5e6e7;
+  border-radius: 12px;
+}
+.ibk-notice__code span,
+.ibk-notice__code b {
+  position: absolute;
+  top: 23.86px;
+  line-height: 0;
+  white-space: nowrap;
+}
+.ibk-notice__code span {
+  left: 13.7px;
+  top: 24.86px;
+  font-size: 13px;
+  color: #484c51;
+}
+.ibk-notice__code b {
+  right: 15.2px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #5b5f66;
+}
+/* 상담 상자: 녹화 (23.3,390)→(370.5,499.5), #eff4f3, r12 */
+.ibk-notice__consult {
+  position: absolute;
+  left: 22.4px;
+  right: 22.6px;
+  top: 360.6px;
+  height: 109.5px;
+  border-radius: 12px;
+  background: var(--ib-mint);
+}
+.ibk-notice__consult b,
+.ibk-notice__consult span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  line-height: 0;
+  white-space: nowrap;
+}
+.ibk-notice__consult b {
+  top: 24.16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d2f31;
+}
+.ibk-notice__consult span {
+  top: 44.7px;
+  font-size: 12.25px;
+  font-weight: 500;
+  color: #7b7e85;
+}
+/* '상담예약' 알약: 녹화 (160.5,454.5)→(232.8,485.5), 흰 바탕, 1px #a2a5a7, 13px #111 */
+.ibk-notice__consult button {
+  position: absolute;
+  left: 134px;
+  top: 64.5px;
+  width: 70.6px;
+  height: 31px;
+  border: 1px solid #a2a5a7;
+  border-radius: 15.5px;
+  background: #fff;
+  font-size: 13px;
+  color: #111;
+}
+
+/* ---------- 홈 아래 탭바 (IbkTabBar) — home 3-10. 앱 영역 아래 71.3 (녹화 y 716.7 혹 꼭대기 ~ 788) ---------- */
+.ibk-tabbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 71.3px;
+  z-index: 20;
+  filter: drop-shadow(0 -4px 4px rgba(0, 0, 0, 0.037));
+}
+.ibk-tabbar__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ibk-tabbar__tab {
+  position: absolute;
+  top: 15px;
+  bottom: 0;
+  width: 70px;
+  color: #95979b;
+}
+.ibk-tabbar__tab .ibk-icon {
+  position: absolute;
+}
+/* 라벨 기준선 녹화 779.3 → 흰 바 위(731.7)에서 47.6 */
+.ibk-tabbar__tab span {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: 43.84px;
+  line-height: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: #76777b;
+  text-align: center;
+  white-space: nowrap;
+}
+/* 가운데 칸은 혹 꼭대기(716.7)부터 */
+.ibk-tabbar__tab--on {
+  top: 0;
+}
+.ibk-tabbar__tab--on span {
+  top: 58.84px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #2b7de9;
+}
+/* 톡톡송금 원 ⌀44.5, 가운데 (192, 녹화 744.6) */
+.ibk-tabbar__talk {
+  position: absolute;
+  left: 12.75px;
+  top: 5.65px;
+}
+
+/* ---------- 홈 뼈대 (IbkHomeSkeleton) — home 1-D · 6-7 ---------- */
+.ibk-skeleton {
+  position: absolute;
+  inset: 0;
+  background: var(--ib-mint);
+}
+.ibk-skeleton i {
+  position: absolute;
+  overflow: hidden;
+  background: #dfe3e9;
+}
+/* 띠: 반폭 47, 가장 진한 곳 rgba(0,0,0,.055), 상자 왼쪽 기준 +125 → −50 를 2초 주기로 (≈85px/s, 모든 상자 같은 시간표) */
+.ibk-skeleton i::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 96px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.055), transparent);
+  animation: ibk-shimmer 2s linear infinite;
+}
+.ibk-skeleton i.ibk-skeleton__card {
+  box-shadow: 0 15px 22px 5px rgba(0, 90, 255, 0.056);
+}
+@keyframes ibk-shimmer {
+  from {
+    translate: 77px 0;
+  }
+  to {
+    translate: -98px 0;
+  }
+}
+
+/* ---------- 시작화면 (IbkSplash) ---------- */
+.ibk-splash {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ib-status);
 }
