@@ -29,6 +29,8 @@ import "./nh/nh-light.css"; // 콕뱅크 라이트모드 (화면 CSS 뒤에)
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
+import { checkAuth, useAuth } from "./auth/auth";
+import { LoginScreen } from "./auth/LoginScreen";
 import { useStatusBar } from "./hooks/useStatusBar";
 
 type Boot = "off" | "pick" | "splash" | "loading" | "ready";
@@ -74,6 +76,17 @@ export default function App() {
   // onDone이 렌더마다 새 함수면 Splash의 effect가 다시 돌아서 타이머가 리셋됨 → useCallback
   const toLoading = useCallback(() => setBoot("loading"), []);
   const toReady = useCallback(() => setBoot("ready"), []);
+  // 로그인: 켜질 때 확인 → 안 돼 있으면 로그인 화면. 로그인하면 (다른 계정일 수 있으니) 프로필 고르기부터
+  const auth = useAuth();
+  const userId = auth.status === "in" ? auth.user.id : null;
+  useEffect(() => {
+    checkAuth();
+  }, []);
+  const [seenUser, setSeenUser] = useState<string | null | undefined>(undefined);
+  if (userId !== seenUser) {
+    if (seenUser !== undefined && userId) setBoot(currentProfileId() ? boot : "pick"); // 방금 로그인
+    setSeenUser(userId);
+  }
   // 녹화 시작: 검은 화면(off) → 앱을 처음부터 (시작화면). 녹화에 앱이 켜지는 모습까지 찍히게
   const navigate = useNavigate();
   useEffect(() => {
@@ -93,11 +106,13 @@ export default function App() {
   return (
     <StatusBarProvider>
       <PhoneFrame overlay={APP === "nh" ? <NhLoadingLayer /> : undefined}>
-        {boot === "off" && <PhoneOff />}
-        {boot === "pick" && <ProfilePicker onEnter={toSplash} />}
-        {boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
-        {boot === "loading" && <BootLoading onDone={toReady} />}
-        {boot === "ready" && <ScreenStack render={APP === "nh" ? renderNhRoute : renderRoute} />}
+        {auth.status === "checking" && <PhoneOff />}
+        {auth.status === "out" && <LoginScreen message={auth.message} />}
+        {auth.status === "in" && boot === "off" && <PhoneOff />}
+        {auth.status === "in" && boot === "pick" && <ProfilePicker onEnter={toSplash} />}
+        {auth.status === "in" && boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
+        {auth.status === "in" && boot === "loading" && <BootLoading onDone={toReady} />}
+        {auth.status === "in" && boot === "ready" && <ScreenStack render={APP === "nh" ? renderNhRoute : renderRoute} />}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />

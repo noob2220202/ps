@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import { logout, remaining, useAuth } from "../auth/auth";
+import { AdminPanel } from "../auth/AdminPanel";
 import { ApiError } from "../api/client";
 import { api, paths } from "../api/endpoints";
 import type { AppProfile } from "../api/types";
@@ -15,6 +18,7 @@ import { ProfileAvatar } from "./ProfileAvatar";
 import { APP, setCurrentProfile } from "./session";
 import { NhAppIcon } from "../nh/common";
 import "./ProfilePicker.css";
+import "../auth/auth.css";
 
 const MAX = 5; // 서버 MAX_PROFILES 와 같게
 
@@ -82,6 +86,7 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
       <button className="picker__manage" onClick={() => setManaging(!managing)}>
         {managing ? "완료" : "프로필 관리"}
       </button>
+      <AccountRow />
 
       <Sheet open={editing !== null} onClose={() => setEditing(null)}>
         {editing !== null && (
@@ -164,6 +169,24 @@ function ProfileForm({ target, canDelete, onDone }: { target: AppProfile | "new"
         }}
       />
       <Dialog message={error} onClose={() => setError(null)} />
+    </div>
+  );
+}
+
+// 로그인한 계정: 아이디 · 남은 기간 · 로그아웃 (관리자는 계정 관리 창)
+function AccountRow() {
+  const auth = useAuth();
+  const [adminOpen, setAdminOpen] = useState(false);
+  if (auth.status !== "in") return null;
+  const u = auth.user;
+  return (
+    <div className="picker__account">
+      <span>
+        {u.username} · {remaining(u)}
+      </span>
+      {u.role === "admin" && <button onClick={() => setAdminOpen(true)}>계정 관리</button>}
+      <button onClick={logout}>로그아웃</button>
+      {adminOpen && createPortal(<AdminPanel onClose={() => setAdminOpen(false)} />, document.body)}
     </div>
   );
 }

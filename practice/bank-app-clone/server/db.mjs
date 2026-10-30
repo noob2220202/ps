@@ -17,7 +17,7 @@ const appArg = process.argv.indexOf("--app");
 export const APP = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
 if (!APPS.includes(APP)) throw new Error(`APP은 kakao 또는 nh (지금: ${APP})`);
 const here = dirname(fileURLToPath(import.meta.url));
-const DATA = process.env.DATA_DIR ?? resolve(here, APP === "nh" ? "data-nh" : "data");
+export const DATA = process.env.DATA_DIR ?? resolve(here, APP === "nh" ? "data-nh" : "data");
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });
 
 // ---------- 프로필 목록 ----------

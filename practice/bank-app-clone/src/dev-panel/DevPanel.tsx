@@ -8,6 +8,7 @@ import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { isCapture, setCapture } from "../platform/capture";
 import { canRecord, recordPhone } from "../platform/recorder";
+import { logout, remaining, useAuth } from "../auth/auth";
 import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
@@ -258,7 +259,22 @@ function CurrentProfile() {
       >
         프로필 바꾸기
       </button>
+      <AccountLine />
     </div>
+  );
+}
+
+// 로그인한 계정 · 남은 기간 · 로그아웃
+function AccountLine() {
+  const auth = useAuth();
+  if (auth.status !== "in") return null;
+  return (
+    <p className="tab__hint" style={{ width: "100%", margin: "8px 0 0" }}>
+      계정 {auth.user.username} · {remaining(auth.user)}{" "}
+      <button className="btn btn--sm" onClick={() => logout().then(() => location.assign("/"))}>
+        로그아웃
+      </button>
+    </p>
   );
 }
 

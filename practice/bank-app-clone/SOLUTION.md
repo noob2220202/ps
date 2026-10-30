@@ -581,3 +581,13 @@ React 상태가 아니라 DOM 속성이라 **새로고침 없이** 바로 바뀌
   덮인 정도를 어림해 라이트 바탕 위에 다시 섞음 (`scripts/nh-crops/light-variants.py`, `nhPic()`이 `-light` 그림을 고름).
 - 상태바는 화면마다 `useNhStatusBar(다크색, { dim, black })` 하나로: 라이트면 흰 바탕 + 어두운 글자.
 
+## 20. 로그인 · 관리자 계정 (`server/auth.mjs`, `src/auth/`)
+- **세션 쿠키**: 로그인하면 임의 토큰을 `sessions` 표에 넣고 `HttpOnly` 쿠키로 줌. 쿠키는 포트를 구분하지 않아서
+  (같은 주소의 9101·9103이 쿠키를 공유) 이름에 앱을 넣음: `bank_sid_kakao` / `bank_sid_nh`.
+- **비밀번호**: `scrypt` + 계정마다 다른 salt, 비교는 `timingSafeEqual`. 같은 IP 에서 1분에 10번 틀리면 잠깐 막음.
+- **모든 /api 앞에 로그인 확인 미들웨어**: 로그인 안 됨 401, 기간 끝 403 EXPIRED, 정지 403 DISABLED.
+  화면은 `client.ts` 가 이 응답을 받으면 `auth.ts` 에 알려서 바로 로그인 화면으로 (서로 import 하면 순환이라 리스너 등록 방식).
+- **프로필 = 계정 소유**: `profiles.owner_id`. 다른 계정의 프로필 id 를 `X-Profile` 로 보내도 "없는 프로필".
+- **기간**: 만든 시각 + N일을 `expires_at` 에 저장 (영구는 NULL). 연장은 남은 기간 끝(이미 끝났으면 지금)에 더함.
+- 첫 실행 때 관리자 계정을 만들고 주인 없는 예전 프로필을 관리자 것으로 (`ALTER TABLE ... ADD COLUMN owner_id`).
+

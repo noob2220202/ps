@@ -19,6 +19,26 @@ import {
   transaction,
 } from "./db.mjs";
 import { BANKS, bankByCode, bankInfo, checkNumber, digitsOf, formatAccountNumber } from "./banks.mjs";
+import {
+  PLANS,
+  clearFails,
+  clearSessionCookie,
+  createUser,
+  expiryFor,
+  findUser,
+  isExpired,
+  isPassword,
+  isUsername,
+  login,
+  logout,
+  noteFail,
+  readCookie,
+  sessionUser,
+  setPassword,
+  setSessionCookie,
+  toUser,
+  tooManyFails,
+} from "./auth.mjs";
 
 // ===== 백엔드 서버 (Express + SQLite) =====
 // npm start → 이 파일 하나가 API(/api/...)와 빌드된 화면(dist/)을 같은 포트(기본 9101)로 제공한다.
@@ -112,14 +132,129 @@ function toTransaction(t, balanceAfter) {
 const TAGS = ["#체크카드", "#자동이체", "#예금이자", "#이체"];
 const KIND_BY_TAG = { "#체크카드": "체크카드결제", "#자동이체": "자동이체", "#예금이자": "예금이자", "#이체": "이체" };
 
+// ---------- 로그인 (server/auth.mjs) ----------
+app.post("/api/auth/login", (req, res) => {
+  const ip = req.ip ?? "";
+  if (tooManyFails(ip)) throw new HttpError(429, "TOO_MANY", "잠시 후 다시 시도해 주세요");
+  const { username, password } = req.body ?? {};
+  const r = login(username, password);
+  if (r.error) {
+    if (r.code !== "EXPIRED") noteFail(ip);
+    throw new HttpError(r.code === "EXPIRED" ? 403 : 401, r.code ?? "LOGIN_FAILED", r.error);
+  }
+  clearFails(ip);
+  setSessionCookie(res, r.token);
+  res.json(toUser(r.user));
+});
+app.post("/api/auth/logout", (req, res) => {
+  logout(readCookie(req));
+  clearSessionCookie(res);
+  res.status(204).end();
+});
+// 이 아래 /api 는 로그인해야 함 (기간이 끝났거나 정지된 계정은 막음)
+app.use("/api", (req, _res, next) => {
+  const user = sessionUser(readCookie(req));
+  if (!user) throw new HttpError(401, "LOGIN_REQUIRED", "로그인해 주세요");
+  if (user.disabled) throw new HttpError(403, "DISABLED", "사용이 정지된 계정이에요");
+  if (isExpired(user)) throw new HttpError(403, "EXPIRED", "이용 기간이 끝났어요. 관리자에게 문의해 주세요");
+  req.user = user;
+  next();
+});
+app.get("/api/auth/me", (req, res) => res.json(toUser(req.user)));
+// 내 비밀번호 바꾸기
+app.post("/api/auth/password", (req, res) => {
+  const { current, next } = req.body ?? {};
+  if (!login(req.user.username, current).user) throw bad("지금 비밀번호가 맞지 않아요", { current: "지금 비밀번호가 맞지 않아요" });
+  if (!isPassword(next)) throw bad("새 비밀번호는 4~64자", { next: "새 비밀번호는 4~64자" });
+  setPassword(req.user.id, next);
+  const r = login(req.user.username, next); // 지금 기기는 다시 로그인된 상태로
+  setSessionCookie(res, r.token);
+  res.status(204).end();
+});
+
+// ---------- 관리자: 계정 만들기·기간·정지·삭제 ----------
+app.use("/api/admin", (req, _res, next) => {
+  if (req.user.role !== "admin") throw new HttpError(403, "FORBIDDEN", "관리자만 쓸 수 있어요");
+  next();
+});
+const adminUser = (u) => ({
+  ...toUser(u),
+  profiles: registry.prepare("SELECT COUNT(*) AS n FROM profiles WHERE owner_id = ?").get(u.id).n,
+});
+const findManaged = (id) => {
+  const u = typeof id === "string" && findUser(id);
+  if (!u) throw new HttpError(404, "USER_NOT_FOUND", "없는 계정이에요");
+  return u;
+};
+app.get("/api/admin/users", (_req, res) => res.json(registry.prepare("SELECT * FROM users ORDER BY role, created_at").all().map(adminUser)));
+app.post("/api/admin/users", (req, res) => {
+  const { username, password, plan } = req.body ?? {};
+  const fields = {};
+  if (!isUsername(username)) fields.username = "아이디는 영문·숫자·_.- 3~20자";
+  else if (registry.prepare("SELECT 1 FROM users WHERE username = ?").get(username)) fields.username = "이미 있는 아이디예요";
+  if (!isPassword(password)) fields.password = "비밀번호는 4~64자";
+  if (!(String(plan) in PLANS)) fields.plan = "기간은 1 / 7 / 30 / forever";
+  if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
+  const u = createUser({ username, password, plan: String(plan) });
+  addProfile(u, username.slice(0, 10), { example: true }); // 첫 프로필 (예시 데이터)
+  res.status(201).json(adminUser(u));
+});
+// 기간 바꾸기: { plan } = 지금부터 다시 그 기간 / { extend } = 남은 기간(끝났으면 지금)에 더하기. 정지·비밀번호 초기화도
+app.patch("/api/admin/users/:id", (req, res) => {
+  const u = findManaged(req.params.id);
+  const { plan, extend, disabled, password } = req.body ?? {};
+  if (u.role === "admin" && (plan !== undefined || extend !== undefined || disabled !== undefined)) throw bad("관리자 계정은 기간·정지를 바꿀 수 없어요");
+  if (plan !== undefined) {
+    if (!(String(plan) in PLANS)) throw bad("기간은 1 / 7 / 30 / forever");
+    registry.prepare("UPDATE users SET plan = ?, expires_at = ? WHERE id = ?").run(String(plan), expiryFor(String(plan)), u.id);
+  }
+  if (extend !== undefined) {
+    if (!(String(extend) in PLANS)) throw bad("연장은 1 / 7 / 30 / forever");
+    const base = u.expires_at && new Date(u.expires_at) > new Date() ? new Date(u.expires_at) : new Date();
+    const next = String(extend) === "forever" ? null : u.expires_at === null ? null : expiryFor(String(extend), base);
+    registry.prepare("UPDATE users SET plan = ?, expires_at = ? WHERE id = ?").run(next === null ? "forever" : String(extend), next, u.id);
+  }
+  if (disabled !== undefined) {
+    registry.prepare("UPDATE users SET disabled = ? WHERE id = ?").run(disabled ? 1 : 0, u.id);
+    if (disabled) registry.prepare("DELETE FROM sessions WHERE user_id = ?").run(u.id);
+  }
+  if (password !== undefined) {
+    if (!isPassword(password)) throw bad("비밀번호는 4~64자", { password: "비밀번호는 4~64자" });
+    setPassword(u.id, password);
+  }
+  res.json(adminUser(findUser(u.id)));
+});
+// 계정 삭제: 그 계정의 프로필·은행 데이터까지
+app.delete("/api/admin/users/:id", (req, res) => {
+  const u = findManaged(req.params.id);
+  if (u.role === "admin") throw bad("관리자 계정은 지울 수 없어요");
+  for (const p of registry.prepare("SELECT id FROM profiles WHERE owner_id = ?").all(u.id)) removeProfileDb(p.id);
+  registry.prepare("DELETE FROM profiles WHERE owner_id = ?").run(u.id);
+  registry.prepare("DELETE FROM sessions WHERE user_id = ?").run(u.id);
+  registry.prepare("DELETE FROM users WHERE id = ?").run(u.id);
+  res.status(204).end();
+});
+
 // ---------- 프로필 (넷플릭스처럼 접속하면 고르기) ----------
 // 프로필 목록 API는 어느 프로필에도 속하지 않음. 나머지 /api 요청은 헤더 X-Profile 의 프로필 DB로 처리
 const toProfile = (r) => ({ id: r.id, name: r.name, avatar: r.avatar, color: r.color, os: r.os ?? undefined, theme: r.theme ?? undefined });
-const findProfile = (id) => {
-  const r = isProfileId(id) && registry.prepare("SELECT * FROM profiles WHERE id = ?").get(id);
+// 프로필은 로그인한 계정 것만 (다른 계정의 프로필 id 를 보내도 없는 것으로)
+const findProfile = (id, user) => {
+  const r = isProfileId(id) && registry.prepare("SELECT * FROM profiles WHERE id = ? AND owner_id = ?").get(id, user.id);
   if (!r) throw new HttpError(404, "PROFILE_NOT_FOUND", "없는 프로필이에요");
   return r;
 };
+const countProfiles = (user) => registry.prepare("SELECT COUNT(*) AS n FROM profiles WHERE owner_id = ?").get(user.id).n;
+function addProfile(user, name, { avatar = AVATARS[0], color = COLORS[0], example = false } = {}) {
+  const id = newProfileId();
+  // 새 프로필은 빈 상태(카카오뱅크 통장 0원 / 콕뱅크 자립예탁금 0원), 새 계정의 첫 프로필은 예시 데이터로
+  if (example) SEEDS[APP].example(profileDb(id), name);
+  else SEEDS[APP].empty(profileDb(id), name);
+  registry
+    .prepare("INSERT INTO profiles (id, name, avatar, color, owner_id, created_at) VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))")
+    .run(id, name, avatar, color, user.id);
+  return id;
+}
 function checkProfileFields({ name, avatar, color, os, theme }) {
   const fields = {};
   if (name !== undefined && !/^.{1,10}$/u.test(String(name).trim())) fields.name = "이름은 1~10자";
@@ -130,39 +265,36 @@ function checkProfileFields({ name, avatar, color, os, theme }) {
   if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
 }
 
-app.get("/api/profiles", (_req, res) => res.json(registry.prepare("SELECT * FROM profiles ORDER BY created_at, rowid").all().map(toProfile)));
+app.get("/api/profiles", (req, res) =>
+  res.json(registry.prepare("SELECT * FROM profiles WHERE owner_id = ? ORDER BY created_at, rowid").all(req.user.id).map(toProfile)),
+);
 
 // 새 프로필: 빈 상태(카카오뱅크 통장 0원)로 시작
 app.post("/api/profiles", (req, res) => {
   const { name, avatar = AVATARS[0], color = COLORS[0] } = req.body ?? {};
   if (name === undefined) throw bad("이름을 입력해 주세요", { name: "이름을 입력해 주세요" });
   checkProfileFields({ name, avatar, color });
-  if (registry.prepare("SELECT COUNT(*) AS n FROM profiles").get().n >= MAX_PROFILES) throw bad(`프로필은 ${MAX_PROFILES}개까지 만들 수 있어요`);
-  const id = newProfileId();
-  // 두 앱 모두 빈 상태로 (카카오뱅크 통장 0원 / 콕뱅크 자립예탁금 0원)
-  SEEDS[APP].empty(profileDb(id), String(name).trim());
-  registry
-    .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, ?, ?, datetime('now', 'localtime'))")
-    .run(id, String(name).trim(), avatar, color);
-  res.status(201).json(toProfile(findProfile(id)));
+  if (countProfiles(req.user) >= MAX_PROFILES) throw bad(`프로필은 ${MAX_PROFILES}개까지 만들 수 있어요`);
+  const id = addProfile(req.user, String(name).trim(), { avatar, color });
+  res.status(201).json(toProfile(findProfile(id, req.user)));
 });
 
 // 이름·아바타 수정, 그리고 이 프로필의 기기/테마 설정 저장
 app.patch("/api/profiles/:id", (req, res) => {
-  const p = findProfile(req.params.id);
+  const p = findProfile(req.params.id, req.user);
   const body = req.body ?? {};
   checkProfileFields(body);
   const next = { ...p, ...Object.fromEntries(Object.entries(body).filter(([k, v]) => v !== undefined && k in p)) };
   registry
     .prepare("UPDATE profiles SET name = ?, avatar = ?, color = ?, os = ?, theme = ? WHERE id = ?")
     .run(String(next.name).trim(), next.avatar, next.color, next.os, next.theme, p.id);
-  res.json(toProfile(findProfile(p.id)));
+  res.json(toProfile(findProfile(p.id, req.user)));
 });
 
 // 삭제: 그 프로필의 DB 파일까지 지움 (마지막 하나는 못 지움)
 app.delete("/api/profiles/:id", (req, res) => {
-  const p = findProfile(req.params.id);
-  if (registry.prepare("SELECT COUNT(*) AS n FROM profiles").get().n <= 1) throw bad("프로필이 하나는 있어야 해요");
+  const p = findProfile(req.params.id, req.user);
+  if (countProfiles(req.user) <= 1) throw bad("프로필이 하나는 있어야 해요");
   registry.prepare("DELETE FROM profiles WHERE id = ?").run(p.id);
   removeProfileDb(p.id);
   res.status(204).end();
@@ -172,7 +304,7 @@ app.use("/api", (req, _res, next) => {
   if (req.path === "/profiles" || req.path.startsWith("/profiles/")) return next();
   const id = req.get("X-Profile");
   if (!id) throw new HttpError(400, "PROFILE_REQUIRED", "프로필을 먼저 골라 주세요");
-  runWithDb(profileDb(findProfile(id).id), next);
+  runWithDb(profileDb(findProfile(id, req.user).id), next);
 });
 
 // ---------- 화면용 API ----------

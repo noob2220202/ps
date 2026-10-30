@@ -14,6 +14,10 @@ export class ApiError extends Error {
   }
 }
 
+// 로그인이 풀렸을 때 알림 받을 곳 (auth.ts 가 등록. 서로 import 하면 순환이라 이렇게)
+let authListener: ((status: number, code: string, message: string) => void) | null = null;
+export const setAuthListener = (fn: typeof authListener) => (authListener = fn);
+
 // 진짜 백엔드를 붙이면 여기만 바꾸면 된다 (예: "https://api.example.com")
 const BASE = "";
 
@@ -29,7 +33,11 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
   const data = res.status === 204 ? undefined : await res.json().catch(() => undefined);
-  if (!res.ok) throw new ApiError(res.status, data);
+  if (!res.ok) {
+    const err = new ApiError(res.status, data);
+    if (!path.startsWith("/api/auth/")) authListener?.(err.status, err.code, err.message);
+    throw err;
+  }
   if (method !== "GET") invalidate(); // 데이터를 바꾸는 요청이 성공하면, 화면들이 다시 불러오도록 알림
   return data as T;
 }
