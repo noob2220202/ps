@@ -6,7 +6,7 @@
   position: absolute;
 }
 .hd-check {
-  left: 160.8px;
+  left: calc(50% - 31.2px);
   top: 77.6px;
   width: 62.4px;
   height: 62.4px;
@@ -124,7 +124,7 @@
   top: 668px;
 }
 .hana-done .hd-bottom {
-  bottom: 20.7px;
+  bottom: max(20.7px, calc(var(--safe-bottom) + 4px));
 }
 .hd-bottom .hana-btn {
   height: 48px;

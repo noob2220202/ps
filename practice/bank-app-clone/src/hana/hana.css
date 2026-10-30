@@ -251,7 +251,7 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
 /* 로고 상자 200 × 60 (녹화 250 × 75px), 가운데 y 202dp → 앱 영역 174 */
 .hana-splash__logo {
   position: absolute;
-  left: 92px;
+  left: calc(50% - 100px);
   top: 144px;
   width: 200px;
   height: 60px;

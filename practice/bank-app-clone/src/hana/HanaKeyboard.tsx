@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { OS } from "../platform/platform";
 
 // 갤럭시(삼성 키보드) 숫자 자판. 하나원큐 계좌번호 칸을 누르면 아래에서 올라옴 — 라이트모드에서도 키보드는 다크.
 // 녹화(480px) y 618~1066: 위 도구줄 44dp(#252525) → 키 4줄(55.2dp, 간격 8) → 아래 ⌨ · ⌄ 줄.
@@ -15,10 +16,11 @@ const ROWS: (KbKey | "dot" | "comma" | null)[][] = [
 export function HanaKeyboard({ open, onKey }: { open: boolean; onKey: (k: KbKey) => void }) {
   // 키보드가 떠 있는 동안 제스처바도 키보드 색으로
   useEffect(() => {
-    if (!open) return;
+    if (!open || OS === "ios") return;
     document.documentElement.dataset.hanaKb = "on";
     return () => void delete document.documentElement.dataset.hanaKb;
   }, [open]);
+  if (OS === "ios") return <IosPad open={open} onKey={onKey} />;
   return (
     <div className={`hana-kb ${open ? "hana-kb--open" : ""}`} aria-hidden={!open} onMouseDown={(e) => e.preventDefault()} onClick={(e) => e.stopPropagation()}>
       <div className="hana-kb__tools">
@@ -52,6 +54,37 @@ export function HanaKeyboard({ open, onKey }: { open: boolean; onKey: (k: KbKey)
             <path d="m5 8 6 6 6-6" />
           </svg>
         </button>
+      </div>
+    </div>
+  );
+}
+
+// 아이폰 숫자 자판 (inputmode="numeric"): 흰 키 3열 × 4줄, 숫자 아래 영문, 왼쪽 아래 빈칸 · 오른쪽 아래 ⌫. 바깥을 누르면 내려감
+const LETTERS: Record<string, string> = { "2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL", "6": "MNO", "7": "PQRS", "8": "TUV", "9": "WXYZ" };
+const IOS_KEYS: (KbKey | null)[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", null, "0", "back"];
+function IosPad({ open, onKey }: { open: boolean; onKey: (k: KbKey) => void }) {
+  return (
+    <div className={`hana-kb hana-kb--ios ${open ? "hana-kb--open" : ""}`} aria-hidden={!open} onMouseDown={(e) => e.preventDefault()} onClick={(e) => e.stopPropagation()}>
+      <div className="hana-ios-keys">
+        {IOS_KEYS.map((k, i) =>
+          k === null ? (
+            <span key={i} />
+          ) : (
+            <button key={i} className={`hana-ios-key ${k === "back" ? "hana-ios-key--back" : ""}`} onClick={() => onKey(k)} aria-label={k === "back" ? "지우기" : k}>
+              {k === "back" ? (
+                <svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden>
+                  <path d="M8 1.5h15a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H8L1.5 10Z" />
+                  <path d="m11.5 6 7 8m0-8-7 8" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <>
+                  <b>{k}</b>
+                  {LETTERS[k] && <small>{LETTERS[k]}</small>}
+                </>
+              )}
+            </button>
+          ),
+        )}
       </div>
     </div>
   );

@@ -106,7 +106,7 @@ html[data-theme="dark"] .hana-home__top--scrolled {
   left: 19px;
 }
 .hana-home__mode {
-  left: 224px;
+  right: 106.7px;
   top: 14.7px !important;
   height: 25.6px !important;
   width: 53.3px;
@@ -134,10 +134,10 @@ html[data-theme="dark"] .hana-home__mode {
   color: #26282b;
 }
 .hana-home__tool {
-  left: 291.6px;
+  right: 64.4px;
 }
 .hana-home__bell {
-  left: 333.7px;
+  right: 22.3px;
 }
 .hana-home__bell i {
   position: absolute;
@@ -390,7 +390,7 @@ html[data-theme="dark"] .hana-home__limit {
 }
 .hana-home__banner-art {
   position: absolute;
-  left: 198.4px;
+  right: 6.3px;
   top: 5.3px;
   width: 138.7px;
   height: 149.3px;
@@ -466,14 +466,15 @@ html[data-theme="dark"] .hana-home__limit {
   border: 0;
   background: none;
 }
+/* 열 가운데: 카드 폭의 20% / 49.85% / 79.7% (384dp 기준 89.1 / 191.5 / 293.9) */
 .hana-home__menu button:nth-child(3n + 1) {
-  left: 18.8px;
+  left: calc(20% - 50px);
 }
 .hana-home__menu button:nth-child(3n + 2) {
-  left: 121.2px;
+  left: calc(49.85% - 50px);
 }
 .hana-home__menu button:nth-child(3n + 3) {
-  left: 223.6px;
+  left: calc(79.7% - 50px);
 }
 .hana-home__menu button:nth-child(-n + 3) {
   top: 26.1px;
@@ -586,7 +587,7 @@ html[data-theme="dark"] .hana-home__promo {
 }
 .hana-home__chest {
   position: absolute;
-  left: 220.8px;
+  right: 18px;
   top: 32.5px;
   width: 64px;
   height: 60.8px;
@@ -664,7 +665,7 @@ html[data-theme="dark"] .hana-home__setting {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 123.6px;
+  height: max(123.6px, calc(104px + var(--safe-bottom)));
   z-index: 6;
   border-radius: 20px 20px 0 0;
   background: var(--hn-card);
@@ -733,8 +734,8 @@ html[data-theme="dark"] .hana-home__chips button {
 }
 .hana-home__down {
   position: absolute;
-  left: 172px;
-  bottom: 19.6px;
+  left: calc(50% - 20px);
+  bottom: max(19.6px, calc(var(--safe-bottom) + 4px));
   z-index: 6;
   width: 40px;
   height: 40px;

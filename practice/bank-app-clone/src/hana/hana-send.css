@@ -290,7 +290,7 @@ html[data-theme="dark"] .hs-busy {
   background: none !important;
 }
 .hana-send .hana-bottom {
-  bottom: 20.7px;
+  bottom: max(20.7px, calc(var(--safe-bottom) + 4px));
 }
 
 /* 삼성 키보드 (HanaKeyboard.tsx) */
@@ -409,6 +409,63 @@ html[data-theme="dark"] .hs-busy {
   background: none;
 }
 
+/* 아이폰 숫자 자판 (키 46, 간격 6, 아래 홈 인디케이터 자리) */
+.hana-kb--ios {
+  height: calc(220px + var(--safe-bottom));
+  background: #d1d4da;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Pretendard Variable", Pretendard, sans-serif;
+}
+html[data-theme="dark"] .hana-kb--ios {
+  background: #2b2b2d;
+}
+.hana-ios-keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 46px;
+  gap: 7px 6px;
+  padding: 6px 6px 0;
+}
+.hana-ios-key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  color: #000 !important;
+  letter-spacing: 0 !important;
+}
+.hana-ios-key:active {
+  background: #b5b9c1;
+}
+.hana-ios-key b {
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 26px;
+}
+.hana-ios-key small {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.8px !important;
+  line-height: 11px;
+}
+.hana-ios-key--back {
+  background: none;
+  box-shadow: none;
+}
+html[data-theme="dark"] .hana-ios-key {
+  background: #6c6c70;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  color: #fff !important;
+}
+html[data-theme="dark"] .hana-ios-key--back {
+  background: none;
+  box-shadow: none;
+}
+
 /* ---------- 은행 / 증권 시트 + 확인 시트 ---------- */
 .hs-sheet {
   position: absolute;
@@ -446,7 +503,7 @@ html[data-theme="dark"] .hs-busy {
 }
 .hs-sheet__grab {
   position: absolute;
-  left: 172.25px;
+  left: calc(50% - 19.75px);
   top: 11px;
   width: 39.5px;
   height: 4px;
@@ -455,7 +512,7 @@ html[data-theme="dark"] .hs-busy {
 }
 .hs-sheet__close {
   position: absolute;
-  left: 335.8px;
+  right: 22.2px;
   top: 21.6px;
   display: flex;
   padding: 0;
@@ -501,7 +558,7 @@ html[data-theme="dark"] .hs-busy {
   top: 113px;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(3, 106.1px);
+  grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 98.1px;
   column-gap: 12.9px;
   row-gap: 12.8px;
@@ -520,7 +577,7 @@ html[data-theme="dark"] .hs-busy {
 .hs-tile .hana-logo,
 .hs-tile .bank-icon {
   position: absolute;
-  left: 27.45px;
+  left: calc(50% - 25.6px);
   top: 18.1px;
 }
 .hs-tile span {
@@ -789,8 +846,8 @@ html[data-theme="dark"] .hs-busy {
   position: absolute;
   left: 20px;
   right: 20px;
-  top: 500px;
-  bottom: 0;
+  height: 310.3px;
+  bottom: max(0px, calc(var(--safe-bottom) - 10px));
   z-index: 3;
   background: var(--hn-bg);
 }
