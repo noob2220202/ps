@@ -1,0 +1,905 @@
+/* 하나원큐 이체. 위치는 녹화(480px) × 0.8 − 상태바 28 = 앱 영역 dp, 머리줄(51.2) 아래는 .hs-body 기준 */
+.hana-send {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  --hs-padback: #cfd1d5;
+}
+html[data-theme="dark"] .hana-send {
+  --hs-padback: #6d7076;
+}
+.hs-page {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  overflow: clip;
+  background: var(--hn-bg);
+  animation: hana-fade-in 80ms linear both;
+}
+.hs-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 51.2px;
+  bottom: 0;
+  padding: 0 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.hs-body > * {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+}
+
+/* 테두리 상자 (입력칸·선택칸): 높이 57.6, 반경 10, 1dp */
+.hs-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 57.6px;
+  padding: 0 14px 0 16px;
+  border: 1px solid var(--hn-line);
+  border-radius: 10px;
+  background: var(--hn-bg);
+  font-size: 17.5px !important;
+  text-align: left;
+}
+.hs-input__ph {
+  color: var(--hn-faint);
+  display: flex;
+  align-items: center;
+}
+
+/* ---------- 누구에게 보낼까요? ---------- */
+.hs-who__title {
+  top: 28.4px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 2px;
+}
+.hs-who__title h2,
+.hs-entry__title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.hs-entry__title {
+  top: 28.4px;
+  line-height: 28px;
+}
+.hs-direct {
+  top: 72px;
+  padding-right: 10px;
+  color: var(--hn-faint) !important;
+}
+.hs-direct svg {
+  color: var(--hn-text);
+}
+.hs-tabs {
+  top: 157px;
+  left: 0 !important;
+  right: 0 !important;
+  height: 45.4px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--hn-line);
+}
+.hs-tabs button {
+  position: relative;
+  padding: 0 8px 2px;
+  border: 0;
+  background: none;
+  font-size: 17px !important;
+  color: var(--hn-sub) !important;
+}
+.hs-tabs button.on {
+  color: var(--hn-text) !important;
+  font-weight: 700;
+}
+.hs-tabs button.on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2.4px;
+  background: var(--hn-text);
+}
+.hs-tabs__contact {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  color: var(--hn-text2);
+}
+.hs-del {
+  top: 219.4px;
+  left: auto !important;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14.5px !important;
+  color: var(--hn-text2) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hs-list {
+  top: 249.2px;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0;
+  padding: 0 0 40px;
+  list-style: none;
+}
+.hs-row {
+  position: relative;
+  height: 83.2px;
+  display: flex;
+  align-items: flex-start;
+  padding: 0 20px 0 19.2px;
+  cursor: pointer;
+}
+.hs-row > .hana-badge {
+  margin-top: 15.6px;
+}
+.hs-row__text {
+  margin-top: 16.5px;
+  margin-left: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.hs-row__text p {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hs-row__text b {
+  font-size: 17.5px;
+  font-weight: 600;
+}
+.hs-row__text span {
+  margin-left: 8px;
+  font-size: 15px;
+  color: var(--hn-sub);
+}
+.hs-row__acct {
+  margin-top: 7px !important;
+  font-size: 16.5px;
+  color: var(--hn-sub);
+  letter-spacing: 0;
+}
+.hs-star {
+  margin-top: 13px;
+  margin-right: -4px;
+  padding: 4px;
+  display: flex;
+  border: 0;
+  background: none;
+  color: var(--hn-sub) !important;
+}
+.hs-row--skel {
+  cursor: default;
+}
+.hs-skel-icon {
+  width: 38.4px;
+  height: 38.4px;
+  border-radius: 50%;
+}
+.hs-skel-a,
+.hs-skel-b {
+  position: absolute;
+  left: 70.4px;
+  height: 24px;
+}
+.hs-skel-a {
+  top: 14px;
+  width: 245px;
+}
+.hs-skel-b {
+  top: 46px;
+  width: 147px;
+}
+.hs-empty {
+  padding: 60px 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--hn-sub);
+}
+
+/* ---------- 받는 분 (계좌번호 · 은행) ---------- */
+.hs-input {
+  top: 72px;
+  justify-content: flex-start;
+  cursor: text;
+}
+.hs-input--focus {
+  border: 1.5px solid var(--hn-green);
+  padding-left: 15.5px;
+}
+.hs-input__value {
+  letter-spacing: 0.4px;
+}
+.hs-caret {
+  width: 1.5px;
+  height: 22px;
+  margin-left: 1px;
+  margin-right: auto;
+  background: var(--hn-text);
+  animation: hs-blink 1s steps(1) infinite;
+}
+.hs-input .hs-input__ph + .hs-caret {
+  order: -1;
+  margin: 0 1px 0 0;
+}
+@keyframes hs-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.hs-input__clear {
+  margin-left: auto;
+  display: flex;
+  padding: 2px;
+  border: 0;
+  background: none;
+  color: var(--hn-faint) !important;
+}
+.hs-select {
+  top: 144px;
+}
+.hs-select__bank {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: -6px;
+}
+.hs-guess {
+  top: 225.6px;
+  right: auto !important;
+  height: 38.4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 10px 0 4px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--hn-badge);
+  font-size: 15px !important;
+  letter-spacing: 0 !important;
+}
+.hs-busy {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.35);
+}
+html[data-theme="dark"] .hs-busy {
+  background: rgba(0, 0, 0, 0.25);
+}
+.hs-busy--clear {
+  background: none !important;
+}
+.hana-send .hana-bottom {
+  bottom: 20.7px;
+}
+
+/* 삼성 키보드 (HanaKeyboard.tsx) */
+.hana-kb {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 343.4px;
+  z-index: 20;
+  background: #0a0a0a;
+  color: #f2f2f2;
+  translate: 0 100%;
+  transition: translate 230ms cubic-bezier(0.2, 0, 0, 1);
+  font-family: "Samsung One", "Pretendard Variable", Pretendard, sans-serif;
+}
+.hana-kb--open {
+  translate: 0 0;
+}
+.hana-kb__tools {
+  position: relative;
+  height: 44px;
+  background: #252525;
+}
+.hana-kb__tool {
+  position: absolute;
+  top: 10.8px;
+  width: 22.4px;
+  height: 22.4px;
+  margin-left: -11.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #414141;
+  color: #a9a9a9;
+}
+.hana-kb__tool svg {
+  width: 15px;
+  height: 15px;
+}
+.hana-kb__tool:nth-child(1) {
+  left: 32.8px;
+}
+.hana-kb__tool:nth-child(2) {
+  left: 100.8px;
+}
+.hana-kb__tool:nth-child(3) {
+  left: 168px;
+}
+.hana-kb__tool:nth-child(4) {
+  left: 236px;
+}
+.hana-kb__tool:nth-child(5) {
+  left: 303.2px;
+}
+.hana-kb__more {
+  position: absolute;
+  left: 360px;
+  top: 12px;
+  translate: -50% 0;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #f7f7f7;
+}
+.hana-kb__keys {
+  position: absolute;
+  left: 9.6px;
+  right: 11.2px;
+  top: 54.4px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 55.2px;
+  gap: 8px;
+}
+.hana-kb__key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: #2c2c2c;
+  color: #f2f2f2 !important;
+  font-size: 24px !important;
+  font-weight: 300;
+}
+.hana-kb__key:active {
+  background: #4a4a4a;
+}
+.hana-kb__key--back,
+.hana-kb__key--enter,
+.hana-kb__key--dot {
+  background: #373737;
+}
+.hana-kb__key--blank,
+.hana-kb__key--comma {
+  background: #161616;
+  color: #6a6a6a !important;
+}
+.hana-kb__bottom {
+  position: absolute;
+  left: 45.6px;
+  right: 42.4px;
+  bottom: 0;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #d6d6d6;
+}
+.hana-kb__bottom button {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* ---------- 은행 / 증권 시트 + 확인 시트 ---------- */
+.hs-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+}
+.hs-sheet--open {
+  pointer-events: auto;
+}
+.hs-sheet__dim {
+  position: absolute;
+  inset: 0;
+  background: var(--hn-dim);
+  opacity: 0;
+  transition: opacity 220ms linear;
+}
+.hs-sheet--open .hs-sheet__dim {
+  opacity: 1;
+}
+.hs-sheet__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 80.8px;
+  bottom: 0;
+  border-radius: 19px 19px 0 0;
+  background: var(--hn-sheet);
+  overflow: hidden;
+  translate: 0 100%;
+  transition: translate 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+.hs-sheet--open .hs-sheet__panel {
+  translate: 0 0;
+}
+.hs-sheet__grab {
+  position: absolute;
+  left: 172.25px;
+  top: 11px;
+  width: 39.5px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--hn-grabber);
+}
+.hs-sheet__close {
+  position: absolute;
+  left: 335.8px;
+  top: 21.6px;
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.hs-sheet__tabs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 67.5px;
+  height: 45.5px;
+  display: flex;
+  padding: 0 19.7px;
+  border-bottom: 1px solid var(--hn-line);
+}
+.hs-sheet__tabs button {
+  position: relative;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 17px !important;
+  color: var(--hn-sub) !important;
+}
+.hs-sheet__tabs button.on {
+  color: var(--hn-text) !important;
+  font-weight: 700;
+}
+.hs-sheet__tabs button.on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2.4px;
+  background: var(--hn-text);
+}
+.hs-sheet__grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 113px;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 106.1px);
+  grid-auto-rows: 98.1px;
+  column-gap: 12.9px;
+  row-gap: 12.8px;
+  align-content: start;
+  padding: 23.5px 19.7px 40px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.hs-tile {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--hn-tile);
+}
+.hs-tile .hana-logo,
+.hs-tile .bank-icon {
+  position: absolute;
+  left: 27.45px;
+  top: 18.1px;
+}
+.hs-tile span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 61.5px;
+  font-size: 16px;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+/* 확인: 아래에서 올라와 화면 전체를 덮는 페이지 (녹화: 올라오는 동안만 뒤가 옅게 어두워짐) */
+.hs-confirm .hs-sheet__dim {
+  background: rgba(0, 0, 0, 0.2);
+}
+.hs-confirm.hs-sheet--open .hs-sheet__dim {
+  opacity: 0;
+  transition-delay: 300ms;
+}
+.hs-confirm .hs-sheet__panel {
+  top: 0;
+  border-radius: 0;
+}
+.hs-confirm .hana-header {
+  background: none;
+}
+.hs-confirm .hana-header h1 {
+  font-size: 17px;
+}
+.hs-confirm__title {
+  position: absolute;
+  left: 20px;
+  top: 76.4px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 32.8px;
+  letter-spacing: -0.6px;
+}
+.hs-confirm__title em,
+.hd-title em {
+  font-style: normal;
+  color: var(--hn-green-text);
+}
+.hs-rows {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 181.6px;
+  margin: 0;
+  padding: 22.4px 0 0;
+  border-top: 1px solid var(--hn-hair);
+}
+.hs-rows > div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15.2px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.hs-rows dt {
+  color: var(--hn-sub);
+}
+.hs-rows dd {
+  margin: 0;
+  text-align: right;
+  color: var(--hn-text);
+  letter-spacing: 0;
+}
+.hs-confirm__add {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 455.2px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hn-hair);
+  display: flex;
+  justify-content: center;
+}
+.hs-confirm__add .hana-chip {
+  height: 30.4px;
+  padding: 0 13px 0 12px;
+  font-size: 15px !important;
+}
+
+/* ---------- 금액 · 표시 ---------- */
+.hs-amt__to {
+  top: 26.6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+.hs-amt__to b {
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.hs-amt__to span {
+  display: flex;
+  align-items: center;
+  font-size: 16.5px;
+  line-height: 22px;
+  color: var(--hn-sub);
+  letter-spacing: 0;
+}
+.hs-amt__value {
+  top: 138.4px;
+  height: 130px;
+  text-align: center;
+}
+.hs-amt__value strong {
+  display: block;
+  height: 40px;
+  font-size: 31px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: 0;
+}
+.hs-amt__value small {
+  margin-left: 2px;
+  font-size: 30px;
+}
+.hs-amt__ph {
+  color: var(--hn-faint);
+  font-weight: 700 !important;
+  font-size: 29px !important;
+}
+.hs-amt__value p {
+  margin: 4px 0 0;
+  font-size: 14.5px;
+  line-height: 20px;
+  color: var(--hn-sub);
+}
+.hs-amt__value .hs-amt__err {
+  margin-top: 12px;
+  color: var(--hn-red);
+  line-height: 20.8px;
+}
+.hs-amt__reserve {
+  display: inline-block;
+  margin-top: 15px;
+  font-size: 14.5px;
+  color: var(--hn-text2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hs-from {
+  top: 353.6px;
+  height: 80px;
+  flex-wrap: wrap;
+  align-content: center;
+  padding: 0 14px 0 15.5px;
+}
+.hs-amt--memo .hs-from {
+  top: 328px;
+}
+.hs-from .hs-from__no {
+  width: calc(100% - 36px);
+  font-size: 14.5px;
+  color: var(--hn-sub);
+  letter-spacing: 0;
+}
+.hs-from b {
+  width: calc(100% - 36px);
+  margin-top: 7px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.hs-from > svg {
+  position: absolute;
+  right: 14px;
+  top: 28px;
+}
+.hs-from__spin {
+  position: absolute;
+  left: 175px;
+  top: 2px;
+  display: flex;
+}
+.hs-memo-part {
+  top: 440px;
+  padding-bottom: 120px;
+}
+.hs-label {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+}
+.hs-memo + .hs-label {
+  margin-top: 32.2px;
+}
+.hs-memo {
+  width: 100%;
+  height: 56.8px;
+}
+.hs-memo--input {
+  color: var(--hn-text);
+  outline: none;
+}
+.hs-memo--input:focus {
+  border: 1.5px solid var(--hn-green);
+}
+.hs-more {
+  margin: 39.4px auto 0;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14.5px !important;
+  color: var(--hn-text2) !important;
+}
+.hs-more span {
+  display: flex;
+}
+.hs-more--up {
+  rotate: 180deg;
+}
+.hs-check {
+  margin-top: 23.4px;
+  height: 71px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--hn-hair);
+  font-size: 16px;
+  cursor: pointer;
+}
+.hs-check input {
+  display: none;
+}
+.hs-check i {
+  width: 19px;
+  height: 19px;
+  border: 1.4px solid #b4b7bc;
+  border-radius: 4px;
+}
+.hs-check input:checked + i {
+  border-color: var(--hn-green);
+  background: var(--hn-green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m5 10 3.3 3.3L15 6.7' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100%;
+}
+.hs-bottom-fade::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  top: -20px;
+  bottom: -21px;
+  z-index: -1;
+  background: linear-gradient(to bottom, transparent, var(--hn-bg) 20px);
+}
+
+/* 금액 자판 (화면 안, 앱 영역 500 ~ 끝): 칩 30.4 → 18.4 → 키 4줄 × 62.4 */
+.hs-pad {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 500px;
+  bottom: 0;
+  z-index: 3;
+  background: var(--hn-bg);
+}
+.hs-pad__quick {
+  display: flex;
+  gap: 8.8px;
+}
+.hs-pad__quick button {
+  flex: 1;
+  height: 30.4px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--hn-chip);
+  font-size: 15.5px !important;
+  color: var(--hn-chip-text) !important;
+}
+.hs-pad__keys {
+  margin-top: 18.4px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 62.4px;
+}
+.hs-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 23px !important;
+  transition: background-color 90ms linear;
+}
+.hs-key--down {
+  background: var(--hn-key-press);
+}
+.hs-key--done {
+  font-size: 19px !important;
+  font-weight: 500;
+}
+
+/* ---------- 받는분에게 표시 수정 ---------- */
+.hs-memo-edit {
+  top: 27.2px;
+  display: flex;
+  gap: 12.8px;
+}
+.hs-memo-edit__input {
+  flex: 1;
+  min-width: 0;
+}
+.hs-memo-edit__input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--hn-text);
+  font: inherit;
+  font-size: 17.5px;
+}
+.hs-memo-edit__input button {
+  display: flex;
+  padding: 2px;
+  border: 0;
+  background: none;
+  color: var(--hn-faint) !important;
+}
+.hs-memo-edit__ok {
+  width: 100px;
+  height: 57.6px;
+}
+.hs-phrase-head {
+  top: 109px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hs-phrase-head b {
+  font-size: 16px;
+  font-weight: 600;
+}
+.hs-phrase-head span {
+  font-size: 14.5px;
+  color: var(--hn-text2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hs-phrases {
+  top: 144px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8.8px;
+}
+.hs-phrases button {
+  height: 34.4px;
+  padding: 0 13px;
+  border: 1px solid var(--hn-line);
+  border-radius: 17.2px;
+  background: none;
+  font-size: 15px !important;
+}
+.hs-phrases__add {
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

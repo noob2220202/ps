@@ -1,0 +1,754 @@
+/* 하나원큐 홈. 위치는 라이트 스크린샷(720px) ÷ 1.875 − 상태바 28 = 앱 영역 dp */
+.hana-home {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--hn-page);
+  --hm-btn-get: #ffffff;
+  --hm-pill: rgba(255, 255, 255, 0.55);
+  --hm-pill-text: #3a3d42;
+  --hm-mode: #5d6975;
+  --hm-home-sub: #4f5f60;
+  --hm-shadow: 0 1px 6px rgba(0, 40, 30, 0.05);
+}
+html[data-theme="dark"] .hana-home {
+  --hm-btn-get: #ffffff;
+  --hm-pill: rgba(0, 0, 0, 0.45);
+  --hm-pill-text: #e8eaec;
+  --hm-mode: #b5b8bd;
+  --hm-home-sub: #b9c4c2;
+  --hm-shadow: none;
+}
+.hana-home__scroll {
+  padding-bottom: 150px;
+}
+
+/* 위쪽 민트 바탕 + 흐린 클로버 (스크린샷 가장자리 색: 위 #c2f6ea → 가운데 #a6e9d2 → 아래 회색 #f1f2f4) */
+.hana-home__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 900px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #c3f7eb 0px, #c4f6ea 200px, #b1ecdb 380px, #a3e5cf 560px, #b4e6d4 660px, #d6ece5 760px, var(--hn-page) 880px);
+  pointer-events: none;
+}
+.hana-home__bg i {
+  position: absolute;
+  border-radius: 50%;
+  background: #62d6b4;
+  filter: blur(22px);
+  opacity: 0.75;
+}
+.hana-home__bg .c1 {
+  left: -70px;
+  top: 300px;
+  width: 150px;
+  height: 120px;
+}
+.hana-home__bg .c2 {
+  left: 260px;
+  top: 40px;
+  width: 140px;
+  height: 90px;
+  background: #8ee6cb;
+}
+.hana-home__bg .c3 {
+  left: 300px;
+  top: 470px;
+  width: 140px;
+  height: 90px;
+}
+.hana-home__bg .c4 {
+  left: 30px;
+  top: 560px;
+  width: 120px;
+  height: 70px;
+  background: #86dfc2;
+}
+html[data-theme="dark"] .hana-home__bg {
+  background: linear-gradient(180deg, #0f3f3a 0px, #0d3e39 200px, #0a3833 380px, #073631 560px, #0b302c 680px, #182724 790px, var(--hn-page) 880px);
+}
+html[data-theme="dark"] .hana-home__bg i {
+  background: #1f5f53;
+  opacity: 0.8;
+}
+
+/* ---------- 머리줄 (56dp). 스크롤하면 반투명 막 ---------- */
+.hana-home__top {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 56px;
+  z-index: 5;
+  transition: background-color 120ms linear;
+}
+.hana-home__top--scrolled {
+  background: rgba(238, 247, 244, 0.86);
+  backdrop-filter: blur(12px);
+}
+html[data-theme="dark"] .hana-home__top--scrolled {
+  background: rgba(26, 43, 41, 0.86);
+}
+.hana-home__top > * {
+  position: absolute;
+  top: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.hana-home__my {
+  left: 19px;
+}
+.hana-home__mode {
+  left: 224px;
+  top: 14.7px !important;
+  height: 25.6px !important;
+  width: 53.3px;
+  padding: 0 3px !important;
+  border-radius: 6px;
+  background: var(--hm-mode) !important;
+  font-size: 13.3px;
+  color: #fff;
+}
+.hana-home__mode b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19.5px;
+  height: 19.5px;
+  border-radius: 4.5px;
+  background: #fff;
+  color: #2c2f33;
+  font-weight: 500;
+}
+.hana-home__mode span {
+  margin-left: 4px;
+}
+html[data-theme="dark"] .hana-home__mode {
+  color: #26282b;
+}
+.hana-home__tool {
+  left: 291.6px;
+}
+.hana-home__bell {
+  left: 333.7px;
+}
+.hana-home__bell i {
+  position: absolute;
+  top: 9px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f0315b;
+  color: #fff;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+
+/* ---------- 대표계좌 (가운데 정렬) ---------- */
+.hana-home__acct {
+  position: relative;
+  height: 358px;
+  text-align: center;
+}
+.hana-home__acct > * {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.hana-home__acct-name {
+  top: 117.6px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16.5px;
+}
+.hana-home__acct-name span {
+  color: var(--hm-home-sub);
+}
+.hana-home__acct-name i {
+  width: 1px;
+  height: 12px;
+  margin: 0 7px;
+  background: currentColor;
+  opacity: 0.3;
+}
+.hana-home__acct-name b {
+  font-weight: 600;
+}
+.hana-home__more {
+  position: absolute;
+  right: 22px;
+  top: 0;
+  height: 22px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+}
+.hana-home__acct-no {
+  top: 145.8px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 17px !important;
+  letter-spacing: 0.35px !important;
+}
+.hana-home__limit {
+  left: 50% !important;
+  right: auto !important;
+  top: 175px;
+  translate: -50% 0;
+  height: 18.5px;
+  padding: 0 6px 0 7.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  border: 1px solid rgba(60, 90, 90, 0.38);
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--hm-home-sub);
+  white-space: nowrap;
+}
+html[data-theme="dark"] .hana-home__limit {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.hana-home__balance {
+  top: 197px;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.hana-home__balance strong {
+  font-size: 27.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.hana-home__balance small {
+  margin-left: 3px;
+  font-size: 25px;
+  font-weight: 600;
+}
+.hana-home__hide {
+  height: 22px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 11px;
+  background: var(--hm-pill);
+  color: var(--hm-pill-text) !important;
+  font-size: 12.5px !important;
+}
+.hana-home__btns {
+  top: 257px;
+  display: flex;
+  justify-content: center;
+  gap: 13.4px;
+}
+.hana-home__btns button {
+  width: 119.5px;
+  height: 41px;
+  border: 0;
+  border-radius: 21px;
+  font-size: 17px !important;
+}
+.hana-home__get {
+  background: var(--hm-btn-get);
+  color: #2b2d31 !important;
+}
+.hana-home__send {
+  background: var(--hn-green);
+  color: #fff !important;
+}
+.hana-home__pager {
+  top: 325px;
+  height: 20.5px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-left: 25px;
+}
+.hana-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 98px;
+  height: 20.5px;
+  border-radius: 10.5px;
+  background: var(--hm-pill);
+  color: var(--hm-pill-text);
+  font-size: 13.5px;
+}
+.hana-pill em {
+  font-style: normal;
+  opacity: 0.6;
+}
+.hana-pill button {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.hana-home__gear {
+  width: 20.5px;
+  height: 20.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--hm-pill);
+  color: var(--hm-pill-text);
+}
+.hana-home__acct-skel {
+  top: 150px;
+  left: 110px !important;
+  right: 110px !important;
+  height: 70px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- 카드들 ---------- */
+.hana-home__cards {
+  position: relative;
+  padding: 20.7px 20.3px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12.8px;
+}
+.hana-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 13px;
+  background: var(--hn-card);
+  box-shadow: var(--hm-shadow);
+  text-align: left;
+}
+.hana-home__all {
+  height: 50.7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 19px 0 20.7px;
+}
+.hana-home__all b {
+  font-size: 18.5px;
+  font-weight: 600;
+}
+.hana-home__all span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15.5px;
+  color: var(--hn-text2);
+}
+.hana-home__banner {
+  height: 159.5px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.hana-home__banner p {
+  position: absolute;
+  left: 20.7px;
+  margin: 0;
+  white-space: pre-line;
+}
+.hana-home__banner-sub {
+  top: 20px;
+  font-size: 15px;
+  color: var(--hn-sub);
+}
+.hana-home__banner-title {
+  top: 43.5px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 23.5px;
+  letter-spacing: -0.5px;
+}
+.hana-pic {
+  display: block;
+}
+.hana-home__banner-art {
+  position: absolute;
+  left: 198.4px;
+  top: 5.3px;
+  width: 138.7px;
+  height: 149.3px;
+  animation: hana-fade-in 200ms linear both;
+}
+.hana-home__banner-ctl {
+  position: absolute;
+  left: 20.2px;
+  top: 112.3px;
+  display: flex;
+  gap: 4px;
+}
+.hana-pill--gray {
+  width: 98px;
+  height: 22.4px;
+  border-radius: 11.2px;
+  background: var(--hn-chip);
+  color: var(--hn-text2);
+  font-size: 13.5px;
+}
+.hana-pill--gray b {
+  font-weight: 500;
+}
+.hana-home__play {
+  width: 22.4px;
+  height: 22.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--hn-chip);
+  color: var(--hn-text2) !important;
+}
+.hana-home__minis {
+  display: flex;
+  gap: 13.3px;
+  margin: 0 -20.3px;
+  padding: 0 20.3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hana-home__mini {
+  flex: 0 0 131.7px;
+  height: 68.3px;
+  padding: 0 0 0 15.5px;
+}
+.hana-home__mini b {
+  position: absolute;
+  top: 13.5px;
+  font-size: 17px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.hana-home__mini span {
+  position: absolute;
+  top: 36px;
+  font-size: 14.5px;
+  color: var(--hn-sub);
+  white-space: nowrap;
+}
+
+/* 메뉴 6개 + 메뉴 추가: 3열 (가운데 x 89.1 / 191.5 / 293.9), 줄 간격 89.3, 아이콘 44.8 상자 */
+.hana-home__menu {
+  height: 305px;
+}
+.hana-home__menu button {
+  position: absolute;
+  width: 100px;
+  height: 80px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.hana-home__menu button:nth-child(3n + 1) {
+  left: 18.8px;
+}
+.hana-home__menu button:nth-child(3n + 2) {
+  left: 121.2px;
+}
+.hana-home__menu button:nth-child(3n + 3) {
+  left: 223.6px;
+}
+.hana-home__menu button:nth-child(-n + 3) {
+  top: 26.1px;
+}
+.hana-home__menu button:nth-child(n + 4) {
+  top: 115.4px;
+}
+.hana-home__menu button:nth-child(7) {
+  top: 204.7px;
+}
+.hana-home__menu img,
+.hana-home__menu .hana-pic--empty {
+  margin: 0 auto;
+  width: 44.8px;
+  height: 44.8px;
+}
+.hana-home__menu span {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 48.5px;
+  font-size: 15px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html[data-theme="dark"] .hana-home__menu img {
+  filter: brightness(1.05);
+}
+
+.hana-home__card-title {
+  position: absolute;
+  left: 20.7px;
+  right: 22px;
+  top: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hana-home__card-title b {
+  font-size: 18.5px;
+  font-weight: 600;
+}
+.hana-home__group {
+  height: 263px;
+}
+.hana-home__group-chips {
+  position: absolute;
+  left: 20.3px;
+  right: 0;
+  top: 67.7px;
+  display: flex;
+  gap: 9px;
+  overflow: hidden;
+}
+.hana-home__group-chips button {
+  flex: 0 0 74.1px;
+  height: 31px;
+  padding: 0;
+  border: 1px solid #9fa3a9;
+  border-radius: 6px;
+  background: none;
+  font-size: 15px !important;
+  white-space: nowrap;
+}
+html[data-theme="dark"] .hana-home__group-chips button {
+  border-color: #6e7177;
+}
+.hana-home__promo {
+  position: absolute;
+  left: 20.3px;
+  right: 20.3px;
+  top: 115.7px;
+  height: 122.7px;
+  border-radius: 13px;
+  background: var(--hn-tile);
+  cursor: pointer;
+}
+html[data-theme="dark"] .hana-home__promo {
+  background: #222327;
+}
+.hana-home__promo-tag {
+  position: absolute;
+  left: 20.3px;
+  top: 20.5px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--hn-green);
+  border-radius: 10px;
+  color: var(--hn-green-text);
+  font-size: 12.5px;
+  line-height: 18px;
+}
+.hana-home__promo p,
+.hana-home__promo b {
+  position: absolute;
+  left: 20.3px;
+  margin: 0;
+}
+.hana-home__promo p {
+  top: 48px;
+  font-size: 14.5px;
+  color: var(--hn-sub);
+}
+.hana-home__promo b {
+  top: 71px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.hana-home__chest {
+  position: absolute;
+  left: 220.8px;
+  top: 32.5px;
+  width: 64px;
+  height: 60.8px;
+}
+.hana-home__assets {
+  height: 130px;
+}
+.hana-home__assets b {
+  position: absolute;
+  left: 20.7px;
+  top: 25.5px;
+  font-size: 18.5px;
+  font-weight: 600;
+}
+.hana-home__assets p {
+  position: absolute;
+  left: 20.7px;
+  top: 62.5px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 19.7px;
+  color: var(--hn-text2);
+}
+.hana-home__assets button {
+  position: absolute;
+  right: 20.3px;
+  top: 70.4px;
+  width: 49.1px;
+  height: 31px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--hn-mint);
+  color: var(--hn-mint-text) !important;
+  font-size: 15px !important;
+}
+.hana-home__setting {
+  align-self: center;
+  margin-top: 20.8px;
+  width: 104.5px;
+  height: 41px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 10px;
+  background: #e4e8eb;
+  color: #50555c !important;
+  font-size: 16.5px !important;
+}
+.hana-home__setting svg {
+  width: 17px;
+  height: 17px;
+}
+html[data-theme="dark"] .hana-home__setting {
+  background: #33363b;
+  color: #aeb2b8 !important;
+}
+.hana-home__privacy {
+  align-self: center;
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 15px !important;
+  color: var(--hn-sub) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- 아래 검색 칩 + 탭 (판 위 반경 20, 앱 영역 686.7 ~ 끝) ---------- */
+.hana-home__tabs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 123.6px;
+  z-index: 6;
+  border-radius: 20px 20px 0 0;
+  background: var(--hn-card);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  transition: translate 220ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+.hana-home__tabs--hidden {
+  translate: 0 130px;
+}
+.hana-home__chips {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 15.2px;
+  display: flex;
+  gap: 8px;
+  padding: 0 13.9px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hana-home__chips button {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--hn-page);
+  font-size: 14.5px !important;
+  white-space: nowrap;
+}
+html[data-theme="dark"] .hana-home__chips button {
+  background: #202123;
+}
+.hana-home__chips .hana-home__search {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 71.5px;
+  padding: 0 0 0 10px;
+  background: var(--hn-green) !important;
+  color: #fff !important;
+}
+.hana-home__tabbar {
+  position: absolute;
+  left: 13.4px;
+  right: 13.4px;
+  top: 58px;
+  display: flex;
+}
+.hana-home__tabbar button {
+  flex: 1;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 0 0;
+  border: 0;
+  background: none;
+  color: var(--hn-sub) !important;
+  font-size: 13px !important;
+}
+.hana-home__tabbar button.on {
+  color: var(--hn-text) !important;
+  font-weight: 600;
+}
+.hana-home__down {
+  position: absolute;
+  left: 172px;
+  bottom: 19.6px;
+  z-index: 6;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--hn-card);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+  color: var(--hn-text2) !important;
+  animation: hana-fade-in 160ms linear both;
+}
+html[data-theme="dark"] .hana-home__down {
+  background: #2c2e33;
+}

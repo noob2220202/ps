@@ -35,10 +35,12 @@
   }
 }
 /* 콕뱅크(갤럭시): 새 화면 80ms 직선 교차 페이드, 뒤로가기는 나가는 화면이 100ms 동안 흐려짐 */
-html[data-app="nh"][data-os="android"] .layer--push-enter {
+html[data-app="nh"][data-os="android"] .layer--push-enter,
+html[data-app="hana"][data-os="android"] .layer--push-enter {
   animation: layer-fade var(--nav-ms) linear both;
 }
-html[data-app="nh"][data-os="android"] .layer--pop-exit {
+html[data-app="nh"][data-os="android"] .layer--pop-exit,
+html[data-app="hana"][data-os="android"] .layer--pop-exit {
   animation: layer-fade-out var(--nav-ms) linear both;
 }
 @keyframes layer-fade-out {

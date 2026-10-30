@@ -449,6 +449,14 @@
   --yellow-pressed: #5f73e6;
   color-scheme: dark;
 }
+/* 하나원큐: 하나 초록 버튼 */
+.dev-panel--hana {
+  --yellow: #00a38e;
+  --yellow-pressed: #008b79;
+}
+.dev-panel--hana .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
+  color: #fff;
+}
 .dev-panel--nh .btn:not(.btn--danger):not(.btn--in):not(.btn--out) {
   color: #fff;
 }

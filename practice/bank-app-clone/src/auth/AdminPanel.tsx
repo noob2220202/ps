@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "../api/client";
-import { APP } from "../profile/session";
+import { APP, APP_NAME } from "../profile/session";
 import { admin, changePassword, remaining, type ManagedUser, type Plan } from "./auth";
 import "./auth.css";
 
@@ -38,7 +38,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
     <div className="admin" role="dialog" aria-label="계정 관리">
       <div className="admin__box">
         <header className="admin__head">
-          <h2>{APP === "nh" ? "NH콕뱅크" : "카카오뱅크"} 계정 관리</h2>
+          <h2>{APP_NAME[APP]} 계정 관리</h2>
           <button onClick={onClose}>닫기</button>
         </header>
 

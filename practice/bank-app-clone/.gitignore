@@ -31,4 +31,5 @@ public/local/
 # 서버 데이터베이스 (내 데이터)
 server/data/
 server/data-nh/
+server/data-hana/
 __pycache__/

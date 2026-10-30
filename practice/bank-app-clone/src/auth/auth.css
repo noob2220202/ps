@@ -67,6 +67,22 @@
   background: #768afb;
   color: #fff;
 }
+/* 하나원큐: 흰 바탕(다크 #191a1c) + 하나 초록 */
+.login--hana {
+  background: #ffffff;
+  color: #25262a;
+}
+html[data-theme="dark"] .login--hana {
+  background: #191a1c;
+  color: #f0f0f2;
+}
+.login--hana .login__form input:focus {
+  border-color: #00a38e;
+}
+.login--hana .login__btn {
+  background: #00a38e;
+  color: #fff;
+}
 .login__btn:disabled {
   opacity: 0.45;
 }

@@ -54,7 +54,7 @@ function StatusBar() {
   const time = useClock();
   return (
     // 콕뱅크: 28px 상태바가 기기 52.5px 에서 끝나 반 픽셀에 어두운 이음새가 생김 → 같은 색 그림자 1px 로 덮음
-    <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background: bg, ...(APP === "nh" && { boxShadow: `0 1px 0 ${bg}` }) }}>
+    <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background: bg, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${bg}` }) }}>
       <span className="statusbar__time">{time}</span>
       {OS === "ios" ? <IosIcons /> : <AndroidIcons />}
     </div>
@@ -64,8 +64,8 @@ function StatusBar() {
 // overlay: 상태바까지 폰 전체를 덮는 것 (콕뱅크 로딩 막)
 export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay?: ReactNode }) {
   const { fg } = useStatusBarStyle();
-  // 콕뱅크(갤럭시): 실제 화면처럼 아래 15dp 검은 제스처바 + 회색 손잡이를 따로 둠
-  const navbar = APP === "nh" && OS === "android";
+  // 콕뱅크·하나원큐(갤럭시): 실제 화면처럼 아래 15dp 검은 제스처바 + 회색 손잡이를 따로 둠
+  const navbar = APP !== "kakao" && OS === "android";
   const recording = useRecorder().status === "recording";
   return (
     <div className={`phone phone--${OS}`}>

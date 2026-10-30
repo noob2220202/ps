@@ -28,7 +28,8 @@
   --safe-bottom: 0px; /* 홈 인디케이터 영역. 실제 아이폰에선 env()로 덮어씀 */
 }
 /* 콕뱅크(갤럭시): 실제 기기 384 × 853.33dp (상태바 28 + 앱 + 제스처바 15) */
-html[data-app="nh"]:not([data-os="ios"]) {
+html[data-app="nh"]:not([data-os="ios"]),
+html[data-app="hana"]:not([data-os="ios"]) {
   --frame-w: 384px;
   --frame-h: 853.33px;
 }

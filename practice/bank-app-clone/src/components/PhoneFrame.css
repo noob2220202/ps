@@ -225,7 +225,8 @@
 
 /* 콕뱅크(갤럭시 384dp): 상태바 28, 아래 제스처바 15 (검정 + 115×4.3 회색 손잡이) — 스크린샷 기기 픽셀 기준
    시계 잉크 y 15–35, x 52 px@720 / 밝은 글자 #f0f0f2 / 시트·로딩 막과 같이 85ms 동안 어두워짐 */
-html[data-app="nh"] .statusbar--android {
+html[data-app="nh"] .statusbar--android,
+html[data-app="hana"] .statusbar--android {
   height: 28px;
   padding-left: 26.7px;
   font-size: 14px;
@@ -235,10 +236,12 @@ html[data-app="nh"] .statusbar--android {
     box-shadow 85ms linear,
     color 85ms linear;
 }
-html[data-app="nh"] .statusbar--android > * {
+html[data-app="nh"] .statusbar--android > *,
+html[data-app="hana"] .statusbar--android > * {
   translate: 0 -1.07px;
 }
-html[data-app="nh"] .statusbar--android.statusbar--light {
+html[data-app="nh"] .statusbar--android.statusbar--light,
+html[data-app="hana"] .statusbar--android.statusbar--light {
   color: #f0f0f2;
 }
 /* 프레임 높이 853.33 이 CSS px 로 붙어 띠가 838 에서 시작 → 0.4 내려서 기기 1572px 부터 검정 */

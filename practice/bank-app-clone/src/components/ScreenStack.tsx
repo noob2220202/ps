@@ -18,8 +18,8 @@ type Render = (loc: Location) => ReactNode;
 
 const EDGE = 24; // 왼쪽 가장자리 몇 px 안에서 시작해야 스와이프로 인정할지
 const EASE = "cubic-bezier(.2,.8,.2,1)";
-// 콕뱅크(갤럭시) 녹화: 새 화면은 약 80ms 교차 페이드, 뒤로가기는 약 100ms 동안 나가는 화면이 흐려짐
-const NH_ANDROID = APP === "nh" && OS === "android";
+// 콕뱅크·하나원큐(갤럭시) 녹화: 새 화면은 약 80ms 교차 페이드, 뒤로가기는 약 100ms 동안 나가는 화면이 흐려짐
+const NH_ANDROID = APP !== "kakao" && OS === "android";
 const navMs = (anim: Anim | null) => (NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS]);
 
 // 화면 내용은 loc/active가 그대로면 다시 그리지 않는다.

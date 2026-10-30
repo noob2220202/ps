@@ -1,0 +1,348 @@
+/* 하나원큐 거래내역조회 · 거래내역상세 (라이트 스크린샷 720px ÷ 1.875 − 28) */
+.hana-history {
+  background: var(--hn-page);
+}
+html[data-theme="dark"] .hana-history {
+  --hn-page: #202125;
+}
+.hana-history .hana-header {
+  position: sticky;
+  top: 0;
+  background: var(--hn-page);
+}
+.hh-card {
+  position: relative;
+  margin: 18.9px 19.7px 0;
+  height: 239px;
+  border-radius: 12.8px;
+  background: var(--hn-card);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.hh-card > * {
+  position: absolute;
+  left: 20.8px;
+  right: 20.3px;
+  margin: 0;
+}
+.hh-card__name {
+  top: 25.3px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8.6px;
+  left: 21.3px !important;
+  font-size: 16.5px;
+}
+.hh-card__name img {
+  width: 21.3px;
+  height: 21.3px;
+}
+.hh-card__name button {
+  margin-left: auto;
+  margin-right: -3px;
+  display: flex;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+}
+.hh-card__no {
+  top: 50px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 19.5px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+.hh-card__bal {
+  top: 101px;
+  height: 30px;
+  text-align: right;
+  font-size: 23.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.hh-card__avail {
+  top: 129.8px;
+  height: 20px;
+  text-align: right;
+  font-size: 14.5px;
+  color: var(--hn-faint);
+  letter-spacing: 0;
+}
+.hh-card__btns {
+  top: 175px;
+  left: 19.8px !important;
+  right: 19.5px !important;
+  display: flex;
+  gap: 13.3px;
+}
+.hh-card__btns .hana-btn {
+  height: 40.5px;
+  font-size: 16.5px !important;
+  font-weight: 500;
+}
+.hh-card__spin {
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hh-filter {
+  height: 40px;
+  margin-top: 16px;
+  padding: 0 20.3px 0 19.9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hh-filter__opts {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  color: var(--hn-text2);
+}
+.hh-filter__opts i {
+  width: 1px;
+  height: 11px;
+  background: var(--hn-line);
+}
+.hh-range {
+  height: 38px;
+  padding: 0 20.3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15.5px;
+  color: var(--hn-sub);
+  letter-spacing: 0;
+}
+.hh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--hn-text2);
+  cursor: pointer;
+}
+.hh-toggle input {
+  display: none;
+}
+.hh-toggle i {
+  position: relative;
+  width: 38.9px;
+  height: 23.5px;
+  border-radius: 12px;
+  background: #c9ccd1;
+  transition: background-color 150ms;
+}
+.hh-toggle i::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 17.5px;
+  height: 17.5px;
+  border-radius: 50%;
+  background: #fff;
+  transition: translate 150ms;
+}
+.hh-toggle input:checked + i {
+  background: var(--hn-green);
+}
+.hh-toggle input:checked + i::after {
+  translate: 15.4px 0;
+}
+.hh-list {
+  margin-top: 10.7px;
+  min-height: 420px;
+  padding-bottom: 40px;
+  background: var(--hn-bg);
+}
+.hh-list__spin {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+.hh-empty {
+  margin: 0;
+  padding: 80px 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--hn-sub);
+}
+.hh-group h3 {
+  margin: 0 19.7px;
+  padding-top: 30.6px;
+  height: 65.6px;
+  border-bottom: 1px solid var(--hn-hair);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 23px;
+  letter-spacing: 0;
+}
+.hh-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 104.5px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+.hh-item > * {
+  position: absolute;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.hh-item__time {
+  left: 20.3px;
+  top: 22.6px;
+  font-size: 15px;
+  color: var(--hn-sub);
+  letter-spacing: 0;
+}
+.hh-item__name {
+  left: 20.3px;
+  top: 48.2px;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 17px;
+  font-weight: 600;
+}
+.hh-item__kind {
+  right: 19.7px;
+  top: 22.6px;
+  font-size: 15px;
+  color: var(--hn-sub);
+}
+.hh-item__amt {
+  right: 19.7px;
+  top: 49.3px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--hn-green-text);
+  letter-spacing: 0;
+}
+.hh-item__amt--out {
+  color: var(--hn-red);
+}
+.hh-item__bal {
+  right: 19.7px;
+  top: 75.4px;
+  font-size: 15px;
+  color: var(--hn-sub);
+  letter-spacing: 0;
+}
+
+/* ---------- 거래내역상세 ---------- */
+.hana-txd {
+  --htd-kakao: #191919;
+}
+html[data-theme="dark"] .hana-txd {
+  --htd-kakao: #f0f0f2;
+}
+.htd-body {
+  padding: 0 20.3px 40px;
+}
+.htd-name {
+  margin: 25.8px 0 0;
+  height: 30px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 30px;
+}
+.htd-rows {
+  margin: 25px 0 0;
+  padding: 23.2px 0 7.3px;
+  border-top: 1px solid var(--hn-hair);
+  border-bottom: 1px solid var(--hn-hair);
+}
+.htd-rows > div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 16.5px;
+  line-height: 24px;
+}
+.htd-rows dt {
+  color: var(--hn-sub);
+}
+.htd-rows dd {
+  margin: 0;
+  text-align: right;
+  letter-spacing: 0;
+}
+.htd-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 16.5px !important;
+}
+.htd-link--strong {
+  font-weight: 600;
+  margin-right: -4px;
+}
+.htd-memo {
+  width: 150px;
+  border: 0;
+  border-bottom: 1.5px solid var(--hn-green);
+  outline: none;
+  background: none;
+  color: var(--hn-text);
+  font: inherit;
+  text-align: right;
+}
+.htd-search {
+  display: flex;
+  margin: 22.6px -3px 0 auto;
+  color: var(--hn-sub) !important;
+}
+.htd-btns {
+  display: flex;
+  gap: 13.3px;
+  margin-top: 45px;
+}
+.htd-btns button {
+  flex: 1;
+  height: 47.5px;
+  padding: 0;
+  border: 1px solid var(--hn-line);
+  border-radius: 10px;
+  background: none;
+  font-size: 17px !important;
+}
+.htd-share {
+  display: flex;
+  justify-content: center;
+  gap: 33px;
+  margin-top: 47.5px;
+}
+.htd-share button {
+  width: 47px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14.5px !important;
+  color: var(--hn-sub) !important;
+  white-space: nowrap;
+}
+.htd-share span {
+  width: 47px;
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--hn-tile);
+}

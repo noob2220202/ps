@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { ApiError } from "../api/client";
-import { KakaoCircle } from "../components/art";
 import { Spinner } from "../components/Spinner";
 import { useStatusBar } from "../hooks/useStatusBar";
-import { NhAppIcon } from "../nh/common";
 import { THEME } from "../platform/theme";
-import { APP } from "../profile/session";
+import { APP, APP_NAME } from "../profile/session";
+import { AppIcon } from "../components/AppBrand";
 import { login } from "./auth";
 import "./auth.css";
 
 // 로그인 (폰 화면 안). 계정은 관리자가 만들어 줌 — 은행(서버)마다 따로
 export function LoginScreen({ message }: { message?: string }) {
-  useStatusBar(APP === "nh" ? "#18171c" : "var(--home-bg)", APP === "nh" || THEME === "dark" ? "light" : "dark");
+  useStatusBar(APP === "nh" ? "#18171c" : APP === "hana" ? (THEME === "dark" ? "#191a1c" : "#ffffff") : "var(--home-bg)", APP === "nh" || THEME === "dark" ? "light" : "dark");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -28,9 +27,9 @@ export function LoginScreen({ message }: { message?: string }) {
     }
   };
   return (
-    <div className={`screen login ${APP === "nh" ? "login--nh" : ""}`}>
-      <div className="login__brand">{APP === "nh" ? <NhAppIcon size={56} /> : <KakaoCircle size={56} />}</div>
-      <h1 className="login__title">{APP === "nh" ? "NH콕뱅크" : "카카오뱅크"} 클론 로그인</h1>
+    <div className={`screen login login--${APP}`}>
+      <div className="login__brand"><AppIcon size={56} /></div>
+      <h1 className="login__title">{APP_NAME[APP]} 클론 로그인</h1>
       <p className="login__desc">관리자에게 받은 아이디로 로그인해 주세요</p>
       <form
         className="login__form"

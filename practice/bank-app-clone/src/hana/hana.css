@@ -1,0 +1,288 @@
+/* 하나원큐: 라이트(기본) / 다크 (<html data-theme="dark">). 값은 실제 앱 녹화(480px)·스크린샷(720px)에서 스포이드로 뽑은 것.
+   기기 폭 384dp → 프레임 384px (1 CSS px = 1dp). 녹화 px × 0.8, 스크린샷 px ÷ 1.875 = CSS px */
+.hana {
+  --hn-bg: #ffffff;
+  --hn-page: #f1f2f4; /* 홈 아래쪽·거래내역 위쪽 회색 바탕 */
+  --hn-card: #ffffff;
+  --hn-text: #25262a;
+  --hn-text2: #43454b; /* 값·본문 */
+  --hn-sub: #6e7177; /* 회색 글자 (라벨, 날짜) */
+  --hn-faint: #a2a5ab; /* 자리표시 글자 */
+  --hn-line: #e4e5e8; /* 입력칸·버튼 테두리 */
+  --hn-hair: #efeff1; /* 목록 구분선 */
+  --hn-chip: #f2f2f4; /* 회색 칩·버튼 */
+  --hn-chip-text: #5c5f66;
+  --hn-tile: #f9fafc; /* 은행 타일 */
+  --hn-badge: #f5f6f8; /* 은행 로고 동그라미 */
+  --hn-green: #00a38e;
+  --hn-green-text: #00a38e;
+  --hn-mint: #e3f6f4; /* '가져오기'·'연결' 연한 초록 버튼 */
+  --hn-mint-text: #029e90;
+  --hn-check: #d7f1ee; /* 완료 체크 원 */
+  --hn-red: #e5323f;
+  --hn-blue: #1e6bf2;
+  --hn-disabled: #f2f2f4;
+  --hn-disabled-text: #c3c5ca;
+  --hn-key-press: #f2f2f4;
+  --hn-dim: rgba(0, 0, 0, 0.6);
+  --hn-sheet: #ffffff;
+  --hn-grabber: #a7a9ad;
+  --hn-skeleton: #eff0f2;
+  background: var(--hn-bg);
+  color: var(--hn-text);
+  font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  letter-spacing: -0.2px;
+}
+html[data-theme="dark"] .hana {
+  --hn-bg: #191a1c;
+  --hn-page: #202125;
+  --hn-card: #191a1c;
+  --hn-text: #f0f0f2;
+  --hn-text2: #dadbde;
+  --hn-sub: #9a9da3;
+  --hn-faint: #6b6e74;
+  --hn-line: #3a3b3f;
+  --hn-hair: #2a2b2f;
+  --hn-chip: #2c2e33;
+  --hn-chip-text: #c3c5ca;
+  --hn-tile: #222327;
+  --hn-badge: #1e1f22;
+  --hn-green: #00a38e;
+  --hn-green-text: #13b7a0;
+  --hn-mint: #2a3a38;
+  --hn-mint-text: #3cc8b4;
+  --hn-check: #3e5c58;
+  --hn-red: #f0505b;
+  --hn-blue: #5b95ff;
+  --hn-disabled: #2c2e33;
+  --hn-disabled-text: #5f6268;
+  --hn-key-press: #2c2e33;
+  --hn-dim: rgba(0, 0, 0, 0.7);
+  --hn-sheet: #191a1c;
+  --hn-grabber: #949599;
+  --hn-skeleton: #26272b;
+}
+.hana button {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+/* 갤럭시 제스처바: 하나원큐는 앱 바탕이 아래까지 (검은 띠가 아님) — 라이트 흰색 + 손잡이 #b0b0b0, 다크 #191a1c + #6c6d6f.
+   키보드가 떠 있으면 키보드 바탕색 */
+html[data-app="hana"] .phone__navbar {
+  background: #ffffff;
+}
+html[data-app="hana"] .phone__navbar i {
+  background: #b0b0b0;
+}
+html[data-app="hana"][data-theme="dark"] .phone__navbar {
+  background: #191a1c;
+}
+html[data-app="hana"][data-theme="dark"] .phone__navbar i {
+  background: #6c6d6f;
+}
+html[data-app="hana"][data-hana-kb] .phone__navbar {
+  background: #090909;
+}
+html[data-app="hana"][data-hana-kb] .phone__navbar i {
+  background: #5d5d5d;
+}
+html[data-app="hana"][data-hana-dim] .phone__navbar {
+  background: #666666;
+}
+html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
+  background: #080809;
+}
+
+
+/* ---------- 머리줄 ---------- */
+.hana-header {
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+  height: 51.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hn-bg);
+}
+.hana-header h1 {
+  margin: 0;
+  font-size: 17.5px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+.hana-header__back {
+  position: absolute;
+  left: 14.5px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  background: none;
+  border: 0;
+}
+.hana-header__right {
+  position: absolute;
+  right: 20px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.hana-header__text {
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: 14px !important;
+  color: var(--hn-text2) !important;
+}
+.hana-header__icon {
+  margin-right: -4px;
+  padding: 4px;
+  display: flex;
+  background: none;
+  border: 0;
+}
+
+/* ---------- 공통 ---------- */
+.hana-logo {
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.hana-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--hn-badge);
+  overflow: hidden;
+}
+.hana-limit {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 5px;
+  height: 19px;
+  line-height: 17px;
+  border: 1px solid var(--hn-blue);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--hn-blue);
+  letter-spacing: -0.4px;
+  vertical-align: 1px;
+}
+.hana-spinner {
+  animation: hana-spin 0.75s linear infinite;
+}
+@keyframes hana-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* 아래 큰 버튼: 높이 53.6, 반경 10, 좌우 20 (녹화 y 955–1022px@480) */
+.hana-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 53.6px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--hn-green);
+  color: #fff !important;
+  font-size: 16.5px !important;
+  font-weight: 600;
+}
+.hana-btn:disabled {
+  background: var(--hn-disabled);
+  color: var(--hn-disabled-text) !important;
+}
+.hana-btn--mint {
+  background: var(--hn-mint);
+  color: var(--hn-mint-text) !important;
+}
+.hana-bottom {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 13.6px;
+  display: flex;
+  gap: 13.6px;
+  z-index: 4;
+}
+
+/* 회색 칩 버튼 (추가이체, 추가메모 …) */
+.hana-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 14px;
+  height: 31px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--hn-chip);
+  color: var(--hn-chip-text) !important;
+  font-size: 14.5px !important;
+}
+
+.hana-skel {
+  display: block;
+  border-radius: 6px;
+  background: var(--hn-skeleton);
+}
+
+/* 알림창 */
+.hana .dialog__box,
+.hana-dialog .dialog__box {
+  background: var(--hn-sheet);
+  color: var(--hn-text);
+}
+
+/* ---------- 시작화면 ---------- */
+.hana-splash {
+  background: #000;
+  overflow: hidden;
+}
+/* 로고 상자 200 × 60 (녹화 250 × 75px), 가운데 y 202dp → 앱 영역 174 */
+.hana-splash__logo {
+  position: absolute;
+  left: 92px;
+  top: 144px;
+  width: 200px;
+  height: 60px;
+  transition: clip-path 320ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+.hana-splash__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hana-splash__logo span {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  color: #00917f;
+  text-align: center;
+  line-height: 60px;
+}
+.hana-splash__logo span b {
+  color: #e2231a;
+}
+/* '1Q'만 보이게: 로고 폭의 36.4% ~ 63.6% */
+.hana-splash__logo--mark {
+  clip-path: inset(0 36.4% 0 36.4%);
+  animation: hana-fade-in 120ms linear both;
+}
+.hana-splash__logo--open {
+  clip-path: inset(0 0 0 0);
+}
+@keyframes hana-fade-in {
+  from {
+    opacity: 0;
+  }
+}

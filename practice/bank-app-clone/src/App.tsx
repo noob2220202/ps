@@ -26,6 +26,12 @@ import { NhAccounts, NhRegister } from "./nh/NhAccounts";
 import { NhHistory } from "./nh/NhHistory";
 import { NhTxDetail } from "./nh/NhTxDetail";
 import "./nh/nh-light.css"; // 콕뱅크 라이트모드 (화면 CSS 뒤에)
+import { HanaSplash } from "./hana/HanaSplash";
+import { HanaHome } from "./hana/HanaHome";
+import { HanaSend } from "./hana/HanaSend";
+import { HanaDone } from "./hana/HanaDone";
+import { HanaHistory } from "./hana/HanaHistory";
+import { HanaTxDetail } from "./hana/HanaTxDetail";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
@@ -62,6 +68,18 @@ const renderNhRoute = (location: Location) => (
     <Route path="/tx/:txId" element={<NhTxDetail />} />
   </Routes>
 );
+
+// 하나원큐 (APP=hana 로 띄운 서버, 9105). 데이터도 따로
+const renderHanaRoute = (location: Location) => (
+  <Routes location={location}>
+    <Route path="/" element={<HanaHome />} />
+    <Route path="/send" element={<HanaSend />} />
+    <Route path="/send/done" element={<HanaDone />} />
+    <Route path="/history/:accountId" element={<HanaHistory />} />
+    <Route path="/tx/:txId" element={<HanaTxDetail />} />
+  </Routes>
+);
+const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute };
 
 // 개발 중 매번 스플래시 보기 귀찮으면 주소 뒤에 ?skip
 const skipSplash = new URLSearchParams(location.search).has("skip");
@@ -110,9 +128,11 @@ export default function App() {
         {auth.status === "out" && <LoginScreen message={auth.message} />}
         {auth.status === "in" && boot === "off" && <PhoneOff />}
         {auth.status === "in" && boot === "pick" && <ProfilePicker onEnter={toSplash} />}
-        {auth.status === "in" && boot === "splash" && (APP === "nh" ? <NhSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
+        {auth.status === "in" &&
+          boot === "splash" &&
+          (APP === "nh" ? <NhSplash onDone={toReady} /> : APP === "hana" ? <HanaSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
         {auth.status === "in" && boot === "loading" && <BootLoading onDone={toReady} />}
-        {auth.status === "in" && boot === "ready" && <ScreenStack render={APP === "nh" ? renderNhRoute : renderRoute} />}
+        {auth.status === "in" && boot === "ready" && <ScreenStack render={ROUTES[APP]} />}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />

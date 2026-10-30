@@ -16,6 +16,18 @@
   --home-card: #1f2630;
   --home-line: #353e4a;
 }
+/* 하나원큐 서버: 하나원큐 바탕색 (라이트 흰색 / 다크 #191a1c) */
+.picker--hana {
+  --home-bg: #ffffff;
+  --home-text: #25262a;
+}
+html[data-theme="dark"] .picker--hana {
+  --home-bg: #191a1c;
+  --home-text: #f0f0f2;
+  --home-btn: #2c2e33;
+  --home-card: #222327;
+  --home-line: #3a3b3f;
+}
 .picker__brand {
   margin-top: 13%;
 }

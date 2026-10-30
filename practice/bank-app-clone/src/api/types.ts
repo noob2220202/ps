@@ -63,6 +63,7 @@ export interface Transaction {
   amount: number; // 출금은 음수
   balanceAfter: number;
   tag: TxTag;
+  toBank?: { code: string; digits: number }; // 내가 보낸 이체면 받은 은행과 계좌번호 자리수
 }
 
 export interface TransactionDetail extends Transaction {
