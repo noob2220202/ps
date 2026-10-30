@@ -844,8 +844,9 @@ button.ibs-cf__row:active {
   color: #000;
 }
 .ibs-cf__mini {
-  margin-right: 6.4px;
-  vertical-align: -3.3px;
+  position: absolute;
+  right: calc(100% + 6.4px);
+  top: -9.04px;
 }
 /* 통장 이름 '보통예금(IBK W통장)': 400 13px #686b70, 오른쪽 끝 346.51, 기준선 343.0 */
 .ibs-cf__fromname {
