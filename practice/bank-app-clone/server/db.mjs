@@ -9,13 +9,13 @@ import { fileURLToPath } from "node:url";
 // 넷플릭스 프로필처럼 프로필마다 DB 파일이 따로 있다 → 계좌·거래·받는 분이 서로 섞이지 않음
 //   server/data/app.db             프로필 목록 (이름, 아바타, 갤럭시/아이폰·테마 설정)
 //   server/data/profiles/<id>.db   그 프로필의 은행 데이터
-// 서버 하나는 앱 하나만: 기본은 카카오뱅크, APP=nh (또는 --app nh) 면 NH 콕뱅크, APP=hana 면 하나원큐.
-// 콕뱅크·하나 서버는 데이터 폴더도 따로 (server/data-nh/, server/data-hana/ — 프로필 목록부터 전부 따로). 표 모양은 같아서 API는 같이 씀
+// 서버 하나는 앱 하나만: 기본은 카카오뱅크, APP=nh (또는 --app nh) 면 NH 콕뱅크, APP=hana 면 하나원큐, APP=ibk 면 IBK기업은행 i-ONE Bank.
+// 콕뱅크·하나·IBK 서버는 데이터 폴더도 따로 (server/data-nh/, data-hana/, data-ibk/ — 프로필 목록부터 전부 따로). 표 모양은 같아서 API는 같이 씀
 // (.gitignore 처리 — 내 데이터는 내 서버에만)
-export const APPS = ["kakao", "nh", "hana"];
+export const APPS = ["kakao", "nh", "hana", "ibk"];
 const appArg = process.argv.indexOf("--app");
 export const APP = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
-if (!APPS.includes(APP)) throw new Error(`APP은 kakao, nh, hana 중 하나 (지금: ${APP})`);
+if (!APPS.includes(APP)) throw new Error(`APP은 kakao, nh, hana, ibk 중 하나 (지금: ${APP})`);
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA = process.env.DATA_DIR ?? resolve(here, APP === "kakao" ? "data" : `data-${APP}`);
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });
@@ -361,11 +361,83 @@ export function seedHanaEmpty(d, userName) {
   transaction(() => hanaBase(d, userName, 0), d);
 }
 
+// ---------- IBK기업은행 i-ONE Bank 초기 데이터 (전부 가상) ----------
+// 홈 계좌 카드를 옆으로 넘기는 녹화라(계좌 3개) 예시도 입출금 계좌 3개. 번호는 기업은행 3-6-2-3 형식
+const IBK_ACCOUNTS = [
+  ["main", "main", "123-456789-01-011", "보통예금(IBK W통장)", 1, 2345670],
+  ["ibk-2", "external", "123-456789-02-022", "보통예금(IBK 급여통장)", 2, 752000],
+  ["ibk-3", "external", "123-456789-03-033", "IBK 평생한가족통장", 3, 320500],
+];
+const IBK_PAYEES = [
+  ["jeju", "18900000000011", "이서준", 0],
+  ["jeju", "18900000000022", "이서준", 0],
+  ["mg", "9003000000033", "김민지", 0],
+  ["kb", "98270000000044", "박하늘", 0],
+  ["shinhan", "110000000055", "정신한", 0],
+  ["jb", "1021000000066", "최예시", 0],
+  ["kakao", "3333000000099", "오카카", 0],
+  ["toss", "190000000077", "강토스", 0],
+  ["nh", "3520000000088", "윤농협", 0],
+  ["woori", "1002000000099", "서우리", 0],
+];
+// [시각, 은행, 번호, 이름, 금액] — '최근 이체' 목록·이체결과조회용 예전 이체
+const IBK_TRANSFERS = [
+  ["2026-10-02 12:10:00", "woori", "1002000000099", "서우리", 30000],
+  ["2026-10-05 09:30:00", "nh", "3520000000088", "윤농협", 12000],
+  ["2026-10-09 19:02:00", "toss", "190000000077", "강토스", 50000],
+  ["2026-10-12 08:15:00", "kakao", "3333000000099", "오카카", 8000],
+  ["2026-10-18 21:45:10", "jb", "1021000000066", "최예시", 20000],
+  ["2026-10-22 13:40:00", "shinhan", "110000000055", "정신한", 15000],
+  ["2026-10-25 18:06:14", "kb", "98270000000044", "박하늘", 100],
+  ["2026-10-27 10:21:33", "mg", "9003000000033", "김민지", 200000],
+  ["2026-10-29 20:43:05", "jeju", "18900000000022", "이서준", 300000],
+  ["2026-10-30 14:04:19", "jeju", "18900000000011", "이서준", 150000],
+];
+// 거래내역 예시: 이체로 받은 돈(파랑) · 1원 인증 입금 · 체크카드
+const IBK_TX = [
+  ["2026-10-01T09:00:00", "홍길동", 500000, "#이체"],
+  ["2026-10-03T13:27:06", "예시마트", -23800, "#체크카드"],
+  ["2026-10-14T11:00:00", "KPS0000", 1, "#이체"],
+  ["2026-10-20T18:21:01", "샘플카페", -4500, "#체크카드"],
+  ["2026-10-30T14:54:00", "이서준", 450000, "#이체"],
+  ["2026-10-30T14:55:30", "이서준", 400000, "#이체"],
+];
+
+const ibkBase = (d, userName, balances) => {
+  wipe(d);
+  d.prepare("INSERT INTO profile (id, user_name, card_last4) VALUES (1, ?, ?)").run(userName, "0000");
+  const acc = d.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, name, sort) VALUES (?, ?, 'ibk', ?, ?, ?, ?)");
+  IBK_ACCOUNTS.slice(0, balances.length).forEach(([id, kind, number, name, sort], i) => acc.run(id, kind, number, balances[i], name, sort));
+};
+
+export function seedIbkExample(d, userName = "홍길동") {
+  transaction(() => {
+    ibkBase(d, userName, IBK_ACCOUNTS.map((a) => a[5]));
+    const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
+    for (const row of IBK_TX) tx.run(...row);
+    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
+    for (const row of IBK_PAYEES) payee.run(...row);
+    const tr = d.prepare(
+      "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",
+    );
+    for (const [at, bank, number, holder, amount] of IBK_TRANSFERS) {
+      const iso = at.replace(" ", "T");
+      tr.run(bank, number, holder, amount, iso, tx.run(iso, holder, -amount, "#이체").lastInsertRowid);
+    }
+  }, d);
+}
+
+// 빈 상태: 보통예금(IBK W통장) 0원 하나만
+export function seedIbkEmpty(d, userName) {
+  transaction(() => ibkBase(d, userName, [0]), d);
+}
+
 // 앱별 "예시 데이터로 / 빈 상태로"
 export const SEEDS = {
   kakao: { example: (d) => seedExample(d), empty: seedEmpty },
   nh: { example: (d, name) => seedNhExample(d, name), empty: seedNhEmpty },
   hana: { example: (d, name) => seedHanaExample(d, name), empty: seedHanaEmpty },
+  ibk: { example: (d, name) => seedIbkExample(d, name), empty: seedIbkEmpty },
 };
 
 // ---------- 처음 켤 때 ----------

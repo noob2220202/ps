@@ -449,6 +449,14 @@
   --yellow-pressed: #5f73e6;
   color-scheme: dark;
 }
+/* i-ONE Bank: 이체 버튼 파랑 */
+.dev-panel--ibk {
+  --yellow: #4896eb;
+  --yellow-pressed: #2f7fd8;
+}
+.dev-panel--ibk .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
+  color: #fff;
+}
 /* 하나원큐: 하나 초록 버튼 */
 .dev-panel--hana {
   --yellow: #00a38e;

@@ -16,6 +16,15 @@
   --home-card: #1f2630;
   --home-line: #353e4a;
 }
+/* i-ONE Bank 서버: 라이트만 (흰 바탕) */
+.picker--ibk,
+html[data-theme="dark"] .picker--ibk {
+  --home-bg: #ffffff;
+  --home-text: #222222;
+  --home-btn: #f0f4f7;
+  --home-card: #f5f7fa;
+  --home-line: #e6e9ee;
+}
 /* 하나원큐 서버: 하나원큐 바탕색 (라이트 흰색 / 다크 #191a1c) */
 .picker--hana {
   --home-bg: #ffffff;

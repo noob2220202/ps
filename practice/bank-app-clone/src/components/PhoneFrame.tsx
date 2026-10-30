@@ -61,6 +61,28 @@ function StatusBar() {
   );
 }
 
+// i-ONE Bank 녹화 기기의 3버튼 내비게이션 바 (Ⅲ 최근 앱 · ▢ 홈 · < 뒤로, 흰 바탕 48dp). PC 에서 < 는 앱 안 뒤로가기
+function NavKeys() {
+  const back = () => {
+    if (((window.history.state as { idx?: number } | null)?.idx ?? 0) > 0) window.history.back();
+  };
+  return (
+    <div className="phone__navbar phone__navbar--keys">
+      <svg className="navkey navkey--recents" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+        <path d="M2.5 2.5v11M8 2.5v11M13.5 2.5v11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+      <svg className="navkey navkey--home" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+        <rect x="1.4" y="1.4" width="13.2" height="13.2" rx="5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      </svg>
+      <button className="navkey navkey--back" onClick={back} aria-label="뒤로">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+          <path d="m10.5 2.5-5.5 5.5 5.5 5.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 // overlay: 상태바까지 폰 전체를 덮는 것 (콕뱅크 로딩 막)
 export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay?: ReactNode }) {
   const { fg } = useStatusBarStyle();
@@ -77,7 +99,9 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
       )}
       <StatusBar />
       <div className="phone__viewport">{children}</div>
-      {navbar ? (
+      {navbar && APP === "ibk" ? (
+        <NavKeys />
+      ) : navbar ? (
         <div className="phone__navbar">
           <i />
         </div>

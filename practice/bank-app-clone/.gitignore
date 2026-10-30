@@ -33,3 +33,4 @@ server/data/
 server/data-nh/
 server/data-hana/
 __pycache__/
+server/data-ibk/

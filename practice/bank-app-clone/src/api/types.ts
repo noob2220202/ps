@@ -150,6 +150,21 @@ export interface TransferResult {
   balanceAfter: number;
 }
 
+// 이체 기록 한 건 (GET /api/transfers) — 보낸 계좌 번호, 받는 분, 통장 표시까지
+export interface TransferRecord {
+  id: string;
+  at: string;
+  fromAccountId: AccountId;
+  fromNumber: string;
+  bank: Bank;
+  number: string; // 숫자만
+  holder: string;
+  amount: number;
+  memoTo: string; // 받는 분 통장 표시 (없으면 내 이름)
+  memoMe: string; // 내 통장 표시 (없으면 받는 분 이름)
+  outTxId: string | null;
+}
+
 // ----- 요청 바디 -----
 export interface NewTransaction {
   merchant: string;

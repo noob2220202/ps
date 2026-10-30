@@ -30,7 +30,12 @@ const chosen = isTheme(param) ? param : param === "system" ? null : stored();
 // 개발자 패널에서 "시스템 / 라이트 / 다크" 중 지금 고른 값 표시용
 export const THEME_CHOICE: Theme | "system" = isTheme(chosen) ? chosen : "system";
 
-export const THEME: Theme = isTheme(chosen)
+// i-ONE Bank 는 녹화에 라이트 모드만 있어서 늘 라이트 (서버가 넣어 주는 앱 이름은 session.ts 와 같은 곳에서 읽음)
+const lightOnly = (window.__BANK_APP__ ?? import.meta.env.VITE_APP) === "ibk";
+
+export const THEME: Theme = lightOnly
+  ? "light"
+  : isTheme(chosen)
   ? chosen
   : matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"

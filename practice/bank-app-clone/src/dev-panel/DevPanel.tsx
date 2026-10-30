@@ -324,8 +324,13 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   const [openEdit, setOpenEdit] = useState(false);
 
   const external = account.kind === "external";
-  const own = APP !== "kakao"; // 콕뱅크·하나원큐: 계좌 이름·번호를 대표계좌까지 전부 바꿀 수 있음
-  const ownHint = APP === "hana" ? { name: "영하나플러스통장", number: "숫자 14자리", max: 16 } : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
+  const own = APP !== "kakao"; // 콕뱅크·하나원큐·i-ONE Bank: 계좌 이름·번호를 대표계좌까지 전부 바꿀 수 있음
+  const ownHint =
+    APP === "hana"
+      ? { name: "영하나플러스통장", number: "숫자 14자리", max: 16 }
+      : APP === "ibk"
+        ? { name: "보통예금(IBK W통장)", number: "숫자 14자리", max: 17 }
+        : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
@@ -518,18 +523,23 @@ function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
 }
 
 // 콕뱅크: 농협 계좌 추가 (은행 고르기 없음)
-// 콕뱅크·하나원큐: 그 은행 계좌만 추가 (이름 · 번호 · 시작 잔액)
+// 콕뱅크·하나원큐·i-ONE Bank: 그 은행 계좌만 추가 (이름 · 번호 · 시작 잔액)
+const OWN_BANK = {
+  nh: { code: "nh", name: "농협", placeholder: "저축예금", numberLabel: "농협 계좌번호 (농축협 14자리 / 농협은행 13자리)" },
+  hana: { code: "hana", name: "하나은행", placeholder: "입출금통장", numberLabel: "하나은행 계좌번호 (14자리)" },
+  ibk: { code: "ibk", name: "기업은행", placeholder: "보통예금", numberLabel: "기업은행 계좌번호 (14자리)" },
+};
 function AddOwnBankAccount({ run }: { run: Run }) {
-  const hana = APP === "hana";
+  const own = OWN_BANK[APP === "hana" || APP === "ibk" ? APP : "nh"];
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [balance, setBalance] = useState(0);
   return (
     <div className="add-bank">
       <Field label="계좌 이름">
-        <input value={name} maxLength={20} placeholder={hana ? "입출금통장" : "저축예금"} onChange={(e) => setName(e.target.value)} />
+        <input value={name} maxLength={20} placeholder={own.placeholder} onChange={(e) => setName(e.target.value)} />
       </Field>
-      <Field label={hana ? "하나은행 계좌번호 (14자리)" : "농협 계좌번호 (농축협 14자리 / 농협은행 13자리)"}>
+      <Field label={own.numberLabel}>
         <input value={number} inputMode="numeric" placeholder="숫자만" onChange={(e) => setNumber(e.target.value.replace(/\D/g, "").slice(0, 14))} />
       </Field>
       <Field label="시작 잔액">
@@ -538,7 +548,7 @@ function AddOwnBankAccount({ run }: { run: Run }) {
       <button
         className="btn"
         onClick={async () => {
-          if (await run(() => api.addBankAccount({ bankCode: hana ? "hana" : "nh", name: name.trim() || undefined, number, balance }), `${hana ? "하나은행" : "농협"} 계좌를 추가했어요`)) {
+          if (await run(() => api.addBankAccount({ bankCode: own.code, name: name.trim() || undefined, number, balance }), `${own.name} 계좌를 추가했어요`)) {
             setName("");
             setNumber("");
             setBalance(0);
@@ -616,7 +626,7 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
 }
 
 function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
-  const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" ? "hana" : "nh")) ?? banks[0]);
+  const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" || APP === "ibk" ? APP : "nh")) ?? banks[0]);
   const [number, setNumber] = useState("");
   const [holder, setHolder] = useState("");
   return (

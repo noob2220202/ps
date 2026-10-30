@@ -9,10 +9,12 @@
     "dev:web": "vite",
     "dev:nh": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app nh --port 8788\" \"vite --mode nh --port 5174\"",
     "dev:hana": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app hana --port 8789\" \"vite --mode hana --port 5175\"",
+    "dev:ibk": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app ibk --port 8790\" \"vite --mode ibk --port 5176\"",
     "build": "tsc -b && vite build",
     "start": "node --disable-warning=ExperimentalWarning server/index.mjs",
     "start:nh": "node --disable-warning=ExperimentalWarning server/index.mjs --app nh",
     "start:hana": "node --disable-warning=ExperimentalWarning server/index.mjs --app hana",
+    "start:ibk": "node --disable-warning=ExperimentalWarning server/index.mjs --app ibk",
     "lint": "oxlint"
   },
   "dependencies": {

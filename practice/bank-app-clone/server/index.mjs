@@ -380,6 +380,7 @@ app.post("/api/accounts", (req, res) => {
   else if (bank.code === "kakao") fields.bankCode = "카카오뱅크 통장은 이미 있어요";
   else if (APP === "nh" && bank.code !== "nh") fields.bankCode = "콕뱅크에는 농협 계좌만 추가할 수 있어요";
   else if (APP === "hana" && bank.code !== "hana") fields.bankCode = "하나원큐에는 하나은행 계좌만 추가할 수 있어요";
+  else if (APP === "ibk" && bank.code !== "ibk") fields.bankCode = "i-ONE Bank에는 기업은행 계좌만 추가할 수 있어요";
   const nameError = checkName(name);
   if (nameError) fields.name = nameError;
   const digits = digitsOf(number);
@@ -400,7 +401,7 @@ app.post("/api/accounts", (req, res) => {
     formatted,
     balance,
     sort,
-    name?.trim() || (APP === "nh" ? "저축예금" : APP === "hana" ? "입출금통장" : null),
+    name?.trim() || ({ nh: "저축예금", hana: "입출금통장", ibk: "보통예금" }[APP] ?? null),
   );
   res.status(201).json(toAccount(findAccount(id)));
 });
@@ -437,7 +438,7 @@ app.patch("/api/accounts/:id", (req, res) => {
 // 다른 은행 계좌 삭제 (거래내역도 ON DELETE CASCADE로 같이 지워짐)
 app.delete("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌" }[APP]}은 지울 수 없어요`);
+  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌", ibk: "대표계좌" }[APP]}은 지울 수 없어요`);
   db().prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
   res.status(204).end();
 });
@@ -629,6 +630,36 @@ const NH_DAILY_LIMIT = 1_000_000;
 const sentToday = (fromId) =>
   db().prepare("SELECT COALESCE(SUM(amount), 0) AS s FROM transfers WHERE from_account_id = ? AND at LIKE ?").get(fromId, `${nowIso().slice(0, 10)}%`).s;
 
+// 이체 기록 (IBK 이체결과조회 · 이체확인증): 최근 것부터. ?from=계좌id 면 그 계좌에서 보낸 것만
+const toTransfer = (t) => {
+  const from = db().prepare("SELECT number FROM accounts WHERE id = ?").get(t.from_account_id);
+  return {
+    id: String(t.id),
+    at: t.at,
+    fromAccountId: t.from_account_id,
+    fromNumber: from?.number ?? "",
+    bank: bankInfo(bankByCode(t.bank_code)),
+    number: t.number,
+    holder: t.holder,
+    amount: t.amount,
+    memoTo: t.memo_to ?? getProfile().userName,
+    memoMe: t.memo_me ?? t.holder,
+    outTxId: t.out_tx_id == null ? null : String(t.out_tx_id),
+  };
+};
+app.get("/api/transfers", (req, res) => {
+  const from = req.query.from ? String(req.query.from) : null;
+  const rows = from
+    ? db().prepare("SELECT * FROM transfers WHERE from_account_id = ? ORDER BY at DESC, id DESC").all(from)
+    : db().prepare("SELECT * FROM transfers ORDER BY at DESC, id DESC").all();
+  res.json(rows.map(toTransfer));
+});
+app.get("/api/transfers/:id", (req, res) => {
+  const t = db().prepare("SELECT * FROM transfers WHERE id = ?").get(req.params.id);
+  if (!t) throw new HttpError(404, "NOT_FOUND", "이체 기록이 없어요");
+  res.json(toTransfer(t));
+});
+
 app.post("/api/transfers", (req, res) => {
   const { fromAccountId, bankCode, number, amount, memoTo, memoMe } = req.body ?? {};
   const from = findAccount(fromAccountId);
@@ -703,7 +734,7 @@ const dist = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
 if (existsSync(dist)) {
   // 화면은 세 앱이 같은 빌드를 쓰고, 어느 앱인지는 index.html에 끼워 넣어 알려준다 (window.__BANK_APP__)
   const html = readFileSync(resolve(dist, "index.html"), "utf8")
-    .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐" }[APP]} 클론 연습</title>`)
+    .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank" }[APP]} 클론 연습</title>`)
     .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};</script></head>`);
   app.use(express.static(dist, { index: false })); // "/" 도 아래에서 (index.html을 그대로 주면 앱 정보가 빠짐)
   // /account/main 같은 주소로 바로 들어와도 index.html을 줘야 화면 쪽 라우터가 처리할 수 있다
@@ -711,5 +742,5 @@ if (existsSync(dist)) {
 }
 
 const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105 }[APP]));
+const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107 }[APP]));
 app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${APP}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));

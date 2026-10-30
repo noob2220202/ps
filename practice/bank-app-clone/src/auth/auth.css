@@ -83,6 +83,19 @@ html[data-theme="dark"] .login--hana {
   background: #00a38e;
   color: #fff;
 }
+/* i-ONE Bank: 흰 바탕 + 이체 버튼 파랑 (녹화 82d59fba, 라이트만) */
+.login--ibk,
+html[data-theme="dark"] .login--ibk {
+  background: #ffffff;
+  color: #222222;
+}
+.login--ibk .login__form input:focus {
+  border-color: #4896eb;
+}
+.login--ibk .login__btn {
+  background: #4896eb;
+  color: #fff;
+}
 .login__btn:disabled {
   opacity: 0.45;
 }

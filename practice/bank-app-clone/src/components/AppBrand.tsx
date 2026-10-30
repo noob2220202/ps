@@ -1,5 +1,6 @@
 import { KakaoCircle } from "./art";
 import { HanaAppIcon } from "../hana/common";
+import { IbkAppIcon } from "../ibk/common";
 import { NhAppIcon } from "../nh/common";
 import { APP } from "../profile/session";
 
@@ -7,5 +8,6 @@ import { APP } from "../profile/session";
 export function AppIcon({ size }: { size: number }) {
   if (APP === "nh") return <NhAppIcon size={size} />;
   if (APP === "hana") return <HanaAppIcon size={size} />;
+  if (APP === "ibk") return <IbkAppIcon size={size} />;
   return <KakaoCircle size={size} />;
 }

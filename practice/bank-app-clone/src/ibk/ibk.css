@@ -1,0 +1,8 @@
+/* i-ONE Bank 공용 (라이트만). 색은 녹화 82d59fba 에서 */
+.ibk {
+  --ib-bg: #ffffff;
+  --ib-text: #222222;
+  --ib-blue: #4896eb; /* 이체·다음 버튼 */
+  background: var(--ib-bg);
+  color: var(--ib-text);
+}

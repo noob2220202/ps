@@ -33,6 +33,11 @@ html[data-app="hana"]:not([data-os="ios"]) {
   --frame-w: 384px;
   --frame-h: 853.33px;
 }
+/* i-ONE Bank 녹화 기기(갤럭시, 1080×2340): 384 × 832dp = 상태바 28.44 + 앱 755.56 + 3버튼 내비게이션 바 48 */
+html[data-app="ibk"]:not([data-os="ios"]) {
+  --frame-w: 384px;
+  --frame-h: 832px;
+}
 
 /* ---------- 홈 테마 (실제 앱은 시스템 다크모드를 따름) ----------
    다크 = 화면 녹화에서, 라이트 = 스크린샷에서 스포이드로 뽑은 값 */
@@ -165,7 +170,8 @@ button {
   }
   .statusbar > *,
   .dynamic-island,
-  .phone__home-indicator {
+  .phone__home-indicator,
+  .phone__navbar--keys {
     display: none !important;
   }
 }

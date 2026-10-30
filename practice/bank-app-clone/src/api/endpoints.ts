@@ -23,6 +23,9 @@ export const paths = {
   payees: "/api/payees",
   profiles: "/api/profiles",
   recipients: (from: string) => `/api/transfer/recipients?from=${encodeURIComponent(from)}`,
+  // 이체 기록 (i-ONE Bank 이체결과조회 · 이체확인증)
+  transfers: (from?: string) => `/api/transfers${from ? `?from=${encodeURIComponent(from)}` : ""}`,
+  transferRecord: (id: string) => `/api/transfers/${encodeURIComponent(id)}`,
 };
 
 // 데이터를 바꾸는 요청들 (조회는 화면에서 useApi(paths.xxx)로)

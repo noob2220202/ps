@@ -33,6 +33,15 @@ import { HanaSend } from "./hana/HanaSend";
 import { HanaDone } from "./hana/HanaDone";
 import { HanaHistory } from "./hana/HanaHistory";
 import { HanaTxDetail } from "./hana/HanaTxDetail";
+import { IbkLoadingLayer } from "./ibk/common";
+import { IbkSplash } from "./ibk/IbkSplash";
+import { IbkHome } from "./ibk/IbkHome";
+import { IbkSend } from "./ibk/IbkSend";
+import { IbkDone } from "./ibk/IbkDone";
+import { IbkHistory } from "./ibk/IbkHistory";
+import { IbkMenu } from "./ibk/IbkMenu";
+import { IbkResults } from "./ibk/IbkResults";
+import { IbkCertificate } from "./ibk/IbkCertificate";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
@@ -80,7 +89,20 @@ const renderHanaRoute = (location: Location) => (
     <Route path="/tx/:txId" element={<HanaTxDetail />} />
   </Routes>
 );
-const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute };
+// IBK기업은행 i-ONE Bank (APP=ibk 로 띄운 서버, 9107). 데이터도 따로.
+// 거래 상세는 거래내역 화면 위 시트, 이체확인증은 이체결과조회에서 들어감
+const renderIbkRoute = (location: Location) => (
+  <Routes location={location}>
+    <Route path="/" element={<IbkHome />} />
+    <Route path="/send" element={<IbkSend />} />
+    <Route path="/send/done" element={<IbkDone />} />
+    <Route path="/history/:accountId" element={<IbkHistory />} />
+    <Route path="/menu" element={<IbkMenu />} />
+    <Route path="/results" element={<IbkResults />} />
+    <Route path="/results/:transferId" element={<IbkCertificate />} />
+  </Routes>
+);
+const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute, ibk: renderIbkRoute };
 
 // 개발 중 매번 스플래시 보기 귀찮으면 주소 뒤에 ?skip
 const skipSplash = new URLSearchParams(location.search).has("skip");
@@ -124,14 +146,22 @@ export default function App() {
 
   return (
     <StatusBarProvider>
-      <PhoneFrame overlay={APP === "nh" ? <NhLoadingLayer /> : APP === "hana" ? <HanaLoadingLayer /> : undefined}>
+      <PhoneFrame overlay={{ nh: <NhLoadingLayer />, hana: <HanaLoadingLayer />, ibk: <IbkLoadingLayer />, kakao: undefined }[APP]}>
         {auth.status === "checking" && <PhoneOff />}
         {auth.status === "out" && <LoginScreen message={auth.message} />}
         {auth.status === "in" && boot === "off" && <PhoneOff />}
         {auth.status === "in" && boot === "pick" && <ProfilePicker onEnter={toSplash} />}
         {auth.status === "in" &&
           boot === "splash" &&
-          (APP === "nh" ? <NhSplash onDone={toReady} /> : APP === "hana" ? <HanaSplash onDone={toReady} /> : <Splash onDone={toLoading} />)}
+          (APP === "nh" ? (
+            <NhSplash onDone={toReady} />
+          ) : APP === "hana" ? (
+            <HanaSplash onDone={toReady} />
+          ) : APP === "ibk" ? (
+            <IbkSplash onDone={toReady} />
+          ) : (
+            <Splash onDone={toLoading} />
+          ))}
         {auth.status === "in" && boot === "loading" && <BootLoading onDone={toReady} />}
         {auth.status === "in" && boot === "ready" && <ScreenStack render={ROUTES[APP]} />}
       </PhoneFrame>
