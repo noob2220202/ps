@@ -50,7 +50,7 @@ const TILES = [
   { label: "추가", x: 297.3, late: 2 },
 ];
 // 프로모 배너 5장 (spec 3-9, 녹화에 나온 순서): 바탕 · 제목 · 글자색 · 부제 · 오른쪽 그림.
-// 제목 한글은 배너 그림 글꼴이라 웹 Noto 보다 좁음(90%) — 1번(2026)만 95% (wide)
+// 제목 한글은 배너 그림 글꼴이라 웹 Noto 보다 좁음(90%) — 1번(2026)은 숫자 자간이 넓어 따로 (wide)
 const PROMOS = [
   { bg: "#141414", color: "#fff", title: "2026 더아트프라자", art: "ibk-promo-2026", wide: true },
   { bg: "#fa6e3c", color: "#fff", title: "계좌개설하고 주식받자!", sub: "IBK기업은행 x IBK투자증권", art: "ibk-promo-gift" },

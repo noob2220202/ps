@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { TransferRecord } from "../api/types";
-import { useApi } from "../api/useApi";
+import { prefetch, useApi } from "../api/useApi";
 import { Dialog } from "../components/Sheet";
 import { ibkBankName, ibkNumber, nf } from "./bank";
 import { IbkHeader, IbkHeaderIcon, IbkIcon } from "./common";
-import { useIbkSpinner } from "./loading";
+import { holdIbkSpinner, ibkSleep, useIbkSpinner } from "./loading";
 import { useIbkBack, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-menu.css";
@@ -24,6 +25,18 @@ const ROW_PITCH = 134.7;
 const BACK_MS = 500;
 // 행 누름 → 확인증 (77.367 손댐 → 77.467 바탕 완전 → 77.633 이동): 뗀 뒤 약 170ms
 const OPEN_DELAY = 170;
+const OPEN_WAIT = 600;
+// 새로 열 때(메뉴 항목 · 홈 바로가기, 뒤로 돌아올 땐 아님) 녹화 1-9 처럼 단계별로 나타남 — 이 화면이 붙은 순간(= 흰 화면 73.000) 기준 ms.
+// 녹화: 흰 화면 → #fafafa+점(go 의 blank) → 73.433 흰 화면 → 73.600 뼈대(선택 상자·띠·필터·글자 없는 기간 띠, 머리줄 없음)
+// → 점 73.933~74.433 → 74.467 머리줄 → 점 74.767~75.267 → 75.033 기간 글자 → 75.367 목록. 흰 화면 67ms 뒤의 기다림은 홈 뼈대처럼 0.6배
+const STAGES = ["white", "skeleton", "header", "period", "rows"] as const;
+type Stage = (typeof STAGES)[number];
+const STAGE_AT = { skeleton: 390, header: 910, period: 1250, rows: 1450 };
+const STAGE_SPIN: [number, number][] = [
+  [590, 810], // 점은 100ms 에 걸쳐 사라지니 머리줄·목록보다 100ms 먼저 놓음
+  [1090, 1350],
+];
+const seenKeys = new Set<string>(); // 이미 그린 방문 기록 칸 (돌아온 것이면 단계 없이 바로)
 
 // .ibk-bl 의 top: 녹화 기준선 base(반올림)에 글자가 놓이게. origin = 담는 상자 위의 녹화 y (ibk-menu.css 머리 주석)
 function blTop(base: number, fs: number, origin: number) {
@@ -43,10 +56,10 @@ const ymd = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.ge
 // 'YYYY-MM-DDTHH:mm:ss' → 'MM.DD HH:mm'
 const rowTime = (at: string) => `${at.slice(5, 7)}.${at.slice(8, 10)} ${at.slice(11, 16)}`;
 
-// 녹화: 오늘 10.30 기준 '1개월' = 2026.10.01 ~ 2026.10.30 (한 달 전 다음 날 ~ 오늘)
-function periodText(now = new Date()) {
-  const from = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate() + 1);
-  return `${ymd(from)} ~ ${ymd(now)}`;
+// 녹화: 오늘 10.30 기준 '1개월' = 2026.10.01 ~ 2026.10.30 (한 달 전 다음 날 ~ 오늘). 지난달에 그날이 없으면 지난달 말일 기준 (거래내역조회와 같음)
+function periodFrom(now: Date) {
+  const lastOfPrev = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+  return new Date(now.getFullYear(), now.getMonth() - 1, Math.min(now.getDate(), lastOfPrev) + 1);
 }
 
 // 은행 건물 (2-2): 녹화 잉크 46~74 × 126~153 → 클론 44.6~71.9. 진한 파랑 지붕(가운데 흰 점) · 띠 · 연한 기둥 4개 · 밑판.
@@ -66,33 +79,93 @@ function BankBuilding() {
   );
 }
 
+// 머리줄 < (IbkHeader onBack 과 같은 모양·자리). 아이폰 모드에서 ScreenStack 의 왼쪽 가장자리(24px) 스와이프가 누르는 순간 포인터를
+// 잡아 버려 < (x 0~48) 를 눌러도 뒤로 가지 않음 → 이 단추에서 시작한 누름은 스와이프로 넘기지 않음 (확인증도 씀)
+export function IbkBackButton({ onBack }: { onBack: () => void }) {
+  return (
+    <button className="ibk-header__back" onClick={onBack} onPointerDown={(e) => e.stopPropagation()} aria-label="뒤로">
+      <IbkIcon name="back" />
+    </button>
+  );
+}
+
 export function IbkResults() {
   useIbkStatusBar();
   const go = useIbkGo();
   const back = useIbkBack("/menu", BACK_MS);
   const list = useApi<TransferRecord[]>(paths.transfers());
-  useIbkSpinner(list.status === "loading");
+  // 새로 연 것인지: 한 번 그린 방문 기록 칸(location.key)으로 돌아온 것(확인증 < · 시스템 뒤로)이면 목록을 바로.
+  // (ScreenStack 이 <Routes location> 으로 그려서 useNavigationType 은 늘 POP 이라 못 씀.) 주소로 바로 연 첫 화면('default')도 바로
+  const { key } = useLocation();
+  const [stage, setStage] = useState<Stage>(() => (key === "default" || seenKeys.has(key) ? "rows" : "white"));
+  useEffect(() => {
+    seenKeys.add(key);
+  }, [key]);
+  const shown = (s: Stage) => STAGES.indexOf(stage) >= STAGES.indexOf(s);
+  useEffect(() => {
+    if (stage === "rows") return; // 단계 시간표는 붙을 때 한 번
+    const t = (Object.keys(STAGE_AT) as (keyof typeof STAGE_AT)[]).map((k) => window.setTimeout(() => setStage(k), STAGE_AT[k]));
+    const releases: (() => void)[] = [];
+    for (const [on, off] of STAGE_SPIN) {
+      let release: (() => void) | null = null;
+      releases.push(() => release?.());
+      t.push(
+        window.setTimeout(() => (release = holdIbkSpinner()), on),
+        window.setTimeout(() => release?.(), off),
+      );
+    }
+    return () => {
+      t.forEach((id) => window.clearTimeout(id));
+      releases.forEach((r) => r());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useIbkSpinner(stage === "rows" && list.status === "loading");
+  const [today] = useState(() => new Date());
+  const from = periodFrom(today);
   const [notice, setNotice] = useState<string | null>(null);
   const [held, setHeld] = useState<string | null>(null);
-  const timers = useRef<number[]>([]);
-  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
   const soon = () => setNotice(SOON);
 
-  const open = (id: string) => {
+  // 녹화: 확인증은 점 없이 내용이 다 그려진 채 밀려 들어옴 → 손을 대는 순간부터 받아 두고(서버 조회 지연 ≈250ms) 받으면 이동 (최대 OPEN_WAIT)
+  const pending = useRef<{ id: string; ready: Promise<unknown> } | null>(null);
+  const warm = (id: string) => {
+    const p = pending.current?.id === id ? pending.current : { id, ready: prefetch(paths.transferRecord(id)) };
+    pending.current = p;
+    return p.ready;
+  };
+  const open = async (id: string) => {
     if (held) return;
     setHeld(id);
-    timers.current.push(
-      window.setTimeout(() => go(`/results/${id}`, { anim: "body-right" }), OPEN_DELAY),
-      window.setTimeout(() => setHeld(null), OPEN_DELAY + 300), // 돌아왔을 때는 누름 바탕 없음 (83.67~)
-    );
+    const ready = warm(id);
+    await Promise.all([Promise.race([ready, ibkSleep(OPEN_WAIT)]), ibkSleep(OPEN_DELAY)]);
+    if (!alive.current) return;
+    go(`/results/${id}`, { anim: "body-right" });
   };
 
-  const rows = list.data ?? [];
+  // 기간 안의 이체만 (서버가 최신순으로 줌). 기간 글자와 같은 날짜 기준
+  const fromIso = `${from.getFullYear()}-${pad(from.getMonth() + 1)}-${pad(from.getDate())}`;
+  const rows = shown("rows") ? (list.data ?? []).filter((t) => t.at.slice(0, 10) >= fromIso) : [];
   return (
     <div className="ibk ibk-page ibr">
-      <IbkHeader title="이체결과조회" onBack={back} right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />} />
+      <IbkHeader
+        title="이체결과조회"
+        className={shown("header") ? "" : "ibr-header--late"}
+        left={<IbkBackButton onBack={back} />}
+        right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />}
+      />
       <div className="ibk-body">
-        <div className="ibr-content" style={{ height: ROW_TOP + Math.max(rows.length, 1) * ROW_PITCH }}>
+        <div
+          className={`ibr-content ${shown("skeleton") ? "" : "is-white"} ${shown("period") ? "" : "is-skeleton"}`}
+          style={{ height: ROW_TOP + Math.max(rows.length, 1) * ROW_PITCH }}
+        >
           <button className="ibr-acct" onClick={soon}>
             <BankBuilding />
             <span className="ibk-bl">전체계좌</span>
@@ -107,11 +180,13 @@ export function IbkResults() {
             <IbkIcon name="search" scale={1.37} sw={1.85} />
           </button>
           <div className="ibr-period">
-            <span className="ibk-bl">{periodText()}</span>
+            <span className="ibk-bl">
+              {ymd(from)} ~ {ymd(today)}
+            </span>
           </div>
 
-          {list.status === "done" && rows.length === 0 && <p className="ibr-empty">조회된 이체결과가 없어요.</p>}
-          {list.status === "error" && (
+          {shown("rows") && list.status === "done" && rows.length === 0 && <p className="ibr-empty">조회기간 내 이체내역이 없습니다.</p>}
+          {shown("rows") && list.status === "error" && (
             <button className="ibr-empty" onClick={list.retry}>
               이체결과를 불러오지 못했어요. 눌러서 다시 시도해 주세요.
             </button>
@@ -122,7 +197,7 @@ export function IbkResults() {
             const shareTop = Math.round(y0 + 84.3); // 단추 위를 화면 정수에 (그래야 아이콘 transform 이 정확)
             return (
               <div key={t.id} className="ibr-row" style={{ top: ROW_TOP + ROW_PITCH * k }}>
-                <button className={`ibr-row__main ${held === t.id ? "is-held" : ""}`} onClick={() => open(t.id)}>
+                <button className={`ibr-row__main ${held === t.id ? "is-held" : ""}`} onPointerDown={() => warm(t.id)} onClick={() => open(t.id)}>
                   <span className="ibk-bl ibr-row__time" style={at("time")}>
                     {rowTime(t.at)}
                   </span>

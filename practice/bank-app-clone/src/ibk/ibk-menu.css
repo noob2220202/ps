@@ -14,7 +14,7 @@
 }
 
 /* ====================== 전체메뉴 ====================== */
-/* 바탕 (1-1): 상태바부터 이어지는 세로 그라데이션 → 녹화 y 232 부터 흰색. 정지점은 녹화 가장자리 열 평균 (압축 띠무늬를 매끈하게)
+/* 바탕 (1-1): 상태바(단색 #dfecfc, IbkMenu STATUS_BG) 아래부터 세로 그라데이션 → 녹화 y 232 부터 흰색. 정지점은 녹화 가장자리 열 평균 (압축 띠무늬를 매끈하게)
    녹화 y 29.4 (224.7,237.2,251.5) · 40 #e2eefb · 80 #e7f3fe · 120 #ebf5fc · 160 #f3f8fd · 200 #f9fafd · 228 #fdfdfd · 232 #fff */
 .ibm .ibm-content {
   position: relative;
@@ -229,8 +229,16 @@
   letter-spacing: -0.5px;
   color: #4e5053;
 }
+/* 고른 칩: 바깥 상자(녹화 19.0~68.8 × 314.8~348.6) 안쪽 0.9 만 채움 — 녹화 화소 반값 경계 클론 19.1~65.9 × 315.7~347.7 (h 32.0, 안 고른 칩보다 1.8 낮음) */
 .ibm-chip.is-on {
   box-shadow: none;
+  background: transparent;
+}
+.ibm-chip.is-on::before {
+  content: "";
+  position: absolute;
+  inset: 0.9px;
+  border-radius: 16px;
   background: #2d3037;
 }
 .ibm-chip.is-on span {
@@ -366,7 +374,12 @@
 }
 .ibm-item:active::before,
 .ibm-item.is-held::before {
-  background: #f0f1f4;
+  background-color: #f0f1f4;
+}
+/* 뗀 뒤: 점이 뜨고 134ms 뒤 133ms 동안 옅어짐 (녹화 72.433 #f0f1f4 → #f4f5f8 → #f7f8fb → #fafafa → 72.567 흰색) */
+.ibm-item.is-held.is-fading::before {
+  background-color: rgba(240, 241, 244, 0);
+  transition: background-color 133ms linear;
 }
 .ibm-item span {
   left: 21.8px; /* top 은 항목마다 (IbkMenu blTop) */
@@ -379,6 +392,17 @@
 /* ====================== 이체결과조회 (본문 y = 녹화 y − 81.4) ====================== */
 .ibr-content {
   position: relative;
+}
+/* 새로 열 때 단계 (IbkResults STAGE_AT, 녹화 1-9): 흰 화면 → 뼈대(머리줄 없음, 기간 띠는 글자 없이 녹화 284.7~314.8 = 30.1) → 머리줄 → 기간 글자 → 목록 */
+.ibr-header--late,
+.ibr-content.is-white > * {
+  visibility: hidden;
+}
+.ibr-content.is-skeleton .ibr-period {
+  height: 30.1px;
+}
+.ibr-content.is-skeleton .ibr-period span {
+  visibility: hidden;
 }
 /* 계좌 선택 상자 (2-2): 녹화 x 22.7~371.0 → 클론 21.8~361.9, y 104.0~176.7, 1px #d4d4d4 r11 (가로 10.74) */
 .ibr-acct {
@@ -513,9 +537,13 @@
   bottom: 0;
   border-radius: 5.86px / 6px;
 }
+/* 누르면 100ms 에 걸쳐 진해짐 (녹화 77.400·77.433 반쯤(#fafafa) → 77.467 #f7f8fb) */
+.ibr-row__main::before {
+  transition: background-color 100ms linear;
+}
 .ibr-row__main:active::before,
 .ibr-row__main.is-held::before {
-  background: #f7f8fb;
+  background-color: #f7f8fb;
 }
 /* 행 글자 top 은 IbkResults ROW_TEXT (녹화 기준선) 로. 시각 11px 700 자간 +0.10 #6c6e73, pen 22.1, 기준선 +18.3 */
 .ibr-row__time {

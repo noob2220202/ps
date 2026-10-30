@@ -246,7 +246,15 @@ export function IbkSend() {
         memoTo: mTo,
         memoMe: mMe,
       };
+      // 단계마다 쌓아 둔 뒤로가기 칸(ibkBack = n)을 먼저 걷고 이체 화면 자리를 완료로 바꿈.
+      // 안 걷으면 기록이 [홈, 이체, 완료] 로 남아 완료·홈·거래내역에서 뒤로 하면 이체 화면이 다시 뜸
       leaving.current = true;
+      const n = (window.history.state as { ibkBack?: number } | null)?.ibkBack ?? 0;
+      if (n > 0)
+        await new Promise<void>((done) => {
+          window.addEventListener("popstate", () => done(), { once: true });
+          window.history.go(-n);
+        });
       navigate("/send/done", { replace: true, state });
       release();
     } catch (e) {
@@ -287,8 +295,9 @@ export function IbkSend() {
   useIbkBackHandler(
     stage !== "who",
     () => {
+      if (leaving.current) return; // 나가는 중(완료로 · 취소)에 걷어 낸 칸은 다시 쌓지 않음
       setPopSeq((n) => n + 1);
-      if (!leaving.current && !busy.current) stepBack();
+      if (!busy.current) stepBack();
     },
     popSeq,
   );

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useLocation } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { Profile } from "../api/types";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { Dialog } from "../components/Sheet";
+import { OS } from "../platform/platform";
 import { IbkHeader, IbkHeaderIcon, IbkIcon } from "./common";
+import { holdIbkSpinner, ibkSleep } from "./loading";
 import { useIbkGo, type IbkGoOptions } from "./nav";
-import { useIbkStatusBar } from "./theme";
+import { IBK_STATUS, useIbkStatusBar } from "./theme";
 import "./ibk-menu.css";
 
 // 전체메뉴 (녹화 70.47~72.0초 · 85.40~88.93초, spec: scratchpad/ibk/specB/menu.md 1절).
@@ -16,14 +19,23 @@ import "./ibk-menu.css";
 // 위치는 클론 좌표 (x = (녹화 x − 0.35) / 1.0242, 본문 y = 녹화 y − 29.4) — 값마다 ibk-menu.css 에 녹화 숫자
 
 const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
-// 메뉴 항목 → 화면: 녹화 1-9 (71.867 누름 → 점 433ms → 흰 화면 → 빈 바탕 + 점 → 이체결과조회)를 줄인 것
-const MENU_GO: IbkGoOptions = { spin: 430, white: 67, blank: 900 };
+// 메뉴 항목 → 화면 (녹화 1-9, 71.867 누름): 뗀 순간 점(72.300~72.567 보임, 바로 사라짐) · 누른 바탕은 점이 뜨고 ≈134ms 뒤 133ms 동안 옅어짐(72.433~72.567)
+// → (녹화엔 빈 메뉴 400ms 가 더 있으나 홈 '이체'(IBK_PAGE)처럼 기다림은 뺌) → 흰 화면 67ms(73.000~73.067) → #fafafa + 점 367ms(73.067~73.433)를 0.6배로 220ms
+// → 이체결과조회가 스스로 흰 화면 → 뼈대 → 머리줄 → 기간 → 목록 (IbkResults STAGE_AT)
+const PRESS = { fadeAt: 134, spin: 267, spinFade: 100 };
+const MENU_GO: IbkGoOptions = { white: 67, blank: 220 };
 // ✕ 누름 덮개가 켜졌다 꺼진 뒤 닫힘 (녹화 88.933 누름 → 89.000 진함 → 89.133~89.233 옅어짐 → 89.267 밀려 나감)
 const CLOSE_HOLD = 70;
 const CLOSE_FADE = 100;
 
-// 상태바(녹화 0~29.4)까지 이어지는 바탕: 녹화 y 0 #ddebfd → 29.4 에서의 색
-const STATUS_BG = "linear-gradient(180deg, #ddebfd, rgb(224.7, 237.2, 251.5))";
+// 상태바(녹화 0~29.4) 바탕: 녹화는 위 (221,235,253) → 아래 (225,237,250) 로 4단계 차이뿐이라 한 색(가운데)으로.
+// 그라데이션을 넘기면 PhoneFrame 의 이음새 그림자(0 1px 0 <bg>)가 검정 1px 줄이 됨 (녹화 y 29 에 검은 줄) → 단색
+const STATUS_BG = "#dfecfc";
+// 오른쪽에서 밀려 들어올 때(menu-in 100ms) 녹화는 판이 상태바도 덮으며 들어옴(70.367 은 왼쪽 75% 가 아직 #fafafa, 70.400 은 25%).
+// 상태바는 화면 밖(PhoneFrame)이라 한 번에 바뀜 → 판이 반쯤 들어온 50ms 에 바꿈
+const STATUS_LATE = 50;
+
+const seenKeys = new Set<string>(); // 이미 그린 방문 기록 칸
 
 // 바로가기 카드 (1-4): 그림(녹화에서 잘라 4배)의 왼쪽 위(클론 x, 녹화 y)·크기(dp), 글자 pen x, 글자 폭(누름 칸용) — 모두 화면 기준
 const CARD = { x: 18.5, y: 147 };
@@ -36,7 +48,7 @@ const SHORTCUTS = [
 
 // 분류 칩 (1-6): 바깥 x (클론), 글자 pen x. 고른 칩은 진회색 채움 (녹화: '최근')
 const CHIPS = [
-  { label: "최근", x: 18.1, w: 47.8, pen: 29.6 }, // 채움 녹화 화소로 다시 잼: 클론 18.1~65.9 × 녹화 314.6~348.6
+  { label: "최근", x: 18.2, w: 48.6, pen: 29.6 }, // 바깥(안 고른 칩 테두리 자리) 녹화 19.0~68.8. 고르면 안쪽 0.9 만 채움 (ibk-menu.css)
   { label: "조회", x: 72.6, w: 48.2, pen: 83.7 },
   { label: "이체/출금", x: 126.8, w: 79.3, pen: 137.9 },
   { label: "예적금", x: 211.7, w: 61.3, pen: 223.1 },
@@ -66,26 +78,56 @@ function Img({ name, className, style }: { name: string; className?: string; sty
 }
 
 export function IbkMenu() {
-  useIbkStatusBar(STATUS_BG);
+  // 새로 밀려 들어오는 중인지: menu-in 으로 연 방문 기록 칸을 처음 그릴 때만 (돌아온 칸은 한 번에 바뀜, 녹화 85.400).
+  // ScreenStack 이 <Routes location> 으로 그려 useNavigationType 은 늘 POP → 칸 key 로 가림
+  const location = useLocation();
+  const [sbLate, setSbLate] = useState(
+    () => OS === "android" && !seenKeys.has(location.key) && (location.state as { ibkAnim?: string } | null)?.ibkAnim === "menu-in",
+  );
+  useEffect(() => {
+    seenKeys.add(location.key);
+  }, [location.key]);
+  useEffect(() => {
+    if (!sbLate) return;
+    const t = window.setTimeout(() => setSbLate(false), STATUS_LATE);
+    return () => window.clearTimeout(t);
+  }, [sbLate]);
+  useIbkStatusBar(sbLate ? IBK_STATUS : STATUS_BG);
   const go = useIbkGo();
   const profile = useApi<Profile>(paths.profile);
   const name = profile.data?.userName ?? "";
   const [notice, setNotice] = useState<string | null>(null);
   const [chip, setChip] = useState<Chip>("최근");
-  const [held, setHeld] = useState<string | null>(null); // 누른 뒤 화면이 바뀔 때까지 바탕을 남겨 둘 항목
+  const [held, setHeld] = useState<{ label: string; fade: boolean } | null>(null); // 뗀 뒤 남겨 둘 누른 바탕 (fade = 옅어지는 중)
   const [closing, setClosing] = useState<"" | "hold" | "fade">("");
   const body = useRef<HTMLDivElement>(null);
   const inquiry = useRef<HTMLDivElement>(null);
   const transfer = useRef<HTMLDivElement>(null);
   const timers = useRef<number[]>([]);
-  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    const ts = timers.current;
+    return () => {
+      alive.current = false;
+      ts.forEach((t) => window.clearTimeout(t));
+    };
+  }, []);
   const soon = () => setNotice(SOON);
 
   const open = async (item: (typeof INQUIRY)[number]) => {
     if (!item.to) return soon();
-    setHeld(item.label);
+    if (held) return;
+    setHeld({ label: item.label, fade: false });
+    const release = holdIbkSpinner();
+    await ibkSleep(PRESS.fadeAt);
+    if (alive.current) setHeld({ label: item.label, fade: true });
+    await ibkSleep(PRESS.spin - PRESS.fadeAt);
+    release();
+    await ibkSleep(PRESS.spinFade);
+    if (!alive.current) return;
     await go(item.to, MENU_GO);
-    setHeld(null);
+    if (alive.current) setHeld(null);
   };
   // ✕ · ⌂ → 홈: 누름 덮개(✕ 만) → 메뉴가 오른쪽으로 밀려 나감
   const close = (withPress: boolean) => {
@@ -188,7 +230,7 @@ export function IbkMenu() {
           {INQUIRY.map((item, k) => (
             <button
               key={item.label}
-              className={`ibm-item ${held === item.label ? "is-held" : ""}`}
+              className={`ibm-item ${held?.label === item.label ? (held.fade ? "is-held is-fading" : "is-held") : ""}`}
               style={{ top: 454.4 + 44.9 * k }}
               onClick={() => open(item)}
             >

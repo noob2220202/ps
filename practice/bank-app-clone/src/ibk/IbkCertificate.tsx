@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { TransferRecord } from "../api/types";
@@ -8,6 +8,7 @@ import { Dialog } from "../components/Sheet";
 import { ibkBankName, ibkNumber, nf } from "./bank";
 import { IbkHeader, IbkHeaderIcon, IbkNotice } from "./common";
 import { useIbkSpinner } from "./loading";
+import { IbkBackButton } from "./IbkResults";
 import { useIbkBack, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-menu.css";
@@ -18,6 +19,7 @@ import "./ibk-menu.css";
 // 위치는 클론 좌표 (x = (녹화 x − 0.35) / 1.0242, 본문 y = 녹화 y − 81.4) — 값마다 ibk-menu.css 에 녹화 숫자
 
 const BACK_MS = 500; // < 를 뗀 뒤 이체결과조회까지 (82.867 뗌 → 83.367)
+const SPIN_AFTER = 300; // 기록을 못 받은 채 열렸을 때(주소로 바로 열기 등) 이만큼 지나야 점
 const MARK = "연습용 화면 · 실제 이체 아님";
 
 // 'YYYY-MM-DDTHH:mm:ss' → 'YYYY.MM.DD HH:mm:ss'
@@ -54,7 +56,14 @@ export function IbkCertificate() {
   const go = useIbkGo();
   const back = useIbkBack("/results", BACK_MS);
   const rec = useApi<TransferRecord>(paths.transferRecord(transferId));
-  useIbkSpinner(rec.status === "loading");
+  // 녹화엔 점이 없음(이체결과조회가 미리 받아 둠). 주소로 바로 열었을 때처럼 오래 걸릴 때만 점
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (rec.status !== "loading") return;
+    const t = window.setTimeout(() => setSlow(true), SPIN_AFTER);
+    return () => window.clearTimeout(t);
+  }, [rec.status]);
+  useIbkSpinner(rec.status === "loading" && slow);
   const [notice, setNotice] = useState<string | null>(null);
 
   if (rec.status === "error")
@@ -83,7 +92,7 @@ export function IbkCertificate() {
 
   return (
     <div className="ibk ibk-page ibc">
-      <IbkHeader title="이체결과조회" onBack={back} right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />} />
+      <IbkHeader title="이체결과조회" left={<IbkBackButton onBack={back} />} right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />} />
       <div className="ibk-body">
         {t && (
           <div className="ibc-content">
