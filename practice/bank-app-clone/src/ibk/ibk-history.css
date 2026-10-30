@@ -4,6 +4,13 @@
    글자 크기·굵기는 spec 값에서 시작해 클론 좌표로 줄인 녹화 평균 프레임(historyB-verify LIST0·WD·DEP)과 겹쳐 다시 맞춘 값
    (spec 은 늘어난 녹화 좌표에서 맞춰서 숫자·영문이 ≈2.4% 크게 나옴 → 대개 spec ÷ 1.0242). 위치는 겹쳐 본 잉크 무게중심 ±0.5 안 */
 
+/* 자간을 안 적은 글자는 −0.2 (앱 body 값을 물려받던 그대로 — 공용 .ibk 는 0). 시트는 화면 밖 층에 그려져서 따로:
+   WD·DEP 평균과 겹쳐 시트 글자 좌우 끝 차 평균 0.57·0.62 (자간 0 이면 1.37·1.50) */
+.ibt,
+.ibt-sheet {
+  letter-spacing: -0.2px;
+}
+
 .ibt .ibk-body {
   background: #fff;
   overscroll-behavior: none; /* 녹화 65.37~65.80 맨 위까지 끌어내려도 늘어남·글로우·바운스 없음 */
@@ -193,11 +200,17 @@ span.ibt-acct__logo:not(.ibk-logo) {
 .ibt-filter {
   left: 22.36px;
   top: 312.45px;
+  width: 124px; /* 글자 + ∨ 끝(112.48 + 10.5). 안의 글자·∨ 는 왼쪽 위 기준이라 폭은 누름 칸만 바꿈 (예전 폭 0 → 글자 13px 만 눌림) */
   height: 13px;
   color: #65676b;
   font-size: 12.7px;
   font-weight: 500;
   letter-spacing: -0.1px;
+}
+.ibt-filter::before {
+  content: ""; /* 누름 칸 위아래 10 · 좌우 6 더 (위 회색 띠 아래끝 287.3 · 아래 기간 띠 347.1 과 안 겹침) */
+  position: absolute;
+  inset: -10px -6px;
 }
 .ibt-filter > span {
   position: absolute;

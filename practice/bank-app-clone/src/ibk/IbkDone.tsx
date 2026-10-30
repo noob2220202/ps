@@ -6,7 +6,8 @@ import { Dialog } from "../components/Sheet";
 import { ibkBankName, ibkNumber, nf } from "./bank";
 import { IbkBankLogo, IbkCheckCircle, IbkHeader, IbkHeaderText, IbkIcon } from "./common";
 import type { IbkDoneState } from "./IbkSend";
-import { IBK_PAGE, useIbkGo } from "./nav";
+import { ibkNextPaint, setIbkCover } from "./loading";
+import { IBK_PAGE, ibkToFirst, useIbkBackHandler, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-done.css";
 
@@ -35,6 +36,7 @@ function DoneView({ result, from, memoTo, memoMe }: IbkDoneState) {
   const [open, setOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const leave = useRef<number | null>(null);
+  const going = useRef(false); // 확인 · 거래내역조회를 눌러 떠나는 중 (그동안 안내창을 띄우면 그 뒤로가기 칸이 기록에 남았음 — V3 race done·donehist)
   useEffect(() => {
     const t = window.setTimeout(() => setArrived(true), ARRIVE_MS);
     return () => {
@@ -45,30 +47,48 @@ function DoneView({ result, from, memoTo, memoMe }: IbkDoneState) {
 
   const fromNo = ibkNumber(from.bank, from.number);
   const toNo = ibkNumber(to.bank, to.number);
-  const soon = () => setNotice("연습용 앱에서는 준비 중인 메뉴예요.");
+  const say = (m: string) => !going.current && setNotice(m);
+  const soon = () => say("연습용 앱에서는 준비 중인 메뉴예요.");
+  // 안드로이드 뒤로(3버튼 바 <)는 안내창부터 닫음 (아이폰은 칸이 있는 동안 가장자리 끌기가 안 됨 — ScreenStack)
+  useIbkBackHandler(!!notice, () => setNotice(null));
   const copy = (bank: Pick<Bank, "code" | "short">, number: string) => {
+    if (going.current) return;
     navigator.clipboard?.writeText(`${ibkBankName(bank)} ${number}`).catch(() => undefined);
-    setNotice("계좌번호를 복사했어요.");
+    say("계좌번호를 복사했어요.");
   };
   // ☆: 받는 분(등록된 계좌)의 즐겨찾기를 켜고 끔 — 하나 HanaDone 과 같은 규칙. 내 계좌는 받는 분으로 등록할 수 없음 (서버 규칙)
   const toggleStar = () => {
+    if (going.current) return;
     setTip(false);
-    if (to.accountId) return setNotice("내 계좌는 즐겨찾기에 추가할 수 없어요.");
+    if (to.accountId) return say("내 계좌는 즐겨찾기에 추가할 수 없어요.");
     if (!to.payeeId) return;
     const next = !star;
     setStar(next);
     api.updatePayee(to.payeeId, { favorite: next }).catch(() => {
       setStar(!next);
-      setNotice("즐겨찾기를 바꾸지 못했어요.");
+      say("즐겨찾기를 바꾸지 못했어요.");
     });
   };
-  // 확인 → 홈 (홈이 흰 1프레임 → 껍데기 → 뼈대 로딩부터: home 6-5 — IbkHome 의 ibkHome: "skeleton"). 이체가 끝났으니 완료 화면은 기록에서 지움
+  // 확인 → 홈 (홈이 흰 1프레임 → 껍데기 → 뼈대 로딩부터: home 6-5 — IbkHome 의 ibkHome: "skeleton"). 이체가 끝났으니 완료 화면은 기록에서 지움.
+  // 기록 첫 칸(홈)까지 걷고 그 칸을 뼈대 홈으로 바꿈 (지금 칸만 바꾸면 기록이 [홈, 홈] — V2 s1). 걷는 동안 돌아온 홈(껍데기)이 비치지 않게 흰 덮개
+  // (뼈대 홈도 흰 1프레임부터라 그만큼 이어짐)
   const toHome = () => {
-    if (leave.current) return;
-    leave.current = window.setTimeout(() => go("/", { replace: true, state: { ibkHome: "skeleton" } }), HOME_DELAY);
+    if (going.current) return;
+    going.current = true;
+    leave.current = window.setTimeout(async () => {
+      setIbkCover("#ffffff");
+      await ibkToFirst();
+      go("/", { replace: true, state: { ibkHome: "skeleton" } });
+      await ibkNextPaint();
+      setIbkCover(null);
+    }, HOME_DELAY);
   };
   // 거래내역조회 → 출금 계좌 거래내역 (녹화에 없음: 홈 카드 → 거래내역과 같은 이동)
-  const toHistory = () => go(`/history/${from.id}`, { ...IBK_PAGE, replace: true });
+  const toHistory = () => {
+    if (going.current) return;
+    going.current = true;
+    go(`/history/${from.id}`, { ...IBK_PAGE, replace: true });
+  };
 
   const details: [string, string][] = [
     ["내 통장 표기", memoMe],

@@ -6,6 +6,7 @@
   inset: 0;
   overflow: hidden;
   background: var(--ib-mint); /* #eff4f3 (3-1) */
+  letter-spacing: -0.2px; /* 자간을 안 적은 글자('원' 등)는 −0.2 로 맞춰 둠 (공용 .ibk 는 0 — 홈은 0 이어도 녹화와 차이 같음) */
 }
 /* 빈 껍데기 (6-2): 바탕 #fafafa + 탭바만. 완료 → 홈 첫 1프레임은 흰색 (6-5, 145.700) */
 .ibh--shell {
@@ -624,20 +625,6 @@
 }
 .ibh--late .ibh-banner__art {
   animation: ibh-late 600ms;
-}
-
-/* ---------- 아이폰 (녹화에 없음): 탭바를 홈 인디케이터(안전영역) 위로 올리고 그 밑은 흰색 ---------- */
-html[data-os="ios"] .ibh > .ibk-tabbar {
-  bottom: var(--safe-bottom);
-}
-html[data-os="ios"] .ibh > .ibk-tabbar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: var(--safe-bottom);
-  background: #fff;
 }
 
 /* ---------- 가운데 톡톡송금 로티 (6-4): 800ms, 145.700 = 0 ---------- */

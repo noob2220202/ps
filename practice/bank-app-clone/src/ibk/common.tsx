@@ -163,22 +163,24 @@ const ICONS = {
       </>
     ),
   },
-  // 상담 헤드셋 (홈 머리줄, 중심 클론 317.1): 머리띠 호 + 양쪽 귀 패드 + 눈 2점·웃는 입 + 오른쪽에서 내려온 마이크, 1.6
+  // 상담 헤드셋 (홈 머리줄, 중심 클론 317.1): 머리띠 호 + 양쪽 귀 패드 + 눈 2점·웃는 입 + 오른쪽에서 내려온 마이크, 1.4
+  // (녹화 homeM 잉크 305.8~328.4 × 45.2~65.9 — 선 1.6 이면 잉크 양 1.15배·마이크 끝 0.8 높음·양옆 0.6 넓었음 → 선 1.4, 마이크 끝 0.8 내림,
+  //  귀 패드 바깥 변 0.6 안으로. 상자 w·h 는 그대로 두어 가운데 맞춤이 안 바뀜, 마이크 점은 상자 밖으로 0.8 나감)
   headset: {
     w: 22.26,
     h: 19.4,
-    sw: 1.6,
+    sw: 1.4,
     cap: "round",
     join: "round",
     draw: (
       <>
-        <path d="M4.3 13V7.25a7.08 7.25 0 0 1 14.15 0v6.05q0 4.6-4.1 4.7" />
-        <rect y="6.2" width="4.3" height="6.8" rx="1.6" />
-        <rect x="18.45" y="6.2" width="3.81" height="6.8" rx="1.6" />
+        <path d="M4.3 13V7.25a7.08 7.25 0 0 1 14.15 0v6.05q0 5.4-4.1 5.5" />
+        <rect x="0.6" y="6.2" width="3.7" height="6.8" rx="1.6" />
+        <rect x="18.45" y="6.2" width="3.21" height="6.8" rx="1.6" />
         <path d="M8.79 10.6q2.54 2 5.08 0" />
         <circle cx="8.79" cy="6.4" r="0.85" fill="currentColor" stroke="none" />
         <circle cx="13.67" cy="6.4" r="0.85" fill="currentColor" stroke="none" />
-        <circle cx="12.6" cy="17.8" r="1.6" fill="currentColor" stroke="none" />
+        <circle cx="12.6" cy="18.6" r="1.6" fill="currentColor" stroke="none" />
       </>
     ),
   },
@@ -625,7 +627,9 @@ export function IbkTabBar({ onTab, className = "", center }: { onTab?: (label: s
   );
 }
 
-// 가운데 톡톡송금 버튼 (정지 모습): 파란 원 + 흰 말풍선(왼쪽 아래 꼬리) 안 파란 ₩ + 말풍선 왼쪽 흰 속도선 2개
+// 가운데 톡톡송금 버튼 (정지 모습): 파란 원 + 흰 말풍선(왼쪽 아래 꼬리) 안 파란 ₩ + 말풍선 왼쪽 흰 속도선 2개.
+// 홈 TalkButton(IbkHome.tsx, 로티 끝 모습)과 같은 값 — 홈 담당이 녹화 평균 프레임에서 다시 잼 (클론 좌표):
+// 말풍선 원 가운데 (193.03, 744.63) r9.3, 꼬리 끝 (181.6, 751.0), 속도선 가운데 y 748.4 (x 178.7~183.2) · 754.0 (x 180.4~184.8)
 export function IbkTalkButton() {
   return (
     <svg className="ibk-tabbar__talk" width="44.5" height="44.5" viewBox="0 0 44.5 44.5" aria-hidden>
@@ -636,10 +640,10 @@ export function IbkTalkButton() {
         </linearGradient>
       </defs>
       <circle cx="22.25" cy="22.25" r="22.25" fill="url(#ibk-talk-g)" />
-      <circle cx="23.2" cy="21.9" r="9.9" fill="#fff" />
-      <path d="M15 25.5 12.6 30.6l6.3-2.2Z" fill="#fff" />
-      <path d="M8.4 25.4h4.4M9.3 29h3.9" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M18.4 19.4l1.75 5.6 2.5-5.1 2.5 5.1 1.75-5.6M17.6 21.3h11.2" fill="none" stroke="#2b72d6" strokeWidth="1.3" strokeLinejoin="round" />
+      <circle cx="23.28" cy="22.28" r="9.3" fill="#fff" />
+      <path d="M14.45 18.65Q10.2 22.15 15 26.6L11.75 29.4 18.5 30.5Z" fill="#fff" />
+      <path d="M9.6 26.5h3.2M11.15 32.15h3" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M18.48 19.78l1.75 5.6 2.5-5.1 2.5 5.1 1.75-5.6M18.2 22.98h9.6" fill="none" stroke="#2b72d6" strokeWidth="1.3" strokeLinejoin="round" />
     </svg>
   );
 }

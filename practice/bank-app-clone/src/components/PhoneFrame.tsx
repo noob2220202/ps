@@ -84,12 +84,23 @@ function IbkIcons() {
   );
 }
 
+// 이음새 그림자 색: 바탕이 그라데이션이면 마지막 색(위→아래 그라데이션의 아래끝). 그대로 넣으면 box-shadow 값이 틀려 통째로
+// 무시되고, 반 픽셀 이음새로 폰 바탕(검정)이 비쳐 상태바 아래 어두운 1px 줄이 생김 (IBK 전체메뉴: 안드로이드 y 29, iOS y 54)
+function seamColor(bg: string) {
+  if (!bg.includes("gradient(")) return bg;
+  const args = bg.slice(bg.indexOf("(") + 1, bg.lastIndexOf(")")).split(/,(?![^(]*\))/); // 괄호 밖 쉼표로만 나눔
+  return args[args.length - 1].trim().replace(/(\s+-?[\d.]+(%|px)?)+$/, ""); // 정지점 위치 떼기
+}
+
 function StatusBar() {
   const { bg, fg } = useStatusBarStyle();
   const time = useClock();
+  const seam = seamColor(bg);
+  // 그라데이션 밑 바탕색도 그 색으로: 아이폰은 바탕색이 200ms 전환이라, 비워 두면(투명) 단색 화면으로 돌아갈 때 검정에서 밝아짐
+  const background = seam === bg ? bg : `${bg} ${seam}`;
   return (
     // 콕뱅크: 28px 상태바가 기기 52.5px 에서 끝나 반 픽셀에 어두운 이음새가 생김 → 같은 색 그림자 1px 로 덮음
-    <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background: bg, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${bg}` }) }}>
+    <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${seam}` }) }}>
       <span className="statusbar__time">{time}</span>
       {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : <AndroidIcons />}
     </div>

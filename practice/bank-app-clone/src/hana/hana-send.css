@@ -30,6 +30,7 @@ html[data-theme="dark"] .hana-send {
   bottom: 0;
   padding: 0 20px;
   overflow-y: auto;
+  overflow-x: hidden; /* y 만 auto 면 x 도 auto → 가로 스크롤 상자가 되어 아이폰 터치 가장자리 끌기(뒤로)가 pointercancel 로 끊김 */
   scrollbar-width: none;
 }
 .hs-body > * {

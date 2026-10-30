@@ -7,7 +7,7 @@ import { Dialog } from "../components/Sheet";
 import { ibkBankName, ibkNumber, nf } from "./bank";
 import { IbkHeader, IbkHeaderIcon, IbkIcon } from "./common";
 import { holdIbkSpinner, ibkSleep, useIbkSpinner } from "./loading";
-import { useIbkBack, useIbkGo } from "./nav";
+import { useIbkBack, useIbkBackHandler, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-menu.css";
 
@@ -79,16 +79,6 @@ function BankBuilding() {
   );
 }
 
-// 머리줄 < (IbkHeader onBack 과 같은 모양·자리). 아이폰 모드에서 ScreenStack 의 왼쪽 가장자리(24px) 스와이프가 누르는 순간 포인터를
-// 잡아 버려 < (x 0~48) 를 눌러도 뒤로 가지 않음 → 이 단추에서 시작한 누름은 스와이프로 넘기지 않음 (확인증도 씀)
-export function IbkBackButton({ onBack }: { onBack: () => void }) {
-  return (
-    <button className="ibk-header__back" onClick={onBack} onPointerDown={(e) => e.stopPropagation()} aria-label="뒤로">
-      <IbkIcon name="back" />
-    </button>
-  );
-}
-
 export function IbkResults() {
   useIbkStatusBar();
   const go = useIbkGo();
@@ -132,7 +122,18 @@ export function IbkResults() {
       alive.current = false;
     };
   }, []);
-  const soon = () => setNotice(SOON);
+  // 떠나는 중(행을 눌러 확인증으로 가기 전 · ← 를 뗀 뒤 BACK_MS)엔 안내창을 띄우지 않음. 띄우면 그 뒤로가기 칸이 기록에 남거나
+  // 늦게 실행된 ← 의 navigate(-1) 이 그 칸만 빼서 화면이 그대로였음 (V3 race resopen · resback)
+  const leaving = useRef(false);
+  const say = (m: string) => !held && !leaving.current && setNotice(m);
+  const soon = () => say(SOON);
+  const onBack = () => {
+    if (held) return;
+    leaving.current = true;
+    back();
+  };
+  // 안드로이드 뒤로(3버튼 바 <)는 안내창부터 닫음 (아이폰은 칸이 있는 동안 가장자리 끌기가 안 됨 — ScreenStack)
+  useIbkBackHandler(!!notice, () => setNotice(null));
 
   // 녹화: 확인증은 점 없이 내용이 다 그려진 채 밀려 들어옴 → 손을 대는 순간부터 받아 두고(서버 조회 지연 ≈250ms) 받으면 이동 (최대 OPEN_WAIT)
   const pending = useRef<{ id: string; ready: Promise<unknown> } | null>(null);
@@ -142,7 +143,7 @@ export function IbkResults() {
     return p.ready;
   };
   const open = async (id: string) => {
-    if (held) return;
+    if (held || leaving.current) return;
     setHeld(id);
     const ready = warm(id);
     await Promise.all([Promise.race([ready, ibkSleep(OPEN_WAIT)]), ibkSleep(OPEN_DELAY)]);
@@ -158,7 +159,7 @@ export function IbkResults() {
       <IbkHeader
         title="이체결과조회"
         className={shown("header") ? "" : "ibr-header--late"}
-        left={<IbkBackButton onBack={back} />}
+        onBack={onBack}
         right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />}
       />
       <div className="ibk-body">
@@ -215,7 +216,7 @@ export function IbkResults() {
                     <small>{ibkBankName(t.bank)}</small> {ibkNumber(t.bank, t.number)}
                   </span>
                 </button>
-                <button className="ibr-row__share" style={{ top: shareTop - y0 }} onClick={() => setNotice(NO_SHARE)} aria-label="공유">
+                <button className="ibr-row__share" style={{ top: shareTop - y0 }} onClick={() => say(NO_SHARE)} aria-label="공유">
                   <IbkIcon
                     name="share"
                     w={SHARE.w}

@@ -28,6 +28,9 @@
   background: var(--ib-bg);
   color: var(--ib-text);
   font-family: Roboto, "Noto Sans KR", sans-serif;
+  /* 앱 전체(body)의 자간 −0.2px 이 물려 내려오지 않게 끊음 (안드로이드 글자 기본 0). 글자마다 자간을 적지 않은 곳이 −0.2 로 녹화와 맞춰 둔
+     화면(홈·이체·완료·거래내역·시트·안내 화면)은 그 화면 CSS 에서 −0.2 를 다시 적음 — 녹화와 겹쳐 0 이 더 맞은 곳은 없었음 */
+  letter-spacing: 0;
   -webkit-tap-highlight-color: transparent;
   /* 앱 영역 위끝이 y 29.4 라서 transform 으로 놓은 것은 그 0.4 가 버려짐(정수로 붙음) → transform 의 y 에 더해 줄 값 */
   --ib-y0: 0.4px;
@@ -35,8 +38,9 @@
 html[data-os="ios"] .ibk {
   --ib-y0: 0px;
 }
-/* 기준선 맞추기: line-height 0 이면 기준선 = 상자 top + 0.3418em (첫 글꼴 Roboto 의 (오름−내림)/2).
-   → top = 기준선 y − 0.3418 × 글자 크기 로 두면 녹화 기준선에 정확히 놓임 */
+/* 기준선 맞추기: line-height 0 이면 기준선 ≈ 상자 top + 0.3418em (첫 글꼴 Roboto 의 (오름−내림)/2) — 한글 Noto 가 섞여도 같음.
+   화면(Chrome)에선 상자 top 이 정수 픽셀로 반올림되고 기준선은 그 floor(A − (A+D)/2) 아래 (A·D = 0.927734em · 0.244141em 을 각각 반올림)라서
+   'top = 기준선 − 0.3418 × 크기' 로 두면 크기·위치에 따라 1.45px 까지 위로 뜸 → 정확히 놓으려면 theme.ts ibkBlTop(녹화 기준선, 크기, 상자 녹화 y) */
 .ibk-bl {
   position: absolute;
   margin: 0;
@@ -155,7 +159,10 @@ html[data-os="ios"] .ibk {
 
 /* ---------- 큰 파란 버튼 (다음 · 보내기 · 확인 · 공유하기) ----------
    상자 녹화 x 18.9~375.0 → 클론 18.1~365.8, y 717.7~769.9 (높이 52.2, 앱 아래끝에서 18.1), r 11.5~12.
-   글자 Noto 600 16.5px 흰색 가운데 (보내기 기준선 녹화 749.5 = 버튼 위 + 31.8 → 아래 flex 가운데 정렬로 31.74).
+   글자 Noto 500 16.5px 흰색 가운데 (보내기 기준선 녹화 749.5 = 버튼 위 + 31.8 → 아래 flex 가운데 정렬로 31.74).
+   화면에선 기준선이 정수 픽셀 749 에 붙음 — 녹화 평균과 겹친 최적 세로 이동 '다음' +0.55 · '보내기' +0.45 · 안내 '확인' −0.30.
+   글자는 1px 단위로만 움직여서(DPR 2 도 같음, 위 여백 0.5~1.4 는 그대로) 1px 내리면 −0.45 · −0.55 · −1.30 → 공용은 그대로 둠
+   (완료는 자기 CSS 에서 1px 내린 쪽이 녹화와 가까움, 확인증도 자기 값)
    누름 (보내기·완료 확인): 바탕이 ≈167ms 동안 #1f4daa 로 어두워지고, 떼면 ≈80ms 만에 돌아옴. 크기는 그대로
    --scale (금액 '다음'·안내 '확인'): 누르는 동안 scale(0.96) 130ms + 바탕 #2c69c7, 떼면 크기는 바로 1 */
 .ibk-btn {
@@ -495,6 +502,8 @@ html[data-os="ios"] .ibk-loading {
   inset: 0;
   background: #fff;
   text-align: center;
+  /* 글자는 −0.2 로 녹화와 맞춘 것 (SD 평균과 겹쳐 글자 좌우 끝 차 평균 2.3 — 자간 0 이면 6.4, 본문 둘째 줄 줄바꿈이 바뀜) */
+  letter-spacing: -0.2px;
 }
 /* 원 지름 45.2, 가운데 (클론 191.5, 녹화 131.3) */
 .ibk-notice__icon {
@@ -647,8 +656,11 @@ html[data-os="ios"] .ibk-loading {
 .ibk-tabbar__tab--on {
   top: 0;
 }
+/* '톡톡송금': 녹화 잉크 172.1~210.6 × 770.7~780.7 (homeM) 에 맞춰 왼쪽 1 · 아래 1 → 172.0~210.8 × 771.0~781.0 (전엔 173.0~211.8 × 770.0~780.0) */
 .ibk-tabbar__tab--on span {
-  top: 58.84px;
+  left: -11px;
+  right: -9px;
+  top: 59.84px;
   font-weight: 700;
   letter-spacing: -0.2px;
   color: #2b7de9;
@@ -658,6 +670,19 @@ html[data-os="ios"] .ibk-loading {
   position: absolute;
   left: 12.75px;
   top: 5.65px;
+}
+/* 아이폰 (녹화에 없음): 탭바를 홈 인디케이터(안전영역) 위로 올리고 그 밑은 흰 띠 — 시작화면·홈 같이 (안 하면 라벨이 인디케이터에 가림) */
+html[data-os="ios"] .ibk-tabbar {
+  bottom: var(--safe-bottom);
+}
+html[data-os="ios"] .ibk-tabbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: var(--safe-bottom);
+  background: #fff;
 }
 
 /* ---------- 홈 뼈대 (IbkHomeSkeleton) — home 1-D · 6-7 ---------- */
@@ -682,8 +707,9 @@ html[data-os="ios"] .ibk-loading {
   background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.055), transparent);
   animation: ibk-shimmer 2s linear infinite;
 }
+/* CARD 그림자: 홈 계좌 카드(ibk-home.css .ibh-card)와 같은 값 — 녹화 카드 아래 바탕이 R −13 · G −9 · B +3 (연파랑) */
 .ibk-skeleton i.ibk-skeleton__card {
-  box-shadow: 0 15px 22px 5px rgba(0, 90, 255, 0.056);
+  box-shadow: 0 15px 22px 5px rgba(187, 214, 255, 0.25);
 }
 @keyframes ibk-shimmer {
   from {

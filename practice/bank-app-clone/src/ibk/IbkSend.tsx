@@ -9,7 +9,7 @@ import { ibkNumber, nf } from "./bank";
 import { IbkBankLogo, IbkHeader, IbkHeaderIcon, IbkHeaderText, IbkIcon, IbkNotice, IbkSheet } from "./common";
 import { IbkKeypad, type IbkKey } from "./IbkKeypad";
 import { holdIbkSpinner, ibkSleep, useIbkSpinner } from "./loading";
-import { useIbkBack, useIbkBackHandler, useIbkGo } from "./nav";
+import { ibkBackLevel, ibkHistoryGo, useIbkBack, useIbkBackHandler, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-send.css";
 
@@ -249,12 +249,7 @@ export function IbkSend() {
       // 단계마다 쌓아 둔 뒤로가기 칸(ibkBack = n)을 먼저 걷고 이체 화면 자리를 완료로 바꿈.
       // 안 걷으면 기록이 [홈, 이체, 완료] 로 남아 완료·홈·거래내역에서 뒤로 하면 이체 화면이 다시 뜸
       leaving.current = true;
-      const n = (window.history.state as { ibkBack?: number } | null)?.ibkBack ?? 0;
-      if (n > 0)
-        await new Promise<void>((done) => {
-          window.addEventListener("popstate", () => done(), { once: true });
-          window.history.go(-n);
-        });
+      await ibkHistoryGo(-ibkBackLevel());
       navigate("/send/done", { replace: true, state });
       release();
     } catch (e) {
@@ -311,8 +306,8 @@ export function IbkSend() {
   // (지금 칸이 ibkBack = n 이면 n 칸 + 이체 화면 한 칸을 한 번에 — 열려 있던 알림창 등은 뒤로가기 처리기가 알아서 닫힘)
   const leave = () => {
     leaving.current = true;
-    const st = window.history.state as { idx?: number; ibkBack?: number } | null;
-    if ((st?.idx ?? 0) > 0) window.history.go(-((st?.ibkBack ?? 0) + 1));
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) window.history.go(-(ibkBackLevel() + 1));
     else navigate("/", { replace: true });
   };
 

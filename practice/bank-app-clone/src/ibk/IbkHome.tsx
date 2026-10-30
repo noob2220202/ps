@@ -41,6 +41,7 @@ const TAIL_MS = 100; // 뼈대 뒤 마지막 단계 값이 보이는 시간
 
 // 처음 켤 때인지 (StrictMode 가 초기값 함수를 두 번 불러도 같게 — 값은 effect 에서 바꿈)
 let booted = false;
+const skeletonKeys = new Set<string>(); // 이미 그린 방문 기록 칸 (뼈대는 칸마다 한 번)
 
 // 나만의 맞춤메뉴 (spec 3-8): 클론 x 34.0 / 121.7 / 209.6 / 297.3
 const TILES = [
@@ -70,11 +71,13 @@ export function IbkHome() {
   const [mode] = useState<Mode>(() => {
     // 이체 완료 '확인'은 go("/", { replace: true, state: { ibkHome: "skeleton" } }) (IbkDone)
     if (!booted) return "first";
-    return (location.state as { ibkHome?: string } | null)?.ibkHome === "skeleton" ? "skeleton" : "return";
+    // 뼈대는 그 칸을 처음 그릴 때만. state 는 칸에 남아서, 이체 → 뒤로로 이 칸에 돌아오면 뼈대(3초)를 또 했음 → 돌아온 모습으로 (녹화 42~46초)
+    return (location.state as { ibkHome?: string } | null)?.ibkHome === "skeleton" && !skeletonKeys.has(location.key) ? "skeleton" : "return";
   });
   useEffect(() => {
     booted = true;
-  }, []);
+    skeletonKeys.add(location.key);
+  }, [location.key]);
 
   // 화면 단계: white(흰 1프레임) → shell(빈 껍데기) → skeleton(뼈대) → ready(내용)
   const [phase, setPhase] = useState<"white" | "shell" | "skeleton" | "ready">(
@@ -421,6 +424,7 @@ function AccountPager({
   const move = (e: PointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
+    if (!e.buttons) return cancel();
     const mx = e.clientX - d.x;
     const my = e.clientY - d.y;
     if (!d.on) {
@@ -434,6 +438,14 @@ function AccountPager({
     }
     const edge = (idx === 0 && mx > 0) || (idx === n - 1 && mx < 0);
     setDx(edge ? mx * 0.3 : mx);
+  };
+  // 손을 뗀 걸 못 받았거나(폰 밖에서 뗌) 다른 곳이 포인터를 가져가면 끌기를 그냥 끝냄 (남으면 버튼 없이 움직여도 카드가 따라감 — V3 pager)
+  const cancel = () => {
+    const on = drag.current?.on;
+    drag.current = null;
+    if (!on) return;
+    setDragging(false);
+    setDx(0);
   };
   const up = (e: PointerEvent<HTMLDivElement>) => {
     const d = drag.current;
@@ -454,6 +466,7 @@ function AccountPager({
       onPointerMove={move}
       onPointerUp={up}
       onPointerCancel={up}
+      onLostPointerCapture={cancel}
       onClickCapture={(e) => {
         if (!moved.current) return;
         moved.current = false;
@@ -524,7 +537,7 @@ function PromoCarousel({ onOpen }: { onOpen: () => void }) {
 // 흰 말풍선은 그동안 왼쪽에서 오른쪽으로 쭉 지나가 빠져나감(0~333) → 왼쪽에서 들어와 천천히 제자리(367~767) →
 // 뾰족한 끝이 왼쪽 아래 꼬리로, 속도선 2개가 자람(533~767).
 // 정지 모습은 녹화 평균 프레임에서 다시 잼 (클론 좌표): 말풍선 원 가운데 (193.03, 744.63) 반지름 9.3 + 왼쪽 아래로 불룩해지며 꼬리 끝 (181.6, 751.0),
-// 속도선 가운데 y 748.4 (x 178.7~183.2) · 754.0 (x 180.4~184.8). 공용 IbkTalkButton 은 말풍선이 0.4 높고 r 9.9, 아래 속도선이 2.6 높음
+// 속도선 가운데 y 748.4 (x 178.7~183.2) · 754.0 (x 180.4~184.8). 공용 IbkTalkButton 도 같은 값
 function TalkButton({ play }: { play: boolean }) {
   return (
     <svg className={`ibk-tabbar__talk ibh-talk ${play ? "ibh-talk--play" : ""}`} width="44.5" height="44.5" viewBox="0 0 44.5 44.5" aria-hidden>

@@ -134,8 +134,8 @@ html[data-app="hana"][data-os="android"] .layer--pop-exit {
 
 /* ---------- i-ONE Bank(갤럭시): 대부분 전환 없음. 고른 곳만 (src/ibk/nav.ts) ----------
    menu-in : 전체메뉴가 오른쪽에서 밀려 들어옴 (거래내역 ≡ → 메뉴: 왼끝 x 292 → 97 → 0, 33ms 간격 ≈100ms ease-in-out), 아래 화면 그대로
-   menu-out: 위 화면이 오른쪽으로 밀려 나감 (메뉴 ✕: +102 → +297 → 밖, ≈130ms)
-   body-right / body-left: 머리줄은 그대로, 본문(.ibk-body)만 x 22~362 창 안에서 밀려 들어옴 (이체결과조회 ↔ 확인증 200 / 230ms) */
+   menu-out: 위 화면이 오른쪽으로 밀려 나감 (메뉴 ✕: +102 → +297 → 밖, 진행률 26%·76% = menu-in 과 같은 100ms ease-in-out)
+   body-right / body-left: 머리줄은 그대로, 본문(.ibk-body)만 x 22~362 창 안에서 밀려 들어옴 (이체결과조회 ↔ 확인증 200ms, 뒤로는 같은 곡선을 거꾸로) */
 html[data-app="ibk"][data-os="android"] .layer--ibk-menu-in.layer--push-enter {
   animation: layer-slide-in var(--nav-ms) cubic-bezier(0.42, 0, 0.58, 1) both;
 }

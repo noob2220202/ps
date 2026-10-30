@@ -9,7 +9,7 @@ import { Dialog } from "../components/Sheet";
 import { ibkNumber, nf } from "./bank";
 import { IbkBankLogo, IbkHeader, IbkHeaderIcon, IbkIcon, IbkSheet } from "./common";
 import { useIbkSpinner } from "./loading";
-import { IBK_PAGE, useIbkBack, useIbkGo } from "./nav";
+import { IBK_PAGE, useIbkBack, useIbkBackHandler, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-history.css";
 
@@ -238,6 +238,9 @@ export function IbkHistory() {
   const failed = !loading && (account.status === "error" || txs.status === "error");
   const [notice, setNotice] = useState<string | null>(null);
   const soon = () => setNotice(SOON);
+  // 안드로이드 뒤로(3버튼 바 <)는 안내창부터 닫음 (시트 위에 뜬 메모 안내도: 안내 → 시트 → 화면 순).
+  // 아이폰은 칸이 있는 동안 가장자리 끌기가 안 됨 (ScreenStack)
+  useIbkBackHandler(!!notice, () => setNotice(null));
 
   // 1개월: 오늘부터 한 달 전 다음 날까지 (녹화: 10.30 → 2026.10.01 ~ 2026.10.30). 지난달에 그날이 없으면 지난달 말일 기준
   const [today] = useState(() => new Date());

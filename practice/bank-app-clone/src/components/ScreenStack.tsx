@@ -3,6 +3,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type AnimationEvent,
   type PointerEvent,
   type ReactNode,
 } from "react";
@@ -11,13 +12,14 @@ import { TIMING } from "../config/timing";
 import { OS } from "../platform/platform";
 import { APP } from "../profile/session";
 import { LayerContext } from "../platform/LayerContext";
-import { IBK_ANIM_MS, ibkAnimFor, type IbkAnim } from "../ibk/nav";
+import { IBK_ANIM_MS, ibkAnimFor, ibkBackLevel, type IbkAnim } from "../ibk/nav";
 import "./ScreenStack.css";
 
 type Anim = "push" | "pop";
 type Render = (loc: Location) => ReactNode;
 
 const EDGE = 24; // 왼쪽 가장자리 몇 px 안에서 시작해야 스와이프로 인정할지
+const SLOP = 8; // 가장자리에서 누른 뒤 가로로 이만큼 움직여야 스와이프 시작 (그 전엔 그냥 누름 → 머리줄 '<' click 이 살아 있음)
 const EASE = "cubic-bezier(.2,.8,.2,1)";
 // 콕뱅크(갤럭시) 녹화: 새 화면은 약 80ms 교차 페이드, 뒤로가기는 약 100ms 동안 나가는 화면이 흐려짐
 // 하나원큐(갤럭시) 녹화: 새 화면이 오른쪽에서 밀고 들어옴 ≈330ms 감속 (라이트 30fps: 6.067s 462px → 6.433s 6px)
@@ -50,6 +52,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const [dragging, setDragging] = useState(false);
   const skipAnim = useRef(false);
   const drag = useRef<{ x: number; id: number; dx: number; width: number; frame: number } | null>(null);
+  const press = useRef<{ x: number; y: number; id: number; el: EventTarget } | null>(null); // 가장자리에서 눌렀지만 아직 스와이프로 정해지지 않은 손가락
   const topEl = useRef<HTMLDivElement | null>(null);
   const underEl = useRef<HTMLDivElement | null>(null);
   const underDim = useRef<HTMLDivElement | null>(null);
@@ -85,11 +88,9 @@ export function ScreenStack({ render }: { render: Render }) {
       setEnterAnim(layerAnim);
       setExiting(layerAnim ? { loc: prevTop, anim: layerAnim } : null);
       if (!a) return;
-      const id = setTimeout(() => {
-        setExiting(null);
-        setEnterAnim(null);
-        setIbkAnim(null);
-      }, IBK_ANIM_MS[a]);
+      // 걷는 건 전환이 실제로 끝났을 때 (아래 onIbkAnimEnd). 길이만큼의 타이머로 걷으면 새 화면을 그리느라 첫 프레임이 늦게 나온 만큼
+      // 잘려 보였음 (개발 서버: 메뉴 열기·닫기 100ms 가 0~67ms 에서, 본문 200ms 가 167~183ms 에서 끊김). 타이머는 끝 이벤트가 안 올 때 대비
+      const id = setTimeout(endIbkAnim, IBK_ANIM_MS[a] + 300);
       return () => clearTimeout(id);
     }
 
@@ -111,6 +112,17 @@ export function ScreenStack({ render }: { render: Render }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
+  // i-ONE Bank 전환 끝: 메뉴 밀기(menu-*)는 층 자신의, 본문 밀기(body-*)는 새 화면 .ibk-body 의 애니메이션이 끝났을 때
+  const endIbkAnim = () => {
+    setExiting(null);
+    setEnterAnim(null);
+    setIbkAnim(null);
+  };
+  const onIbkAnimEnd = (e: AnimationEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement;
+    if (ibkAnim?.startsWith("menu") ? t === e.currentTarget : t.classList.contains("ibk-body") && e.animationName.startsWith("ibk-in-")) endIbkAnim();
+  };
+
   // 손가락 위치를 화면 2장 + 어둡게 덮는 막에 반영. transform/opacity만 → GPU 합성만으로 처리.
   const paint = (dx: number, width: number, animate: boolean) => {
     const t = animate ? `transform ${TIMING.swipeRelease}ms ${EASE}` : "none";
@@ -131,17 +143,42 @@ export function ScreenStack({ render }: { render: Render }) {
 
   // ---------- iOS: 왼쪽 가장자리 스와이프로 뒤로가기 ----------
   const canSwipe = OS === "ios" && below !== null && exiting === null;
+  // 화면 안 뒤로가기 칸(i-ONE Bank useIbkBackHandler: 시트 · 안내창 · 이체 금액/확인 단계)이 쌓여 있으면 끌지 않음. 끝까지 끌면 navigate(-1) 이
+  // 그 칸만 빼고 주소(location.key)는 그대로라 위 층이 402px 밀린 채 멈췄음 (V2 s6b · V3 iosstuck). 실제 iOS 도 시트·알림이 떠 있으면 뒤로 끌기가 안 됨
+  const inScreenBack = () => ibkBackLevel() > 0;
+  // 안쪽 부품(홈 계좌 카드 AccountPager 등)이 같은 move 에서 먼저 포인터를 잡았는지. 층이 빼앗으면 카드가 끌기 상태로 남았음 (V3 pager).
+  // 누른 곳(down)은 빼고 봄: 터치는 누른 요소가 저절로 포인터를 잡고 있음(암묵 캡처)
+  const childOwns = (e: PointerEvent<HTMLDivElement>, down: EventTarget) => {
+    for (let el = e.target as Element | null; el && el !== e.currentTarget; el = el.parentElement)
+      if (el !== down && el.hasPointerCapture(e.pointerId)) return true;
+    return false;
+  };
 
+  // 누르는 순간 포인터를 잡으면(setPointerCapture) 그 누름의 click 이 사라져 가장자리에 걸친 '<' 가 안 눌림 (네 앱 모두, x 24 안쪽)
+  // → 누를 땐 자리만 적어 두고, 가로로 SLOP 넘게 움직였을 때 잡고 끌기 시작. 세로로 먼저 움직이면 스와이프 아님
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (!canSwipe || drag.current) return;
+    if (!canSwipe || drag.current || inScreenBack()) return;
     const rect = e.currentTarget.getBoundingClientRect();
     if (e.clientX - rect.left > EDGE) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    drag.current = { x: e.clientX, id: e.pointerId, dx: 0, width: rect.width, frame: 0 };
-    setDragging(true); // 뒤 화면을 마운트하기 위해 이 한 번만 리렌더
+    press.current = { x: e.clientX, y: e.clientY, id: e.pointerId, el: e.target };
   };
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    const s = press.current;
+    if (s && s.id === e.pointerId) {
+      if (!e.buttons) {
+        press.current = null; // 폰 밖에서 떼어 pointerup 을 못 받은 것
+        return;
+      }
+      const mx = e.clientX - s.x;
+      const my = Math.abs(e.clientY - s.y);
+      if (Math.abs(mx) < SLOP && my < SLOP) return;
+      press.current = null;
+      if (mx < SLOP || my > mx || !canSwipe || drag.current || inScreenBack() || childOwns(e, s.el)) return;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      drag.current = { x: s.x, id: e.pointerId, dx: 0, width: e.currentTarget.getBoundingClientRect().width, frame: 0 };
+      setDragging(true); // 뒤 화면을 마운트하기 위해 이 한 번만 리렌더
+    }
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     d.dx = Math.max(0, e.clientX - d.x);
@@ -154,7 +191,8 @@ export function ScreenStack({ render }: { render: Render }) {
     }
   };
 
-  const onPointerUp = () => {
+  const onPointerUp = (e: PointerEvent<HTMLDivElement>) => {
+    if (press.current?.id === e.pointerId) press.current = null; // 움직이지 않고 뗌 = 그냥 누름 (click 은 그대로)
     const d = drag.current;
     if (!d || d.id < 0) return;
     cancelAnimationFrame(d.frame);
@@ -165,6 +203,14 @@ export function ScreenStack({ render }: { render: Render }) {
       setTimeout(() => {
         skipAnim.current = true;
         navigate(-1); // 드래그 표시는 주소가 바뀐 뒤 layout effect에서 지운다(깜빡임 방지)
+        // 주소가 바뀌지 않는 뒤로(화면이 직접 쌓은 칸 — 하나 hanaSend · 콕 nhBankPicker 등)면 layout effect 가 돌지 않아 밀린 채 남음 → 제자리로
+        setTimeout(() => {
+          if (drag.current !== d) return;
+          if (topEl.current) topEl.current.style.cssText = "";
+          skipAnim.current = false;
+          drag.current = null;
+          setDragging(false);
+        }, 300);
       }, TIMING.swipeRelease);
     } else {
       paint(0, d.width, true);
@@ -196,6 +242,7 @@ export function ScreenStack({ render }: { render: Render }) {
           className={ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : l.className}
           style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
+          onAnimationEnd={ibkAnim ? onIbkAnimEnd : undefined}
           {...(l.active && {
             onPointerDown,
             onPointerMove,
