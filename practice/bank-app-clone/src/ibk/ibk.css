@@ -1,8 +1,21 @@
 /* i-ONE Bank 공용 (라이트만). 색은 녹화 82d59fba 에서 */
+
+/* 글꼴: 녹화 글자를 후보 글꼴로 그려 겹쳐 본 결과 숫자·영문은 Roboto(오차 17.5, Noto·Pretendard 30~50),
+   한글은 Noto Sans KR 계열이 가장 가까움 → 안드로이드 시스템 글꼴을 쓰는 앱. 번들에 넣어 PC·아이폰에서도 같게 */
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/600.css";
+@import "@fontsource/roboto/700.css";
+@import "@fontsource/noto-sans-kr/400.css";
+@import "@fontsource/noto-sans-kr/500.css";
+@import "@fontsource/noto-sans-kr/600.css";
+@import "@fontsource/noto-sans-kr/700.css";
+
 .ibk {
   --ib-bg: #ffffff;
   --ib-text: #222222;
   --ib-blue: #4896eb; /* 이체·다음 버튼 */
   background: var(--ib-bg);
   color: var(--ib-text);
+  font-family: Roboto, "Noto Sans KR", sans-serif;
 }

@@ -45,7 +45,7 @@ export type Slot =
 
 // import.meta.glob은 "빌드할 때" 폴더를 훑어서 있는 파일만 번들에 넣는다.
 // 그래서 실행 중에 없는 파일을 요청(404)하거나, 대체 이미지로 바뀌며 깜빡이는 일이 없다.
-const files = import.meta.glob<string>("./local/*.{png,jpg,jpeg,webp}", { eager: true, import: "default" });
+const files = import.meta.glob<string>("./local/*.{png,jpg,jpeg,webp,svg}", { eager: true, import: "default" });
 const local = new Map(Object.entries(files).map(([path, url]) => [path.replace(/^.*\/|\.\w+$/g, ""), url]));
 
 // 슬롯 목록에 없는 이름(예: 은행 로고 "bank-shinhan")도 찾을 수 있게 문자열로 받는다
