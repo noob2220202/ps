@@ -267,25 +267,33 @@ html[data-app="hana"] .statusbar--android.statusbar--light {
 }
 
 /* ---------- i-ONE Bank 기기 (녹화 82d59fba, 384 × 832dp) ----------
-   상태바 28.44 (기기 80px), 아래 3버튼 내비게이션 바 48 (기기 135px) — 흰 바탕, 회색 선 아이콘 */
+   상태바 0~29.4, 아래 3버튼 내비게이션 바 788~832 (44) — 흰 바탕, 구분선 없음. 아이콘 세로 가운데 810.1,
+   가로 가운데 Ⅲ 83.2 / ○ 190.9 / < 298.5 (화면 가운데 192 가 아니라 190.9 에 대칭 — 시스템 UI) */
 html[data-app="ibk"] .statusbar--android {
-  height: 28.44px;
+  height: 29.4px;
   padding-left: 26.7px;
   font-size: 14px;
   font-weight: 400;
 }
 .phone__navbar--keys {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0 52px;
+  height: 44px;
   background: #ffffff;
   color: #5d5f62;
   transform: none;
 }
 .navkey {
+  position: absolute;
+  top: calc(22.1px - 8px);
   display: block;
+}
+.navkey--recents {
+  left: calc(83.2px - 8px);
+}
+.navkey--home {
+  left: calc(190.9px - 8px);
+}
+.navkey--back {
+  left: calc(298.5px - 8px);
 }
 button.navkey {
   display: flex;

@@ -33,7 +33,7 @@ html[data-app="hana"]:not([data-os="ios"]) {
   --frame-w: 384px;
   --frame-h: 853.33px;
 }
-/* i-ONE Bank 녹화 기기(갤럭시, 1080×2340): 384 × 832dp = 상태바 28.44 + 앱 755.56 + 3버튼 내비게이션 바 48 */
+/* i-ONE Bank 녹화 기기(갤럭시): 384 × 832dp = 상태바 29.4 + 앱 758.6 + 3버튼 내비게이션 바 44 (녹화 경계 y 29.4 / 788.0) */
 html[data-app="ibk"]:not([data-os="ios"]) {
   --frame-w: 384px;
   --frame-h: 832px;

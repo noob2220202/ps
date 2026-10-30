@@ -8,8 +8,10 @@
   2. Real-ESRGAN(애니 모델, esrgan.py)으로 4배 → 가장자리가 또렷해짐
   3. 역투영: 키운 그림을 다시 줄여 원본과 비교한 차이를 더해 줌 → 업스케일이 바꾼 색·밝기를 원래대로
   4. 바탕 걷기: 가장자리에서 이어진 바탕색만 투명하게 (그림 안쪽의 같은 색은 남김) + 경계 2px 은 바탕을 덜어 낸 반투명
-  5. 필요하면 동그라미로 자름 (은행 로고 원 등)
-그림은 원래 자리 상자 그대로 4배라, 화면에는 상자 크기(dp)로 놓으면 위치가 맞음.
+  5. 가로 되돌리기: 이 녹화는 화면이 가로로 1.0242배 늘어나 있음 (원·정사각형 11개 가로/세로 비, 클론 x = (녹화 x − 0.35) / 1.0242)
+     → 키운 그림의 가로를 1/1.0242 로 줄여 실제 비율로
+  6. 필요하면 동그라미 / 갤럭시 아이콘 모양으로 자름 (은행 로고 원 등)
+상자(box)는 녹화 좌표. 화면에는 (상자 폭 / 1.0242) × 상자 높이 dp 로, 왼쪽 위는 x = (x0 − 0.35) / 1.0242 에 놓으면 위치가 맞음.
 필요: ffmpeg, torch(CPU 판), numpy, Pillow
 """
 import argparse
@@ -29,6 +31,7 @@ from esrgan import upscale  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[2] / "src/assets/local"
 SCALE = 4
+STRETCH = 1.0242  # 녹화의 가로 늘어남
 
 # 그림 목록: assets/*.json (화면별 파일, 여러 사람이 동시에 고쳐도 안 겹치게)
 #   {"이름": {"t": [시작 초, 끝 초], "box": [x0, y0, x1, y1] (녹화 px = dp), "bg": 바탕 처리, "shape": 모양, "note": 설명}}
@@ -141,13 +144,16 @@ def make(net, video, cache, name, spec):
         border = np.concatenate([lr[0], lr[-1], lr[:, 0], lr[:, -1]])
         bg = np.median(border, axis=0)
     rgba = remove_bg(sr, bg) if bg is not None else np.dstack([sr, np.full(sr.shape[:2], 255.0)])
+    h, w = rgba.shape[:2]
+    w2 = round(w / STRETCH)
+    rgba = np.stack([np.asarray(Image.fromarray(rgba[..., c].astype(np.float32), "F").resize((w2, h), Image.LANCZOS)) for c in range(4)], axis=2).clip(0, 255)
     if shape == "circle":
         rgba = circle(rgba)
     elif shape == "squircle":
         rgba = squircle(rgba)
     img = Image.fromarray(rgba.round().clip(0, 255).astype(np.uint8), "RGBA")
     img.save(OUT / f"ibk-{name}.png", optimize=True)
-    print(f"ibk-{name}: {box[2] - box[0]} × {box[3] - box[1]} dp → {img.size[0]} × {img.size[1]} px")
+    print(f"ibk-{name}: {(box[2] - box[0]) / STRETCH:.1f} × {box[3] - box[1]} dp → {img.size[0]} × {img.size[1]} px")
     return img
 
 
