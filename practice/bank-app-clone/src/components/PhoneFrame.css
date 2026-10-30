@@ -273,6 +273,7 @@ html[data-app="hana"] .statusbar--android.statusbar--light {
 html[data-app="ibk"] .statusbar--android {
   position: relative;
   height: 29.4px;
+  transition: none; /* 녹화: 상태바 색은 화면과 같이 바로 바뀜 (menu 4) */
   padding: 0;
   font-family: Roboto, sans-serif;
   font-size: 14px;

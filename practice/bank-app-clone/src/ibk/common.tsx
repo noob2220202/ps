@@ -532,7 +532,12 @@ export function IbkBankLogo({ bank, size = 30, className = "" }: { bank: Pick<Ba
       </span>
     );
   if (bank.name && bank.short && bank.color && bank.section) return <BankIcon bank={bank as Bank} size={size} />;
-  return <span className={`ibk-logo ibk-logo--empty ${className}`} style={box} />;
+  const other = localAsset(`bank-${bank.code}`); // 은행 정보가 code 뿐이면 공용 로고 그림만
+  return (
+    <span className={`ibk-logo ibk-logo--empty ${className}`} style={box}>
+      {other && <img src={other} alt="" draggable={false} style={box} />}
+    </span>
+  );
 }
 
 // ---------- 안내(오류) 화면 ----------
@@ -590,10 +595,10 @@ export function IbkNotice({
 // 가운데 톡톡송금 원 ⌀44.5 (중심 192, 744.6) — 정지한 최종 모습 (나타날 때의 로티는 홈 쪽)
 const TABS = [
   { label: "자산", x: 49.8, icon: "tab-asset" as const, ix: 41.3, iy: 747.0 },
-  { label: "상품", x: 120.6, icon: "tab-product" as const, ix: 112.9, iy: 748.8 },
+  { label: "상품", x: 120.6, icon: "tab-product" as const, ix: 112.9, iy: 748.3 },
   { label: "톡톡송금", x: 192 },
   { label: "혜택", x: 262.4, icon: "tab-gift" as const, ix: 255.1, iy: 747.0 },
-  { label: "주식", x: 333.4, icon: "tab-stock" as const, ix: 325.3, iy: 748.1 },
+  { label: "주식", x: 333.4, icon: "tab-stock" as const, ix: 325.3, iy: 748.6 },
 ];
 export function IbkTabBar({ onTab, className = "", center }: { onTab?: (label: string) => void; className?: string; center?: ReactNode }) {
   return (

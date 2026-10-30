@@ -476,7 +476,7 @@ html[data-os="ios"] .ibk-loading {
   background: var(--ib-blue);
   color: #fff;
   font-size: 16.5px;
-  font-weight: 600;
+  font-weight: 500;
 }
 .ibk .dialog__buttons button:active {
   background: var(--ib-blue-press);
