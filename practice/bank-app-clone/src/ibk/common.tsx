@@ -509,20 +509,17 @@ export function IbkSheet({
 
 // ---------- 은행 로고 원 ----------
 // 받는 분 목록(who 5)·금액·확인·완료의 은행 로고. 녹화에 나온 은행은 녹화에서 잘라 4배로 키운 원 (ibk-bank-<code>, 지름 30 원에 꽉 참),
-// 기업은행은 홈 탭의 ibk-logo-ibk (로고 원 지름 23.7 이 그림 25.4 × 26 의 가운데), 녹화에 없는 은행은 공용 BankIcon
-const IBK_LOGO = { w: 25.39, h: 26, d: 23.7 };
+// 기업은행은 ibk-logo-ibk.svg (IBK CI 심볼을 녹화의 원에 맞춰 원으로 자른 벡터, 원이 그림에 꽉 참), 녹화에 없는 은행은 공용 BankIcon
 export function IbkBankLogo({ bank, size = 30, className = "" }: { bank: Pick<Bank, "code"> & Partial<Bank>; size?: number; className?: string }) {
   const box: CSSProperties = { width: size, height: size };
   if (bank.code === "ibk") {
     const src = localAsset("ibk-logo-ibk");
-    if (src) {
-      const k = size / IBK_LOGO.d;
+    if (src)
       return (
         <span className={`ibk-logo ${className}`} style={box}>
-          <img src={src} alt="기업" draggable={false} style={{ width: IBK_LOGO.w * k, height: IBK_LOGO.h * k }} />
+          <img src={src} alt="기업" draggable={false} style={box} />
         </span>
       );
-    }
   }
   const src = localAsset(`ibk-bank-${bank.code}`);
   if (src)

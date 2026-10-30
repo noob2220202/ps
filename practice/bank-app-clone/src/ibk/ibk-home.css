@@ -1,0 +1,674 @@
+/* i-ONE Bank 홈 (spec/home.md). x 는 클론 좌표 = (녹화 x − 0.35) / 1.0242, y 는 앱 영역 = 녹화 y − 29.4.
+   글자는 .ibk-bl (line-height 0) 로 기준선에 놓음: top = 기준선(앱 y) − 0.3418 × 글자 크기 */
+
+.ibh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ib-mint); /* #eff4f3 (3-1) */
+}
+/* 빈 껍데기 (6-2): 바탕 #fafafa + 탭바만. 완료 → 홈 첫 1프레임은 흰색 (6-5, 145.700) */
+.ibh--shell {
+  background: var(--ib-status);
+}
+.ibh--white {
+  background: #fff;
+}
+.ibh-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ibh-scroll::-webkit-scrollbar {
+  display: none;
+}
+/* 녹화에서 홈을 스크롤한 적 없음 → 앱 영역(758.6) 그대로. 프로모 배너 아래는 탭바 밑 */
+.ibh-page {
+  position: relative;
+  height: 100%;
+  min-height: 758.6px;
+  overflow: hidden;
+}
+.ibh-page button {
+  display: block;
+  padding: 0;
+  text-align: left;
+}
+
+/* ---------- 머리줄 (3-2) ---------- */
+.ibh-header.ibk-header {
+  color: #000; /* 종·상담·≡ #000 (측정 #020505) */
+}
+/* '할 일': Noto 500 18px +0.2 #646973, 잉크 녹화 (24.3, 47.0)–(60.0, 63.3) → 클론 23.4~58.2, 기준선 녹화 61.9 */
+.ibh-todo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 96px;
+  height: 52px;
+  color: #646973;
+}
+.ibh-todo > span {
+  left: 22.5px;
+  top: 26.35px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+/* 체크 상자 잉크 녹화 (67.5, 47.0)–(87.1, 63.8) → 클론 65.6~84.7 (#65696f) */
+.ibh-todo .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #65696f;
+  transform: translate(66.26px, calc(18.3px + var(--ib-y0)));
+}
+.ibh-todo:active {
+  opacity: 0.5;
+}
+
+/* ---------- 큰 배너 (3-3): Noto 600 18px +0.3 #000, 줄 기준선 녹화 131.1 / 155.5 (피치 24.4), 잉크 왼쪽 클론 23.2 ---------- */
+.ibh-banner {
+  position: absolute;
+  left: 0;
+  top: 52px;
+  width: 384px;
+  height: 112px;
+  color: #000;
+}
+.ibh-banner > .ibk-bl {
+  left: 21.8px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.ibh-banner__l1 {
+  top: 43.55px; /* 앱 101.7 − 52 − 6.15 */
+}
+.ibh-banner__l2 {
+  top: 67.95px;
+}
+/* 그림: 녹화 상자 (244, 100)–(368, 192) → 클론 237.9 × 앱 70.6, 121.07 × 92 (바탕째) */
+.ibh-banner__art {
+  position: absolute;
+  left: 237.89px;
+  top: 18.6px;
+  width: 121.07px;
+  height: 92px;
+}
+
+/* ---------- 계좌 카드 + 폴더 탭 (3-4 · 3-5): 카드 클론 18.5 ~ 365.5 (347), 녹화 y 193.9(탭 위) ~ 447.9 ---------- */
+.ibh-card {
+  position: absolute;
+  left: 18.5px;
+  top: 164.5px;
+  width: 347px;
+  height: 254px;
+}
+/* 몸통 녹화 y 234.8 ~ 447.9, 흰색, 오른쪽 위·아래 r16 (가로 15.6), 파란 그림자 0 15 22 5 rgba(0,90,255,.056) */
+.ibh-card__body {
+  position: absolute;
+  left: 0;
+  top: 40.9px;
+  width: 347px;
+  height: 213.1px;
+  border-radius: 0 15.6px 15.6px 15.6px / 0 16px 16px 16px;
+  background: #fff;
+  box-shadow: 0 15px 22px 5px rgba(0, 90, 255, 0.056);
+  overflow: hidden;
+}
+.ibh-tabs {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+.ibh-tab {
+  position: absolute;
+  top: 0;
+  height: 40.9px;
+}
+.ibh-tab > span {
+  top: 20.83px; /* 기준선 녹화 219.0 = 탭 위 + 25.1 */
+  font-size: 12.5px;
+  font-weight: 600;
+}
+/* '기업은행' 600 12.5 +0.1 #161616, 잉크 클론 68.2~112.0 / 로고 ⌀23.7 가운데 (48.3, 녹화 214.4) */
+.ibh-tab--ibk {
+  left: 0;
+  width: 112px;
+  color: #161616;
+}
+.ibh-tab--ibk > span {
+  left: 49.1px;
+  letter-spacing: 0.1px;
+}
+.ibh-tab .ibh-tab__logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(17.95px, calc(8.65px + var(--ib-y0)));
+}
+/* '다른금융' 600 12.5 0 #7b7f85, 잉크 클론 154.5~198.6 */
+.ibh-tab--other {
+  left: 112.7px;
+  width: 90px;
+  color: #7b7f85;
+}
+.ibh-tab--other > span {
+  left: 22.7px;
+}
+/* 쉬운뱅킹 칩: 흰 알약 클론 278.0 ~ 365.5, 녹화 y 199.7 ~ 227.6, r14 */
+.ibh-easy {
+  position: absolute;
+  left: 259.5px;
+  top: 5.8px;
+  width: 87.5px;
+  height: 27.9px;
+  border-radius: 13.67px / 14px;
+  background: #fff;
+}
+.ibh-easy > span {
+  font-weight: 700;
+  color: #3b3c3f;
+}
+/* '가가': 작은 '가' 5.75px 잉크 클론 288.5, 큰 '가' 11px 잉크 클론 295.8, 아래선 녹화 ≈218.4 */
+.ibh-easy__s {
+  left: 10.1px;
+  top: 16.73px;
+  font-size: 5.75px;
+}
+.ibh-easy__b {
+  left: 17.1px;
+  top: 14.94px;
+  font-size: 11px;
+}
+/* '쉬운뱅킹' 500 12.75 −0.1 #444646, 잉크 클론 310.2 ~ 353.9, 기준선 녹화 218.3 */
+.ibh-easy__t {
+  left: 31.6px;
+  top: 14.24px;
+  font-size: 12.75px;
+  letter-spacing: -0.1px;
+  color: #444646;
+  font-weight: 500 !important;
+}
+
+/* ---------- 계좌 넘기기 ---------- */
+.ibh-pager {
+  position: absolute;
+  inset: 0;
+  touch-action: pan-y;
+  transition: transform 300ms cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+.ibh-pager--drag {
+  transition: none;
+}
+.ibh-pager__page {
+  position: absolute;
+  top: 0;
+  width: 347px;
+  height: 213.1px;
+}
+.ibh-acct {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+/* 이름 Noto 600 16px +0.4 #000, 잉크 녹화 (38.8, 258.2)–(187.6, 274.8) → 클론 37.5~182.8, 기준선 녹화 271.5 */
+.ibh-acct__name {
+  left: 18.5px;
+  top: 31.23px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: #000;
+}
+/* 계좌번호 Roboto 400 14.25px +0.4 #4b4c4f, 잉크 클론 37.5~166.4, 기준선 녹화 293.2 */
+.ibh-acct__no {
+  left: 18.6px;
+  top: 53.53px;
+  font-size: 14.25px;
+  letter-spacing: 0.4px;
+  color: #4b4c4f;
+}
+/* ⧉ 계좌번호 끝에서 4 (녹화 174.9~186.8 × 282.9~294.0), #838383 */
+.ibh-acct__copy {
+  position: absolute !important;
+  left: calc(100% + 1.47px);
+  top: -6.88px;
+  width: 16px;
+  height: 16px;
+  color: #838383;
+}
+.ibh-acct__copy .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(2px, 2px);
+}
+/* ⋮ 가운데 클론 335.2, 점 녹화 y 258.4 / 264.8 / 271.2, #606060 */
+.ibh-acct__more {
+  position: absolute;
+  left: 301.85px;
+  top: 8.25px;
+  width: 30px;
+  height: 44px;
+  color: #606060;
+}
+.ibh-acct__more .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(13.5px, 14px);
+}
+/* 잔액 Roboto 700 22.25px +0.1 #000 오른쪽 정렬, 잉크 오른끝 클론 308.2, 기준선 녹화 369.9 */
+.ibh-acct__bal {
+  right: 56.4px;
+  top: 127.5px;
+  font-size: 22.25px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  color: #000;
+}
+/* '원' Noto 500 17.5px, 잉크 클론 310.4~324.6, 녹화 y 353.8~369.4 */
+.ibh-acct__won {
+  left: 291.3px;
+  top: 127.3px;
+  font-size: 17.5px;
+  font-weight: 500;
+  color: #000;
+}
+/* ↻ 가운데 클론 338.1, 녹화 y 362.0 → 몸통 (319.6, 127.2), #2a2a2a */
+.ibh-acct__refresh {
+  position: absolute;
+  left: 303.6px;
+  top: 111.2px;
+  width: 32px;
+  height: 32px;
+  color: #2a2a2a;
+}
+.ibh-acct__refresh .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(9.95px, 9.95px);
+}
+.ibh-spin {
+  animation: ibh-spin 800ms linear;
+}
+@keyframes ibh-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+/* 이체 / ATM출금: 녹화 x 38.2~192.5 / 200.9~355.3 → 클론 36.9~187.6 / 195.8~346.6, y 392.1~429.5 (37.4), r≈11, #4092ef
+   글자 Noto 700 12.5px +0.3 흰색 가운데, 기준선 녹화 415.0 (버튼 위 + 22.9). 누름 #2a61be (1프레임 만에) */
+.ibh-acct__btn {
+  position: absolute;
+  top: 157.3px;
+  height: 37.4px;
+  border-radius: 10.74px / 11px;
+  background: var(--ib-blue);
+  color: #fff !important;
+}
+.ibh-acct__btn:active {
+  background: #2a61be;
+}
+.ibh-acct__btn > span {
+  left: 0;
+  right: 0;
+  top: 18.63px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+.ibh-acct__send {
+  left: 18.4px;
+  width: 150.7px;
+}
+.ibh-acct__atm {
+  left: 177.3px;
+  width: 150.8px;
+}
+
+/* ---------- 페이지 점 (3-6): 녹화 y 463.0 ~ 470.1, 활성 알약 18.8 × 7.1 #000, 나머지 ⌀7.3 #707481, 사이 3.7, 가운데 191.8 ---------- */
+.ibh-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 433.6px;
+  height: 7.1px;
+  display: flex;
+  justify-content: center;
+  gap: 3.7px;
+  padding-right: 0.4px;
+}
+.ibh-dots i {
+  width: 7.3px;
+  height: 7.1px;
+  border-radius: 3.55px;
+  background: #707481;
+  transition:
+    width 200ms ease-out,
+    background-color 200ms ease-out;
+}
+.ibh-dots i.on {
+  width: 18.8px;
+  background: #000;
+}
+
+/* ---------- 바로가기 상자 (3-7): 클론 18.6 ~ 365.6, 녹화 y 485.6 ~ 537.9 (52.3), r16, 위 #f8fcfe → 아래 #fdfefe ---------- */
+.ibh-quick {
+  position: absolute;
+  left: 18.6px;
+  top: 456.2px;
+  width: 347px;
+  height: 52.3px;
+  border-radius: 15.6px / 16px;
+  background: linear-gradient(180deg, #f8fcfe, #fdfefe);
+  overflow: hidden;
+}
+.ibh-quick__item {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  width: 173.5px;
+  height: 52.3px;
+  color: #000 !important;
+}
+.ibh-quick__item--r {
+  left: 173.5px;
+}
+.ibh-quick__item:active {
+  background: rgba(0, 0, 0, 0.03);
+}
+/* W 동전: 녹화 상자 (39, 502)–(61, 522) → 클론 37.7, 21.48 × 20 */
+.ibh-quick__recent {
+  position: absolute;
+  left: 19.13px;
+  top: 16.4px;
+  width: 21.48px;
+  height: 20px;
+}
+/* 신분증·지갑: 녹화 상자 (206, 500)–(235, 524) → 클론 200.8, 28.31 × 24 */
+.ibh-quick__id {
+  position: absolute;
+  left: 8.69px;
+  top: 14.4px;
+  width: 28.31px;
+  height: 24px;
+}
+/* Noto 600 14.25px, 기준선 녹화 516.5 (상자 위 + 30.9) / 잉크 왼쪽 클론 65.0 · 231.2 */
+.ibh-quick__item > span {
+  top: 26.03px;
+  font-size: 14.25px;
+  font-weight: 600;
+}
+.ibh-quick__t1 {
+  left: 45.8px;
+  letter-spacing: 0.2px;
+}
+.ibh-quick__t2 {
+  left: 38.5px;
+  letter-spacing: 0.3px;
+}
+/* > 4.4 × 9 선 1.4 #727b79: 잉크 녹화 (159.3, 507.0)–(164.9, 516.2) / (316.7, …) → 클론 155.2 · 308.9 */
+.ibh-quick__item > .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #727b79;
+}
+.ibh-quick__go1 {
+  transform: translate(137.3px, 22.1px);
+}
+.ibh-quick__go2 {
+  transform: translate(117.5px, 22.1px);
+}
+
+/* ---------- 나만의 맞춤메뉴 (3-8) ---------- */
+/* 제목 Noto 500 16px +0.2 #000, 잉크 클론 23.9 ~ 130.2, 기준선 녹화 569.0 */
+.ibh-my {
+  left: 23.3px;
+  top: 534.13px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #000;
+}
+/* 타일 52.4 × 51.9 (녹화 y 596.9 ~ 648.8), r≈18, 흰색 / 추가 #e1e5ea. 라벨 Noto 500 11.5 +0.3 #565a5d, 기준선 녹화 667.5 */
+.ibh-tile {
+  position: absolute !important;
+  top: 567.5px;
+  width: 52.4px;
+  height: 80px;
+}
+.ibh-tile__box {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 52.4px;
+  height: 51.9px;
+  border-radius: 17.6px / 18px;
+  background: #fff;
+  overflow: hidden;
+}
+.ibh-tile--add .ibh-tile__box {
+  background: #e1e5ea;
+}
+.ibh-tile:active .ibh-tile__box {
+  filter: brightness(0.96);
+}
+/* 그림: 녹화 상자 (44 / 134 / 224, 606) 36 × 36 → 클론 35.15 × 36, 타일 왼쪽 + 8.7, 위 + 9.1 */
+.ibh-tile__art {
+  position: absolute;
+  left: 8.7px;
+  top: 9.1px;
+  width: 35.15px;
+  height: 36px;
+}
+/* + 16 × 16 선 1.6 #7a7d84, 가운데 클론 323.5 · 녹화 622.85 */
+.ibh-tile__plus {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #7a7d84;
+  transform: translate(18.2px, 17.95px);
+}
+.ibh-tile > span {
+  left: -20px;
+  right: -20px;
+  top: 66.67px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: #565a5d;
+  text-align: center;
+}
+
+/* ---------- 프로모 배너 (3-9): 클론 18.2 ~ 365.1 (346.9), 윗변 녹화 691.3, r≈17, 피치 366. 위 40dp 만 보임 ---------- */
+.ibh-promo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 661.9px;
+  height: 140px;
+  overflow: hidden;
+}
+.ibh-promo__track {
+  position: absolute;
+  inset: 0;
+  transition: transform 270ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.ibh-promo__track--jump {
+  transition: none;
+}
+.ibh-promo__card {
+  position: absolute !important;
+  top: 0;
+  width: 346.9px;
+  height: 140px;
+  border-radius: 16.6px / 17px;
+  overflow: hidden;
+}
+/* 제목 Roboto/Noto 700 17.5px, 잉크 왼쪽 클론 44.7, 기준선 녹화 729.2 (배너 위 + 37.9) */
+.ibh-promo__title {
+  left: 25.8px;
+  top: 31.92px;
+  font-size: 17.5px;
+  font-weight: 700;
+}
+/* 부제 (2번) ≈7.25px 흰색 80%, 잉크 녹화 x 46.3 ~ 129.7, y 704.0 ~ 710.6 */
+.ibh-promo__sub {
+  left: 26.3px;
+  top: 16.22px;
+  font-size: 7.25px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+/* 오른쪽 그림: 녹화 상자 (255, 692)–(360, 731) → 클론 248.6, 102.52 × 39 */
+.ibh-promo__art {
+  position: absolute;
+  left: 230.43px;
+  top: 0.7px;
+  width: 102.52px;
+  height: 39px;
+}
+.ibh-pic--empty {
+  display: block;
+}
+
+/* ---------- 가운데 톡톡송금 로티 (6-4): 800ms, 145.700 = 0 ---------- */
+.ibh-talk * {
+  transform-box: view-box;
+}
+.ibh-talk--play .ibh-talk__disc {
+  transform-origin: 22.25px 22.25px;
+  animation: ibh-talk-disc 800ms linear both;
+}
+.ibh-talk--play .ibh-talk__bubble {
+  animation: ibh-talk-bubble 800ms linear both;
+}
+.ibh-talk__point {
+  opacity: 0;
+  transform-origin: 23.2px 21.9px;
+}
+.ibh-talk--play .ibh-talk__point {
+  animation: ibh-talk-point 800ms linear both;
+}
+.ibh-talk--play .ibh-talk__tail {
+  transform-origin: 18px 26px;
+  animation: ibh-talk-tail 800ms linear both;
+}
+.ibh-talk--play .ibh-talk__lines {
+  transform-origin: 13px 27px;
+  animation: ibh-talk-lines 800ms linear both;
+}
+/* 원판: 0~33ms 없음 → 33·67ms 실 같은 렌즈(≈12%) → 100ms 50% → 133ms 72% → 167ms 90% → 200ms 꽉 참 */
+@keyframes ibh-talk-disc {
+  0%,
+  4.1% {
+    transform: scaleX(0);
+  }
+  4.2%,
+  8.3% {
+    transform: scaleX(0.13);
+  }
+  12.5% {
+    transform: scaleX(0.5);
+  }
+  16.7% {
+    transform: scaleX(0.72);
+  }
+  20.8% {
+    transform: scaleX(0.9);
+  }
+  25%,
+  100% {
+    transform: none;
+  }
+}
+/* 말풍선: 200~333ms 오른쪽으로 빠짐 (+5 · +17 · +25 · +28 · 밖), 367ms 왼쪽 끝에서 다시 (−29 · −20 · −10 · −4 · −1 · 0 = 533ms) */
+@keyframes ibh-talk-bubble {
+  0%,
+  22% {
+    transform: none;
+  }
+  25% {
+    transform: translateX(5px);
+  }
+  29.2% {
+    transform: translateX(17px);
+  }
+  33.3% {
+    transform: translateX(25px);
+  }
+  37.5% {
+    transform: translateX(28px);
+  }
+  41.6% {
+    transform: translateX(34px);
+  }
+  41.7% {
+    transform: translateX(-34px);
+  }
+  45.8% {
+    transform: translateX(-29px);
+  }
+  50% {
+    transform: translateX(-20px);
+  }
+  54.2% {
+    transform: translateX(-10px);
+  }
+  58.3% {
+    transform: translateX(-4px);
+  }
+  62.5% {
+    transform: translateX(-1px);
+  }
+  66.7%,
+  100% {
+    transform: none;
+  }
+}
+/* 뾰족한 왼쪽 끝 → 533~600ms 에 왼쪽 아래로 돌며 꼬리가 됨 */
+@keyframes ibh-talk-point {
+  0%,
+  66.7% {
+    opacity: 1;
+    transform: none;
+  }
+  75% {
+    opacity: 1;
+    transform: rotate(-39deg) scale(0.6);
+  }
+  75.1%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes ibh-talk-tail {
+  0%,
+  75% {
+    opacity: 0;
+  }
+  75.1%,
+  100% {
+    opacity: 1;
+  }
+}
+/* 속도선: 567~767ms 오른쪽 끝에서 왼쪽으로 자람 */
+@keyframes ibh-talk-lines {
+  0%,
+  70.8% {
+    transform: scaleX(0);
+  }
+  95.8%,
+  100% {
+    transform: none;
+  }
+}

@@ -6,6 +6,7 @@
 녹화(앱 서랍 58dp)보다 훨씬 선명. 모양은 녹화 앱 서랍에서 잰 갤럭시 아이콘 모서리(초타원 n=2.7, crops.py 의 squircle 과 같음).
 iTunes 조회 API(id 1460543865 = 'i-ONE Bank - 개인고객용')로 지금 올라와 있는 아이콘 주소를 얻음. 필요: numpy, Pillow, 인터넷
 IBK CI 심볼(ibk-ci-symbol.svg, 이체확인증 로고)은 companieslogo.com 의 Industrial Bank of Korea 로고 SVG 를 그대로 씀.
+IBK 원 로고(ibk-logo-ibk.svg, 홈 '기업은행' 탭·받는 분·출금계좌 등)는 그 심볼 경로를 녹화의 원 크기에 맞춰 원으로 자른 벡터 (업스케일보다 선명).
 """
 import io
 import json

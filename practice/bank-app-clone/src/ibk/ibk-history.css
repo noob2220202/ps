@@ -1,0 +1,489 @@
+/* 거래내역조회 + 상세거래내역 시트 (spec: scratchpad/ibk/specB/history.md, 녹화 50.07~70.37초).
+   x 는 클론 좌표 = (녹화 x − 0.35) / 1.0242 · 본문 y = 녹화 y − 81.4 (머리줄 아래끝) · 시트 y = 시트 위끝 기준.
+   글자는 line-height 1 상자의 위끝(spec '줄높이1 상자 top')으로 놓음. 녹화 숫자는 괄호 안 */
+
+.ibt .ibk-body {
+  background: #fff;
+}
+.ibt-top {
+  position: relative;
+  height: 409px; /* 첫 거래 행 위끝 녹화 490.4 */
+}
+.ibt-top > *,
+.ibt-acct > *,
+.ibt-btn > span,
+.ibt-tx > *,
+.ibt-sheet > *,
+.ibt-card > *,
+.ibt-cell > * {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: pre;
+}
+
+/* '내 계좌' 16.5px 600 (상자 22.8 / 108.1) */
+.ibt-top__title {
+  left: 21.87px;
+  top: 26.4px;
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: #111;
+}
+
+/* 계좌 상자 (22.75~370.85 × 141.4~210.15), 테두리 1px #d5d5d5, r10.5 */
+.ibt-acct {
+  left: 21.87px;
+  top: 60px;
+  width: 339.88px;
+  height: 68.75px;
+  border-radius: 10.25px / 10.5px;
+  box-shadow: inset 0 0 0 1px #d5d5d5;
+  background: #fff;
+}
+/* IBK 원 로고: 중심 (54.1, 176.8), 지름 22.9 → 클론에서 겹쳐 맞춘 지름 22.15 (22.6 × 0.98), 0.25 아래 */
+.ibt-acct__logo {
+  left: 19.31px;
+  top: 24.1px;
+  transform: translate(0, 0.25px) scale(0.98);
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fff;
+}
+.ibt-acct__logo > img {
+  position: absolute;
+  max-width: none;
+}
+span.ibt-acct__logo:not(.ibk-logo) {
+  display: block;
+}
+/* 상품명 13px 500 #717377 (상자 73.66 / 159.0) */
+.ibt-acct__name {
+  left: 49.21px;
+  top: 17.55px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  color: #717377;
+}
+/* 계좌번호 15px 600 (상자 73.47 / 177.09) */
+.ibt-acct__no {
+  left: 49.52px;
+  top: 35.69px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+}
+/* ∨ (339.9,172.75) → (346.25,178.95) → (352.7,172.7), 1.2 #222 */
+.ibt-acct__chev {
+  left: 0;
+  top: 0;
+  transform: translate(309.66px, 31.3px);
+}
+
+/* 채우기 (22.75~193.3) / 이체 (202.05~370.85), y 225.0~270.05, r10.5 */
+.ibt-btn {
+  top: 143.6px;
+  height: 45.05px;
+  border-radius: 10.25px / 10.5px;
+  font-size: 14.43px;
+}
+.ibt-btn > span {
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+.ibt-btn--fill {
+  left: 21.87px;
+  width: 166.75px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #959595;
+  color: #222;
+  font-weight: 500;
+}
+.ibt-btn--fill > span {
+  top: 15.7px; /* 글자 상자 241.25 */
+  left: 0.4px;
+}
+.ibt-btn--send {
+  left: 196.93px;
+  width: 164.82px;
+  background: var(--ib-blue);
+  color: #fff;
+  font-weight: 600;
+}
+.ibt-btn--send > span {
+  top: 16.62px; /* 241.62 */
+}
+
+/* 링크 줄: 13px 600 #43454c, 상자 위 300.15, 밑줄 312.15~313.55 (1.4) — 밑줄은 녹화 글자 폭대로 따로 그음 */
+.ibt-links {
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+.ibt-links > * {
+  position: absolute;
+}
+.ibt-link {
+  top: 219.25px;
+  height: 13px;
+  font-size: 12.7px;
+  font-weight: 600;
+  line-height: 1;
+  color: #43454c;
+  white-space: nowrap;
+}
+.ibt-link::after {
+  content: "";
+  position: absolute;
+  top: 11.25px; /* 밑줄 위 312.15 */
+  height: 1.4px;
+  background: currentColor;
+}
+.ibt-link--1 {
+  left: 61.41px; /* 63.25 */
+}
+.ibt-link--1::after {
+  left: 0.15px; /* 63.4~134.85 */
+  width: 69.76px;
+}
+.ibt-link--2 {
+  left: 154.8px; /* 158.9 */
+}
+.ibt-link--2::after {
+  left: -0.14px; /* 158.75~230.4 */
+  width: 69.96px;
+}
+.ibt-link--3 {
+  left: 248.73px; /* 255.1 */
+}
+.ibt-link--3::after {
+  left: -0.68px; /* 254.4~330.4 */
+  width: 74.2px;
+}
+/* 구분선 1px #dfdfdf, x 147.15 / 243.0, y 300.8~312.0 */
+.ibt-links__bar {
+  top: 219.4px;
+  width: 0.98px;
+  height: 11.2px;
+  background: #dfdfdf;
+}
+.ibt-links__bar--1 {
+  left: 143.33px;
+}
+.ibt-links__bar--2 {
+  left: 236.92px;
+}
+
+/* 회색 띠 357.7~368.7 */
+.ibt-band {
+  left: 0;
+  right: 0;
+  top: 276.3px;
+  height: 11px;
+  background: var(--ib-mint);
+}
+/* '1개월 · 전체 · 최신순' 13px 400 #65676b (상자 23.0 / 392.6) + ∨ 1px #8f9093 */
+.ibt-filter {
+  left: 22.36px;
+  top: 312.45px;
+  height: 13px;
+  color: #65676b;
+  font-size: 12.7px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+.ibt-filter > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: 1;
+  white-space: pre;
+}
+.ibt-filter__chev {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(112.48px, 2.45px); /* (138.45,396.05) → (143.8,401.35) → (149.2,396.0) */
+}
+/* 기간 띠 428.5~475.6 #eff4f3, 글자 13.5px 400 #808389 (상자 22.6 / 445.5) */
+.ibt-period {
+  left: 0;
+  right: 0;
+  top: 347.1px;
+  height: 47.1px;
+  background: var(--ib-mint);
+}
+.ibt-period > span {
+  position: absolute;
+  left: 21.72px;
+  top: 16.75px;
+  font-size: 13.18px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  line-height: 1;
+  color: #808389;
+  white-space: pre;
+}
+
+/* ---------- 거래 행 (R = 490.4 + 103i, 높이 84, 행 사이 19, 상자 7.8~385.9 r8) ---------- */
+.ibt-list {
+  padding-bottom: 19px;
+}
+.ibt-tx {
+  position: relative;
+  display: block;
+  width: 369.46px;
+  height: 84px;
+  margin: 0 0 19px 7.27px;
+  border-radius: 8px;
+  background: #fff;
+  text-align: left;
+  touch-action: pan-y;
+  /* 손 뗌: 크기 230ms ease, 바탕 ≈130ms 페이드아웃 (spec 3-7) */
+  transition:
+    transform 230ms ease,
+    background-color 130ms linear;
+}
+.ibt-tx:last-child {
+  margin-bottom: 0;
+}
+/* 누름: scale .96 (230ms ease), 바탕 #f1f2f7 로 ≈150ms */
+.ibt-tx.is-down {
+  transform: scale(0.96);
+  background: #f1f2f7;
+  transition:
+    transform 230ms ease,
+    background-color 150ms linear;
+}
+/* 짧게 눌렀다 뗀 행: 크기만 돌아오고 바탕은 딤이 덮을 때까지 */
+.ibt-tx.is-held {
+  background: #f1f2f7;
+  transition: transform 230ms ease;
+}
+/* 'MM.DD HH:MM' 11.5px 700 #74777c (상자 22.96 / R+9.85) */
+.ibt-tx__date {
+  left: 14.61px;
+  top: 9.55px;
+  font-size: 11.23px;
+  font-weight: 700;
+  color: #74777c;
+}
+/* 이름: 한글 15px 600 (R+37.15), 영문·숫자 15.5px (R+36.45) */
+.ibt-tx__name {
+  left: 14.67px;
+  top: 36.65px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+}
+.ibt-tx__name--latin {
+  top: 35.95px;
+  font-size: 15.5px;
+}
+/* 금액 15.5px 600, 오른끝 371.0 (R+36.85). 입금 #2369c4 */
+.ibt-tx__amt {
+  right: 14.59px;
+  top: 36.6px;
+  font-size: 14.96px;
+  font-weight: 700;
+  color: #111;
+}
+.ibt-tx__amt--in {
+  color: #2369c4;
+}
+/* 거래 후 잔액 11.5px 700 #777a7f (R+63.9) */
+.ibt-tx__bal {
+  right: 14.59px;
+  top: 63.4px;
+  font-size: 11.23px;
+  font-weight: 700;
+  color: #777a7f;
+}
+.ibt-empty,
+.ibt-fail {
+  padding: 60px 22px;
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ib-sub);
+}
+.ibt-fail button {
+  margin-top: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px #939393;
+  font-size: 13px;
+  color: #3a3b3d;
+}
+
+/* ---------- 상세거래내역 시트 ----------
+   아래끝 = 앱 아래끝(녹화 788), 높이 = 내용: 출금(다시이체 있음) 545.85 → 위끝 242.15 / 입금 538.2 → 249.8 (COMMON 6) */
+.ibt-sheet {
+  position: relative;
+  height: 545.85px;
+}
+.ibt-sheet--plain {
+  height: 538.2px;
+}
+/* '상세거래내역' 16.5px 600 (상자 22.84 / T+26.35) */
+.ibt-sheet__title {
+  left: 21.96px;
+  top: 26.35px;
+  font-size: 16.5px;
+  font-weight: 600;
+  color: #111;
+}
+/* ✕ (351.3~367.45 × T+25.75~T+41.45), 1.5 #111 — 누름 칸 44 × 44 */
+.ibt-sheet__close {
+  left: 328.5px;
+  top: 11.6px;
+  width: 44px;
+  height: 44px;
+  color: #111;
+}
+.ibt-sheet__close .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(14.16px, 14.15px);
+}
+.ibt-sheet__close:active .ibk-icon {
+  opacity: 0.42;
+}
+/* 이름 14.5px 500 #3f4348 (상자 22.98 / T+79.36) */
+.ibt-sheet__name {
+  left: 22.1px;
+  top: 79.36px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #3f4348;
+}
+/* 금액 17.5px 600: 출금 #111 (상자 23.0 / T+109.35), 입금 #2369c4 (22.8 / T+105.6) */
+.ibt-sheet__amt {
+  left: 22.11px;
+  top: 109.35px;
+  font-size: 17.5px;
+  font-weight: 600;
+  color: #111;
+}
+.ibt-sheet__amt--in {
+  left: 21.92px;
+  top: 105.6px;
+  color: #2369c4;
+}
+/* 다시이체 (298.6~371.0 × T+102.75, 높이 30.15) 알약 r15, 1px #939393, 글자 13px 400 #3a3b3d (상자 위 T+111.35) */
+.ibt-sheet__resend {
+  left: 291.2px;
+  top: 102.75px;
+  width: 70.69px;
+  height: 30.15px;
+  border-radius: 15px;
+  box-shadow: inset 0 0 0 1px #939393;
+  background: #fff;
+  color: #3a3b3d;
+  font-size: 13px;
+  font-weight: 400;
+}
+.ibt-sheet__resend > span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8.6px;
+  line-height: 1;
+  text-align: center;
+}
+.ibt-sheet__resend:active:not(:disabled) {
+  background: var(--ib-press-row);
+}
+/* 표 카드 (22.75~371.0 × 389.7~765.45) 1px #eaeaea r12 — 출금 T+147.55, 입금 T+139.9 */
+.ibt-card {
+  left: 21.87px;
+  top: 147.55px;
+  width: 340.02px;
+  height: 375.75px;
+  border-radius: 11.72px / 12px;
+  box-shadow: inset 0 0 0 1px #eaeaea;
+}
+.ibt-sheet--plain .ibt-card {
+  top: 139.9px;
+}
+.ibt-card__line {
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #eaeaea;
+}
+.ibt-cell {
+  left: 0;
+  right: 0;
+  height: 49px;
+}
+/* 라벨 13px 400 #585c62 (상자 39.4 / 줄+18.1) */
+.ibt-cell__label {
+  left: 16.26px;
+  top: 18.1px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #585c62;
+}
+/* 값: 오른끝 355.0. 한글 13px 600 (줄+18.15), 숫자 13.5px 600 (줄+17.9). 공백 그대로 + 공백 넓게 (예금주명 '…   주') */
+.ibt-cell__value {
+  right: 15.62px;
+  top: 18.15px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  word-spacing: 1.3px;
+}
+.ibt-cell__value--num {
+  top: 17.9px;
+  font-size: 13.5px;
+}
+/* 메모 입력: 안내문도 굵은 검정 (녹화) */
+.ibt-cell__memo {
+  right: 15.62px;
+  top: 18.15px;
+  width: 230px;
+  height: 13px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 13px;
+  color: #111;
+  text-align: right;
+}
+.ibt-cell__memo::placeholder {
+  color: #111;
+  opacity: 1;
+}
+/* 등록 (317.45~354.85 × 727.25~749.7) r5.3, 1px #939393, 글자 11px 500 #333 (상자 위 733.25) */
+.ibt-cell__save {
+  left: 287.74px;
+  top: 41.2px;
+  width: 36.52px;
+  height: 22.45px;
+  border-radius: 5.17px / 5.3px;
+  box-shadow: inset 0 0 0 1px #939393;
+  background: #fff;
+  color: #333;
+  font-size: 11px;
+  font-weight: 500;
+}
+.ibt-cell__save > span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  line-height: 1;
+  text-align: center;
+}
+.ibt-cell__save:active:not(:disabled) {
+  background: var(--ib-press-row);
+}
