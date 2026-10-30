@@ -566,6 +566,10 @@ html[data-os="ios"] .ibk-loading {
   border-radius: 12px;
   background: var(--ib-mint);
 }
+/* 오류코드가 없으면(녹화엔 없는 경우) 상담 상자가 코드 상자 자리로 올라감 */
+.ibk-notice--nocode .ibk-notice__consult {
+  top: 295.1px;
+}
 .ibk-notice__consult b,
 .ibk-notice__consult span {
   position: absolute;

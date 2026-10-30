@@ -592,7 +592,7 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
         <BankIcon bank={payee.bank} size={30} />
         <span className="acct-edit__name">
           <strong>
-            {payee.holder} {payee.favorite && "★"}
+            {payee.holder} {payee.favorite && "★"} {payee.receiveError && "⚠"}
           </strong>
           <small>
             {payee.bank.short} {payee.number}
@@ -612,6 +612,20 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
             <button className="btn btn--sm" onClick={() => run(() => api.updatePayee(payee.id, { holder, number }), "받는 분 정보를 바꿨어요")}>
               저장
             </button>
+            {/* i-ONE Bank: 실제 녹화(28초)의 받는 은행 오류 안내를 이 계좌로 재현 */}
+            {APP === "ibk" && (
+              <button
+                className="btn btn--sm btn--ghost"
+                onClick={() =>
+                  run(
+                    () => api.updatePayee(payee.id, { receiveError: !payee.receiveError }),
+                    payee.receiveError ? "받는 은행 오류를 껐어요" : "이 계좌로 보내면 받는 은행 오류 안내가 떠요",
+                  )
+                }
+              >
+                {payee.receiveError ? "받는 은행 오류 끄기" : "받는 은행 오류 켜기"}
+              </button>
+            )}
             <button
               className="btn btn--sm btn--danger"
               onClick={() => confirm(`${payee.holder}님을 받는 분에서 지울까요?`) && run(() => api.deletePayee(payee.id), "받는 분을 지웠어요")}

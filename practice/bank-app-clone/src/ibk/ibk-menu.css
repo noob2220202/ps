@@ -1,0 +1,757 @@
+/* i-ONE Bank 전체메뉴 (ibm-) · 이체결과조회 (ibr-) · 이체확인증 (ibc-) — spec: scratchpad/ibk/specB/menu.md
+   x 는 클론 좌표 (= (녹화 x − 0.35) / 1.0242), 폭·가로 반경은 ÷1.0242.
+   글자는 .ibk-bl. 화면에서 Chrome 은 글자 상자 위(line-height 0)를 정수 픽셀로 반올림하고, 그 아래 c = floor(A − (A+D)/2) 에 기준선을 둠
+   (A·D = Roboto 올림 0.9277em · 내림 0.2441em 을 각각 반올림: 10.75·11px → 3, 12.5~13·14.5px → 4, 14.25·16·16.25px → 5, 19.75px → 6, 20.75px → 7;
+   실험 scratchpad/ibk/menuimpl/blt.cjs). 그래서 top = round(녹화 기준선) − c − (담는 상자의 녹화 y) 로 둠 → 기준선이 녹화와 ±0.5 안
+   ('기준선 − 0.3418 × 크기' 로 두면 크기·위치에 따라 1.4px 까지 위로 뜸)
+   전체메뉴 본문 y = 녹화 y − 29.4 (머리줄도 본문 안), 이체결과조회·확인증 본문 y = 녹화 y − 81.4 (머리줄 아래) */
+
+/* 앱 전체(body)의 자간 −0.2px 이 물려 내려오지 않게: 이 세 화면의 글자는 자간을 모두 여기서 정함 (적지 않은 것 = 0) */
+.ibm,
+.ibr,
+.ibc {
+  letter-spacing: 0;
+}
+
+/* ====================== 전체메뉴 ====================== */
+/* 바탕 (1-1): 상태바부터 이어지는 세로 그라데이션 → 녹화 y 232 부터 흰색. 정지점은 녹화 가장자리 열 평균 (압축 띠무늬를 매끈하게)
+   녹화 y 29.4 (224.7,237.2,251.5) · 40 #e2eefb · 80 #e7f3fe · 120 #ebf5fc · 160 #f3f8fd · 200 #f9fafd · 228 #fdfdfd · 232 #fff */
+.ibm .ibm-content {
+  position: relative;
+  height: 758.6px; /* 녹화는 스크롤하지 않음: 이체/출금 제목(775.4)까지가 앱 영역 안 */
+  background: linear-gradient(
+    180deg,
+    rgb(224.7, 237.2, 251.5) 0,
+    #e2eefb 10.6px,
+    #e7f3fe 50.6px,
+    #ebf5fc 90.6px,
+    #f3f8fd 130.6px,
+    #f9fafd 170.6px,
+    #fdfdfd 198.6px,
+    #fff 202.6px
+  );
+}
+.ibm .ibk-header {
+  color: #111;
+}
+/* 녹화 ✕ 누름은 아이콘이 흐려지지 않고 뒤에 옅은 덮개 (1-2) */
+.ibm .ibk-header__icon:active .ibk-icon {
+  opacity: 1;
+}
+/* '로그아웃' (1-2): 12.75px 600 자간 −0.70 #131b25, pen 21.8, 기준선 녹화 60.3. 밑줄 1px 중심 62.3, x 21.9~66.2 */
+.ibm-logout {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 64px;
+  height: 36px;
+  color: #131b25;
+}
+.ibm-logout span {
+  position: absolute;
+  left: 9.8px;
+  top: 18.6px; /* 기준선 60 − 4 − 단추 37.4 */
+  line-height: 0;
+  font-size: 12.75px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  white-space: nowrap;
+}
+.ibm-logout span::after {
+  content: "";
+  position: absolute;
+  left: 0.1px;
+  top: 5.858px;
+  width: 44.3px;
+  height: 1px;
+  background: currentColor;
+}
+/* ✕ 누름 덮개 (1-2): 녹화 x 344.8~(화면 밖) → 클론 336.3 ~ ✕ 중심 356.8 대칭 377.3, y 34.9~75.9, r≈7, 검정 5%. 67ms 에 진해짐, 뗀 뒤 100ms 에 옅어짐 */
+.ibm-close-press {
+  position: absolute;
+  left: 336.3px;
+  top: 5.5px;
+  width: 41px;
+  height: 41px;
+  border-radius: 6.83px / 7px;
+  background: rgba(0, 0, 0, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms linear;
+}
+.ibm .ibk-header:has(.ibk-header__icon[aria-label="닫기"]:active) .ibm-close-press,
+.ibm-close-press.is-hold {
+  opacity: 1;
+  transition-duration: 67ms;
+}
+.ibm-close-press.is-fade {
+  opacity: 0;
+  transition-duration: 100ms;
+}
+
+/* [이름]님 > (1-3): 이름 20.75px 600 자간 −0.575 #000 (pen 21.6, 기준선 녹화 119.0), '님' 400 #080e14 바로 뒤,
+   > 꺾쇠 선 중심 상자 7.1 × 15 (녹화 잉크 107.5~116 × 103~118.5), 1.5 #1b252c */
+.ibm-name {
+  position: absolute;
+  left: 11.6px;
+  top: 62.6px; /* 화면 92 (정수) + 줄 40 의 기준선 27 (반행간 8 + 올림 19) = 119 */
+  height: 40px;
+  padding: 0 10px;
+  line-height: 40px;
+  font-size: 20.75px;
+  white-space: nowrap;
+  text-align: left;
+  color: #000;
+}
+.ibm-name b {
+  font-weight: 600;
+  letter-spacing: -0.575px;
+}
+.ibm-name span {
+  font-weight: 400;
+  color: #080e14;
+}
+.ibm-name .ibk-icon {
+  display: inline-block;
+  margin-left: 9.4px;
+  vertical-align: 0.1px;
+  color: #1b252c;
+}
+
+/* 바로가기 카드 (1-4): 녹화 x 19.3~374.4 → 클론 18.5~365.2, y 147.0~195.0, 흰색 r14.5 (가로 14.16), 옅은 그림자 */
+.ibm-card {
+  position: absolute;
+  left: 18.5px;
+  top: 117.6px;
+  width: 346.7px;
+  height: 48px;
+  border-radius: 14.16px / 14.5px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+.ibm-card__item {
+  position: absolute;
+  top: 0;
+  height: 48px;
+}
+.ibm-card__img {
+  position: absolute;
+  display: block;
+}
+/* 글자 12.75px 500 자간 −0.66 #232425, 기준선 녹화 175.8 (카드 위에서 28.8) */
+.ibm-card__item span {
+  top: 25px; /* 기준선 176 − 4 − 카드 147 */
+  font-size: 12.75px;
+  font-weight: 500;
+  letter-spacing: -0.66px;
+  color: #232425;
+}
+/* 세로 구분선: 중심 클론 273.1, y 162.6~179.3, 1px #c4c4c4 */
+.ibm-card__bar {
+  position: absolute;
+  left: 254.1px;
+  top: 15.6px;
+  width: 1px;
+  height: 16.7px;
+  background: #c4c4c4;
+}
+/* 오른쪽 흰 흐림 (1-4 검증): '플라워' 가림 비율이 클론 x 312 20% · 325 43% · 336 56% · 340 65% · 359 94% → 300 에서 0, 362 에서 100% */
+.ibm-card__fade {
+  position: absolute;
+  left: 281.5px;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, #fff 62px);
+  pointer-events: none;
+}
+
+/* 검색칸 (1-5): 녹화 x 19.2~374.6 → 클론 18.4~365.4, y 217.6~262.4, #eff4f3 r11 (가로 10.74) */
+.ibm-search {
+  position: absolute;
+  left: 18.4px;
+  top: 188.2px;
+  width: 347px;
+  height: 44.8px;
+  border-radius: 10.74px / 11px;
+  background: var(--ib-mint);
+}
+/* 돋보기: 원 중심 클론 (40.3, 239.5) 반지름 5.5, 선 1.5 #6a6e73 (녹화 화소에 맞춤). 칸 위치(18.4, 217.6)는 화면에서 (18, 218) 로 붙음 → transform 으로 나머지 */
+.ibm-search__icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(16.79px, 15.99px);
+  color: #6a6e73;
+}
+/* 자리글 14.5px 500 자간 −0.40 #72757c, pen 51.8, 기준선 녹화 245.5 */
+.ibm-search span {
+  left: 33.4px;
+  top: 24.4px; /* 기준선 245.5 → 246 − 4 − 217.6 */
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  color: #72757c;
+}
+
+/* 회색 띠 (1-1): 녹화 y 292.4~299.7, 전체 폭 */
+.ibm-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 263px;
+  height: 7.3px;
+  background: var(--ib-mint);
+}
+
+/* 분류 칩 (1-6): y 314.8~348.6 (33.8) 알약, 테두리 1px (녹화는 2px 로 번져 진하기 합 50~70 → 1px #c2c2c2), 글자 14.5px 500 자간 −0.50 #4e5053
+   (기준선 녹화 337.2). 고른 칩: 진회색 #2d3037 채움(테두리 없음, 녹화 화소로 잼 — 안쪽만 채운 게 아님), 글자 600 자간 −0.58 흰색 */
+.ibm-chips {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 285.4px;
+  height: 33.8px;
+}
+.ibm-chip {
+  position: absolute;
+  top: 0;
+  height: 33.8px;
+  border-radius: 16.9px;
+  box-shadow: inset 0 0 0 1px #c2c2c2;
+  background: #fff;
+}
+.ibm-chip span {
+  top: 18.2px; /* 기준선 337 − 4 − 314.8 */
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  color: #4e5053;
+}
+.ibm-chip.is-on {
+  box-shadow: none;
+  background: #2d3037;
+}
+.ibm-chip.is-on span {
+  font-weight: 600;
+  letter-spacing: -0.58px;
+  color: #fff;
+}
+/* ⌄ 앞 흰 흐림 ('대출' 오른쪽 테두리만 옅음) */
+.ibm-chips__fade {
+  position: absolute;
+  left: 318px;
+  top: 0;
+  width: 13px;
+  height: 33.8px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5));
+  pointer-events: none;
+}
+/* ⌄ 원 (1-6, 녹화 화소로 다시 잼): 클론 x 332.0~365.6, y 314.8~348.5, 흰 바탕 + 1px #232323.
+   안쪽 V 선 중심 클론 340.0 → 348.5 → 356.9 × 녹화 327.5 → 336.1, 1.45 #3a3b3e */
+.ibm-chips__more {
+  position: absolute;
+  left: 332px;
+  top: 0;
+  width: 33.6px;
+  height: 33.7px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px #232323;
+  background: #fff;
+  color: #3a3b3e;
+}
+/* 단추는 화면 (332, 315) 에 붙음 → transform 으로 나머지 */
+.ibm-chips__more .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(8px, 12.5px);
+}
+
+/* 최근 이용 메뉴 (1-7): 16px 600 자간 −0.325 #000, pen 21.6, 기준선 녹화 399.7 / 펼쳐보기 12.75px 600 자간 −0.70 #616368, 끝 362.3, 기준선 398.6 */
+.ibm-recent {
+  left: 21.6px;
+  top: 365.6px; /* 기준선 400 − 5 − 29.4 */
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.325px;
+  color: #000;
+}
+.ibm-expand {
+  right: 12.4px;
+  top: 355.6px; /* 기준선 399 − 4 − 안쪽 여백 10 − 29.4 */
+  padding: 10px;
+  line-height: 0;
+  font-size: 12.75px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  color: #616368;
+}
+/* 구분선 (1-8): 중심 녹화 424.0 / 731.4, x 21.7~361.5, 1px #e4e4e4 */
+.ibm-line {
+  position: absolute;
+  left: 21.7px;
+  width: 339.8px;
+  height: 1px;
+  background: #e4e4e4;
+}
+.ibm-line--1 {
+  top: 394.1px;
+}
+.ibm-line--2 {
+  top: 701.5px;
+}
+
+/* 메뉴 묶음 (1-8): 아이콘(녹화에서 잘라 4배) + 제목 16px 600 자간 −0.40 #000 (pen 59.1) */
+.ibm-group {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.ibm-group__icon {
+  position: absolute;
+  top: 0;
+  display: block;
+}
+.ibm-group b {
+  left: 59.1px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: #000;
+}
+/* 조회: 아이콘 녹화 26,448 ~ 52,476 → 클론 25.04 · 25.39 × 28, 제목 기준선 468.0 */
+.ibm-group--inquiry {
+  top: 418.6px;
+  height: 28px;
+}
+.ibm-group--inquiry .ibm-group__icon {
+  left: 25.04px;
+  width: 25.39px;
+  height: 28px;
+}
+.ibm-group--inquiry b {
+  top: 15px; /* 기준선 468 − 5 − 448 */
+}
+/* 이체/출금: 아이콘 녹화 23,756 ~ 54,783 → 클론 22.11 · 30.27 × 27, 제목 기준선 775.4 */
+.ibm-group--transfer {
+  top: 726.6px;
+  height: 27px;
+}
+.ibm-group--transfer .ibm-group__icon {
+  left: 22.11px;
+  width: 30.27px;
+  height: 27px;
+}
+.ibm-group--transfer b {
+  top: 14px; /* 기준선 775 − 5 − 756 */
+}
+/* 하위 항목 (1-8): 14.5px 500 자간 −0.50 #1c1c1d, pen 21.8, 기준선 녹화 511.9 + 44.9k.
+   칸 = 기준선 −28.1 ~ +17.0 (45.1). 누르면 바탕 #f0f1f4, 클론 x 7.0 ~ 대칭 377, r≈7 (1-9) — 화면이 바뀔 때까지 남음 */
+.ibm-item {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 45.1px;
+}
+.ibm-item::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 0;
+  bottom: 0;
+  border-radius: 6.83px / 7px;
+}
+.ibm-item:active::before,
+.ibm-item.is-held::before {
+  background: #f0f1f4;
+}
+.ibm-item span {
+  left: 21.8px; /* top 은 항목마다 (IbkMenu blTop) */
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  color: #1c1c1d;
+}
+
+/* ====================== 이체결과조회 (본문 y = 녹화 y − 81.4) ====================== */
+.ibr-content {
+  position: relative;
+}
+/* 계좌 선택 상자 (2-2): 녹화 x 22.7~371.0 → 클론 21.8~361.9, y 104.0~176.7, 1px #d4d4d4 r11 (가로 10.74) */
+.ibr-acct {
+  position: absolute;
+  left: 21.8px;
+  top: 22.6px;
+  width: 340.1px;
+  height: 72.7px;
+  border-radius: 10.74px / 11px;
+  box-shadow: inset 0 0 0 1px #d4d4d4;
+  background: #fff;
+}
+/* 은행 건물: 화면 (44, 녹화 125) 에 정수로 */
+.ibr-acct__icon {
+  position: absolute;
+  left: 22.2px;
+  top: 21px;
+}
+/* '전체계좌' 14.25px 500 자간 +0.125 #2a2a2a, pen 82.9, 기준선 녹화 145.0 */
+.ibr-acct span {
+  left: 61.1px;
+  top: 36px; /* 기준선 145 − 5 − 104 */
+  font-size: 14.25px;
+  font-weight: 500;
+  letter-spacing: 0.125px;
+  color: #2a2a2a;
+}
+/* ⌄: 녹화 잉크 339~353.5 × 136~143.5 → 선 중심 상자 클론 331.25 · 녹화 136.65, 12.9 × 6.2, 1.3 #232323 */
+.ibr-acct__arrow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(309.45px, 33.1px);
+  color: #232323;
+}
+/* 회색 띠 (2-3): 녹화 y 214.0~225.2 */
+.ibr-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 132.6px;
+  height: 11.2px;
+  background: var(--ib-mint);
+}
+/* '1개월 · 즉시이체 ⌄' (2-3): 13px 500 자간 −0.275 #717478, pen 22.0, 기준선 녹화 259.7. 칸은 화면 y 240 (정수)부터 */
+.ibr-filter {
+  position: absolute;
+  left: 12px;
+  top: 158.6px;
+  width: 125px;
+  height: 36px;
+  color: #717478;
+}
+.ibr-filter span {
+  left: 10px;
+  top: 16px; /* 기준선 260 − 4 − 240 */
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.275px;
+}
+/* 작은 ⌄: 녹화 잉크 116~128 × 252~257.5 → 선 중심 상자 클론 113.4 · 252.5, 10.7 × 4.5, 1px 글자색 */
+.ibr-filter__arrow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(101.7px, 12.83px);
+}
+/* 굵은 돋보기 (2-3): 녹화 잉크 350~368 × 245~263.5 → 클론 341.4~359.0, 선 2 #000 */
+.ibr-search {
+  position: absolute;
+  left: 332px;
+  top: 158.6px;
+  width: 36px;
+  height: 36px;
+  color: #000;
+}
+.ibr-search .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(10.83px, 6.7px);
+}
+/* 기간 띠 (2-3): 녹화 y 284.8~331.7, 글자 13px 400 자간 +0.05 #6c6f75, pen 21.9, 기준선 312.5 */
+.ibr-period {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 203.4px;
+  height: 46.9px;
+  background: var(--ib-mint);
+}
+.ibr-period span {
+  left: 21.9px;
+  top: 24.2px; /* 기준선 312.6 → 313 − 4 − 284.8 */
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.05px;
+  color: #6c6f75;
+}
+.ibr-empty {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 300px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  color: var(--ib-sub);
+}
+/* 이체 행 (2-4): 칸 위 = 시각 기준선 − 18.3 (첫 행 녹화 346.5), 피치 134.7. 구분선 없음 */
+.ibr-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 134.7px;
+}
+/* 누름 바탕 (2-4): 칸 위 ~ 계좌 기준선 +11.4 (84.3), 클론 x 7.6 ~ 대칭 376.4, r≈6, #f7f8fb */
+.ibr-row__main {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 84.3px;
+}
+.ibr-row__main::before {
+  content: "";
+  position: absolute;
+  left: 7.6px;
+  right: 7.6px;
+  top: 0;
+  bottom: 0;
+  border-radius: 5.86px / 6px;
+}
+.ibr-row__main:active::before,
+.ibr-row__main.is-held::before {
+  background: #f7f8fb;
+}
+/* 행 글자 top 은 IbkResults ROW_TEXT (녹화 기준선) 로. 시각 11px 700 자간 +0.10 #6c6e73, pen 22.1, 기준선 +18.3 */
+.ibr-row__time {
+  left: 22.1px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  color: #6c6e73;
+}
+/* '정상' 11px 500 #6a6d72, 끝 362.0, 기준선 +20.4 */
+.ibr-row__state {
+  right: 22px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6a6d72;
+}
+/* 받는 분 14.25px 600 자간 +0.25 #131415, pen 22.0, 기준선 +50.9 */
+.ibr-row__name {
+  left: 22px;
+  font-size: 14.25px;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+  color: #131415;
+}
+/* 금액: 숫자 700 + '원' 500, 14.75px 자간 +0.10 #000 (녹화 기기 숫자가 한글보다 굵음 — §10 아래), 끝 362.0, 기준선 +50.9 */
+.ibr-row__amt {
+  right: 21.9px;
+  font-size: 14.75px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  color: #000;
+}
+.ibr-row__amt small,
+.ibr-row__acct small {
+  font-size: inherit;
+  font-weight: 500;
+}
+/* 은행 번호: 숫자 700 + 은행 이름 500, 10.75px 자간 +0.25 #686b70, pen 21.8, 기준선 +72.7 */
+.ibr-row__acct {
+  left: 21.8px;
+  font-size: 10.75px;
+  font-weight: 700;
+  letter-spacing: 0.25px;
+  color: #686b70;
+}
+/* 공유 (2-4): 녹화 잉크 348~361 × 437~450, 1.3 #0f0f0f. 아이콘 위치·크기는 IbkResults SHARE */
+.ibr-row__share {
+  position: absolute;
+  left: 330px;
+  top: 84.3px;
+  width: 32px;
+  height: 40px;
+  color: #0f0f0f;
+}
+.ibr-row__share .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* ====================== 이체확인증 (본문 y = 녹화 y − 81.4) ====================== */
+.ibc-content {
+  position: relative;
+  height: 706.6px; /* 스크롤 없음 (3-6): 본문 = 앱 아래끝까지 */
+  min-height: 100%;
+}
+/* '이체확인증' 19.75px 600 자간 +0.125 #171818, pen 22.2, 기준선 녹화 126.0 */
+.ibc-title {
+  left: 22.2px;
+  top: 38.6px; /* 기준선 126 − 6 − 81.4 */
+  font-size: 19.75px;
+  font-weight: 600;
+  letter-spacing: 0.125px;
+  color: #171818;
+}
+/* 표 (3-3): 녹화 x 23~371 → 클론 21.9~361.7, 위 테두리 중심 164.3, 9행 피치 41.82, 마지막 선 중심 540.7 */
+.ibc-table {
+  position: absolute;
+  left: 21.9px;
+  top: 82.4px;
+  width: 339.8px;
+  height: 377.38px;
+}
+/* 라벨 칸 클론 21.8~151.3 #eff4f3 */
+.ibc-table__labels {
+  position: absolute;
+  left: -0.1px;
+  top: 0;
+  bottom: 0;
+  width: 129.5px;
+  background: var(--ib-mint);
+}
+.ibc-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 41.82px;
+}
+/* 줄 위 선: 위 테두리는 진회색(번져 보이는 진하기 합 → #474747), 나머지는 1px #e9e9e9 (라벨 칸 위에선 #e5eae9) */
+.ibc-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #e5eae9 129.4px, #e9e9e9 129.4px);
+}
+.ibc-row:first-of-type::before {
+  background: #474747;
+}
+.ibc-row--end {
+  height: 1px;
+}
+/* 라벨 12.5px 600 자간 +0.13 #44474e, pen 31.4, 기준선 녹화 189.7 + 41.82k (선 중심 아래 25.4) */
+.ibc-row__label {
+  left: 9.5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.13px;
+  color: #44474e;
+}
+/* 값: 오른쪽 맞춤, 글자 끝 클론 352.4~352.7 (표 오른쪽 361.7 − 9.2) */
+.ibc-row__value {
+  font-weight: 500;
+}
+.ibc-row__value--ko {
+  right: 9.11px;
+  font-size: 12.5px;
+  letter-spacing: 0.19px;
+  color: #46484a;
+}
+/* 숫자 값: 13px 600 #343639 (녹화와 겹쳐 맞춤: 일시 모양 오차 600 0.05 / 500 0.31, 계좌 잉크 폭도 600 이 같음) */
+.ibc-row__value--num {
+  right: 9.03px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #343639;
+}
+.ibc-row__value--amt {
+  right: 8.78px;
+  font-size: 12.75px;
+  font-weight: 600;
+  letter-spacing: 0.22px;
+  color: #222425;
+}
+/* 금액 끝 '원'은 500 (녹화 기기 한글이 숫자보다 가늘게 나옴 — §10 아래. 0원 · 이체금액) */
+.ibc-row__value small {
+  font-size: inherit;
+  font-weight: 500;
+}
+/* 연습용 표시: 표 위에 비스듬한 옅은 글자를 반복 (표 글자는 그대로 읽히게) */
+.ibc-mark {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ibc-mark__sheet {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 720px;
+  transform: translate(-50%, -50%) rotate(-24deg);
+}
+.ibc-mark__sheet p {
+  margin: 0;
+  line-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: rgba(28, 86, 168, 0.12);
+  text-align: center;
+  white-space: nowrap;
+}
+.ibc-mark__sheet p:nth-child(even) {
+  text-indent: 150px;
+}
+/* 확인 문구 (3-4): 14.5px 600 #181a1a, pen 22.2, 기준선 녹화 579.8 */
+.ibc-confirm {
+  left: 22.2px;
+  top: 494.6px; /* 기준선 580 − 4 − 81.4 */
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #181a1a;
+}
+/* 안내 2줄: 12.5px 500 자간 +0.15 #2a2c2c, pen 22.1, 폭 339.8 자연 줄바꿈, 기준선 610.5 / 629.7 (줄 간격 19.2) */
+.ibc-note {
+  position: absolute;
+  left: 22.1px;
+  width: 339.8px;
+  top: 515.227px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 19.2px;
+  letter-spacing: 0.15px;
+  color: #2a2c2c;
+  word-break: keep-all; /* 녹화: 낱말 단위로 줄바꿈 ('참고용으로만' 뒤) */
+}
+/* IBK기업은행 로고 (3-5): 심볼 = CI 벡터(잉크 녹화 270~289 × 658~676), 글자 = 녹화에서 잘라 4배 (녹화 291~374 × 657~678) */
+.ibc-logo__symbol,
+.ibc-logo__word,
+.ibc-logo__text {
+  position: absolute;
+  display: block;
+}
+.ibc-logo__symbol {
+  left: 261.9px;
+  top: 575.81px;
+  width: 20.14px;
+  height: 19.52px;
+}
+.ibc-logo__word {
+  left: 283.78px;
+  top: 575.6px;
+  width: 81.04px;
+  height: 21px;
+}
+.ibc-logo__text {
+  left: 285px;
+  top: 578px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0055a2;
+}
+/* 공유하기 (3-6): 녹화 x 19.0~375.0 → 클론 18.2~365.8, y 717.9~770.4 (52.5), r12 #4092ef, 글자 16.25px 자간 +0.10 흰색 기준선 749.8 */
+.ibc-bottom {
+  left: 18.2px;
+  right: 18.2px;
+  bottom: 17.6px;
+}
+.ibc-bottom .ibk-btn {
+  height: 52.5px;
+  padding-top: 1.6px; /* 가운데 맞춤 글자를 0.8 내려 기준선 749.8 에 */
+  font-size: 16.25px;
+  font-weight: 500; /* 600 은 잉크가 1.36배 (공용 큰 버튼과 같은 판단) */
+  letter-spacing: 0.1px;
+}

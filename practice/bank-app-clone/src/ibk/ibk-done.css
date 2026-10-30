@@ -127,7 +127,7 @@
 /* '즐겨찾기에 추가해보세요' 700 11px #4879b1, 글자 상자 왼쪽 149.04 (몸통에서 12.03), 기준선 277.75 */
 .ibd-tip__t {
   left: 12.5px;
-  top: 15.92px;
+  top: 16.92px; /* Noto 잉크가 녹화 글꼴보다 위로 0.8 높아 무게중심이 −0.69 → 1px 내림 (검수) */
   font-size: 11px;
   font-weight: 700;
   letter-spacing: -0.18px;
@@ -219,20 +219,18 @@
   margin-right: 6.1px;
 }
 /* 로고 원 ⌀17.5 (5-5 는 16.7 — 녹화 평균에서 방향별 경계로 다시 잼: 반지름 8.1 / 8.4 + 렌더 치우침 0.3), 중심 = 기준선 − 5 */
-.ibd-logo .ibk-logo {
+/* 로고는 IbkBankLogo 의 .ibk-logo 원 또는 (녹화에 없는 은행) 공용 BankIcon 의 img/span → 클래스가 아니라 자식으로 잡음 */
+.ibd-logo > * {
   position: absolute;
   left: 0;
   top: 0;
   transform: translate(0, -13.75px);
-  /* 기업 로고 그림(원보다 큼)이 왼쪽 위로 붙지 않고 원 가운데에 오게: 칸을 원 크기로 고정하고 넘치는 그림도 가운데 정렬 */
-  grid-template: 100% / 100%;
-  place-items: unsafe center;
 }
-/* 로고 끝 → 계좌 글자 사이가 녹화에서 은행마다 다름 (기업 5.55 · 국민 6.6 — 5-5 의 6.44 / 6.83 과 같은 경향) */
-.ibd-acct--from .ibk-logo {
-  transform: translate(0.56px, -13.75px);
+/* 로고 끝 → 계좌 글자 사이가 녹화에서 은행마다 다름 (기업 6.3 · 국민 6.6 — 5-5 의 6.44 / 6.83 과 같은 경향) */
+.ibd-acct--from .ibd-logo > * {
+  transform: translate(-0.16px, -13.75px); /* 검수: 0.87 이면 녹화보다 오른쪽 +1.03 (경계 155.15~171.58 vs 156.16~172.64) */
 }
-.ibd-acct--to .ibk-logo {
+.ibd-acct--to .ibd-logo > * {
   transform: translate(-0.51px, -13.75px);
 }
 /* 통장 이름: 400 13px #6a6d72, 오른쪽 끝 327.72, 기준선 327.75 */
@@ -348,17 +346,31 @@
   background: currentColor;
 }
 
-/* 확인 눌림 (5-8, 144.767~145.133): ≈167ms 동안 scale .96 + 바탕 #1f4daa, 떼면 크기는 133ms 에 1 로 돌아오고
-   바탕은 117ms 더 #1f4daa 로 있다가 67ms 에 원래 색 */
+/* 공유·확인 글자 (5-8): 공용 .ibk-btn 그대로면 녹화보다 위로 0.6~0.7 (기준선이 749 에 붙음) → 2px 위 여백으로 1px 내림.
+   자간은 0-6 B 표의 클론 값 (공유 −0.37 · 확인 −0.27 — 공용 0 / +0.3 이면 두 글자 사이가 녹화보다 0.5 넓음) */
+.ibd .ibk-bottom > .ibk-btn {
+  padding-top: 2px;
+}
+.ibd .ibk-bottom > .ibk-btn--line {
+  padding-right: 0.64px; /* 글자 무게중심 +0.32 → 가운데로 */
+  letter-spacing: -0.37px;
+}
+.ibd .ibd-ok {
+  letter-spacing: -0.27px;
+}
+
+/* 확인 눌림 (5-8, 144.75~145.13 실제 프레임에 곡선을 맞춤 — done/fitpress.py):
+   누름: 크기 1 → .96 187ms cubic-bezier(0,.8,.7,1), 바탕 10ms 늦게 #1f4daa 까지 163ms cubic-bezier(0,.6,.7,1)
+   뗌(144.916): 크기 .96 → 1 220ms cubic-bezier(0,.8,.6,1), 바탕은 120ms 더 #1f4daa 로 있다가 67ms 에 원래 색 */
 .ibd .ibd-ok {
   transition:
-    transform 133ms cubic-bezier(0.25, 0.6, 0.4, 1),
-    background-color 67ms ease-out 117ms;
+    transform 220ms cubic-bezier(0, 0.8, 0.6, 1),
+    background-color 67ms ease-out 120ms;
 }
 .ibd .ibd-ok:active:not(:disabled) {
   transform: scale(0.96);
   background: #1f4daa;
   transition:
-    transform 167ms cubic-bezier(0.25, 0.6, 0.4, 1),
-    background-color 167ms cubic-bezier(0.3, 0.4, 0.4, 1);
+    transform 187ms cubic-bezier(0, 0.8, 0.7, 1),
+    background-color 163ms cubic-bezier(0, 0.6, 0.7, 1) 10ms;
 }

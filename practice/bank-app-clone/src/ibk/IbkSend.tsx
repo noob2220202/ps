@@ -29,7 +29,7 @@ export interface IbkDoneState {
 // 실제 앱은 '보내기' 뒤 비밀번호 화면(녹화가 막히는 보안 화면)이 뜨지만, 연습용이라 원호 로딩 뒤 바로 완료로 넘어감
 type Stage = "who" | "amount" | "confirm";
 type Dir = "fwd" | "back";
-// 받는 분 (서버가 receiveError 를 주면 '다음' 뒤 받는 은행 오류 안내 — 녹화 28초. 지금 서버엔 없음)
+// 받는 분 (서버가 receiveError 를 주면 '다음' 뒤 받는 은행 오류 안내 — 녹화 28초. 🔔 관리 → 받는 분에서 계좌마다 켬)
 type To = Recipient & { receiveError?: boolean };
 interface Notice {
   message: string;
@@ -42,7 +42,7 @@ const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
 const TITLE = "아래 내용을\n확인해주세요";
 const LIMIT = 10_000_000; // 서버의 1회 이체 한도
 // 금액 읽기 (amount 4-3): 만 미만은 숫자 그대로 "2,000원", 만 이상은 "20만원" (끝자리가 남는 경우는 녹화에 없음 → "12만 3,456원")
-export function ibkReadWon(n: number) {
+function ibkReadWon(n: number) {
   const man = Math.floor(n / 10000);
   const rest = n % 10000;
   if (!man) return `${nf.format(rest)}원`;
@@ -80,7 +80,8 @@ export function IbkSend() {
   const [error, setError] = useState<string | null>(null);
   const [asking, setAsking] = useState(false); // 취소 → 이체를 취소하시겠습니까?
   const [fromSheet, setFromSheet] = useState(false);
-  const [picked, setPicked] = useState<string | null>(null); // 누른 목록 행 (다음 화면까지 눌림 바탕 유지)
+  const [picked, setPicked] = useState<string | null>(null);
+  const [popSeq, setPopSeq] = useState(0); // 안드로이드 뒤로로 단계를 되돌린 횟수 // 누른 목록 행 (다음 화면까지 눌림 바탕 유지)
   // 받는 분 화면 상태 (금액에서 돌아와도 입력값·탭은 그대로)
   const [digits, setDigits] = useState("");
   const [tab, setTab] = useState<"acct" | "fav">("acct");
@@ -92,12 +93,19 @@ export function IbkSend() {
   const visited = useRef(false); // 금액 화면을 한 번 봤는지 (처음만 원호 로딩 — who 6.4 관측 1 vs 2)
   const leaving = useRef(false);
 
+  // 머리줄 오른쪽(≡ ↔ 취소)은 본문보다 늦게 바뀜: 받는 분 → 금액은 도착하고 33ms 뒤(amount 8-1), 금액 → 받는 분은 밀기 둘째 프레임(≈100ms, who 6.6)
+  const [head, setHead] = useState<Stage>("who");
+  const headTimer = useRef(0);
+  useEffect(() => () => clearTimeout(headTimer.current), []);
   const toStage = (s: Stage, d: Dir) => {
+    clearTimeout(headTimer.current);
+    headTimer.current = window.setTimeout(() => setHead(s), d === "fwd" ? 293 : 100);
     setStage(s);
     setDir(d);
     setSeq((n) => n + 1);
     setKp(false);
     setPicked(null);
+    setTyping(false); // 입력칸이 사라지면 blur 가 오지 않음
   };
   const choose = (r: To) => {
     if (!to || to.bank.code !== r.bank.code || to.number !== r.number) {
@@ -107,17 +115,18 @@ export function IbkSend() {
     setTo(r); // 금액은 그대로 (amount 8-6: 받는 분을 바꿔도 200,000원 유지)
   };
 
-  // 목록 행 → 금액. 처음엔 233ms 뒤 원호 → 금액 화면이 오른쪽에서 (원호는 도착하고 ≈150ms 뒤 사라짐), 두 번째부터는 ≈330ms 뒤 바로 (who 6.4·6.5)
+  // 목록 행 → 금액. 처음엔 원호 → 금액 화면이 오른쪽에서 (원호는 도착하고 ≈150ms 뒤 사라짐), 두 번째부터는 바로 (who 6.4·6.5).
+  // 녹화는 누른 순간부터 원호 233ms · 전환 333ms 이고 손을 뗀 건 그 33~67ms 뒤 → 뗀(click) 뒤로는 200 / 290ms
   const pick = async (r: To, key: string) => {
     if (busy.current) return;
     busy.current = true;
     setPicked(key);
     let release: (() => void) | null = null;
     if (!visited.current) {
-      await ibkSleep(233);
+      await ibkSleep(200);
       release = holdIbkSpinner();
       await ibkSleep(1000);
-    } else await ibkSleep(330);
+    } else await ibkSleep(290);
     visited.current = true;
     choose(r);
     toStage("amount", "fwd");
@@ -156,6 +165,40 @@ export function IbkSend() {
       busy.current = false;
     }
   };
+
+  // 거래내역 '다시이체': ?bank=…&number=… 로 오면 원호 아래에서 그 계좌를 조회해 금액 화면부터 (받는 분 화면은 그리지 않음)
+  const againBank = params.get("bank");
+  const againNumber = params.get("number");
+  const [again, setAgain] = useState(!!(againBank && againNumber));
+  const chooseRef = useRef(choose);
+  useEffect(() => {
+    chooseRef.current = choose;
+  });
+  useEffect(() => {
+    if (!againBank || !againNumber) return;
+    let live = true;
+    busy.current = true;
+    const release = holdIbkSpinner();
+    Promise.all([api.lookupAccount(againBank, againNumber), ibkSleep(700)])
+      .then(
+        ([r]) => {
+          if (!live) return;
+          visited.current = true;
+          chooseRef.current(r);
+          setHead("amount");
+          setStage("amount");
+        },
+        () => live && setNotice({ message: "입금계좌 정보가 올바르지 않습니다. 은행과 계좌번호를 확인해 주시기 바랍니다.", then: "who" }),
+      )
+      .finally(() => {
+        busy.current = false;
+        release();
+        if (live) setAgain(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, [againBank, againNumber]);
 
   // 금액 '다음' → 뗀 다음 프레임에 원호 1.4초 → 확인 화면 (오른쪽에서) | 안내 화면 (한 번에) — amount 8-5
   const next = async () => {
@@ -213,6 +256,18 @@ export function IbkSend() {
     }
   };
 
+  // 안내 화면 '확인' → 전환 없이 한 번에 (amount 7: 금액 화면 C 상태로)
+  const closeNotice = () => {
+    if (!notice) return;
+    setNotice(null);
+    if (notice.then !== stage) {
+      clearTimeout(headTimer.current);
+      setHead(notice.then);
+      setStage(notice.then);
+      setDir(null);
+      setSeq((n) => n + 1);
+    }
+  };
   // 뒤로: 단계 하나씩. 머리줄 ← 는 뗀 뒤 ≈450ms 기다렸다 (amount 8-7, confirm 4-2), 안드로이드 뒤로는 바로
   const stepBack = () => {
     if (stage === "confirm") toStage("amount", "back");
@@ -227,23 +282,22 @@ export function IbkSend() {
       stepBack();
     }, 450);
   };
-  useIbkBackHandler(stage !== "who", () => !leaving.current && !busy.current && stepBack(), stage);
+  // 금액·확인 단계 동안 뒤로가기 칸 하나. 뒤로가기로 빠지면 한 단계 되돌리고, 아직 깊으면 key(popSeq)를 바꿔 다시 쌓음.
+  // (단계가 바뀔 때마다 key 를 바꾸면 걷어 내는 history.back() 과 다시 쌓는 pushState 가 엇갈려 칸이 사라짐 → 앞으로 갈 땐 그대로 둠)
+  useIbkBackHandler(
+    stage !== "who",
+    () => {
+      setPopSeq((n) => n + 1);
+      if (!leaving.current && !busy.current) stepBack();
+    },
+    popSeq,
+  );
   useIbkBackHandler(!!notice, () => closeNotice());
   useIbkBackHandler(!!editing, () => setEditing(null));
   useIbkBackHandler(kp, () => setKp(false));
   useIbkBackHandler(asking, () => setAsking(false));
   useIbkBackHandler(!!error, () => setError(null));
 
-  // 안내 화면 '확인' → 전환 없이 한 번에 (amount 7: 금액 화면 C 상태로)
-  const closeNotice = () => {
-    if (!notice) return;
-    setNotice(null);
-    if (notice.then !== stage) {
-      setStage(notice.then);
-      setDir(null);
-      setSeq((n) => n + 1);
-    }
-  };
   // 취소 → 예: 단계와 상관없이 이체를 나감 (쌓아 둔 뒤로가기 칸이 있으면 두 칸)
   // (지금 칸이 ibkBack = n 이면 n 칸 + 이체 화면 한 칸을 한 번에 — 열려 있던 알림창 등은 뒤로가기 처리기가 알아서 닫힘)
   const leave = () => {
@@ -261,7 +315,7 @@ export function IbkSend() {
         title="이체"
         onBack={headerBack}
         right={
-          stage === "who" ? (
+          head === "who" ? (
             <IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />
           ) : (
             <IbkHeaderText onClick={() => setAsking(true)}>취소</IbkHeaderText>
@@ -270,7 +324,7 @@ export function IbkSend() {
       />
       {stage === "who" && (
         <div key={`who-${seq}`} className={`ibk-body ibs-body ${anim}`}>
-          {ready ? (
+          {ready && !again ? (
             <Who
               data={data.data}
               digits={digits}
@@ -330,19 +384,19 @@ export function IbkSend() {
               onReserve={() => setError("연습용 앱에서는 예약이체를 할 수 없어요.")}
             />
           </div>
-          {kp ? (
+          {/* '다음'은 늘 있고 자판이 올라오면 판이 덮음 (자판 '확인'을 떼는 순간 같은 프레임에 보임 — amount 6-3) */}
+          <div key={`next-${seq}`} className={`ibk-bottom ibs-bottom ${late}`}>
+            <button className="ibk-btn ibs-press" disabled={amount <= 0} onClick={next}>
+              다음
+            </button>
+          </div>
+          {kp && (
             <IbkKeypad
               chips
               onKey={(k) => setAmount((a) => press(a, k))}
               onChip={(add) => setAmount((a) => Math.min(add === null ? account.balance : a + add, 99_999_999_999))}
               onDone={() => setKp(false)}
             />
-          ) : (
-            <div key={`next-${seq}`} className={`ibk-bottom ibs-bottom ${late}`}>
-              <button className="ibk-btn ibs-press" disabled={amount <= 0} onClick={next}>
-                다음
-              </button>
-            </div>
           )}
         </>
       )}
@@ -513,7 +567,7 @@ function Who({
                 onSoon();
               }}
             >
-              <IbkIcon name="camera" />
+              <IbkIcon name="camera" sw={1.62} />
             </button>
           )}
         </label>
@@ -522,7 +576,7 @@ function Who({
           <span className="ibk-bl">연락처 이체</span>
         </button>
         <button className="ibs-link ibs-link--search" onClick={onSoon}>
-          <IbkIcon name="search" />
+          <IbkIcon name="search" sw={1.5} />
           <span className="ibk-bl">계좌 검색</span>
         </button>
         <div className={`ibs-seg ibs-seg--${tab}`} role="tablist">
@@ -560,7 +614,7 @@ function Section({ title, count, open, onToggle }: { title: string; count?: numb
         {title}
         {count !== undefined && <b>{count}</b>}
       </span>
-      <IbkIcon name={open ? "chevron-up" : "chevron-down"} className={open ? "ibs-sec__up" : "ibs-sec__down"} />
+      <IbkIcon name={open ? "chevron-up" : "chevron-down"} sw={1.38} className={open ? "ibs-sec__up" : "ibs-sec__down"} />
     </button>
   );
 }
@@ -571,11 +625,13 @@ function WhoRow({ row, on, onPick }: { row: Row; on: boolean; onPick: () => void
     <button className={`ibs-row ${on ? "ibs-row--on" : ""}`} onClick={onPick}>
       <i className="ibs-row__bg" />
       <span className="ibs-row__in">
-        <IbkBankLogo bank={row.r.bank} size={29.6} className="ibs-row__logo" />
+        <span className="ibs-row__logo">
+          <IbkBankLogo bank={row.r.bank} size={29.6} />
+        </span>
         <b className="ibk-bl ibs-row__name">{row.name}</b>
         <span className="ibk-bl ibs-row__acct">
-          {row.r.bank.short}
-          <span>{ibkNumber(row.r.bank, row.r.number)}</span>
+          <small>{row.r.bank.short}</small>
+          {ibkNumber(row.r.bank, row.r.number)}
         </span>
         {row.last && (
           <span className="ibk-bl ibs-row__last">
@@ -612,17 +668,21 @@ function Amount({
   return (
     <div className="ibs-amt">
       <h2 className="ibk-bl ibs-amt__h ibs-amt__h--from">내 계좌에서</h2>
-      <IbkBankLogo bank={account.bank} size={22.8} className="ibs-amt__logo ibs-amt__logo--from" />
+      <span className="ibs-amt__logo ibs-amt__logo--from">
+        <IbkBankLogo bank={account.bank} size={21.9} />
+      </span>
       <button className="ibs-amt__line ibs-amt__line--from" onClick={onFrom} aria-label="출금계좌 바꾸기">
         <span className="ibs-amt__bank">{account.bank.short}</span>
         <span className="ibs-amt__num">{ibkNumber(account.bank, account.number ?? "")}</span>
-        <IbkIcon name="chevron-down" w={13.67} h={6.8} color="#7a7a7a" className="ibs-amt__chev" />
+        <IbkIcon name="chevron-down" w={12.9} h={6.15} color="#7a7a7a" className="ibs-amt__chev" />
       </button>
       <span className="ibk-bl ibs-amt__avail">
         출금가능금액 <span>{nf.format(account.balance)}</span>원
       </span>
       <h2 className="ibk-bl ibs-amt__h ibs-amt__h--to">{to.holder}님 계좌로</h2>
-      <IbkBankLogo bank={to.bank} size={22} className="ibs-amt__logo ibs-amt__logo--to" />
+      <span className="ibs-amt__logo ibs-amt__logo--to">
+        <IbkBankLogo bank={to.bank} size={22.6} />
+      </span>
       <div className="ibs-amt__line ibs-amt__line--to">
         <span className="ibs-amt__bank">{to.bank.short}</span>
         <span className="ibs-amt__num">{ibkNumber(to.bank, to.number)}</span>
@@ -676,21 +736,29 @@ function Confirm({
 }) {
   return (
     <div className="ibs-cf">
-      <IbkBankLogo bank={account.bank} size={29.8} className="ibs-cf__logo ibs-cf__logo--from" />
+      <span className="ibs-cf__logo ibs-cf__logo--from">
+        <IbkBankLogo bank={account.bank} size={29.8} />
+      </span>
       {/* ▸ 1.5초 주기로 깜빡임 (3-2) */}
       <svg className="ibs-cf__tri" width="5.94" height="11.8" viewBox="0 0 5.94 11.8" aria-hidden>
         <path d="M0 0v11.8l5.94-5.9Z" fill="#101010" stroke="#101010" strokeWidth="0.6" strokeLinejoin="round" />
       </svg>
-      <IbkBankLogo bank={to.bank} size={29.9} className="ibs-cf__logo ibs-cf__logo--to" />
+      <span className="ibs-cf__logo ibs-cf__logo--to">
+        <IbkBankLogo bank={to.bank} size={29.9} />
+      </span>
       <h2 className="ibk-bl ibs-cf__name">{to.holder}님께</h2>
       <span className="ibk-bl ibs-cf__acct">{`${to.bank.short} ${ibkNumber(to.bank, to.number)}`}</span>
-      <h2 className="ibk-bl ibs-cf__q">{nf.format(amount)}원을 보낼까요?</h2>
+      <h2 className="ibk-bl ibs-cf__q">
+        <span>{nf.format(amount)}</span>원을 보낼까요?
+      </h2>
       <span className="ibk-bl ibs-cf__kor">{ibkReadWon(amount)}</span>
       <div className="ibs-cf__card">
         <div className="ibs-cf__row ibs-cf__row--from">
           <span className="ibk-bl ibs-cf__label">출금계좌</span>
           <span className="ibk-bl ibs-cf__from">
-            <IbkBankLogo bank={account.bank} size={16.7} className="ibs-cf__mini" />
+            <span className="ibs-cf__mini">
+              <IbkBankLogo bank={account.bank} size={16.7} />
+            </span>
             {`${account.bank.short} ${ibkNumber(account.bank, account.number ?? "")}`}
           </span>
           <span className="ibk-bl ibs-cf__fromname">{account.label}</span>

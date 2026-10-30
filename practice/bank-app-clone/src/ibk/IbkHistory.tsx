@@ -20,7 +20,13 @@ import "./ibk-history.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const ymd = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
-const won = (n: number) => `${nf.format(n)}원`;
+// 금액 + '원'. '원' 은 따로 (.ibt-won — 녹화 삼성 한글 글꼴은 Noto 보다 가늘고 숫자와 사이가 조금 넓음, 시트에선 0.85 아래)
+const Won = ({ n }: { n: number }) => (
+  <>
+    {nf.format(n)}
+    <span className="ibt-won">원</span>
+  </>
+);
 const hangul = (s: string) => /[ㄱ-ㆎ가-힣]/.test(s);
 const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
 const MEMO_MAX = 25; // 녹화 '최대 25자까지 입력'
@@ -38,9 +44,12 @@ function IbkCircleLogo({ size }: { size: number }) {
 }
 
 // 거래 행. 누르는 동안 scale(.96) + 바탕 #f1f2f7 (spec 3-7). 끌어서 스크롤해도 누른 모습 그대로 따라가고, 손을 떼면 되돌아감.
-// 짧게 누르고 떼면(클릭) 크기만 돌아가고 바탕은 딤이 덮을 때까지 그대로
+// 짧게 누르고 떼면(클릭) 크기만 돌아가고 바탕은 그때까지 차오른 색 그대로 딤이 덮을 때까지 멈춤
+// (녹화 ② 53.80 #f6f7fa · ③ 59.27 #f3f4f7 에서 멈춤 — raw 156~161, 215~220)
 function TxRow({ tx, onOpen, held }: { tx: Transaction; onOpen: (tx: Transaction) => void; held: boolean }) {
   const [pressed, setPressed] = useState(false);
+  const [frozen, setFrozen] = useState<string | undefined>();
+  const self = useRef<HTMLButtonElement>(null);
   const moved = useRef(false);
   const start = useRef({ x: 0, y: 0 });
   const clear = useRef<(() => void) | null>(null);
@@ -76,22 +85,33 @@ function TxRow({ tx, onOpen, held }: { tx: Transaction; onOpen: (tx: Transaction
   const name = tx.merchant;
   return (
     <button
+      ref={self}
       className={`ibt-tx ${pressed ? "is-down" : ""} ${held ? "is-held" : ""}`}
+      style={held ? { backgroundColor: frozen } : undefined}
       onPointerDown={down}
       onPointerMove={move}
-      onClick={() => !moved.current && onOpen(tx)}
+      onClick={() => {
+        if (moved.current) return;
+        if (self.current) setFrozen(getComputedStyle(self.current).backgroundColor);
+        onOpen(tx);
+      }}
     >
       <span className="ibt-tx__date">
         {tx.date} {tx.time}
       </span>
       <b className={`ibt-tx__name ${hangul(name) ? "" : "ibt-tx__name--latin"}`}>{name}</b>
-      <b className={`ibt-tx__amt ${out ? "" : "ibt-tx__amt--in"}`}>{out ? `-${won(-tx.amount)}` : won(tx.amount)}</b>
-      <span className="ibt-tx__bal">{won(tx.balanceAfter)}</span>
+      <b className={`ibt-tx__amt ${out ? "" : "ibt-tx__amt--in"}`}>
+        {out ? "-" : ""}
+        <Won n={Math.abs(tx.amount)} />
+      </b>
+      <span className="ibt-tx__bal">
+        <Won n={tx.balanceAfter} />
+      </span>
     </button>
   );
 }
 
-// 상세 표의 값: 숫자(일시·계좌번호·'-')는 Roboto 13.5px, 한글은 13px (spec 4-3)
+// 상세 표의 값: 숫자(일시·계좌번호·'-')는 Roboto 13px 700, 한글은 12.7px 600 (spec 4-3 을 녹화와 겹쳐 다시 맞춤)
 function Cell({ label, value, top }: { label: string; value: string; top: number }) {
   const num = /^[\d\s.:-]+$/.test(value);
   return (
@@ -169,7 +189,10 @@ function TxSheetBody({
         <IbkIcon name="close" w={15.77} h={15.7} />
       </button>
       <p className="ibt-sheet__name">{tx.merchant}</p>
-      <b className={`ibt-sheet__amt ${out ? "" : "ibt-sheet__amt--in"}`}>{out ? `-${won(-tx.amount)}` : won(tx.amount)}</b>
+      <b className={`ibt-sheet__amt ${out ? "" : "ibt-sheet__amt--in"}`}>
+        {out ? "-" : ""}
+        <Won n={Math.abs(tx.amount)} />
+      </b>
       {resend && (
         <button className="ibt-sheet__resend" disabled={!t} onClick={() => t && detail && onResend(detail)}>
           <span>다시이체</span>
@@ -223,7 +246,8 @@ export function IbkHistory() {
   const fromIso = `${from.getFullYear()}-${pad(from.getMonth() + 1)}-${pad(from.getDate())}`;
   const list = (txs.data ?? []).filter((t) => t.at.slice(0, 10) >= fromIso); // 서버가 최신순으로 줌
 
-  // 상세 시트: 행을 떼고 ≈130ms 뒤 딤(녹화 53.83 → 53.97), 딤 뒤 ≈200ms 기다렸다 시트 (상세 조회 시간 — 녹화 333/133ms)
+  // 상세 시트: 행을 떼고 ≈180ms 뒤 딤(녹화 손 뗌 53.80 → 딤 53.967 / 59.27 → 59.50), 딤 뒤 ≈300~330ms 에 시트가 올라오기 시작
+  // (녹화 53.967 → 54.30 / 59.50 → 59.80 — 59.633 의 4% 한 장은 200ms 멈춘 첫 프레임이라 셈에서 뺌). wait 270 + rAF 두 번 ≈ 녹화와 같음
   const [sel, setSel] = useState<Transaction | null>(null);
   const [detail, setDetail] = useState<TransactionDetail | null>(null);
   const [open, setOpen] = useState(false);
@@ -244,13 +268,13 @@ export function IbkHistory() {
     timer.current = window.setTimeout(() => {
       setOpen(true);
       setHeld(null);
-    }, 130);
+    }, 180);
   };
   const close = () => setOpen(false);
   const resend = (d: TransactionDetail) => {
     if (!d.transfer) return;
     // 시트의 뒤로가기 칸을 이체 화면으로 바꿔 넣음 → 이체에서 뒤로 오면 시트는 닫힘
-    go(`/send?bank=${d.transfer.bank.code}&number=${d.transfer.number}`, { ...IBK_PAGE, replace: true });
+    go(`/send?from=${encodeURIComponent(accountId)}&bank=${d.transfer.bank.code}&number=${d.transfer.number}`, { ...IBK_PAGE, replace: true });
   };
 
   return (
@@ -282,7 +306,7 @@ export function IbkHistory() {
               <button className="ibt-btn ibt-btn--fill" onClick={soon}>
                 <span>채우기</span>
               </button>
-              <button className="ibt-btn ibt-btn--send" onClick={() => go(`/send?from=${accountId}`, IBK_PAGE)}>
+              <button className="ibt-btn ibt-btn--send" onClick={() => go(`/send?from=${encodeURIComponent(accountId)}`, IBK_PAGE)}>
                 <span>이체</span>
               </button>
               <nav className="ibt-links">
@@ -319,7 +343,7 @@ export function IbkHistory() {
           </>
         ) : null}
       </div>
-      <IbkSheet open={open} onClose={close} wait={200}>
+      <IbkSheet open={open} onClose={close} wait={270}>
         {sel && (
           <TxSheetBody key={sel.id} tx={sel} detail={detail} onClose={close} onResend={resend} onNotice={setNotice} />
         )}

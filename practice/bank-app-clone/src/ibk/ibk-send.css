@@ -1,12 +1,23 @@
 /* i-ONE Bank 이체 (IbkSend · IbkKeypad). 녹화 82d59fba — spec/who.md, specB/amount.md, specB/confirm.md
    x = 클론 좌표 ((녹화 x − 0.35) / 1.0242), 본문 안 y = 녹화 y − 81.4 (머리줄 아래 끝). 글자는 .ibk-bl: top = 기준선 − 0.3418em */
 
+/* 단계 밀기: 녹화 위치 기록(34.533~34.733 오른쪽에서 +299/246/163/76/47/0, 42.000~42.167 왼쪽에서 −334/278/193/149/30/0)을
+   맞춰 보면 거의 일정한 속도 — 앞으로 260ms linear(오차 0.028), 뒤로 190ms linear(0.040). 공용 곡선(.25,.6,.35,1 / .2,.2,.3,1)은
+   처음이 빨라 오차 0.07~0.09 → 이체 화면에서만 바꿈 */
+.ibs .ibk-in-right {
+  animation-duration: 260ms;
+  animation-timing-function: linear;
+}
+.ibs .ibk-in-left {
+  animation-duration: 190ms;
+  animation-timing-function: linear;
+}
 /* 아래 버튼은 본문이 밀려 들어오는 동안엔 없고 도착한 프레임에 나타남 (amount 8-1, confirm 3-8) */
 .ibs-late {
-  animation: ibs-late 230ms step-end backwards;
+  animation: ibs-late 260ms step-end backwards;
 }
 .ibs-late--back {
-  animation-duration: 200ms;
+  animation-duration: 190ms;
 }
 @keyframes ibs-late {
   from {
@@ -44,7 +55,7 @@
   top: 39.04px;
   font-size: 19.5px;
   font-weight: 600;
-  letter-spacing: 0.36px;
+  letter-spacing: 0.44px;
   color: #000;
 }
 /* '입금계좌': 500 13px #555658, 잉크 왼쪽 27.72 → 26.72, 기준선 176.8 (2.4) */
@@ -60,8 +71,8 @@
 .ibs-acct {
   position: absolute;
   left: 21.72px;
+  right: 22.11px; /* 폭 340.17 (아이폰 402 폭에서도 좌우 여백 그대로) */
   top: 106.4px;
-  width: 340.17px;
   height: 52.8px;
   box-sizing: border-box;
   border: 1px solid #d5d8d8;
@@ -110,7 +121,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  transform: translate(11.42px, calc(15.5px + var(--ib-y0)));
+  transform: translate(11.42px, calc(15.1px + var(--ib-y0)));
 }
 /* 지우기 (녹화에 없음): 회색 원 18 안 흰 × */
 .ibs-acct__clear {
@@ -144,7 +155,7 @@
 }
 /* 연락처 아이콘 선 중심 녹화 202.6~213.0 × 255.8~267.1 → 클론 197.47, #3a3a3c */
 .ibs-link--contact {
-  left: 190px;
+  right: 96px; /* 왼끝 190 */
   width: 98px;
 }
 .ibs-link--contact .ibk-icon {
@@ -156,7 +167,7 @@
 }
 /* 돋보기 원 중심 녹화 (306.2, 260.9) → 클론 (298.62, 260.9), #111 */
 .ibs-link--search {
-  left: 287px;
+  right: 17px; /* 왼끝 287 */
   width: 80px;
 }
 .ibs-link--search .ibk-icon {
@@ -171,8 +182,8 @@
 .ibs-seg {
   position: absolute;
   left: 21.72px;
+  right: 22.01px; /* 폭 340.27 */
   top: 231.6px;
-  width: 340.27px;
   height: 53px;
   box-sizing: border-box;
   border: 1px solid #e8eaec;
@@ -183,26 +194,26 @@
   position: absolute;
   left: 3.4px;
   top: 3.5px;
-  width: 161.78px;
+  width: calc(50% - 7.355px); /* 161.78 (안 폭 338.27 = 3.4 + 161.78 + 7.91 + 161.78 + 3.4) */
   height: 44.5px;
   border-radius: 5.86px / 6px;
   background: #fff;
   box-shadow: 0 5px 4px rgba(0, 0, 0, 0.05);
 }
 .ibs-seg--fav .ibs-seg__pill {
-  transform: translateX(169.69px);
+  transform: translateX(calc(100% + 7.91px));
 }
 .ibs-seg button {
   position: absolute;
   top: 3.5px;
-  width: 161.78px;
+  width: calc(50% - 7.355px);
   height: 44.5px;
 }
 .ibs-seg button:first-of-type {
   left: 3.4px;
 }
 .ibs-seg button:last-of-type {
-  left: 173.09px;
+  left: calc(50% + 3.955px); /* 173.09 */
 }
 /* 글자: 기준선 녹화 344.1 = 알약 위 + 26.6. 고른 칸 600 #000 / 아닌 칸 400 #6f7277 (14.5px).
    잉크 가운데가 알약 가운데보다 바깥쪽으로 1.35 (녹화 108.6 vs 110.0, 285.1 vs 283.75) */
@@ -257,15 +268,15 @@
 }
 .ibs-sec .ibk-icon {
   position: absolute;
-  left: 0;
+  left: calc(100% - 36.66px); /* 347.34 */
   top: 0;
   color: #222;
 }
 .ibs-sec__down {
-  transform: translate(347.34px, calc(16.8px + var(--ib-y0)));
+  transform: translateY(calc(16.8px + var(--ib-y0)));
 }
 .ibs-sec__up {
-  transform: translate(347.34px, calc(17.3px + var(--ib-y0)));
+  transform: translateY(calc(17.3px + var(--ib-y0)));
 }
 
 /* 목록 행 (2.10): 피치 63.55, 로고 원 중심 = 행 위 + 26.2 (녹화 524.3), 지름 29.6 (녹화 가로 30 × 세로 29.3~30) */
@@ -279,7 +290,7 @@
 .ibs-row__in {
   position: absolute;
   inset: 0;
-  transform-origin: 192px 26.2px;
+  transform-origin: 50% 26.2px;
   transition: transform 130ms cubic-bezier(0.2, 0.6, 0.35, 1);
 }
 /* 누름 (6.4): 바로 scale 0.96, 바탕 #f4f5f8 은 한 프레임(33ms) 늦게. 다음 화면으로 갈 땐 바탕을 그때까지 유지 */
@@ -290,7 +301,7 @@
 .ibs-row__bg {
   position: absolute;
   left: 6.98px;
-  width: 370.04px;
+  right: 6.98px; /* 폭 370.04 */
   top: 0.3px;
   height: 52.3px;
   border-radius: 11.7px / 12px;
@@ -301,6 +312,13 @@
 .ibs-row--on .ibs-row__bg {
   opacity: 1;
   transition: opacity 0s 33ms;
+}
+/* 로고는 감싼 칸으로 놓음 (공용 BankIcon 대체 그림은 className 을 받지 않음) */
+.ibs-row__logo,
+.ibs-amt__logo,
+.ibs-cf__logo,
+.ibs-cf__mini {
+  display: flex;
 }
 .ibs-row__logo {
   position: absolute;
@@ -324,9 +342,11 @@
   letter-spacing: 0.14px;
   color: #6d6e71;
 }
-/* 은행 이름과 번호 사이: 녹화 잉크 7 (공백 한 칸보다 2 좁음) */
-.ibs-row__acct span {
-  margin-left: 1.3px;
+/* 은행 이름은 따로 맞추면 Noto 12.25px (who 0.1 표), 번호까지 녹화 잉크 7 */
+.ibs-row__acct small {
+  margin-right: 4.2px;
+  font-size: 12.25px;
+  letter-spacing: 0.1px;
 }
 /* '최종이체 날짜': 오른쪽 끝 잉크 녹화 370.1 → 361.0, 기준선 518.9 (+20.8). 최종이체 Noto 400 12.5 #7b7c7f · 날짜 Roboto 500 13 #6b6c6f */
 .ibs-row__last {
@@ -344,9 +364,9 @@
   letter-spacing: 0;
   color: #7b7c7f;
 }
-/* 목록 끝: 마지막 로고 아래 55.5 (who 2.10) */
+/* 목록 끝: 마지막 로고 아래 → 앱 아래끝 788 이 56.1 (who 2.10, 검수: 끝까지 스크롤한 녹화 평균과 겹쳐 맞춤 — 31.6 이면 행이 2px 낮음) */
 .ibs-who__end {
-  height: 33px;
+  height: 33.6px;
 }
 .ibs-empty {
   margin: 0;
@@ -393,17 +413,18 @@
   left: 21.53px;
   top: 125.69px;
 }
-/* 로고: 출금 IBK 가운데 녹화 (34.5, 141.6) 지름 22.2 / 받는 은행 (34.65, 232.95) 지름 22 (2·3) */
+/* 로고: 출금 IBK 잉크 가운데 클론 (33.75, 141.65) 지름 21.9 / 받는 은행 (33.31, 233.0) 지름 22.6 (2·3, 검수에서 녹화 평균과 겹쳐 맞춤).
+   그림은 left/top 이면 정수 픽셀로 붙어 크기·위치가 ±0.5 틀어짐 → transform 으로 놓음 */
 .ibs-amt__logo {
   position: absolute;
+  left: 0;
+  top: 0;
 }
 .ibs-amt__logo--from {
-  left: 21.7px;
-  top: 48.17px;
+  transform: translate(22.8px, calc(49.3px + var(--ib-y0)));
 }
 .ibs-amt__logo--to {
-  left: 22.49px;
-  top: 140.55px;
+  transform: translate(22.01px, calc(140.3px + var(--ib-y0)));
 }
 /* 은행 이름(Noto 500 14.5 #111) + 번호(Roboto 500 15.25 #000) 한 줄 — 줄 상자 20 의 가운데 = 글자 가운데.
    은행 이름 가운데 녹화 142.68 / 234.58, 번호 141.65 / 233.55 (1px 위), ⌄ 141.2 */
@@ -432,7 +453,7 @@
 .ibs-amt__num {
   position: relative;
   top: -1.03px;
-  margin-left: 3.3px;
+  margin-left: 4.75px;
   font-size: 15.25px;
   font-weight: 500;
   line-height: 20px;
@@ -443,21 +464,26 @@
 .ibs-amt__chev {
   position: relative;
   top: -0.43px;
-  margin-left: 9.35px;
+  margin-left: 8.29px;
 }
 /* '출금가능금액 N원': 13.3px 400 #74767b (상자 left 22.8, 가운데 166.0) */
 .ibs-amt__avail {
   left: 21.92px;
   top: 84.05px;
   font-size: 13.3px;
-  letter-spacing: -0.21px;
+  letter-spacing: -0.5px;
   color: #6a6c71;
+}
+/* 잔액 숫자: 녹화는 한글이 2px 좁고 숫자가 2px 넓고 14% 진함 (검수: 글자별 잉크 열 비교) → 숫자만 500 · 자간 −0.12 */
+.ibs-amt__avail span {
+  font-weight: 500;
+  letter-spacing: -0.12px;
 }
 /* '변경': 14.5px 400 #3a6ea5 + 밑줄 1.5px (가운데 녹화 240.0), 번호 끝 → 밑줄 시작 8 */
 .ibs-amt__change {
   position: relative;
   top: -0.6px;
-  margin-left: 6.7px;
+  margin-left: 5.28px;
   padding: 0;
   font-size: 14.5px;
   line-height: 20px;
@@ -465,14 +491,14 @@
   color: #3a6ea5;
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
-  text-underline-offset: 3.2px;
+  text-underline-offset: 1.9px;
 }
 /* 금액 줄 (4): 누를 수 있는 칸 녹화 281.4~326.4. 안 좌표는 칸 위(녹화 281.4) 기준 */
 .ibs-amt__field {
   position: absolute;
   left: 0;
   top: 200px;
-  width: 384px;
+  width: 100%;
   height: 45px;
 }
 /* 자리표시 '얼마를 보낼까요?': 18.5px 500 #66686e (상자 left 26.9 → 25.92, 가운데 302.68) */
@@ -498,11 +524,12 @@
   font-size: 17.5px;
   font-weight: 600;
 }
-/* 밑줄: 녹화 22.8→370.85 × 320.3~322.3 (2px #b0b5bc), 자판이 올라오면 320~323 (3px #3069b5) */
+/* 밑줄: 녹화 22.8→370.85 × 320.3~322.3 (2px #b0b5bc), 자판이 올라오면 320~323 (3px #3069b5) — 자판보다 33ms 늦게(20.333 → 20.367),
+   자판이 내려갈 땐 같은 프레임에 회색 (8-2·8-4) */
 .ibs-amt__under {
   position: absolute;
   left: 21.92px;
-  width: 339.83px;
+  right: 22.25px; /* 폭 339.83 */
   top: 38.9px;
   height: 2px;
   background: #b0b5bc;
@@ -511,6 +538,10 @@
   top: 38.6px;
   height: 3px;
   background: #3069b5;
+  transition:
+    top 0s 33ms,
+    height 0s 33ms,
+    background-color 0s 33ms;
 }
 /* 커서 (빈 값일 때만): 녹화 22.85~24.7 × 289.2~311.5, #111, 750ms 부드럽게 깜빡임 (4-2) */
 .ibs-amt__caret {
@@ -554,7 +585,7 @@
 /* '이용안내': 13px 400 #333539 + 밑줄 1px (녹화 172.9~221.0 × 620.95~621.95), 가운데 녹화 196.75 → 191.76, 글자 가운데 615.65 */
 .ibs-amt__guide {
   position: absolute;
-  left: 149.76px;
+  left: calc(50% - 42.24px); /* 149.76 */
   top: 520px;
   width: 84px;
   height: 30px;
@@ -599,13 +630,14 @@
 }
 
 /* ---------- 숫자 자판 (IbkKeypad — amount 6) ----------
-   판: 윗변 녹화 447.6(선 무게중심 448.1), 위 모서리 r28, 가로 녹화 −2.7~396.3 → 클론 −2.98~386.6. 안 좌표 = 클론 x + 1.98, 녹화 y − 448.6 */
+   판: 윗변 녹화 447.6(선 무게중심 448.1), 위 모서리 r28. 가로는 스펙(녹화 −2.7~396.3 → 클론 −2.98~386.6)보다
+   검수에서 녹화 평균의 호와 열마다 겹쳐 맞춘 −4.2~388 (호 중심 클론 23.1 / 360.7). 안 좌표 = 클론 x + 3.2, 녹화 y − 448.6 */
 .ibs-kp {
   position: absolute;
-  left: -2.98px;
-  right: -2.6px;
-  top: 418.2px;
+  left: -4.2px;
+  right: -4px;
   bottom: 0;
+  height: 340.4px;
   z-index: 6;
   box-sizing: border-box;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -614,13 +646,10 @@
   background: #fff;
   user-select: none;
 }
-html[data-os="ios"] .ibs-kp {
-  top: 443.6px;
-}
 /* 칩: 녹화 471.2→500.4 (29.2), 1px #b4b7ba, r6.5, 12.75px 400 #222 (6-1) */
 .ibs-kp__chips {
   position: absolute;
-  left: 56.22px;
+  left: calc(50% - 137.66px); /* 57.44 (판 안 폭 390.2) */
   top: 22.6px;
   display: flex;
   gap: 4.49px;
@@ -648,10 +677,11 @@ html[data-os="ios"] .ibs-kp {
 /* 숫자 칸: 열 클론 −0.34 / 127.81 / 255.97 (폭 128.15), 행 녹화 512.3 / 561.0 / 609.7 / 658.4 (높이 48.7) (6-2) */
 .ibs-kp__keys {
   position: absolute;
-  left: 1.64px;
+  left: 2.86px;
+  right: 2.89px; /* 칸 폭 128.15 × 3 */
   top: 63.7px;
   display: grid;
-  grid-template-columns: repeat(3, 128.15px);
+  grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 48.7px;
 }
 .ibs-kp__key {
@@ -663,7 +693,7 @@ html[data-os="ios"] .ibs-kp {
 /* 숫자: Pretendard 700 22.5px #000, 잉크 가운데 = 칸 가운데 + 0.8 */
 .ibs-kp__key span {
   position: relative;
-  top: 1.1px;
+  top: 1.5px;
   font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: 22.5px;
   font-weight: 700;
@@ -673,8 +703,9 @@ html[data-os="ios"] .ibs-kp {
 }
 .ibs-kp__back {
   position: absolute;
-  left: 56.32px;
-  top: 16.5px;
+  left: 50%;
+  top: 0;
+  transform: translate(-8.08px, 17.15px); /* 칸 안 x 56.0 */
 }
 /* 물결: 누른 점에서 반지름 ≈30 → 칸을 덮는 크기, 중심이 칸 가운데로 (140ms ease-out), 70ms 에 불투명, 떼면 150ms 에 사라짐.
    반투명 검정 .067 (다 칠하면 #eeeeee, 빨리 두 번 누르면 겹쳐 #e5e5e5) */
@@ -707,9 +738,9 @@ html[data-os="ios"] .ibs-kp {
 /* 자판 '확인': 녹화 19.0~374.7 × 716.45~769.1, r12.3. 누르면 한 프레임에 #1f4daa, 크기 그대로 (6-3) */
 .ibk-btn.ibs-kp__done {
   position: absolute;
-  left: 20.19px;
+  left: 21.41px;
+  right: 21.5px; /* 폭 347.29 */
   top: 267.85px;
-  width: 347.29px;
   height: 52.65px;
   border-radius: 12px / 12.3px;
   transition: none;
@@ -769,10 +800,17 @@ html[data-os="ios"] .ibs-kp {
 .ibs-cf__q {
   left: 22.11px;
   top: 148.01px;
+  letter-spacing: -0.05px;
+}
+/* 금액 숫자는 Roboto 700 (녹화 '0' 잉크가 600 보다 11% 진하고 1px 넓음). 숫자 간격도 녹화가 11.9 로 넓어
+   '200,000' 뒤 '원' 이 2px 늦게 시작 → 숫자만 자간 +0.38 */
+.ibs-cf__q span {
+  font-weight: 700;
+  letter-spacing: 0.38px;
 }
 .ibs-cf__acct {
   left: 22.11px;
-  top: 109.74px;
+  top: 110.24px;
   font-size: 12.75px;
   font-weight: 500;
   letter-spacing: 0.14px;
@@ -790,8 +828,8 @@ html[data-os="ios"] .ibs-kp {
 .ibs-cf__card {
   position: absolute;
   left: 21.77px;
+  right: 22.11px; /* 폭 340.12 */
   top: 213.74px;
-  width: 340.12px;
   height: 167.36px;
   box-sizing: border-box;
   border: 1px solid #e8e9e9;
@@ -802,12 +840,12 @@ html[data-os="ios"] .ibs-kp {
   position: relative;
   display: block;
   width: 100%;
-  height: 48.13px;
+  height: 49.13px; /* 위 구분선 1 + 48.13 */
   border-top: 1px solid #e8e8e8;
   text-align: left;
 }
 .ibs-cf__row:last-child {
-  height: 48.33px;
+  height: 49.33px;
 }
 .ibs-cf__row--from {
   height: 66.9px;
@@ -819,24 +857,24 @@ button.ibs-cf__row:active {
 /* 행 안 좌표: 카드 안쪽 왼쪽 = 클론 22.77, 행 위 = 녹화 296.14 / 363.04 / 412.17 */
 .ibs-cf__label {
   left: 15.1px;
-  top: 25.1px;
+  top: 24.7px;
   font-size: 12.75px;
   font-weight: 500;
   letter-spacing: -0.02px;
   color: #686a6e;
 }
 .ibs-cf__row--from .ibs-cf__label {
-  left: 15.21px;
-  top: 24px;
+  left: 14.7px;
+  top: 24.5px;
   letter-spacing: -0.23px;
   color: #6e7176;
 }
 .ibs-cf__row:last-child .ibs-cf__label {
-  top: 24.97px;
+  top: 24.6px;
 }
 /* 출금계좌: [IBK 16.7] 기업 123-456789-01-011 — 700 12.75px #000, 오른쪽 끝 346.08, 기준선 324.25. 로고 가운데 = 기준선 − 5.05, 로고 → 글자 6.4 */
 .ibs-cf__from {
-  right: 14.81px;
+  right: 14.3px;
   top: 23.75px;
   font-size: 12.75px;
   font-weight: 700;
@@ -845,21 +883,21 @@ button.ibs-cf__row:active {
 }
 .ibs-cf__mini {
   position: absolute;
-  right: calc(100% + 6.4px);
+  right: calc(100% + 7.4px);
   top: -9.04px;
 }
 /* 통장 이름 '보통예금(IBK W통장)': 400 13px #686b70, 오른쪽 끝 346.51, 기준선 343.0 */
 .ibs-cf__fromname {
-  right: 14.38px;
+  right: 15px;
   top: 42.42px;
   font-size: 13px;
-  letter-spacing: -0.06px;
+  letter-spacing: -0.12px;
   color: #686b70;
 }
 /* 표기 값: 500 12.75px #000, 오른쪽 끝 322.09 / 322.41 */
 .ibs-cf__val {
   right: 38.8px;
-  top: 25.1px;
+  top: 24.7px;
   font-size: 12.75px;
   font-weight: 500;
   letter-spacing: -0.02px;
@@ -867,23 +905,23 @@ button.ibs-cf__row:active {
 }
 .ibs-cf__row:last-child .ibs-cf__val {
   right: 38.48px;
-  top: 25.22px;
+  top: 24.85px;
   letter-spacing: 0.08px;
 }
 /* > : 꼭짓점 녹화 (349.63, 388.0), 열린 끝 343.2 × 381.8~394.1 → 클론 334.75, 1.35 #1e1e1e */
 .ibs-cf__gt {
   position: absolute;
-  left: 0;
+  left: calc(100% - 26.14px); /* 311.98 */
   top: 0;
-  transform: translate(311.98px, calc(18.76px + var(--ib-y0)));
+  transform: translateY(calc(17.32px + var(--ib-y0)));
 }
 .ibs-cf__row:last-child .ibs-cf__gt {
-  transform: translate(311.98px, calc(19.13px + var(--ib-y0)));
+  transform: translateY(calc(17.88px + var(--ib-y0)));
 }
 /* '추가정보입력 ⌄': 700 12.75px #545659, left 149.29, 기준선 492.25. ⌄ 꼭짓점 클론 227.72, 222.97~232.30 × 485.28~490.06, 1.3 (3-5) */
 .ibs-cf__more {
   position: absolute;
-  left: 140px;
+  left: calc(50% - 52px); /* 140 */
   top: 395px;
   width: 104px;
   height: 26px;
@@ -907,16 +945,16 @@ button.ibs-cf__row:active {
   margin: 0;
 }
 .ibs-cf__promo .ibk-bl {
-  top: 617.15px;
+  top: 616.45px;
   font-size: 13.75px;
 }
 .ibs-cf__promo span {
-  left: 109.99px;
+  left: calc(50% - 82.01px); /* 109.99 */
   letter-spacing: -0.19px;
   color: #000;
 }
 .ibs-cf__promo b {
-  left: 175.89px;
+  left: calc(50% - 16.11px); /* 175.89 */
   font-weight: 500;
   letter-spacing: -0.13px;
   color: #4a75a8;

@@ -528,7 +528,12 @@ export function IbkBankLogo({ bank, size = 30, className = "" }: { bank: Pick<Ba
         <img src={src} alt={bank.short ?? ""} draggable={false} style={box} />
       </span>
     );
-  if (bank.name && bank.short && bank.color && bank.section) return <BankIcon bank={bank as Bank} size={size} />;
+  if (bank.name && bank.short && bank.color && bank.section)
+    return (
+      <span className={`ibk-logo ${className}`} style={box}>
+        <BankIcon bank={bank as Bank} size={size} />
+      </span>
+    );
   const other = localAsset(`bank-${bank.code}`); // 은행 정보가 code 뿐이면 공용 로고 그림만
   return (
     <span className={`ibk-logo ibk-logo--empty ${className}`} style={box}>
@@ -556,7 +561,7 @@ export function IbkNotice({
   onConsult?: () => void;
 }) {
   return (
-    <div className="ibk ibk-notice">
+    <div className={`ibk ibk-notice ${code ? "" : "ibk-notice--nocode"}`}>
       <svg className="ibk-notice__icon" width="45.2" height="45.2" viewBox="0 0 45.2 45.2" aria-hidden>
         <circle cx="22.6" cy="22.6" r="22.6" fill="#e2f0fd" />
         <path d="M22.6 15.45v7.4" stroke="#4092ef" strokeWidth="3.3" strokeLinecap="round" />

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
-import { useLocation, useNavigationType } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { Account, HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
@@ -7,9 +7,9 @@ import { localAsset } from "../assets/Asset";
 import { Dialog } from "../components/Sheet";
 import { DevPanel } from "../dev-panel/DevPanel";
 import { ibkNumber, nf } from "./bank";
-import { IbkBankLogo, IbkHeader, IbkHeaderIcon, IbkHomeSkeleton, IbkIcon, IbkTabBar } from "./common";
+import { IbkBankLogo, IbkHeader, IbkHeaderIcon, IbkHomeSkeleton, IbkIcon, IbkNotice, IbkTabBar } from "./common";
 import { holdIbkSpinner } from "./loading";
-import { IBK_PAGE, useIbkGo } from "./nav";
+import { IBK_PAGE, useIbkBackHandler, useIbkGo } from "./nav";
 import { useIbkStatusBar } from "./theme";
 import "./ibk-home.css";
 
@@ -20,9 +20,12 @@ import "./ibk-home.css";
 // 좌표는 클론 좌표 (x = (녹화 x − 0.35) / 1.0242, 앱 영역 y = 녹화 y − 29.4). 값은 ibk-home.css 에 녹화 위치와 같이 적음
 
 // 홈이 나타나는 세 가지 (spec 6-2 · 6-3 · 6-5)
-//  first    : 앱을 처음 켤 때 (시작화면이 뼈대를 이미 보여 줌) → 바로 내용, 잔액 0 부터 카운트업
+//  first    : 앱을 처음 켤 때 (시작화면이 녹화 145.7~150.67 의 뼈대 로딩을 이미 보여 줌) → 바로 내용 = 뼈대 뒤와 같이
 //  return   : 다른 화면에서 돌아올 때 → 빈 껍데기(#fafafa + 탭바, 가운데 버튼 로티) 300ms → 내용 → 점 잠깐 → 잔액 0 부터 카운트업
-//  skeleton : 이체 완료 '확인' 뒤 → 흰 1프레임 → 껍데기 + 점 → 뼈대 → 내용, 잔액은 이전 값 → 새 값 (2프레임)
+//  skeleton : 이체 완료 '확인' 뒤 → 흰 1프레임 → 껍데기 + 점 → 뼈대 → 내용
+// 뼈대 뒤 내용 (first · skeleton, 녹화 내용 150.633 기준): 카운트업은 뼈대 밑에서 이미 돌았고 마지막 단계 값 50 × ⌈목표/50⌉ 가
+//   100ms 보인 뒤 목표 값 (150.633~150.700 '…850' → 150.733 '…805': 50 × ⌈14,560,805/50⌉ = 14,560,850). ↻ 는 돌지 않음.
+//   그림은 늦게 뜸 (+200 할 일 체크·종·상담·≡·타일 1·2 / +433 + / +500 ⋮·⧉·↻·타일 3 / +600 배너 그림) — ibk-home.css .ibh--late
 type Mode = "first" | "return" | "skeleton";
 // return: 내용 a 4.300→4.667 · b 43.767→44.067 · c 89.267→89.533 (267~367ms) → 300.
 //   점: 내용 뒤 0.24~0.56초에 떠서 0.14~0.43초 (b 44.63~44.77, c 89.77~90.07, a 5.07~5.5) → +400 ~ +700.
@@ -32,27 +35,24 @@ const RETURN_AT = { content: 300, spinOn: 700, spinOff: 1000, spin: 1067, count:
 //   기다림은 통신 시간이라 시작화면(IbkSplash)과 같은 비율로 줄임
 const SKELETON_AT = { white: 67, spinOn: 170, skeleton: 500, spinOff: 1830, content: 2970 };
 // 잔액 카운트업 (6-3): 화면 값 = min(목표, k × ⌈목표/50⌉), k = 1…50 이 시간에 선형. b 0.53초 · c 0.66초 → 600ms.
-// 완료 → 홈은 이전 값 → 새 값 2단계 (14,560,905 → …850 → …805, 2프레임 = 67ms)
 const COUNT = { steps: 50, ms: 600 };
-const COUNT_AFTER_TRANSFER = { steps: 2, ms: 67 };
-// ↻ 한 바퀴 800ms(24프레임) 선형, 시계 방향 (b 44.90 20° → 45.633 350°)
-const REFRESH_SPIN_MS = 800;
+const TAIL_MS = 100; // 뼈대 뒤 마지막 단계 값이 보이는 시간
+// ↻ 한 바퀴 800ms(24프레임) 선형, 시계 방향 (b 44.90 20° → 45.633 350°) — ibk-home.css .ibh-spin
 
 // 처음 켤 때인지 (StrictMode 가 초기값 함수를 두 번 불러도 같게 — 값은 effect 에서 바꿈)
 let booted = false;
-// 계좌마다 마지막으로 보여 준 잔액 (완료 → 홈 때 이전 값에서 새 값으로)
-const lastShown = new Map<string, number>();
 
 // 나만의 맞춤메뉴 (spec 3-8): 클론 x 34.0 / 121.7 / 209.6 / 297.3
 const TILES = [
-  { label: "전체계좌조회", x: 34.0, art: "ibk-menu-allacct" },
-  { label: "IBK포인트", x: 121.7, art: "ibk-menu-point" },
-  { label: "i-ONE 가드", x: 209.6, art: "ibk-menu-guard" },
-  { label: "추가", x: 297.3 },
+  { label: "전체계좌조회", x: 34.0, art: "ibk-menu-allacct", late: 1 },
+  { label: "IBK포인트", x: 121.7, art: "ibk-menu-point", late: 1 },
+  { label: "i-ONE 가드", x: 209.6, art: "ibk-menu-guard", late: 3 },
+  { label: "추가", x: 297.3, late: 2 },
 ];
-// 프로모 배너 5장 (spec 3-9, 녹화에 나온 순서): 바탕 · 제목 · 글자색 · 부제 · 오른쪽 그림
+// 프로모 배너 5장 (spec 3-9, 녹화에 나온 순서): 바탕 · 제목 · 글자색 · 부제 · 오른쪽 그림.
+// 제목 한글은 배너 그림 글꼴이라 웹 Noto 보다 좁음(90%) — 1번(2026)만 95% (wide)
 const PROMOS = [
-  { bg: "#141414", color: "#fff", title: "2026 더아트프라자", art: "ibk-promo-2026" },
+  { bg: "#141414", color: "#fff", title: "2026 더아트프라자", art: "ibk-promo-2026", wide: true },
   { bg: "#fa6e3c", color: "#fff", title: "계좌개설하고 주식받자!", sub: "IBK기업은행 x IBK투자증권", art: "ibk-promo-gift" },
   { bg: "#dbf6d7", color: "#111", title: "Npay 포인트 전환 EVENT", art: "ibk-promo-npay" },
   { bg: "#fbe5fc", color: "#111", title: "모으기 신청하고 커피 받자♥", art: "ibk-promo-pig" },
@@ -66,13 +66,11 @@ export function IbkHome() {
   useIbkStatusBar();
   const go = useIbkGo();
   const location = useLocation();
-  const navType = useNavigationType();
   const home = useApi<HomeData>(paths.home);
   const [mode] = useState<Mode>(() => {
-    const st = location.state as { ibkHome?: string; ibkAnim?: string } | null;
+    // 이체 완료 '확인'은 go("/", { replace: true, state: { ibkHome: "skeleton" } }) (IbkDone)
     if (!booted) return "first";
-    if (st?.ibkHome === "skeleton" || (navType === "REPLACE" && !st?.ibkAnim && !st?.ibkHome)) return "skeleton";
-    return "return";
+    return (location.state as { ibkHome?: string } | null)?.ibkHome === "skeleton" ? "skeleton" : "return";
   });
   useEffect(() => {
     booted = true;
@@ -89,6 +87,9 @@ export function IbkHome() {
   const [notice, setNotice] = useState<string | null>(null);
   const soon = () => setNotice("연습용 앱에서는 준비 중인 메뉴예요.");
   const [panelOpen, setPanelOpen] = useState(false); // 종 → 관리 패널
+  // 안드로이드 뒤로(3버튼 바 <)는 열린 안내창·관리 패널부터 닫음
+  useIbkBackHandler(!!notice, () => setNotice(null));
+  useIbkBackHandler(panelOpen, () => setPanelOpen(false));
 
   // 계좌: 기업은행 계좌만 (다른 은행 계좌는 '다른금융' 몫). 대표 main 이 첫 장
   const all = home.data?.accounts ?? [];
@@ -100,7 +101,9 @@ export function IbkHome() {
 
   // 잔액 카운트업 · ↻ 돌기
   const [count, setCount] = useState<{ id: string; value: number } | null>(null);
-  const [spinKey, setSpinKey] = useState(0); // 바뀌면 ↻ 한 바퀴
+  const [tail, setTail] = useState(mode !== "return"); // 뼈대 뒤: 마지막 단계 값 50 × ⌈목표/50⌉ 을 보이는 중
+  const [spin, setSpin] = useState<{ id: string; n: number } | null>(null); // 바뀌면 그 계좌의 ↻ 한 바퀴
+  const spinOnce = (id: string) => setSpin((s) => ({ id, n: (s?.n ?? 0) + 1 }));
   const countRaf = useRef(0);
   const runCount = (acc: Account, from: number, o: { steps: number; ms: number }) => {
     cancelAnimationFrame(countRaf.current);
@@ -113,7 +116,8 @@ export function IbkHome() {
     const unit = Math.ceil(Math.abs(d) / o.steps);
     const t0 = performance.now();
     const tick = (now: number) => {
-      const k = Math.min(o.steps, Math.floor(((now - t0) / o.ms) * o.steps) + 1);
+      // rAF 의 now 는 프레임 시작 시각이라 t0 보다 이를 수 있음 → k 는 1 부터
+      const k = Math.min(o.steps, Math.max(1, Math.floor(((now - t0) / o.ms) * o.steps) + 1));
       const value = from + Math.sign(d) * Math.min(Math.abs(d), k * unit);
       if (value === to) {
         setCount(null);
@@ -124,7 +128,6 @@ export function IbkHome() {
     };
     tick(t0);
   };
-  useEffect(() => () => cancelAnimationFrame(countRaf.current), []);
 
   // 껍데기 · 뼈대 시간표
   useEffect(() => {
@@ -149,44 +152,38 @@ export function IbkHome() {
   useEffect(() => {
     if (waited) setPhase("ready");
   }, [waited]);
-  // 자료를 아직 못 받았으면 받을 때까지 점 (껍데기 위)
-  useEffect(() => (waited && !loaded ? holdIbkSpinner() : undefined), [waited, loaded]);
+  // 자료를 아직 못 받았으면 받을 때까지 점 (껍데기 위). 못 받으면 안내 화면(다시 시도)
+  const failed = home.status === "error";
+  useEffect(() => (waited && !loaded && !failed ? holdIbkSpinner() : undefined), [waited, loaded, failed]);
 
-  // 내용이 나타난 뒤: 잔액 새로고침 (6-3)
-  const startedFor = useRef<string | null>(null);
+  // 내용이 나타난 뒤: 잔액 새로고침 (6-3). 내용이 처음 나타날 때 한 번 (그 뒤 계좌를 넘겨도 다시 하지 않음)
+  const accountRef = useRef(account);
   useEffect(() => {
-    if (!ready || !account || startedFor.current) return;
-    startedFor.current = account.id;
-    const acc = account;
-    if (mode === "skeleton") {
-      runCount(acc, lastShown.get(acc.id) ?? 0, COUNT_AFTER_TRANSFER);
-      return;
-    }
-    if (mode === "first") {
-      setSpinKey((k) => k + 1);
-      runCount(acc, 0, COUNT);
-      return;
+    accountRef.current = account;
+  });
+  useEffect(() => {
+    const acc = accountRef.current;
+    if (!ready || !acc) return;
+    if (mode !== "return") {
+      const t = window.setTimeout(() => setTail(false), TAIL_MS);
+      return () => clearTimeout(t);
     }
     let release: (() => void) | null = null;
     const base = RETURN_AT.content;
     const t = [
       window.setTimeout(() => (release = holdIbkSpinner()), RETURN_AT.spinOn - base),
       window.setTimeout(() => (release?.(), (release = null)), RETURN_AT.spinOff - base),
-      window.setTimeout(() => setSpinKey((k) => k + 1), RETURN_AT.spin - base),
+      window.setTimeout(() => spinOnce(acc.id), RETURN_AT.spin - base),
       window.setTimeout(() => runCount(acc, 0, COUNT), RETURN_AT.count - base),
     ];
     return () => {
       t.forEach(clearTimeout);
       release?.();
+      cancelAnimationFrame(countRaf.current);
     };
-    // 한 번만 (내용이 처음 나타날 때)
+    // runCount 는 상태 설정만 하는 함수라 매번 새로 만들어져도 같음
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, account?.id]);
-  // 보여 준 잔액 기억
-  useEffect(() => {
-    if (ready) for (const a of accounts) lastShown.set(a.id, a.balance);
-  });
-
+  }, [ready, mode]);
   // ↻ 누름: 잔액 다시 받고(점 300ms) → 0 부터 카운트업 + ↻ 한 바퀴 (녹화엔 직접 누른 장면 없음 → 홈 복귀 때와 같게)
   const refresh = async () => {
     if (!account) return;
@@ -196,7 +193,7 @@ export function IbkHome() {
     await new Promise((r) => setTimeout(r, 300));
     release();
     await new Promise((r) => setTimeout(r, 100));
-    setSpinKey((k) => k + 1);
+    spinOnce(acc.id);
     runCount(acc, 0, COUNT);
   };
 
@@ -209,9 +206,20 @@ export function IbkHome() {
   const toSend = () => account && go(`/send?from=${encodeURIComponent(account.id)}`, IBK_PAGE);
   const toHistory = (acc: Account) => go(`/history/${encodeURIComponent(acc.id)}`, IBK_PAGE);
 
+  if (waited && failed)
+    return (
+      <div className="ibk ibh">
+        <IbkNotice
+          title={"잠시 후 다시\n시도해 주세요"}
+          message={home.error?.message ?? "계좌 정보를 불러오지 못했어요."}
+          consult={false}
+          onConfirm={home.retry}
+        />
+      </div>
+    );
   const shell = phase === "white" || phase === "shell" || (phase === "ready" && !loaded);
   return (
-    <div className={`ibk ibh ${shell ? "ibh--shell" : ""} ${phase === "white" ? "ibh--white" : ""}`}>
+    <div className={`ibk ibh ${shell ? "ibh--shell" : ""} ${phase === "white" ? "ibh--white" : ""} ${mode !== "return" ? "ibh--late" : ""}`}>
       {phase === "skeleton" && <IbkHomeSkeleton />}
       {ready && (
         <div className="ibh-scroll">
@@ -235,8 +243,12 @@ export function IbkHome() {
             />
 
             <button className="ibh-banner" onClick={soon}>
-              <span className="ibk-bl ibh-banner__l1">IBK 단독 포켓몬 굿즈와</span>
-              <span className="ibk-bl ibh-banner__l2">I-포켓몬(신용) 구경가자!</span>
+              <span className="ibk-bl ibh-banner__l1">
+                <b>IBK</b> 단독 포켓몬 굿즈와
+              </span>
+              <span className="ibk-bl ibh-banner__l2">
+                <b>I</b>-포켓몬(신용) 구경가자!
+              </span>
               <Pic name="ibk-home-banner-art" className="ibh-banner__art" />
             </button>
 
@@ -272,7 +284,7 @@ export function IbkHome() {
                       >
                         <IbkIcon name="more" />
                       </button>
-                      <strong className="ibk-bl ibh-acct__bal">{nf.format(on && count?.id === acc.id ? count.value : acc.balance)}</strong>
+                      <strong className="ibk-bl ibh-acct__bal">{nf.format(on && count?.id === acc.id ? count.value : on && tail ? COUNT.steps * Math.ceil(acc.balance / COUNT.steps) : acc.balance)}</strong>
                       <span className="ibk-bl ibh-acct__won">원</span>
                       <button
                         className="ibh-acct__refresh"
@@ -282,7 +294,7 @@ export function IbkHome() {
                         }}
                         aria-label="잔액 새로고침"
                       >
-                        <IbkIcon key={on ? spinKey : 0} name="refresh" className={on && spinKey ? "ibh-spin" : ""} />
+                        <IbkIcon key={spin?.id === acc.id ? spin.n : 0} name="refresh" className={spin?.id === acc.id ? "ibh-spin" : ""} />
                       </button>
                       <button
                         className="ibh-acct__btn ibh-acct__send"
@@ -305,6 +317,7 @@ export function IbkHome() {
                     </div>
                   )}
                 />
+                {!accounts.length && <span className="ibk-bl ibh-acct__empty">등록된 계좌가 없어요</span>}
               </div>
               <FolderTabs />
               <button className="ibh-tab ibh-tab--ibk">
@@ -331,18 +344,18 @@ export function IbkHome() {
               <button className="ibh-quick__item" onClick={() => go("/results", IBK_PAGE)}>
                 <Pic name="ibk-home-recent" className="ibh-quick__recent" />
                 <span className="ibk-bl ibh-quick__t1">최근 이체내역</span>
-                <IbkIcon name="chevron-right" w={4.4} h={9} sw={1.4} className="ibh-quick__go1" />
+                <IbkIcon name="chevron-right" w={4.3} h={7.6} sw={1.4} className="ibh-quick__go1" />
               </button>
               <button className="ibh-quick__item ibh-quick__item--r" onClick={soon}>
                 <Pic name="ibk-home-idcard" className="ibh-quick__id" />
                 <span className="ibk-bl ibh-quick__t2">신분증·지갑</span>
-                <IbkIcon name="chevron-right" w={4.4} h={9} sw={1.4} className="ibh-quick__go2" />
+                <IbkIcon name="chevron-right" w={4.3} h={7.6} sw={1.4} className="ibh-quick__go2" />
               </button>
             </div>
 
             <b className="ibk-bl ibh-my">나만의 맞춤메뉴</b>
             {TILES.map((t) => (
-              <button key={t.label} className={`ibh-tile ${t.art ? "" : "ibh-tile--add"}`} style={{ left: t.x }} onClick={soon}>
+              <button key={t.label} className={`ibh-tile ibh-tile--late${t.late} ${t.art ? "" : "ibh-tile--add"}`} style={{ left: t.x }} onClick={soon}>
                 <i className="ibh-tile__box">{t.art ? <Pic name={t.art} className="ibh-tile__art" /> : <IbkIcon name="plus" className="ibh-tile__plus" />}</i>
                 <span className="ibk-bl">{t.label}</span>
               </button>
@@ -370,8 +383,8 @@ function Pic({ name, className = "" }: { name: string; className?: string }) {
 // 기업은행 | 다른금융 폴더 탭 (spec 3-4): 흰 탭은 카드와 한 몸, 회색 탭(#e0e5eb)은 같은 모양을 91.1 오른쪽으로 옮겨 흰 탭 뒤에.
 // 흰 탭 오른쪽 윤곽(녹화 y → 클론 x): 194→114.6 · 200→124.8 · 210→130.5 · 222→131.4 · 230→135.5 · 234→142.0
 //  = 볼록 원 r22 (중심 109.2, 215.9) → 세로 131.2 → 오목 원 r15 (중심 146.2, 219.8) → 카드 윗변 234.8. 왼쪽 위 r12.5(가로 12.2)
-// 좌표: 카드 왼쪽 위(클론 18.5, 녹화 193.9) 기준
-const TAB_PATH = "M0,40.9 V12.5 A12.2,12.5 0 0 1 12.2,0 H90.7 A22,22 0 0 1 112.7,22 V25.9 A15,15 0 0 0 127.7,40.9 Z";
+// 좌표: 카드 왼쪽 위(클론 18.75, 녹화 193.9) 기준
+const TAB_PATH = "M0,40.9 V12.5 A12.2,12.5 0 0 1 12.2,0 H90.15 A22,22 0 0 1 112.15,22 V25.9 A15,15 0 0 0 127.15,40.9 Z";
 function FolderTabs() {
   return (
     <svg className="ibh-tabs" width="347" height="41" viewBox="0 0 347 41" aria-hidden>
@@ -382,8 +395,8 @@ function FolderTabs() {
 }
 
 // 계좌 카드 안 내용을 옆으로 밀어 다음 계좌 (녹화에 넘기는 장면은 없음 → 안드로이드 ViewPager 처럼 손을 따라가다 놓으면 붙음).
-// 카드 몸통(폭 347) 안에서만 보임. 가로로 8px 넘게 움직이면 밀기, 놓을 때 50px 넘게 밀었거나 빠르게 튕겼으면 넘김
-const PAGE_W = 347;
+// 카드 몸통(폭 346.9) 안에서만 보임. 가로로 8px 넘게 움직이면 밀기, 놓을 때 50px 넘게 밀었거나 빠르게 튕겼으면 넘김
+const PAGE_W = 346.9;
 function AccountPager({
   accounts,
   idx,
@@ -461,12 +474,16 @@ function PromoCarousel({ onOpen }: { onOpen: () => void }) {
   const [p, setP] = useState(0);
   const [jump, setJump] = useState(false); // 마지막(첫 장 사본) → 첫 장으로 순간 이동
   useEffect(() => {
-    const t = window.setTimeout(() => {
-      setJump(false);
-      setP((v) => v + 1);
-    }, PROMO_MS);
+    // 멈춰 있는 시간이 3.3초: 넘김(270ms)이 시작될 때 p 가 바뀌므로 그만큼 더 (첫 장으로 순간 이동한 뒤엔 이미 멈춘 상태)
+    const t = window.setTimeout(
+      () => {
+        setJump(false);
+        setP((v) => v + 1);
+      },
+      jump ? PROMO_MS : PROMO_MS + PROMO_SLIDE_MS,
+    );
     return () => clearTimeout(t);
-  }, [p]);
+  }, [p, jump]);
   useEffect(() => {
     if (p < PROMOS.length) return;
     const t = window.setTimeout(() => {
@@ -481,7 +498,19 @@ function PromoCarousel({ onOpen }: { onOpen: () => void }) {
         {[...PROMOS, PROMOS[0]].map((b, i) => (
           <button key={i} className="ibh-promo__card" style={{ left: 18.2 + i * 366, background: b.bg, color: b.color }} onClick={onOpen}>
             {b.sub && <span className="ibk-bl ibh-promo__sub">{b.sub}</span>}
-            <b className="ibk-bl ibh-promo__title">{b.title}</b>
+            <b className={`ibk-bl ibh-promo__title ${b.wide ? "ibh-promo__title--wide" : ""}`}>
+              {[...b.title].map((ch, j) =>
+                /[가-힣]/.test(ch) ? (
+                  <span key={j}>{ch}</span>
+                ) : ch === "♥" ? (
+                  <i key={j} className="ibh-promo__heart">
+                    {ch}
+                  </i>
+                ) : (
+                  ch
+                ),
+              )}
+            </b>
             <Pic name={b.art} className="ibh-promo__art" />
           </button>
         ))}
@@ -490,9 +519,12 @@ function PromoCarousel({ onOpen }: { onOpen: () => void }) {
   );
 }
 
-// 가운데 톡톡송금 버튼 + 로티 (spec 6-4, 녹화 145.700 기준 30fps): 파란 원판이 세로로 선 채 돌며 나타남(0~233ms) →
-// 흰 말풍선이 오른쪽으로 빠져나감(200~333) → 왼쪽에서 들어와 제자리(367~533) → 뾰족한 끝이 왼쪽 아래 꼬리로, 속도선 2개가 자람(533~767).
-// 정지 모습은 공용 IbkTalkButton 과 같은 도형
+// 가운데 톡톡송금 버튼 + 로티 (spec 6-4, 녹화 145.700 기준 30fps — 검수에서 프레임마다 다시 잼):
+// 원판은 같은 크기 원 창이 왼쪽에서 밀려 들어오며 드러남(0~196ms, 왼쪽 윤곽은 제자리 · 오른쪽 윤곽이 볼록하게 나아감 = 두 원의 겹침) →
+// 흰 말풍선은 그동안 왼쪽에서 오른쪽으로 쭉 지나가 빠져나감(0~333) → 왼쪽에서 들어와 천천히 제자리(367~767) →
+// 뾰족한 끝이 왼쪽 아래 꼬리로, 속도선 2개가 자람(533~767).
+// 정지 모습은 녹화 평균 프레임에서 다시 잼 (클론 좌표): 말풍선 원 가운데 (193.03, 744.63) 반지름 9.3 + 왼쪽 아래로 불룩해지며 꼬리 끝 (181.6, 751.0),
+// 속도선 가운데 y 748.4 (x 178.7~183.2) · 754.0 (x 180.4~184.8). 공용 IbkTalkButton 은 말풍선이 0.4 높고 r 9.9, 아래 속도선이 2.6 높음
 function TalkButton({ play }: { play: boolean }) {
   return (
     <svg className={`ibk-tabbar__talk ibh-talk ${play ? "ibh-talk--play" : ""}`} width="44.5" height="44.5" viewBox="0 0 44.5 44.5" aria-hidden>
@@ -509,18 +541,18 @@ function TalkButton({ play }: { play: boolean }) {
         <circle cx="22.25" cy="22.25" r="22.25" fill="url(#ibh-talk-g)" />
         <g clipPath="url(#ibh-talk-clip)">
           <g className="ibh-talk__bubble">
-            <circle cx="23.2" cy="21.9" r="9.9" fill="#fff" />
-            <path className="ibh-talk__point" d="M9.6 21.9 15.9 15.3v13.2Z" fill="#fff" />
-            <path className="ibh-talk__tail" d="M15 25.5 12.6 30.6l6.3-2.2Z" fill="#fff" />
+            <circle cx="23.28" cy="22.28" r="9.3" fill="#fff" />
+            <path className="ibh-talk__point" d="M9.68 22.28 16.16 16.3v11.96Z" fill="#fff" />
+            <path className="ibh-talk__tail" d="M14.45 18.65Q10.2 22.15 15 26.6L11.75 29.4 18.5 30.5Z" fill="#fff" />
             <path
-              d="M18.4 19.4l1.75 5.6 2.5-5.1 2.5 5.1 1.75-5.6M17.6 21.3h11.2"
+              d="M18.48 19.78l1.75 5.6 2.5-5.1 2.5 5.1 1.75-5.6M18.2 22.98h9.6"
               fill="none"
               stroke="#2b72d6"
               strokeWidth="1.3"
               strokeLinejoin="round"
             />
           </g>
-          <path className="ibh-talk__lines" d="M8.4 25.4h4.4M9.3 29h3.9" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+          <path className="ibh-talk__lines" d="M9.6 26.5h3.2M11.15 32.15h3" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
         </g>
       </g>
     </svg>

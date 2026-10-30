@@ -62,10 +62,10 @@ function DoneView({ result, from, memoTo, memoMe }: IbkDoneState) {
       setNotice("즐겨찾기를 바꾸지 못했어요.");
     });
   };
-  // 확인 → 홈 (홈이 뼈대 로딩부터: home 6-5). 이체가 끝났으니 완료 화면은 기록에서 지움
+  // 확인 → 홈 (홈이 흰 1프레임 → 껍데기 → 뼈대 로딩부터: home 6-5 — IbkHome 의 ibkHome: "skeleton"). 이체가 끝났으니 완료 화면은 기록에서 지움
   const toHome = () => {
     if (leave.current) return;
-    leave.current = window.setTimeout(() => go("/", { replace: true, state: { ibkFrom: "done" } }), HOME_DELAY);
+    leave.current = window.setTimeout(() => go("/", { replace: true, state: { ibkHome: "skeleton" } }), HOME_DELAY);
   };
   // 거래내역조회 → 출금 계좌 거래내역 (녹화에 없음: 홈 카드 → 거래내역과 같은 이동)
   const toHistory = () => go(`/history/${from.id}`, { ...IBK_PAGE, replace: true });

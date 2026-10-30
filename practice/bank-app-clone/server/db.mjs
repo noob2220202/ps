@@ -83,6 +83,7 @@ const SCHEMA = `
     number    TEXT NOT NULL,               -- 숫자만 (하이픈 없이)
     holder    TEXT NOT NULL,               -- 예금주
     favorite  INTEGER NOT NULL DEFAULT 0,  -- 최근 이체 목록의 ☆
+    receive_error INTEGER NOT NULL DEFAULT 0, -- i-ONE Bank: 이 계좌로 보내면 받는 은행 오류 안내 (녹화 28초)
     UNIQUE (bank_code, number)
   );
 
@@ -145,6 +146,7 @@ function migrate(d) {
   if (!columns("profile").includes("card_spend")) d.exec("ALTER TABLE profile ADD COLUMN card_spend INTEGER");
   if (!columns("profile").includes("cashback_count")) d.exec("ALTER TABLE profile ADD COLUMN cashback_count INTEGER NOT NULL DEFAULT 2");
   if (!columns("accounts").includes("safebox")) d.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");
+  if (!columns("payees").includes("receive_error")) d.exec("ALTER TABLE payees ADD COLUMN receive_error INTEGER NOT NULL DEFAULT 0");
   if (columns("profile").includes("mini_account_no")) {
     // mini 계좌 삭제: 거래·이체 기록은 ON DELETE CASCADE로 같이 지워지고, mini로 "보낸" 기록만 따로 정리
     const mini = d.prepare("SELECT mini_account_no AS no FROM profile").get();

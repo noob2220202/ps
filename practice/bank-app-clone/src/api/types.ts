@@ -104,6 +104,7 @@ export interface Recipient {
   accountId?: AccountId;
   payeeId?: string;
   favorite?: boolean;
+  receiveError?: boolean; // i-ONE Bank: 받는 은행 오류 안내 (녹화 28초)
 }
 
 export interface MyAccountRecipient {
@@ -129,6 +130,7 @@ export interface Payee {
   number: string;
   holder: string;
   favorite: boolean;
+  receiveError?: boolean; // i-ONE Bank: 보내면 받는 은행 오류 안내 (🔔 관리 → 받는 분에서 켬)
 }
 
 export interface NewTransfer {

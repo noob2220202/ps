@@ -103,32 +103,38 @@ export function useIbkBack(fallback = "/", delay = 0) {
 // 안드로이드 뒤로(3버튼 바 <)를 화면 안에서 받기: active 인 동안 방문 기록 한 칸(주소·라우터 상태 그대로)을 쌓아 두고,
 // 뒤로가기로 그 칸이 빠지면 onBack. 다른 이유로 끝나면(active=false) 쌓아 둔 칸을 걷어 냄. 여럿이 겹치면 나중 것부터.
 // key 가 바뀌면(예: 이체 단계) 다시 쌓음 → 단계마다 뒤로 한 번씩. 시트·이체 단계에 씀
+const backLevel = () => (window.history.state as { ibkBack?: number } | null)?.ibkBack ?? 0;
 export function useIbkBackHandler(active: boolean, onBack: () => void, key?: unknown) {
   const ref = useRef(onBack);
   useEffect(() => {
     ref.current = onBack;
   });
+  const depth = useRef(0); // 지금 쌓아 둔 칸의 깊이 (0 = 없음)
+  // 칸이 빠지는 것 지켜보기: 켜져 있는 동안 한 번만 붙임. 꺼지거나 화면을 떠날 때 내 칸이 맨 위에 남아 있으면 걷어 냄
   useEffect(() => {
     if (!active) return;
-    let depth = 0;
-    let popped = false;
-    const level = () => ((window.history.state as { ibkBack?: number } | null)?.ibkBack ?? 0);
     const onPop = () => {
-      if (level() >= depth) return; // 더 위에 쌓인 다른 칸이 빠진 것
-      popped = true;
-      window.removeEventListener("popstate", onPop);
+      if (!depth.current || backLevel() >= depth.current) return; // 더 위에 쌓인 다른 칸이 빠진 것
+      depth.current = 0;
       ref.current();
     };
-    // 한 박자 늦게 쌓기: 개발 모드(StrictMode)가 effect 를 두 번 돌려도 한 칸만
-    const t = window.setTimeout(() => {
-      depth = level() + 1;
-      window.history.pushState({ ...window.history.state, ibkBack: depth }, "");
-      window.addEventListener("popstate", onPop);
-    });
+    window.addEventListener("popstate", onPop);
     return () => {
-      window.clearTimeout(t);
       window.removeEventListener("popstate", onPop);
-      if (depth && !popped && level() === depth) window.history.back();
+      if (depth.current && backLevel() === depth.current) window.history.back();
+      depth.current = 0;
     };
+  }, [active]);
+  // 칸 쌓기: 켜져 있는데 칸이 없을 때만 (처음, 또는 뒤로가기로 빠진 뒤 key 가 바뀌면). 칸이 있는 채로 key 만 바뀌면 그대로 둠
+  // (예전엔 key 가 바뀔 때마다 걷고 다시 쌓다가 history.back() 이 새 칸을 지워서 뒤로 한 번에 화면을 통째로 나갔음)
+  // 한 박자 늦게 쌓기: 개발 모드(StrictMode)가 effect 를 두 번 돌려도 한 칸만
+  useEffect(() => {
+    if (!active || depth.current) return;
+    const t = window.setTimeout(() => {
+      if (depth.current) return;
+      depth.current = backLevel() + 1;
+      window.history.pushState({ ...window.history.state, ibkBack: depth.current }, "");
+    });
+    return () => window.clearTimeout(t);
   }, [active, key]);
 }

@@ -11,7 +11,7 @@ export type IbkKey = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" |
 const KEYS: IbkKey[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "00", "0", "back"];
 
 // 칩 (6-1): 녹화 x 55.9→107.2 … 286.1→337.4 → 클론 54.24~329.09, 폭 50.09 (+100만 56.83), 사이 4.49
-export const IBK_CHIPS = [
+const IBK_CHIPS = [
   { label: "+1만", add: 10_000 },
   { label: "+5만", add: 50_000 },
   { label: "+10만", add: 100_000 },
@@ -72,9 +72,10 @@ function Key({ k, onKey }: { k: IbkKey; onKey: (k: IbkKey) => void }) {
         />
       ))}
       {k === "back" ? (
-        // ← (6-2): 꼭짓점 녹화 (320.2, 683.0) → 클론 (312.29, 683.0), 팔 끝 클론 x 319.22 (y ±8.1), 가로선 끝 329.87, 둥근 끝 (녹화 1.6 → 잉크 양을 맞춰 1.45)
-        <svg className="ibs-kp__back" width="17.58" height="16.2" viewBox="0 0 17.58 16.2" overflow="visible" aria-hidden>
-          <path d="M6.93 0 0 8.1l6.93 8.1M0 8.1h17.58" fill="none" stroke="#000" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round" />
+        // ← (6-2): 꼭짓점 녹화 (320.2, 683.0) → 클론 (312.29, 683.0), 팔 끝 클론 x 319.22, 가로선 끝 329.2 (잉크 끝 녹화 337.8), 둥근 끝 (녹화 1.6 → 잉크 양을 맞춰 1.45).
+        // 팔 끝 y 는 잉크 끝(674.9 / 691.1)이라 선 중심은 ±7.45 (검수: ±8.1 이면 잉크 높이가 녹화보다 1.3 큼)
+        <svg className="ibs-kp__back" width="16.9" height="14.9" viewBox="0 0 16.9 14.9" overflow="visible" aria-hidden>
+          <path d="M6.93 0 0 7.45l6.93 7.45M0 7.45h16.9" fill="none" stroke="#000" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       ) : (
         <span>{k}</span>

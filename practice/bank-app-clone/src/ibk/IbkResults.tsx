@@ -1,4 +1,159 @@
-// 구현 전 자리 (spec: scratchpad/ibk/spec)
+import { useEffect, useRef, useState } from "react";
+import { paths } from "../api/endpoints";
+import type { TransferRecord } from "../api/types";
+import { useApi } from "../api/useApi";
+import { Dialog } from "../components/Sheet";
+import { ibkBankName, ibkNumber, nf } from "./bank";
+import { IbkHeader, IbkHeaderIcon, IbkIcon } from "./common";
+import { useIbkSpinner } from "./loading";
+import { useIbkBack, useIbkGo } from "./nav";
+import { useIbkStatusBar } from "./theme";
+import "./ibk-menu.css";
+
+// 이체결과조회 (녹화 75.37~77.33초 · 83.67~85.33초, spec: scratchpad/ibk/specB/menu.md 2절).
+// 머리줄(< 이체결과조회 ≡) 아래만 스크롤: 계좌 선택 상자(🏛 전체계좌 ⌄) → 회색 띠 → '1개월 · 즉시이체 ⌄' + 굵은 돋보기
+// → 기간 띠 → 이체 행(시각 · 정상 / 받는 분 · 금액 / 은행 번호 / 공유, 피치 134.7, 구분선 없음). 행을 누르면 이체확인증(본문만 오른쪽에서).
+// 위치는 클론 좌표 (x = (녹화 x − 0.35) / 1.0242, 본문 y = 녹화 y − 81.4) — 값마다 ibk-menu.css 에 녹화 숫자
+
+const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
+const NO_SHARE = "연습용 앱에서는 공유할 수 없어요.";
+const ROW_TOP = 265.1; // 첫 행 칸 위 = 녹화 346.5 (시각 기준선 364.8 − 18.3), 본문 기준
+const ROW_REC = 346.5;
+const ROW_PITCH = 134.7;
+// < 를 뗀 뒤 이전 화면까지 (녹화 84.867 뗌 → 85.400 메뉴, 82.867 → 83.367 확인증 → 결과): 약 500ms
+const BACK_MS = 500;
+// 행 누름 → 확인증 (77.367 손댐 → 77.467 바탕 완전 → 77.633 이동): 뗀 뒤 약 170ms
+const OPEN_DELAY = 170;
+
+// .ibk-bl 의 top: 녹화 기준선 base(반올림)에 글자가 놓이게. origin = 담는 상자 위의 녹화 y (ibk-menu.css 머리 주석)
+function blTop(base: number, fs: number, origin: number) {
+  const a = Math.round(0.927734 * fs);
+  const d = Math.round(0.244141 * fs);
+  return Math.round(base) - Math.floor(a - (a + d) / 2) - origin;
+}
+
+// 이체 행 글자: [녹화 기준선(첫 행), 크기] — 행마다 + 피치 (2-4, §10)
+const ROW_TEXT = { time: [364.8, 11], state: [366.9, 11], name: [397.4, 14.25], amt: [397.4, 14.75], acct: [419.2, 10.75] } as const;
+// 공유 아이콘 (2-4): 녹화 화소로 다시 잼 — 고리 중심 왼쪽 (341.1, 442.6) · 위 (350.0, 438.25) · 아래 (350.0, 447.45) → 기본 모양을 11.76 × 12.0 으로,
+// 선 중심 상자 왼쪽 위 클론 (339.67, 녹화 436.85). 단추(화면 x 330, 칸 위 +84.3) 안에서 transform 으로 (단추 위치는 화면에서 정수로 붙음)
+const SHARE = { x: 340.05, y: 436.85, w: 11.76, h: 12.0 };
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const ymd = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
+// 'YYYY-MM-DDTHH:mm:ss' → 'MM.DD HH:mm'
+const rowTime = (at: string) => `${at.slice(5, 7)}.${at.slice(8, 10)} ${at.slice(11, 16)}`;
+
+// 녹화: 오늘 10.30 기준 '1개월' = 2026.10.01 ~ 2026.10.30 (한 달 전 다음 날 ~ 오늘)
+function periodText(now = new Date()) {
+  const from = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate() + 1);
+  return `${ymd(from)} ~ ${ymd(now)}`;
+}
+
+// 은행 건물 (2-2): 녹화 잉크 46~74 × 126~153 → 클론 44.6~71.9. 진한 파랑 지붕(가운데 흰 점) · 띠 · 연한 기둥 4개 · 밑판.
+// viewBox 는 클론 좌표 그대로 (화면 x 44, 녹화 y 125 에 정수로 놓음)
+function BankBuilding() {
+  return (
+    <svg className="ibr-acct__icon" width="28" height="29" viewBox="44 125 28 29" aria-hidden>
+      <path d="M44.4 133.1 58.4 126 71.6 133.1Z" fill="#0b70e0" />
+      <rect x="44.4" y="132.6" width="27.2" height="4" rx="0.8" fill="#0b70e0" />
+      <circle cx="58" cy="130.5" r="1.3" fill="#e9fbff" />
+      <rect x="46.8" y="136.6" width="22.8" height="10.8" fill="#dcf1ff" />
+      {[48.4, 53.8, 59.2, 64.7].map((x) => (
+        <rect key={x} x={x} y="136.6" width="2.8" height="10.8" fill="#70aaee" />
+      ))}
+      <rect x="44.75" y="147.35" width="26.7" height="4.95" rx="1" fill="#0b70e0" />
+    </svg>
+  );
+}
+
 export function IbkResults() {
-  return <div className="screen ibk">IbkResults</div>;
+  useIbkStatusBar();
+  const go = useIbkGo();
+  const back = useIbkBack("/menu", BACK_MS);
+  const list = useApi<TransferRecord[]>(paths.transfers());
+  useIbkSpinner(list.status === "loading");
+  const [notice, setNotice] = useState<string | null>(null);
+  const [held, setHeld] = useState<string | null>(null);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+  const soon = () => setNotice(SOON);
+
+  const open = (id: string) => {
+    if (held) return;
+    setHeld(id);
+    timers.current.push(
+      window.setTimeout(() => go(`/results/${id}`, { anim: "body-right" }), OPEN_DELAY),
+      window.setTimeout(() => setHeld(null), OPEN_DELAY + 300), // 돌아왔을 때는 누름 바탕 없음 (83.67~)
+    );
+  };
+
+  const rows = list.data ?? [];
+  return (
+    <div className="ibk ibk-page ibr">
+      <IbkHeader title="이체결과조회" onBack={back} right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />} />
+      <div className="ibk-body">
+        <div className="ibr-content" style={{ height: ROW_TOP + Math.max(rows.length, 1) * ROW_PITCH }}>
+          <button className="ibr-acct" onClick={soon}>
+            <BankBuilding />
+            <span className="ibk-bl">전체계좌</span>
+            <IbkIcon name="chevron-down" w={12.9} h={6.2} sw={1.3} className="ibr-acct__arrow" />
+          </button>
+          <i className="ibr-band" />
+          <button className="ibr-filter" onClick={soon}>
+            <span className="ibk-bl">1개월 · 즉시이체</span>
+            <IbkIcon name="chevron-down" w={10.7} h={4.5} sw={1.15} className="ibr-filter__arrow" />
+          </button>
+          <button className="ibr-search" onClick={soon} aria-label="검색">
+            <IbkIcon name="search" scale={1.37} sw={1.85} />
+          </button>
+          <div className="ibr-period">
+            <span className="ibk-bl">{periodText()}</span>
+          </div>
+
+          {list.status === "done" && rows.length === 0 && <p className="ibr-empty">조회된 이체결과가 없어요.</p>}
+          {list.status === "error" && (
+            <button className="ibr-empty" onClick={list.retry}>
+              이체결과를 불러오지 못했어요. 눌러서 다시 시도해 주세요.
+            </button>
+          )}
+          {rows.map((t, k) => {
+            const y0 = ROW_REC + ROW_PITCH * k; // 행 칸 위의 녹화 y
+            const at = (key: keyof typeof ROW_TEXT) => ({ top: blTop(ROW_TEXT[key][0] + ROW_PITCH * k, ROW_TEXT[key][1], y0) });
+            const shareTop = Math.round(y0 + 84.3); // 단추 위를 화면 정수에 (그래야 아이콘 transform 이 정확)
+            return (
+              <div key={t.id} className="ibr-row" style={{ top: ROW_TOP + ROW_PITCH * k }}>
+                <button className={`ibr-row__main ${held === t.id ? "is-held" : ""}`} onClick={() => open(t.id)}>
+                  <span className="ibk-bl ibr-row__time" style={at("time")}>
+                    {rowTime(t.at)}
+                  </span>
+                  <span className="ibk-bl ibr-row__state" style={at("state")}>
+                    정상
+                  </span>
+                  <b className="ibk-bl ibr-row__name" style={at("name")}>
+                    {t.holder}
+                  </b>
+                  <b className="ibk-bl ibr-row__amt" style={at("amt")}>
+                    {nf.format(t.amount)}
+                    <small>원</small>
+                  </b>
+                  <span className="ibk-bl ibr-row__acct" style={at("acct")}>
+                    <small>{ibkBankName(t.bank)}</small> {ibkNumber(t.bank, t.number)}
+                  </span>
+                </button>
+                <button className="ibr-row__share" style={{ top: shareTop - y0 }} onClick={() => setNotice(NO_SHARE)} aria-label="공유">
+                  <IbkIcon
+                    name="share"
+                    w={SHARE.w}
+                    h={SHARE.h}
+                    style={{ transform: `translate(${SHARE.x - 330}px, ${SHARE.y + ROW_PITCH * k - shareTop}px)` }}
+                  />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <Dialog message={notice} onClose={() => setNotice(null)} />
+    </div>
+  );
 }

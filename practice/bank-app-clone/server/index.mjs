@@ -499,7 +499,8 @@ app.get("/api/transactions/:id", (req, res) => {
 app.patch("/api/transactions/:id", (req, res) => {
   const t = findTx(req.params.id);
   const memo = String(req.body?.memo ?? "").trim();
-  if (memo.length > 20) throw bad("거래메모는 20자 이하", { memo: "20자 이하" });
+  const max = APP === "ibk" ? 25 : 20; // i-ONE Bank 메모는 25자
+  if (memo.length > max) throw bad(`거래메모는 ${max}자 이하`, { memo: `${max}자 이하` });
   db().prepare("UPDATE transactions SET memo = ? WHERE id = ?").run(memo || null, t.id);
   res.json({ id: String(t.id), memo });
 });
@@ -521,6 +522,7 @@ const toPayee = (p) => ({
   number: p.number,
   holder: p.holder,
   favorite: !!p.favorite,
+  ...(p.receive_error && { receiveError: true }), // i-ONE Bank: 받는 은행 오류 안내를 띄울 계좌
 });
 
 function findPayee(id) {
@@ -566,7 +568,10 @@ app.patch("/api/payees/:id", (req, res) => {
   const body = req.body ?? {};
   const { bankCode, digits, name } = checkPayee(body, p);
   const favorite = body.favorite === undefined ? p.favorite : body.favorite ? 1 : 0;
-  db().prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ? WHERE id = ?").run(bankCode, digits, name, favorite, p.id);
+  const receiveError = body.receiveError === undefined ? p.receive_error : body.receiveError ? 1 : 0;
+  db()
+    .prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ?, receive_error = ? WHERE id = ?")
+    .run(bankCode, digits, name, favorite, receiveError, p.id);
   res.json(toPayee(findPayee(p.id)));
 });
 
@@ -604,7 +609,7 @@ app.get("/api/transfer/recipients", (req, res) => {
   // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이
   const recent = db()
     .prepare(
-      `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite
+      `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite, p.receive_error
          FROM transfers t LEFT JOIN payees p ON p.bank_code = t.bank_code AND p.number = t.number
         GROUP BY t.bank_code, t.number ORDER BY last_at DESC LIMIT 20`,
     )
@@ -616,6 +621,7 @@ app.get("/api/transfer/recipients", (req, res) => {
       holder: r.holder,
       lastAt: r.last_at,
       ...(r.payee_id && { payeeId: String(r.payee_id), favorite: !!r.favorite }),
+      ...(r.receive_error && { receiveError: true }),
     }));
   // 자주쓰는(☆ 누른 받는 분) — 콕뱅크 "자주쓰는" 탭
   const favorites = db()
