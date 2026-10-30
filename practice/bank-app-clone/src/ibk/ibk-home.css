@@ -344,7 +344,7 @@
   width: 150.8px;
 }
 
-/* ---------- 페이지 점 (3-6): 녹화 y 463.0 ~ 470.1, 활성 알약 18.8 × 7.1 #000, 나머지 ⌀7.3 #707481, 사이 3.7, 가운데 191.8 ---------- */
+/* ---------- 페이지 점 (3-6): 녹화 y 463.0 ~ 470.1, 활성 알약 18.8 × 7.1 #0d0e13, 나머지 ⌀7.3 #707481, 사이 3.7, 가운데 191.8 ---------- */
 .ibh-dots {
   position: absolute;
   left: 0;
@@ -365,9 +365,10 @@
     width 200ms ease-out,
     background-color 200ms ease-out;
 }
+/* 알약 속 (13, 14, 19) — 가장자리의 더 검은 띠는 압축 테두리 (검수: #000 → #0d0e13) */
 .ibh-dots i.on {
   width: 18.8px;
-  background: #000;
+  background: #0d0e13;
 }
 
 /* ---------- 바로가기 상자 (3-7): 클론 18.6 ~ 365.6, 녹화 y 485.6 ~ 537.9 (52.3), r16, 위 #f8fcfe → 아래 #fdfefe ---------- */
@@ -510,10 +511,12 @@
   height: 96.7px;
   overflow: hidden;
 }
+/* 넘김 진행률 녹화 33ms 22% · 100 58% · 133 67% · 167 85% · 200 89% · 233 96.5% · 267 100%
+   → (0.35, 0.7, 0.8, 1) 은 22 · 57 · 70 · 82 · 90 · 97 · 100 (검수: spec 권장 (0.2, 0.7, 0.3, 1) 은 100ms 에 82% 로 너무 빠름) */
 .ibh-promo__track {
   position: absolute;
   inset: 0;
-  transition: transform 270ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition: transform 270ms cubic-bezier(0.35, 0.7, 0.8, 1);
 }
 .ibh-promo__track--jump {
   transition: none;
@@ -528,12 +531,14 @@
 }
 /* 제목 700 18px +0.1, 잉크 왼쪽 클론 44.5~45.0, 영문·숫자 기준선 녹화 729 ("2026" 윗선 716.5).
    배너 그림 속 한글은 웹 Noto 보다 1 낮고 폭이 90% (글자 분포를 겹쳐 맞춘 배율 0.90) → 한 글자씩 가로 0.9 배 + 줄인 만큼 당김 (Noto 한글 폭 0.92em) */
+/* 띄어쓰기도 그림 글꼴이 좁음: 낱말마다 녹화보다 ≈1 오른쪽으로 밀려서 (검수: 4번 '커피' +1.0 · '받자' +2.0, 5번 '기업은행' +1.1) −0.8 */
 .ibh-promo__title {
   left: 25.55px;
   top: 31.85px;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.1px;
+  word-spacing: -0.4px;
 }
 .ibh-promo__title > span {
   display: inline-block;
@@ -542,6 +547,14 @@
   margin-right: -1.656px;
   transform: scaleX(0.9);
   transform-origin: 0 0;
+}
+/* ♥ (4번 '모으기 신청하고 커피 받자♥'): 녹화 잉크 16.1 × 13.2 (클론 x 219.5~235.6, 녹화 y 716.5~729.7) — 웹 글꼴 ♥ 는 19.7 × 14.9 라 기준선을 축으로 줄임.
+   상자(줄 높이 0)의 위끝 = 기준선 − 0.3418em = 6.15px 위 */
+.ibh-promo__heart {
+  display: inline-block;
+  font-style: normal;
+  transform: scale(0.817, 0.888);
+  transform-origin: 0 6.15px;
 }
 /* 1번(2026 더아트프라자)은 한글 폭 95%, "2026" 첫 잉크 클론 45 */
 .ibh-promo__title--wide {
@@ -569,6 +582,58 @@
 }
 .ibh-pic--empty {
   display: block;
+}
+
+/* ---------- 계좌 없음 (녹화에 없음): 카드 몸통 가운데 회색 안내 (맞춤메뉴 라벨 색) ---------- */
+.ibh-acct__empty {
+  left: 0;
+  right: 0;
+  top: 101.7px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #565a5d;
+  text-align: center;
+}
+
+/* ---------- 뼈대 뒤 그림이 늦게 뜸 (first · skeleton, 녹화 내용 150.633 기준 · d 프레임마다 잉크 양으로 잼) ----------
+   +200ms 할 일 체크 · 종 · 상담 · ≡ · 타일 1·2 / +433 '+' / +500 ⋮ · ⧉ · ↻ · 타일 3 / +600 배너 그림.
+   W 동전·신분증·IBK 로고·프로모 그림은 처음부터 있음 */
+@keyframes ibh-late {
+  from,
+  to {
+    visibility: hidden;
+  }
+}
+.ibh--late .ibh-todo .ibk-icon,
+.ibh--late .ibh-header .ibk-header__icon,
+.ibh--late .ibh-tile--late1 .ibh-tile__art {
+  animation: ibh-late 200ms;
+}
+.ibh--late .ibh-tile--late2 .ibh-tile__plus {
+  animation: ibh-late 433ms;
+}
+.ibh--late .ibh-acct__more,
+.ibh--late .ibh-acct__copy,
+.ibh--late .ibh-acct__refresh,
+.ibh--late .ibh-tile--late3 .ibh-tile__art {
+  animation: ibh-late 500ms;
+}
+.ibh--late .ibh-banner__art {
+  animation: ibh-late 600ms;
+}
+
+/* ---------- 아이폰 (녹화에 없음): 탭바를 홈 인디케이터(안전영역) 위로 올리고 그 밑은 흰색 ---------- */
+html[data-os="ios"] .ibh > .ibk-tabbar {
+  bottom: var(--safe-bottom);
+}
+html[data-os="ios"] .ibh > .ibk-tabbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: var(--safe-bottom);
+  background: #fff;
 }
 
 /* ---------- 가운데 톡톡송금 로티 (6-4): 800ms, 145.700 = 0 ---------- */
