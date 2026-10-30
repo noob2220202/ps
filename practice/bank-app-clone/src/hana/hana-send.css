@@ -225,25 +225,23 @@ html[data-theme="dark"] .hana-send {
   border: 1.5px solid var(--hn-green);
   padding-left: 15.5px;
 }
-.hs-input__value {
+.hs-input__el {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--hn-text);
+  caret-color: var(--hn-text);
+  font: inherit;
+  font-size: 17.5px;
   letter-spacing: 0.4px;
 }
-.hs-caret {
-  width: 1.5px;
-  height: 22px;
-  margin-left: 1px;
-  margin-right: auto;
-  background: var(--hn-text);
-  animation: hs-blink 1s steps(1) infinite;
-}
-.hs-input .hs-input__ph + .hs-caret {
-  order: -1;
-  margin: 0 1px 0 0;
-}
-@keyframes hs-blink {
-  50% {
-    opacity: 0;
-  }
+.hs-input__el::placeholder {
+  color: var(--hn-faint);
+  letter-spacing: -0.2px;
 }
 .hs-input__clear {
   margin-left: auto;

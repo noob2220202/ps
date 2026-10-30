@@ -21,6 +21,9 @@ export interface HanaDoneState {
 
 type Stage = "who" | "amount" | "memo";
 
+// 터치 화면(폰·태블릿)인지: 입력칸을 누르면 기기 키보드가 알아서 뜸
+const TOUCH = matchMedia("(pointer: coarse)").matches;
+
 // 이체 (라이트 녹화 7~40초, 다크 녹화 18~70초). 한 화면이 단계별로 바뀜:
 //   who    "누구에게 보낼까요?" 직접 입력 / 최근·내계좌·자주 목록
 //          └ 직접 입력 → '받는 분' 화면(계좌번호 + 은행 고르기 시트) → 확인 → 계좌 조회
@@ -306,12 +309,14 @@ function Entry({
 }) {
   const [digits, setDigits] = useState("");
   const [focus, setFocus] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const blur = () => input.current?.blur();
   const [bankCode, setBankCode] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
   // 처음 열리면 잠깐 뒤 계좌번호 칸에 커서 + 키보드 (녹화 0.6초쯤)
   useEffect(() => {
-    const t = window.setTimeout(() => setFocus(true), 450);
+    const t = window.setTimeout(() => input.current?.focus(), 450);
     return () => clearTimeout(t);
   }, []);
   useHanaStatusBar(picking ? { light: "#666666", dark: "#080809" } : undefined);
@@ -322,12 +327,12 @@ function Entry({
   const guess = digits.length >= 10 ? known.find((r) => r.number === digits) : undefined;
 
   const onKey = (k: KbKey) => {
-    if (k === "hide" || k === "enter") setFocus(false);
+    if (k === "hide" || k === "enter") blur();
     else if (k === "back") setDigits((d) => d.slice(0, -1));
     else setDigits((d) => (d + k).slice(0, 16));
   };
   const submit = async (code = bankCode, tileLabel = label) => {
-    setFocus(false);
+    blur();
     if (digits.length < 6) return onError("계좌번호를 확인해 주세요.");
     if (!code) return setPicking(true);
     setBusy(true);
@@ -348,22 +353,29 @@ function Entry({
   };
 
   return (
-    <div className="hs-page" onClick={() => setFocus(false)}>
+    <div className="hs-page" onClick={blur}>
       <HanaHeader title="받는 분" right={<HeaderClose onClick={onClose} />} />
       <div className="hs-body">
         <h2 className="hs-entry__title">이체할 계좌를 입력해 주세요</h2>
-        <div
-          className={`hs-field hs-input ${focus ? "hs-input--focus" : ""}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            setFocus(true);
-          }}
-        >
-          {digits ? <span className="hs-input__value">{digits}</span> : <span className="hs-input__ph">-없이 계좌번호 입력</span>}
-          {focus && <i className="hs-caret" />}
+        {/* 진짜 입력칸: 폰에선 폰 자체 키보드(숫자)가 뜨고, PC에선 키보드로 치거나 아래 그려 둔 갤럭시 자판으로 */}
+        <div className={`hs-field hs-input ${focus ? "hs-input--focus" : ""}`} onClick={(e) => e.stopPropagation()}>
+          <input
+            ref={input}
+            className="hs-input__el"
+            value={digits}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="off"
+            placeholder="-없이 계좌번호 입력"
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
+            onChange={(e) => setDigits(e.target.value.replace(/\D/g, "").slice(0, 16))}
+            onKeyDown={(e) => e.key === "Enter" && blur()}
+          />
           {digits && focus && (
             <button
               className="hs-input__clear"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={(e) => {
                 e.stopPropagation();
                 setDigits("");
@@ -378,7 +390,7 @@ function Entry({
           className="hs-field hs-select"
           onClick={(e) => {
             e.stopPropagation();
-            setFocus(false);
+            blur();
             setPicking(true);
           }}
         >
@@ -422,7 +434,8 @@ function Entry({
           <HanaSpinner size={34} />
         </div>
       )}
-      <HanaKeyboard open={focus && !picking} onKey={onKey} />
+      {/* 폰(터치)에선 폰 키보드가 뜨니까 그림 자판은 PC에서만 */}
+      {!TOUCH && <HanaKeyboard open={focus && !picking} onKey={onKey} />}
       <BankSheet
         open={picking}
         banks={banks}
