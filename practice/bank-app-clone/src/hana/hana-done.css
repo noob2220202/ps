@@ -5,35 +5,64 @@
 .hana-done > *:not(.hana-header):not(.hana-bottom):not(.dialog) {
   position: absolute;
 }
+/* 체크 원 ø64 (L/0177 x 200~280 y 132~212 @480 → 가운데 137.6dp), 체크 획 5.2dp */
 .hd-check {
-  left: calc(50% - 31.2px);
-  top: 77.6px;
-  width: 62.4px;
-  height: 62.4px;
+  left: calc(50% - 32px);
+  top: 76.8px;
+  width: 64px;
+  height: 64px;
 }
 .hd-check svg {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
-.hd-check circle {
-  fill: var(--hn-check);
-  transform-origin: 32px 32px;
-  animation: hd-pop 360ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
-}
-.hd-check path {
+.hd-check__arc {
   fill: none;
   stroke: var(--hn-green);
-  stroke-width: 4.2;
+  stroke-width: 5;
+  stroke-linecap: round;
+  transform-origin: 32px 32px;
+  animation: hd-arc 670ms linear 100ms both;
+}
+.hd-check__disc {
+  fill: var(--hn-check);
+  transform-origin: 32px 32px;
+  animation: hd-pop 200ms ease-out 770ms both;
+}
+.hd-check__tick {
+  fill: none;
+  stroke: var(--hn-green);
+  stroke-width: 5.2;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
-  animation: hd-draw 320ms ease-out 260ms forwards;
+  animation: hd-draw 220ms ease-out 870ms forwards;
+}
+/* 원호: 12시에서 시계 방향으로 길어졌다(최대 ≈70°) 줄며 한 바퀴 (L/0163~0170 30fps 20프레임) */
+@keyframes hd-arc {
+  0% {
+    stroke-dasharray: 0.5 100;
+    rotate: -90deg;
+    opacity: 1;
+  }
+  50% {
+    stroke-dasharray: 20 100;
+  }
+  99% {
+    stroke-dasharray: 0.5 100;
+    rotate: 270deg;
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes hd-pop {
   from {
-    scale: 0.2;
+    scale: 0.5;
     opacity: 0;
   }
 }
@@ -42,16 +71,26 @@
     stroke-dashoffset: 0;
   }
 }
+/* 제목 1줄 잉크 283px@480 (226.4dp) → 23px 자간 0, 줄 피치 33.2dp. 왼→오 쓸리며 등장 (100ms) */
 .hd-title {
   left: 0;
   right: 0;
-  top: 159.6px;
+  top: 159.2px;
   margin: 0;
   text-align: center;
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
-  line-height: 32.8px;
-  letter-spacing: -0.6px;
+  line-height: 33.2px;
+  letter-spacing: 0;
+  animation: hd-wipe 100ms linear both;
+}
+@keyframes hd-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }
 .hd-chips {
   left: 0;
@@ -59,26 +98,27 @@
   top: 249.6px;
   display: flex;
   justify-content: center;
-  gap: 13.4px;
+  gap: 12.4px;
 }
+/* 칩 41.6 높이, 글자 16.5px, 좌우 16 (L/0177 추가메모 88dp · 자동이체 등록 121.6dp) */
 .hd-chips .hana-chip {
-  height: 40px;
-  padding: 0 15.5px;
+  height: 41.6px;
+  padding: 0 16px;
   border-radius: 8px;
-  font-size: 16px !important;
+  font-size: 16.5px;
 }
 .hd-chips .hd-star {
-  width: 53.6px;
+  width: 55.2px;
   padding: 0;
   justify-content: center;
-  color: var(--hn-sub) !important;
+  color: var(--hn-sub);
 }
 .hd-rows {
   left: 20px;
   right: 20px;
   top: 337.6px;
   margin: 0;
-  padding: 22.4px 0 6.4px;
+  padding: 22.4px 0 8.8px;
   border-top: 1px solid var(--hn-hair);
   border-bottom: 1px solid var(--hn-hair);
 }
@@ -86,11 +126,12 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 14.4px;
-  font-size: 16px;
+  font-size: 16.5px;
   line-height: 24px;
 }
 .hd-rows dt {
   color: var(--hn-sub);
+  letter-spacing: 0;
 }
 .hd-rows dd {
   margin: 0;
@@ -98,7 +139,7 @@
   letter-spacing: 0;
 }
 .hd-more {
-  position: relative !important;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,14 +149,14 @@
   height: 22px;
   border: 0;
   background: none;
-  font-size: 14.5px !important;
-  color: var(--hn-text2) !important;
+  font-size: 14.5px;
+  color: var(--hn-sub);
 }
 .hd-more span {
   display: flex;
 }
 .hd-rows + .hd-more {
-  position: absolute !important;
+  position: absolute;
   left: 0;
   right: 0;
   top: 516.2px;
@@ -126,10 +167,14 @@
 .hana-done .hd-bottom {
   bottom: max(20.7px, calc(var(--safe-bottom) + 4px));
 }
+/* 아래 버튼 49.6 높이, 공유 99.2 폭, 틈 12.8 (L/0177 y 962~1024, x 25~149 / 165~455) */
+.hana-done .hd-bottom {
+  gap: 12.8px;
+}
 .hd-bottom .hana-btn {
-  height: 48px;
+  height: 49.6px;
   font-weight: 500;
 }
 .hd-share {
-  flex: 0 0 98.4px;
+  flex: 0 0 99.2px;
 }

@@ -5,28 +5,31 @@
   --hn-page: #f1f2f4; /* 홈 아래쪽·거래내역 위쪽 회색 바탕 */
   --hn-card: #ffffff;
   --hn-text: #25262a;
-  --hn-text2: #43454b; /* 값·본문 */
-  --hn-sub: #6e7177; /* 회색 글자 (라벨, 날짜) */
-  --hn-faint: #a2a5ab; /* 자리표시 글자 */
-  --hn-line: #e4e5e8; /* 입력칸·버튼 테두리 */
+  --hn-text2: #62666b; /* 행동 글자 (취소·다계좌이체·연락처·편집·펼치기) — L/0090 취소 (100,100,104) */
+  --hn-sub: #636a70; /* 보조 회색 (라벨·날짜·구분) — 완료 라벨 #66686c, 필터 #5d666f, 행 #677078 의 가운데 */
+  --hn-faint: #919396; /* 자리표시 글자 — L/0040 '-없이 계좌번호 입력' (145,146,148) */
+  --hn-line: #d2d3d6; /* 입력칸·선택칸 테두리 — L/0040 (206,206,206) */
+  --hn-line-strong: #b4b6b9; /* 상세 '다시 이체' 버튼 테두리 — b296deb7 */
+  --hn-tab-line: #d4d5d7; /* 탭 밑줄 — 0871415a (215,216,218) */
+  --hn-chip-line: #e8e8ea; /* 자주쓰는문구 칩 테두리 — L/0110 (236~244) */
   --hn-hair: #efeff1; /* 목록 구분선 */
   --hn-chip: #f2f2f4; /* 회색 칩·버튼 */
-  --hn-chip-text: #5c5f66;
+  --hn-chip-text: #666a70; /* L/0177 추가메모 글자 */
   --hn-tile: #f9fafc; /* 은행 타일 */
   --hn-badge: #f5f6f8; /* 은행 로고 동그라미 */
   --hn-green: #00a38e;
   --hn-green-text: #00a38e;
   --hn-mint: #e3f6f4; /* '가져오기'·'연결' 연한 초록 버튼 */
-  --hn-mint-text: #029e90;
+  --hn-mint-text: #0b7f70; /* 95fd8510 가져오기 글자 (가장 진한 10% #01695b) */
   --hn-check: #d7f1ee; /* 완료 체크 원 */
-  --hn-red: #e5323f;
+  --hn-red: #dc4455; /* 95fd8510 -1원 */
   --hn-blue: #1e6bf2;
-  --hn-disabled: #f2f2f4;
-  --hn-disabled-text: #c3c5ca;
+  --hn-disabled: #e7e8ec; /* L/0086 비활성 '다음' (231,232,236) */
+  --hn-disabled-text: #b4b5b9;
   --hn-key-press: #f2f2f4;
   --hn-dim: rgba(0, 0, 0, 0.6);
   --hn-sheet: #ffffff;
-  --hn-grabber: #a7a9ad;
+  --hn-grabber: #8e959d; /* 0871415a 손잡이 (142,149,157) */
   --hn-skeleton: #eff0f2;
   background: var(--hn-bg);
   color: var(--hn-text);
@@ -37,62 +40,78 @@ html[data-theme="dark"] .hana {
   --hn-bg: #191a1c;
   --hn-page: #202125;
   --hn-card: #191a1c;
-  --hn-text: #f0f0f2;
-  --hn-text2: #dadbde;
-  --hn-sub: #9a9da3;
-  --hn-faint: #6b6e74;
-  --hn-line: #3a3b3f;
-  --hn-hair: #2a2b2f;
-  --hn-chip: #2c2e33;
-  --hn-chip-text: #c3c5ca;
-  --hn-tile: #222327;
-  --hn-badge: #1e1f22;
+  --hn-text: #f6f7f9; /* D/0170 흰 글자 */
+  --hn-text2: #b5b6b9; /* D/0091 취소 (182,183,185) */
+  --hn-sub: #b0b2b6; /* D/0170 라벨 #b4b5b8, D/0177 행 #a8a9ab */
+  --hn-faint: #949599; /* D/0047 자리표시 (149,150,152) */
+  --hn-line: #5c5d60; /* D/0047 상자 테두리 (91~104) */
+  --hn-line-strong: #757678; /* D/0213 */
+  --hn-tab-line: #4c4d50;
+  --hn-chip-line: #393a3d;
+  --hn-hair: #2f3032; /* D/0177 날짜 밑줄 */
+  --hn-chip: #353a40; /* D/0091 빠른금액 칩 (56,59,64), D/0170 추가메모 칩 #323940 */
+  --hn-chip-text: #b2b5bb;
+  --hn-tile: #1d1d1f; /* D/0066 은행 타일 (29,29,31) */
+  --hn-badge: #222325;
   --hn-green: #00a38e;
-  --hn-green-text: #13b7a0;
-  --hn-mint: #2a3a38;
-  --hn-mint-text: #3cc8b4;
-  --hn-check: #3e5c58;
-  --hn-red: #f0505b;
-  --hn-blue: #5b95ff;
-  --hn-disabled: #2c2e33;
-  --hn-disabled-text: #5f6268;
+  --hn-green-text: #0a9d87; /* D/0170 제목 초록 #089a85 */
+  --hn-mint: #bccaca; /* D/0176 가져오기 바탕 — 다크에서도 연한 회민트 */
+  --hn-mint-text: #185c50;
+  --hn-check: #647e7b; /* D/0170 체크 원 */
+  --hn-red: #dc4a60; /* D/0185 */
+  --hn-blue: #4f8fe0;
+  --hn-disabled: #212224; /* D/0089 비활성 '다음' (33,34,36) */
+  --hn-disabled-text: #7a7c80;
   --hn-key-press: #2c2e33;
   --hn-dim: rgba(0, 0, 0, 0.7);
   --hn-sheet: #191a1c;
   --hn-grabber: #949599;
   --hn-skeleton: #26272b;
 }
-.hana button {
+/* 버튼은 글자 설정만 물려받고 우선순위는 0 으로 (:where) — 그래야 .hana-btn 같은 한 클래스 규칙이 없이 이김 */
+:where(.hana) button {
   font: inherit;
   color: inherit;
   letter-spacing: inherit;
+}
+/* 실제 앱에서 잘라 온 아이콘 마스크 (common.tsx Ic) */
+.hana-ic {
+  display: inline-block;
+  flex-shrink: 0;
+  background: currentColor;
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+}
+.hana-ic--missing {
+  border-radius: 4px;
+  background: currentColor;
+  opacity: 0.25;
 }
 
 /* 갤럭시 제스처바: 하나원큐는 앱 바탕이 아래까지 (검은 띠가 아님) — 라이트 흰색 + 손잡이 #b0b0b0, 다크 #191a1c + #6c6d6f.
    키보드가 떠 있으면 키보드 바탕색 */
 html[data-app="hana"] .phone__navbar {
   background: #ffffff;
+  box-shadow: 0 -1px 0 #ffffff; /* 띠가 0.4px 내려가 있어서(PhoneFrame.css) 화면과 띠 사이로 검은 줄이 비치지 않게 같은 색으로 덮음 */
 }
 html[data-app="hana"] .phone__navbar i {
-  background: #b0b0b0;
+  background: #a5a6a8; /* 8dd6d3c1 #a9a9a9 · d3850f0b #a0a1a3 */
 }
 html[data-app="hana"][data-theme="dark"] .phone__navbar {
   background: #191a1c;
+  box-shadow: 0 -1px 0 #191a1c;
 }
 html[data-app="hana"][data-theme="dark"] .phone__navbar i {
   background: #6c6d6f;
 }
 html[data-app="hana"][data-hana-kb] .phone__navbar {
   background: #090909;
+  box-shadow: 0 -1px 0 #090909;
 }
 html[data-app="hana"][data-hana-kb] .phone__navbar i {
   background: #5d5d5d;
-}
-html[data-app="hana"][data-hana-dim] .phone__navbar {
-  background: #666666;
-}
-html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
-  background: #080809;
 }
 
 
@@ -107,15 +126,17 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   justify-content: center;
   background: var(--hn-bg);
 }
+/* 제목 잉크 폭: '거래내역조회' 92dp (95fd8510) · '받는 분' 50.4dp (L/0040) → 18.4px */
 .hana-header h1 {
   margin: 0;
-  font-size: 17.5px;
+  font-size: 18.4px;
   font-weight: 500;
   letter-spacing: -0.3px;
 }
+/* 뒤로 < 잉크 x 23~33 y 46~64 (95fd8510, 상태바 포함 dp) */
 .hana-header__back {
   position: absolute;
-  left: 14.5px;
+  left: 18px; /* 뒤로 < 잉크 x 23.2~32.8dp (L/0035 x 29~41 @480), 잘라 온 아이콘 여백 1.07 + 버튼 안쪽 4 */
   top: 0;
   height: 100%;
   display: flex;
@@ -136,8 +157,8 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   padding: 0;
   background: none;
   border: 0;
-  font-size: 14px !important;
-  color: var(--hn-text2) !important;
+  font-size: 14.7px;
+  color: var(--hn-text2);
 }
 .hana-header__icon {
   margin-right: -4px;
@@ -145,6 +166,13 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   display: flex;
   background: none;
   border: 0;
+}
+/* 잘라 온 ×·< 는 잉크 가운데가 머리줄 가운데보다 1.6dp 아래 (× 잉크 x 340.8~360 y 17.6~36.8dp, L/0040) */
+.hana-header__back .hana-ic {
+  translate: 0 1.4px;
+}
+.hana-header__icon .hana-ic {
+  translate: -2.9px 1.6px;
 }
 
 /* ---------- 공통 ---------- */
@@ -162,17 +190,18 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   background: var(--hn-badge);
   overflow: hidden;
 }
+/* '한도계좌' 배지 55 × 21dp (L/0090 x 290~359 y 560~586 @480) */
 .hana-limit {
   display: inline-block;
   margin-left: 4px;
-  padding: 0 5px;
-  height: 19px;
-  line-height: 17px;
+  padding: 0 8px;
+  height: 21px;
+  line-height: 19px;
   border: 1px solid var(--hn-blue);
-  border-radius: 10px;
-  font-size: 12px;
+  border-radius: 10.5px;
+  font-size: 13px;
   color: var(--hn-blue);
-  letter-spacing: -0.4px;
+  letter-spacing: -0.2px;
   vertical-align: 1px;
 }
 .hana-spinner {
@@ -194,17 +223,17 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   border: 0;
   border-radius: 10px;
   background: var(--hn-green);
-  color: #fff !important;
-  font-size: 16.5px !important;
+  color: #fff;
+  font-size: 16.5px;
   font-weight: 600;
 }
 .hana-btn:disabled {
   background: var(--hn-disabled);
-  color: var(--hn-disabled-text) !important;
+  color: var(--hn-disabled-text);
 }
 .hana-btn--mint {
   background: var(--hn-mint);
-  color: var(--hn-mint-text) !important;
+  color: var(--hn-mint-text);
 }
 .hana-bottom {
   position: absolute;
@@ -226,8 +255,8 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   border: 0;
   border-radius: 6px;
   background: var(--hn-chip);
-  color: var(--hn-chip-text) !important;
-  font-size: 14.5px !important;
+  color: var(--hn-chip-text);
+  font-size: 14.5px;
 }
 
 .hana-skel {
@@ -236,17 +265,99 @@ html[data-app="hana"][data-theme="dark"][data-hana-dim] .phone__navbar {
   background: var(--hn-skeleton);
 }
 
-/* 알림창 */
+/* 화면 사이 로딩 페이지 (common.tsx HanaLoadingLayer): 폰 안 앱 영역(상태바 아래)만 덮음 */
+.hana-loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28px;
+  bottom: 0;
+  z-index: 40;
+  background: var(--hn-bg);
+}
+.hana-loading .hana-spinner {
+  position: absolute;
+  left: calc(50% - 15px);
+  top: 371px;
+}
+
+/* 불러오기 실패 (common.tsx HanaRetry) */
+.hana-retry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 20px;
+  text-align: center;
+}
+.hh-card .hana-retry {
+  inset: 0;
+  justify-content: center;
+  padding: 0;
+}
+.hana-retry b {
+  font-size: 16.5px;
+  font-weight: 600;
+}
+.hana-retry span {
+  font-size: 14.5px;
+  color: var(--hn-sub);
+}
+.hana-retry button {
+  margin-top: 10px;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--hn-line);
+  border-radius: 8px;
+  background: none;
+  font-size: 15px;
+}
+
+/* 알림창 (라이트 녹화 2: 55초 '입금계좌번호 오류입니다.', 39초 '이체를 취소하시겠어요?'): 좌우 20 · 반경 17 흰 상자,
+   글자 16px 줄 24 왼쪽 정렬 (위 33.2, 아래 틈 24.8), 버튼 높이 48 반경 8 (아래 19.2). 두 개면 [아니요 민트][예 초록] 틈 12. 뒤 60% 어둡게 */
+.hana .dialog {
+  background: var(--hn-dim);
+}
 .hana .dialog__box,
 .hana-dialog .dialog__box {
+  width: calc(100% - 40px);
+  padding: 33.2px 20px 19.2px;
+  border-radius: 17px;
   background: var(--hn-sheet);
   color: var(--hn-text);
+  text-align: left;
+}
+.hana .dialog__box p {
+  padding: 0 0 24.8px;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+.hana .dialog__buttons {
+  gap: 12px;
+  border: 0;
+}
+.hana .dialog__buttons button {
+  height: 48px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--hn-green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+.hana .dialog__buttons .dialog__cancel {
+  background: var(--hn-mint);
+  color: var(--hn-mint-text);
 }
 
 /* ---------- 시작화면 ---------- */
 .hana-splash {
   background: #000;
   overflow: hidden;
+}
+.hana-splash--light {
+  background: #fff;
 }
 /* 로고 상자 200 × 60 (녹화 250 × 75px), 가운데 y 202dp → 앱 영역 174 */
 .hana-splash__logo {

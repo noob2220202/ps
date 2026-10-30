@@ -1,81 +1,55 @@
-/* 하나원큐 홈. 위치는 라이트 스크린샷(720px) ÷ 1.875 − 상태바 28 = 앱 영역 dp */
+/* 하나원큐 홈. 위치는 라이트 스크린샷(720px) ÷ 1.875 − 상태바 28 = 앱 영역 dp (8dd6d3c1 맨 위, 069b9ebb 메뉴, d3850f0b 맨 아래).
+   글자색은 720 원본에서 가장 어두운 2% 로 뽑은 값 (제목 #212428 ≈ 본문 변수, 보조 #60676e) */
 .hana-home {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: var(--hn-page);
   --hm-btn-get: #ffffff;
-  --hm-pill: rgba(255, 255, 255, 0.55);
-  --hm-pill-text: #3a3d42;
+  --hm-pill: rgba(255, 255, 255, 0.75); /* 8dd6d3c1 알약 #e7faf4 (민트 위 흰 0.75) */
+  --hm-pill-text: #2f393b;
   --hm-mode: #5d6975;
-  --hm-home-sub: #4f5f60;
+  --hm-home-sub: #566c72; /* '입출금' */
+  --hm-sub: #60676e; /* 배너 소제목·작은 카드 부제·탭 비활성·개인정보 */
   --hm-shadow: 0 1px 6px rgba(0, 40, 30, 0.05);
 }
 html[data-theme="dark"] .hana-home {
   --hm-btn-get: #ffffff;
-  --hm-pill: rgba(0, 0, 0, 0.45);
+  --hm-pill: rgba(0, 0, 0, 0.7); /* D/0014 알약 #000f0c~#0b1819 */
   --hm-pill-text: #e8eaec;
-  --hm-mode: #b5b8bd;
+  --hm-mode: #b0b5bb;
   --hm-home-sub: #b9c4c2;
+  --hm-sub: #b4b5b7;
   --hm-shadow: none;
 }
+/* 맨 아래 '개인정보 처리방침' 아래 바닥까지 65dp (d3850f0b 잉크 y 773 → 838) */
 .hana-home__scroll {
-  padding-bottom: 150px;
+  padding-bottom: 50px;
 }
 
-/* 위쪽 민트 바탕 + 흐린 클로버 (스크린샷 가장자리 색: 위 #c2f6ea → 가운데 #a6e9d2 → 아래 회색 #f1f2f4) */
+/* 배경: 실제 화면에서 글자·카드 자리를 메운 그림 (scripts/hana-crops/icons.py). 폭 384dp 기준이라 아이폰(402)에선 조금 커짐.
+   다크는 글자보다 늦게 나타남 (D/0013 평평한 #202125 → D/0014 그라데이션, 0.5초 안) */
 .hana-home__bg {
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
-  height: 900px;
-  overflow: hidden;
-  background: linear-gradient(180deg, #c3f7eb 0px, #c4f6ea 200px, #b1ecdb 380px, #a3e5cf 560px, #b4e6d4 660px, #d6ece5 760px, var(--hn-page) 880px);
+  height: auto;
   pointer-events: none;
-}
-.hana-home__bg i {
-  position: absolute;
-  border-radius: 50%;
-  background: #62d6b4;
-  filter: blur(22px);
-  opacity: 0.75;
-}
-.hana-home__bg .c1 {
-  left: -70px;
-  top: 300px;
-  width: 150px;
-  height: 120px;
-}
-.hana-home__bg .c2 {
-  left: 260px;
-  top: 40px;
-  width: 140px;
-  height: 90px;
-  background: #8ee6cb;
-}
-.hana-home__bg .c3 {
-  left: 300px;
-  top: 470px;
-  width: 140px;
-  height: 90px;
-}
-.hana-home__bg .c4 {
-  left: 30px;
-  top: 560px;
-  width: 120px;
-  height: 70px;
-  background: #86dfc2;
+  user-select: none;
 }
 html[data-theme="dark"] .hana-home__bg {
-  background: linear-gradient(180deg, #0f3f3a 0px, #0d3e39 200px, #0a3833 380px, #073631 560px, #0b302c 680px, #182724 790px, var(--hn-page) 880px);
+  animation: hana-fade-in 450ms linear both;
 }
-html[data-theme="dark"] .hana-home__bg i {
-  background: #1f5f53;
-  opacity: 0.8;
+.hana-home__bg--plain {
+  height: 826px;
+  background: linear-gradient(180deg, #c2f6ea 0px, #abead7 320px, #90debf 440px, #a9e1c9 560px, #c6e6d9 680px, #ebf0f1 805px, var(--hn-page) 825px);
+}
+html[data-theme="dark"] .hana-home__bg--plain {
+  background: linear-gradient(180deg, #184a45 0px, #103c39 215px, #05322f 390px, #073330 460px, #122524 640px, #132222 712px, var(--hn-page) 800px);
 }
 
-/* ---------- 머리줄 (56dp). 스크롤하면 반투명 막 ---------- */
+/* ---------- 머리줄 (56dp). 스크롤하면 중립 회백 막 ≈0.65 + 블러 (069b9ebb 막 안 #d3efe8, d3850f0b 흰 위 #f2f2f2; 다크 D/0021 흰 0.12) ---------- */
 .hana-home__top {
   position: absolute;
   left: 0;
@@ -86,11 +60,12 @@ html[data-theme="dark"] .hana-home__bg i {
   transition: background-color 120ms linear;
 }
 .hana-home__top--scrolled {
-  background: rgba(238, 247, 244, 0.86);
+  background: rgba(236, 238, 241, 0.65);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 html[data-theme="dark"] .hana-home__top--scrolled {
-  background: rgba(26, 43, 41, 0.86);
+  background: rgba(255, 255, 255, 0.12);
 }
 .hana-home__top > * {
   position: absolute;
@@ -102,57 +77,130 @@ html[data-theme="dark"] .hana-home__top--scrolled {
   border: 0;
   background: none;
 }
+/* MY 잉크 x 24.4~48 y 44.4~68 (8dd6d3c1, 상태바 포함 dp) */
 .hana-home__my {
-  left: 19px;
+  left: 23px;
 }
+/* 홈|간편 칩 54.4 × 26.4 (x 223.2~277.6 y 42.4~68.8), 반경 7, 흰 '홈' 상자 19.2 × 21.6, '간편' 흰 500. 다크는 '홈' 상자가 검정 #16181b */
 .hana-home__mode {
-  right: 106.7px;
-  top: 14.7px !important;
-  height: 25.6px !important;
-  width: 53.3px;
-  padding: 0 3px !important;
-  border-radius: 6px;
-  background: var(--hm-mode) !important;
+  right: 106.4px;
+  top: 14.4px;
+  height: 26.4px;
+  width: 54.4px;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: var(--hm-mode);
   font-size: 13.3px;
+  font-weight: 500;
   color: #fff;
 }
 .hana-home__mode b {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 19.5px;
-  height: 19.5px;
+  width: 19.2px;
+  height: 21.6px;
   border-radius: 4.5px;
   background: #fff;
   color: #2c2f33;
   font-weight: 500;
 }
 .hana-home__mode span {
-  margin-left: 4px;
+  margin-left: 4.5px;
 }
 html[data-theme="dark"] .hana-home__mode {
   color: #26282b;
 }
+html[data-theme="dark"] .hana-home__mode b {
+  background: #16181b;
+  color: #fff;
+}
+/* 지갑 잉크 x 293.2~318.8 / 종 잉크 x 336.8~356 y 44~67.2, N 배지 ø12.8 가운데 (357.6, 46) #f0659a (8dd6d3c1) */
 .hana-home__tool {
-  right: 64.4px;
+  right: 64.8px;
 }
 .hana-home__bell {
-  right: 22.3px;
+  right: 26px;
 }
-.hana-home__bell i {
+.hana-home__bell .hana-ic {
+  translate: 0 -1.2px;
+}
+.hana-home__badge {
   position: absolute;
-  top: 9px;
-  right: -4px;
-  width: 14px;
-  height: 14px;
+  top: 11.6px;
+  right: -6px;
+  width: 12.8px;
+  height: 12.8px;
   border-radius: 50%;
-  background: #f0315b;
+  background: #f0659a;
   color: #fff;
-  font-size: 9px;
+  font-size: 8.5px;
   font-style: normal;
   font-weight: 700;
-  line-height: 14px;
+  line-height: 12.8px;
   text-align: center;
+}
+html[data-theme="dark"] .hana-home__badge {
+  background: #c53e6a;
+}
+/* 스캔 → 지갑 모핑 (실제는 모서리 괄호가 선으로 줄었다가 지갑이 됨, ≈1초): 두 아이콘을 겹쳐 두고 교차 페이드 + 살짝 줄어듦 */
+.hana-home__morph {
+  position: relative;
+  display: block;
+  width: 28.8px;
+  height: 26.7px;
+}
+.hana-home__morph .hana-ic {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  transition:
+    opacity 400ms ease-in-out,
+    scale 400ms ease-in-out;
+}
+.hana-home__morph-wallet {
+  opacity: 0;
+  scale: 0.6;
+}
+.hana-home__morph--wallet .hana-home__morph-scan {
+  opacity: 0;
+  scale: 0.6;
+  transition-delay: 0ms;
+}
+.hana-home__morph--wallet .hana-home__morph-wallet {
+  opacity: 1;
+  scale: 1;
+  transition-delay: 350ms;
+}
+/* '원큐지갑' 말풍선: 흰 둥근 상자 56 × 25.6 (x 275.2~331.2 y 84.8~110.4 → 머리줄 아래 28.8), 위 꼭지 9.6 × 6.4, 아이콘 가운데 정렬 */
+.hana-home__tip {
+  position: absolute;
+  left: 50%;
+  top: 56.8px;
+  translate: -50% 0;
+  width: 56px;
+  height: 25.6px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  color: #2c2b30;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 25.6px;
+  text-align: center;
+  white-space: nowrap;
+  animation: hana-fade-in 150ms linear both;
+}
+.hana-home__tip::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  translate: -50% 0;
+  border: 4.8px solid transparent;
+  border-top: 0;
+  border-bottom: 6.4px solid #fff;
 }
 
 /* ---------- 대표계좌 (가운데 정렬) ---------- */
@@ -166,18 +214,19 @@ html[data-theme="dark"] .hana-home__mode {
   left: 0;
   right: 0;
 }
+/* '입출금' 40.8 × 15.2 (≈17.3px) #566c72, 통장이름 117.6 폭 600, ⋮ 4 × 16 (x 349.6~353.6) */
 .hana-home__acct-name {
   top: 117.6px;
   height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16.5px;
+  font-size: 17.3px;
 }
 .hana-home__acct-name span {
   color: var(--hm-home-sub);
 }
-.hana-home__acct-name i {
+.hana-home__acct-name > i {
   width: 1px;
   height: 12px;
   margin: 0 7px;
@@ -189,110 +238,139 @@ html[data-theme="dark"] .hana-home__mode {
 }
 .hana-home__more {
   position: absolute;
-  right: 22px;
+  right: 24.4px;
   top: 0;
   height: 22px;
+  display: flex;
+  align-items: center;
   padding: 0 6px;
   border: 0;
   background: none;
 }
+/* '하나은행 123-…' 17.5px, 번호 15자 172.8 폭 (글자당 11.5), 복사 아이콘 16 × 15.2 */
 .hana-home__acct-no {
   top: 145.8px;
   height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   padding: 0;
   border: 0;
   background: none;
-  font-size: 17px !important;
-  letter-spacing: 0.35px !important;
+  font-size: 17.5px;
+  letter-spacing: 0;
 }
+/* 한도계좌 배지 71.2 × 20.8 (x 156.8~228 y 201.6~222.4), 글자 13.3px #51656c, 테두리 ≈#5a6b70 */
 .hana-home__limit {
-  left: 50% !important;
-  right: auto !important;
-  top: 175px;
+  left: 50%;
+  right: auto;
+  top: 173.6px;
   translate: -50% 0;
-  height: 18.5px;
-  padding: 0 6px 0 7.5px;
+  height: 20.8px;
+  padding: 0 5px 0 7.5px;
   display: inline-flex;
   align-items: center;
-  gap: 1px;
-  border: 1px solid rgba(60, 90, 90, 0.38);
-  border-radius: 10px;
-  font-size: 12.5px;
-  color: var(--hm-home-sub);
+  gap: 0;
+  border: 1px solid rgba(40, 70, 72, 0.55);
+  border-radius: 10.4px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 13.3px;
+  color: #51656c;
   white-space: nowrap;
 }
 html[data-theme="dark"] .hana-home__limit {
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.45);
+  background: none;
+  color: #cfd9d7;
 }
+/* 잔액 '40,468' 잉크 88 폭 (≈28px, 자간 −0.9), '원' 18.4 × 20.8 (≈23.5px) 베이스라인 맞춤, 숨김 알약 38.4 × 27.2 #eafefe 글자 #485157 */
 .hana-home__balance {
   top: 197px;
   height: 33px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
 }
 .hana-home__balance strong {
-  font-size: 27.5px;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 0.2px;
+  letter-spacing: -0.9px;
 }
 .hana-home__balance small {
-  margin-left: 3px;
-  font-size: 25px;
+  margin-left: 3.5px;
+  font-size: 23.5px;
   font-weight: 600;
+  letter-spacing: 0;
+}
+.hana-home__loading {
+  font-size: 15px;
+  color: var(--hm-sub);
+}
+.hana-home__retry {
+  height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--hm-pill);
+  color: var(--hm-pill-text);
+  font-size: 14px;
 }
 .hana-home__hide {
-  height: 22px;
-  padding: 0 8px;
+  height: 27.2px;
+  padding: 0 9px;
   border: 0;
-  border-radius: 11px;
-  background: var(--hm-pill);
-  color: var(--hm-pill-text) !important;
-  font-size: 12.5px !important;
+  border-radius: 13.6px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #485157;
+  font-size: 12.5px;
 }
+html[data-theme="dark"] .hana-home__hide {
+  background: var(--hm-pill);
+  color: var(--hm-pill-text);
+}
+/* 가져오기 119.2 × 42 (x 66.8~186 y 284.4~326), 보내기 120.8 × 44, 틈 12.4, 글자 500 */
 .hana-home__btns {
-  top: 257px;
+  top: 256px;
   display: flex;
   justify-content: center;
-  gap: 13.4px;
+  gap: 12.4px;
 }
 .hana-home__btns button {
   width: 119.5px;
-  height: 41px;
+  height: 43px;
   border: 0;
-  border-radius: 21px;
-  font-size: 17px !important;
+  border-radius: 21.5px;
+  font-size: 17px;
+  font-weight: 500;
 }
 .hana-home__get {
   background: var(--hm-btn-get);
-  color: #2b2d31 !important;
+  color: #222528;
 }
 .hana-home__send {
   background: var(--hn-green);
-  color: #fff !important;
+  color: #fff;
 }
+/* 페이저 알약 97.5 × 23.2 (x 128.2~225.7 y 350.6~373.8 → 앱 322.6) + 톱니 원 ø24.7, 묶음 가운데 = 화면 가운데 */
 .hana-home__pager {
-  top: 325px;
-  height: 20.5px;
+  top: 322.6px;
+  height: 24.7px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding-left: 25px;
+  gap: 4.5px;
 }
 .hana-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  width: 98px;
-  height: 20.5px;
-  border-radius: 10.5px;
+  gap: 9px;
+  width: 97.5px;
+  height: 23.2px;
+  border-radius: 11.6px;
   background: var(--hm-pill);
   color: var(--hm-pill-text);
   font-size: 13.5px;
@@ -308,8 +386,8 @@ html[data-theme="dark"] .hana-home__limit {
   background: none;
 }
 .hana-home__gear {
-  width: 20.5px;
-  height: 20.5px;
+  width: 24.7px;
+  height: 24.7px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -317,22 +395,14 @@ html[data-theme="dark"] .hana-home__limit {
   background: var(--hm-pill);
   color: var(--hm-pill-text);
 }
-.hana-home__acct-skel {
-  top: 150px;
-  left: 110px !important;
-  right: 110px !important;
-  height: 70px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.35);
-}
 
-/* ---------- 카드들 ---------- */
+/* ---------- 카드들 (틈 14, 반경 13) ---------- */
 .hana-home__cards {
   position: relative;
   padding: 20.7px 20.3px 0;
   display: flex;
   flex-direction: column;
-  gap: 12.8px;
+  gap: 14px;
 }
 .hana-card {
   position: relative;
@@ -344,12 +414,13 @@ html[data-theme="dark"] .hana-home__limit {
   box-shadow: var(--hm-shadow);
   text-align: left;
 }
+/* 전체계좌 49 높이, '보기' #222528 + 쉐브론 7.2 × 13.6 (오른끝에서 20.2) */
 .hana-home__all {
-  height: 50.7px;
+  height: 49px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 19px 0 20.7px;
+  padding: 0 17px 0 20.7px;
 }
 .hana-home__all b {
   font-size: 18.5px;
@@ -358,12 +429,12 @@ html[data-theme="dark"] .hana-home__limit {
 .hana-home__all span {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-size: 15.5px;
-  color: var(--hn-text2);
+  color: var(--hn-text);
 }
 .hana-home__banner {
-  height: 159.5px;
+  height: 158.5px;
   overflow: hidden;
   cursor: pointer;
 }
@@ -376,7 +447,7 @@ html[data-theme="dark"] .hana-home__limit {
 .hana-home__banner-sub {
   top: 20px;
   font-size: 15px;
-  color: var(--hn-sub);
+  color: var(--hm-sub);
 }
 .hana-home__banner-title {
   top: 43.5px;
@@ -396,27 +467,30 @@ html[data-theme="dark"] .hana-home__limit {
   height: 149.3px;
   animation: hana-fade-in 200ms linear both;
 }
+/* 배너 페이저 알약 109.6 × 24 (x 40.4~150), 멈춤 원 ø22 (x 277.2~310) */
 .hana-home__banner-ctl {
   position: absolute;
-  left: 20.2px;
+  left: 21.5px;
   top: 112.3px;
   display: flex;
+  align-items: center;
   gap: 4px;
 }
 .hana-pill--gray {
-  width: 98px;
-  height: 22.4px;
-  border-radius: 11.2px;
+  width: 109.6px;
+  height: 24px;
+  border-radius: 12px;
+  gap: 8px;
   background: var(--hn-chip);
-  color: var(--hn-text2);
+  color: var(--hn-text);
   font-size: 13.5px;
 }
 .hana-pill--gray b {
   font-weight: 500;
 }
 .hana-home__play {
-  width: 22.4px;
-  height: 22.4px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -424,7 +498,7 @@ html[data-theme="dark"] .hana-home__limit {
   border: 0;
   border-radius: 50%;
   background: var(--hn-chip);
-  color: var(--hn-text2) !important;
+  color: var(--hn-text2);
 }
 .hana-home__minis {
   display: flex;
@@ -436,7 +510,7 @@ html[data-theme="dark"] .hana-home__limit {
 }
 .hana-home__mini {
   flex: 0 0 131.7px;
-  height: 68.3px;
+  height: 67.5px;
   padding: 0 0 0 15.5px;
 }
 .hana-home__mini b {
@@ -450,23 +524,27 @@ html[data-theme="dark"] .hana-home__limit {
   position: absolute;
   top: 36px;
   font-size: 14.5px;
-  color: var(--hn-sub);
+  color: var(--hm-sub);
   white-space: nowrap;
 }
 
-/* 메뉴 6개 + 메뉴 추가: 3열 (가운데 x 89.1 / 191.5 / 293.9), 줄 간격 89.3, 아이콘 44.8 상자 */
+/* 메뉴 6개 + 메뉴 추가: 3열 (가운데 카드 폭의 20% / 49.85% / 79.7% = 89.1 / 191.5 / 293.9), 줄 간격 89.3.
+   아이콘 잉크 가운데 = 카드 위에서 46, 라벨(500, 최대폭 92 → '하나원큐 축구…' 말줄임) 가운데 = 82 (069b9ebb) */
 .hana-home__menu {
-  height: 305px;
+  height: 303.5px;
 }
 .hana-home__menu button {
   position: absolute;
   width: 100px;
   height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   padding: 0;
   border: 0;
   background: none;
 }
-/* 열 가운데: 카드 폭의 20% / 49.85% / 79.7% (384dp 기준 89.1 / 191.5 / 293.9) */
 .hana-home__menu button:nth-child(3n + 1) {
   left: calc(20% - 50px);
 }
@@ -477,26 +555,26 @@ html[data-theme="dark"] .hana-home__limit {
   left: calc(79.7% - 50px);
 }
 .hana-home__menu button:nth-child(-n + 3) {
-  top: 26.1px;
+  top: 23.6px;
 }
 .hana-home__menu button:nth-child(n + 4) {
-  top: 115.4px;
+  top: 112.9px;
 }
 .hana-home__menu button:nth-child(7) {
-  top: 204.7px;
+  top: 202.2px;
 }
 .hana-home__menu img,
 .hana-home__menu .hana-pic--empty {
-  margin: 0 auto;
   width: 44.8px;
   height: 44.8px;
 }
 .hana-home__menu span {
   position: absolute;
-  left: -6px;
-  right: -6px;
-  top: 48.5px;
+  left: 4px;
+  right: 4px;
+  top: 51px;
   font-size: 15px;
+  font-weight: 500;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -509,18 +587,19 @@ html[data-theme="dark"] .hana-home__menu img {
 .hana-home__card-title {
   position: absolute;
   left: 20.7px;
-  right: 22px;
+  right: 20.2px;
   top: 26px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .hana-home__card-title b {
-  font-size: 18.5px;
+  font-size: 19px;
   font-weight: 600;
 }
+/* 하나금융그룹 262 높이, 칩 76 × 32 테두리 #b7b8bc, 프로모 카드 #f6f7f9, 태그 56.8 × 23.2 #1c9686 */
 .hana-home__group {
-  height: 263px;
+  height: 262px;
 }
 .hana-home__group-chips {
   position: absolute;
@@ -532,13 +611,13 @@ html[data-theme="dark"] .hana-home__menu img {
   overflow: hidden;
 }
 .hana-home__group-chips button {
-  flex: 0 0 74.1px;
-  height: 31px;
+  flex: 0 0 76px;
+  height: 32px;
   padding: 0;
-  border: 1px solid #9fa3a9;
+  border: 1px solid #b7b8bc;
   border-radius: 6px;
   background: none;
-  font-size: 15px !important;
+  font-size: 15px;
   white-space: nowrap;
 }
 html[data-theme="dark"] .hana-home__group-chips button {
@@ -551,7 +630,7 @@ html[data-theme="dark"] .hana-home__group-chips button {
   top: 115.7px;
   height: 122.7px;
   border-radius: 13px;
-  background: var(--hn-tile);
+  background: #f6f7f9;
   cursor: pointer;
 }
 html[data-theme="dark"] .hana-home__promo {
@@ -561,13 +640,17 @@ html[data-theme="dark"] .hana-home__promo {
   position: absolute;
   left: 20.3px;
   top: 20.5px;
-  height: 20px;
-  padding: 0 6px;
-  border: 1px solid var(--hn-green);
-  border-radius: 10px;
-  color: var(--hn-green-text);
+  height: 23px;
+  padding: 0 7px;
+  border: 1px solid #1c9686;
+  border-radius: 11.5px;
+  color: #1c9686;
   font-size: 12.5px;
-  line-height: 18px;
+  line-height: 21px;
+}
+html[data-theme="dark"] .hana-home__promo-tag {
+  border-color: var(--hn-green-text);
+  color: var(--hn-green-text);
 }
 .hana-home__promo p,
 .hana-home__promo b {
@@ -578,7 +661,7 @@ html[data-theme="dark"] .hana-home__promo {
 .hana-home__promo p {
   top: 48px;
   font-size: 14.5px;
-  color: var(--hn-sub);
+  color: var(--hm-sub);
 }
 .hana-home__promo b {
   top: 71px;
@@ -592,43 +675,48 @@ html[data-theme="dark"] .hana-home__promo {
   width: 64px;
   height: 60.8px;
 }
+/* 내 자산 128.8 높이, 본문 17.3px #222528 줄간 21.5, 연결 50.4 × 32.8 글자 #0d796a */
 .hana-home__assets {
-  height: 130px;
+  height: 128.8px;
 }
 .hana-home__assets b {
   position: absolute;
   left: 20.7px;
   top: 25.5px;
-  font-size: 18.5px;
+  font-size: 19px;
   font-weight: 600;
 }
 .hana-home__assets p {
   position: absolute;
   left: 20.7px;
-  top: 62.5px;
+  top: 61.5px;
   margin: 0;
-  font-size: 16px;
-  line-height: 19.7px;
-  color: var(--hn-text2);
+  font-size: 17.3px;
+  line-height: 21.5px;
+  color: var(--hn-text);
 }
 .hana-home__assets button {
   position: absolute;
   right: 20.3px;
-  top: 70.4px;
-  width: 49.1px;
-  height: 31px;
+  top: 69.5px;
+  width: 50.4px;
+  height: 32.8px;
   padding: 0;
   border: 0;
   border-radius: 8px;
   background: var(--hn-mint);
-  color: var(--hn-mint-text) !important;
-  font-size: 15px !important;
+  color: #0d796a;
+  font-size: 15px;
 }
+html[data-theme="dark"] .hana-home__assets button {
+  color: var(--hn-mint-text);
+}
+/* 홈 설정 104.8 × 42.4 #e4e8eb 글자 #5e6871, 톱니 15.2 × 16 */
 .hana-home__setting {
   align-self: center;
   margin-top: 20.8px;
-  width: 104.5px;
-  height: 41px;
+  width: 104.8px;
+  height: 42.4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -636,16 +724,12 @@ html[data-theme="dark"] .hana-home__promo {
   border: 0;
   border-radius: 10px;
   background: #e4e8eb;
-  color: #50555c !important;
-  font-size: 16.5px !important;
-}
-.hana-home__setting svg {
-  width: 17px;
-  height: 17px;
+  color: #5e6871;
+  font-size: 16.5px;
 }
 html[data-theme="dark"] .hana-home__setting {
   background: #33363b;
-  color: #aeb2b8 !important;
+  color: #aeb2b8;
 }
 .hana-home__privacy {
   align-self: center;
@@ -653,8 +737,8 @@ html[data-theme="dark"] .hana-home__setting {
   padding: 0;
   border: 0;
   background: none;
-  font-size: 15px !important;
-  color: var(--hn-sub) !important;
+  font-size: 15px;
+  color: var(--hm-sub);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -675,6 +759,7 @@ html[data-theme="dark"] .hana-home__setting {
 .hana-home__tabs--hidden {
   translate: 0 130px;
 }
+/* 칩: 글자 13.3px 500 #212429, 좌우 13.5, 높이 33, 반경 10. 검색 칩 72 × 33.6 #00a38e */
 .hana-home__chips {
   position: absolute;
   left: 0;
@@ -688,26 +773,31 @@ html[data-theme="dark"] .hana-home__setting {
 }
 .hana-home__chips button {
   flex-shrink: 0;
-  height: 32px;
-  padding: 0 11px;
+  height: 33px;
+  padding: 0 13.5px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--hn-page);
-  font-size: 14.5px !important;
+  color: #212429;
+  font-size: 13.3px;
+  font-weight: 500;
   white-space: nowrap;
 }
 html[data-theme="dark"] .hana-home__chips button {
   background: #202123;
+  color: var(--hn-text);
 }
 .hana-home__chips .hana-home__search {
   display: flex;
   align-items: center;
   gap: 4px;
-  width: 71.5px;
-  padding: 0 0 0 10px;
-  background: var(--hn-green) !important;
-  color: #fff !important;
+  width: 72px;
+  height: 33.6px;
+  padding: 0 0 0 9px;
+  background: var(--hn-green);
+  color: #fff;
 }
+/* 탭: 아이콘 잉크 y 791~811 (8dd6d3c1), 글자 13px — 비활성 #60676e, 활성 '홈' 700 */
 .hana-home__tabbar {
   position: absolute;
   left: 13.4px;
@@ -721,24 +811,36 @@ html[data-theme="dark"] .hana-home__chips button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
-  padding: 2px 0 0;
+  gap: 4px;
+  padding: 3px 0 0;
   border: 0;
   background: none;
-  color: var(--hn-sub) !important;
-  font-size: 13px !important;
+  color: var(--hm-sub);
+  font-size: 13px;
+}
+.hana-home__tab-ic {
+  height: 22px;
+  display: flex;
+  align-items: center;
 }
 .hana-home__tabbar button.on {
-  color: var(--hn-text) !important;
-  font-weight: 600;
+  color: var(--hn-text);
+  font-weight: 700;
 }
+html[data-theme="dark"] .hana-home__tabbar button {
+  color: #a9aaac;
+}
+html[data-theme="dark"] .hana-home__tabbar button.on {
+  color: var(--hn-text);
+}
+/* ⌄⌄ 흰 원 ø42.7 (가운데 (192, 798)), 넓고 연한 그림자, 쉐브론 16 × 17.6 #424a53 이 아래로 흐르며 사라짐 */
 .hana-home__down {
   position: absolute;
-  left: calc(50% - 20px);
+  left: calc(50% - 21.35px);
   bottom: max(19.6px, calc(var(--safe-bottom) + 4px));
   z-index: 6;
-  width: 40px;
-  height: 40px;
+  width: 42.7px;
+  height: 42.7px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -746,10 +848,31 @@ html[data-theme="dark"] .hana-home__chips button {
   border: 0;
   border-radius: 50%;
   background: var(--hn-card);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
-  color: var(--hn-text2) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  color: #424a53;
+  overflow: hidden;
   animation: hana-fade-in 160ms linear both;
+}
+.hana-home__down .hana-ic {
+  animation: hana-down-flow 1.2s ease-in-out infinite;
+}
+@keyframes hana-down-flow {
+  0% {
+    translate: 0 -4px;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 6px;
+    opacity: 0;
+  }
 }
 html[data-theme="dark"] .hana-home__down {
   background: #2c2e33;
+  color: #d5d7da;
 }

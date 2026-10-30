@@ -18,6 +18,7 @@ import { ProfilePicker } from "./profile/ProfilePicker";
 import { APP, currentProfileId } from "./profile/session";
 import { NhSplash } from "./nh/NhSplash";
 import { NhLoadingLayer } from "./nh/common";
+import { HanaLoadingLayer } from "./hana/common";
 import { NhHome } from "./nh/NhHome";
 import { NhSend } from "./nh/NhSend";
 import { NhConfirm } from "./nh/NhConfirm";
@@ -123,7 +124,7 @@ export default function App() {
 
   return (
     <StatusBarProvider>
-      <PhoneFrame overlay={APP === "nh" ? <NhLoadingLayer /> : undefined}>
+      <PhoneFrame overlay={APP === "nh" ? <NhLoadingLayer /> : APP === "hana" ? <HanaLoadingLayer /> : undefined}>
         {auth.status === "checking" && <PhoneOff />}
         {auth.status === "out" && <LoginScreen message={auth.message} />}
         {auth.status === "in" && boot === "off" && <PhoneOff />}

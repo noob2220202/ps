@@ -437,7 +437,7 @@ app.patch("/api/accounts/:id", (req, res) => {
 // 다른 은행 계좌 삭제 (거래내역도 ON DELETE CASCADE로 같이 지워짐)
 app.delete("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  if (row.kind !== "external") throw bad("카카오뱅크 통장은 지울 수 없어요");
+  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌" }[APP]}은 지울 수 없어요`);
   db().prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
   res.status(204).end();
 });
@@ -595,7 +595,7 @@ app.get("/api/transfer/recipients", (req, res) => {
   const from = String(req.query.from ?? "");
   const mine = db()
     .prepare("SELECT * FROM accounts WHERE id != ? ORDER BY sort, rowid")
-    .all(APP === "kakao" ? from : "")
+    .all(APP === "nh" ? "" : from)
     .map((a) => {
       const acc = toAccount(a, profile);
       return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName, balance: acc.balance };
@@ -701,7 +701,7 @@ app.use((err, _req, res, _next) => {
 // ---------- 빌드된 화면 제공 (npm run build 후) ----------
 const dist = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
 if (existsSync(dist)) {
-  // 화면은 두 앱이 같은 빌드를 쓰고, 어느 앱인지는 index.html에 끼워 넣어 알려준다 (window.__BANK_APP__)
+  // 화면은 세 앱이 같은 빌드를 쓰고, 어느 앱인지는 index.html에 끼워 넣어 알려준다 (window.__BANK_APP__)
   const html = readFileSync(resolve(dist, "index.html"), "utf8")
     .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐" }[APP]} 클론 연습</title>`)
     .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};</script></head>`);

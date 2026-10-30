@@ -20,7 +20,20 @@ export const HANA_BANKS: [string, string][] = [
 ];
 // 은행 목록 끝의 세금 타일 (은행이 아니라 연습용 앱에선 안내만)
 export const HANA_TAX: [string, string][] = [["tax-national", "국세"], ["tax-customs", "관세"], ["tax-treasury", "국고금"], ["tax-local", "지방세입"]];
-const LABEL = new Map(HANA_BANKS);
+// 증권 탭의 순서와 타일 이름 (라이트 녹화 2, 9~16초: 가나다 → 영문)
+export const HANA_SECURITIES: [string, string][] = [
+  ["hanasec", "하나증권"], ["kyobo", "교보증권"], ["daol", "다올투자증권"],
+  ["daishin", "대신증권"], ["meritz", "메리츠증권"], ["mirae", "미래에셋증권"],
+  ["bookook", "부국증권"], ["samsung", "삼성증권"], ["sangsangin", "상상인증권"],
+  ["shinyoung", "신영증권"], ["shinhansec", "신한투자증권"], ["imsec", "아이엠증권"],
+  ["wooriinv", "우리투자증권"], ["yuanta", "유안타증권"], ["eugene", "유진증권"],
+  ["kakaopaysec", "카카오페이증권"], ["cape", "케이프증권"], ["kiwoom", "키움증권"],
+  ["tosssec", "토스증권"], ["kis", "한국투자"], ["hanwha", "한화투자증권"],
+  ["hmsec", "현대차증권"], ["bnksec", "BNK투자증권"], ["dbsec", "DB증권"],
+  ["ibksec", "IBK투자증권"], ["kbsec", "KB증권"], ["ls", "LS증권"],
+  ["nhsec", "NH투자증권"], ["sks", "SK증권"],
+];
+const LABEL = new Map([...HANA_BANKS, ...HANA_SECURITIES]);
 
 // 받는 분 은행 이름: 농협 13·14자리는 "지역농축협" (녹화: 최근 목록·확인·완료), 나머지는 타일 이름
 export function hanaBankName(bank: Pick<Bank, "code" | "short">, number = "") {

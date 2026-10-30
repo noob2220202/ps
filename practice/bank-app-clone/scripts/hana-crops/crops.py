@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """하나원큐 화면 그림을 스크린샷·녹화에서 잘라 src/assets/local/hana-*.png 로 저장.
 
-  python3 scripts/hana-crops/crops.py --shots <스크린샷 폴더> --dark <다크 녹화.mp4>
+  python3 scripts/hana-crops/crops.py --shots <스크린샷 폴더> --dark <다크 녹화.mp4> --light2 <라이트 녹화 2.mp4>
 
 스크린샷(720×1600, 1dp = 1.875px, 2026-10-30)은 파일 이름 앞 8자리로 찾음 (아래 SHOTS).
   은행 로고      은행선택 시트의 타일(#f9fafc) 위 로고 → 타일 바탕을 걷어 낸 투명 PNG (hana-bank-<code>.png)
   배너 그림 10장 홈 배너 카드 오른쪽 그림 → 흰 바탕을 가장자리부터 걷어 냄 (다크 카드에도 놓이게) (hana-banner-<n>.png)
   메뉴 아이콘    홈 메뉴 카드 6개 (hana-menu-<n>.png), 하나금융그룹 보물상자 (hana-chest.png), 하나 로고 (hana-symbol.png)
   시작화면 로고  다크 녹화 5초쯤 '하나 1Q 원큐' (검은 바탕 → 투명) (hana-splash-logo.png)
+  증권사 로고    라이트 녹화 2(329f99bd, 2026-10-30 23:03) 증권 탭 → 은행 로고와 같은 상자 (hana-bank-<code>.png).
+                 스크린샷이 없어 480px 녹화에서 자른 것이라 은행 로고보다 덜 선명함
 그림은 자른 상자 그대로 화면에 놓으면(상자 가운데 = 원래 자리) 위치가 맞도록 상자 크기·가운데를 고정해서 자름.
 필요: ffmpeg, Pillow, numpy
 """
@@ -97,11 +99,36 @@ def save(arr, name):
     print("saved", name, arr.shape[1], "x", arr.shape[0])
 
 
-def splash_logo(video):
+def frame(video, t):
     with tempfile.TemporaryDirectory() as tmp:
         f = Path(tmp) / "s.png"
-        subprocess.run(["ffmpeg", "-v", "error", "-ss", "5.0", "-i", video, "-frames:v", "1", str(f)], check=True)
-        a = np.asarray(Image.open(f).convert("RGB")).astype(float)
+        subprocess.run(["ffmpeg", "-v", "error", "-ss", str(t), "-i", video, "-frames:v", "1", str(f)], check=True)
+        return np.asarray(Image.open(f).convert("RGB")).astype(float)
+
+
+# 증권 탭 (녹화 480px = 스크린샷의 2/3): 초 → (첫 줄 타일 위 y px, 줄 간격 px, 줄마다 code). 9.75초 = 시트 맨 위, 15초 = 맨 아래로 내림
+SEC = {
+    9.75: (310.4, 138.0, [["hanasec", "kyobo", "daol"], ["daishin", "meritz", "mirae"], ["bookook", "samsung", "sangsangin"],
+                          ["shinyoung", "shinhansec", "imsec"], ["wooriinv", "yuanta", "eugene"]]),
+    15.0: (334.0, 138.3, [["kakaopaysec", "cape", "kiwoom"], ["tosssec", "kis", "hanwha"], ["hmsec", "bnksec", "dbsec"],
+                          ["ibksec", "kbsec", "ls"], ["nhsec", "sks"]]),
+}
+
+
+def sec_logos(video):
+    k = 480 / 720
+    w, h = round(LOGO_BOX[0] * k), round(LOGO_BOX[1] * k)
+    for t, (top, pitch, rows) in SEC.items():
+        a = frame(video, t)
+        for r, row in enumerate(rows):
+            for cx, code in zip(COLS, row):
+                c = crop_box(a, cx * k, top + r * pitch + 67 * k, w, h)
+                bg = np.median(np.concatenate([c[0], c[-1], c[:, 0], c[:, -1]]), axis=0)  # 타일 바탕 (녹화마다 조금 다름)
+                save(unblend(c, bg), f"hana-bank-{code}")
+
+
+def splash_logo(video):
+    a = frame(video, 5.0)
     c = a[215:290, 115:365]  # 로고 상자 (녹화 480px 기준, 가운데 x 240, y 252.5)
     # 검은 바탕 위 초록(#00917f 무렵)·빨강(#e2231a 무렵) 두 색 → 가장 밝은 채널을 그 색의 최대값으로 나눠 불투명도
     red = c[..., 0] > c[..., 1]
@@ -115,6 +142,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shots", required=True)
     ap.add_argument("--dark", help="다크모드 녹화 (시작화면 로고)")
+    ap.add_argument("--light2", help="라이트 녹화 2 (증권사 로고)")
     args = ap.parse_args()
 
     for key, (top, rows) in PICK.items():
@@ -136,6 +164,8 @@ def main():
 
     if args.dark:
         save(splash_logo(args.dark), "hana-splash-logo")
+    if args.light2:
+        sec_logos(args.light2)
 
 
 if __name__ == "__main__":

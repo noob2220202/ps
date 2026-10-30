@@ -30,13 +30,14 @@ html[data-theme="dark"] .hana-history {
   display: flex;
   align-items: center;
   gap: 8.6px;
-  left: 21.3px !important;
+  left: 21.3px;
   font-size: 16.5px;
 }
 .hh-card__name img {
   width: 21.3px;
   height: 21.3px;
 }
+/* ⋮ 점 ø3.2 피치 6.4 (95fd8510 x 423~427 y 157~177 @480) */
 .hh-card__name button {
   margin-left: auto;
   margin-right: -3px;
@@ -46,41 +47,61 @@ html[data-theme="dark"] .hana-history {
   background: none;
 }
 .hh-card__no {
-  top: 50px;
+  top: 50.8px;
   height: 26px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 1px;
   font-size: 19.5px;
   font-weight: 700;
   letter-spacing: 0.1px;
 }
+/* 번호 옆 ⌄ 10.4 × 7.2dp 회색 #676767 (다크 #5e5e60) */
+/* ⌄ 잉크 12.8 × 6.4dp, 번호 끝에서 7.2dp 띄우고 숫자 아래쪽에 (95fd8510) */
+.hh-card__chev {
+  margin-left: 3.2px;
+  translate: 0 1.6px;
+  color: #676767;
+}
+html[data-theme="dark"] .hh-card__chev {
+  color: #8e8e90;
+}
+/* 잔액 숫자 22.5px 피치 13.6dp, '원' 19px (95fd8510 '40,468원' 잉크 x 319~430 @480, 오른끝 344dp) */
 .hh-card__bal {
-  top: 101px;
+  top: 101.8px;
+  right: 18.7px;
   height: 30px;
   text-align: right;
-  font-size: 23.5px;
+  font-size: 22.5px;
   font-weight: 700;
+  letter-spacing: -1px;
+}
+.hh-card__won {
+  font-size: 19px;
   letter-spacing: 0;
 }
 .hh-card__avail {
-  top: 129.8px;
+  top: 131.4px;
+  right: 18.7px;
   height: 20px;
   text-align: right;
   font-size: 14.5px;
-  color: var(--hn-faint);
+  color: #91969b;
   letter-spacing: 0;
+}
+html[data-theme="dark"] .hh-card__avail {
+  color: #8e9093;
 }
 .hh-card__btns {
   top: 175px;
-  left: 19.8px !important;
-  right: 19.5px !important;
+  left: 19.8px;
+  right: 19.5px;
   display: flex;
   gap: 13.3px;
 }
 .hh-card__btns .hana-btn {
   height: 40.5px;
-  font-size: 16.5px !important;
+  font-size: 16.5px;
   font-weight: 500;
 }
 .hh-card__spin {
@@ -97,14 +118,26 @@ html[data-theme="dark"] .hana-history {
   align-items: center;
   justify-content: space-between;
 }
+/* 돋보기 17.6dp 거의 검정 (95fd8510 #0a0a0a, 다크 #e2e4e8) */
+.hh-filter__search {
+  display: flex;
+  color: #0a0a0a;
+}
+html[data-theme="dark"] .hh-filter__search {
+  color: #e2e4e8;
+}
+/* 1개월 | 전체 | 최신순: 단어 사이 14.4dp, 글자 → 정렬 아이콘 6.4dp, 색 #5d666f */
 .hh-filter__opts {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5.5px;
   font-size: 15px;
-  color: var(--hn-text2);
+  color: var(--hn-sub);
 }
-.hh-filter__opts i {
+.hh-filter__sort {
+  margin-left: 1px;
+}
+.hh-filter__opts > i:not(.hana-ic) {
   width: 1px;
   height: 11px;
   background: var(--hn-line);
@@ -117,13 +150,14 @@ html[data-theme="dark"] .hana-history {
   justify-content: space-between;
   font-size: 15.5px;
   color: var(--hn-sub);
-  letter-spacing: 0;
+  letter-spacing: 0.35px; /* 기간 잉크 209px@480 */
 }
 .hh-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--hn-text2);
+  font-size: 14.5px;
+  color: var(--hn-sub);
   cursor: pointer;
 }
 .hh-toggle input {
@@ -155,7 +189,7 @@ html[data-theme="dark"] .hana-history {
   translate: 15.4px 0;
 }
 .hh-list {
-  margin-top: 10.7px;
+  margin-top: 8.3px; /* 흰 목록 시작 440dp (95fd8510 y 550 @480) */
   min-height: 420px;
   padding-bottom: 40px;
   background: var(--hn-bg);
@@ -174,13 +208,13 @@ html[data-theme="dark"] .hana-history {
 }
 .hh-group h3 {
   margin: 0 19.7px;
-  padding-top: 30.6px;
+  padding-top: 32.2px;
   height: 65.6px;
   border-bottom: 1px solid var(--hn-hair);
   font-size: 17px;
   font-weight: 700;
   line-height: 23px;
-  letter-spacing: 0;
+  letter-spacing: -0.25px;
 }
 .hh-item {
   position: relative;
@@ -219,10 +253,11 @@ html[data-theme="dark"] .hana-history {
   font-size: 15px;
   color: var(--hn-sub);
 }
+/* 금액 '-1원' 잉크 43 × 21px@480 → 19px */
 .hh-item__amt {
   right: 19.7px;
-  top: 49.3px;
-  font-size: 18px;
+  top: 48.6px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--hn-green-text);
   letter-spacing: 0;
@@ -245,8 +280,9 @@ html[data-theme="dark"] .hana-history {
 html[data-theme="dark"] .hana-txd {
   --htd-kakao: #f0f0f2;
 }
+/* 값 오른끝 364dp (b296deb7 x 455 @480) → 오른쪽 여백 18.7 */
 .htd-body {
-  padding: 0 20.3px 40px;
+  padding: 0 18.7px 40px 20.3px;
 }
 .htd-name {
   margin: 25.8px 0 0;
@@ -254,10 +290,14 @@ html[data-theme="dark"] .hana-txd {
   font-size: 22px;
   font-weight: 700;
   line-height: 30px;
+  color: #121419; /* b296deb7 이름·값 거의 검정 */
+}
+html[data-theme="dark"] .htd-name {
+  color: var(--hn-text);
 }
 .htd-rows {
   margin: 25px 0 0;
-  padding: 23.2px 0 7.3px;
+  padding: 21.6px 0 7.3px;
   border-top: 1px solid var(--hn-hair);
   border-bottom: 1px solid var(--hn-hair);
 }
@@ -275,19 +315,23 @@ html[data-theme="dark"] .hana-txd {
   margin: 0;
   text-align: right;
   letter-spacing: 0;
+  color: #121419;
+}
+html[data-theme="dark"] .htd-rows dd {
+  color: var(--hn-text);
 }
 .htd-link {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0;
   padding: 0;
   border: 0;
   background: none;
-  font-size: 16.5px !important;
+  font-size: 16.5px;
 }
 .htd-link--strong {
   font-weight: 600;
-  margin-right: -4px;
+  margin-right: -5px;
 }
 .htd-memo {
   width: 150px;
@@ -301,48 +345,67 @@ html[data-theme="dark"] .hana-txd {
 }
 .htd-search {
   display: flex;
-  margin: 22.6px -3px 0 auto;
-  color: var(--hn-sub) !important;
+  margin: 22.6px -5px 0 auto;
+  color: #606a73;
 }
+html[data-theme="dark"] .htd-search {
+  color: #a8a9ab;
+}
+/* 다시 이체 / 자주쓰는 이체 등록: 166.4 × 49.6, 중간 회색 테두리 (b296deb7) */
 .htd-btns {
   display: flex;
-  gap: 13.3px;
+  gap: 12.8px;
   margin-top: 45px;
 }
 .htd-btns button {
   flex: 1;
-  height: 47.5px;
+  height: 49.6px;
   padding: 0;
-  border: 1px solid var(--hn-line);
+  border: 1px solid var(--hn-line-strong);
   border-radius: 10px;
   background: none;
-  font-size: 17px !important;
+  font-size: 17px;
+  color: var(--hn-text);
 }
+/* 공유 원 ø46.4 #f6f7f9 (다크 #212224), 가운데 x 112 / 192 / 272dp, 글자 #62686e */
 .htd-share {
   display: flex;
   justify-content: center;
-  gap: 33px;
-  margin-top: 47.5px;
+  gap: 33.6px;
+  margin-top: 48.7px;
 }
 .htd-share button {
-  width: 47px;
+  width: 46.4px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   padding: 0;
   border: 0;
   background: none;
-  font-size: 14.5px !important;
-  color: var(--hn-sub) !important;
+  font-size: 14.5px;
+  color: #62686e;
   white-space: nowrap;
 }
+html[data-theme="dark"] .htd-share button {
+  color: #c6c8ca;
+}
 .htd-share span {
-  width: 47px;
-  height: 47px;
+  width: 46.4px;
+  height: 46.4px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--hn-tile);
+  background: #f6f7f9;
+}
+html[data-theme="dark"] .htd-share span {
+  background: #212224;
+}
+.htd-share__ic {
+  display: block;
+}
+/* 다크에선 카카오톡 말풍선이 흰색 (D/0213 #e8e7ea) */
+html[data-theme="dark"] .htd-share__ic--kakao {
+  filter: invert(1);
 }

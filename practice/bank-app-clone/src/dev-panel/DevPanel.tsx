@@ -324,7 +324,8 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   const [openEdit, setOpenEdit] = useState(false);
 
   const external = account.kind === "external";
-  const nh = APP !== "kakao"; // 콕뱅크·하나원큐: 계좌 이름·번호를 대표계좌까지 전부 바꿀 수 있음
+  const own = APP !== "kakao"; // 콕뱅크·하나원큐: 계좌 이름·번호를 대표계좌까지 전부 바꿀 수 있음
+  const ownHint = APP === "hana" ? { name: "영하나플러스통장", number: "숫자 14자리", max: 16 } : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
@@ -364,22 +365,22 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
               </button>
             </>
           )}
-          {nh && (
+          {own && (
             <>
               <Field label="계좌 이름 (홈·내역에 보이는 이름)">
-                <input value={label} maxLength={20} placeholder="자립예탁금" onChange={(e) => setLabel(e.target.value)} />
+                <input value={label} maxLength={20} placeholder={ownHint.name} onChange={(e) => setLabel(e.target.value)} />
               </Field>
               <button className="btn btn--sm" onClick={() => run(() => api.updateAccount(account.id, { name: label }), "계좌 이름을 바꿨어요")}>
                 이름 저장
               </button>
             </>
           )}
-          {(external || nh) && (
+          {(external || own) && (
             <>
               <Field label="계좌번호">
-                {nh ? (
-                  // 농협은 13자리(352-0000-0000-00)와 14자리(000000-00-000000) 둘 다 → 숫자만 받고 서버가 하이픈을 넣음
-                  <input value={number} inputMode="numeric" placeholder="숫자 13~14자리" onChange={(e) => setNumber(e.target.value.replace(/[^\d-]/g, "").slice(0, 17))} />
+                {own ? (
+                  // 농협은 13자리(352-0000-0000-00)와 14자리(000000-00-000000), 하나은행은 14자리(000-000000-00000) → 숫자만 받고 서버가 하이픈을 넣음
+                  <input value={number} inputMode="numeric" placeholder={ownHint.number} onChange={(e) => setNumber(e.target.value.replace(/[^\d-]/g, "").slice(0, ownHint.max))} />
                 ) : (
                   <input value={number} inputMode="numeric" onChange={(e) => setNumber(formatAccountNumber(bank?.pattern, e.target.value, bank?.alt))} />
                 )}
@@ -615,7 +616,7 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
 }
 
 function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
-  const [bank, setBank] = useState(banks.find((b) => b.code === "nh") ?? banks[0]);
+  const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" ? "hana" : "nh")) ?? banks[0]);
   const [number, setNumber] = useState("");
   const [holder, setHolder] = useState("");
   return (

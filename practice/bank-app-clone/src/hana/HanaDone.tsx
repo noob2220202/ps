@@ -14,7 +14,7 @@ export function HanaDone() {
   const navigate = useNavigate();
   const state = useLocation().state as HanaDoneState | null;
   const [open, setOpen] = useState(false);
-  const [star, setStar] = useState(false);
+  const [star, setStar] = useState(!!state?.result.to.favorite); // 이미 자주쓰는 계좌면 켜진 채로
   const [notice, setNotice] = useState<string | null>(null);
   useHanaStatusBar();
   if (!state) return <Navigate to="/" replace />;
@@ -34,10 +34,13 @@ export function HanaDone() {
           </button>
         }
       />
+      {/* 체크 (L/0163~0177 30fps): 제목이 왼→오로 쓸리며 뜨고(100ms) → 원 둘레를 초록 원호가 한 바퀴(≈670ms) →
+          민트 원이 0.5→1 로 커지며(200ms) 체크가 그려짐 */}
       <div className="hd-check" aria-hidden>
         <svg viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="31.2" />
-          <path d="m20.5 32.5 7.8 7.8 15.2-15.6" />
+          <circle className="hd-check__arc" cx="32" cy="32" r="29.5" pathLength={100} />
+          <circle className="hd-check__disc" cx="32" cy="32" r="32" />
+          <path className="hd-check__tick" d="m20.5 32.5 7.8 7.8 15.2-15.6" />
         </svg>
       </div>
       <h2 className="hd-title">
@@ -50,7 +53,7 @@ export function HanaDone() {
       </h2>
       <div className="hd-chips">
         <button className="hana-chip hd-star" onClick={toggleStar} aria-label="자주쓰는 이체">
-          <StarIcon on={star} size={21} />
+          <StarIcon on={star} size={23} />
         </button>
         <button className="hana-chip" onClick={() => navigate(`/tx/${result.outTxId}`)}>
           추가메모
@@ -100,7 +103,7 @@ export function HanaDone() {
       <button className="hd-more" onClick={() => setOpen((o) => !o)}>
         {open ? "접기" : "펼치기"}
         <span className={open ? "hs-more--up" : ""}>
-          <ChevronDown size={16} stroke={1.5} />
+          <ChevronDown size={18} stroke={1.6} />
         </span>
       </button>
       <div className="hana-bottom hd-bottom">

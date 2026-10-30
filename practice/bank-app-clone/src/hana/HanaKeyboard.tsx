@@ -146,17 +146,18 @@ function KeyboardIcon() {
     </svg>
   );
 }
+// ⌫ 는 채워진 흰 모양에 어두운 × (L/0044 38 × 29px = 30.4 × 23.2dp), ↵ 36 × 33px
 function BackKey() {
   return (
-    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" aria-hidden>
-      <path d="M9 2.5h14.5a2.5 2.5 0 0 1 2.5 2.5v12a2.5 2.5 0 0 1-2.5 2.5H9L2 11Z" />
-      <path d="m12.5 7.5 7 7m0-7-7 7" strokeLinecap="round" />
+    <svg width="30" height="23" viewBox="0 0 28 22" aria-hidden>
+      <path d="M9 1.5h14.5a2.5 2.5 0 0 1 2.5 2.5v14a2.5 2.5 0 0 1-2.5 2.5H9L1.5 11Z" fill="#e6e6e6" />
+      <path d="m12.5 7 8 8m0-8-8 8" stroke="#2c2c2c" strokeWidth="1.9" strokeLinecap="round" />
     </svg>
   );
 }
 function EnterKey() {
   return (
-    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="29" height="26" viewBox="0 0 28 22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <path d="M23 3v6.5a3 3 0 0 1-3 3H5M10 7.5l-5 5 5 5" />
     </svg>
   );
