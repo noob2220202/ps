@@ -109,7 +109,17 @@ export function HanaHome() {
     settleTimer.current = window.setTimeout(() => setSettled(true), 160);
   };
 
-  const account = home.data?.accounts.find((a) => a.id === "main") ?? home.data?.accounts[0];
+  // 대표계좌 자리: 내 하나은행 계좌들을 < n / 전체 > 로 넘김 (대표 'main' 이 첫 장). 계좌를 지워 장 수가 줄면 마지막 장으로
+  const accounts = [...(home.data?.accounts ?? [])].sort((a, b) => Number(b.id === "main") - Number(a.id === "main"));
+  const [page, setPage] = useState(0);
+  const idx = Math.min(page, Math.max(accounts.length - 1, 0));
+  const account = accounts[idx];
+  const turn = (d: number) => accounts.length > 1 && setPage((idx + d + accounts.length) % accounts.length);
+  // 실제 앱은 계좌가 하나여도 '1 / 2' (두 번째 장은 자료가 없음) → 그땐 화살표를 누르면 안내만
+  const arrow = (d: number) => (accounts.length > 1 ? turn(d) : setNotice("계좌가 하나뿐이에요.\n🔔 → 계좌 탭에서 하나은행 계좌를 추가하면 넘겨 볼 수 있어요."));
+  // 계좌 카드를 옆으로 밀어도 넘어감 (가로로 40px 넘게, 세로보다 많이). 민 뒤엔 손을 뗀 자리의 버튼이 눌리지 않게
+  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
   const soon = () => setNotice("연습용 앱에서는 준비 중인 메뉴예요.");
   const [title, sub] = [BANNERS[slide][1], BANNERS[slide][0]];
   const bg = localAsset(HANA_LIGHT ? "hana-home-bg-light" : "hana-home-bg-dark");
@@ -121,7 +131,28 @@ export function HanaHome() {
         {/* 다크는 글자가 먼저 뜨고 배경이 0.5초 안에 나타남 (D/0013 → D/0014) */}
         {bg ? <img className="hana-home__bg" src={bg} alt="" draggable={false} /> : <div className="hana-home__bg hana-home__bg--plain" />}
 
-        <section className="hana-home__acct">
+        <section
+          className="hana-home__acct"
+          onPointerDown={(e) => {
+            swipe.current = { x: e.clientX, y: e.clientY };
+            swiped.current = false;
+          }}
+          onPointerUp={(e) => {
+            const s = swipe.current;
+            swipe.current = null;
+            if (!s) return;
+            const dx = e.clientX - s.x;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - s.y) * 1.5) {
+              swiped.current = true;
+              turn(dx < 0 ? 1 : -1);
+            }
+          }}
+          onClickCapture={(e) => {
+            if (!swiped.current) return;
+            swiped.current = false;
+            e.stopPropagation();
+          }}
+        >
           <div className="hana-home__acct-name">
             <span>입출금</span>
             <i />
@@ -186,7 +217,13 @@ export function HanaHome() {
           </div>
           <div className="hana-home__pager">
             <span className="hana-pill">
-              <SmallChevron left /> 1 <em>/</em> {Math.max(2, home.data?.accounts.length ?? 2)} <SmallChevron />
+              <button onClick={() => arrow(-1)} aria-label="이전 계좌">
+                <SmallChevron left />
+              </button>{" "}
+              {idx + 1} <em>/</em> {Math.max(2, accounts.length)}{" "}
+              <button onClick={() => arrow(1)} aria-label="다음 계좌">
+                <SmallChevron />
+              </button>
             </span>
             <span className="hana-home__gear">
               <Ic name="gear" w={13.9} h={14.9} />

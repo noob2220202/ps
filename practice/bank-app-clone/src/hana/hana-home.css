@@ -208,6 +208,7 @@ html[data-theme="dark"] .hana-home__badge {
   position: relative;
   height: 358px;
   text-align: center;
+  touch-action: pan-y; /* 세로 스크롤은 그대로, 가로로 밀면 계좌 넘기기 (HanaHome swipe) */
 }
 .hana-home__acct > * {
   position: absolute;
@@ -379,9 +380,11 @@ html[data-theme="dark"] .hana-home__hide {
   font-style: normal;
   opacity: 0.6;
 }
+/* 화살표는 그림이 작아서(≈6dp) 누르는 자리만 상하 6 · 좌우 8 넓힘 (음수 여백이라 자리는 그대로) */
 .hana-pill button {
   display: flex;
-  padding: 0;
+  padding: 6px 8px;
+  margin: -6px -8px;
   border: 0;
   background: none;
 }
