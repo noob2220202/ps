@@ -12,6 +12,7 @@ npm install
 npm run dev        # 카카오뱅크: API 서버 + 화면 동시 실행 → http://localhost:5173  (?skip 붙이면 스플래시 생략)
 npm run dev:nh     # NH 콕뱅크:  → http://localhost:5174 (API 8788)
 npm run dev:hana   # 하나원큐:   → http://localhost:5175 (API 8789)
+npm run dev:ibk    # i-ONE Bank: → http://localhost:5176 (API 8790)
 ```
 
 ### VPS에 띄우기 (포트 9101)
@@ -30,12 +31,17 @@ npm run start:nh                       # http://서버IP:9103
 # 하나원큐도 서버를 하나 더 (같은 빌드, 포트 9105, 데이터 따로)
 npm run start:hana                     # http://서버IP:9105
 # pm2 start "npm run start:hana" --name hana
+
+# IBK기업은행 i-ONE Bank도 서버를 하나 더 (같은 빌드, 포트 9107, 데이터 따로)
+npm run start:ibk                      # http://서버IP:9107
+# pm2 start "npm run start:ibk" --name ibk
 ```
 
 서버 하나가 화면과 API를 같이 줍니다. 포트 변경은 `PORT=8080 npm start`.
 **서버 하나는 앱 하나만** 엽니다: `npm start` = 카카오뱅크(기본 9101, 데이터 `server/data/`),
 `npm run start:nh` (= `APP=nh`) = NH 콕뱅크(기본 9103, 데이터 `server/data-nh/`),
-`npm run start:hana` (= `APP=hana`) = 하나원큐(기본 9105, 데이터 `server/data-hana/`). 프로필 목록부터 전부 따로입니다.
+`npm run start:hana` (= `APP=hana`) = 하나원큐(기본 9105, 데이터 `server/data-hana/`),
+`npm run start:ibk` (= `APP=ibk`) = IBK기업은행 i-ONE Bank(기본 9107, 데이터 `server/data-ibk/`). 프로필 목록부터 전부 따로입니다.
 데이터는 `server/data/`(SQLite)에 저장되고 커밋되지 않습니다. 프로필 목록은 `app.db`, 프로필별 은행 데이터는 `profiles/<id>.db`.
 폴더째 지우면 예시 데이터의 "홍길동" 프로필 하나로 다시 시작. 예전 버전의 `bank.db`가 있으면 첫 프로필로 자동으로 옮겨집니다.
 
@@ -135,6 +141,37 @@ python3 scripts/hana-crops/crops.py --shots <스크린샷 폴더> --dark 다크�
 python3 scripts/hana-crops/icons.py --shots <스크린샷 폴더> --frames <다크 녹화 프레임 폴더(D/0014.jpg)>
 ```
 
+## 💙 IBK기업은행 i-ONE Bank (네 번째 앱)
+
+포트 9107(`npm run start:ibk`)로 들어가면 로그인 → 프로필 고르기 → 시작화면 → i-ONE Bank 홈.
+실제 앱 화면 녹화 한 개(2026-10-31, 갤럭시 3버튼, 384 × 832)를 프레임 단위로 재서 그렸어요. 이 앱은 라이트만 있어요.
+
+- **홈**: 머리줄(할 일 · 🔔 · 상담 · ≡) → 기업은행 탭 → 대표계좌 카드(잔액 숫자가 올라가는 애니메이션, 이체 · 거래내역) →
+  배너 → 바로가기 → 아래 탭바. 🔔 종 = 관리 패널
+- **이체**: "누구에게 보낼까요?"(입금계좌 직접 입력 · 계좌번호 / 즐겨찾기 탭 · 내 계좌 · 최근 이체) → 은행 고르기 시트 →
+  "얼마를 보낼까요?"(숫자 자판, 출금계좌 바꾸기, 받는 분 / 내 통장 표기) → 확인 → **비밀번호 없이 바로 완료**
+  (실제 앱은 여기서 비밀번호 자판이 뜨는데 보안 화면이라 녹화가 막혀서 건너뜀). '취소'는 "이체를 취소하시겠습니까?" 확인 뒤 나감.
+  등록 안 된 계좌, 같은 계좌, 1회 한도·잔액 초과는 실제 앱과 같은 안내 화면
+- **받는 은행 오류**: 🔔 관리 → 받는 분 탭에서 계좌마다 `받는 은행 오류 켜기` → 그 계좌로 보내면 실제처럼 금액 '다음' 뒤에
+  "해당기관 기타 사유로 거래가 불가능합니다"(오류코드 ECBKEXT10625)
+- **완료**: 체크 → 출금 · 입금 계좌 → 이체결과조회 / 확인
+- **거래내역조회**: 계좌 상자 → 채우기 · 이체 → 날짜별 목록. 행을 누르면 **상세거래내역** 시트(메모 25자까지, 보낸 이체면 '다시이체' → 금액 화면부터)
+- **전체메뉴**(≡) → **이체결과조회**(날짜별 이체, 공유) → **이체확인증**. 확인증에는 **"연습용 화면 · 실제 이체 아님" 워터마크**가 깔리고
+  공유하기는 막혀 있어요 (가짜 증빙으로 쓰이지 않게)
+- 받는 분은 다른 앱처럼 🔔 관리 → 받는 분 탭에 등록한 계좌만 보낼 수 있어요. 계좌 추가는 기업은행 계좌만
+
+그림은 녹화가 하나뿐이라 **AI 업스케일(Real-ESRGAN 4배)** 로 키우고, 웹에 원본이 있는 건 원본을 썼어요:
+
+```bash
+# 앱 아이콘: App Store 원본(1024px)을 받아 갤럭시 아이콘 모양으로 (인터넷 필요)
+python3 scripts/ibk-crops/appicon.py
+# 배너 · 메뉴 그림 · 은행 로고 원: 녹화에서 잘라 4배로 (ffmpeg, torch(CPU), numpy, Pillow)
+#   모델: RealESRGAN_x4plus_anime_6B.pth (github.com/xinntao/Real-ESRGAN 릴리스)
+python3 scripts/ibk-crops/crops.py --video i-ONE녹화.mp4 --model RealESRGAN_x4plus_anime_6B.pth [--only 이름,이름]
+```
+
+IBK 로고(마름모 심볼, 원 로고)는 벡터(SVG)라서 크기를 키워도 선명해요 (`src/assets/local/ibk-ci-symbol.svg`, `ibk-logo-ibk.svg`).
+
 ## 폰 아래 스위치 줄 (PC)
 
 `Galaxy/iPhone` · `라이트/다크` · 🔋 배터리 잔량(0~100) · 🕐 상태바 시각(정한 시각부터 흘러감) · `실제 시간`(지금 시각으로) · `● 녹화`.
@@ -174,7 +211,7 @@ python3 scripts/hana-crops/icons.py --shots <스크린샷 폴더> --frames <다�
 ## 데이터
 
 이름(`홍길동`), 계좌번호, 잔액, 거래내역, 가게 주소, 카드 정보는 **전부 가상의 예시값**입니다
-(초기값: `server/db.mjs`의 `seed()` / 콕뱅크는 `seedNhExample()`, 🔔 패널에서 수정 가능). 실제 개인정보는 넣지 마세요 — 공개 저장소입니다.
+(초기값: `server/db.mjs`의 `seed()` / 콕뱅크는 `seedNhExample()`, 하나원큐는 `seedHanaExample()`, i-ONE Bank는 `seedIbkExample()`, 🔔 패널에서 수정 가능). 실제 개인정보는 넣지 마세요 — 공개 저장소입니다.
 
 ### 이미지 에셋
 
