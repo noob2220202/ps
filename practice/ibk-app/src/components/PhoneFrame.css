@@ -300,13 +300,34 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
   left: 0;
   top: 0;
 }
-/* 인트로 영상에서 그대로 잘라 온 알림 아이콘 (카메라 접근 중 2개·메일·점), 영상 속 좌표 그대로 */
+/* 인트로 영상에서 그대로 잘라 온 알림 아이콘 (카메라 접근 중 2개·메일), 영상 속 좌표 그대로 */
 .ibk-sb-notif {
   position: absolute;
   left: 60px;
   top: 3px;
-  width: 78px;
+  width: 55px;
   height: 24px;
+}
+/* 녹화 중 표시 점 (영상 속 점 자리, x 119~126 · y 11~18): 실제 안드로이드 녹화 표시처럼 1초 주기로 깜빡임 */
+.ibk-sb-rec {
+  position: absolute;
+  left: 119px;
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4036;
+  animation: ibk-sb-rec-blink 1s linear infinite;
+}
+@keyframes ibk-sb-rec-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 .ibk-sb-pct {
   position: absolute;

@@ -53,12 +53,20 @@ function IosIcons() {
 
 // i-ONE Bank 녹화 기기 상태바 오른쪽 (spec/home.md 2-1, 클론 x): "LTE⁺"(아래 옅은 ↑↓) 288.7~306.8 · 신호 막대 4개 310.3~319.8
 // · "38%" 325.6~350.0 · 세로 배터리 352.6~359.9 (위 꼭지, 위쪽 #bebebe · 아래 잔량만큼 #454545). 막대·글자 기준선 녹화 y 20.2
-// 인트로 영상(녹화 기기 홈 화면) 상태바 왼쪽의 알림 아이콘 4개(카메라 접근 중 2개·메일·점)를 그 영상에서
-// 그대로 잘라 옴 (x 60~138, y 3~27) — 인트로가 끝나고 이 상태바로 넘어올 때 알림 아이콘이 안 달라지게
+// 인트로 영상(녹화 기기 홈 화면) 상태바 왼쪽의 알림 아이콘 2개(카메라 접근 중)·메일을 그 영상에서
+// 그대로 잘라 옴 (x 60~115, y 3~27) — 인트로가 끝나고 이 상태바로 넘어올 때 알림 아이콘이 안 달라지게.
+// 그 옆의 점은 따로(아래 IbkRecDot) — 원본 영상에서도 깜빡이는 녹화 중 표시라 고정 이미지로는 못 따라 함
 function IbkNotifIcons() {
   const src = localAsset("ibk-sb-notif");
   if (!src) return null;
   return <img className="ibk-sb-notif" src={src} alt="" aria-hidden />;
+}
+
+// 인트로 영상 속 점 자리 그대로(x 119~126, y 11~18)에, 우리 쪽도 녹화 중일 때 실제로 깜빡이게
+function IbkRecDot() {
+  const recording = useRecorder().status === "recording";
+  if (!recording) return null;
+  return <i className="ibk-sb-rec" aria-hidden />;
 }
 
 function IbkIcons() {
@@ -68,6 +76,7 @@ function IbkIcons() {
   return (
     <span className="statusbar__right statusbar__right--ibk">
       <IbkNotifIcons />
+      <IbkRecDot />
       <svg className="ibk-sb-icons" width="384" height="29.4" viewBox="0 0 384 29.4" aria-hidden>
         <g transform={`translate(${-shift} 0)`}>
           <path
