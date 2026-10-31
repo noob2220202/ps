@@ -7,6 +7,8 @@ import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { isCapture, setCapture } from "../platform/capture";
+import { isElectron } from "../platform/electronBridge";
+import { isIntroOn, setIntroOn } from "../platform/introVideo";
 import { canRecord, recordPhone } from "../platform/recorder";
 import { logout, remaining, useAuth } from "../auth/auth";
 import { BankIcon } from "../components/BankIcon";
@@ -154,6 +156,7 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
         <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
       </Field>
       <CaptureToggle />
+      <IntroVideoToggle />
       <RecordButton onStart={onClose} />
       <Field label="테마">
         <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
@@ -235,6 +238,27 @@ function CaptureToggle() {
           setOn(v === "on");
         }}
       />
+    </Field>
+  );
+}
+
+// 녹화 맨 앞에 인트로 영상 붙이기 켜고 끄기. 프로그램판(.exe)에서만 실제로 붙음 — 웹판은 켜 둬도 평소처럼 저장됨
+function IntroVideoToggle() {
+  const [on, setOn] = useState(isIntroOn);
+  return (
+    <Field label="녹화 맨 앞에 인트로 영상 붙이기">
+      <Segmented
+        value={on ? "on" : "off"}
+        options={[
+          ["off", "끄기"],
+          ["on", "켜기"],
+        ]}
+        onChange={(v) => {
+          setIntroOn(v === "on");
+          setOn(v === "on");
+        }}
+      />
+      {!isElectron && <p className="tab__hint">프로그램판(.exe)에서만 실제로 붙어요. 지금 웹에서는 켜 둬도 평소처럼 저장돼요.</p>}
     </Field>
   );
 }

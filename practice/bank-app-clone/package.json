@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "node --watch --disable-warning=ExperimentalWarning server/index.mjs --port 8787",
@@ -15,12 +16,16 @@
     "start:nh": "node --disable-warning=ExperimentalWarning server/index.mjs --app nh",
     "start:hana": "node --disable-warning=ExperimentalWarning server/index.mjs --app hana",
     "start:ibk": "node --disable-warning=ExperimentalWarning server/index.mjs --app ibk",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "electron": "npm run build && electron .",
+    "dist:win": "npm run build && electron-builder --win portable"
   },
   "dependencies": {
     "@fontsource/noto-sans-kr": "^5.3.1",
     "@fontsource/roboto": "^5.3.0",
     "express": "^5.3.0",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
     "pretendard": "^1.3.9",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -32,11 +37,38 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "concurrently": "^10.0.6",
+    "electron": "^45.2.1",
+    "electron-builder": "^26.0.26",
     "oxlint": "^1.89.0",
     "typescript": "~7.0.2",
     "vite": "^8.3.5"
   },
   "engines": {
     "node": ">=22.13"
+  },
+  "build": {
+    "appId": "com.practice.bankclone.ibk",
+    "productName": "i-ONE Bank 연습",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "**/*",
+      "!src",
+      "!public",
+      "!scripts",
+      "!server/data*",
+      "!*.md",
+      "!.env.*",
+      "!tsconfig*.json",
+      "!vite.config.ts",
+      "!release"
+    ],
+    "asar": false,
+    "win": {
+      "target": [
+        "portable"
+      ]
+    }
   }
 }

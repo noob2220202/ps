@@ -9,6 +9,8 @@
 // 코덱: 안드로이드 크롬의 mp4(H.264 하드웨어 인코더)는 프레임이 깨진 파일이 나와서 webm(VP9/VP8)으로 저장
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
+import { isElectron, saveWithIntro } from "./electronBridge";
+import { isIntroOn } from "./introVideo";
 
 type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
 
@@ -171,19 +173,28 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   const chunks: Blob[] = [];
   recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
   const onFsChange = () => !document.fullscreenElement && stopCurrent?.();
-  recorder.onstop = () => {
+  recorder.onstop = async () => {
     cleanupCanvas();
     display.getTracks().forEach((t) => t.stop());
     document.removeEventListener("fullscreenchange", onFsChange);
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     const blob = new Blob(chunks, { type: type || "video/webm" });
+    stopCurrent = null;
+    set({ status: "idle" });
+    // 프로그램판(.exe)이고 인트로 영상 설정이 켜져 있으면: 메인 프로세스가 ffmpeg로 앞에 붙여서 저장(다른 자리 선택창)
+    if (isElectron && isIntroOn()) {
+      const result = await saveWithIntro(blob, ext);
+      if (result.ok || result.canceled) {
+        onStop?.();
+        return;
+      }
+      // 실패하면(ffmpeg 오류 등) 평소처럼 그냥 다운로드
+    }
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = fileName(ext);
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
-    stopCurrent = null;
-    set({ status: "idle" });
     onStop?.();
   };
   stopCurrent = () => recorder.state !== "inactive" && recorder.stop();
