@@ -301,14 +301,11 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
   left: 0;
   top: 0;
 }
-/* 알림 아이콘(고정) · 첫 캠코더 안쪽(깜빡임): 인트로 영상에서 잘라 온 68 × 24 두 장, 영상 속 좌표 그대로 겹침 */
-.ibk-sb-notif,
-.ibk-sb-rec {
+/* 알림 아이콘(고정) · 첫 캠코더 안쪽(깜빡임): 인트로 영상 좌표 그대로 그린 384 × 29.4 SVG 두 장을 겹침 */
+.ibk-sb-left {
   position: absolute;
-  left: 60px;
-  top: 3px;
-  width: 68px;
-  height: 24px;
+  left: 0;
+  top: 0;
 }
 /* 화면 녹화 중 표시: 1초 주기 0.5초 켜짐 · 0.5초 꺼짐 (영상: 꺼짐 0.47초 그대로 잼). 위상은 style animation-delay 로 */
 .ibk-sb-rec {

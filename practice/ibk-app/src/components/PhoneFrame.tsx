@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from "react";
-import { localAsset } from "../assets/Asset";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { OS } from "../platform/platform";
@@ -53,25 +52,52 @@ function IosIcons() {
 
 // i-ONE Bank 녹화 기기 상태바 오른쪽 (spec/home.md 2-1, 클론 x): "LTE⁺"(아래 옅은 ↑↓) 288.7~306.8 · 신호 막대 4개 310.3~319.8
 // · "38%" 325.6~350.0 · 세로 배터리 352.6~359.9 (위 꼭지, 위쪽 #bebebe · 아래 잔량만큼 #454545). 막대·글자 기준선 녹화 y 20.2
-// 상태바 왼쪽 알림 아이콘: 인트로 영상(같은 기기 홈 화면)에서 그대로 잘라 옴 (x 60~128, y 3~27, 시간 글자 굵기에 맞춘 불투명도).
-// 첫 캠코더는 테두리만 여기, 안쪽(깜빡이는 부분)은 IbkRecIcon. 두 번째 캠코더·메일·점은 영상에서도 고정
+// 상태바 왼쪽 알림 아이콘: 인트로 영상(같은 기기 홈 화면) 아이콘을 프레임 70여 장 평균으로 재서 벡터로 다시 그림 (영상 좌표 그대로,
+// 잘라 붙인 그림은 영상 화질 그대로라 뭉개져 보였음). 화면 녹화 중(모서리 괄호 안 캠코더) 2개 · 메일(오른쪽 아래 배지) · 점.
+// 첫 캠코더는 괄호만 여기, 안쪽 캠코더는 영상에서도 깜빡여서 IbkRecIcon
 function IbkNotifIcons() {
-  const src = localAsset("ibk-sb-notif");
-  if (!src) return null;
-  return <img className="ibk-sb-notif" src={src} alt="" aria-hidden />;
+  return (
+    <svg className="ibk-sb-left" width="384" height="29.4" viewBox="0 0 384 29.4" fill="currentColor" aria-hidden>
+      {/* 메일 테두리는 배지 둘레만큼 비움 */}
+      <mask id="ibk-sb-mailcut">
+        <rect width="384" height="30" fill="#fff" />
+        <circle cx="109.83" cy="18.91" r="3.47" fill="#000" />
+      </mask>
+      <path d="M66.36 9.8h2.1v1.05h-1.05v1.05h-1.05ZM77.23 9.8h-2.1v1.05h1.05v1.05h1.05ZM66.36 20.45h2.1v-1.05h-1.05v-1.05h-1.05ZM77.23 20.45h-2.1v-1.05h1.05v-1.05h1.05ZM83.28 9.8h2.1v1.05h-1.05v1.05h-1.05ZM94.15 9.8h-2.1v1.05h1.05v1.05h1.05ZM83.28 20.45h2.1v-1.05h-1.05v-1.05h-1.05ZM94.15 20.45h-2.1v-1.05h1.05v-1.05h1.05Z" />
+      <rect x="85.91" y="13.19" width="4.1" height="3.87" rx="0.35" fill="none" stroke="currentColor" strokeWidth="1" />
+      <path d="M90.1 14.67L91.75 12.88V17.38L90.1 15.59Z" />
+      <g mask="url(#ibk-sb-mailcut)">
+        <rect x="101.15" y="12.01" width="9.31" height="6.9" rx="0" fill="none" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M101.4 12.25L105.81 15.27L110.22 12.25" fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" />
+      </g>
+      <circle cx="109.83" cy="18.91" r="1.41" />
+      <circle cx="122.75" cy="15.06" r="1.93" />
+    </svg>
+  );
 }
 
-// 첫 캠코더 안쪽 = 화면 녹화 중 표시. 영상에서 켜진 프레임 - 꺼진 프레임으로 그 부분만 잘라 옴. 늘 1초 주기로 깜빡이고,
-// 인트로가 끝나는 순간 영상과 같은 위상으로 다시 맞춤 (intro.ts syncBlink). 위상이 바뀔 때만 새로 그려서 애니메이션 처음부터
+// 첫 캠코더 안쪽 = 깜빡이는 화면 녹화 중 표시. 늘 1초 주기로 깜빡이고, 인트로가 끝나는 순간 영상과 같은 위상으로 다시 맞춤
+// (intro.ts syncBlink). 위상이 바뀔 때만 새로 그려서 애니메이션 처음부터
 function IbkRecIcon() {
   const epoch = useBlinkEpoch();
   return <IbkRecImg key={epoch} epoch={epoch} />;
 }
 function IbkRecImg({ epoch }: { epoch: number }) {
   const [delay] = useState(() => -((performance.now() - epoch) % BLINK_MS));
-  const src = localAsset("ibk-sb-rec");
-  if (!src) return null;
-  return <img className="ibk-sb-rec" src={src} alt="" aria-hidden style={{ animationDelay: `${delay}ms` }} />;
+  return (
+    <svg
+      className="ibk-sb-left ibk-sb-rec"
+      width="384"
+      height="29.4"
+      viewBox="0 0 384 29.4"
+      fill="currentColor"
+      aria-hidden
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <rect x="68.99" y="13.19" width="4.1" height="3.87" rx="0.35" fill="none" stroke="currentColor" strokeWidth="1" />
+      <path d="M73.18 14.67L74.83 12.88V17.38L73.18 15.59Z" />
+    </svg>
+  );
 }
 
 // 오른쪽 아이콘은 인트로 영상(같은 기기) 상태바와 겹쳐 맞춤: 원래 IBK 녹화 좌표보다 LTE +7.25 · 신호 +8 · 배터리 +8.75, 아래로 0.5
