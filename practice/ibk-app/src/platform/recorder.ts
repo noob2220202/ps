@@ -10,7 +10,13 @@
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { isIntroOn } from "./intro";
+import { setBattery, setClock } from "./deviceStatus";
 import introSrc from "../assets/intro/ibk-open-intro.mp4";
+
+// 인트로 영상(ibk-open-intro.mp4) 첫 프레임에 찍힌 상태바 값 그대로. 영상이 끝나고 우리 상태바로
+// 넘어갈 때 시간·배터리가 뚝 바뀌어 보이지 않도록, 인트로 재생 전에 이 값으로 맞춰 둔다
+const INTRO_CLOCK = "10:00";
+const INTRO_BATTERY = 38;
 
 type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
 
@@ -200,8 +206,13 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
   // 인트로 켜져 있으면: 폰 위에 실제 기기 영상(홈 화면 → 앱 찾기 → 탭)을 먼저 재생하고, 끝나자마자 바로 시작화면으로
   // (인트로 영상이 폰 프레임과 같은 기기·같은 해상도라 상태바·3버튼 내비바가 안 끊기고 한 녹화로 자연스럽게 이어짐)
-  if (isIntroOn()) await playIntro(target);
-  else await sleep(600);
+  if (isIntroOn()) {
+    setClock(INTRO_CLOCK); // 영상 속 상태바 시간·배터리와 맞춰서, 영상이 끝나고 우리 상태바로 넘어갈 때 숫자가 안 튀게
+    setBattery(INTRO_BATTERY);
+    await playIntro(target);
+  } else {
+    await sleep(600);
+  }
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
 }
 
