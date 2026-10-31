@@ -300,6 +300,14 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
   left: 0;
   top: 0;
 }
+/* 인트로 영상에서 그대로 잘라 온 알림 아이콘 (카메라 접근 중 2개·메일·점), 영상 속 좌표 그대로 */
+.ibk-sb-notif {
+  position: absolute;
+  left: 60px;
+  top: 3px;
+  width: 78px;
+  height: 24px;
+}
 .ibk-sb-pct {
   position: absolute;
   right: 33.55px;
