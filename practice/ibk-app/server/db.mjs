@@ -12,6 +12,8 @@ import { fileURLToPath } from "node:url";
 // IBK기업은행 i-ONE Bank 단독 서버 (.gitignore 처리 — 내 데이터는 내 서버에만)
 export const APPS = ["ibk"];
 export const APP = "ibk";
+const portArg = process.argv.indexOf("--port");
+export const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : 9107));
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA = process.env.DATA_DIR ?? resolve(here, `data-${APP}`);
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });

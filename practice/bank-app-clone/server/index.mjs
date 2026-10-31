@@ -45,6 +45,8 @@ import {
 // 개발 중(npm run dev)에는 API만 8787에서 돌고, Vite 개발 서버가 /api 요청을 여기로 넘겨준다.
 
 const app = express();
+// 같은 서버의 Caddy·nginx 뒤에 둘 때 진짜 접속 IP 로 로그인 실패를 셈 (안 그러면 모두 127.0.0.1 이라 한 사람이 10번 틀리면 다 막힘)
+app.set("trust proxy", "loopback");
 app.use(express.json());
 
 // 스켈레톤/스피너가 실제 앱처럼 잠깐 보이도록 조회 요청에 약간의 지연 (API_DELAY_MS=0 이면 끔)

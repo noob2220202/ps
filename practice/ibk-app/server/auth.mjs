@@ -1,7 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { APP, DATA, registry } from "./db.mjs";
+import { APP, DATA, PORT, registry } from "./db.mjs";
 
 // ===== 로그인 계정 (은행마다 따로 — 서버 하나 = 앱 하나, 데이터 폴더가 따로라 계정도 따로) =====
 // 관리자(admin)가 계정을 만들고 이용 기간을 정함: 1일 / 7일 / 30일 / 영구 (만든 순간부터 줄어듦)
@@ -30,7 +30,9 @@ registry.exec(`
 if (!registry.prepare("SELECT 1 FROM pragma_table_info('profiles') WHERE name = 'owner_id'").get()) registry.exec("ALTER TABLE profiles ADD COLUMN owner_id TEXT");
 
 export const PLANS = { 1: 1, 7: 7, 30: 30, forever: null }; // 일 수 (null = 영구)
-export const COOKIE = `bank_sid_${APP}`;
+// 포트까지 이름에 넣음: 쿠키는 포트를 구분하지 않아서, 같은 IP 에 기존 i-ONE Bank(bank-app-clone, bank_sid_ibk)나
+// 이 앱을 여러 개 띄우면 한쪽에 로그인할 때 다른 쪽이 로그아웃됐음
+export const COOKIE = `bank_sid_${APP}_${PORT}`;
 const SESSION_DAYS = 30;
 
 const hash = (password, salt) => scryptSync(String(password), salt, 32).toString("hex");

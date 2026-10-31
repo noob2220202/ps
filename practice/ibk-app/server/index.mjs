@@ -15,6 +15,7 @@ import {
   removeProfileDb,
   runWithDb,
   APP,
+  PORT,
   SEEDS,
   transaction,
 } from "./db.mjs";
@@ -749,6 +750,4 @@ if (existsSync(dist)) {
   app.get("/{*path}", (_req, res) => res.type("html").send(html));
 }
 
-const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107 }[APP]));
 app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${APP}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));
