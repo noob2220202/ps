@@ -88,7 +88,8 @@ export function IbkHome() {
   const ready = phase === "ready" && loaded;
 
   const [notice, setNotice] = useState<string | null>(null);
-  const soon = () => setNotice("연습용 앱에서는 준비 중인 메뉴예요.");
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
   const [panelOpen, setPanelOpen] = useState(false); // 종 → 관리 패널
   // 안드로이드 뒤로(3버튼 바 <)는 열린 안내창·관리 패널부터 닫음
   useIbkBackHandler(!!notice, () => setNotice(null));

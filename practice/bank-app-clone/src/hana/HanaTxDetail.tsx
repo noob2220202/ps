@@ -123,7 +123,7 @@ export function HanaTxDetail() {
               </dd>
             </div>
           </dl>
-          <button className="htd-link htd-search" onClick={() => setNotice("연습용 앱에서는 준비 중인 메뉴예요.")}>
+          <button className="htd-link htd-search" onClick={() => {}}>
             ‘{t.merchant}’ 검색 <ChevronRight size={20} stroke={1.6} />
           </button>
           {t.transfer && (
@@ -141,13 +141,13 @@ export function HanaTxDetail() {
           )}
           {/* 공유 아이콘 3개는 b296deb7 의 원 안에서 잘라 온 그림 (scripts/hana-crops/icons.py → hana-share-*) */}
           <div className="htd-share">
-            <button onClick={() => setNotice("연습용 앱에서는 공유할 수 없어요.")}>
+            <button onClick={() => {}}>
               <span>
                 <ShareIcon name="kakao" w={22.4} h={20.3} fallback={<KakaoIcon />} />
               </span>
               카카오톡
             </button>
-            <button onClick={() => setNotice("연습용 앱에서는 공유할 수 없어요.")}>
+            <button onClick={() => {}}>
               <span>
                 <ShareIcon name="sms" w={21.3} h={20.3} fallback={<SmsIcon />} />
               </span>

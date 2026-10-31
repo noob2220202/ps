@@ -58,7 +58,7 @@ export function HanaDone() {
         <button className="hana-chip" onClick={() => navigate(`/tx/${result.outTxId}`)}>
           추가메모
         </button>
-        <button className="hana-chip" onClick={() => setNotice("연습용 앱에서는 자동이체를 등록할 수 없어요.")}>
+        <button className="hana-chip" onClick={() => {}}>
           자동이체 등록
         </button>
       </div>
@@ -107,7 +107,7 @@ export function HanaDone() {
         </span>
       </button>
       <div className="hana-bottom hd-bottom">
-        <button className="hana-btn hd-share" onClick={() => setNotice("연습용 앱에서는 공유할 수 없어요.")}>
+        <button className="hana-btn hd-share" onClick={() => {}}>
           공유
         </button>
         <button className="hana-btn" onClick={() => navigate(`/history/${result.fromAccountId}`, { replace: true })}>

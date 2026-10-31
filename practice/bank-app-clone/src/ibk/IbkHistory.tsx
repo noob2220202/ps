@@ -28,7 +28,6 @@ const Won = ({ n }: { n: number }) => (
   </>
 );
 const hangul = (s: string) => /[ㄱ-ㆎ가-힣]/.test(s);
-const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
 const MEMO_MAX = 25; // 녹화 '최대 25자까지 입력'
 
 // IBK 원 로고 (spec 7): CI 심볼 벡터(viewBox 1561×1513)를 원(중심 780,750 · 반지름 564)으로 자른 것. 벡터가 없으면 공용 로고 원
@@ -237,7 +236,8 @@ export function IbkHistory() {
   useIbkSpinner(loading);
   const failed = !loading && (account.status === "error" || txs.status === "error");
   const [notice, setNotice] = useState<string | null>(null);
-  const soon = () => setNotice(SOON);
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
   // 안드로이드 뒤로(3버튼 바 <)는 안내창부터 닫음 (시트 위에 뜬 메모 안내도: 안내 → 시트 → 화면 순).
   // 아이폰은 칸이 있는 동안 가장자리 끌기가 안 됨 (ScreenStack)
   useIbkBackHandler(!!notice, () => setNotice(null));

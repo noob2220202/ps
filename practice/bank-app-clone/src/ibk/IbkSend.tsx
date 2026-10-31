@@ -38,7 +38,8 @@ interface Notice {
 }
 
 const TOUCH = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches; // 폰이면 입력칸에 기기 키보드
-const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
+// 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+const soon = () => {};
 const TITLE = "아래 내용을\n확인해주세요";
 const LIMIT = 10_000_000; // 서버의 1회 이체 한도
 // 금액 읽기 (amount 4-3): 만 미만은 숫자 그대로 "2,000원", 만 이상은 "20만원" (끝자리가 남는 경우는 녹화에 없음 → "12만 3,456원")
@@ -343,7 +344,7 @@ export function IbkSend() {
               onRecent={() => setRecentOpen((v) => !v)}
               picked={picked}
               onPick={pick}
-              onSoon={() => setError(SOON)}
+              onSoon={soon}
             />
           ) : (
             (data.status === "error" || home.status === "error") && (
@@ -384,8 +385,8 @@ export function IbkSend() {
               onOpenKp={() => setKp(true)}
               onFrom={() => setFromSheet(true)}
               onChange={() => !busy.current && toStage("who", "back")}
-              onGuide={() => setError(SOON)}
-              onReserve={() => setError("연습용 앱에서는 예약이체를 할 수 없어요.")}
+              onGuide={soon}
+              onReserve={soon}
             />
           </div>
           {/* '다음'은 늘 있고 자판이 올라오면 판이 덮음 (자판 '확인'을 떼는 순간 같은 프레임에 보임 — amount 6-3) */}
@@ -414,7 +415,7 @@ export function IbkSend() {
               memoMe={memoMe ?? to.holder}
               memoTo={memoTo ?? me}
               onEdit={setEditing}
-              onMore={() => setError(SOON)}
+              onMore={soon}
             />
           </div>
           <div key={`send-${seq}`} className={`ibk-bottom ibs-bottom ${late}`}>
@@ -440,7 +441,7 @@ export function IbkSend() {
       )}
       {notice && (
         <div className="ibs-notice">
-          <IbkNotice title={TITLE} message={notice.message} code={notice.code} onConfirm={closeNotice} onConsult={() => setError(SOON)} />
+          <IbkNotice title={TITLE} message={notice.message} code={notice.code} onConfirm={closeNotice} onConsult={soon} />
         </div>
       )}
       <BankSheet

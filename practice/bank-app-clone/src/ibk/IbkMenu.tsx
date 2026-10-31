@@ -18,7 +18,6 @@ import "./ibk-menu.css";
 // 바탕은 상태바부터 이어지는 연파랑 → 흰 그라데이션. 녹화는 스크롤하지 않아 이체/출금 아래 내용은 없음 (문구를 지어내지 않음).
 // 위치는 클론 좌표 (x = (녹화 x − 0.35) / 1.0242, 본문 y = 녹화 y − 29.4) — 값마다 ibk-menu.css 에 녹화 숫자
 
-const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
 // 메뉴 항목 → 화면 (녹화 1-9, 71.867 누름): 뗀 순간 점(72.300~72.567 보임, 바로 사라짐) · 누른 바탕은 점이 뜨고 ≈134ms 뒤 133ms 동안 옅어짐(72.433~72.567)
 // → (녹화엔 빈 메뉴 400ms 가 더 있으나 홈 '이체'(IBK_PAGE)처럼 기다림은 뺌) → 흰 화면 67ms(73.000~73.067) → #fafafa + 점 367ms(73.067~73.433)를 0.6배로 220ms
 // → 이체결과조회가 스스로 흰 화면 → 뼈대 → 머리줄 → 기간 → 목록 (IbkResults STAGE_AT)
@@ -117,7 +116,8 @@ export function IbkMenu() {
     };
   }, []);
   // 항목을 눌러 이동을 기다리는 중이거나 닫는 중엔 안내창을 띄우지 않음 (띄우면 그 뒤로가기 칸이 기록에 남아 '<' 한 번이 헛돎 — V3 race menuopen)
-  const soon = () => !held && !shut.current && setNotice(SOON);
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
 
   const open = async (item: (typeof INQUIRY)[number]) => {
     if (held || shut.current) return;

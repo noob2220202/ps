@@ -120,7 +120,8 @@ export function HanaHome() {
   // 계좌 카드를 옆으로 밀어도 넘어감 (가로로 40px 넘게, 세로보다 많이). 민 뒤엔 손을 뗀 자리의 버튼이 눌리지 않게
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const swiped = useRef(false);
-  const soon = () => setNotice("연습용 앱에서는 준비 중인 메뉴예요.");
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
   const [title, sub] = [BANNERS[slide][1], BANNERS[slide][0]];
   const bg = localAsset(HANA_LIGHT ? "hana-home-bg-light" : "hana-home-bg-dark");
   const openHistory = () => account && go(`/history/${account.id}`);

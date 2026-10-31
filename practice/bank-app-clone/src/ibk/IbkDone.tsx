@@ -48,7 +48,8 @@ function DoneView({ result, from, memoTo, memoMe }: IbkDoneState) {
   const fromNo = ibkNumber(from.bank, from.number);
   const toNo = ibkNumber(to.bank, to.number);
   const say = (m: string) => !going.current && setNotice(m);
-  const soon = () => say("연습용 앱에서는 준비 중인 메뉴예요.");
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
   // 안드로이드 뒤로(3버튼 바 <)는 안내창부터 닫음 (아이폰은 칸이 있는 동안 가장자리 끌기가 안 됨 — ScreenStack)
   useIbkBackHandler(!!notice, () => setNotice(null));
   const copy = (bank: Pick<Bank, "code" | "short">, number: string) => {

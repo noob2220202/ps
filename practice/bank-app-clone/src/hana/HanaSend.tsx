@@ -143,7 +143,7 @@ export function HanaSend() {
           data={data.data}
           failed={data.status === "error"}
           onRetry={data.retry}
-          onDelete={() => setError("연습용 앱에서는 최근 이체 목록을 지울 수 없어요.\n(이체 기록은 🔔 관리 → 거래 탭에서 지울 수 있어요)")}
+          onDelete={() => {}}
           onBack={safeBack}
           onDirect={() => setEntry(true)}
           onPick={(r) => (r.accountId === from ? setError("출금계좌와 같은 계좌로는 보낼 수 없어요.") : pick(r))}
@@ -237,7 +237,7 @@ export function HanaSend() {
           setFrom(id);
           setFromSheet(false);
         }}
-        onRegister={() => setError("연습용 앱에서는 다른은행 계좌를 등록할 수 없어요.")}
+        onRegister={() => {}}
       />
       <Dialog message={error} onClose={() => setError(null)} />
       <Dialog message={asking ? "이체를 취소하시겠어요?" : null} cancelLabel="아니요" okLabel="예" onCancel={() => setAsking(false)} onClose={leave} />
@@ -504,7 +504,7 @@ function Entry({
           setPicking(false);
           setBankCode(code);
         }}
-        onTax={() => onError("연습용 앱에서는 은행·증권사 계좌로만 보낼 수 있어요.")}
+        onTax={() => {}}
       />
     </div>
   );

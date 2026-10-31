@@ -16,8 +16,6 @@ import "./ibk-menu.css";
 // → 기간 띠 → 이체 행(시각 · 정상 / 받는 분 · 금액 / 은행 번호 / 공유, 피치 134.7, 구분선 없음). 행을 누르면 이체확인증(본문만 오른쪽에서).
 // 위치는 클론 좌표 (x = (녹화 x − 0.35) / 1.0242, 본문 y = 녹화 y − 81.4) — 값마다 ibk-menu.css 에 녹화 숫자
 
-const SOON = "연습용 앱에서는 준비 중인 메뉴예요.";
-const NO_SHARE = "연습용 앱에서는 공유할 수 없어요.";
 const ROW_TOP = 265.1; // 첫 행 칸 위 = 녹화 346.5 (시각 기준선 364.8 − 18.3), 본문 기준
 const ROW_REC = 346.5;
 const ROW_PITCH = 134.7;
@@ -125,8 +123,8 @@ export function IbkResults() {
   // 떠나는 중(행을 눌러 확인증으로 가기 전 · ← 를 뗀 뒤 BACK_MS)엔 안내창을 띄우지 않음. 띄우면 그 뒤로가기 칸이 기록에 남거나
   // 늦게 실행된 ← 의 navigate(-1) 이 그 칸만 빼서 화면이 그대로였음 (V3 race resopen · resback)
   const leaving = useRef(false);
-  const say = (m: string) => !held && !leaving.current && setNotice(m);
-  const soon = () => say(SOON);
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
   const onBack = () => {
     if (held) return;
     leaving.current = true;
@@ -216,7 +214,7 @@ export function IbkResults() {
                     <small>{ibkBankName(t.bank)}</small> {ibkNumber(t.bank, t.number)}
                   </span>
                 </button>
-                <button className="ibr-row__share" style={{ top: shareTop - y0 }} onClick={() => say(NO_SHARE)} aria-label="공유">
+                <button className="ibr-row__share" style={{ top: shareTop - y0 }} onClick={soon} aria-label="공유">
                   <IbkIcon
                     name="share"
                     w={SHARE.w}

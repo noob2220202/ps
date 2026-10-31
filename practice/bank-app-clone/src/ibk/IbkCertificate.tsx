@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { TransferRecord } from "../api/types";
@@ -64,12 +64,6 @@ export function IbkCertificate() {
   }, [rec.status]);
   useIbkSpinner(rec.status === "loading" && slow);
   const [notice, setNotice] = useState<string | null>(null);
-  // ← 를 뗀 뒤(BACK_MS)엔 안내창을 띄우지 않음: 띄우면 늦게 실행된 navigate(-1) 이 그 뒤로가기 칸만 빼서 화면이 그대로였음 (V3 race certback)
-  const leaving = useRef(false);
-  const onBack = () => {
-    leaving.current = true;
-    back();
-  };
   // 안드로이드 뒤로(3버튼 바 <)는 '공유하기' 안내창부터 닫음 (아이폰은 칸이 있는 동안 가장자리 끌기가 안 됨 — ScreenStack)
   useIbkBackHandler(!!notice, () => setNotice(null));
 
@@ -99,7 +93,7 @@ export function IbkCertificate() {
 
   return (
     <div className="ibk ibk-page ibc">
-      <IbkHeader title="이체결과조회" onBack={onBack} right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />} />
+      <IbkHeader title="이체결과조회" onBack={back} right={<IbkHeaderIcon name="menu" label="전체메뉴" onClick={() => go("/menu", { anim: "menu-in" })} />} />
       <div className="ibk-body">
         {t && (
           <div className="ibc-content">
@@ -142,7 +136,7 @@ export function IbkCertificate() {
               {wordmark ? <img className="ibc-logo__word" src={wordmark} alt="" draggable={false} /> : <b className="ibc-logo__text">IBK기업은행</b>}
             </div>
             <div className="ibk-bottom ibc-bottom">
-              <button className="ibk-btn" onClick={() => !leaving.current && setNotice("연습용 앱에서는 공유할 수 없어요.")}>
+              <button className="ibk-btn" onClick={() => {}} /* 공유는 막음 (눌러도 아무 일 없음) */>
                 공유하기
               </button>
             </div>

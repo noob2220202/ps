@@ -46,7 +46,8 @@ export function HanaHistory() {
     const k = t.at.slice(0, 10);
     groups.set(k, [...(groups.get(k) ?? []), t]);
   }
-  const soon = () => setNotice("연습용 앱에서는 준비 중인 메뉴예요.");
+  // 기능 없는 버튼은 눌러도 아무 일 없음 (안내창 없이)
+  const soon = () => {};
 
   return (
     <div className="screen hana hana-history">
