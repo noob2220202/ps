@@ -1,0 +1,150 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y; /* 세로 스크롤은 브라우저에, 가로 이동은 스와이프 제스처에 */
+}
+
+/* 움직이는 동안만 GPU 레이어로 승격 (항상 켜두면 메모리 낭비) */
+.layer--push-enter,
+.layer--push-exit,
+.layer--pop-enter,
+.layer--pop-exit,
+.layer--dragging,
+.layer--under {
+  will-change: transform;
+}
+
+/* 이전 화면을 어둡게 하는 막: filter 대신 opacity 애니메이션 (합성 단계에서만 처리됨) */
+.layer__dim {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ---------- 안드로이드: 영상처럼 새 화면이 위로 페이드인, 뒤로가기는 즉시 ---------- */
+[data-os="android"] .layer--push-enter {
+  animation: layer-fade var(--nav-ms) ease-out both;
+}
+@keyframes layer-fade {
+  from {
+    opacity: 0;
+  }
+}
+/* 콕뱅크(갤럭시): 새 화면 80ms 직선 교차 페이드, 뒤로가기는 나가는 화면이 100ms 동안 흐려짐 */
+html[data-app="nh"][data-os="android"] .layer--push-enter {
+  animation: layer-fade var(--nav-ms) linear both;
+}
+html[data-app="nh"][data-os="android"] .layer--pop-exit {
+  animation: layer-fade-out var(--nav-ms) linear both;
+}
+/* 하나원큐(갤럭시): 새 화면이 오른쪽에서 밀고 들어옴(330ms 감속), 뒤로가기는 오른쪽으로 밀려 나감 */
+html[data-app="hana"][data-os="android"] .layer--push-enter {
+  animation: layer-slide-in var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
+}
+html[data-app="hana"][data-os="android"] .layer--pop-exit {
+  animation: layer-slide-out var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes layer-slide-in {
+  from {
+    translate: 100% 0;
+  }
+}
+@keyframes layer-slide-out {
+  to {
+    translate: 100% 0;
+  }
+}
+@keyframes layer-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- iOS: 오른쪽에서 밀고 들어오는 push, 이전 화면은 30%만 왼쪽으로 + 살짝 어두워짐 ---------- */
+[data-os="ios"] .layer--push-enter,
+[data-os="ios"] .layer--dragging,
+[data-os="ios"] .layer--pop-exit {
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
+}
+[data-os="ios"] .layer--push-enter {
+  animation: ios-push-in var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--push-exit {
+  animation: ios-push-out var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--pop-enter {
+  animation: ios-pop-in var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--pop-exit {
+  animation: ios-pop-out var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--push-exit .layer__dim {
+  animation: dim-in var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--pop-enter .layer__dim {
+  animation: dim-out var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+[data-os="ios"] .layer--under {
+  transform: translate3d(-30%, 0, 0);
+}
+[data-os="ios"] .layer--under .layer__dim {
+  opacity: 0.12;
+}
+
+@keyframes ios-push-in {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes ios-push-out {
+  to {
+    transform: translate3d(-30%, 0, 0);
+  }
+}
+@keyframes ios-pop-in {
+  from {
+    transform: translate3d(-30%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes ios-pop-out {
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+@keyframes dim-in {
+  to {
+    opacity: 0.12;
+  }
+}
+@keyframes dim-out {
+  from {
+    opacity: 0.12;
+  }
+}
+
+/* ---------- i-ONE Bank(갤럭시): 대부분 전환 없음. 고른 곳만 (src/ibk/nav.ts) ----------
+   menu-in : 전체메뉴가 오른쪽에서 밀려 들어옴 (거래내역 ≡ → 메뉴: 왼끝 x 292 → 97 → 0, 33ms 간격 ≈100ms ease-in-out), 아래 화면 그대로
+   menu-out: 위 화면이 오른쪽으로 밀려 나감 (메뉴 ✕: +102 → +297 → 밖, 진행률 26%·76% = menu-in 과 같은 100ms ease-in-out)
+   body-right / body-left: 머리줄은 그대로, 본문(.ibk-body)만 x 22~362 창 안에서 밀려 들어옴 (이체결과조회 ↔ 확인증 200ms, 뒤로는 같은 곡선을 거꾸로) */
+html[data-app="ibk"][data-os="android"] .layer--ibk-menu-in.layer--push-enter {
+  animation: layer-slide-in var(--nav-ms) cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+html[data-app="ibk"][data-os="android"] .layer--ibk-menu-out.layer--pop-exit {
+  animation: layer-slide-out var(--nav-ms) cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+html[data-app="ibk"][data-os="android"] .layer--ibk-body-right:not(.layer--push-exit, .layer--pop-exit) .ibk-body {
+  animation: ibk-in-right var(--nav-ms) cubic-bezier(0.42, 0, 0.58, 1) backwards;
+}
+html[data-app="ibk"][data-os="android"] .layer--ibk-body-left:not(.layer--push-exit, .layer--pop-exit) .ibk-body {
+  animation: ibk-in-left var(--nav-ms) cubic-bezier(0.42, 0, 0.58, 1) backwards;
+}

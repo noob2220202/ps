@@ -1,0 +1,381 @@
+/* i-ONE Bank 이체 완료 (specB/confirm.md 5절, 녹화 140.0~145.7초). x 는 클론 좌표 = (녹화 x − 0.35) / 1.0242, y 는 앱 영역 = 녹화 y − 29.4.
+   글자 top = 기준선 − 29.4 − 0.3418 × 글자 크기 (.ibk-bl). 자간은 0-6 B 표의 클론 값 */
+
+/* 자간을 안 적은 글자(펼친 행 값 등)는 −0.2 (앱 body 값을 물려받던 그대로 — 공용 .ibk 는 0) */
+.ibd {
+  letter-spacing: -0.2px;
+}
+
+/* 글자 기준선은 정수 픽셀에 붙음. 녹화 기준선이 x.75 인 줄(통장 이름·자세히보기·말풍선)은 --ib-y0 만큼 내려야
+   아래 픽셀로 붙음 (겹쳐 재서 정함) */
+.ibd .ibd-acctname,
+.ibd .ibd-more,
+.ibd .ibd-tip__t,
+.ibd .ibd-val {
+  margin-top: var(--ib-y0);
+}
+
+/* 확인 화면 머리줄(← 이체 취소)이 완료 화면 위에 3프레임(100ms) 남아 있음 (140.000~140.067) */
+.ibd-ghost {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+/* 체크 원: 중심 클론 (191.91, 녹화 147.17), 지름 47.1 (5-1 은 46.8 — 녹화 평균에서 방향별 경계로 다시 잼: 반지름 23.46 + 렌더 치우침 0.1).
+   나타나는 애니메이션 없음 (140.000 프레임에 완성된 모습 — 30fps 실제 프레임 139.933 → 140.000 사이에 한 번에) */
+.ibd-check {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(168.36px, calc(94.22px + var(--ib-y0)));
+}
+.ibd-check .ibk-check-circle {
+  display: block;
+}
+
+/* "○○님께": 600 20px, 기준선 212.0, 가운데 (글자 상자 146.11~238.44 → 가운데 192.27) */
+.ibd-name {
+  left: 0;
+  width: 384.55px;
+  top: 175.76px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.06px;
+  color: #101111;
+}
+
+/* "100 원을 보냈어요 ☆": 기준선 242.0, 글자 + 별 묶음이 가운데 (금액 왼쪽 101.69). 말풍선이 카드 위 테두리를 덮도록 위 층 */
+.ibd-sent {
+  left: 0;
+  width: 384px;
+  top: 205.51px; /* 242 − 29.4 − 0.3418 × 20.75 */
+  text-align: center;
+  font-size: 20.75px;
+  z-index: 2;
+}
+.ibd-sent b {
+  font-weight: 600;
+}
+/* 금액 숫자: Roboto 700 20.75px #2c68ba (글자 상자 101.69~137.51) */
+.ibd-sent .ibd-amt {
+  font-weight: 700;
+  letter-spacing: 0.03px;
+  color: #2c68ba;
+}
+/* '원': 숫자와 2.5 떨어짐 (보통 글자 사이보다 넓음 — 5-2) */
+.ibd-won {
+  margin-left: 2.5px;
+  font-size: 20px;
+  letter-spacing: 0;
+  color: #3f73b5;
+}
+.ibd-sent__t {
+  margin-left: -0.4px;
+  font-size: 20px;
+  letter-spacing: 0;
+  color: #0e0f10;
+}
+/* ☆ 자리: '을 보냈어요' 끝에서 12.18, 별 중심 클론 275.40 / 녹화 y 235.95 = 기준선 − 6.05 (5-3).
+   폭 15.28 = 묶음 가운데를 192 에 맞추는 값 (별 그림 16.74 는 넘쳐 그려짐) */
+.ibd-star-at {
+  position: relative;
+  display: inline-block;
+  width: 15.28px;
+  height: 0;
+  margin-left: 12.18px;
+}
+.ibd-star {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-9.63px, -24.05px); /* left/top 이면 누름 칸이 정수 픽셀로 붙어 별이 0.5 까지 어긋남 */
+  width: 36px;
+  height: 36px;
+  color: #646464;
+}
+.ibd-star .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(9.8px, 9.87px); /* 별 그림 16.24 × 15.44 (바깥 반지름 8.54) 의 중심 = 자리 (8.29, 기준선 − 6.46) — 녹화와 무게중심·퍼짐을 맞춤 */
+}
+/* 즐겨찾기 켠 별: 녹화에 없음 → 채운 별 */
+.ibd-star--on {
+  color: #f5b400;
+}
+.ibd-star--on .ibk-icon {
+  fill: currentColor;
+}
+
+/* 말풍선 (5-4): 몸통 클론 137.01~300.76 × 녹화 258.07~289.84, 테두리 1px #5a8ab0, 반경 5.4 × 5.5, 위로 꼬리(꼭짓점 = 별 바로 아래),
+   옅은 그림자. 완료 화면 100ms 뒤 한 번에 나타나 계속 보임 */
+.ibd-tip {
+  position: absolute;
+  left: -130.02px;
+  top: 16.07px; /* 258.07 − 기준선 242 */
+  width: 163.75px;
+  height: 31.77px;
+  font-size: 11px;
+}
+.ibd-tip__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  fill: #fff;
+  stroke: #6390b5;
+  stroke-width: 1;
+  filter: drop-shadow(0 1.5px 2px rgba(0, 0, 0, 0.07));
+}
+/* '즐겨찾기에 추가해보세요' 700 11px #4879b1, 글자 상자 왼쪽 149.04 (몸통에서 12.03), 기준선 277.75 */
+.ibd-tip__t {
+  left: 12.5px;
+  top: 16.92px; /* Noto 잉크가 녹화 글꼴보다 위로 0.8 높아 무게중심이 −0.69 → 1px 내림 (검수) */
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.18px;
+  color: #4879b1;
+}
+/* ×: 선 끝 클론 283.10~290.32 × 녹화 270.1~277.6, 1.1 */
+.ibd-tip__x {
+  position: absolute;
+  left: 132.09px;
+  top: -1.97px;
+  width: 28px;
+  height: 28px;
+  color: #4879b1;
+}
+.ibd-tip__x .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(14px, 14px);
+}
+
+/* ---------- 계좌 카드 (5-5): 클론 21.77~361.89 × 녹화 279.7~398.21, 테두리 1px #e8e9e9, 반경 11.5 ---------- */
+.ibd-mid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 250.3px;
+}
+.ibd-card {
+  box-sizing: border-box;
+  margin-left: 21.77px;
+  width: 340.12px;
+  border: 1px solid #e8e9e9;
+  border-radius: 11.2px / 11.5px;
+}
+.ibd-line {
+  display: block;
+  height: 1px;
+  background: #e8e8e8;
+}
+/* 행: 출금 67.05 (녹화 280.7~347.75), 입금·펼친 행 48.46. 글자 top 은 행 위끝 기준 */
+.ibd-row {
+  position: relative;
+  height: 48.46px;
+}
+.ibd-row--from {
+  height: 67.05px;
+}
+.ibd-label {
+  left: 15.1px;
+  top: 24.14px;
+  font-size: 12.75px;
+  font-weight: 500;
+  letter-spacing: -0.11px;
+  color: #686a6f;
+}
+.ibd-label--from {
+  left: 14.77px;
+  top: 24.19px;
+  letter-spacing: -0.18px;
+  color: #666a6f;
+}
+.ibd-label--to {
+  left: 15.11px;
+  letter-spacing: -0.3px;
+  color: #696c70;
+}
+/* 계좌번호: 700 12.75 검정, 오른쪽 끝 클론 325.34 / 325.52, 기준선 행 위 + 28.3 / 28.25. 왼쪽에 은행 로고 원 ⌀16.7 (로고 끝 → 글자 6.6) */
+.ibd-acct {
+  font-size: 12.75px;
+  font-weight: 700;
+  color: #020303;
+}
+.ibd-acct--from {
+  right: 35.55px;
+  top: 23.94px;
+  letter-spacing: 0.13px;
+}
+.ibd-acct--to {
+  right: 35.37px;
+  top: 23.89px;
+  letter-spacing: 0.16px;
+}
+.ibd-logo {
+  position: relative;
+  display: inline-block;
+  width: 17.5px;
+  height: 0;
+  margin-right: 6.1px;
+}
+/* 로고 원 ⌀17.5 (5-5 는 16.7 — 녹화 평균에서 방향별 경계로 다시 잼: 반지름 8.1 / 8.4 + 렌더 치우침 0.3), 중심 = 기준선 − 5 */
+/* 로고는 IbkBankLogo 의 .ibk-logo 원 또는 (녹화에 없는 은행) 공용 BankIcon 의 img/span → 클래스가 아니라 자식으로 잡음 */
+.ibd-logo > * {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(0, -13.75px);
+}
+/* 로고 끝 → 계좌 글자 사이가 녹화에서 은행마다 다름 (기업 6.3 · 국민 6.6 — 5-5 의 6.44 / 6.83 과 같은 경향) */
+.ibd-acct--from .ibd-logo > * {
+  transform: translate(-0.16px, -13.75px); /* 검수: 0.87 이면 녹화보다 오른쪽 +1.03 (경계 155.15~171.58 vs 156.16~172.64) */
+}
+.ibd-acct--to .ibd-logo > * {
+  transform: translate(-0.51px, -13.75px);
+}
+/* 통장 이름: 400 13px #6a6d72, 오른쪽 끝 327.72, 기준선 327.75 */
+.ibd-acctname {
+  right: 33.17px;
+  top: 42.61px;
+  font-size: 13px;
+  letter-spacing: -0.085px;
+  color: #6a6d72;
+}
+/* 펼친 행의 값 (녹화에 없음 — 확인 카드 값 모양, 오른쪽 끝 = 통장 이름 줄과 같은 346.5) */
+.ibd-val {
+  right: 14.39px;
+  top: 24.14px;
+  font-size: 12.75px;
+  font-weight: 500;
+  color: #000;
+}
+/* ⧉ 복사: 뒤 ㄱ 왼선 클론 331.87, 윗선 녹화 298.1 (행 위 + 17.4), 1.25 #0a0a0a. 누름 칸 32 */
+.ibd-copy {
+  position: absolute;
+  left: 299.1px;
+  top: 7.4px;
+  width: 32px;
+  height: 32px;
+  color: #0a0a0a;
+}
+.ibd-copy .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(10px, 10px);
+}
+.ibd-row--from .ibd-copy .ibk-icon {
+  transform: translate(10px, 10.4px);
+}
+
+/* 자세히보기 ⌄ (5-6): 700 12.75 #525559, 기준선 = 카드 아래 + 29.54, ⌄ 10 × 5.1 · 1.3 #3a3a3a (글자 끝에서 3.27), 묶음 가운데 191.1 */
+.ibd-more-at {
+  position: relative;
+  height: 0;
+}
+.ibd-more {
+  left: 0;
+  width: 382.25px;
+  top: 25.18px;
+  text-align: center;
+  font-size: 12.75px;
+  font-weight: 700;
+  letter-spacing: -0.13px;
+  color: #525559;
+}
+.ibd-more button {
+  position: relative;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  line-height: 0;
+}
+/* 누름 칸을 글자보다 넓게 (위치는 그대로) */
+.ibd-more button::before,
+.ibd-link button::before {
+  content: "";
+  position: absolute;
+  inset: -14px -10px;
+}
+.ibd-more__chev {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 0;
+  margin-left: 3.27px;
+  color: #3a3a3a;
+}
+.ibd-more__chev .ibk-icon {
+  position: absolute;
+  left: 0;
+  top: -7.15px;
+}
+
+/* 거래내역조회 (5-7): 700 12.5 #494c52 + 밑줄 1px (기준선 + 1.3), 기준선 675.5, 글자 상자 157.10~227.42 */
+.ibd-link {
+  left: 0;
+  width: 384.52px;
+  top: 641.83px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.22px;
+  color: #494c52;
+}
+.ibd-link button {
+  position: relative;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  line-height: 0;
+}
+.ibd-link button > span {
+  position: relative;
+}
+/* 밑줄: 녹화 676.8~677.8 = 기준선 + 1.3. 글자 칸(inline) 아래끝 = 기준선 + Roboto 내림 0.2441em */
+.ibd-link button > span::after {
+  content: "";
+  position: absolute;
+  left: -0.38px;
+  right: 0.5px;
+  top: 100%;
+  margin-top: -1.15px; /* 녹화 행 676/677/678 어두움 42/140/6 → 677 행에 붙게 */
+  height: 1px;
+  background: currentColor;
+}
+
+/* 공유·확인 글자 (5-8): 공용 .ibk-btn 그대로면 녹화보다 위로 0.6~0.7 (기준선이 749 에 붙음) → 2px 위 여백으로 1px 내림.
+   자간은 0-6 B 표의 클론 값 (공유 −0.37 · 확인 −0.27 — 공용 0 / +0.3 이면 두 글자 사이가 녹화보다 0.5 넓음) */
+.ibd .ibk-bottom > .ibk-btn {
+  padding-top: 2px;
+}
+.ibd .ibk-bottom > .ibk-btn--line {
+  padding-right: 0.64px; /* 글자 무게중심 +0.32 → 가운데로 */
+  letter-spacing: -0.37px;
+}
+.ibd .ibd-ok {
+  letter-spacing: -0.27px;
+}
+
+/* 확인 눌림 (5-8, 144.75~145.13 실제 프레임에 곡선을 맞춤 — done/fitpress.py):
+   누름: 크기 1 → .96 187ms cubic-bezier(0,.8,.7,1), 바탕 10ms 늦게 #1f4daa 까지 163ms cubic-bezier(0,.6,.7,1)
+   뗌(144.916): 크기 .96 → 1 220ms cubic-bezier(0,.8,.6,1), 바탕은 120ms 더 #1f4daa 로 있다가 67ms 에 원래 색 */
+.ibd .ibd-ok {
+  transition:
+    transform 220ms cubic-bezier(0, 0.8, 0.6, 1),
+    background-color 67ms ease-out 120ms;
+}
+.ibd .ibd-ok:active:not(:disabled) {
+  transform: scale(0.96);
+  background: #1f4daa;
+  transition:
+    transform 187ms cubic-bezier(0, 0.8, 0.7, 1),
+    background-color 163ms cubic-bezier(0, 0.6, 0.7, 1) 10ms;
+}

@@ -1,0 +1,68 @@
+.wordmark {
+  display: inline-flex;
+  color: #1c1c1c;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.wordmark__light {
+  font-weight: 450;
+}
+.wordmark__bold {
+  font-weight: 750;
+}
+
+/* 앨범 로고: 굵고 좁은 글자를 살짝 겹쳐서 글리치 느낌 */
+.album-logo {
+  display: inline-block;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  transform: scale(0.6, 1.08);
+  text-shadow: 0.2em 0 0 currentColor;
+  color: #000;
+  line-height: 1;
+}
+
+/* 노랑/초록/파랑 그라데이션 링이 도는 스피너 (AI 배너 문구 바뀔 때) */
+.ring-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  background: conic-gradient(#ffd400, #2fc48d, #2f8cff, #ffd400);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  animation: spin 0.9s linear infinite;
+}
+
+/* 안드로이드 머티리얼 스피너: 회전 + 호 길이가 늘었다 줄었다 */
+.arc-spinner {
+  animation: spin 1.4s linear infinite;
+}
+.arc-spinner circle {
+  animation: arc 1.4s ease-in-out infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes arc {
+  0% {
+    stroke-dasharray: 1 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90 150;
+    stroke-dashoffset: -124;
+  }
+}
+
+.kakao-circle {
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--yellow);
+  display: grid;
+  place-items: center;
+}

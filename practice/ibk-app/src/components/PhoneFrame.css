@@ -1,0 +1,334 @@
+.statusbar {
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px 0 24px;
+  font-size: 12px;
+  font-weight: 500;
+  transition:
+    background-color 200ms,
+    color 200ms;
+  z-index: 10;
+}
+.statusbar--light {
+  color: #fff;
+}
+.statusbar--dark {
+  color: #222;
+}
+.statusbar__right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* 배터리: 아래에서부터 잔량만큼 채우고 나머지는 옅게 */
+.statusbar__battery {
+  width: 7px;
+  height: 11px;
+  border-radius: 1.5px;
+  background: linear-gradient(to top, currentColor var(--lv, 62%), color-mix(in srgb, currentColor 35%, transparent) var(--lv, 62%));
+}
+
+/* ---------- iOS 상태바 (iPhone 17 Pro: 높이 54pt, 시간은 섬 왼쪽 공간의 가운데) ---------- */
+.statusbar--ios {
+  height: 54px;
+  padding: 6px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 126px 1fr;
+}
+.statusbar--ios .statusbar__time {
+  justify-self: center;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  padding-left: 14px;
+}
+.statusbar__right--ios {
+  grid-column: 3;
+  justify-self: center;
+  gap: 6px;
+  padding-right: 6px;
+}
+.ios-battery {
+  position: relative;
+  width: 25px;
+  height: 12px;
+  padding: 1.5px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  display: flex;
+}
+.ios-battery::after {
+  content: "";
+  position: absolute;
+  right: -3.5px;
+  top: 3.5px;
+  width: 1.5px;
+  height: 4px;
+  border-radius: 0 1px 1px 0;
+  background: color-mix(in srgb, currentColor 40%, transparent);
+}
+.ios-battery__level {
+  border-radius: 2px;
+  background: currentColor;
+}
+.ios-battery__level--low {
+  background: #ff3b30;
+}
+
+/* 다이내믹 아일랜드: 상태바 위에 떠 있는 검은 알약 */
+.dynamic-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 126px;
+  height: 37px;
+  margin-left: -63px;
+  border-radius: 19px;
+  background: #000;
+  z-index: 60;
+}
+/* 녹화 중: 아일랜드 크기는 그대로, 왼쪽에 빨간 점 (실제 아이폰 녹화: 지름 10.5, 가운데가 왼쪽 끝에서 16, #ef4036) */
+.dynamic-island i {
+  position: absolute;
+  left: 10.75px;
+  top: 50%;
+  width: 10.5px;
+  height: 10.5px;
+  margin-top: -5.25px;
+  border-radius: 50%;
+  background: #ef4036;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.dynamic-island--rec i {
+  opacity: 1;
+}
+
+.phone__home-indicator {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 108px;
+  height: 4px;
+  margin-left: -54px;
+  border-radius: 2px;
+  background: rgba(128, 128, 128, 0.6);
+  z-index: 50;
+  pointer-events: none;
+}
+.phone--ios .phone__home-indicator {
+  bottom: 8px;
+  width: 140px;
+  height: 5px;
+  margin-left: -70px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.9);
+}
+.phone--ios .phone__home-indicator--light {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ---------- PC용 기기 전환 스위치 ---------- */
+.switches {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 760px;
+  margin: 18px auto 0;
+}
+.os-switch {
+  display: flex;
+  width: max-content;
+  padding: 3px;
+  border-radius: 10px;
+  background: #dcdce0;
+}
+.os-switch a {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  text-decoration: none;
+}
+.os-switch a.on {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.os-switch--rec {
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #dcdce0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+}
+.os-switch--rec i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff3b30;
+}
+/* 배터리 · 시각 · 실제 시간 */
+.os-switch--status {
+  align-items: center;
+  gap: 4px;
+  padding: 3px 3px 3px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+.os-switch--status label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: 6px;
+}
+.os-switch--status input {
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  color: #111;
+  text-align: center;
+}
+.os-switch--status input[type="number"] {
+  width: 44px;
+}
+.os-switch--status input[type="time"] {
+  width: 112px;
+}
+.os-switch--status button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font: inherit;
+  color: #555;
+}
+.os-switch--status button.on {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+@media (max-width: 500px) {
+  .switches {
+    display: none;
+  }
+}
+
+/* 콕뱅크(갤럭시 384dp): 상태바 28, 아래 제스처바 15 (검정 + 115×4.3 회색 손잡이) — 스크린샷 기기 픽셀 기준
+   시계 잉크 y 15–35, x 52 px@720 / 밝은 글자 #f0f0f2 / 시트·로딩 막과 같이 85ms 동안 어두워짐 */
+html[data-app="nh"] .statusbar--android,
+html[data-app="hana"] .statusbar--android {
+  height: 28px;
+  padding-left: 26.7px;
+  font-size: 14px;
+  font-weight: 400;
+  transition:
+    background-color 85ms linear,
+    box-shadow 85ms linear,
+    color 85ms linear;
+}
+html[data-app="nh"] .statusbar--android > *,
+html[data-app="hana"] .statusbar--android > * {
+  translate: 0 -1.07px;
+}
+html[data-app="nh"] .statusbar--android.statusbar--light,
+html[data-app="hana"] .statusbar--android.statusbar--light {
+  color: #f0f0f2;
+}
+/* 프레임 높이 853.33 이 CSS px 로 붙어 띠가 838 에서 시작 → 0.4 내려서 기기 1572px 부터 검정 */
+.phone__navbar {
+  position: relative;
+  flex-shrink: 0;
+  height: 15px;
+  background: #000;
+  z-index: 50;
+  transform: translateY(0.4px);
+}
+/* 손잡이: 기기 1582–1589px (843.73 ~ 848dp) → 띠 위에서 5.33 */
+.phone__navbar i {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 115.2px;
+  height: 4.27px;
+  margin-left: -57.6px;
+  border-radius: 2.2px;
+  background: #5d5d5d;
+  transform: translateY(5.33px);
+}
+
+/* ---------- i-ONE Bank 기기 (녹화 82d59fba, 384 × 832dp) ----------
+   상태바 0~29.4 (#fafafa), 아래 3버튼 내비게이션 바 788~832 (44) — 흰 바탕, 구분선 없음.
+   상태바 글자: Roboto 400 14px #5c5c5c, 기준선 y 20.2 (숫자 잉크 10.0~20.2). 시계 잉크 왼쪽 클론 25.2, "38%" 잉크 325.6~350.0,
+   배터리 352.6~359.9 (spec/home.md 2-1 을 정지 프레임에서 다시 잼). line-height 0 → 기준선 = top + 0.3418em */
+html[data-app="ibk"] .statusbar--android {
+  position: relative;
+  height: 29.4px;
+  transition: none; /* 녹화: 상태바 색은 화면과 같이 바로 바뀜 (menu 4) */
+  padding: 0;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+html[data-app="ibk"] .statusbar--android.statusbar--dark {
+  color: #4f4f4f;
+}
+html[data-app="ibk"] .statusbar--android .statusbar__time {
+  position: absolute;
+  left: 23.77px;
+  top: 15.415px;
+  line-height: 0;
+}
+/* 오른쪽 아이콘은 384 × 29.4 SVG 한 장에 클론 좌표 그대로 (작은 svg 를 흐름에 놓으면 화면 픽셀에 붙어 0.5~1px 씩 튐) */
+.statusbar__right--ibk {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.ibk-sb-icons {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ibk-sb-pct {
+  position: absolute;
+  right: 33.55px;
+  top: 15.415px;
+  line-height: 0;
+}
+.phone__navbar--keys {
+  height: 44px;
+  background: #ffffff;
+  color: #8a8a8a;
+  transform: none;
+}
+.navkeys {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/* 뒤로 누름 칸 (< 가운데 298.5). 누르는 동안 회색 둥근 바탕 (녹화 3.5초 부근, 모양은 대략) */
+.navkey--back {
+  position: absolute;
+  left: 268.5px;
+  top: 0;
+  width: 60px;
+  height: 44px;
+  border: 0;
+  border-radius: 22px;
+  background: none;
+  cursor: pointer;
+}
+.navkey--back:active {
+  background: rgba(0, 0, 0, 0.06);
+}

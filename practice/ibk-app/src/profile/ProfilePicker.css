@@ -1,0 +1,191 @@
+/* 프로필 고르기: 홈과 같은 배경/글자색 토큰 → 라이트/다크 자동. 노란 B 로고 + 파스텔 동그라미 아바타 */
+.picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--home-bg);
+  color: var(--home-text);
+  padding: 0 24px calc(28px + var(--safe-bottom));
+}
+/* 콕뱅크 서버: 테마와 상관없이 콕뱅크 다크 색 */
+.picker--nh {
+  --home-bg: #18171c;
+  --home-text: #ffffff;
+  --home-sub: #9ba2ac;
+  --home-btn: #28323c;
+  --home-card: #1f2630;
+  --home-line: #353e4a;
+}
+/* i-ONE Bank 서버: 라이트만 (흰 바탕) */
+.picker--ibk,
+html[data-theme="dark"] .picker--ibk {
+  --home-bg: #ffffff;
+  --home-text: #222222;
+  --home-btn: #f0f4f7;
+  --home-card: #f5f7fa;
+  --home-line: #e6e9ee;
+}
+/* 하나원큐 서버: 하나원큐 바탕색 (라이트 흰색 / 다크 #191a1c) */
+.picker--hana {
+  --home-bg: #ffffff;
+  --home-text: #25262a;
+}
+html[data-theme="dark"] .picker--hana {
+  --home-bg: #191a1c;
+  --home-text: #f0f0f2;
+  --home-btn: #2c2e33;
+  --home-card: #222327;
+  --home-line: #3a3b3f;
+}
+.picker__brand {
+  margin-top: 13%;
+}
+.picker__title {
+  margin: 22px 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.picker__desc {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--home-sub);
+}
+.picker__loading {
+  margin-top: 80px;
+}
+.picker__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 120px);
+  gap: 26px 34px;
+  margin-top: 44px;
+}
+.picker__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+}
+.picker__item:active .profile-avatar,
+.picker__item:active .picker__add {
+  transform: scale(0.95);
+}
+.picker__avatar-wrap {
+  position: relative;
+}
+/* 관리 모드: 아바타를 살짝 어둡게 + 연필 */
+.picker__pencil {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.38);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  animation: layer-fade 160ms ease-out;
+}
+.picker__add {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 1.5px dashed color-mix(in srgb, var(--home-text) 25%, transparent);
+  color: var(--home-sub);
+  display: grid;
+  place-items: center;
+  transition: transform 140ms ease;
+}
+.picker__name {
+  max-width: 120px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.picker__name--sub {
+  font-weight: 500;
+  color: var(--home-sub);
+}
+.picker__manage {
+  margin-top: auto;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 20px;
+  background: var(--home-btn);
+  color: var(--home-text);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+/* 프로필 만들기/수정 시트 */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 18px 14px;
+}
+.profile-form h2 {
+  margin: 0 4px;
+  font-size: 18px;
+}
+.profile-form__preview {
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 16px;
+}
+.profile-form__name {
+  height: 52px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  outline: none;
+  background: #f5f5f5;
+  color: #1c1c1c;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+.profile-form__avatars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  gap: 10px;
+  margin: 18px 0 14px;
+}
+.profile-form__avatars button {
+  padding: 3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.profile-form__avatars button.on {
+  border-color: #1c1c1c;
+}
+.profile-form__colors {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.profile-form__colors button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.profile-form__colors button.on {
+  outline: 2px solid #1c1c1c;
+  outline-offset: 2px;
+}
+.profile-form__hint {
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+}
+.profile-form__delete {
+  margin-top: 12px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e5484d;
+}

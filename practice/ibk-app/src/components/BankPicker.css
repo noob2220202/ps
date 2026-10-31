@@ -1,0 +1,63 @@
+/* ---------- 은행선택 시트 (🔔 관리 패널: 다른 은행 계좌 추가 · 받는 분 등록) ---------- */
+.bank-sheet__title {
+  margin: 34px 22px 18px;
+  font-size: 19px;
+  font-weight: 700;
+}
+.bank-sheet__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  margin: 0 18px 12px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: #f7f7f7;
+}
+.bank-sheet__search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+}
+.bank-sheet__search input::placeholder {
+  color: #a0a0a0;
+}
+.bank-sheet__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 18px 20px;
+  scrollbar-width: none;
+}
+.bank-sheet__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+}
+.bank-sheet__grid + .bank-sheet__grid {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ececec;
+}
+.bank-sheet__item {
+  height: 48.5px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 14.5px;
+  text-align: left;
+  white-space: nowrap;
+}
+.bank-sheet__item:active {
+  opacity: 0.6;
+}
+.bank-sheet__empty {
+  margin: 60px 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: #9a9a9a;
+  white-space: pre-line;
+}

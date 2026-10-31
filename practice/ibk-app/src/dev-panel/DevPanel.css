@@ -1,0 +1,474 @@
+.dev-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+.dev-panel--open {
+  pointer-events: auto;
+}
+.dev-panel__backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+.dev-panel--open .dev-panel__backdrop {
+  opacity: 0.45;
+}
+
+/* 아래에서 올라오는 시트: transform만 움직여서 부드럽게 */
+.dev-panel__sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 86%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px 22px 0 0;
+  background: var(--home-card);
+  color: var(--home-text);
+  transform: translate3d(0, 100%, 0);
+  transition: transform 360ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  will-change: transform;
+}
+.dev-panel--open .dev-panel__sheet {
+  transform: translate3d(0, 0, 0);
+}
+.dev-panel__grabber {
+  width: 36px;
+  height: 5px;
+  margin: 8px auto 0;
+  border-radius: 3px;
+  background: var(--home-line);
+}
+.dev-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px 6px 20px;
+  font-size: 17px;
+}
+.dev-panel__head button {
+  color: var(--home-sub);
+}
+.dev-panel__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 14px 10px;
+  border-bottom: 1px solid var(--home-line);
+}
+.dev-panel__tabs button {
+  flex: 1;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--home-sub);
+}
+.dev-panel__tabs button.on {
+  background: var(--home-btn);
+  color: var(--home-text);
+}
+.dev-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: calc(24px + var(--safe-bottom));
+}
+
+.tab {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+}
+.tab form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tab__h {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+.tab__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--home-sub);
+  line-height: 1.5;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.field__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--home-sub);
+}
+.field__error {
+  font-size: 11.5px;
+  color: #e5484d;
+}
+.field input,
+.field select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--home-btn);
+  color: var(--home-text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+.field input:focus,
+.field select:focus {
+  border-color: var(--yellow);
+}
+.field input[type="range"] {
+  padding: 0;
+  background: none;
+  accent-color: #f5c400;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.seg {
+  display: flex;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--home-btn);
+}
+.seg button {
+  flex: 1;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--home-sub);
+}
+.seg button.on {
+  background: var(--home-card);
+  color: var(--home-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.btn {
+  height: 44px;
+  border-radius: 12px;
+  background: var(--yellow);
+  color: #1c1c1c;
+  font-size: 14px;
+  font-weight: 700;
+}
+.btn:active {
+  background: var(--yellow-pressed);
+}
+.btn--sm {
+  height: 40px;
+  padding: 0 16px;
+}
+.btn--danger {
+  margin-top: 8px;
+  background: var(--home-btn);
+  color: #e5484d;
+}
+
+.tab__h--first {
+  margin-top: 0;
+}
+
+/* 금액 입력 + 빠른 더하기 버튼 */
+.money {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.money__box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--home-btn);
+}
+.money__box input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--home-text);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+}
+.money__box span {
+  font-size: 15px;
+  font-weight: 600;
+}
+.chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chips-row--wrap {
+  flex-wrap: wrap;
+}
+.chip-btn {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid var(--home-line);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.chip-btn.on {
+  border-color: transparent;
+  background: var(--home-text);
+  color: var(--home-card);
+}
+.chip-btn--ghost {
+  border-style: dashed;
+  color: var(--home-sub);
+}
+
+/* 계좌 목록 (눌러서 펼치기) */
+.acct-edit {
+  border-radius: 14px;
+  background: var(--home-btn);
+}
+.acct-edit__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-align: left;
+}
+.acct-edit__name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.acct-edit__name small {
+  font-size: 11px;
+  color: var(--home-sub);
+}
+.acct-edit__bal {
+  font-weight: 700;
+}
+.acct-edit__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 12px 14px;
+}
+.acct-edit__body .money__box,
+.acct-edit__body input {
+  background: var(--home-card);
+}
+
+/* 은행 고르기: 고른 은행 버튼 + 펼치면 은행선택 목록 */
+.add-bank {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bank-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 14px 0 10px;
+  border-radius: 12px;
+  background: var(--home-btn);
+  text-align: left;
+}
+.bank-select strong {
+  flex: 1;
+  font-size: 14px;
+}
+.bank-select__picker {
+  display: flex;
+  flex-direction: column;
+  max-height: 360px;
+  border-radius: 14px;
+  background: #fff;
+  color: #1c1c1c;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--home-line);
+}
+.bank-select__picker .bank-sheet__title {
+  display: none;
+}
+.bank-select__picker .bank-sheet__search {
+  margin: 12px 12px 6px;
+  height: 44px;
+}
+.bank-select__picker .bank-sheet__list {
+  padding: 0 12px 12px;
+}
+
+.btn--in {
+  flex: 1;
+  background: #2f8cff;
+  color: #fff;
+}
+.btn--out {
+  flex: 1;
+  background: #ff5a5f;
+  color: #fff;
+}
+.btn--in:active,
+.btn--out:active {
+  filter: brightness(0.9);
+  background-color: inherit;
+}
+
+/* 아래에서 잠깐 뜨는 알림 */
+.dev-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24px + var(--safe-bottom));
+  transform: translateX(-50%);
+  max-width: 85%;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: rgba(30, 30, 30, 0.92);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: toast-in 220ms ease-out;
+  pointer-events: none;
+}
+.dev-toast--error {
+  background: #e5484d;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--home-line);
+}
+.tx-row span:first-child {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tx-row__in {
+  color: #1e88e5;
+}
+.tx-row button {
+  color: var(--home-sub);
+  padding: 4px;
+}
+
+/* 기본 탭 맨 위: 지금 프로필 */
+.current-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--home-btn);
+}
+.current-profile__blank {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--home-line);
+}
+.current-profile__name {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.current-profile__name small {
+  font-size: 11px;
+  color: var(--home-sub);
+}
+.current-profile__name strong {
+  font-size: 15px;
+}
+.row .btn--danger {
+  flex: 1;
+  margin-top: 0;
+}
+
+.count-value {
+  min-width: 44px;
+  align-self: center;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+.btn:disabled {
+  opacity: 0.4;
+}
+
+/* 콕뱅크: 다크 + 보라 버튼 (변수만 바꿔 끼움) */
+.dev-panel--nh {
+  --home-card: #1f2630;
+  --home-btn: #2c3540;
+  --home-line: #353e4a;
+  --home-text: #ffffff;
+  --home-sub: #9ba2ac;
+  --yellow: #7589fb;
+  --yellow-pressed: #5f73e6;
+  color-scheme: dark;
+}
+/* i-ONE Bank: 이체 버튼 파랑 */
+.dev-panel--ibk {
+  --yellow: #4896eb;
+  --yellow-pressed: #2f7fd8;
+}
+.dev-panel--ibk .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
+  color: #fff;
+}
+/* 하나원큐: 하나 초록 버튼 */
+.dev-panel--hana {
+  --yellow: #00a38e;
+  --yellow-pressed: #008b79;
+}
+.dev-panel--hana .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
+  color: #fff;
+}
+.dev-panel--nh .btn:not(.btn--danger):not(.btn--in):not(.btn--out) {
+  color: #fff;
+}
+.dev-panel--nh input,
+.dev-panel--nh select {
+  color: #fff;
+}

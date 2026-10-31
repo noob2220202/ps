@@ -1,0 +1,312 @@
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+
+/* 영상 프레임에서 스포이드로 뽑은 색 */
+:root {
+  --yellow: #ffe100;
+  --yellow-pressed: #e8cd00;
+
+  --dark-bg: #1f1f1f;
+  --dark-surface: #262626;
+  --dark-btn: #363636;
+  --dark-nav: #2d2d2d;
+  --dark-line: #3a3a3a;
+  --dark-sub: #8a898c;
+
+
+  --light-bg: #f5f4f7;
+  --light-btn: #f2f2f4;
+  --lavender: #efe6fc;
+  --text: #202020;
+  --sub: #858585;
+  --line: #ececec;
+  --blue: #1f63b5;
+  --navy: #333957;
+  --red: #ea2029;
+
+  --frame-w: 360px;
+  --frame-h: 800px;
+  --safe-bottom: 0px; /* 홈 인디케이터 영역. 실제 아이폰에선 env()로 덮어씀 */
+}
+/* 콕뱅크(갤럭시): 실제 기기 384 × 853.33dp (상태바 28 + 앱 + 제스처바 15) */
+html[data-app="nh"]:not([data-os="ios"]),
+html[data-app="hana"]:not([data-os="ios"]) {
+  --frame-w: 384px;
+  --frame-h: 853.33px;
+}
+/* i-ONE Bank 녹화 기기(갤럭시): 384 × 832dp = 상태바 29.4 + 앱 758.6 + 3버튼 내비게이션 바 44 (녹화 경계 y 29.4 / 788.0) */
+html[data-app="ibk"]:not([data-os="ios"]) {
+  --frame-w: 384px;
+  --frame-h: 832px;
+}
+
+/* ---------- 홈 테마 (실제 앱은 시스템 다크모드를 따름) ----------
+   다크 = 화면 녹화에서, 라이트 = 스크린샷에서 스포이드로 뽑은 값 */
+[data-theme="dark"] {
+  --home-bg: #1f1f1f;
+  --home-card: #262626;
+  --home-btn: #363636;
+  --home-text: #ffffff;
+  --home-sub: #8a898c;
+  --home-faint: #6a6a6a;
+  --home-line: #3a3a3a;
+  --home-icon-bg: #383838;
+  --home-promo-bg: #3d4a42;
+  --home-nav: #2d2d2d;
+  --home-nav-fg: #e8e8e8;
+  --home-badge-line: #555555;
+  --home-badge-text: #b0b0b0;
+  --home-lanyard: #4a4a4a;
+  --home-pill: #262626;
+  --home-glass: rgba(46, 46, 48, 0.62);
+  --home-ad-bg: #262626;
+}
+[data-theme="light"] {
+  --home-bg: #ffffff; /* 카드 사이가 회색으로 보이는 건 페이지가 아니라 카드 그림자 때문 */
+  --home-card: #ffffff;
+  --home-btn: #f5f5f5;
+  --home-text: #212121;
+  --home-sub: #656565;
+  --home-faint: #cccccc;
+  --home-line: #d9d9d9;
+  --home-icon-bg: #f5f5f5;
+  --home-promo-bg: #ebf9ec;
+  --home-nav: #ffffff;
+  --home-nav-fg: #111111;
+  --home-badge-line: #d0d0d0;
+  --home-badge-text: #8f8f8f;
+  --home-lanyard: #e6e6e6;
+  --home-pill: #ffffff;
+  --home-glass: rgba(255, 255, 255, 0.7);
+  --home-ad-bg: #f6f6f6;
+}
+
+/* iPhone 17 Pro: 402 x 874pt, 하단 안전영역 34pt */
+[data-os="ios"] {
+  --frame-w: 402px;
+  --frame-h: 874px;
+  --safe-bottom: 34px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  background: #e9e9ec;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ---------- 폰 프레임 ---------- */
+.phone {
+  position: relative;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  margin: 24px auto;
+  border-radius: 36px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 10px #111,
+    0 0 0 11px #333,
+    0 30px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.phone__viewport {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.phone--ios {
+  border-radius: 62px;
+  box-shadow:
+    0 0 0 9px #0b0b0c,
+    0 0 0 11px #9c9ca1,
+    0 0 0 12px #6d6d72,
+    0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+/* 진짜 폰 화면 크기면 프레임 없이 꽉 채움. 가짜 상태바 내용은 숨기고,
+   노치/다이내믹 아일랜드 높이(safe-area-inset-top)만큼 배경색 띠로 남긴다 */
+@media (max-width: 500px) {
+  :root,
+  [data-os="ios"] {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body {
+    background: #000;
+  }
+  .phone {
+    width: 100%;
+    height: 100dvh;
+    margin: 0;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .statusbar {
+    height: env(safe-area-inset-top, 0px) !important;
+    padding: 0 !important;
+  }
+  .statusbar > *,
+  .dynamic-island,
+  .phone__home-indicator,
+  .phone__navbar--keys {
+    display: none !important;
+  }
+}
+
+/* 캡쳐모드 (🔔 → 기본): 폰 테두리·그림자·둥근 모서리 없이 화면만 가운데에. 크기와 상태바는 그대로 */
+[data-capture="on"] body {
+  background: #000;
+}
+[data-capture="on"] .phone {
+  margin: max(0px, calc((100dvh - var(--frame-h)) / 2)) auto 0;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+[data-capture="on"] .switches {
+  display: none;
+}
+/* 녹화 중(Element Capture): 진짜 포인터는 폰 위에서 숨기고 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
+   — 가짜 포인터는 폰 요소 밖에 있어서 녹화에 안 찍힘 (FakeCursor) */
+[data-fake-cursor="on"] .phone,
+[data-fake-cursor="on"] .phone * {
+  cursor: none !important;
+}
+/* Element Capture 는 녹화할 요소가 따로 쌓임 맥락(stacking context)이어야 함 */
+.phone {
+  isolation: isolate;
+}
+
+/* ---------- 스크린 공통 ---------- */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 누르면 살짝 작아지고 어두워지는 효과 (영상에서 카드 누를 때) */
+.pressable {
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    background-color 120ms ease;
+}
+.pressable:active {
+  transform: scale(0.975);
+  filter: brightness(0.9);
+}
+
+.row-press:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- 스켈레톤 ---------- */
+/* 반짝임: background-position을 움직이면 매 프레임 다시 칠해야 함(paint).
+   대신 빛줄기(::after)를 transform으로 지나가게 → 합성만으로 처리 */
+.skel {
+  position: relative;
+  overflow: hidden;
+  background: #f0f0f2;
+  border-radius: 8px;
+}
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  transform: translate3d(-100%, 0, 0);
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+/* ---------- 접히는 애니메이션 (광고/배너 닫기) ---------- */
+.collapsible {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 320ms ease,
+    opacity 220ms ease;
+}
+.collapsible > * {
+  overflow: hidden;
+  min-height: 0;
+}
+.collapsible--closed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.fade-up {
+  animation: fade-up 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ---------- iOS 전용 ---------- */
+/* 아이폰에선 시스템 글꼴(SF Pro + 애플SD산돌고딕Neo). 다른 기기에선 Pretendard로 대체 */
+[data-os="ios"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, sans-serif;
+}
+
+/* iOS 26+ Liquid Glass 원형 버튼: 반투명 + 배경 흐림 + 위쪽 하이라이트 */
+[data-os="ios"] .icon-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 160ms cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+[data-os="ios"] .icon-btn:active {
+  background: rgba(255, 255, 255, 0.75);
+  transform: scale(1.12); /* 유리 버튼은 누르면 살짝 부풀어 오름 */
+}
+
+.ios-spinner {
+  animation: spin 0.8s steps(8) infinite;
+}
