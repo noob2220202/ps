@@ -16,9 +16,11 @@ function load(): Status {
 }
 
 let status = load();
+let savedAt = Date.now(); // 마지막으로 바꾼 시각 (시계를 바꾼 직후 렌더가 지난 틱 시각으로 계산되지 않게)
 const listeners = new Set<() => void>();
 function save(next: Status) {
   status = next;
+  savedAt = Date.now();
   try {
     localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
@@ -48,5 +50,6 @@ export function useNow() {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-  return new Date(now + (offset ?? 0));
+  // 시각을 바꾼 직후엔 바꾼 시각 기준으로 (지난 틱 시각으로 계산하면 10:00 으로 맞춰도 1초 가까이 9:59 로 보였음)
+  return new Date(Math.max(now, savedAt) + (offset ?? 0));
 }

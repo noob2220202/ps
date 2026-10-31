@@ -34,3 +34,18 @@ export const useIntro = () =>
     (fn) => (listeners.add(fn), () => void listeners.delete(fn)),
     () => on,
   );
+
+// 상태바 캠코더(화면 녹화 중) 표시 깜빡임: 1초 주기(0.5초 켜짐 · 0.5초 꺼짐). blinkEpoch = 켜짐이 시작된 시각(performance.now).
+// 인트로 영상은 끝나는 순간 그 표시가 켜진 지 0.25초째라(2.55초에 켜짐, 2.80초에 끝남) 영상이 끝날 때 그 위상으로 맞춘다
+export const BLINK_MS = 1000;
+let blinkEpoch = performance.now();
+const blinkListeners = new Set<() => void>();
+export function syncBlink(onForMs: number) {
+  blinkEpoch = performance.now() - onForMs;
+  blinkListeners.forEach((fn) => fn());
+}
+export const useBlinkEpoch = () =>
+  useSyncExternalStore(
+    (fn) => (blinkListeners.add(fn), () => void blinkListeners.delete(fn)),
+    () => blinkEpoch,
+  );

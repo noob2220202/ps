@@ -9,7 +9,7 @@
 // 코덱: 안드로이드 크롬의 mp4(H.264 하드웨어 인코더)는 프레임이 깨진 파일이 나와서 webm(VP9/VP8)으로 저장
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
-import { isIntroOn } from "./intro";
+import { isIntroOn, syncBlink } from "./intro";
 import { setBattery, setClock } from "./deviceStatus";
 import introSrc from "../assets/intro/ibk-open-intro.mp4";
 
@@ -17,6 +17,8 @@ import introSrc from "../assets/intro/ibk-open-intro.mp4";
 // 넘어갈 때 시간·배터리가 뚝 바뀌어 보이지 않도록, 인트로 재생 전에 이 값으로 맞춰 둔다
 const INTRO_CLOCK = "10:00";
 const INTRO_BATTERY = 38;
+// 영상이 끝나는 순간(2.80초) 상태바 캠코더 표시는 2.55초에 켜져서 0.25초째 켜져 있는 중
+const INTRO_BLINK_ON_MS = 250;
 
 type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
 
@@ -224,6 +226,7 @@ function playIntro(target: HTMLElement) {
     video.playsInline = true;
     video.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:999;";
     const done = () => {
+      syncBlink(INTRO_BLINK_ON_MS); // 영상 속 캠코더 표시 깜빡임을 우리 상태바가 같은 위상으로 이어 받음
       video.remove();
       resolve();
     };

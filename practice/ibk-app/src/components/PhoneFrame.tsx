@@ -4,7 +4,7 @@ import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { OS } from "../platform/platform";
 import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
-import { setIntro, useIntro } from "../platform/intro";
+import { BLINK_MS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
 import { THEME } from "../platform/theme";
 import { APP } from "../profile/session";
 import "./PhoneFrame.css";
@@ -53,23 +53,28 @@ function IosIcons() {
 
 // i-ONE Bank 녹화 기기 상태바 오른쪽 (spec/home.md 2-1, 클론 x): "LTE⁺"(아래 옅은 ↑↓) 288.7~306.8 · 신호 막대 4개 310.3~319.8
 // · "38%" 325.6~350.0 · 세로 배터리 352.6~359.9 (위 꼭지, 위쪽 #bebebe · 아래 잔량만큼 #454545). 막대·글자 기준선 녹화 y 20.2
-// 인트로 영상(녹화 기기 홈 화면) 상태바 왼쪽의 메일·점을 그 영상에서 그대로 잘라 옴 (x 97~126, y 3~27)
-// — 인트로가 끝나고 이 상태바로 넘어올 때 알림 아이콘이 안 달라지게. 캠코더 모양 녹화 중 표시는 따로(아래 IbkRecIcon)
+// 상태바 왼쪽 알림 아이콘: 인트로 영상(같은 기기 홈 화면)에서 그대로 잘라 옴 (x 60~128, y 3~27, 시간 글자 굵기에 맞춘 불투명도).
+// 첫 캠코더는 테두리만 여기, 안쪽(깜빡이는 부분)은 IbkRecIcon. 두 번째 캠코더·메일·점은 영상에서도 고정
 function IbkNotifIcons() {
   const src = localAsset("ibk-sb-notif");
   if (!src) return null;
   return <img className="ibk-sb-notif" src={src} alt="" aria-hidden />;
 }
 
-// 인트로 영상 속 캠코더 모양 "화면 녹화 중" 표시 (x 60~97, y 3~27, 그 영상에서 그대로 잘라 옴) 자리 그대로에,
-// 우리 쪽도 녹화 중일 때 실제로 깜빡이게. 원본 영상에서도 깜빡이는 표시라 고정 이미지로는 못 따라 함
+// 첫 캠코더 안쪽 = 화면 녹화 중 표시. 영상에서 켜진 프레임 - 꺼진 프레임으로 그 부분만 잘라 옴. 늘 1초 주기로 깜빡이고,
+// 인트로가 끝나는 순간 영상과 같은 위상으로 다시 맞춤 (intro.ts syncBlink). 위상이 바뀔 때만 새로 그려서 애니메이션 처음부터
 function IbkRecIcon() {
-  const recording = useRecorder().status === "recording";
+  const epoch = useBlinkEpoch();
+  return <IbkRecImg key={epoch} epoch={epoch} />;
+}
+function IbkRecImg({ epoch }: { epoch: number }) {
+  const [delay] = useState(() => -((performance.now() - epoch) % BLINK_MS));
   const src = localAsset("ibk-sb-rec");
-  if (!recording || !src) return null;
-  return <img className="ibk-sb-rec" src={src} alt="" aria-hidden />;
+  if (!src) return null;
+  return <img className="ibk-sb-rec" src={src} alt="" aria-hidden style={{ animationDelay: `${delay}ms` }} />;
 }
 
+// 오른쪽 아이콘은 인트로 영상(같은 기기) 상태바와 겹쳐 맞춤: 원래 IBK 녹화 좌표보다 LTE +7.25 · 신호 +8 · 배터리 +8.75, 아래로 0.5
 function IbkIcons() {
   const { battery } = useDeviceStatus();
   const fill = Math.min(10.5, (battery / 100) * 10.5 + 0.5);
@@ -79,7 +84,7 @@ function IbkIcons() {
       <IbkNotifIcons />
       <IbkRecIcon />
       <svg className="ibk-sb-icons" width="384" height="29.4" viewBox="0 0 384 29.4" aria-hidden>
-        <g transform={`translate(${-shift} 0)`}>
+        <g transform={`translate(${7.25 - shift} 0.5)`}>
           <path
             d="M290.55 9.7v5.35h3M293.18 10.25h4.49M295.72 10.25v5.4M302.36 10.25h-3.04v4.85h3.04M299.32 12.95h2.9M305.59 9.25v3.1M304.02 10.8h3.12"
             fill="none"
@@ -87,14 +92,14 @@ function IbkIcons() {
             strokeWidth="1.35"
           />
           <path d="M294.45 21.1v-3.9m-1 1 1-1 1 1M298.36 17.2v3.9m-1-1 1 1 1-1" fill="none" stroke="#c9c9c9" strokeWidth="0.9" />
-          <g fill="#454545">
-            <rect x="310.4" y="17.6" width="1.27" height="2.7" />
-            <rect x="312.82" y="15.2" width="1.27" height="5.1" />
-            <rect x="315.7" y="12.3" width="1.27" height="8" />
-            <rect x="318.6" y="9.3" width="1.27" height="11" />
-          </g>
         </g>
-        <g transform="translate(352.7 8.3)">
+        <g transform={`translate(${8 - shift} 0.5)`} fill="#454545">
+          <rect x="310.4" y="17.6" width="1.27" height="2.7" />
+          <rect x="312.82" y="15.2" width="1.27" height="5.1" />
+          <rect x="315.7" y="12.3" width="1.27" height="8" />
+          <rect x="318.6" y="9.3" width="1.27" height="11" />
+        </g>
+        <g transform="translate(361.45 8.8)">
           <rect x="1.76" width="3.42" height="2" rx="0.4" fill="#bcbcbc" />
           <rect y="1.7" width="7.3" height="10.5" rx="0.9" fill="#c4c4c4" />
           <path d={`M0 ${12.2 - fill}h7.3v${fill - 0.9}a.9.9 0 0 1-.9.9H.9a.9.9 0 0 1-.9-.9Z`} fill="#4a4a4a" />

@@ -283,10 +283,11 @@ html[data-app="ibk"] .statusbar--android {
 html[data-app="ibk"] .statusbar--android.statusbar--dark {
   color: #4f4f4f;
 }
+/* 시간: 인트로 영상(같은 기기) 상태바와 겹쳐 맞춤 (원래 IBK 녹화 좌표에서 오른쪽 1 · 아래 0.75) */
 html[data-app="ibk"] .statusbar--android .statusbar__time {
   position: absolute;
-  left: 23.77px;
-  top: 15.415px;
+  left: 24.77px;
+  top: 16.165px;
   line-height: 0;
 }
 /* 오른쪽 아이콘은 384 × 29.4 SVG 한 장에 클론 좌표 그대로 (작은 svg 를 흐름에 놓으면 화면 픽셀에 붙어 0.5~1px 씩 튐) */
@@ -300,26 +301,22 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
   left: 0;
   top: 0;
 }
-/* 인트로 영상에서 그대로 잘라 온 알림 아이콘 (카메라 접근 중 2개·메일), 영상 속 좌표 그대로 */
-.ibk-sb-notif {
-  position: absolute;
-  left: 97px;
-  top: 3px;
-  width: 29px;
-  height: 24px;
-}
-/* 캠코더 모양 "화면 녹화 중" 표시 (영상 속 자리, x 60~97 · y 3~27): 실제 안드로이드 녹화 표시처럼 1초 주기로 깜빡임 */
+/* 알림 아이콘(고정) · 첫 캠코더 안쪽(깜빡임): 인트로 영상에서 잘라 온 68 × 24 두 장, 영상 속 좌표 그대로 겹침 */
+.ibk-sb-notif,
 .ibk-sb-rec {
   position: absolute;
   left: 60px;
   top: 3px;
-  width: 37px;
+  width: 68px;
   height: 24px;
+}
+/* 화면 녹화 중 표시: 1초 주기 0.5초 켜짐 · 0.5초 꺼짐 (영상: 꺼짐 0.47초 그대로 잼). 위상은 style animation-delay 로 */
+.ibk-sb-rec {
   animation: ibk-sb-rec-blink 1s linear infinite;
 }
 @keyframes ibk-sb-rec-blink {
   0%,
-  49% {
+  49.9% {
     opacity: 1;
   }
   50%,
@@ -329,8 +326,8 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
 }
 .ibk-sb-pct {
   position: absolute;
-  right: 33.55px;
-  top: 15.415px;
+  right: 24.8px; /* 인트로 영상에 맞춤 (원래 33.55 · 15.415) */
+  top: 15.915px;
   line-height: 0;
 }
 .phone__navbar--keys {
