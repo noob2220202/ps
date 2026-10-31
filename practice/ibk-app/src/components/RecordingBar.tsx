@@ -1,17 +1,44 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { beginArmed, stopRecording, useRecorder } from "../platform/recorder";
 import "./RecordingBar.css";
 
-// 녹화 중 표시 + 정지 버튼. 폰 바깥(페이지 맨 위)에 떠서 녹화 영상에는 안 찍힌다
+// 녹화 중 표시 + 정지 버튼. 폰과 절대 겹치지 않는 자리(오른쪽 → 왼쪽 → 아래 → 위)에 띄움 — 겹치면 녹화 영상에 찍힘
+// (창 폭이 좁을 때 왼쪽 위 구석으로 갔더니 폰 상태바 왼쪽 위를 덮었음). 남는 자리가 없으면 숨김: 끝내기는 브라우저의 공유 중지
 export function RecordingBar() {
   const rec = useRecorder();
   const [now, setNow] = useState(() => Date.now());
   const recording = rec.status === "recording";
+  const fullscreen = recording && rec.fullscreen;
+  const bar = useRef<HTMLDivElement>(null);
+  const [place, setPlace] = useState<{ left: number; top: number } | null>(null);
   useEffect(() => {
     if (!recording) return;
     const id = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(id);
   }, [recording]);
+  useLayoutEffect(() => {
+    if (!recording || fullscreen) return;
+    const fit = () => {
+      const phone = document.querySelector(".phone");
+      if (!bar.current || !phone) return;
+      const p = phone.getBoundingClientRect();
+      const w = bar.current.offsetWidth;
+      const h = bar.current.offsetHeight;
+      const g = 12; // 화면 가장자리 · 폰과의 틈
+      const top = Math.max(g, Math.min(p.top, innerHeight - h - g));
+      const spots = [
+        { left: p.right + g, top, ok: innerWidth - p.right >= w + 2 * g },
+        { left: p.left - g - w, top, ok: p.left >= w + 2 * g },
+        { left: (innerWidth - w) / 2, top: p.bottom + g, ok: innerHeight - p.bottom >= h + 2 * g },
+        { left: (innerWidth - w) / 2, top: p.top - g - h, ok: p.top >= h + 2 * g },
+      ];
+      const spot = spots.find((s) => s.ok);
+      setPlace(spot ? { left: spot.left, top: spot.top } : null);
+    };
+    fit();
+    addEventListener("resize", fit);
+    return () => removeEventListener("resize", fit);
+  }, [recording, fullscreen]);
   // 폰: 화면 공유를 허락한 뒤 한 번 더 눌러야 전체화면으로 시작 (전체화면은 누름 안에서만 켤 수 있음)
   if (rec.status === "arming")
     return (
@@ -25,7 +52,7 @@ export function RecordingBar() {
   if (!recording || rec.fullscreen) return null;
   const sec = Math.max(0, Math.floor((now - rec.startedAt) / 1000));
   return (
-    <div className="rec-bar" role="status">
+    <div ref={bar} className="rec-bar" role="status" style={place ?? { visibility: "hidden" }}>
       <span className="rec-bar__dot" />
       녹화 중 {Math.floor(sec / 60)}:{String(sec % 60).padStart(2, "0")}
       <button onClick={stopRecording}>정지</button>
