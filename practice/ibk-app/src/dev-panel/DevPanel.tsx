@@ -4,7 +4,6 @@ import { api, formatAccountNumber, paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
 import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TxTag } from "../api/types";
 import { won } from "../lib/format";
-import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { isCapture, setCapture } from "../platform/capture";
 import { canRecord, recordPhone } from "../platform/recorder";
@@ -148,9 +147,6 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
   return (
     <div className="tab">
       <CurrentProfile />
-      <Field label="기기">
-        <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
-      </Field>
       <CaptureToggle />
       <RecordButton onStart={onClose} />
       <Field label="테마">

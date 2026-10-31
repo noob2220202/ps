@@ -10,7 +10,6 @@ import { Dialog, Sheet } from "../components/Sheet";
 import { Spinner } from "../components/Spinner";
 import { Icon } from "../components/icons/Icon";
 import { useStatusBar } from "../hooks/useStatusBar";
-import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
 import { AVATAR_COLORS, AVATAR_NAMES } from "./avatars";
 import { ProfileAvatar } from "./ProfileAvatar";
@@ -31,11 +30,10 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
 
   const enter = (p: AppProfile) => {
     setCurrentProfile(p.id);
-    // 이 프로필이 지난번에 쓰던 기기/테마가 지금과 다르면 그걸로 다시 연다
-    // (OS/THEME는 앱이 켜질 때 한 번 정해지는 값이라 새로 불러와야 바뀜)
-    const os = p.os ?? OS;
+    // 이 프로필이 지난번에 쓰던 테마가 지금과 다르면 그걸로 다시 연다 (기기는 늘 갤럭시)
+    // (THEME는 앱이 켜질 때 한 번 정해지는 값이라 새로 불러와야 바뀜)
     const theme = p.theme ?? THEME_CHOICE;
-    if (os !== OS || theme !== THEME_CHOICE) location.assign(`/?os=${os}&theme=${theme}`);
+    if (theme !== THEME_CHOICE) location.assign(`/?theme=${theme}`);
     else onEnter();
   };
 

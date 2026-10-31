@@ -215,14 +215,6 @@ export function OsSwitch() {
   return (
     <div className="switches">
       <nav className="os-switch">
-        <a href="/?os=android" className={OS === "android" ? "on" : ""}>
-          Galaxy
-        </a>
-        <a href="/?os=ios" className={OS === "ios" ? "on" : ""}>
-          iPhone
-        </a>
-      </nav>
-      <nav className="os-switch">
         <a href="/?theme=light" className={THEME === "light" ? "on" : ""}>
           라이트
         </a>

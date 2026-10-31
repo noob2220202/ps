@@ -147,32 +147,17 @@ button {
     0 30px 60px rgba(0, 0, 0, 0.35);
 }
 
-/* 진짜 폰 화면 크기면 프레임 없이 꽉 채움. 가짜 상태바 내용은 숨기고,
-   노치/다이내믹 아일랜드 높이(safe-area-inset-top)만큼 배경색 띠로 남긴다 */
+/* 진짜 폰 화면(폭 500 이하): 테두리만 없애고 갤럭시 384 × 832 화면을 그대로 화면에 맞게 키우거나 줄여서 보여 줌.
+   상태바 · 3버튼 내비바는 인트로 영상 기기에 맞춰 일부러 만든 것이라 어디서든 숨기지 않음 (배율은 capture.ts --screen-fit) */
 @media (max-width: 500px) {
-  :root,
-  [data-os="ios"] {
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
   body {
     background: #000;
   }
   .phone {
-    width: 100%;
-    height: 100dvh;
-    margin: 0;
+    margin: 0 auto;
     border-radius: 0 !important;
     box-shadow: none !important;
-  }
-  .statusbar {
-    height: env(safe-area-inset-top, 0px) !important;
-    padding: 0 !important;
-  }
-  .statusbar > *,
-  .dynamic-island,
-  .phone__home-indicator,
-  .phone__navbar--keys {
-    display: none !important;
+    zoom: var(--screen-fit, 1);
   }
 }
 
@@ -187,6 +172,12 @@ button {
 }
 [data-capture="on"] .switches {
   display: none;
+}
+/* 창이 폰보다 작으면 창에 맞게 줄임 (capture.ts). 진짜 폰 화면(폭 500 이하)은 위에서 꽉 채우므로 제외 */
+@media (min-width: 501px) {
+  [data-capture="on"] .phone {
+    zoom: var(--capture-fit, 1);
+  }
 }
 /* 녹화 중(Element Capture): 진짜 포인터는 폰 위에서 숨기고 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
    — 가짜 포인터는 폰 요소 밖에 있어서 녹화에 안 찍힘 (FakeCursor) */
