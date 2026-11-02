@@ -9,6 +9,13 @@
 // 코덱: 안드로이드 크롬의 mp4(H.264 하드웨어 인코더)는 프레임이 깨진 파일이 나와서 webm(VP9/VP8)으로 저장
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
+import { isIntroOn, syncBlink } from "./intro";
+import { setBattery, setClock } from "./deviceStatus";
+import kbankIntroSrc from "../assets/intro/kbank-open-intro.mp4";
+
+// 케이뱅크 인트로 영상(kbank-open-intro.mp4 = 녹화 cb67e5eb 2.8~5.6초) 상태바 값 그대로. 영상이 끝나고 우리 상태바로
+// 넘어갈 때 시각·배터리가 뚝 바뀌어 보이지 않게, 인트로를 틀기 전에 이 값으로 맞춰 둠
+const INTRO = { src: kbankIntroSrc, clock: "06:11", battery: 24, blinkOnMs: 330 };
 
 type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
 
@@ -196,8 +203,35 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   await nextFrame();
   recorder.start();
   set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
-  await sleep(600);
+  // 인트로(kbank2): 폰 위에 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 먼저 틀고, 끝나자마자 바로 시작화면으로
+  // (영상과 폰 틀이 같은 기기·같은 비율이라 상태바·손잡이가 안 끊기고 한 번의 녹화로 이어짐)
+  if (isIntroOn()) {
+    setClock(INTRO.clock);
+    setBattery(INTRO.battery);
+    await playIntro(target);
+  } else {
+    await sleep(600);
+  }
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
+}
+
+function playIntro(target: HTMLElement) {
+  return new Promise<void>((resolve) => {
+    const video = document.createElement("video");
+    video.src = INTRO.src;
+    video.muted = true;
+    video.playsInline = true;
+    video.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:999;";
+    const done = () => {
+      syncBlink(INTRO.blinkOnMs); // 영상 속 캠코더 깜빡임을 우리 상태바가 같은 위상으로 이어 받음
+      video.remove();
+      resolve();
+    };
+    video.addEventListener("ended", done, { once: true });
+    video.addEventListener("error", done, { once: true });
+    target.appendChild(video);
+    video.play().catch(done);
+  });
 }
 
 // 폰 화면 녹화 (폰 아래 [● 녹화] / 🔔 패널): 녹화하는 동안은 캡쳐모드로 테두리를 숨겼다가 끝나면 원래대로

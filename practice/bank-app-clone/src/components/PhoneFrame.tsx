@@ -4,7 +4,8 @@ import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../pla
 import { OS } from "../platform/platform";
 import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
 import { THEME } from "../platform/theme";
-import { APP } from "../profile/session";
+import { APP, HAS_INTRO } from "../profile/session";
+import { BLINK_MS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -103,6 +104,7 @@ function StatusBar() {
     <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${seam}` }) }}>
       <span className="statusbar__time">{time}</span>
       {OS === "android" && APP === "kbank" && <span className="statusbar__carrier">SKT</span>}
+      {OS === "android" && APP === "kbank" && HAS_INTRO && <KbankRecLeft />}
       {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : APP === "kbank" ? <KbankIcons /> : <AndroidIcons />}
     </div>
   );
@@ -131,13 +133,15 @@ function NavKeys() {
 
 // 케이뱅크 녹화 기기(갤럭시 One UI) 상태바 오른쪽 (녹화 cb67e5eb 0691 프레임을 dp 로, 아이콘 #494949):
 // 5G 상자(317.0~327.4, 아래 ↓↑) · 신호 막대 4개(332.6~343.0) · 배터리 알약(348.9~371.6 × 11.1~24.1, 바탕 #bab8b9, 잔량만큼 왼쪽 #494949, 가운데 흰 숫자).
-// 방해금지(⊖)·화면녹화 표시는 녹화하던 사람 기기 설정이라 뺌
+// 방해금지 ⊖(300.7~311.1)도 녹화 기기 그대로 (kbank2 인트로 영상과 이어지게). 화면녹화 표시는 kbank2 만 (KbankRecLeft)
 function KbankIcons() {
   const { battery } = useDeviceStatus();
   const lv = 348.9 + (22.7 * Math.max(0, Math.min(100, battery))) / 100;
   return (
     <span className="statusbar__right statusbar__right--kbank">
       <svg className="kb-sb-icons" width="384" height="33.2" viewBox="0 0 384 33.2" aria-hidden>
+        <circle cx="305.9" cy="17.6" r="5.2" fill="#494949" />
+        <rect x="302.6" y="16.85" width="6.6" height="1.5" rx="0.4" fill="#fff" />
         <rect x="317.2" y="11.3" width="10" height="6.6" rx="1.2" fill="#494949" />
         <text x="322.2" y="16.75" textAnchor="middle" fontSize="6.4" fontWeight="700" fill="#fff" fontFamily="Roboto, sans-serif">
           5G
@@ -161,6 +165,35 @@ function KbankIcons() {
         </text>
       </svg>
     </span>
+  );
+}
+
+// kbank2(녹화 인트로) 상태바 왼쪽: 인트로 영상 속 기기처럼 늘 화면녹화 중 표시 — 빨간 알약(가운데 ◉, 69.6~102.2 × 8.5~27)
+// + 모서리 괄호(107.7~120.4 × 11.4~23.8) 안에서 1초 주기로 깜빡이는 캠코더. 영상이 끝날 때 위상을 영상과 맞춤 (intro.ts syncBlink)
+function KbankRecLeft() {
+  const epoch = useBlinkEpoch();
+  return (
+    <svg className="kb-sb-left" width="384" height="33.2" viewBox="0 0 384 33.2" aria-hidden>
+      <rect x="69.6" y="8.6" width="32.6" height="18.4" rx="9.2" fill="#c42223" />
+      <circle cx="85.8" cy="17.7" r="2.6" fill="#fff" />
+      <circle cx="85.8" cy="17.7" r="4.6" fill="none" stroke="#fff" strokeWidth="1.3" strokeDasharray="5.2 2" strokeDashoffset="1" />
+      <path
+        d="M107.7 14.3v-2.9h2.9M117.5 11.4h2.9v2.9M120.4 20.9v2.9h-2.9M110.6 23.8h-2.9v-2.9"
+        fill="none"
+        stroke="#494949"
+        strokeWidth="1.05"
+      />
+      <KbankRecCam key={epoch} epoch={epoch} />
+    </svg>
+  );
+}
+function KbankRecCam({ epoch }: { epoch: number }) {
+  const [delay] = useState(() => -((performance.now() - epoch) % BLINK_MS));
+  return (
+    <g className="kb-sb-rec" fill="#494949" style={{ animationDelay: `${delay}ms` }}>
+      <rect x="111" y="15.9" width="5.4" height="4.6" rx="0.6" />
+      <path d="M116.2 17.6 118.1 16.2v4l-1.9-1.4Z" />
+    </g>
   );
 }
 
@@ -219,6 +252,7 @@ export function OsSwitch() {
           다크
         </a>
       </nav>
+      {HAS_INTRO && <IntroToggle />}
       <DeviceStatusControls />
       {/* 녹화: 누르면 앱을 처음(시작화면)부터 다시 띄우며 폰 화면만 녹화 */}
       {canRecord() && (
@@ -228,6 +262,21 @@ export function OsSwitch() {
         </button>
       )}
     </div>
+  );
+}
+
+// 녹화 인트로 켜기/끄기 (kbank2): 켜면 녹화 시작 때 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 앞에 이어 붙여 녹화
+function IntroToggle() {
+  const on = useIntro();
+  return (
+    <nav className="os-switch" title="녹화 인트로 (기기 홈 화면에서 앱을 찾아 켜는 영상을 녹화 앞에 이어 붙임)">
+      <a href="#" className={on ? "on" : ""} onClick={(e) => (e.preventDefault(), setIntro(true))}>
+        인트로 켜기
+      </a>
+      <a href="#" className={!on ? "on" : ""} onClick={(e) => (e.preventDefault(), setIntro(false))}>
+        인트로 끄기
+      </a>
+    </nav>
   );
 }
 
