@@ -1,0 +1,219 @@
+/* 이체 완료 (KbankDone). 큰 글자·로고·아래 버튼 자리는 kbank-send.css 의 .kbs-big · .kbs-pair · .kbs-bottom 을 같이 씀 (같은 자리, 프레임 1100·1210) */
+:where(.kbd button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.kbd-abs,
+.kbd-pair {
+  position: absolute;
+  margin: 0;
+  white-space: nowrap;
+}
+/* 셋째 줄 바꿈: '보낼까요?' 가 사라지며 '보내는 중이에요' 가 겹쳐 나타남 (1082~1087, ≈170ms) */
+.kbd-out {
+  animation: kbd-out 170ms linear both;
+}
+.kbd-in {
+  animation: kbd-in 170ms linear both;
+}
+.kbd-in--late {
+  animation-delay: 30ms;
+}
+@keyframes kbd-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes kbd-in {
+  from {
+    opacity: 0;
+  }
+}
+/* 확인중 버튼이 흐려지며 사라짐 (1081~1088, 230ms) */
+.kbd-leave {
+  animation: kbd-out 230ms linear forwards;
+}
+.kbd-leave__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* ✓ 잉크 165.3~218.7 × 169.2~206.3, 그려짐 (1155~1160, ≈170ms) */
+.kbd-check {
+  position: absolute;
+  left: 164px;
+  top: 167.9px;
+}
+.kbd-check path {
+  stroke-dasharray: 72;
+  stroke-dashoffset: 72;
+  animation: kbd-draw 200ms ease-out forwards;
+}
+@keyframes kbd-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* 받는계좌 | 은행 번호 : 가운데 367.1 */
+.kbd-rcv {
+  top: 356.1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #57585b;
+}
+.kbd-rcv i {
+  width: 1px;
+  height: 12px;
+  background: #dcdcdc;
+  margin: 0 7px;
+}
+/* 떠오르기: 200ms (1155~1160) */
+.kbd-up {
+  animation: kbd-up 200ms ease-out both;
+}
+@keyframes kbd-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+/* 공유 원 91.1~134.1 · 메세지 알약 148.4~292.2, 413.3~455.6 (#eef2f6) */
+.kbd-acts {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 413.3px;
+  height: 42.3px;
+}
+.kbd-share {
+  position: absolute;
+  left: 91.1px;
+  width: 43px;
+  height: 42.3px;
+  border-radius: 50%;
+  background: #eef2f6;
+  display: grid;
+  place-items: center;
+}
+.kbd-msg {
+  position: absolute;
+  left: 148.4px;
+  width: 143.8px;
+  height: 42.3px;
+  border-radius: 21.2px;
+  background: #eef2f6;
+  display: flex;
+  align-items: center;
+  padding-left: 16.9px;
+  box-sizing: border-box;
+  gap: 6.5px;
+  font-size: 16px;
+  color: #3a3e42;
+}
+.kbd-msg img {
+  width: 21.5px;
+  height: 23.4px;
+}
+/* 말풍선: 122.4~318.3 × 478.4~511.5 #4361ff, 꼭지 x 220.3 위로 4dp, 글자 15 흰색 */
+.kbd-tip {
+  position: absolute;
+  left: 122.4px;
+  top: 478.4px;
+  width: 195.9px;
+  height: 33.2px;
+  border-radius: 8px;
+  background: #4361ff;
+  color: #fff;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  padding-left: 15.6px;
+  box-sizing: border-box;
+  animation: kbd-in 170ms linear both;
+}
+.kbd-tip::before {
+  content: "";
+  position: absolute;
+  left: 92.4px;
+  top: -4px;
+  border: 5px solid transparent;
+  border-top: 0;
+  border-bottom: 4.2px solid #4361ff;
+}
+.kbd-tip button {
+  position: absolute;
+  right: 13px;
+  top: 0;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+/* 의견 카드: 19.5~364.5 × 620.3~695.1, #eef2f6 */
+.kbd-fb {
+  position: absolute;
+  left: 19.5px;
+  right: 19.5px;
+  top: 620.3px;
+  height: 74.8px;
+  border-radius: 10.5px;
+  background: #eef2f6;
+  text-align: left;
+}
+.kbd-fb > * {
+  position: absolute;
+  white-space: nowrap;
+}
+.kbd-fb__pen {
+  left: 22.8px;
+  top: 25.4px;
+}
+.kbd-fb__small {
+  left: 56.6px;
+  top: 15.7px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #54585c;
+}
+.kbd-fb__big {
+  left: 56.6px;
+  top: 36.8px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  color: #383c44;
+}
+.kbd-fb__gt {
+  right: 24.5px;
+  top: 30.4px;
+}
+/* 추가이체 19.5~139.9 (#ebf0fd) · 확인 147.7~364.5 (#0212a3), 723.1~779.1 */
+.kbd-btns {
+  position: absolute;
+  left: 19.5px;
+  right: 19.5px;
+  top: 723.1px;
+  height: 56px;
+  display: flex;
+  gap: 7.8px;
+}
+.kbd-btns button {
+  height: 100%;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 500;
+}
+.kbd-again {
+  width: 120.4px;
+  background: #ebf0fd;
+  color: #0b1a8c;
+}
+.kbd-ok {
+  flex: 1;
+  background: #0212a3;
+  color: #fff;
+}

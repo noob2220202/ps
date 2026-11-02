@@ -99,6 +99,8 @@ export function ScreenStack({ render }: { render: Render }) {
     // 스와이프로 이미 화면을 밀어냈으면 pop 애니메이션을 또 하지 않는다.
     // 안드로이드(카카오뱅크 영상)는 뒤로가기가 즉시 바뀌므로 pop 애니메이션 없음. 콕뱅크는 짧게 흐려짐.
     if (skipAnim.current || (OS === "android" && anim === "pop" && !NH_ANDROID)) anim = null;
+    // 케이뱅크 이체 완료 → 홈('확인'이 기록을 첫 칸까지 걷음 = POP): 녹화(41.8~42.1초)는 홈이 한 번에 나옴
+    if (KBANK_ANDROID && anim === "pop" && prevTop.pathname === "/send/done") anim = null;
     skipAnim.current = false;
     drag.current = null;
     setDragging(false);
