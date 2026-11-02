@@ -393,6 +393,29 @@
   color: var(--home-sub);
   padding: 4px;
 }
+/* 거래 행에서 이름·금액 부분만 눌러서 상세 편집을 열기 (삭제 ×는 그대로 옆에) */
+.tx-row__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  font: inherit;
+}
+
+/* 거래 상세 편집 (🔔 거래 탭: 거래 행을 눌렀을 때) */
+.tx-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--home-line);
+}
+.tx-edit .row > .field {
+  flex: 1;
+}
 
 /* 기본 탭 맨 위: 지금 프로필 */
 .current-profile {
