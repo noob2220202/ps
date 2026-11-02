@@ -107,15 +107,15 @@
   background: currentColor;
 }
 /* 글자: 녹화 글꼴은 한글이 넓고 띄어쓰기가 좁음 → '사장님' 폭에 맞춰 15px, 띄어쓰기·자간을 줄여 글줄 폭을 맞춤.
-   '사장님' 잉크 x 427~486px(277.9~317.0) = 알약 왼끝 + 18.2, 펼친 글줄 x 178~454px (115.9~296.1) */
+   '사장님' 잉크 x 427~486px(277.9~317.0) = 알약 왼끝 + 18.2 (점 포함), 글자는 + 22, 펼친 글줄 x 178~454px (115.9~296.1) */
 .kbh-pill__text {
   position: absolute;
-  left: 18px;
+  left: 21.4px;
   top: 6.3px;
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.3px;
-  word-spacing: -2.2px;
+  letter-spacing: -0.4px;
+  word-spacing: -0.8px;
 }
 /* 접힌 뒤엔 '사장님' 뒤가 없음 (접히는 동안만 잘린 채 보임, 녹화 410~416) */
 .kbh-pill--closed .kbh-pill__more,
