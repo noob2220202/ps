@@ -42,6 +42,13 @@ import { IbkHistory } from "./ibk/IbkHistory";
 import { IbkMenu } from "./ibk/IbkMenu";
 import { IbkResults } from "./ibk/IbkResults";
 import { IbkCertificate } from "./ibk/IbkCertificate";
+import "./kbank/kbank.css";
+import { KbankSplash } from "./kbank/KbankSplash";
+import { KbankHome } from "./kbank/KbankHome";
+import { KbankAccount } from "./kbank/KbankAccount";
+import { KbankTxDetail } from "./kbank/KbankTxDetail";
+import { KbankSend } from "./kbank/KbankSend";
+import { KbankDone } from "./kbank/KbankDone";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
@@ -102,7 +109,18 @@ const renderIbkRoute = (location: Location) => (
     <Route path="/results/:transferId" element={<IbkCertificate />} />
   </Routes>
 );
-const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute, ibk: renderIbkRoute };
+// 케이뱅크 (APP=kbank 9109, 녹화 인트로를 켠 kbank2 9111 — 화면은 같고 데이터는 따로).
+// 계좌 화면 = 잔액 카드 + 거래내역, 거래 상세는 아래에서 올라오는 전체 화면
+const renderKbankRoute = (location: Location) => (
+  <Routes location={location}>
+    <Route path="/" element={<KbankHome />} />
+    <Route path="/account/:accountId" element={<KbankAccount />} />
+    <Route path="/tx/:txId" element={<KbankTxDetail />} />
+    <Route path="/send" element={<KbankSend />} />
+    <Route path="/send/done" element={<KbankDone />} />
+  </Routes>
+);
+const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute, ibk: renderIbkRoute, kbank: renderKbankRoute };
 
 // 개발 중 매번 스플래시 보기 귀찮으면 주소 뒤에 ?skip
 const skipSplash = new URLSearchParams(location.search).has("skip");
@@ -146,7 +164,7 @@ export default function App() {
 
   return (
     <StatusBarProvider>
-      <PhoneFrame overlay={{ nh: <NhLoadingLayer />, hana: <HanaLoadingLayer />, ibk: <IbkLoadingLayer />, kakao: undefined }[APP]}>
+      <PhoneFrame overlay={{ nh: <NhLoadingLayer />, hana: <HanaLoadingLayer />, ibk: <IbkLoadingLayer />, kbank: undefined, kakao: undefined }[APP]}>
         {auth.status === "checking" && <PhoneOff />}
         {auth.status === "out" && <LoginScreen message={auth.message} />}
         {auth.status === "in" && boot === "off" && <PhoneOff />}
@@ -159,6 +177,8 @@ export default function App() {
             <HanaSplash onDone={toReady} />
           ) : APP === "ibk" ? (
             <IbkSplash onDone={toReady} />
+          ) : APP === "kbank" ? (
+            <KbankSplash onDone={toReady} />
           ) : (
             <Splash onDone={toLoading} />
           ))}

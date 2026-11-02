@@ -34,3 +34,5 @@ server/data-nh/
 server/data-hana/
 __pycache__/
 server/data-ibk/
+server/data-kbank/
+server/data-kbank2/

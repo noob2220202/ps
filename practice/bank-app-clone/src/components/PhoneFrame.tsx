@@ -102,7 +102,8 @@ function StatusBar() {
     // 콕뱅크: 28px 상태바가 기기 52.5px 에서 끝나 반 픽셀에 어두운 이음새가 생김 → 같은 색 그림자 1px 로 덮음
     <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${seam}` }) }}>
       <span className="statusbar__time">{time}</span>
-      {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : <AndroidIcons />}
+      {OS === "android" && APP === "kbank" && <span className="statusbar__carrier">SKT</span>}
+      {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : APP === "kbank" ? <KbankIcons /> : <AndroidIcons />}
     </div>
   );
 }
@@ -128,6 +129,41 @@ function NavKeys() {
   );
 }
 
+// 케이뱅크 녹화 기기(갤럭시 One UI) 상태바 오른쪽 (녹화 cb67e5eb 0691 프레임을 dp 로, 아이콘 #494949):
+// 5G 상자(317.0~327.4, 아래 ↓↑) · 신호 막대 4개(332.6~343.0) · 배터리 알약(348.9~371.6 × 11.1~24.1, 바탕 #bab8b9, 잔량만큼 왼쪽 #494949, 가운데 흰 숫자).
+// 방해금지(⊖)·화면녹화 표시는 녹화하던 사람 기기 설정이라 뺌
+function KbankIcons() {
+  const { battery } = useDeviceStatus();
+  const lv = 348.9 + (22.7 * Math.max(0, Math.min(100, battery))) / 100;
+  return (
+    <span className="statusbar__right statusbar__right--kbank">
+      <svg className="kb-sb-icons" width="384" height="33.2" viewBox="0 0 384 33.2" aria-hidden>
+        <rect x="317.2" y="11.3" width="10" height="6.6" rx="1.2" fill="#494949" />
+        <text x="322.2" y="16.75" textAnchor="middle" fontSize="6.4" fontWeight="700" fill="#fff" fontFamily="Roboto, sans-serif">
+          5G
+        </text>
+        <path d="M319.6 18.8v3.7m-1.5-1.5 1.5 1.5 1.5-1.5M324.8 22.5v-3.7m-1.5 1.5 1.5-1.5 1.5 1.5" stroke="#494949" strokeWidth="0.9" fill="none" />
+        <g fill="#494949">
+          <rect x="332.6" y="19.4" width="1.6" height="3.4" rx="0.5" />
+          <rect x="335.4" y="17.2" width="1.6" height="5.6" rx="0.5" />
+          <rect x="338.2" y="14.4" width="1.6" height="8.4" rx="0.5" />
+          <rect x="341.2" y="11.7" width="1.6" height="11.1" rx="0.5" />
+        </g>
+        <clipPath id="kb-batt">
+          <rect x="348.9" y="11.1" width="22.7" height="13" rx="6.5" />
+        </clipPath>
+        <g clipPath="url(#kb-batt)">
+          <rect x="348.9" y="11.1" width="22.7" height="13" fill="#bab8b9" />
+          <rect x="348.9" y="11.1" width={lv - 348.9} height="13" fill="#494949" />
+        </g>
+        <text x="361.2" y="21.3" textAnchor="middle" fontSize="9.6" fontWeight="500" fill="#eeeeee" fontFamily="Roboto, sans-serif">
+          {battery}
+        </text>
+      </svg>
+    </span>
+  );
+}
+
 // overlay: 상태바까지 폰 전체를 덮는 것 (콕뱅크 로딩 막)
 export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay?: ReactNode }) {
   const { fg } = useStatusBarStyle();
@@ -146,6 +182,11 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
       <div className="phone__viewport">{children}</div>
       {navbar && APP === "ibk" ? (
         <NavKeys />
+      ) : navbar && APP === "kbank" ? (
+        // 케이뱅크 녹화 기기: 제스처 내비게이션인데 검은 띠 없이 앱 위에 손잡이만 (124.3~259.0 × 824~828, #b0aeaf)
+        <div className="phone__gesture" aria-hidden>
+          <i />
+        </div>
       ) : navbar ? (
         <div className="phone__navbar">
           <i />

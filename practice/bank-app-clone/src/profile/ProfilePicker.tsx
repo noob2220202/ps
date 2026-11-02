@@ -26,8 +26,8 @@ const MAX = 5; // 서버 MAX_PROFILES 와 같게
 export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
   // 콕뱅크는 다크 화면뿐 → 프로필 고르기도 콕뱅크 바탕색
   useStatusBar(
-    APP === "nh" ? "#18171c" : APP === "hana" ? (THEME === "dark" ? "#191a1c" : "#ffffff") : APP === "ibk" ? "#fafafa" : "var(--home-bg)",
-    APP === "nh" || (THEME === "dark" && APP !== "ibk") ? "light" : "dark",
+    APP === "nh" ? "#18171c" : APP === "hana" ? (THEME === "dark" ? "#191a1c" : "#ffffff") : APP === "ibk" ? "#fafafa" : APP === "kbank" ? "#ffffff" : "var(--home-bg)",
+    APP === "nh" || (THEME === "dark" && APP !== "ibk" && APP !== "kbank") ? "light" : "dark",
   );
   const list = useApi<AppProfile[]>(paths.profiles);
   const [managing, setManaging] = useState(false);

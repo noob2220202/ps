@@ -1,7 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { APP, DATA, registry } from "./db.mjs";
+import { DATA, SERVER_ID, registry } from "./db.mjs";
 
 // ===== 로그인 계정 (은행마다 따로 — 서버 하나 = 앱 하나, 데이터 폴더가 따로라 계정도 따로) =====
 // 관리자(admin)가 계정을 만들고 이용 기간을 정함: 1일 / 7일 / 30일 / 영구 (만든 순간부터 줄어듦)
@@ -30,7 +30,7 @@ registry.exec(`
 if (!registry.prepare("SELECT 1 FROM pragma_table_info('profiles') WHERE name = 'owner_id'").get()) registry.exec("ALTER TABLE profiles ADD COLUMN owner_id TEXT");
 
 export const PLANS = { 1: 1, 7: 7, 30: 30, forever: null }; // 일 수 (null = 영구)
-export const COOKIE = `bank_sid_${APP}`;
+export const COOKIE = `bank_sid_${SERVER_ID}`; // kbank2 는 kbank 와 쿠키도 따로
 const SESSION_DAYS = 30;
 
 const hash = (password, salt) => scryptSync(String(password), salt, 32).toString("hex");
@@ -139,7 +139,7 @@ if (!registry.prepare("SELECT 1 FROM users WHERE role = 'admin'").get()) {
   if (!process.env.ADMIN_PASSWORD) {
     const file = resolve(DATA, "admin-password.txt");
     writeFileSync(file, `아이디: ${username}\n비밀번호: ${password}\n(로그인 후 관리 화면에서 비밀번호를 바꾸고 이 파일은 지워도 돼요)\n`);
-    console.log(`[${APP}] 관리자 계정을 만들었어요 → 아이디 ${username} / 비밀번호 ${password}  (${file})`);
+    console.log(`[${SERVER_ID}] 관리자 계정을 만들었어요 → 아이디 ${username} / 비밀번호 ${password}  (${file})`);
   }
   registry.prepare("UPDATE profiles SET owner_id = ? WHERE owner_id IS NULL").run(admin.id);
 }

@@ -6,9 +6,10 @@ import { defineConfig } from 'vite'
 // npm run dev:nh (= vite --mode nh) 는 콕뱅크: 화면 5174 + API 8788. VITE_APP=nh 는 .env.nh 에서
 // npm run dev:hana (= vite --mode hana) 는 하나원큐: 화면 5175 + API 8789. VITE_APP=hana 는 .env.hana 에서
 // npm run dev:ibk (= vite --mode ibk) 는 IBK기업은행 i-ONE Bank: 화면 5176 + API 8790. VITE_APP=ibk 는 .env.ibk 에서
+// npm run dev:kbank (= vite --mode kbank) 는 케이뱅크: 화면 5177 + API 8791. dev:kbank2 는 녹화 인트로를 켠 케이뱅크: 화면 5178 + API 8792
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   server: {
-    proxy: { '/api': { nh: 'http://localhost:8788', hana: 'http://localhost:8789', ibk: 'http://localhost:8790' }[mode] ?? 'http://localhost:8787' },
+    proxy: { '/api': { nh: 'http://localhost:8788', hana: 'http://localhost:8789', ibk: 'http://localhost:8790', kbank: 'http://localhost:8791', kbank2: 'http://localhost:8792' }[mode] ?? 'http://localhost:8787' },
   },
 }))

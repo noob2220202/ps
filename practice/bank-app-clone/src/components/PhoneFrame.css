@@ -332,3 +332,60 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
 .navkey--back:active {
   background: rgba(0, 0, 0, 0.06);
 }
+
+/* ---------- 케이뱅크 기기 (녹화 cb67e5eb, 384 × 833.08dp, 갤럭시 One UI 제스처 내비게이션) ----------
+   상태바 0~33.2 흰색. "SKT" 잉크 11.7~34.5 · 시각 39.7~65.1, 숫자 잉크 y 13.0~22.1 (Roboto, #494949, 시각만 굵게).
+   아래 제스처 손잡이는 앱 위에 겹쳐 그림 (검은 띠 없음) */
+html[data-app="kbank"] .statusbar--android {
+  position: relative;
+  height: 33.2px;
+  padding: 0;
+  justify-content: flex-start;
+  font-family: Roboto, sans-serif;
+  font-size: 12.8px;
+  letter-spacing: 0;
+  color: #494949;
+  transition: none;
+}
+html[data-app="kbank"] .statusbar--android .statusbar__carrier {
+  position: absolute;
+  left: 11.2px;
+  top: 22.1px;
+  line-height: 0;
+  font-weight: 400;
+}
+html[data-app="kbank"] .statusbar--android .statusbar__time {
+  position: absolute;
+  left: 39.2px;
+  top: 22.1px;
+  line-height: 0;
+  font-weight: 500;
+}
+.statusbar__right--kbank {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.kb-sb-icons {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.phone__gesture {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  z-index: 50;
+  pointer-events: none;
+}
+.phone__gesture i {
+  position: absolute;
+  left: 124.3px;
+  top: 7.2px; /* 화면 824 − (833.08 − 16) */
+  width: 134.7px;
+  height: 4px;
+  border-radius: 2px;
+  background: #b0aeaf;
+}

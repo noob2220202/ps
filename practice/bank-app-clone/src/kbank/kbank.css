@@ -1,0 +1,76 @@
+/* 케이뱅크 (녹화 cb67e5eb, 590 × 1280px = 384 × 833.08dp, 1dp = 1.53646px). 라이트만.
+   값은 녹화 px ÷ 1.53646 (theme.ts kb()), 앱 영역 y 는 상태바 33.2 를 뺀 값 (kbY()) */
+.kb {
+  --kb-blue: #0212a4; /* 로고·브랜드 */
+  --kb-text: #191919;
+  --kb-sub: #6b6b6b;
+  --kb-line: #ececec;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #ffffff;
+  color: var(--kb-text);
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  letter-spacing: 0;
+}
+
+/* 시작화면: 'Kbank' 녹화 x 123.66~260.3 · 화면 y 353.5~387.2 (앱 영역 y 320.3) */
+.kb-splash__logo {
+  position: absolute;
+  left: 123.66px;
+  top: 320.3px;
+  width: 136.68px;
+  height: 33.68px;
+}
+
+/* ---------- 머리줄 (header.tsx) ---------- */
+.kb-header {
+  position: relative;
+  height: 56px;
+  flex-shrink: 0;
+}
+.kb-header__back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 56px;
+}
+.kb-header__back svg,
+.kb-header__x svg {
+  display: block;
+}
+.kb-header__title {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  top: 0;
+  margin: 0;
+  line-height: 50px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kb-header__right {
+  position: absolute;
+  right: 21px;
+  top: 0;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+.kb-header__right button {
+  font: inherit;
+  color: inherit;
+}
+.kb-header__x {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  width: 44px;
+  height: 56px;
+}

@@ -15,6 +15,8 @@ import {
   removeProfileDb,
   runWithDb,
   APP,
+  INTRO,
+  SERVER_ID,
   SEEDS,
   transaction,
 } from "./db.mjs";
@@ -381,6 +383,7 @@ app.post("/api/accounts", (req, res) => {
   else if (APP === "nh" && bank.code !== "nh") fields.bankCode = "콕뱅크에는 농협 계좌만 추가할 수 있어요";
   else if (APP === "hana" && bank.code !== "hana") fields.bankCode = "하나원큐에는 하나은행 계좌만 추가할 수 있어요";
   else if (APP === "ibk" && bank.code !== "ibk") fields.bankCode = "i-ONE Bank에는 기업은행 계좌만 추가할 수 있어요";
+  else if (APP === "kbank" && bank.code !== "kbank") fields.bankCode = "케이뱅크에는 케이뱅크 계좌만 추가할 수 있어요";
   const nameError = checkName(name);
   if (nameError) fields.name = nameError;
   const digits = digitsOf(number);
@@ -401,7 +404,7 @@ app.post("/api/accounts", (req, res) => {
     formatted,
     balance,
     sort,
-    name?.trim() || ({ nh: "저축예금", hana: "입출금통장", ibk: "보통예금" }[APP] ?? null),
+    name?.trim() || ({ nh: "저축예금", hana: "입출금통장", ibk: "보통예금", kbank: "듀얼K 입출금통장" }[APP] ?? null),
   );
   res.status(201).json(toAccount(findAccount(id)));
 });
@@ -438,7 +441,7 @@ app.patch("/api/accounts/:id", (req, res) => {
 // 다른 은행 계좌 삭제 (거래내역도 ON DELETE CASCADE로 같이 지워짐)
 app.delete("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌", ibk: "대표계좌" }[APP]}은 지울 수 없어요`);
+  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌", ibk: "대표계좌", kbank: "대표계좌" }[APP]}은 지울 수 없어요`);
   db().prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
   res.status(204).end();
 });
@@ -821,13 +824,13 @@ const dist = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
 if (existsSync(dist)) {
   // 화면은 세 앱이 같은 빌드를 쓰고, 어느 앱인지는 index.html에 끼워 넣어 알려준다 (window.__BANK_APP__)
   const html = readFileSync(resolve(dist, "index.html"), "utf8")
-    .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank" }[APP]} 클론 연습</title>`)
-    .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};</script></head>`);
+    .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank", kbank: "케이뱅크" }[APP]} 클론 연습</title>`)
+    .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};${INTRO ? " window.__BANK_INTRO__ = true;" : ""}</script></head>`);
   app.use(express.static(dist, { index: false })); // "/" 도 아래에서 (index.html을 그대로 주면 앱 정보가 빠짐)
   // /account/main 같은 주소로 바로 들어와도 index.html을 줘야 화면 쪽 라우터가 처리할 수 있다
   app.get("/{*path}", (_req, res) => res.type("html").send(html));
 }
 
 const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107 }[APP]));
-app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${APP}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));
+const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111 }[SERVER_ID]));
+app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${SERVER_ID}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));
