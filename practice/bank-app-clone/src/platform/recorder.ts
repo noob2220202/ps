@@ -11,6 +11,7 @@ import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { isIntroOn, syncBlink } from "./intro";
 import { setBattery, setClock } from "./deviceStatus";
+import { OS } from "./platform";
 import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
 import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
 
@@ -217,7 +218,8 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
 
   // 인트로(kbank2): 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 폰 위에 덮어 첫 장면까지 받아 둔 뒤 녹화 시작
   // → 녹화 첫 프레임이 영상 첫 장면 (받는 동안의 검은 화면이 녹화 앞에 붙지 않게)
-  const intro = isIntroOn() ? await loadIntro(target) : null;
+  // 영상은 갤럭시 기기 화면이라 아이폰 모드(?os=ios)에선 틀지 않음
+  const intro = isIntroOn() && OS === "android" ? await loadIntro(target) : null;
   // 앱을 검은 화면으로 돌려 놓고, 그 모습이 한 프레임 그려진 뒤 녹화 시작 → 시작화면부터
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
   await nextFrame();

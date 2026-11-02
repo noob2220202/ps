@@ -391,6 +391,12 @@ html[data-app="kbank"] .statusbar--android .statusbar__time {
   border-radius: 2px;
   background: #b2b2b2;
 }
+/* 진짜 폰 화면(500px 이하)에선 기기의 손잡이가 따로 있으니 그리지 않음 (다른 앱의 홈 인디케이터·3버튼 바와 같음) */
+@media (max-width: 500px) {
+  .phone__gesture {
+    display: none;
+  }
+}
 /* kbank2: 상태바 왼쪽 화면녹화 표시 (PhoneFrame KbankRecLeft). 캠코더는 0.986초 주기 반 켜짐 (길이는 intro.ts BLINK_MS 를 style 로) */
 .kb-sb-left {
   position: absolute;

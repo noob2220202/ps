@@ -289,7 +289,7 @@ export function OsSwitch() {
           다크
         </a>
       </nav>
-      {HAS_INTRO && <IntroToggle />}
+      {HAS_INTRO && OS === "android" && <IntroToggle />}
       <DeviceStatusControls />
       {/* 녹화: 누르면 앱을 처음(시작화면)부터 다시 띄우며 폰 화면만 녹화 */}
       {canRecord() && (
@@ -302,7 +302,7 @@ export function OsSwitch() {
   );
 }
 
-// 녹화 인트로 켜기/끄기 (kbank2): 켜면 녹화 시작 때 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 앞에 이어 붙여 녹화
+// 녹화 인트로 켜기/끄기 (kbank2, 갤럭시 모드만 — 영상이 갤럭시 화면): 켜면 녹화 시작 때 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 앞에 이어 붙여 녹화
 function IntroToggle() {
   const on = useIntro();
   return (
