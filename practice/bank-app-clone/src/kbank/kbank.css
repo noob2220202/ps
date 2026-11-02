@@ -48,7 +48,7 @@
   position: absolute;
   left: 60px;
   right: 60px;
-  top: 15.1px;
+  top: 15.7px;
   margin: 0;
   line-height: 18px;
   text-align: center;
@@ -62,8 +62,8 @@
 /* '관리' 16px: 잉크 y 16.9~31.2 (화면 77~99px), 오른쪽 끝 362.5 (517~557px) */
 .kb-header__right {
   position: absolute;
-  right: 20.4px;
-  top: 17.2px;
+  right: 19.8px;
+  top: 17.8px;
   line-height: 16px;
   display: flex;
   align-items: center;

@@ -40,7 +40,7 @@ function Skeleton() {
         </span>
       ))}
       <b style={{ top: 389.2 }} />
-      {[0, 1, 2, 3].map((n) => (
+      {[0, 1, 2].map((n) => (
         <span key={n}>
           <i style={{ left: 19.5, top: 423.7 + n * 106.1, width: 110.6, height: 13.7 }} />
           <i style={{ left: 19.5, top: 445.8 + n * 106.1, width: 142.5, height: 20.2 }} />

@@ -161,7 +161,7 @@ export function KbankTxDetail() {
               </div>
               <div className="kbt-row" style={{ top: 507.4 }}>
                 <dt>받는 분에게 표기</dt>
-                <dd>{home.data?.profile.userName ?? ""}</dd>
+                <dd>{detail.data?.memoTo || home.data?.profile.userName || ""}</dd>
               </div>
               <div className="kbt-line" style={{ top: 541.6 }} />
               <div className="kbt-btns" style={{ top: 566.9 }}>

@@ -74,6 +74,7 @@ export interface TransactionDetail extends Transaction {
   phone?: string;
   memo?: string; // 거래메모 (콕뱅크)
   transfer?: { bank: Bank; number: string; holder: string }; // 내가 보낸 이체면 받은 계좌
+  memoTo?: string; // 보낼 때 받는 분 통장에 표시한 글자 (없으면 내 이름)
 }
 
 export interface Banner {

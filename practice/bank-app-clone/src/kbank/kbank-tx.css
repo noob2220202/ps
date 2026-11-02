@@ -187,9 +187,9 @@
 }
 
 /* 이 화면으로 들어오고 나갈 때는 ScreenStack 의 케이뱅크 가로 밀기(새 화면 · 밑 화면 시차 밀기)를 끄고 위 올라오기/내려가기만 (녹화엔 가로 움직임 없음, 밑 계좌 화면은 그대로) */
-html[data-app="kbank"] .layer--push-enter:has(> .kbt),
-html[data-app="kbank"] .layer--pop-exit:has(> .kbt),
-html[data-app="kbank"] .layer--push-exit:has(~ .layer--push-enter > .kbt),
-html[data-app="kbank"] .layer--pop-enter:has(~ .layer--pop-exit > .kbt) {
+html[data-app="kbank"] .layer.layer--push-enter:has(> .kbt),
+html[data-app="kbank"] .layer.layer--pop-exit:has(> .kbt),
+html[data-app="kbank"] .layer.layer--push-exit:has(~ .layer--push-enter > .kbt),
+html[data-app="kbank"] .layer.layer--pop-enter:has(~ .layer--pop-exit > .kbt) {
   animation: none;
 }

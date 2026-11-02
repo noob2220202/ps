@@ -48,19 +48,20 @@ html[data-app="hana"][data-os="android"] .layer--push-enter {
 html[data-app="hana"][data-os="android"] .layer--pop-exit {
   animation: layer-slide-out var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
 }
-/* 케이뱅크(갤럭시): 하나원큐처럼 오른쪽에서 밀고 들어옴(250ms 감속, 녹화 홈 → 계좌 · 계좌 → 이체), 뒤로가기는 오른쪽으로 밀려 나감 */
+/* 케이뱅크(갤럭시): 새 화면이 오른쪽에서 밀고 들어옴 200ms (홈 → 계좌 raw 43.70~43.95초 587→437→345→174→101→53→22→0px),
+   뒤로가기는 오른쪽으로 밀려 나감. 거래 상세(.kbt)는 아래에서 올라오는 따로 된 움직임 (kbank-tx.css) */
 html[data-app="kbank"][data-os="android"] .layer--push-enter {
-  animation: layer-slide-in var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
+  animation: layer-slide-in var(--nav-ms) cubic-bezier(0.22, 0, 0.38, 1) both;
 }
 html[data-app="kbank"][data-os="android"] .layer--pop-exit {
-  animation: layer-slide-out var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
+  animation: layer-slide-out var(--nav-ms) cubic-bezier(0.22, 0, 0.38, 1) both;
 }
-/* 밑의 화면은 왼쪽으로 조금 밀림 (녹화 21.97~22.17초 계좌 → 이체, 시차 밀기) — 뒤로가기는 거꾸로 */
-html[data-app="kbank"][data-os="android"] .layer--push-exit {
-  animation: kb-under-out var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
+/* 이체 화면이 오갈 때만 밑의 화면이 왼쪽으로 조금 밀림 (녹화 21.97~22.17초 계좌 → 이체, 시차 밀기). 홈 → 계좌는 밑의 홈이 그대로 */
+html[data-app="kbank"][data-os="android"] .layer--push-exit:has(~ .layer--push-enter > .kbs) {
+  animation: kb-under-out var(--nav-ms) cubic-bezier(0.22, 0, 0.38, 1) both;
 }
-html[data-app="kbank"][data-os="android"] .layer--pop-enter {
-  animation: kb-under-in var(--nav-ms) cubic-bezier(0.2, 0, 0, 1) both;
+html[data-app="kbank"][data-os="android"] .layer--pop-enter:has(~ .layer--pop-exit > .kbs) {
+  animation: kb-under-in var(--nav-ms) cubic-bezier(0.22, 0, 0.38, 1) both;
 }
 @keyframes kb-under-out {
   to {

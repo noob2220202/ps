@@ -496,6 +496,7 @@ function txDetailJson(id) {
     memo: t.memo ?? "",
     // 내가 보낸 이체면(또는 🔔 패널에서 상대 정보를 지정했으면) 받은 은행/계좌 (콕뱅크 거래 상세의 입금은행·입금계좌)
     ...(sent && { transfer: { bank: bankInfo(bankByCode(sent.bank_code)), number: sent.number, holder: sent.holder } }),
+    ...(sent?.memo_to && { memoTo: sent.memo_to }), // 받는 분 통장에 찍힌 글자 (케이뱅크 거래 상세 '받는 분에게 표기')
   };
 }
 

@@ -27,7 +27,10 @@ const NH_ANDROID = APP !== "kakao" && OS === "android";
 const HANA_ANDROID = APP === "hana" && OS === "android";
 // 케이뱅크(갤럭시) 녹화: 새 화면(대개 뼈대 로딩 상태)이 오른쪽에서 밀고 들어옴, 뒤 화면은 그대로 (19.73~19.93초 왼끝 49→31→20→11→3→0%)
 const KBANK_ANDROID = APP === "kbank" && OS === "android";
-const navMs = (anim: Anim | null) => (KBANK_ANDROID ? 250 : HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS]);
+// 거래 상세(/tx/)는 아래에서 올라옴 445ms · 내려감 413ms (raw 58.94~59.32초 · 65.21~65.62초, 움직임은 kbank-tx.css), 그 밖의 밀기는 200ms
+const kbankMs = (anim: Anim | null, path: string) => (path.startsWith("/tx/") ? (anim === "pop" ? 413 : 445) : 200);
+const navMs = (anim: Anim | null, path = "") =>
+  KBANK_ANDROID ? kbankMs(anim, path) : HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS];
 // i-ONE Bank(갤럭시) 녹화: 화면 사이는 대부분 전환 없이 한 번에 바뀜(로딩 점·빈 바탕은 src/ibk/loading.ts).
 // 이동할 때 location.state.ibkAnim 으로 고른 곳만 밀기 (src/ibk/nav.ts: 메뉴 열기·닫기, 본문만 밀기)
 const IBK_ANDROID = APP === "ibk" && OS === "android";
@@ -50,6 +53,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const [exiting, setExiting] = useState<{ loc: Location; anim: Anim } | null>(null);
   const [enterAnim, setEnterAnim] = useState<Anim | null>(null);
   const [ibkAnim, setIbkAnim] = useState<IbkAnim | null>(null);
+  const [animMs, setAnimMs] = useState(0); // 지금 전환 길이 (--nav-ms)
   // 드래그 "중인지"만 state. 손가락 위치(dx)는 매 프레임 바뀌므로 ref + DOM 직접 조작.
   const [dragging, setDragging] = useState(false);
   const skipAnim = useRef(false);
@@ -108,10 +112,12 @@ export function ScreenStack({ render }: { render: Render }) {
     setExiting(anim ? { loc: prevTop, anim } : null);
     if (!anim) return;
 
+    const ms = navMs(anim, anim === "pop" ? prevTop.pathname : location.pathname); // 케이뱅크는 어느 화면이 오가는지에 따라 길이가 다름
+    setAnimMs(ms);
     const id = setTimeout(() => {
       setExiting(null);
       setEnterAnim(null);
-    }, navMs(anim));
+    }, ms);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
@@ -244,7 +250,7 @@ export function ScreenStack({ render }: { render: Render }) {
         <div
           key={l.loc.key}
           className={ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : l.className}
-          style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : navMs(exiting?.anim ?? enterAnim)}ms` }}
+          style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : animMs || navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
           onAnimationEnd={ibkAnim ? onIbkAnimEnd : undefined}
           {...(l.active && {
