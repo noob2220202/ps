@@ -1,7 +1,11 @@
-/* 이체 (KbankSend). 값은 녹화 px ÷ 1.53646, y 는 앱 영역 기준(화면 y − 33.2). 프레임 번호는 30fps 기준 */
+/* 이체 (KbankSend). 값은 녹화 px ÷ 1.53646, y 는 앱 영역 기준(화면 y − 33.2). 프레임 번호는 30fps 기준.
+   글꼴은 Pretendard(.kb, ss01) 그대로 — 녹화 dp = CSS px, 굵기는 400/500/700 셋만 (FONT.md). 글자 위치는 녹화 정지 구간 평균과
+   잉크 상자를 겹쳐 맞춤 (scratchpad review/send/ink.py, 1 녹화 px = 0.65dp 안).
+   아래쪽 부품(숫자판·다음·보내기·표·AI 알약)은 앱 바닥에서 잼: 안드로이드 제스처 16dp, 아이폰은 홈 인디케이터 안전영역(--safe-bottom) */
 .kbs {
   --kbs-blue: #0012a5; /* 다음·보내기 (프레임 860 (300,1170)) */
   --kbs-name: #4862f7; /* 확인 '○○' · › (프레임 950) */
+  --kbs-floor: max(16px, var(--safe-bottom, 0px)); /* 앱 바닥에서 비워 둘 높이 (안드로이드 16 = 제스처 손잡이) */
 }
 :where(.kbs button) {
   font: inherit;
@@ -35,33 +39,34 @@
   background: #eff0f3;
   border-radius: 6px;
 }
+/* 세로 경계 (프레임 667~676 평균, x 40·100·200 줄): 제목 72.9~105.4 · 탭 121.1~169.2 · 입력 193.3~265.5 · 소제목 292.9~317.6 */
 .kbs-sk--title {
   left: 19.5px;
-  top: 73px;
+  top: 72.9px;
   width: 205px;
-  height: 34px;
+  height: 32.5px;
 }
 .kbs-sk--seg {
   left: 19.5px;
   right: 19.5px;
-  top: 118px;
-  height: 52px;
+  top: 121.1px;
+  height: 48.1px;
 }
 .kbs-sk--input {
   left: 19.5px;
   right: 19.5px;
-  top: 192.3px;
-  height: 73.7px;
+  top: 193.3px;
+  height: 72.2px;
 }
 .kbs-sk--sec {
   left: 19.5px;
-  width: 90px;
-  height: 25px;
+  width: 88.6px;
+  height: 24.7px;
 }
 .kbs-sk--secr {
-  left: 315px;
+  right: 19.5px;
   width: 49.5px;
-  height: 26px;
+  height: 24.7px;
 }
 .kbs-sk--dot {
   left: 19.5px;
@@ -69,15 +74,16 @@
   height: 35.2px;
   border-radius: 50%;
 }
+/* 행 두 줄: 349.5~373.6 · 377.5~401.6 (피치 84, 둘째 묶음 581.9 · 609.8) */
 .kbs-sk--l1 {
   left: 72.9px;
   width: 186px;
-  height: 25.6px;
+  height: 24.3px;
 }
 .kbs-sk--l2 {
   left: 72.9px;
   width: 257.6px;
-  height: 24.6px;
+  height: 24.3px;
 }
 
 /* ---------- 어디로 돈을 보낼까요? (프레임 700). 본문은 머리줄(56) 아래에서 스크롤 → 안쪽 top = 앱 y − 56 ---------- */
@@ -193,12 +199,14 @@
   height: 0;
 }
 /* + 다른 은행 계좌 불러오기: 원 지름 32.5 (#ebeef9), 글자 x 64.4, 가운데 375.9 */
+/* 글자 16 500 (FONT.md 맞춤 478) */
 .kbs-other {
   left: 19.5px;
   display: flex;
   align-items: center;
   height: 32.5px;
   font-size: 16px;
+  font-weight: 500;
   color: #1a1a1a;
 }
 .kbs-other__plus {
@@ -210,9 +218,9 @@
   place-items: center;
   margin-right: 12.4px;
 }
-/* 편집하기: 279.9~364.5 × 440~472, #edf1f6, 글자 #031199 */
+/* 편집하기: 279.9~364.5 × 440~472, #edf1f6, 글자 14 500 #031199 (FONT.md 맞춤 462) 잉크 x 290.3 · ✎ 잉크 343.9~354.7 × 451.7~462 (프레임 682~701) */
 .kbs-edit {
-  left: 279.9px;
+  right: 19.5px;
   width: 84.6px;
   top: 384px;
   height: 32px;
@@ -220,13 +228,15 @@
   background: #edf1f6;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
+  padding-left: 10.2px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: #031199;
 }
-/* 행: 피치 78.1, 로고 원 36.4 (가운데 511.2), 이름 가운데 −10.4 · 17, 계좌 +12.1 · 14 #5f6069, ☆ 가운데 x 350 */
+.kbs-edit svg {
+  margin-left: 5.9px;
+}
+/* 행: 피치 78.1, 로고 원 36.4 (가운데 511.2), 이름 16 500 (한글 잉크 높이 14.3 ÷ 0.9) 잉크 위 행 위 + 20.5, 계좌 14 400 잉크 위 + 44.6 #5f6069, ☆ 가운데 x 350.2 */
 .kbs-row {
   left: 0;
   right: 0;
@@ -246,8 +256,8 @@
 }
 .kbs-row__name {
   left: 67.3px;
-  top: 17.6px;
-  font-size: 17px;
+  top: 16.75px;
+  font-size: 16px;
   line-height: 22px;
   font-weight: 500;
   color: #16171a;
@@ -262,25 +272,23 @@
   white-space: nowrap;
 }
 .kbs-star {
-  right: 13px;
+  right: 14px;
   top: 19px;
   width: 40px;
   height: 40px;
   display: grid;
   place-items: center;
 }
-/* AI 알약: 93.1~290.3 × 676.2~727 (프레임 700), 흰 바탕 + 파란 번짐, 글자 16 굵게 x 133.4 */
+/* AI 알약: 93.1~290.3 × 676.2~727 (프레임 700, 가운데 x 191.7 · 바닥에서 72.7), 흰 바탕 + 파란 번짐, 글자 16 700 x 133.4
+   번짐: 알약 가장자리 rgb(224,236,253) → 22dp 밖에서 흰색 (프레임 682~701 세로·가로 줄) = 0 0 24px rgba(41,124,241,.29) */
 .kbs-ai {
   position: absolute;
-  left: 93.1px;
-  top: 676.2px;
+  left: calc(50% - 98.9px);
+  bottom: calc(var(--kbs-floor) + 56.7px);
   width: 197.2px;
   height: 51px;
   border-radius: 26px;
   background: #fff;
-  box-shadow:
-    0 0 14px rgba(72, 120, 247, 0.22),
-    0 2px 6px rgba(72, 98, 247, 0.08);
   display: flex;
   align-items: center;
   font-size: 16px;
@@ -290,7 +298,7 @@
   isolation: isolate;
   animation: kbs-ai-in 260ms ease-out both;
 }
-/* 알약 둘레의 흰 번짐: 뒤 목록 글자가 흐려 보임 (프레임 700 '새마을금고' 줄) */
+/* 알약 둘레의 흰 번짐(뒤 목록 글자가 흐려 보임, 프레임 700 '새마을금고' 줄) 위에 파란 번짐 */
 .kbs-ai::before {
   content: "";
   position: absolute;
@@ -298,11 +306,19 @@
   border-radius: 40px;
   background: rgba(255, 255, 255, 0.75);
   filter: blur(8px);
+  z-index: -2;
+}
+.kbs-ai::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 24px rgba(41, 124, 241, 0.29);
   z-index: -1;
 }
 .kbs-ai img {
   position: absolute;
-  left: 15.5px;
+  left: 14.5px;
   top: 14.5px;
   width: 22.1px;
   height: 23.4px;
@@ -318,12 +334,12 @@
   }
 }
 
-/* ---------- 아래 버튼 (다음·보내기): 19.5~364.5 × 723.1~779.1, 반지름 12 ---------- */
+/* ---------- 아래 버튼 (다음·보내기): 19.5~364.5 × 723.1~779.1 (앱 바닥 799.9 에서 20.8 위), 반지름 12 ---------- */
 .kbs-bottom {
   position: absolute;
   left: 19.5px;
   right: 19.5px;
-  top: 723.1px;
+  bottom: calc(var(--kbs-floor) + 4.8px);
   height: 56px;
   z-index: 2;
 }
@@ -341,39 +357,50 @@
   color: #ccd1de;
   cursor: default;
 }
-/* 확인중 (프레임 1000: #3242b7) */
+/* 확인중 (프레임 982~1044: 바탕 #3242b7). 점 지름 4.5 #909ede, 가운데 x 156.6 · 164.8 · 172.1, y 752.9 (쉴 때)
+   '확인중' 18 500 잉크 x 185.0~231.7 · 위 742.6 (보내기 글자와 같은 높이) */
 .kbs-btn--check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #3242b7;
   cursor: default;
 }
 .kbs-checking {
   display: inline-flex;
   align-items: center;
-  gap: 2.4px;
+  height: 18px;
+  line-height: 18px;
+  position: relative;
+  left: 0.6px;
 }
 .kbs-checking i {
-  width: 3px;
-  height: 3px;
+  width: 4.5px;
+  height: 4.5px;
+  margin-right: 3.3px;
   border-radius: 50%;
-  background: #fff;
-  animation: kbs-dot 900ms infinite;
+  background: #909ede;
+  position: relative;
+  top: 2.3px;
+  animation: kbs-jump 630ms ease-in-out 80ms infinite;
 }
 .kbs-checking i:nth-child(2) {
-  animation-delay: 150ms;
+  animation-delay: 260ms;
 }
 .kbs-checking i:nth-child(3) {
-  animation-delay: 300ms;
+  margin-right: 10.4px;
+  animation-delay: 440ms;
 }
-.kbs-checking span {
-  margin-left: 6px;
-}
-@keyframes kbs-dot {
+/* 점 하나: 0.13초에 2.85 올라 0.15초 머물고 0.13초에 내려옴 (프레임 984~997) */
+@keyframes kbs-jump {
   0%,
+  66%,
   100% {
-    opacity: 0.35;
+    transform: none;
   }
-  40% {
-    opacity: 1;
+  21%,
+  45% {
+    transform: translateY(-2.85px);
   }
 }
 
@@ -406,14 +433,16 @@
   margin: 0;
   white-space: nowrap;
 }
-/* 'K 케이뱅크(0110) 에서' 가운데 84.3 · '님에게' 117.8, 로고 지름 20.8 x 19.5, 글자 x 44.3 */
+/* 'K 케이뱅크(…) 에서' 가운데 84.3 · '님에게' 117.8, 로고 지름 20.8 x 19.5, 글자 x 44.3
+   은행·이름 16 700, '에서'·'님에게' 16 500 #565a62 (프레임 764~908 맞춤: '케이뱅크' 폭비 1.000 · '님에게' 500 잉크량 0.99, 400 은 0.83) */
 .kbs-amt__line {
   left: 19.5px;
   height: 22px;
   display: flex;
   align-items: center;
   gap: 3.9px;
-  font-size: 17px;
+  font-size: 16px;
+  font-weight: 500;
   color: #565a62;
 }
 .kbs-amt__line b {
@@ -425,6 +454,14 @@
 }
 .kbs-amt__line--to {
   top: 106.8px;
+}
+/* 로고 가운데 y 83.6 · 116.5 (프레임 737~762, 글자 줄 가운데보다 0.7 · 1.3 위) */
+.kbs-amt__line > :first-child {
+  position: relative;
+  top: -0.7px;
+}
+.kbs-amt__line--to > :first-child {
+  top: -1.3px;
 }
 /* 금액칸: 가운데 202.4, 26 굵게. 자리표시 #818a9d x 24.1, 커서 19.5~21.5 × 184.2~220.6 #4c60e0 */
 .kbs-amt__field {
@@ -445,7 +482,15 @@
   color: #131719;
   display: inline-flex;
   align-items: center;
-  margin-left: 0.6px;
+  margin-left: -1.7px;
+}
+/* 굵은 금액의 '1': 좌우 0.06em 넓게 (FONT.md '1' 뒤 +0.071em) */
+.kbs-one {
+  margin: 0 0.06em;
+}
+/* 방금 누른 자리: 160ms 페이드 (프레임 763~768) */
+.kbs-new {
+  animation: kbs-fade 160ms linear both;
 }
 .kbs-caret {
   display: inline-block;
@@ -454,23 +499,23 @@
   background: #4c60e0;
   animation: kbs-blink 1s step-end infinite;
 }
+/* 입력 중 커서는 글자 사이에 겹쳐 그림 (안드로이드 EditText: 자리를 차지하지 않음) — 녹화 커서 31.5~33.7 × 184.2~220.6, '1' 잉크 오른쪽 29.1 · '원' 34.5 */
 .kbs-amt__value .kbs-caret {
-  height: 30px;
-  margin: 0 0.5px;
+  margin: 0 -1.8px 0 -0.2px;
 }
 @keyframes kbs-blink {
   50% {
     opacity: 0;
   }
 }
-/* ⓧ : 66.4~82.0 (프레임 860) */
+/* ⓧ : 잉크 65.7~82.7 × 193.9~210.9 (프레임 764~908) */
 .kbs-amt__clear {
-  margin-left: 10.5px;
-  width: 16px;
-  height: 16px;
+  margin-left: 9.9px;
+  width: 16.6px;
+  height: 16.6px;
   display: grid;
 }
-/* 출금 가능금액 | 1원 : 가운데 239.8, 16 #55565a, 구분선 x 114.5 #e4e4e4, 잔액 밑줄 #28272a */
+/* 출금 가능금액 | 1원 : 가운데 239.8, 16 500 #55565a (FONT.md 맞춤 478), 구분선 x 114.5 #e4e4e4, 잔액 밑줄 #28272a */
 .kbs-amt__avail {
   left: 19.5px;
   top: 228.8px;
@@ -480,51 +525,66 @@
   display: flex;
   align-items: center;
 }
+.kbs-amt__avail > span {
+  font-weight: 500;
+}
+/* 구분선 x 114.8 (프레임 737~762) */
 .kbs-amt__sep {
   width: 1px;
   height: 12px;
   background: #e4e4e4;
-  margin: 0 8px 0 7px;
+  margin: 0 8px 0 8.1px;
 }
 .kbs-amt__avail u {
+  font-weight: 500;
   color: #28272a;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
-/* 칩: 390~422 (h 32), 폭 79.5 · 사이 9, #ecf1fe, 글자 14 #091a8a */
+/* 칩·숫자판 묶음: 칩 위 390.6 ~ 숫자판 아래 710.45 → 앱 바닥(799.9)에서 89.4 위 */
 .kbs-pad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--kbs-floor) + 73.4px);
+  height: 319.9px;
   animation: kbs-fade 130ms linear 100ms both;
 }
+/* 칩: 390.6~422.5, 폭 80.1 · 사이 8.2 (경계 19.5|99.6 108.0|188.1 195.9|276.0 284.4|364.5), #ecf1fe, 글자 14 400 #091a8a (FONT.md 맞춤 363~389) */
 .kbs-chips {
   position: absolute;
   left: 19.5px;
   right: 19.5px;
-  top: 390px;
-  height: 32px;
+  top: 0;
+  height: 31.9px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 9px;
+  gap: 8.2px;
 }
 .kbs-chip {
   border-radius: 8px;
   background: #ecf1fe;
+  padding-bottom: 1.2px;
   font-size: 14px;
-  font-weight: 500;
   color: #091a8a;
 }
-/* 숫자: 줄 가운데 473.5 피치 67.7, 열 128 씩, 28 */
+/* 숫자: 줄 가운데 472.6 · 541.1 · 609.1 · 677.1 (FONT.md lh1 위 458.6 · 527.1 · 595.1 · 663.1 + 14), 열 가운데 64 · 192 · 320, 28 400 */
 .kbs-keys {
   position: absolute;
   left: 0;
   right: 0;
-  top: 439.65px;
+  top: 49.05px;
   display: grid;
-  grid-template-columns: repeat(3, 128px);
+  grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 67.7px;
+}
+.kbs-keys > :nth-child(-n + 3) {
+  padding-bottom: 1.8px;
 }
 .kbs-key {
   display: grid;
   place-items: center;
+  padding: 0;
   font-size: 28px;
   line-height: 1;
   color: #181818;
@@ -539,7 +599,7 @@
   margin: 0;
   white-space: nowrap;
 }
-/* K › B : 로고 지름 48.8, 가운데 y 193.3, K x 144.2 · B x 240.5 · › x 191.4 */
+/* K › B : 로고 지름 48.8, 가운데 y 193.3, K x 144.2 · B x 240.5 · › x 191.4 (화면 가운데 192 기준 — 아이폰 402 폭에서도 가운데) */
 .kbs-pair {
   left: 0;
   right: 0;
@@ -550,40 +610,98 @@
   position: absolute;
 }
 .kbs-pair > :first-child {
-  left: 119.8px;
+  left: calc(50% - 72.2px);
   top: 0;
 }
 .kbs-pair > :last-child {
-  left: 216.1px;
+  left: calc(50% + 24.1px);
   top: 0;
 }
 .kbs-pair__gt {
-  left: 187px;
+  left: calc(50% - 5px);
   top: 17.4px;
 }
+/* 보내는 중 ››› (프레임 1081~1153, 화살표 꼭짓점 x): 확인의 › (194) 가 70ms 뒤 187 로 물러났다가(1083) 230~400ms 에 셋으로 펼쳐짐(1088~1093)
+   → 옅은 187 (불투명 0.12) · 중간 193 (0.39) · 진한 198.5 가 0.55초마다 194.3 · 201.5 까지 늘었다 줄었다 함 (1103 · 1120 · 1137) */
 .kbs-pair__run {
-  left: 181px;
-  top: 18.4px;
-  display: flex;
-  gap: 0;
+  left: calc(50% - 12px);
+  top: 17.4px;
+  width: 30px;
+  height: 14px;
 }
 .kbs-pair__run svg {
-  margin-right: -1px;
-  animation: kbs-run 900ms infinite;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.kbs-pair__run svg:nth-child(1) {
+  opacity: 0.12;
+  animation: kbs-run-show 470ms linear both;
 }
 .kbs-pair__run svg:nth-child(2) {
-  animation-delay: 150ms;
+  opacity: 0.39;
+  animation:
+    kbs-run-mid 470ms ease-out both,
+    kbs-sway-mid 550ms ease-in-out 470ms infinite alternate;
 }
 .kbs-pair__run svg:nth-child(3) {
-  animation-delay: 300ms;
+  animation:
+    kbs-run-dark 470ms ease-out both,
+    kbs-sway-dark 550ms ease-in-out 470ms infinite alternate;
 }
-@keyframes kbs-run {
+@keyframes kbs-run-show {
   0%,
-  100% {
-    opacity: 0.25;
+  14% {
+    visibility: hidden;
   }
-  45% {
-    opacity: 1;
+  15% {
+    visibility: visible;
+  }
+}
+@keyframes kbs-run-mid {
+  0%,
+  14% {
+    visibility: hidden;
+    transform: none;
+  }
+  15%,
+  49% {
+    visibility: visible;
+    transform: none;
+  }
+  85%,
+  100% {
+    transform: translateX(6px);
+  }
+}
+@keyframes kbs-run-dark {
+  0%,
+  14% {
+    transform: translateX(7px);
+  }
+  15%,
+  49% {
+    transform: none;
+  }
+  85%,
+  100% {
+    transform: translateX(11.5px);
+  }
+}
+@keyframes kbs-sway-mid {
+  from {
+    transform: translateX(6px);
+  }
+  to {
+    transform: translateX(7.3px);
+  }
+}
+@keyframes kbs-sway-dark {
+  from {
+    transform: translateX(11.5px);
+  }
+  to {
+    transform: translateX(14.5px);
   }
 }
 /* 큰 글자 세 줄: 24 굵게, 가운데 258.0 / 289.3 / 321.5 */
@@ -604,30 +722,30 @@
   top: 242px;
 }
 .kbs-big--2 {
-  top: 273.3px;
+  top: 274.6px;
 }
 .kbs-big--3 {
   top: 305.5px;
 }
-/* '○○ 번호로 보내요': 가운데 365.1, 16 #626168 */
+/* '○○ 번호로 보내요': 잉크 358.0~372.3 (프레임 927~977), 16 400 #626168 */
 .kbs-sub {
   left: 0;
   right: 0;
-  top: 354.1px;
+  top: 355.4px;
   text-align: center;
   font-size: 16px;
   line-height: 22px;
   color: #626168;
 }
-/* 표: 20.2~363.2 × 535.6~657.4, #f6f7fa, 줄 가운데 559.4 / 595.8 / 632.3 */
+/* 표: 19.5~364.5 × 534.0~658.3 (가운데 x·y 줄 경계, 프레임 927~977 — 바닥에서 141.6), #f6f7fa, 줄 피치 36.45, 글자 잉크 위 552.6 / 589.0 / 625.5 */
 .kbs-table {
-  left: 20.2px;
-  right: 20.8px;
-  top: 535.6px;
-  height: 121.8px;
+  left: 19.5px;
+  right: 19.5px;
+  bottom: calc(var(--kbs-floor) + 125.6px);
+  height: 124.3px;
   border-radius: 12px;
   background: #f6f7fa;
-  padding-top: 5.15px;
+  padding-top: 8.1px;
   box-sizing: border-box;
 }
 .kbs-table__row {
@@ -635,7 +753,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 21.5px 0 20.2px;
+  padding: 0 22.7px 0 19.6px;
   font-size: 15px;
   color: #55565a;
 }
@@ -644,6 +762,11 @@
   align-items: center;
   gap: 6.5px;
   color: #2b2c31;
+}
+/* 표의 ✎ 잉크 가운데 y 가 글자 줄 가운데보다 0.7 위 (559.7 · 596.2 · 632.6) */
+.kbs-table__val .kbs-pen {
+  position: relative;
+  top: -0.7px;
 }
 .kbs-table__input {
   width: 130px;
@@ -656,14 +779,14 @@
   outline: 0;
   padding: 0;
 }
-/* 부가기능 설정 › : 가운데 684.4, 오른쪽 끝 339.7, 15 #292929 */
+/* 부가기능 설정 › : 가운데 684.4 (바닥에서 104.5), 글자 잉크 x 242.8, › 오른쪽 끝 339.7, 15 400 #292929 */
 .kbs-addon {
   right: 44.3px;
-  top: 673.4px;
+  bottom: calc(var(--kbs-floor) + 88.5px);
   height: 22px;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 7.7px;
   font-size: 15px;
   color: #292929;
 }
@@ -693,7 +816,7 @@
   position: absolute;
   left: 20px;
   right: 20px;
-  top: 698px;
+  bottom: calc(var(--kbs-floor) + 69.9px);
   margin: 0;
   text-align: center;
   font-size: 13px;

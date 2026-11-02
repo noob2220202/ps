@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { OS } from "../platform/platform";
@@ -104,7 +104,7 @@ function StatusBar() {
     <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${seam}` }) }}>
       <span className="statusbar__time">{time}</span>
       {OS === "android" && APP === "kbank" && <span className="statusbar__carrier">SKT</span>}
-      {OS === "android" && APP === "kbank" && HAS_INTRO && <KbankRecLeft />}
+      {OS === "android" && APP === "kbank" && HAS_INTRO && <KbankRecLeft time={time} />}
       {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : APP === "kbank" ? <KbankIcons /> : <AndroidIcons />}
     </div>
   );
@@ -131,36 +131,43 @@ function NavKeys() {
   );
 }
 
-// 케이뱅크 녹화 기기(갤럭시 One UI) 상태바 오른쪽 (녹화 cb67e5eb 0691 프레임을 dp 로, 아이콘 #494949):
-// 5G 상자(317.0~327.4, 아래 ↓↑) · 신호 막대 4개(332.6~343.0) · 배터리 알약(348.9~371.6 × 11.1~24.1, 바탕 #bab8b9, 잔량만큼 왼쪽 #494949, 가운데 흰 숫자).
-// 방해금지 ⊖(300.7~311.1)도 녹화 기기 그대로 (kbank2 인트로 영상과 이어지게). 화면녹화 표시는 kbank2 만 (KbankRecLeft)
+// 케이뱅크 녹화 기기(갤럭시 One UI) 상태바 오른쪽 (아이콘 #494949). 녹화 원본 9.8~14.9초 흰 상태바 141장 평균을 590px 그대로 두고
+// 반값 경계로 잰 dp (kbank-review frame/sbm·edges): ⊖ 300.84~312.18 × 12.25~23.39 (흰 막대 302.96~310.02 × 16.99~18.3)
+// · 5G 상자 317.04~328.03 × 11.19~18.19, 아래 ↓(320.6) ↑(324.6) 18.6~23.2 · 신호 막대 4개 왼끝 332.66 / 335.85 / 339.03 / 342.17,
+// 폭 1.58, 위끝 20.44 / 17.56 / 14.78 / 11.76, 아래끝 23.47 · 배터리 알약 348.9~371.6 × 11.3~24.35 (바탕 #bab8b9, 잔량만큼 왼쪽 #494949, 가운데 흰 숫자).
+// 가운데줄은 모두 y 17.8. 방해금지 ⊖도 녹화 기기 그대로 (kbank2 인트로 영상과 이어지게). 화면녹화 표시는 kbank2 만 (KbankRecLeft)
 function KbankIcons() {
   const { battery } = useDeviceStatus();
   const lv = 348.9 + (22.7 * Math.max(0, Math.min(100, battery))) / 100;
   return (
     <span className="statusbar__right statusbar__right--kbank">
       <svg className="kb-sb-icons" width="384" height="33.2" viewBox="0 0 384 33.2" aria-hidden>
-        <circle cx="305.9" cy="17.6" r="5.2" fill="#494949" />
-        <rect x="302.6" y="16.85" width="6.6" height="1.5" rx="0.4" fill="#fff" />
-        <rect x="317.2" y="11.3" width="10" height="6.6" rx="1.2" fill="#494949" />
-        <text x="322.2" y="16.75" textAnchor="middle" fontSize="6.4" fontWeight="700" fill="#fff" fontFamily="Roboto, sans-serif">
+        <circle cx="306.5" cy="17.82" r="5.62" fill="#494949" />
+        <rect x="302.97" y="17" width="7.05" height="1.3" rx="0.4" fill="#fff" />
+        <rect x="317.04" y="11.19" width="11" height="7" rx="1.3" fill="#494949" />
+        <text x="322.45" y="17.15" textAnchor="middle" fontSize="7" fontWeight="700" fill="#fff" fontFamily="Roboto, sans-serif">
           5G
         </text>
-        <path d="M319.6 18.8v3.7m-1.5-1.5 1.5 1.5 1.5-1.5M324.8 22.5v-3.7m-1.5 1.5 1.5-1.5 1.5 1.5" stroke="#494949" strokeWidth="0.9" fill="none" />
+        <path
+          d="M320.6 18.6v4.4m-1.75-1.75 1.75 1.75 1.75-1.75M324.6 23.2v-4.4m-1.75 1.75 1.75-1.75 1.75 1.75"
+          stroke="#494949"
+          strokeWidth="0.95"
+          fill="none"
+        />
         <g fill="#494949">
-          <rect x="332.6" y="19.4" width="1.6" height="3.4" rx="0.5" />
-          <rect x="335.4" y="17.2" width="1.6" height="5.6" rx="0.5" />
-          <rect x="338.2" y="14.4" width="1.6" height="8.4" rx="0.5" />
-          <rect x="341.2" y="11.7" width="1.6" height="11.1" rx="0.5" />
+          <rect x="332.66" y="20.44" width="1.58" height="3.03" rx="0.45" />
+          <rect x="335.85" y="17.56" width="1.58" height="5.91" rx="0.45" />
+          <rect x="339.03" y="14.78" width="1.58" height="8.69" rx="0.45" />
+          <rect x="342.17" y="11.76" width="1.58" height="11.71" rx="0.45" />
         </g>
         <clipPath id="kb-batt">
-          <rect x="348.9" y="11.1" width="22.7" height="13" rx="6.5" />
+          <rect x="348.9" y="11.3" width="22.7" height="13.05" rx="6.52" />
         </clipPath>
         <g clipPath="url(#kb-batt)">
-          <rect x="348.9" y="11.1" width="22.7" height="13" fill="#bab8b9" />
-          <rect x="348.9" y="11.1" width={lv - 348.9} height="13" fill="#494949" />
+          <rect x="348.9" y="11.3" width="22.7" height="13.05" fill="#bab8b9" />
+          <rect x="348.9" y="11.3" width={lv - 348.9} height="13.05" fill="#494949" />
         </g>
-        <text x="361.2" y="21.3" textAnchor="middle" fontSize="9.6" fontWeight="500" fill="#eeeeee" fontFamily="Roboto, sans-serif">
+        <text x="361.2" y="21.5" textAnchor="middle" fontSize="9.6" fontWeight="500" fill="#eeeeee" fontFamily="Roboto, sans-serif">
           {battery}
         </text>
       </svg>
@@ -168,31 +175,61 @@ function KbankIcons() {
   );
 }
 
-// kbank2(녹화 인트로) 상태바 왼쪽: 인트로 영상 속 기기처럼 늘 화면녹화 중 표시 — 빨간 알약(가운데 ◉, 69.6~102.2 × 8.5~27)
-// + 모서리 괄호(107.7~120.4 × 11.4~23.8) 안에서 1초 주기로 깜빡이는 캠코더. 영상이 끝날 때 위상을 영상과 맞춤 (intro.ts syncBlink)
-function KbankRecLeft() {
+// kbank2(녹화 인트로) 상태바 왼쪽: 인트로 영상 속 기기처럼 늘 화면녹화 중 표시 (위와 같은 평균 프레임에서 잼) —
+// 빨간 알약 68.8~102.26 × 8.49~27.15 (가운데 85.53, 17.82: 흰 점 r 2.6 + 대각선 네 곳이 끊긴 흰 고리 r 4.78 · 두께 1.15)
+// + 둥근 모서리 괄호(바깥 108.04~120.24 × 11.78~24.11, 두께 1.15, 팔 길이 2.8) 안에서 0.986초 주기로 깜빡이는 캠코더
+// (몸통 110.5~116 × 15.6~20.2, 렌즈 끝 117.9). 영상이 끝날 때 위상을 영상과 맞춤 (intro.ts syncBlink)
+// 괄호·캠코더(.kb-sb-dim)는 영상이 끝난 직후 다른 상태바 글자와 같이 서서히 나타남 (빨간 알약은 그대로)
+// 시각이 '6:11' 보다 길면(예: 12:34) 그만큼 오른쪽으로 (실제 기기처럼 시각 뒤에 3.7dp 띄워 이어 붙음)
+function KbankRecLeft({ time }: { time: string }) {
   const epoch = useBlinkEpoch();
+  const dx = useTimeShift(time);
+  // 고리: 둘레 2π·4.78 = 30.03 을 네 토막(6.11) + 틈(1.4)으로, 첫 토막 가운데가 3시 방향 → 틈이 대각선
   return (
     <svg className="kb-sb-left" width="384" height="33.2" viewBox="0 0 384 33.2" aria-hidden>
-      <rect x="69.6" y="8.6" width="32.6" height="18.4" rx="9.2" fill="#c42223" />
-      <circle cx="85.8" cy="17.7" r="2.6" fill="#fff" />
-      <circle cx="85.8" cy="17.7" r="4.6" fill="none" stroke="#fff" strokeWidth="1.3" strokeDasharray="5.2 2" strokeDashoffset="1" />
-      <path
-        d="M107.7 14.3v-2.9h2.9M117.5 11.4h2.9v2.9M120.4 20.9v2.9h-2.9M110.6 23.8h-2.9v-2.9"
-        fill="none"
-        stroke="#494949"
-        strokeWidth="1.05"
-      />
-      <KbankRecCam key={epoch} epoch={epoch} />
+      <g transform={dx ? `translate(${dx} 0)` : undefined}>
+        <rect x="68.8" y="8.49" width="33.46" height="18.66" rx="9.33" fill="#c42223" />
+        <circle cx="85.53" cy="17.82" r="2.6" fill="#fff" />
+        <circle cx="85.53" cy="17.82" r="4.78" fill="none" stroke="#fff" strokeWidth="1.15" strokeDasharray="6.11 1.4" strokeDashoffset="3.055" />
+        <g className="kb-sb-dim">
+          <path
+            d="M108.6 15.3v-1.74a1.2 1.2 0 0 1 1.2-1.2h1.6M116.9 12.36h1.56a1.2 1.2 0 0 1 1.2 1.2v1.74M119.66 20.8v1.53a1.2 1.2 0 0 1-1.2 1.2h-1.56M111.4 23.53h-1.6a1.2 1.2 0 0 1-1.2-1.2V20.8"
+            fill="none"
+            stroke="#494949"
+            strokeWidth="1.15"
+          />
+          <KbankRecCam key={epoch} epoch={epoch} />
+        </g>
+      </g>
     </svg>
   );
+}
+// 상태바 시각 글자 폭 − '6:11' 폭 (PhoneFrame.css 케이뱅크 시각과 같은 글꼴). 글꼴을 다 받으면 다시 잼
+let timeCtx: CanvasRenderingContext2D | null = null;
+function timeTextWidth(text: string) {
+  timeCtx ??= document.createElement("canvas").getContext("2d");
+  if (!timeCtx) return 0;
+  timeCtx.font = "700 13.2px Roboto, sans-serif";
+  return timeCtx.measureText(text).width;
+}
+function useTimeShift(time: string) {
+  const [fontsReady, setFontsReady] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    document.fonts?.ready.then(() => alive && setFontsReady(true));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  // fontsReady: 글꼴을 받은 뒤 다시 재려고 의존성에 둠
+  return useMemo(() => Math.max(0, timeTextWidth(time) - timeTextWidth("6:11")), [time, fontsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 function KbankRecCam({ epoch }: { epoch: number }) {
   const [delay] = useState(() => -((performance.now() - epoch) % BLINK_MS));
   return (
-    <g className="kb-sb-rec" fill="#494949" style={{ animationDelay: `${delay}ms` }}>
-      <rect x="111" y="15.9" width="5.4" height="4.6" rx="0.6" />
-      <path d="M116.2 17.6 118.1 16.2v4l-1.9-1.4Z" />
+    <g className="kb-sb-rec" fill="#494949" style={{ animationDelay: `${delay}ms`, animationDuration: `${BLINK_MS}ms` }}>
+      <rect x="110.5" y="15.6" width="5.5" height="4.6" rx="0.6" />
+      <path d="M115.8 17.35 117.9 15.95v4l-2.1-1.4Z" />
     </g>
   );
 }
@@ -216,7 +253,7 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
       {navbar && APP === "ibk" ? (
         <NavKeys />
       ) : navbar && APP === "kbank" ? (
-        // 케이뱅크 녹화 기기: 제스처 내비게이션인데 검은 띠 없이 앱 위에 손잡이만 (124.3~259.0 × 824~828, #b0aeaf)
+        // 케이뱅크 녹화 기기: 제스처 내비게이션인데 검은 띠 없이 앱 위에 손잡이만 (124.8~259.2 × 824.1~828.0, #b2b2b2)
         <div className="phone__gesture" aria-hidden>
           <i />
         </div>

@@ -6,8 +6,9 @@ import type { Account, Bank, HomeData, Recipient, TransferRecipients, TransferRe
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { BankIcon } from "../components/BankIcon";
+import { kbankBankName } from "./bank";
 import { KbankHeader } from "./header";
-import { KbankKeypad } from "./keypad";
+import { KbankKeypad, KbankWonDigits } from "./keypad";
 import { kbBackLevel, kbHistoryGo, kbNf, kbPress, kbReadWon, useKbankBackStep } from "./sendback";
 import { useKbankStatusBar } from "./theme";
 import "./kbank-send.css";
@@ -21,7 +22,7 @@ export interface KbankDoneState {
 // 이체 (녹화 21.5~35초, 프레임 645~1060). 한 화면이 단계로 바뀜:
 //   skel    회색 뼈대 (665~676, ≈370ms) — 머리줄 ‹ 도 없음
 //   who     어디로 돈을 보낼까요? (677~) — 행을 누르면 받는 분이 정해지고 금액으로
-//   amount  ○○(0110) 에서 / ○○ 님에게 · 얼마를 보내시겠어요? · 칩 · 숫자판 · 다음 (726~)
+//   amount  ○○(끝 4자리) 에서 / ○○ 님에게 · 얼마를 보내시겠어요? · 칩 · 숫자판 · 다음 (726~)
 //   confirm K › B · ○○님에게 N원을 보낼까요? · 표시·시간 표 · 보내기 → 확인중 (912~)
 // 실제 앱은 보내기 뒤 보안 비밀번호(녹화 35초 검정) → 클론은 건너뛰고 완료(/send/done, '보내는 중이에요'부터)로
 type Stage = "skel" | "who" | "amount" | "confirm";
@@ -56,6 +57,7 @@ export function KbankSend() {
   const [seq, setSeq] = useState(0); // 단계 본문을 새로 그릴 때마다 (들어오는 애니메이션 다시)
   const [to, setTo] = useState<To | null>(null);
   const [amount, setAmount] = useState(0);
+  const [typed, setTyped] = useState(0); // 숫자 자판으로 한 자리 붙일 때마다 +1 (새 자리만 페이드), 칩·지우기는 0
   const [memoTo, setMemoTo] = useState<string | null>(null); // 받는사람 통장에 표시 (null = 내 이름)
   const [memoMe, setMemoMe] = useState<string | null>(null); // 내 통장에 표시 (null = 받는 분 이름)
   const [sending, setSending] = useState(false);
@@ -235,8 +237,27 @@ export function KbankSend() {
       )}
       {stage === "amount" && to && account && (
         <div key={`amount-${seq}`} className="kbs-stage kbs-amount">
-          <Amount account={account} to={to} amount={amount} onClear={() => setAmount(0)} />
-          <KbankKeypad onKey={(k) => setAmount((a) => kbPress(a, k))} onChip={(add) => setAmount((a) => Math.min(add === null ? account.balance : a + add, 99_999_999_999))} />
+          <Amount
+            account={account}
+            to={to}
+            amount={amount}
+            typed={typed}
+            onClear={() => {
+              setAmount(0);
+              setTyped(0);
+            }}
+          />
+          <KbankKeypad
+            onKey={(k) => {
+              const n = kbPress(amount, k);
+              setTyped((t) => (k !== "back" && n !== amount ? t + 1 : 0));
+              setAmount(n);
+            }}
+            onChip={(add) => {
+              setTyped(0);
+              setAmount(Math.min(add === null ? account.balance : amount + add, 99_999_999_999));
+            }}
+          />
           <div className="kbs-bottom kbs-fade kbs-fade--3">
             <button className="kbs-btn" disabled={amount <= 0 || over} onClick={next}>
               다음
@@ -280,7 +301,7 @@ export function KbankSend() {
   );
 }
 
-// '··· 확인중' (프레임 990~1040): 점 셋이 차례로 밝아짐
+// '··· 확인중' (프레임 982~1044): 점 셋이 차례로 2.85dp 뛰어오름 (0.63초 주기, 0.18초씩 늦게)
 export function Checking() {
   return (
     <span className="kbs-checking">
@@ -292,13 +313,14 @@ export function Checking() {
   );
 }
 
-// ---------- 뼈대 (프레임 670) ----------
+// ---------- 뼈대 (프레임 667~676 평균, x 40·100·200 세로 줄 경계) ----------
+// 행: 첫 줄 위 349.5 · 433.5 · 581.9 · 666.2, 둘째 줄 +28, 원(지름 35.2) 위 +8.45 · 소제목 292.9 · 525.9
 function Skeleton() {
   const row = (top: number) => (
     <>
-      <i className="kbs-sk kbs-sk--dot" style={{ top: top + 9 }} />
+      <i className="kbs-sk kbs-sk--dot" style={{ top: top + 8.45 }} />
       <i className="kbs-sk kbs-sk--l1" style={{ top }} />
-      <i className="kbs-sk kbs-sk--l2" style={{ top: top + 28.6 }} />
+      <i className="kbs-sk kbs-sk--l2" style={{ top: top + 28 }} />
     </>
   );
   return (
@@ -306,14 +328,14 @@ function Skeleton() {
       <i className="kbs-sk kbs-sk--title" />
       <i className="kbs-sk kbs-sk--seg" />
       <i className="kbs-sk kbs-sk--input" />
-      <i className="kbs-sk kbs-sk--sec" style={{ top: 293.3 }} />
-      <i className="kbs-sk kbs-sk--secr" style={{ top: 293.3 }} />
-      {row(348.6)}
-      {row(433.2)}
-      <i className="kbs-sk kbs-sk--sec" style={{ top: 525.6 }} />
-      <i className="kbs-sk kbs-sk--secr" style={{ top: 525.6 }} />
-      {row(581.6)}
-      {row(665.6)}
+      <i className="kbs-sk kbs-sk--sec" style={{ top: 292.9 }} />
+      <i className="kbs-sk kbs-sk--secr" style={{ top: 292.9 }} />
+      {row(349.5)}
+      {row(433.5)}
+      <i className="kbs-sk kbs-sk--sec" style={{ top: 525.9 }} />
+      <i className="kbs-sk kbs-sk--secr" style={{ top: 525.9 }} />
+      {row(581.9)}
+      {row(666.2)}
     </div>
   );
 }
@@ -353,7 +375,8 @@ function Who({
   return (
     <>
       <div className="kbs-body">
-        <div className="kbs-who" style={{ height: 511.2 + 78.1 * (recent.length + mine.length) + 60 - 56 }}>
+        {/* 끝까지 내리면 마지막 행 아래 108.8 (+ 아이폰 안전영역) 이 비어 AI 알약·홈 인디케이터에 덜 가림 */}
+        <div className="kbs-who" style={{ height: `calc(${511.2 + 78.1 * (recent.length + mine.length) + 60 - 56}px + var(--safe-bottom, 0px))` }}>
           <h2 className="kbs-t kbs-who__title">어디로 돈을 보낼까요?</h2>
           <div className="kbs-seg" role="tablist">
             <button role="tab" aria-selected className="on">
@@ -396,9 +419,7 @@ function Who({
             <h3 className="kbs-t kbs-sec kbs-sec--recent">최근 보낸 계좌</h3>
             <button className="kbs-edit" onClick={soon}>
               편집하기
-              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
-                <path d="M1.2 10.8 1.6 8.3 8.2 1.7a1 1 0 0 1 1.4 0l.7.7a1 1 0 0 1 0 1.4L3.7 10.4Z" fill="#0312a0" />
-              </svg>
+              <KbankPencil size={11.5} color="#0312a0" />
             </button>
             {recent.map((row, i) => {
               const on = stars[row.key] ?? !!row.r.favorite;
@@ -478,34 +499,34 @@ function WhoRow({
         <KbankBankLogo bank={row.r.bank} size={36.4} />
       </span>
       <b className="kbs-row__name">{row.name}</b>
-      <span className="kbs-row__acct">{`${row.r.bank.name} ${row.r.number}`}</span>
+      <span className="kbs-row__acct">{`${kbankBankName(row.r.bank, row.r.number)} ${row.r.number}`}</span>
       {star}
     </div>
   );
 }
 
 // ---------- 금액 (프레임 760 · 860) ----------
-function Amount({ account, to, amount, onClear }: { account: Account; to: To; amount: number; onClear: () => void }) {
+function Amount({ account, to, amount, typed, onClear }: { account: Account; to: To; amount: number; typed: number; onClear: () => void }) {
   const last4 = digitsOf(account.number).slice(-4);
   return (
     <div className="kbs-amt">
       <p className="kbs-amt__line kbs-amt__line--from kbs-fade">
         <KbankBankLogo bank={account.bank} size={20.8} />
-        <b>{`${account.bank.name}(${last4})`}</b> 에서
+        <b>{`${kbankBankName(account.bank, account.number)}(${last4})`}</b> 에서
       </p>
       <p className="kbs-amt__line kbs-amt__line--to kbs-fade kbs-fade--1">
         <KbankBankLogo bank={to.bank} size={20.8} />
-        <b>{`${to.bank.name} ${to.holder}`}</b> 님에게
+        <b>{`${kbankBankName(to.bank, to.number)} ${to.holder}`}</b> 님에게
       </p>
       <div className="kbs-amt__field kbs-fade kbs-fade--2">
         {amount > 0 ? (
           <>
             <span className="kbs-amt__value">
-              {kbNf.format(amount)}
+              <KbankWonDigits text={kbNf.format(amount)} fresh={typed} />
               <i className="kbs-caret" />원
             </span>
             <button className="kbs-amt__clear" onClick={onClear} aria-label="지우기">
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+              <svg width="16.6" height="16.6" viewBox="0 0 16 16" aria-hidden>
                 <circle cx="8" cy="8" r="8" fill="#69727f" />
                 <path d="M5.4 5.4l5.2 5.2M10.6 5.4l-5.2 5.2" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
               </svg>
@@ -553,7 +574,7 @@ function Confirm({
       </h2>
       <h2 className="kbs-big kbs-big--2 kbs-cfin">{kbNf.format(amount)}원을</h2>
       <h2 className="kbs-big kbs-big--3 kbs-cfin kbs-cfin--1">보낼까요?</h2>
-      <p className="kbs-sub kbs-cfin kbs-cfin--2">{`${to.bank.name} ${to.number}로 보내요`}</p>
+      <p className="kbs-sub kbs-cfin kbs-cfin--2">{`${kbankBankName(to.bank, to.number)} ${to.number}로 보내요`}</p>
       <div className="kbs-table kbs-cfup">
         <MemoRow label="받는사람 통장에 표시" value={memoTo} onSave={onMemoTo} />
         <MemoRow label="내 통장에 표시" value={memoMe} onSave={onMemoMe} />
@@ -575,7 +596,7 @@ function Confirm({
   );
 }
 
-// K › B (확인) — 완료 화면은 › 대신 ›››
+// K › B (확인) — 보내는 중에는 › 가 ››› 로 펼쳐져 늘었다 줄었다 함 (kbank-send.css .kbs-pair__run)
 export function KbankPair({ from, to, className = "", moving = false }: { from: Bank; to: Bank; className?: string; moving?: boolean }) {
   return (
     <div className={`kbs-pair ${className}`}>
@@ -583,8 +604,8 @@ export function KbankPair({ from, to, className = "", moving = false }: { from: 
       {moving ? (
         <span className="kbs-pair__run" aria-hidden>
           {[0, 1, 2].map((i) => (
-            <svg key={i} width="7" height="12" viewBox="0 0 7 12">
-              <path d="M1.2 1.2 5.6 6l-4.4 4.8" fill="none" stroke="#4862f7" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+            <svg key={i} width="9" height="14" viewBox="0 0 9 14">
+              <path d="M1.8 1.6 7 7l-5.2 5.4" fill="none" stroke="#4862f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           ))}
         </span>
@@ -598,14 +619,17 @@ export function KbankPair({ from, to, className = "", moving = false }: { from: 
   );
 }
 
-function Pencil() {
-  // ✎ : 잉크 x 326.1~341.7 · 15.6 × 15.6 (프레임 950)
+// ✎ 뚜껑이 떨어진 연필: 왼쪽 아래 끝이 직각으로 깎인 몸통(폭 4.47) + 0.55 틈 + 둥근 뚜껑 (프레임 682~701 '편집하기' · 927~977 표).
+//   16 칸에 잉크 0.4~15.65 · 0.6~15.85 → 표는 16 (녹화 잉크 326.1~341.7 × 551.9~567.5 = 15.6, 몸통 폭 4.3), '편집하기' 는 11.5 (343.6~354.7 = 11.1)
+export function KbankPencil({ size = 16, color = "#2a2d33", className = "kbs-pen" }: { size?: number; color?: string; className?: string }) {
   return (
-    <svg className="kbs-pen" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-      <path d="M1 15l.6-3.6L10.9 2.1a1.4 1.4 0 0 1 2 0l1 1a1.4 1.4 0 0 1 0 2L4.6 14.4Z" fill="#2a2d33" />
+    <svg className={className} width={size} height={size} viewBox="0 0 16 16" aria-hidden>
+      <path d="M0.4 15.85V12.69L8.95 4.14 12.11 7.3 3.56 15.85Z" fill={color} />
+      <path d="M9.34 3.75 11.83 1.26A2.235 2.235 0 0 1 14.99 4.42L12.5 6.91Z" fill={color} />
     </svg>
   );
 }
+const Pencil = () => <KbankPencil />;
 
 // 표시 이름: ✎ 를 누르면 그 자리에서 고침 (녹화에 없음 — 가장 단순하게)
 function MemoRow({ label, value, onSave }: { label: string; value: string; onSave: (v: string) => void }) {

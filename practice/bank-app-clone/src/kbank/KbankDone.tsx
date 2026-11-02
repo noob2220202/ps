@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { localAsset } from "../assets/Asset";
+import { kbankBankName } from "./bank";
 import { Checking, KbankPair, type KbankDoneState } from "./KbankSend";
 import { kbHistoryGo, kbNf } from "./sendback";
 import { useKbankStatusBar } from "./theme";
@@ -9,11 +10,16 @@ import "./kbank-done.css";
 
 // 이체 완료 (녹화 36~42초, 프레임 1081~1260). 머리줄 없음.
 //   sending  보내는 중이에요 (1081~1153): 확인 화면에서 머리줄·표가 한 번에 빠지고 '확인중' 버튼이 230ms 동안 흐려지며 사라짐,
-//            셋째 줄 '보낼까요?' → '보내는 중이에요' 겹쳐 바뀜(1082~1087), K ››› B 화살표가 차례로 밝아짐
+//            셋째 줄 '보낼까요?' → '보내는 중이에요' 겹쳐 바뀜(1082~1087), K › B 의 › 가 ››› 로 펼쳐져 늘었다 줄었다 함(1083~1153)
 //   done     보냈어요 (1154~): 로고가 빠지고 ✓ 가 그려지며 '보냈어요', '받는계좌 | 은행 번호', 공유·메세지 보내기, 아래 의견 카드·추가이체/확인이
-//            200ms 동안 떠오름(1155~1160). 말풍선 '돈을 보냈다고 알려주세요 ×' 는 470ms 뒤(1168)
+//            200ms 동안 떠오름(1155~1160). 말풍선 '돈을 보냈다고 알려주세요 ×' 는 470ms 뒤(1168). 메세지 앞 그림은 1.285초마다 굴러 바뀜
+// 아이폰: 아래 카드·버튼은 홈 인디케이터 위로(--safe-bottom), 가운데 부품(✓ · 공유/메세지 · 말풍선)은 화면 가운데 기준이라 402 폭에서도 가운데
 const SENDING_MS = 2170; // 1088 → 1153
 const TIP_MS = 470; // 1154 → 1168
+// '메세지 보내기' 앞 그림: 웃는 얼굴 → 네잎클로버 → 돈주머니 (녹화 1155~1254 에 보인 순서, 그 뒤는 처음부터 다시).
+// 바뀌기 시작: 38.46 · 39.75 · 41.03초 (원본 프레임 시각) → 1.285초마다. 처음 것은 '보냈어요' 와 함께 아래서 올라옴
+const EMOJI = ["kbank-send-smile", "kbank-send-clover", "kbank-send-bag"];
+const EMOJI_MS = 1285;
 
 export function KbankDone() {
   useKbankStatusBar();
@@ -87,10 +93,10 @@ function DoneView({ result, from }: KbankDoneState) {
         <p className="kbs-sub kbd-abs kbd-rcv">
           받는계좌
           <i />
-          {`${to.bank.name} ${to.number}`}
+          {`${kbankBankName(to.bank, to.number)} ${to.number}`}
         </p>
       ) : (
-        <p className="kbs-sub kbd-abs">{`${to.bank.name} ${to.number}로 보내요`}</p>
+        <p className="kbs-sub kbd-abs">{`${kbankBankName(to.bank, to.number)} ${to.number}로 보내요`}</p>
       )}
       {/* 확인 화면의 '확인중' 버튼이 흐려지며 사라짐 (1081~1088) */}
       {!done && (
@@ -109,7 +115,7 @@ function DoneView({ result, from }: KbankDoneState) {
               </svg>
             </button>
             <button className="kbd-msg" onClick={soon}>
-              {localAsset("kbank-send-clover") && <img src={localAsset("kbank-send-clover")} alt="" draggable={false} />}
+              <MsgEmoji />
               메세지 보내기
             </button>
           </div>
@@ -117,16 +123,19 @@ function DoneView({ result, from }: KbankDoneState) {
             <div className="kbd-tip">
               <span>돈을 보냈다고 알려주세요</span>
               <button onClick={() => setTipClosed(true)} aria-label="닫기">
+                {/* × 잉크 289.6~300.7 × 490.1~500.5 (프레임 1170~1189) */}
                 <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden>
-                  <path d="M1.5 1.5l10 10M11.5 1.5l-10 10" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+                  <path d="M2.1 2.1l8.8 8.8M10.9 2.1l-8.8 8.8" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
           )}
           <button className="kbd-fb kbd-up" onClick={soon}>
-            <svg className="kbd-fb__pen" width="20" height="20" viewBox="0 0 20 20" aria-hidden>
-              <path d="M2 16.2 2.8 12 12.6 2.2a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L6.4 15.6Z" fill="#3a3e45" />
-              <path d="M2 18.6h16" stroke="#3a3e45" strokeWidth="1.6" strokeLinecap="round" />
+            {/* 연필(뚜껑 떨어짐) + 끝 오른쪽 밑줄: 잉크 43.0~62.5 × 648.2~667.1, 몸통 폭 6.9 (프레임 1170~1189, 몸통 #565c64 · 밑줄 #b0b4c0) */}
+            <svg className="kbd-fb__pen" width="22" height="22" viewBox="0 0 22 22" aria-hidden>
+              <path d="M2.03 19.91V15.03L12.13 4.94 17.33 9.5 6.92 19.91Z" fill="#565c64" />
+              <path d="M12.59 4.48 14.57 2.5A3.46 3.46 0 0 1 19.77 7.06L17.79 9.04Z" fill="#565c64" />
+              <path d="M9.85 19.75H21.1" stroke="#b0b4c0" strokeWidth="1.63" />
             </svg>
             <span className="kbd-fb__small">케이뱅크 이체하기</span>
             <b className="kbd-fb__big">고객님의 의견이 궁금해요</b>
@@ -145,5 +154,22 @@ function DoneView({ result, from }: KbankDoneState) {
         </>
       )}
     </div>
+  );
+}
+
+// 위로 굴러 바뀌는 그림 (프레임 1193~1205 · 1231~1243): 21.5 × 23.4 칸 안에서 나가는 것은 위로 밀리며 흐려지고(≈130ms),
+// 들어오는 것은 아래에서 올라오며 진해짐(≈260ms, 70ms 늦게). 칸 밖은 잘림 (녹화 잉크가 칸 위·아래 끝 426.3 · 443.2 에서 잘림)
+function MsgEmoji() {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const t = window.setInterval(() => setN((v) => v + 1), EMOJI_MS);
+    return () => clearInterval(t);
+  }, []);
+  const pic = (i: number) => localAsset(EMOJI[i % EMOJI.length]);
+  return (
+    <span className="kbd-emoji" aria-hidden>
+      {n > 0 && pic(n - 1) && <img key={n - 1} className="kbd-emoji__out" src={pic(n - 1)} alt="" draggable={false} />}
+      {pic(n) && <img key={n} className="kbd-emoji__in" src={pic(n)} alt="" draggable={false} />}
+    </span>
   );
 }

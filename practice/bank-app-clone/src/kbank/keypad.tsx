@@ -23,9 +23,9 @@ export function KbankKeypad({ onKey, onChip }: { onKey: (k: KbankKey) => void; o
         {KEYS.map((k) => (
           <button key={k} className="kbs-key" onClick={() => onKey(k)} aria-label={k === "back" ? "지우기" : k}>
             {k === "back" ? (
-              // ← : 잉크 x 307.9~332.6 · y 665.8~687.9 (프레임 760), 가는 선
-              <svg width="25" height="23" viewBox="0 0 25 23" aria-hidden>
-                <path d="M23.6 11.5H2.2M11.6 1.6 1.7 11.5l9.9 9.9" fill="none" stroke="#181818" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              // ← : 잉크 x 307.9~332.6 · y 665.8~687.9 (프레임 760), 가는 선 — 26 칸 가운데 320 에 잉크 307.75~332.45
+              <svg width="26" height="23" viewBox="0 0 26 23" aria-hidden>
+                <path d="M24.6 11.5H1.6M11.5 1.6 1.6 11.5l9.9 9.9" fill="none" stroke="#181818" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : (
               k
@@ -34,5 +34,26 @@ export function KbankKeypad({ onKey, onChip }: { onKey: (k: KbankKey) => void; o
         ))}
       </div>
     </div>
+  );
+}
+
+// 굵은 금액 숫자 (금액 칸 26 굵게). 녹화의 굵은 금액 줄은 '1' 만 Pretendard 보다 좌우가 넓음
+//   (FONT.md: 프레임 763~910 '1원' 의 '1' 뒤 +0.071em, 다른 숫자는 비례폭 그대로) → '1' 만 span 으로 감싸 좌우 0.06em (.kbs-one)
+// fresh > 0 이면 마지막 자리(방금 누른 숫자)만 160ms 페이드 (프레임 763~768: 자리표시는 바로 사라지고 '1' 이 5프레임에 걸쳐 진해짐)
+export function KbankWonDigits({ text, fresh = 0 }: { text: string; fresh?: number }) {
+  const last = text.length - 1;
+  return (
+    <>
+      {[...text].map((c, i) => {
+        const cls = `${c === "1" ? "kbs-one" : ""}${fresh && i === last ? " kbs-new" : ""}`.trim();
+        return cls ? (
+          <span key={fresh && i === last ? `n${fresh}` : i} className={cls}>
+            {c}
+          </span>
+        ) : (
+          c
+        );
+      })}
+    </>
   );
 }

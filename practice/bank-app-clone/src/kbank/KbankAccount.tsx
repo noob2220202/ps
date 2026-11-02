@@ -30,33 +30,44 @@ function Skeleton() {
     <div className="kba-skel" aria-hidden>
       <i style={{ left: 19.5, top: 72.9, width: 142.5, height: 20.2 }} />
       <i style={{ left: 19.5, top: 108.7, width: 142.5, height: 14.3 }} />
-      <i style={{ left: 164, top: 163.4, width: 200.5, height: 23.4 }} />
-      <i className="kba-skel__btn" style={{ left: 19.5, top: 227.1, width: 168.3, height: 48.2 }} />
-      <i className="kba-skel__btn" style={{ left: 195.9, top: 227.1, width: 168.3, height: 48.2 }} />
-      {[0, 1, 2, 3].map((n) => (
-        <span key={n}>
-          <i className="kba-skel__tile" style={{ left: 43 + n * 86.1, top: 303.3 }} />
-          <i style={{ left: 30.6 + n * 86.1, top: 351.5, width: 64.4, height: 14.3 }} />
-        </span>
-      ))}
+      <i style={{ right: 19.5, top: 163.4, width: 200.5, height: 23.4 }} />
+      <i className="kba-skel__btn" style={{ left: 19.5, top: 227.1, width: "calc((100% - 47.4px) / 2)", height: 48.2 }} />
+      <i className="kba-skel__btn" style={{ right: 19.7, top: 227.1, width: "calc((100% - 47.4px) / 2)", height: 48.2 }} />
+      {/* 네모 4개: 가운데 63.2 + 86.1n (384 폭) → 양옆 20 을 뺀 폭을 4등분한 칸 가운데 */}
+      <div className="kba-skel__tiles">
+        {[0, 1, 2, 3].map((n) => (
+          <span key={n}>
+            <i className="kba-skel__tile" />
+            <i className="kba-skel__label" />
+          </span>
+        ))}
+      </div>
       <b style={{ top: 389.2 }} />
       {[0, 1, 2].map((n) => (
         <span key={n}>
           <i style={{ left: 19.5, top: 423.7 + n * 106.1, width: 110.6, height: 13.7 }} />
           <i style={{ left: 19.5, top: 445.8 + n * 106.1, width: 142.5, height: 20.2 }} />
-          <i style={{ left: 205.7, top: 445.8 + n * 106.1, width: 158.6, height: 20.2 }} />
+          <i style={{ right: 19.7, top: 445.8 + n * 106.1, width: 158.6, height: 20.2 }} />
         </span>
       ))}
     </div>
   );
 }
 
-// 번호 옆 복사 (잉크 x 219~241 · y 223~245px = 14.3dp 정사각, #6d737a). 뒤 네모 위에 흰 앞 네모
+// 굵은 금액(잔액 28px · 거래 금액 22px, 700)의 '1' 과 '0': 녹화는 Pretendard 보다 '1' 이 좌우 0.054em 씩 넓고 '0' 은 0.05em 좁음
+// (프레임 630 · 1340 · 1500 금액 9줄 글자 구간 최소제곱 → 남는 차 평균 0.53px, 그대로 그리면 3.3px). 작은 글자(14px 400)는 그대로 맞음
+function BoldNum({ text }: { text: string }) {
+  return text.split(/([01])/).map((t, i) => (t === "1" || t === "0" ? <span key={i} className={`kba-n${t}`}>{t}</span> : t));
+}
+
+// 번호 옆 복사 (잉크 x 219~241 · y 223~245px = 14.3dp 정사각, #6d737a). 앞 네모가 왼쪽 위(흰 바탕으로 덮음), 뒤 네모는 오른쪽 아래로
+// 오른쪽·아래 변만 보임 (프레임 630 번호 옆 · 1800 거래 금액 옆 잉크: 앞 533~550 × 491~508, 뒤 539~555 × 497~513px — 1차는 앞뒤가 반대였음).
+// 크기·간격·굵기는 1800 거래 금액 옆 아이콘과 격자로 맞춤 (잉크 RMS 1차 62% → 40%, 남은 건 기기px 반올림 위치)
 function CopyIcon({ color, size = 14.3 }: { color: string; size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 22 22" aria-hidden>
-      <rect x="1" y="1" width="14.6" height="14.6" rx="3.4" fill="none" stroke={color} strokeWidth="2" />
-      <rect x="6.4" y="6.4" width="14.6" height="14.6" rx="3.4" fill="#fff" stroke={color} strokeWidth="2" />
+    <svg width={size} height={size} viewBox="0 0 22 22" overflow="visible" aria-hidden>
+      <rect x="5.4" y="5.4" width="15.6" height="15.6" rx="3" fill="none" stroke={color} strokeWidth="1.8" />
+      <rect x="0.6" y="0.6" width="15.6" height="15.6" rx="3" fill="#fff" stroke={color} strokeWidth="1.8" />
     </svg>
   );
 }
@@ -74,17 +85,19 @@ function TxRow({ tx, onOpen }: { tx: Transaction; onOpen: () => void }) {
   return (
     // 누르는 순간 상세를 미리 받아 둠 → 올라오는 동안 내용이 보임
     <button className="kba-row" onPointerDown={() => void prefetch(paths.transaction(tx.id))} onClick={onOpen}>
-      <span className="kba-row__when">
-        {tx.date}
-        <i className="kba-row__bar" />
-        <span className="kba-row__time">{tx.time}</span>
+      {/* 누르면 회색 바탕 위에서 내용만 줄어듦 (kbank-account.css .kba-row:active) */}
+      <span className="kba-row__in">
+        <span className="kba-row__when">
+          {tx.date}
+          <i className="kba-row__bar" />
+          <span className="kba-row__time">{tx.time}</span>
+        </span>
+        <span className="kba-row__name">{tx.merchant}</span>
+        <span className={`kba-row__amt ${inbound ? "kba-row__amt--in" : ""}`}>
+          <BoldNum text={`${inbound ? "+" : "-"}${nf.format(Math.abs(tx.amount))}원`} />
+        </span>
+        <span className="kba-row__bal">잔액 {nf.format(tx.balanceAfter)}원</span>
       </span>
-      <span className="kba-row__name">{tx.merchant}</span>
-      <span className={`kba-row__amt ${inbound ? "kba-row__amt--in" : ""}`}>
-        {inbound ? "+" : "-"}
-        {nf.format(Math.abs(tx.amount))}원
-      </span>
-      <span className="kba-row__bal">잔액 {nf.format(tx.balanceAfter)}원</span>
     </button>
   );
 }
@@ -101,6 +114,13 @@ export function KbankAccount() {
   const [titled, setTitled] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const ready = waited && acc.status === "done" && txs.status === "done";
+  // 못 받았으면 뼈대 대신 다시 시도 (녹화에 없음 — 이체 화면 .kbs-fail 과 같은 모양)
+  const failed = acc.status === "error" || txs.status === "error";
+
+  // 입금 거래 상세의 '상대 정보' 은행은 받는 분 목록에서 찾음 → 미리 받아 둠 (상세가 올라올 때 이름 뒤에 은행이 늦게 붙지 않게)
+  useEffect(() => {
+    void prefetch(paths.recipients(accountId));
+  }, [accountId]);
 
   useEffect(() => {
     if (waited) return;
@@ -128,7 +148,25 @@ export function KbankAccount() {
 
   return (
     <div className="kb kba">
-      {!ready ? (
+      {failed && !ready ? (
+        <div className="kba-fail">
+          {acc.error?.status === 404 ? (
+            <p>계좌를 찾을 수 없어요</p>
+          ) : (
+            <>
+              <p>거래내역을 불러오지 못했어요</p>
+              <button
+                onClick={() => {
+                  acc.retry();
+                  txs.retry();
+                }}
+              >
+                다시 시도
+              </button>
+            </>
+          )}
+        </div>
+      ) : !ready ? (
         <Skeleton />
       ) : (
         <>
@@ -145,7 +183,9 @@ export function KbankAccount() {
                   <CopyIcon color="#6d737a" />
                 </button>
               </div>
-              <div className="kba-bal">{nf.format(a?.balance ?? 0)}원</div>
+              <div className="kba-bal">
+                <BoldNum text={`${nf.format(a?.balance ?? 0)}원`} />
+              </div>
               <button className="kba-btn kba-btn--get">가져오기</button>
               <button className="kba-btn kba-btn--send" onClick={() => navigate(`/send?from=${encodeURIComponent(accountId)}`)}>
                 이체하기
@@ -178,15 +218,17 @@ export function KbankAccount() {
               </button>
             </div>
             <div className="kba-list">
-              {txs.data?.map((tx) => (
-                <TxRow key={tx.id} tx={tx} onOpen={() => navigate(`/tx/${tx.id}`, { state: { tx } })} />
-              ))}
+              {txs.data?.length ? (
+                txs.data.map((tx) => <TxRow key={tx.id} tx={tx} onOpen={() => navigate(`/tx/${tx.id}`, { state: { tx } })} />)
+              ) : (
+                <p className="kba-empty">조회 기간 동안 거래내역이 없어요</p>
+              )}
             </div>
           </div>
         </>
       )}
       <KbankHeader
-        className={`kba-header ${ready ? "" : "kba-header--hidden"} ${titled ? "kba-header--titled" : ""}`}
+        className={`kba-header ${ready || failed ? "" : "kba-header--hidden"} ${titled ? "kba-header--titled" : ""}`}
         title={a?.label ?? " "}
         onBack={goBack}
         right={<button>관리</button>}

@@ -342,7 +342,7 @@ html[data-app="kbank"] .statusbar--android {
   padding: 0;
   justify-content: flex-start;
   font-family: Roboto, sans-serif;
-  font-size: 12.8px;
+  font-size: 13.2px;
   letter-spacing: 0;
   color: #494949;
   transition: none;
@@ -350,16 +350,16 @@ html[data-app="kbank"] .statusbar--android {
 html[data-app="kbank"] .statusbar--android .statusbar__carrier {
   position: absolute;
   left: 11.2px;
-  top: 17.75px; /* line-height 0 → 기준선 = top + 0.3418em = 22.1 (숫자 잉크 아래끝) */
+  top: 17.9px; /* line-height 0 → 기준선 = top + 0.3418em = 22.4 */
   line-height: 0;
   font-weight: 400;
 }
 html[data-app="kbank"] .statusbar--android .statusbar__time {
   position: absolute;
   left: 39.2px;
-  top: 17.75px; /* line-height 0 → 기준선 = top + 0.3418em = 22.1 (숫자 잉크 아래끝) */
+  top: 17.9px; /* line-height 0 → 기준선 = top + 0.3418em = 22.4 */
   line-height: 0;
-  font-weight: 600;
+  font-weight: 700;
 }
 .statusbar__right--kbank {
   position: absolute;
@@ -380,23 +380,44 @@ html[data-app="kbank"] .statusbar--android .statusbar__time {
   z-index: 50;
   pointer-events: none;
 }
+/* 손잡이: 녹화 시작화면 정지 프레임 12장 평균, 반값 경계 124.77~259.24 × 824.12~828.03, 가운데 #b2b2b2 (luma 177.8).
+   클론을 같은 방법으로 재면 왼쪽 −0.19 · 위 −0.3 치우쳐 나와서 그만큼 보정 */
 .phone__gesture i {
   position: absolute;
-  left: 124.3px;
-  top: 7.2px; /* 화면 824 − (833.08 − 16) */
-  width: 134.7px;
+  left: 124.96px;
+  top: 7.3px; /* 화면 824.3 − (833.08 − 16) */
+  width: 134.3px;
   height: 4px;
   border-radius: 2px;
-  background: #b0aeaf;
+  background: #b2b2b2;
 }
-/* kbank2: 상태바 왼쪽 화면녹화 표시 (PhoneFrame KbankRecLeft). 캠코더는 1초 주기 0.5초 켜짐 */
+/* kbank2: 상태바 왼쪽 화면녹화 표시 (PhoneFrame KbankRecLeft). 캠코더는 0.986초 주기 반 켜짐 (길이는 intro.ts BLINK_MS 를 style 로) */
 .kb-sb-left {
   position: absolute;
   left: 0;
   top: 0;
 }
 .kb-sb-rec {
-  animation: kb-sb-rec-blink 1s linear infinite;
+  animation: kb-sb-rec-blink 986ms linear infinite;
+}
+/* kbank2: 인트로 영상이 끝난 직후 상태바 글자·아이콘이 영상 속 흰색(어두운 기기 홈 화면 테마)에서 #494949 로 바뀜.
+   녹화 원본 5.615~5.788초 'SKT' 잉크 253 → 197 → 161 → 131 → 104 → 79 → 75 → 74 (흰 바탕이라 투명도 0 → 1 과 같음):
+   영상 끝 + 15ms 부터 165ms cubic-bezier(0,0,.4,1) 로 맞춤 (오차 RMS 0.018). 빨간 녹화 알약은 그대로 (recorder.ts playIntro) */
+html[data-intro-end] .statusbar--android .statusbar__time,
+html[data-intro-end] .statusbar--android .statusbar__carrier,
+html[data-intro-end] .statusbar__right--kbank,
+html[data-intro-end] .kb-sb-dim {
+  animation: kb-sb-in 165ms 15ms cubic-bezier(0, 0, 0.4, 1) backwards;
+}
+/* 제스처 손잡이도 흰색에서 #b0aeaf 로 — 더 천천히: 5.591~5.988초 249 → 235 → 223 → 215 → 206 → … → 175 (영상 끝부터 410ms
+   cubic-bezier(0,0,.2,1), 오차 RMS 0.013) */
+html[data-intro-end] .phone__gesture i {
+  animation: kb-sb-in 410ms cubic-bezier(0, 0, 0.2, 1) backwards;
+}
+@keyframes kb-sb-in {
+  from {
+    opacity: 0;
+  }
 }
 @keyframes kb-sb-rec-blink {
   0%,

@@ -11,11 +11,28 @@ import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { isIntroOn, syncBlink } from "./intro";
 import { setBattery, setClock } from "./deviceStatus";
-import kbankIntroSrc from "../assets/intro/kbank-open-intro.mp4";
+import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
+import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
 
-// 케이뱅크 인트로 영상(kbank-open-intro.mp4 = 녹화 cb67e5eb 2.8~5.6초) 상태바 값 그대로. 영상이 끝나고 우리 상태바로
-// 넘어갈 때 시각·배터리가 뚝 바뀌어 보이지 않게, 인트로를 틀기 전에 이 값으로 맞춰 둠
-const INTRO = { src: kbankIntroSrc, clock: "06:11", battery: 24, blinkOnMs: 330 };
+// 케이뱅크 인트로 영상 = 녹화 cb67e5eb 3.03~5.60초 (30fps 로 고른 프레임 92~168, 77장 2.567초): 기기 홈 화면 → 금융 폴더 → K 탭 →
+// 시작화면이 반쯤 밝아진 데까지. 같은 장면을 mp4(H.264 High 3.1)와 webm(VP9) 두 가지로 — H.264 를 못 트는 브라우저(오픈소스 Chromium 등)는 webm.
+// 둘 다 녹화 원본에서 바로: ffmpeg -i 녹화.mp4 -vf "fps=30,trim=start_frame=91:end_frame=168,setpts=PTS-STARTPTS" -an -pix_fmt yuv420p
+//   -colorspace bt709 -color_primaries bt709 -color_trc bt709 에 mp4 는 -c:v libx264 -profile:v high -level 3.1 -bf 0 -crf 20 -movflags +faststart,
+//   webm 은 -c:v libvpx-vp9 -crf 24 -b:v 0 -row-mt 1. mp4 는 B 프레임 없이(-bf 0) — 있으면 첫 장면이 0.233초에서 시작해(편집 목록)
+//   브라우저 시간·길이가 webm 과 달라짐. 프레임 평균 오차(녹화 30fps 프레임 대비) mp4 0.70 · webm 0.77 / 255
+// 상태바 값도 영상 그대로 맞춰 둠 (영상이 끝나고 우리 상태바로 넘어갈 때 시각·배터리가 뚝 바뀌어 보이지 않게)
+const INTRO = {
+  sources: [
+    { src: kbankIntroMp4, type: 'video/mp4; codecs="avc1.64001F"' },
+    { src: kbankIntroWebm, type: 'video/webm; codecs="vp9"' },
+  ],
+  clock: "06:11",
+  // 녹화 시계는 14.92초(영상 첫 장면 + 11.88초)에 6:11 → 6:12 (74.81초에 6:13). setClock 은 분까지라 그때 6:12 로 한 번 더 맞춤
+  nextMinuteMs: 11_880,
+  battery: 24,
+  // 영상 끝(녹화 5.60초)에 캠코더 표시가 켜진 지: 영상 속 켜짐 2.200초(77장 중 67번째) → 끝 2.567초 = 0.37초째. 꺼짐은 녹화 5.713~5.738초 사이
+  blinkOnMs: 370,
+};
 
 type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
 
@@ -198,38 +215,128 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   track.addEventListener("ended", () => stopCurrent?.());
   if (fullscreen) document.addEventListener("fullscreenchange", onFsChange);
 
+  // 인트로(kbank2): 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 폰 위에 덮어 첫 장면까지 받아 둔 뒤 녹화 시작
+  // → 녹화 첫 프레임이 영상 첫 장면 (받는 동안의 검은 화면이 녹화 앞에 붙지 않게)
+  const intro = isIntroOn() ? await loadIntro(target) : null;
   // 앱을 검은 화면으로 돌려 놓고, 그 모습이 한 프레임 그려진 뒤 녹화 시작 → 시작화면부터
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
   await nextFrame();
+  const started = new Promise((r) => recorder.addEventListener("start", r, { once: true }));
   recorder.start();
   set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
-  // 인트로(kbank2): 폰 위에 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 먼저 틀고, 끝나자마자 바로 시작화면으로
-  // (영상과 폰 틀이 같은 기기·같은 비율이라 상태바·손잡이가 안 끊기고 한 번의 녹화로 이어짐)
-  if (isIntroOn()) {
+  if (intro) {
+    // 녹화기가 첫 프레임을 받기 시작한 뒤에 틀어야 영상 첫 장면부터 찍힘 (바로 틀면 앞 5장쯤이 빠졌음, 시험 녹화 rec1)
+    await started;
+    await nextFrame();
+    // 영상을 틀고, 끝나면 바로 시작화면 (영상과 폰 틀이 같은 기기·같은 비율이라 상태바·손잡이가 안 끊기고 한 번의 녹화로 이어짐)
     setClock(INTRO.clock);
     setBattery(INTRO.battery);
-    await playIntro(target);
+    const minute = setTimeout(() => state.status === "recording" && setClock("06:12"), INTRO.nextMinuteMs);
+    const stopKeep = keepCapturing(target);
+    recorder.addEventListener("stop", () => (clearTimeout(minute), stopKeep()), { once: true });
+    await playIntro(intro, target);
   } else {
     await sleep(600);
+    window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
   }
-  window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
 }
 
-function playIntro(target: HTMLElement) {
-  return new Promise<void>((resolve) => {
+// 녹화가 끊기지 않게: 인트로 영상(2.6초 동안 화면 전체가 30fps 로 바뀜)이 끝나면 크롬 화면 캡처가 '움직이는 영역'을 그 영상으로 잡은 채
+// 0.4초 동안 새 프레임을 안 내보내고(시작화면 첫 0.4초·상태바가 바뀌는 모습이 빠짐), 그 뒤로도 0.5~0.75초 간격으로만 찍었음
+// (시험 녹화: 영상 끝 → 시작화면 첫 프레임 +0.40초, 언제 영상을 걷든 같음). 폰 전체를 덮는 거의 투명한 흰 막의 투명도를
+// 매 프레임 0.001 ↔ 0.002 로 바꿔(색 차이 0.5 단계 미만이라 안 보임) 녹화가 끝날 때까지 매 프레임 찍히게 함. 인트로가 있는 녹화만
+function keepCapturing(target: HTMLElement) {
+  const el = document.createElement("div");
+  el.style.cssText = "position:absolute;inset:0;z-index:998;pointer-events:none;background:#fff;opacity:0.001";
+  target.appendChild(el);
+  const anim = el.animate([{ opacity: 0.001 }, { opacity: 0.002 }], { duration: 1000 / 60, iterations: Infinity, direction: "alternate" });
+  return () => {
+    anim.cancel();
+    el.remove();
+  };
+}
+
+// 틀 수 있는 영상부터 (canPlayType 이 "" 이면 뺌. 다 "" 이면 그래도 차례로 시도)
+function introSources() {
+  const probe = document.createElement("video");
+  const ok = INTRO.sources.filter((s) => probe.canPlayType(s.type) !== "");
+  return ok.length ? ok : INTRO.sources;
+}
+
+// 인트로 영상을 폰 위에 덮고 끝까지 받아 둠(첫 장면이 보이는 채 멈춤). 이 형식을 못 틀면 다음 형식, 다 안 되거나 5초 안에 못 받으면 null (인트로 없이)
+function loadIntro(target: HTMLElement) {
+  return new Promise<HTMLVideoElement | null>((resolve) => {
+    const list = introSources();
+    let i = 0;
     const video = document.createElement("video");
-    video.src = INTRO.src;
     video.muted = true;
     video.playsInline = true;
+    video.preload = "auto";
     video.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:999;";
-    const done = () => {
-      syncBlink(INTRO.blinkOnMs); // 영상 속 캠코더 깜빡임을 우리 상태바가 같은 위상으로 이어 받음
+    const finish = (ok: boolean) => {
+      clearTimeout(timer);
+      video.removeEventListener("canplaythrough", onReady);
+      video.removeEventListener("error", onError);
+      if (!ok) video.remove();
+      resolve(ok ? video : null);
+    };
+    const onReady = () => finish(true);
+    const onError = () => {
+      if (++i >= list.length) return finish(false);
+      video.src = list[i].src;
+      video.load();
+    };
+    const timer = setTimeout(() => finish(false), 5000);
+    video.addEventListener("canplaythrough", onReady);
+    video.addEventListener("error", onError);
+    video.src = list[0].src;
+    target.appendChild(video);
+  });
+}
+
+// 영상을 끝까지 틀고 바로 시작화면으로. 마지막 장면(2.533초)이 나오는 순간 시작화면을 영상 밑에 미리 띄워 두고, 그 장면이 1/30초
+// 보인 뒤 곧바로 영상을 걷음 → 녹화 원본처럼 마지막 장면(5.566초, 반쯤 밝아진 회색) 다음 장면이 흰 시작화면 (사이에 검은 화면·같은 장면 반복 없이).
+// 'ended' 는 마지막 장면이 나오고 38ms 뒤에야 와서(시험 녹화) 기다리면 회색 장면이 한 장 더 찍힘 → 장면 시각으로 맞추고 'ended' 는 대비로만
+const oneFrame = () => new Promise((r) => requestAnimationFrame(r));
+function playIntro(video: HTMLVideoElement, target: HTMLElement) {
+  return new Promise<void>((resolve) => {
+    let mounted = false;
+    const mount = () => {
+      if (mounted) return;
+      mounted = true;
+      window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
+    };
+    const lastFrame = video.duration - 1.5 / 30;
+    const onFrame = (_now: number, meta: { mediaTime: number; expectedDisplayTime: number }) => {
+      if (meta.mediaTime < lastFrame) return video.requestVideoFrameCallback(onFrame);
+      mount();
+      // 마지막 장면이 화면에 나온 때 + 1/30초 − 반 프레임(8ms): 그다음 그리는 프레임부터 시작화면
+      setTimeout(done, Math.max(0, meta.expectedDisplayTime + 1000 / 30 - 8 - performance.now()));
+    };
+    if ("requestVideoFrameCallback" in video) video.requestVideoFrameCallback(onFrame);
+
+    let ended = false;
+    const done = async () => {
+      if (ended) return;
+      ended = true;
+      const endAt = performance.now();
+      clearTimeout(guard);
+      // 상태바가 영상 속 흰 글자(어두운 기기 홈 화면 테마)에서 #494949 로 서서히 바뀜 (PhoneFrame.css [data-intro-end]). 영상이 끝난 때부터
+      const d = document.documentElement.dataset;
+      d.introEnd = "on";
+      setTimeout(() => delete d.introEnd, 600); // 가장 긴 손잡이 410ms 가 끝난 뒤
+      mount();
+      // 시작화면이 그려질 때까지 (대개 이미 그려져 있음. 로그인·프로필 고르기 중이면 그냥 넘어감)
+      for (let i = 0; i < 6 && !target.querySelector(".kb-splash"); i++) await oneFrame();
+      // 영상 속 캠코더 깜빡임을 우리 상태바가 같은 위상으로 이어 받음 (영상이 끝난 때 기준 — 기다린 만큼 더함)
+      syncBlink(INTRO.blinkOnMs + (performance.now() - endAt));
       video.remove();
       resolve();
     };
+    // 영상이 멈춰 버려도(디코딩·네트워크) 녹화가 영상에 갇히지 않게
+    const guard = setTimeout(done, (Number.isFinite(video.duration) ? video.duration * 1000 : 3000) + 3000);
     video.addEventListener("ended", done, { once: true });
     video.addEventListener("error", done, { once: true });
-    target.appendChild(video);
     video.play().catch(done);
   });
 }

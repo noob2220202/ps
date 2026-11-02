@@ -1,0 +1,9 @@
+/* 케이뱅크 글꼴: 녹화 글자 82곳(한글 53 · 숫자 29)을 후보 11종(Pretendard · Noto Sans KR · IBM Plex Sans KR · Gothic A1 · Nanum Gothic ·
+   NanumSquare · Spoqa Han Sans Neo · SUIT · Wanted Sans · Roboto · Inter)으로 그려 크기·위치·굵기를 맞춘 뒤 잉크 오차를 비교함 (FONT.md).
+   한글: Pretendard 10.0% (다음 Wanted Sans 11.2 · SUIT 13.2 · Noto 18.9), 가로세로비 1.000, 맞춘 크기가 정수 dp(±0.05)
+   → 앱 글꼴은 Pretendard 그대로 (global.css 의 Pretendard Variable, 따로 불러오지 않음). 글자를 가로로 늘릴(scaleX) 필요 없음.
+   숫자 6·9 는 획이 곧은 모양 = Pretendard ss01 'Straight-sided six and nine' (숫자판 6·9 오차 62% → 8.6%, 숫자 줄 평균 22.2 → 17.6%).
+   ss01 의 6·9 는 기본보다 0.035~0.039em 좁음. 한글·다른 숫자는 그대로 */
+.kb {
+  font-feature-settings: "ss01";
+}

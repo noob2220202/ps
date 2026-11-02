@@ -1,5 +1,8 @@
 /* 케이뱅크 홈 (KbankHome.tsx) + 아래 탭바 (tabbar.tsx). 녹화 cb67e5eb 9.47~19.5초 · 42~43초.
-   값은 녹화 px ÷ 1.53646, 앱 y = 화면 y − 33.2. 글자는 line-height 1 로 두고 top = 잉크 위 + 0.4 − 0.055em (한글 윗선) */
+   값은 녹화 px ÷ 1.53646, 앱 y = 화면 y − 33.2. 글꼴은 Pretendard 그대로(FONT.md) → 녹화 dp = CSS px, 늘림(scaleX)·자간 없음.
+   글자는 line-height 1 로 두고 크기·굵기·left·top 은 FONT.md 항목별 표(글자 상자 왼쪽 · line-height 1 상자 위)에서 시작해,
+   폰 원점을 기기 화소에 맞춰(590/384 배율) 찍은 클론과 녹화 잉크 상자를 겹쳐 다듬음. 표에 없는 글자는 Pretendard 로 그려 크기·굵기를 맞춤(오차 %).
+   크롬은 글자 기준선을 CSS 1px 단위로 놓아서 세로는 ±0.5 안이 한계 (녹화 기기는 0.65dp 단위) */
 
 /* 바탕: 화면에 고정 (스크롤해도 그대로) — 녹화 x 566~586 세로: y ~300px 까지 #dae3f1(218,227,241) → ~410px 부터 #ebf1f9(235,241,249) */
 .kbh {
@@ -45,42 +48,45 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-/* '홈': 잉크 x 31~60px · y 77~109px (앱 20.2 · 16.9~38.4), #141821 */
+/* '홈': 잉크 x 31~60px · y 77~110px (앱 20.4~39.9 · 17.3~38.5), #141821 — FONT.md 24px 700, left 19.8.
+   top 은 표(16.2)로 그리면 잉크가 0.8 위라 겹쳐 보고 17.0 (녹화 350, 폰 원점을 기기 화소에 맞춰 찍음) */
 .kbh-head__title {
   position: absolute;
-  left: 20.1px;
-  top: 15.7px;
-  font-size: 23.8px;
+  left: 19.8px;
+  top: 17px;
+  font-size: 24px;
   font-weight: 700;
   color: #141821;
 }
 
-/* 알약: 오른끝 504px(328.3) · y 75~115px (앱 15.3, 높이 26.6), 오른쪽에 붙어 왼쪽으로 늘고 줆, 안 글자는 왼쪽 붙임(잘림).
-   폭: 처음 460px(29.3) → 펼침 144px(235) → 접힘 399px('● 사장님', 68.6)
+/* 알약: 오른끝 504.5px(328.4) · y 74.4~115.8px (앱 15.2, 높이 26.9), 오른쪽에 붙어 왼쪽으로 늘고 줆, 안 글자는 왼쪽 붙임(잘림).
+   폭: 처음 460px(29.3) → 펼침 144.0px(234.6, 녹화 350) → 접힘 399.8px('● 사장님', 68.3, 녹화 440)
    회색: 바탕 #c0cbe0(192,203,224) 글자 #505b70 · 파랑: 바탕 #eaf2fe(234,242,254) 글자 #3e64fd */
 .kbh-pill {
   position: absolute;
-  right: 55.7px;
-  top: 15.3px;
-  height: 26.6px;
-  width: 68.6px;
-  border-radius: 13.3px;
+  right: 55.6px;
+  top: 15.2px;
+  height: 26.9px;
+  width: 68.3px;
+  border-radius: 13.45px;
   overflow: hidden;
   background: #c0cbe0;
   color: #505b70;
+  /* 접힘: 녹화 406.5~418 폭 380ms (2.5 · 6 · 11 · 27 · 42 · 53 · 68 · 77 · 85 · 94 · 98% / 33ms), 색 409~418 */
   transition:
-    width 400ms cubic-bezier(0.3, 0, 0.2, 1),
+    width 380ms ease-in-out,
     background-color 300ms linear,
     color 300ms linear;
 }
 .kbh-pill--mini {
   width: 29.3px;
 }
+/* 펼침: 녹화 305.5~316 폭 350ms (13.6 · 22 · 40 · 51 · 62 · 72 · 89 · 94 · 98% / 33ms = ease) */
 .kbh-pill--open,
 .kbh-pill--blue {
-  width: 235px;
+  width: 234.6px;
   transition:
-    width 333ms cubic-bezier(0.2, 0.5, 0.3, 1),
+    width 350ms ease,
     background-color 300ms linear,
     color 300ms linear;
 }
@@ -92,30 +98,28 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 235px;
+  width: 234.6px;
   height: 100%;
   white-space: nowrap;
 }
-/* 점: 녹화 415~424px → 지름 6.5, 가운데가 알약 왼끝 + 13.7 */
+/* 점: 녹화 350 잉크 x 159~171.5 · y 89~101px (103.5~111.6 · 앱 24.7~32.5) → 지름 7.8, 가운데가 알약 왼끝 + 13.65 · 위 + 13.5 */
 .kbh-pill__dot {
   position: absolute;
-  left: 10.4px;
-  top: 10px;
-  width: 6.6px;
-  height: 6.6px;
+  left: 9.75px;
+  top: 9.6px;
+  width: 7.8px;
+  height: 7.8px;
   border-radius: 50%;
   background: currentColor;
 }
-/* 글자: 녹화 글꼴은 한글이 넓고 띄어쓰기가 좁음 → '사장님' 폭에 맞춰 15px, 띄어쓰기·자간을 줄여 글줄 폭을 맞춤.
-   '사장님' 잉크 x 427~486px(277.9~317.0) = 알약 왼끝 + 18.2 (점 포함), 글자는 + 22, 펼친 글줄 x 178~454px (115.9~296.1) */
+/* 글자: FONT.md 14px 700 자간 0 — 펼친 글줄 상자 left 115.5 (녹화 329~379, 잉크 x 180~458px) = 알약 왼끝 93.8 + 21.7.
+   녹화 잉크 높이가 2px 작음(y 85~105px, 클론 85~107) → 잉크 위끝을 맞춰 위 15.2 + 6.7 */
 .kbh-pill__text {
   position: absolute;
-  left: 21.4px;
-  top: 6.3px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.65px;
-  word-spacing: -0.6px;
+  left: 21.7px;
+  top: 6.7px;
+  font-size: 14px;
+  font-weight: 700;
 }
 /* 접힌 뒤엔 '사장님' 뒤가 없음 (접히는 동안만 잘린 채 보임, 녹화 410~416) */
 .kbh-pill--closed .kbh-pill__more,
@@ -132,7 +136,8 @@
   height: 16.9px;
 }
 
-/* 종 + 빨간 뱃지: 뱃지 x 526~569px · y 64~89px (342.3~371 · 앱 8.5~25.4) #f9515b, 종 잉크 x 530~558px · y ~70~110px (#29323e) */
+/* 종 + 빨간 뱃지: 뱃지 x 526~569px · y 64~89px (342.3~370.6 · 앱 8.5~26.7) #f9515b,
+   종 잉크(녹화 334~379 평균) 옆선 x 348.2 · 362.5 → 아래로 벌어져 밑줄 y 34.4 (x 345.9~364.8), 추 354.0 둘레 35.1~38.4 (#29323e) */
 .kbh-bell {
   position: absolute;
   left: 340px;
@@ -148,14 +153,14 @@
 .kbh-bell__badge {
   position: absolute;
   left: 2.3px;
-  top: 2.5px;
-  min-width: 28.7px;
+  top: 2.2px;
+  min-width: 28px;
   height: 16.9px;
   padding: 0 4px;
   border-radius: 8.5px;
   background: #f9515b;
   color: #fff;
-  font-size: 11.1px;
+  font-size: 11px; /* 맞춤 11px 700 */
   font-weight: 700;
   line-height: 16.9px;
   text-align: center;
@@ -172,47 +177,54 @@
 .kbh-scroll::-webkit-scrollbar {
   display: none;
 }
-/* 맨 아래까지 내리면 1375px(895dp) 내려감 (녹화 496~508) → 내용 높이 800 + 895 = 1695 */
+/* 처음 들어올 때 녹화 309~328 (+567 ~ +1233ms) 카드 전체가 12.1dp(18.6px) 아래에 있다가 한 번에 제자리 */
+.kbh-page--bump {
+  transform: translateY(12.1px);
+}
+/* 맨 아래까지 내리면 1375px(895dp) 내려감 (녹화 496~508) → 내용 높이 800 + 895 = 1695 (아이폰은 탭바가 더 높은 만큼 늘려
+   맨 아래 '간편 홈 모드' 와 탭바 사이가 같게).
+   카드 위·아래 끝(x 300 세로 줄, 녹화 350·415·444·465·483·500 경계를 면적법으로 1/10px): 계좌 57.3~319.6 · 안내 331.7~545.1 · 바로가기 557.2~662.7 ·
+   내 자산 675.0~926.3 · 흩어진 계좌 938.2~1018.3 · 실시간 추천 1030.5~1331.9 → 사이 12~12.3 (평균 12.1) */
 .kbh-page {
   position: relative;
-  padding: 57.9px 19.5px 0;
-  height: 1695px;
+  padding: 57.3px 19.5px 0;
+  height: calc(1695px + max(0px, var(--safe-bottom) - 16px));
   box-sizing: border-box;
 }
-/* 카드: x 30~559px (19.5~364.5, 폭 345), 모서리 r ≈ 30px(19.5), 사이 20px(13) */
+/* 카드: x 30~559px (19.5~364.5, 폭 345), 모서리 r ≈ 30px(19.5), 사이 18.6px(12.1) */
 .kbh-card {
   position: relative;
   background: #fff;
   border-radius: 19.5px;
-  margin-bottom: 13px;
+  margin-bottom: 12.1px;
 }
 .kbh-card > * {
   position: absolute;
 }
 
-/* ---------- 계좌 카드: 앱 y 57.9 (녹화 140px) ~ 217.7(385px) / 넘김 칸이 끼면 ~318.9(541px) ---------- */
+/* ---------- 계좌 카드: 앱 y 57.3 (녹화 139.1px) ~ 217.6(385.3px, 넘김 칸 윗선) / 넘김 칸이 끼면 ~319.6(542.1px) ---------- */
 .kbh-acct {
-  height: 159.8px;
+  height: 160.3px;
   cursor: pointer;
 }
 .kbh-acct--more {
-  height: 261px;
+  height: 262.3px;
 }
-/* '듀얼K 입출금통장' 잉크 x 62px(40.4) · y 174~193px(앱 80.0~93.1), #282729 */
+/* '듀얼K 입출금통장' 잉크 x 62px(40.2) · y 174~193px(앱 79.9~93.2), #282729 — FONT.md 15px 500, left 39.8
+   (줄 높이 16 = 복사 단추라 글자 상자는 줄 위 + 0.5, 겹쳐 보고 줄 위 79.3) */
 .kbh-acct__title {
-  left: 21px;
-  top: 21.1px;
+  left: 20.3px;
+  top: 21.95px;
   font-size: 15px;
   font-weight: 500;
   color: #282729;
 }
-/* 번호: 잉크 x 228~392px(148.4~255.8) · y 176~191px, #646469 */
+/* 번호: 잉크 x 228~392px(148.6~255.8) · y 176~191px, #646469 — 맞춤 15px 400 (오차 22%, 14px 은 52%) */
 .kbh-acct__no {
-  margin-left: 5px;
+  margin-left: 4.2px;
   font-weight: 400;
   color: #646469;
-  letter-spacing: 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 /* 복사: 잉크 x 401~419px · y 176~193px (261.0~273.4 · 앱 81.3~93.1) — 번호 바로 뒤 5.2 */
 .kbh-acct__title {
@@ -227,29 +239,31 @@
   align-items: center;
   justify-content: center;
 }
-/* ⋮: 잉크 x 523~527px · y 173~198px (340.4~343.6 · 앱 79.4~96.3), 점 지름 3.2 · 간격 6.85, #73727e */
+/* ⋮: 녹화 350 잉크 x 340.4~344.0 · 앱 y 79.3~96.4 (가운데 342.2, 87.85), 점 지름 3.9 · 사이 3.1, #73727e */
 .kbh-acct__more {
-  left: 313px;
-  top: 16px;
+  left: 313.7px;
+  top: 16.55px;
   width: 18px;
   height: 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3.65px;
+  gap: 3.1px;
 }
 .kbh-acct__more i {
-  width: 3.4px;
-  height: 3.4px;
+  width: 3.9px;
+  height: 3.9px;
   border-radius: 50%;
   background: #73727e;
 }
-/* 잔액: 잉크 x 65~113px · y 214~245px ('1원' 42.3~74.2 · 앱 106.1~126.9), 굵게 #19181b. 처음 0.47초는 #c4cad6 */
+/* 잔액: '1원' 잉크 x 42.7~74.5 · 앱 y 106.1~127.1 (녹화 350), '0원' 40.2~74.5 (녹화 1290) — 24px 700, 굵게 #19181b. 처음 0.47초는 #c4cad6.
+   '1원' 과 '0원' 의 '원' 끝이 같음 = 녹화 '1' 폭이 '0' 과 같음 → '1' 좌우 0.095em (Pretendard 0 = 0.660em, 1 = 0.469em).
+   글자 상자 왼쪽 39.2 ('0' 잉크 40.2 − 왼쪽 여백 0.045em) */
 .kbh-acct__bal {
-  left: 22.7px;
-  top: 46.5px;
-  font-size: 24.2px;
+  left: 19.7px;
+  top: 47.95px;
+  font-size: 24px;
   font-weight: 700;
   color: #19181b;
   display: flex;
@@ -257,27 +271,33 @@
 .kbh-acct__bal--gray {
   color: #c4cad6;
 }
+.kbh-n1 {
+  margin: 0 0.095em;
+}
+/* 굴림 (녹화 1271.3~1298): 보이는 창은 글줄보다 위로 0.18em · 아래로 0.15em 큼 (잉크가 y 206~255px 에서만 보임, 1.33em = 49px),
+   새 숫자와 옛 숫자가 1.33em 간격으로 붙어 함께 내려감. 움직임은 처음에 빠르고 오래 끄는 꼴
+   (8 · 11 · 15 · 21 · 23 · 26 · 30 · 32 · 34 · 37 … 49px / 33ms → cubic-bezier(0, .11, .25, .98) 850ms) */
 .kbh-roll {
   position: relative;
   display: inline-block;
   overflow: hidden;
-  height: 1.12em;
-  margin-bottom: -0.12em;
+  margin: -0.18em 0 -0.15em;
+  padding: 0.18em 0 0.15em;
 }
 .kbh-roll__new {
   display: inline-block;
-  animation: kbh-roll-in 270ms cubic-bezier(0.3, 0, 0.3, 1) both;
+  animation: kbh-roll-in 850ms cubic-bezier(0, 0.11, 0.25, 0.98) both;
 }
 .kbh-roll__old {
   position: absolute;
   left: 50%;
-  top: 0;
+  top: 0.18em;
   transform: translateX(-50%);
-  animation: kbh-roll-out 270ms cubic-bezier(0.3, 0, 0.3, 1) both;
+  animation: kbh-roll-out 850ms cubic-bezier(0, 0.11, 0.25, 0.98) both;
 }
 @keyframes kbh-roll-in {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-1.33em);
   }
   to {
     transform: translateY(0);
@@ -288,59 +308,64 @@
     transform: translate(-50%, 0);
   }
   to {
-    transform: translate(-50%, 100%);
+    transform: translate(-50%, 1.33em);
   }
 }
-/* 가져오기 / 이체하기: x 61~288px · 301~529px (39.7~188.1 · 195.9~344.3), y 287~354px (앱 153.6~197.9), r ≈ 12px(8), #ecf2f6, 글자 #1c226e */
+/* 가져오기 / 이체하기: x 61.4~288.9px · 301.5~529.1px (39.9~188.1 · 196.2~344.3), y 287.3~354.7px (앱 153.8~197.6), r ≈ 12px(8), #ecf2f6, 글자 #1c226e.
+   글자 FONT.md 15px 400, 가운데 맞춤 → left 87.8 · 244.2, 상자 위는 겹쳐 보고 단추 위 + 14.7 (잉크 y 168.8~181.9) */
 .kbh-acct__btn {
-  top: 95.7px;
-  width: 148.4px;
-  height: 44.3px;
+  top: 96.2px;
+  width: 148.2px;
+  height: 43.9px;
+  box-sizing: border-box;
+  padding: 14.7px 0 14.2px; /* 단추는 글자를 세로 가운데 두므로 위아래 여백으로 글자 상자(15)를 고정 */
   border-radius: 8px;
   background: #ecf2f6;
   color: #1c226e;
-  font-size: 14.9px;
+  font-size: 15px;
+  line-height: 1;
   text-align: center;
 }
 .kbh-acct__get {
-  left: 20.2px;
+  left: 20.4px;
 }
 .kbh-acct__send {
-  left: 176.4px;
+  left: 176.7px;
 }
 
-/* 넘김 칸 (계좌 카드 아래): 선 y 385~386px(앱 217.7) — 카드 그림 · 'ONE 11월 쓴 돈' · '0원' · 점 5개 */
+/* 넘김 칸 (계좌 카드 아래): 선 y 385.3~387.1px(앱 217.6~218.7) — 카드 그림 · 'ONE 11월 쓴 돈' · '0원' · 점 5개 */
 .kbh-one {
   left: 0;
   right: 0;
-  top: 159.8px;
-  height: 101.2px;
+  top: 160.3px;
+  height: 102px;
   border-top: 1px solid #eaeaea;
   box-sizing: border-box;
 }
 .kbh-one > * {
   position: absolute;
 }
-/* 카드 그림: 잉크 x 75~114px · y 412~472px (48.8~74.8 · 앱 234.9~274.6) — 그림(내 자산 쪽에서 자름)을 0.93배 */
+/* 카드 그림: 녹화 350 잉크 x 49.3~74.4 · 앱 y 235.0~274.5 (25.1 × 39.5) — 내 자산 쪽 그림(잉크 28.0 × 43.8)의 0.90배 */
 .kbh-one__card {
-  left: 25.7px;
-  top: 12px;
-  width: 33.8px;
-  height: 49.6px;
+  left: 26.2px;
+  top: 11.8px;
+  width: 32.8px;
+  height: 48.1px;
 }
-/* 'ONE 11월 쓴 돈' 잉크 x 152px(98.9) · y 416px(앱 237.6), #4f4f51 */
+/* 'ONE 11월 쓴 돈' 잉크 x 152px(98.3) · y 416px(앱 237.6), #4f4f51 — FONT.md 14px 400, left 97.8 · top 236.7
+   (넘김 칸 윗선 1px 안쪽이 기준. 글자 기준선은 CSS 1px 단위로 놓이므로 겹쳐 보고 잉크가 가장 가까운 값) */
 .kbh-one__l1 {
-  left: 79.5px;
-  top: 19.1px;
+  left: 78.3px;
+  top: 16.9px;
   font-size: 14px;
   color: #4f4f51;
 }
-/* '0원' 잉크 y 452~473px (앱 261.0~275.3) */
+/* '0원' 잉크 x 98.7~120.2 · y 452~473px (앱 261.3~275.1) — 맞춤 16px 500 (오차 21%, 700 은 38%) */
 .kbh-one__l2 {
-  left: 79.4px;
-  top: 42.9px;
-  font-size: 15.1px;
-  font-weight: 700;
+  left: 78.3px;
+  top: 41.85px;
+  font-size: 16px;
+  font-weight: 500;
   color: #222;
 }
 /* 점: x 253~335px · y 506~515px (164.7~218.7 · 앱 296.1~302.6), 지름 6.5 간격 11.9, 첫 점 #555a67 채움, 나머지 테두리 #96959b */
@@ -362,60 +387,62 @@
   background: #555a67;
 }
 
-/* ---------- 안전한 금융거래: 앱 y 331.9 (녹화 561px) ~ 544.1 (887px) ---------- */
+/* ---------- 안전한 금융거래: 앱 y 331.7 (녹화 560.9px) ~ 545.1 (888.5px) ---------- */
 .kbh-safe {
-  height: 212.2px;
+  height: 213.4px;
 }
-/* 굵은 두 줄: 잉크 y 597 · 636px (앱 355.4 · 380.7), #44444a */
+/* 굵은 두 줄: FONT.md 16px 700, left 39.7 · top 354.3 / 380.0, #44444a */
 .kbh-safe__l1,
 .kbh-safe__l2 {
-  left: 21px;
+  left: 20.2px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: #44444a;
-  top: 48px;
 }
 .kbh-safe__l1 {
-  top: 22.6px;
+  top: 22.9px;
 }
 .kbh-safe__l2 {
-  top: 48.4px;
+  top: 48.85px;
 }
-/* 회색 두 줄: 잉크 y 675 · 710px (앱 406.1 · 428.9), #69696e */
+/* 회색 두 줄: FONT.md 14px 400, top 404.8 / 427.6, #69696e */
 .kbh-safe__l3,
 .kbh-safe__l4 {
-  left: 21px;
+  left: 20.2px;
   font-size: 14px;
   color: #69696e;
-  top: 95.9px;
 }
 .kbh-safe__l3 {
-  top: 74.1px;
+  top: 72.8px;
 }
 .kbh-safe__l4 {
-  top: 96.7px;
+  top: 95.5px;
 }
-/* ×: 잉크 x 510~523px · y 596~610px (331.9~341 · 앱 354.7~364.5) */
+/* ×: 녹화 350 잉크 x 331.5~341.3 · 앱 y 354.7~364.6 (가운데 336.4, 359.65) */
 .kbh-safe__x {
-  left: 306.5px;
-  top: 16.4px;
+  left: 305.95px;
+  top: 17.05px;
   width: 22px;
   height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* 파란 버튼: x 61~243px · y 796~856px (39.7~158.8 · 앱 484.9~524.6) #4260fe, 글자 흰색 x 81~223px */
+/* 파란 버튼: x 61.5~243.6px · y 796.8~857.0px (40.0~158.5 · 앱 485.0~524.9) #4260fe.
+   글자 흰색 FONT.md 15px 400, 가운데 맞춤 → left 51.7, 상자 위는 겹쳐 보고 단추 위 + 12.9 (잉크 y 497.7~511.4) */
 .kbh-safe__go {
-  left: 20.2px;
-  top: 153px;
-  width: 119.1px;
-  height: 39.7px;
+  left: 20.5px;
+  top: 153.3px;
+  width: 118.5px;
+  height: 39.8px;
+  box-sizing: border-box;
+  padding: 12.9px 0 11.9px;
   border-radius: 6.5px;
   background: #4260fe;
   color: #fff;
-  font-size: 14.8px;
+  font-size: 15px;
   font-weight: 400;
+  line-height: 1;
   text-align: center;
 }
 /* 자물쇠: 상자 x 428~518px · y 742~864px (278.6 · 앱 449.7, 58.6 × 79.4) — 잠긴 회색 → 잠긴 파랑 → 열림 */
@@ -431,16 +458,23 @@
   width: 100%;
   height: 100%;
   opacity: 0;
+  transition: opacity 100ms linear;
 }
+/* 회색 위로 파랑이 100ms 에 걸쳐 덮이고(녹화 310~313 · 1269.5~1272), 열림은 파랑과 맞바꿈(313~316 · 1274~1276) */
 .kbh-lock--gray .kbh-lock__gray,
+.kbh-lock--blue .kbh-lock__gray,
 .kbh-lock--blue .kbh-lock__blue,
 .kbh-lock--open .kbh-lock__open {
   opacity: 1;
 }
+.kbh-lock--blue .kbh-lock__gray,
+.kbh-lock--open .kbh-lock__gray {
+  transition: none;
+}
 
-/* ---------- 바로가기: 앱 y 557.1 (907px) ~ 661.9 (1068px) ---------- */
+/* ---------- 바로가기: 앱 y 557.2 (907.2px) ~ 662.7 (1069.1px) ---------- */
 .kbh-quick {
-  height: 104.8px;
+  height: 105.5px;
 }
 /* 네모: x 71~144px · y 931~1005px (46.2 · 앱 572.7, 47.5 정사각), 간격 81.1, 테두리 1px #ececec, r 14 */
 .kbh-quick__item {
@@ -498,53 +532,56 @@
   width: 28px;
   height: 28px;
 }
-/* 이름: 잉크 y 1022~1039px (앱 632.0~643.7), 가운데 = 네모 가운데, #323134 */
+/* 이름: 잉크 y 1022~1039px (앱 632.0~643.7), 가운데 = 네모 가운데, #323134 — FONT.md 13px 500, top 631.2 */
 .kbh-quick__item .kbh-t {
   position: absolute;
   left: 0;
   right: 0;
-  top: 75px;
+  top: 73.6px;
   text-align: center;
   font-size: 13px;
   font-weight: 500;
   color: #323134;
 }
 
-/* ---------- 내 자산: 앱 y 675.0 (1088px) ~ 925.5 (1473px) ---------- */
+/* ---------- 내 자산: 앱 y 675.0 (1088.1px) ~ 926.3 (1474.2px) ---------- */
 .kbh-asset {
-  height: 250.5px;
+  height: 251.4px;
 }
-/* '내 자산' 잉크 x 63px · y 1124~1148px (41.0 · 앱 698.4~714.6), #45444a */
+/* '내 자산' 잉크 x 63px · y 1124~1148px (41.0 · 앱 698.4~714.6), #45444a — FONT.md 18px 700, left 39.7 · top 697.6 */
 .kbh-asset__title {
-  left: 21.5px;
-  top: 22.5px;
-  font-size: 17.9px;
+  left: 20.2px;
+  top: 23px;
+  font-size: 18px;
   font-weight: 700;
   color: #45444a;
 }
-/* '편집' 잉크 x 463~498px · y 1127~1145px (301.3~324.8 · 앱 700.3), 톱니 508~525px (330.6~342.3) #7e7d85 */
+/* '편집' 잉크 x 463~498px · y 1127~1145px (300.9~324.8 · 앱 700.0~713.0) 맞춤 15px 500, 톱니 508~525px (330.6~342.3) #7e7d85 */
 .kbh-asset__edit {
-  left: 278px;
-  top: 20px;
+  left: 276.9px;
+  top: 21.15px;
   height: 22px;
   padding: 0 4px;
   display: flex;
   align-items: center;
-  gap: 5.5px;
+  gap: 3.45px;
 }
 .kbh-asset__edit .kbh-t {
-  font-size: 14.7px;
+  font-size: 15px;
+  font-weight: 500;
   color: #7e7d85;
 }
 .kbh-asset__edit svg {
   display: block;
+  position: relative;
+  top: -0.45px; /* 톱니 잉크 330.2~342.7 × 앱 700.3~713.7 (녹화 350) */
 }
-/* '카드' 잉크 y 1199~1219px (앱 747.2~760.8), #48474b */
+/* '카드' 잉크 y 1199~1219px (앱 747.2~760.8), #48474b — 맞춤 16px 700 (오차 17%) */
 .kbh-asset__sec {
-  left: 21px;
+  left: 20.2px;
   top: 71.1px;
-  font-size: 15.8px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: #48474b;
 }
 /* 카드 그림: 잉크 x 70~113px · y 1249~1317px (45.6~74.2 · 앱 779.7~824.6), 상자 64~120 × 997~1079 (스크롤 245) */
@@ -554,17 +591,17 @@
   width: 36.4px;
   height: 53.4px;
 }
-/* 'ONE 11월 쓴 돈' 잉크 x 142px(92.4) · y 1254px(앱 783.0) / '0원' 1288~1311px (앱 805.1~820.7) */
+/* 'ONE 11월 쓴 돈' 잉크 x 142px(92.4) · y 1254px(앱 783.0) 14px 400 / '0원' 1288~1311px (앱 805.1~820.7) 맞춤 18px 700 (오차 23%) */
 .kbh-asset__l1 {
-  left: 73px;
+  left: 72.6px;
   top: 106.9px;
   font-size: 14px;
   color: #4f4f51;
 }
 .kbh-asset__l2 {
-  left: 72.9px;
+  left: 71.6px;
   top: 130.4px;
-  font-size: 15.1px;
+  font-size: 18px;
   font-weight: 700;
   color: #222;
 }
@@ -576,28 +613,33 @@
   height: 1px;
   background: #eaeaea;
 }
-/* '내 자산 모두 보기' 잉크 x 193~355px · y 1415~1436px (125.6~231.7 · 앱 887.7~902.1), › 378~388px (246~253.2) #686868 */
+/* '내 자산 모두 보기' 잉크 x 193~355px · y 1415~1436px (125.6~231.8 · 앱 888.1~902.4, 녹화 444), › 378~388px (246~253.2) #686868 */
 .kbh-asset__all {
   left: 0;
   right: 0;
   top: 188.9px;
   bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 13px;
-  padding-left: 1.6px;
-  padding-bottom: 1px;
+}
+.kbh-asset__all > * {
+  position: absolute;
 }
 .kbh-asset__all .kbh-t {
+  left: 104.9px;
+  top: 23.75px;
   font-size: 16px;
+  font-weight: 500; /* 맞춤 16px 500 (오차 25%, 400 은 30%) */
   color: #686868;
 }
+/* ›: 녹화 444 잉크 x 245.7~253.0 · 높이 10.7 → 선 x 1~7 · y 1.75~12.25 (굵기 1.5) */
+.kbh-asset__all svg {
+  display: block;
+  left: 225.45px;
+  top: 24.35px;
+}
 
-/* ---------- 흩어져 있는 내 계좌: 앱 y 937.9 (1492px) ~ 1017.3 (1614px) ---------- */
+/* ---------- 흩어져 있는 내 계좌: 앱 y 938.2 ~ 1018.3 (녹화 444·465·483 경계) ---------- */
 .kbh-link {
-  height: 79.4px;
-  margin-bottom: 13px;
+  height: 80px;
 }
 /* 동그라미: 잉크 x 61~122px · y 1523~1584px (39.7~80.1 · 앱 958~998.4), 약 1.17초마다 다음 은행으로 겹쳐 바뀜 (녹화 442 남색 · 450~482 노랑 · 487~ 파랑) */
 .kbh-coin {
@@ -640,8 +682,8 @@
 }
 /* 글자 잉크 x 142px · y 1542~1563px (92.4 · 앱 970.4~984.7), #1f1e20 */
 .kbh-link__t {
-  left: 73px;
-  top: 31.6px;
+  left: 72.5px;
+  top: 32.6px;
   font-size: 16px;
   font-weight: 500;
   color: #1f1e20;
@@ -655,52 +697,47 @@
   box-sizing: border-box;
   border: 1px solid #e5e4e8;
   border-radius: 8px;
-  font-size: 13.9px;
+  padding: 7.2px 0 9.4px; /* 글자 상자(14) 위 = 테두리 1 + 7.2 (녹화 444 잉크 y 971.5~983.6 에 맞춤) */
+  font-size: 14px;
+  font-weight: 500; /* 맞춤 14px 500 (오차 31%, 400 은 33%) */
+  line-height: 1;
   color: #6a6a6f;
   text-align: center;
 }
 
-/* ---------- 실시간 추천: 앱 y 1030.3 (1634px) ~ 1331 (2096px) ---------- */
-/* 글꼴: 녹화 글자는 Pretendard 보다 약 10% 넓음(기기 글꼴로 보임) → 대개 폭으로 크기를 맞춤 (높이는 1~2dp 큼).
-   이 칸·알약 글자는 20~30% 넓어서 높이로 크기를 맞추고 가로로 늘림 (kbh-w) */
-.kbh-w {
-  display: inline-block;
-  transform: scaleX(1.2);
-  transform-origin: left center;
-}
+/* ---------- 실시간 추천: 앱 y 1030.5 ~ 1331.9 (녹화 465·483·500 경계) ---------- */
 .kbh-rec {
-  height: 300.7px;
+  height: 301.4px;
   overflow: hidden;
 }
-/* '○○○님을 위한' 잉크 x 62px · y 1677~1695px (40.4 · 앱 1058.3~1070.6), #68676b */
+/* '○○○님을 위한' #68676b — FONT.md 15px 400, 줄 상자 left 39.7 · top 1057.0 (녹화 494~510 앱 y 162.1 + 스크롤 894.9) */
 .kbh-rec__l1 {
-  left: 21px;
-  top: 27.7px;
-  font-size: 12.3px;
+  left: 20.2px;
+  top: 27.5px;
+  font-size: 15px;
   color: #68676b;
-  transform: scaleX(1.22);
 }
-/* '실시간 추천 서비스예요' 잉크 x 62~311px · y 1715~1735px (40.4~203.1 · 앱 1083.0~1096.7), #1b191c */
+/* '실시간 추천 서비스예요' 잉크 x 62~311px (40.4~203.7), #1b191c — FONT.md 18px 700, left 39.7 · top 1079.7 */
 .kbh-rec__l2 {
-  left: 21px;
-  top: 52.3px;
-  font-size: 13.8px;
+  left: 20.2px;
+  top: 49.2px;
+  font-size: 18px;
   font-weight: 700;
   color: #1b191c;
-  transform: scaleX(1.3);
 }
-/* 가로 카드: x 60~264px(39.1~171.8) · 277~479 · 490~, y 1780~2066px (앱 1125.3~1311.4), r 16 */
+/* 가로 카드 (녹화 500, 스크롤 1375px): 첫 카드 x 60.7~264.6px (39.5~172.2), 둘째 '히든카드' 가운데 246.05 → 179.7~312.4,
+   셋째 왼끝 492.3px(320.4) · y 쪽 1125.6~1312.2 (높이 186.6), r 16 */
 .kbh-rec__row {
-  left: 19.5px;
-  top: 95px;
+  left: 20px;
+  top: 95.1px;
   display: flex;
-  gap: 8px;
+  gap: 7.5px;
 }
 .kbh-rec__item {
   position: relative;
   flex: none;
-  width: 132.4px;
-  height: 186.1px;
+  width: 132.7px;
+  height: 186.6px;
   border-radius: 16px;
   background: #f6f7fa;
   text-align: center;
@@ -708,15 +745,16 @@
 .kbh-rec__item--pick {
   background: #f9edfc;
 }
-/* 꼬리표: 녹화 x 80~133px · y 1800~1829px (52.1~86.9 · 앱 1138.4~1157) — 추천 흰 바탕 보라 글자, 순위는 연한 파랑 바탕 파란 글자 */
+/* 꼬리표: 녹화 x 80~133px · y 1800~1829px (51.3~86.7 · 앱 1138.4~1157) — 추천 흰 바탕 보라 글자, 순위는 연한 파랑 바탕 파란 글자.
+   '추천'·'1위' 알약 폭(녹화 465: 35.4 · 30.2)과 글자 가운데(카드 왼끝 + 29.65 · 27.45) → 카드 왼끝 + 12.1, 좌우 여백 8 */
 .kbh-rec__tag {
   position: absolute;
-  left: 13px;
+  left: 12.1px;
   top: 13.1px;
   height: 18.6px;
-  padding: 0 7.3px;
+  padding: 0 8px;
   border-radius: 9.3px;
-  font-size: 11.3px;
+  font-size: 11px; /* 맞춤 11px 700 ('추천' 32% · '1위' 26% · '2위' 23%) */
   font-weight: 700;
   line-height: 18.6px;
   background: #fff;
@@ -725,7 +763,6 @@
 .kbh-rec__item--rank .kbh-rec__tag {
   background: #e9eefc;
   color: #4b5fdf;
-  padding: 0 6.5px;
 }
 /* 그림: 여행가방 상자 x 118~205px · 카드 340~415px, y 1841~1922px (앱 1165.0, 높이 52.7) */
 .kbh-rec__art {
@@ -742,45 +779,41 @@
   width: 48.8px;
   height: 52.7px;
 }
-/* 제목: 녹화 x 94~231px · y 1925~1947px (61.2~150.3 · 앱 1219.7~1234.4), 굵게 #201725 */
+/* 제목: FONT.md 16px 700 (줄 상자 top 쪽 1218.2 = 카드 위 + 92.6), 겹쳐 보고 + 93.6 (잉크 y 1218.8~1233.1), 가운데 맞춤, 굵게 #201725 */
 .kbh-rec__title {
   position: absolute;
   left: 0;
   right: 0;
-  top: 94px;
-  font-size: 13px;
+  top: 93.6px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1;
   color: #201725;
   white-space: nowrap;
-  transform-origin: center;
-  transform: scaleX(1.23);
 }
-/* 설명 두 줄: y 1962~1980 · 1987~2006px (앱 1244 · 1260), #6d6775 */
+/* 설명 두 줄: FONT.md 14px 400, 첫 줄 top 쪽 1241.3 (= 카드 위 + 115.7), 둘째 줄은 맞춤 14px 400 (오차 27%), #6d6775 */
 .kbh-rec__desc {
   position: absolute;
   left: 0;
   right: 0;
-  font-size: 12.1px;
+  font-size: 14px;
   line-height: 1;
   color: #6d6775;
   white-space: nowrap;
-  transform-origin: center;
-  transform: scaleX(1.16);
 }
 .kbh-rec__desc--1 {
-  top: 117.8px;
+  top: 115.7px;
 }
 .kbh-rec__desc--2 {
-  top: 136.3px;
+  top: 134.5px;
 }
 
-/* ---------- 의견: 앱 y 1343 (2113px) ~ 1417.5 (2229px), #d8dce7, r 22 ---------- */
+/* ---------- 의견: 쪽 y 1344.0 ~ 1417.7 (녹화 483 · 500 경계), #d8dce7, r 22 ---------- */
 .kbh-opinion {
   position: relative;
   display: block;
   width: 100%;
-  height: 74.5px;
+  height: 73.2px;
   border-radius: 22px;
   background: #d8dce7;
 }
@@ -796,22 +829,23 @@
 }
 /* 잉크 x 118px · y 2145px (76.8 · 앱 1362.9) #4b4f5a / x 117px · y 2178px (76.1 · 앱 1384.3) 굵게 #414651 */
 .kbh-opinion__l1 {
-  left: 57.4px;
-  top: 19.1px;
-  font-size: 13.9px;
+  left: 56.6px;
+  top: 18.1px;
+  font-size: 14px;
+  font-weight: 500; /* 맞춤 14px 500 (오차 24%, 400 은 25%) */
   color: #4b4f5a;
 }
 .kbh-opinion__l2 {
   left: 56.7px;
   top: 40.3px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700; /* 맞춤 15px 700 (오차 15%, 600 은 20%) */
   color: #414651;
 }
 /* ›: 잉크 x 514~521px · y 2165~2180px (334.5~339.7 · 앱 1375.9~1386.3) */
 .kbh-opinion__go {
   left: 314.7px;
-  top: 32.5px;
+  top: 31.65px;
 }
 
 /* ---------- 간편 홈 모드 | 홈 화면 설정: 잉크 y 2313~2333px (앱 1472.9~1485.9), #777d87 ---------- */
@@ -819,7 +853,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 1472.9px;
+  top: 1471.9px;
 }
 .kbh-foot > * {
   position: absolute;
@@ -828,19 +862,38 @@
   font-size: 15px;
   color: #777d87;
 }
-/* x 123px (80.1) · 358px (233.0), 가운데 막대 x 294~295px (191.3, 폭 1.3 · 높이 12.4) */
+/* 잉크 x 79.8 · 233.0 (녹화 500), FONT.md 15px 400 · left 79.0 · 232.7, 가운데 막대 x 294~295px (191.3, 폭 1.3 · 높이 12.4) */
 .kbh-foot button:first-child {
-  left: 80.2px;
+  left: 79px;
 }
 .kbh-foot button:last-child {
-  left: 233.1px;
+  left: 232.6px;
 }
 .kbh-foot i {
   left: 191.3px;
-  top: 0.9px;
+  top: 1.9px;
   width: 1.3px;
   height: 12.4px;
   background: #b4b9c2;
+}
+
+/* ---------- 못 받았을 때 (녹화에 없음, 계좌 화면 .kba-fail 과 같은 모양) ---------- */
+.kbh-fail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 300px;
+  text-align: center;
+  font-size: 15px;
+  color: #55565a;
+}
+.kbh-fail p {
+  margin: 0;
+}
+:where(.kbh) .kbh-fail button {
+  margin-top: 8px;
+  color: #0012a6;
+  text-align: center;
 }
 
 /* ---------- 뼈대 (녹화 289~291) ---------- */
@@ -853,12 +906,14 @@
 }
 
 /* ---------- 아래 탭바 (tabbar.tsx): 윗선 녹화 y 1172px (앱 730.3), 높이 69.6 (화면 아래끝까지) ---------- */
+/* 아래 16 은 제스처 손잡이 자리(앱 위에 겹쳐 그림). 아이폰(녹화 없음)은 그 자리를 홈 인디케이터 안전영역(34)으로 바꿔
+   아이콘·글자가 인디케이터에 가리지 않게 함 (i-ONE Bank 의 html[data-os=ios] .ibk-tabbar 와 같은 뜻) */
 .kbh-tabbar {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 69.6px;
+  height: calc(53.6px + max(16px, var(--safe-bottom)));
   z-index: 3;
   display: flex;
   padding: 0 8.6px;
@@ -876,24 +931,34 @@
   background: none;
   font: inherit;
 }
-/* 그림 상자 46~92px · y 1182~1227px (29.9 × 29.3, 앱 736.1 → 탭바 위 + 5.8) */
+/* 그림 상자 46~92px · y 1182~1227px (29.9 × 29.3). 녹화 350 잉크 가운데 x 45.0 · 118.65 · 192.15 · 265.5 · 338.9, 위 740.6~744.1 에 맞춤
+   (잘라 온 그림마다 안쪽 여백이 달라 상품·서비스·전체는 따로 옮김) */
 .kbh-tabbar__tab img,
 .kbh-tabbar__tab i {
   position: absolute;
   left: 50%;
-  top: 6.4px;
+  top: 5.8px;
   width: 29.9px;
   height: 29.3px;
   margin-left: -15px;
 }
-/* 글자: 잉크 y 1231~1246px (앱 768.0~777.8 → 탭바 위 + 37.6), #6b6e72 · 홈 #0212a4 */
+.kbh-tabbar__tab:nth-child(2) img {
+  margin-left: -15.3px;
+}
+.kbh-tabbar__tab:nth-child(4) img {
+  margin-left: -14.7px;
+}
+.kbh-tabbar__tab:nth-child(5) img {
+  margin-left: -15.3px;
+}
+/* 글자: 잉크 y 1231~1246px (앱 768.0~777.8), #6b6e72 · 홈 #0212a4 — FONT.md 11px 500, top 767.7 (= 탭바 위 730.3 + 37.4) */
 .kbh-tabbar__tab span {
   position: absolute;
   left: 0;
   right: 0;
-  top: 38.3px;
+  top: 37.4px;
   text-align: center;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 1;
   color: #5c5f63;

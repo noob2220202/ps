@@ -42,11 +42,11 @@
   align-items: center;
   justify-content: center;
 }
-/* ✓ 잉크 165.3~218.7 × 169.2~206.3, 그려짐 (1155~1160, ≈170ms) */
+/* ✓ 잉크 165.3~218.7 × 169.2~206.3, 그려짐 (1155~1160, ≈170ms). 가운데 x 192 기준 */
 .kbd-check {
   position: absolute;
-  left: 164px;
-  top: 167.9px;
+  left: calc(50% - 28px);
+  top: 168.6px;
 }
 .kbd-check path {
   stroke-dasharray: 72;
@@ -58,9 +58,9 @@
     stroke-dashoffset: 0;
   }
 }
-/* 받는계좌 | 은행 번호 : 가운데 367.1 */
+/* 받는계좌 | 은행 번호 : 16 400, 잉크 359.9~374.9 (프레임 1170~1189) */
 .kbd-rcv {
-  top: 356.1px;
+  top: 357.7px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,85 +82,122 @@
     transform: translateY(8px);
   }
 }
-/* 공유 원 91.1~134.1 · 메세지 알약 148.4~292.2, 413.3~455.6 (#eef2f6) */
+/* 공유 원 91.1~134.7 · 메세지 알약 147.1~293.5, 412.9~456.5 (#eef2f6, 가로·세로 줄 경계 프레임 1170~1189). 묶음 가운데 x 192.3 */
 .kbd-acts {
   position: absolute;
   left: 0;
   right: 0;
-  top: 413.3px;
-  height: 42.3px;
+  top: 412.9px;
+  height: 43.6px;
 }
 .kbd-share {
   position: absolute;
-  left: 91.1px;
-  width: 43px;
-  height: 42.3px;
+  left: calc(50% - 100.9px);
+  width: 43.6px;
+  height: 43.6px;
   border-radius: 50%;
   background: #eef2f6;
   display: grid;
   place-items: center;
 }
+/* '메세지 보내기' 15 500 (맞춤: 폭비 0.992 · 잉크량 1.04) 잉크 x 192.65 · 위 426.95 */
 .kbd-msg {
   position: absolute;
-  left: 148.4px;
-  width: 143.8px;
-  height: 42.3px;
-  border-radius: 21.2px;
+  left: calc(50% - 44.9px);
+  width: 146.4px;
+  height: 43.6px;
+  border-radius: 21.8px;
   background: #eef2f6;
   display: flex;
   align-items: center;
-  padding-left: 16.9px;
+  padding-left: 44.7px;
   box-sizing: border-box;
-  gap: 6.5px;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 500;
   color: #3a3e42;
 }
-.kbd-msg img {
+/* 그림 칸: 그림 상자 165.3~186.8 × 422.4~445.8 (녹화에서 자른 254~287 × 700~736px), 보이는 창 425.7~443.9 (굴러 바뀔 때 잉크가 잘리는 곳) */
+.kbd-emoji {
+  position: absolute;
+  left: 18.2px;
+  top: 12.8px;
+  width: 21.5px;
+  height: 18.2px;
+  overflow: hidden;
+}
+.kbd-emoji img {
+  position: absolute;
+  left: 0;
+  top: -3.3px;
   width: 21.5px;
   height: 23.4px;
 }
-/* 말풍선: 122.4~318.3 × 478.4~511.5 #4361ff, 꼭지 x 220.3 위로 4dp, 글자 15 흰색 */
+.kbd-emoji__in {
+  animation: kbd-roll-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1) 70ms both;
+}
+/* 처음 것: '보냈어요' 와 함께 (1159~1166, 완료 뒤 ≈150ms) */
+.kbd-emoji__in:only-child {
+  animation-delay: 150ms;
+}
+.kbd-emoji__out {
+  animation: kbd-roll-out 130ms ease-in forwards;
+}
+@keyframes kbd-roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(17px);
+  }
+}
+@keyframes kbd-roll-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+/* 말풍선: 121.1~318.9 × 477.7~512.2 #4361ff (가운데 줄 경계), 꼭지 x 220.3 위로 3.9, 반지름 ≈ 9.
+   글자 14 700 흰색 (맞춤: 폭비 1.000, 400·500 은 너무 가늚) 잉크 x 137.3 · 위 488.1, × 잉크 289.6~300.7 × 490.1~500.5 */
 .kbd-tip {
   position: absolute;
-  left: 122.4px;
-  top: 478.4px;
-  width: 195.9px;
-  height: 33.2px;
-  border-radius: 8px;
+  left: calc(50% - 70.9px);
+  top: 477.7px;
+  width: 197.8px;
+  height: 34.5px;
+  border-radius: 9px;
   background: #4361ff;
   color: #fff;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  padding-left: 15.6px;
+  padding-left: 16px;
   box-sizing: border-box;
   animation: kbd-in 170ms linear both;
 }
 .kbd-tip::before {
   content: "";
   position: absolute;
-  left: 92.4px;
-  top: -4px;
+  left: 94.2px;
+  top: -3.9px;
   border: 5px solid transparent;
   border-top: 0;
-  border-bottom: 4.2px solid #4361ff;
+  border-bottom: 3.9px solid #4361ff;
 }
 .kbd-tip button {
   position: absolute;
-  right: 13px;
+  right: 17.85px;
   top: 0;
   height: 100%;
   display: grid;
   place-items: center;
 }
-/* 의견 카드: 19.5~364.5 × 620.3~695.1, #eef2f6 */
+/* 의견 카드: 19.5~364.5 × 620.3~695.1 (바닥에서 104.8), #eef2f6, 반지름 12 (위 4.7 줄에서 모서리가 2.6 들어감) */
 .kbd-fb {
   position: absolute;
   left: 19.5px;
   right: 19.5px;
-  top: 620.3px;
+  bottom: calc(max(16px, var(--safe-bottom, 0px)) + 88.8px);
   height: 74.8px;
-  border-radius: 10.5px;
+  border-radius: 12px;
   background: #eef2f6;
   text-align: left;
 }
@@ -168,20 +205,22 @@
   position: absolute;
   white-space: nowrap;
 }
+/* 연필(뚜껑이 떨어진 모양) + 밑줄: 잉크 43.0~62.5 × 648.2~667.1 */
 .kbd-fb__pen {
-  left: 22.8px;
-  top: 25.4px;
+  left: 21.3px;
+  top: 26.2px;
 }
+/* '케이뱅크 이체하기' 14 400 (맞춤: 폭비 1.000 · 잉크량 1.02) 잉크 x 76.15 · 위 639.1, '고객님의 의견이 궁금해요' 16 700 잉크 위 660.6 */
 .kbd-fb__small {
-  left: 56.6px;
-  top: 15.7px;
-  font-size: 13px;
+  left: 55.9px;
+  top: 16.4px;
+  font-size: 14px;
   line-height: 18px;
   color: #54585c;
 }
 .kbd-fb__big {
-  left: 56.6px;
-  top: 36.8px;
+  left: 55.9px;
+  top: 37.5px;
   font-size: 16px;
   line-height: 22px;
   font-weight: 700;
@@ -191,12 +230,12 @@
   right: 24.5px;
   top: 30.4px;
 }
-/* 추가이체 19.5~139.9 (#ebf0fd) · 확인 147.7~364.5 (#0212a3), 723.1~779.1 */
+/* 추가이체 19.5~139.9 (#ebf0fd) · 확인 147.7~364.5 (#0212a3), 723.1~779.1 (바닥에서 20.8), 글자 18 500 */
 .kbd-btns {
   position: absolute;
   left: 19.5px;
   right: 19.5px;
-  top: 723.1px;
+  bottom: calc(max(16px, var(--safe-bottom, 0px)) + 4.8px);
   height: 56px;
   display: flex;
   gap: 7.8px;

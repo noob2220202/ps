@@ -25,12 +25,19 @@ const EASE = "cubic-bezier(.2,.8,.2,1)";
 // 하나원큐(갤럭시) 녹화: 새 화면이 오른쪽에서 밀고 들어옴 ≈330ms 감속 (라이트 30fps: 6.067s 462px → 6.433s 6px)
 const NH_ANDROID = APP !== "kakao" && OS === "android";
 const HANA_ANDROID = APP === "hana" && OS === "android";
-// 케이뱅크(갤럭시) 녹화: 새 화면(대개 뼈대 로딩 상태)이 오른쪽에서 밀고 들어옴, 뒤 화면은 그대로 (19.73~19.93초 왼끝 49→31→20→11→3→0%)
+// 케이뱅크(갤럭시) 녹화: 새 화면이 오른쪽에서 밀고 들어오고, 밑 화면은 덮이는 만큼 왼쪽으로 조금 밀리며(덮인 비율에 따라 가속) 8%까지 어두워짐.
+// 뒤로는 그 반대. 녹화 원본 프레임 시각으로 새 화면 왼끝을 재서 곡선을 맞춤 (화면마다 다름, ScreenStack.css 케이뱅크 블록):
+//   acc  = 계좌로 287ms (43.69~43.97초, RMS 3.6px)  · send = 이체로 328ms (21.88~22.20초, RMS 4.7px)
+//   pop  = 뒤로 296ms (이체 완료 '확인' → 홈 41.78~42.08초, RMS 1.7px) · tx = 거래 상세 올라옴 445ms · 내려감 413ms (움직임은 kbank-tx.css)
 const KBANK_ANDROID = APP === "kbank" && OS === "android";
-// 거래 상세(/tx/)는 아래에서 올라옴 445ms · 내려감 413ms (raw 58.94~59.32초 · 65.21~65.62초, 움직임은 kbank-tx.css), 그 밖의 밀기는 200ms
-// 이체 완료 → 홈('확인' = 기록을 첫 칸까지 걷는 POP)은 완료가 오른쪽으로 빠지며 홈이 왼쪽에서 같이 밀려 옴 ≈250ms (녹화 41.87~42.10초)
-const kbankMs = (anim: Anim | null, path: string) =>
-  path.startsWith("/tx/") ? (anim === "pop" ? 413 : 445) : path === "/send/done" ? 250 : 200;
+type KbAnim = "acc" | "send" | "pop" | "tx";
+const kbankAnim = (anim: Anim, path: string): KbAnim =>
+  path.startsWith("/tx/") ? "tx" : anim === "pop" ? "pop" : path.startsWith("/send") ? "send" : "acc";
+const KBANK_MS: Record<KbAnim, number> = { acc: 287, send: 328, pop: 296, tx: 445 };
+const kbankMs = (anim: Anim | null, path: string) => {
+  const k = kbankAnim(anim ?? "push", path);
+  return k === "tx" && anim === "pop" ? 413 : KBANK_MS[k];
+};
 const navMs = (anim: Anim | null, path = "") =>
   KBANK_ANDROID ? kbankMs(anim, path) : HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS];
 // i-ONE Bank(갤럭시) 녹화: 화면 사이는 대부분 전환 없이 한 번에 바뀜(로딩 점·빈 바탕은 src/ibk/loading.ts).
@@ -56,6 +63,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const [enterAnim, setEnterAnim] = useState<Anim | null>(null);
   const [ibkAnim, setIbkAnim] = useState<IbkAnim | null>(null);
   const [animMs, setAnimMs] = useState(0); // 지금 전환 길이 (--nav-ms)
+  const [kbAnim, setKbAnim] = useState<KbAnim | null>(null); // 케이뱅크 갤럭시: 지금 전환 종류 (layer--kb-*)
   // 드래그 "중인지"만 state. 손가락 위치(dx)는 매 프레임 바뀌므로 ref + DOM 직접 조작.
   const [dragging, setDragging] = useState(false);
   const skipAnim = useRef(false);
@@ -110,17 +118,30 @@ export function ScreenStack({ render }: { render: Render }) {
     setDragging(false);
     setEnterAnim(anim);
     setExiting(anim ? { loc: prevTop, anim } : null);
+    setKbAnim(null);
     if (!anim) return;
 
-    const ms = navMs(anim, anim === "pop" ? prevTop.pathname : location.pathname); // 케이뱅크는 어느 화면이 오가는지에 따라 길이가 다름
+    const path = anim === "pop" ? prevTop.pathname : location.pathname;
+    const ms = navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
     setAnimMs(ms);
-    const id = setTimeout(() => {
-      setExiting(null);
-      setEnterAnim(null);
-    }, ms);
+    if (KBANK_ANDROID) setKbAnim(kbankAnim(anim, path));
+    // 케이뱅크는 움직임이 실제로 끝났을 때 걷음 (onKbAnimEnd) — 돌아가는 화면을 새로 그리느라 첫 프레임이 늦게 나온 만큼(≈45ms) 타이머가 먼저 끝나
+    // 뒤로 갈 때 나가는 화면이 70% 지점에서 사라졌음 (rAF 기록 nav_pop). 타이머는 끝 이벤트가 안 올 때 대비
+    const id = setTimeout(endAnim, KBANK_ANDROID ? ms + 300 : ms);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
+
+  const endAnim = () => {
+    setExiting(null);
+    setEnterAnim(null);
+    setKbAnim(null);
+  };
+  // 케이뱅크 전환 끝: 위 층의 가로 밀기(층 자신), 거래 상세는 .kbt 의 올라오기·내려가기
+  const onKbAnimEnd = (e: AnimationEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement;
+    if (t === e.currentTarget ? e.animationName.startsWith("layer-slide-") : t.classList.contains("kbt") && /^kbt-(up|down)$/.test(e.animationName)) endAnim();
+  };
 
   // i-ONE Bank 전환 끝: 메뉴 밀기(menu-*)는 층 자신의, 본문 밀기(body-*)는 새 화면 .ibk-body 의 애니메이션이 끝났을 때
   const endIbkAnim = () => {
@@ -249,10 +270,10 @@ export function ScreenStack({ render }: { render: Render }) {
       {layers.map((l) => (
         <div
           key={l.loc.key}
-          className={ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : l.className}
+          className={ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : kbAnim ? `${l.className} layer--kb-${kbAnim}` : l.className}
           style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : animMs || navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
-          onAnimationEnd={ibkAnim ? onIbkAnimEnd : undefined}
+          onAnimationEnd={ibkAnim ? onIbkAnimEnd : kbAnim ? onKbAnimEnd : undefined}
           {...(l.active && {
             onPointerDown,
             onPointerMove,

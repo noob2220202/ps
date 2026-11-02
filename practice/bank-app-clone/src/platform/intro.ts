@@ -37,9 +37,10 @@ export const useIntro = () =>
     () => on,
   );
 
-// 상태바 화면녹화 표시(괄호 안 캠코더) 깜빡임: 1초 주기(0.5초 켜짐 · 0.5초 꺼짐, 녹화 12.7~30초 프레임마다 잼).
-// blinkEpoch = 켜짐이 시작된 시각(performance.now). 인트로 영상이 끝나는 순간엔 켜진 지 0.33초째(녹화 5.27초에 켜짐, 5.60초에 끝남)
-export const BLINK_MS = 1000;
+// 상태바 화면녹화 표시(괄호 안 캠코더) 깜빡임: 0.986초 주기, 반은 켜짐 (녹화 원본 프레임 시각으로 잼: 켜짐 5.24 · 10.17 · … · 29.93초
+// 18번을 직선 맞춤 → 주기 985.8ms, 켜짐 길이 491~508ms). blinkEpoch = 켜짐이 시작된 시각(performance.now).
+// 인트로 영상이 끝나는 순간엔 켜진 지 0.37초째 (recorder.ts INTRO.blinkOnMs)
+export const BLINK_MS = 986;
 let blinkEpoch = performance.now();
 const blinkListeners = new Set<() => void>();
 export function syncBlink(onForMs: number) {

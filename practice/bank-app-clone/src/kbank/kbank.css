@@ -1,5 +1,6 @@
 /* 케이뱅크 (녹화 cb67e5eb, 590 × 1280px = 384 × 833.08dp, 1dp = 1.53646px). 라이트만.
    값은 녹화 px ÷ 1.53646 (theme.ts kb()), 앱 영역 y 는 상태바 33.2 를 뺀 값 (kbY()) */
+@import "./fonts.css"; /* 글꼴 판정: Pretendard 유지 + 곧은 6·9(ss01) */
 .kb {
   --kb-blue: #0212a4; /* 로고·브랜드 */
   --kb-text: #191919;
@@ -43,7 +44,7 @@
 .kb-header__x svg {
   display: block;
 }
-/* 제목 18px 600: 한글 잉크 위 = top + 0.0635em → 잉크 가운데 24.1 (프레임 1500 화면 y 76~100px) */
+/* 제목 18px 500 (프레임 1490~1510 맞춤: 500 오차 10.9% · 600 23.2%): 한글 잉크 위 = top + 0.0635em → 잉크 가운데 24.1 (프레임 1500 화면 y 76~100px) */
 .kb-header__title {
   position: absolute;
   left: 60px;
@@ -53,13 +54,13 @@
   line-height: 18px;
   text-align: center;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 500;
   color: #161719;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* '관리' 16px: 잉크 y 16.9~31.2 (화면 77~99px), 오른쪽 끝 362.5 (517~557px) */
+/* '관리'·'취소' 16px 500 (프레임 612~648 '관리' 500 오차 8.3% · 400 12.8%, 731~762 '취소' 9.1 · 13.2): 잉크 y 16.9~31.2 (화면 77~99px), 오른쪽 끝 362.5 (517~557px) */
 .kb-header__right {
   position: absolute;
   right: 19.8px;
@@ -68,6 +69,7 @@
   display: flex;
   align-items: center;
   font-size: 16px;
+  font-weight: 500;
   color: #161719;
 }
 .kb-header__right button {

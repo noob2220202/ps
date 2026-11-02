@@ -81,7 +81,7 @@
 }
 .kbt-memo__pen {
   display: block;
-  margin: -3.5px 0 0 3px;
+  margin: -2.5px 0 0 3.65px;
 }
 .kbt-memo__input {
   width: 300px;
@@ -129,14 +129,14 @@
   margin: 0;
   color: #1b1b1b;
 }
-/* 거래 금액 + 복사 (잉크 x 533~555 · y 491~514px): 금액 끝 520 에서 8.5 */
+/* 거래 금액 + 복사 (프레임 1800 잉크: 금액 끝 521 · 복사 533~556 · y 491~514px): 금액 끝에서 12px(7.8dp), 줄 오른쪽 끝보다 1.3 안쪽 */
 .kbt-amt {
   display: flex;
   align-items: flex-start;
 }
 .kbt-amt__copy {
   display: block;
-  margin: -0.2px 0 0 4.5px;
+  margin: -0.1px 1.6px 0 6.8px;
 }
 .kbt-amt__copy svg {
   display: block;
@@ -175,15 +175,47 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9.7px;
+  gap: 8.4px; /* 아이콘 잉크 끝 → 글자 14px (프레임 1800 · 2100 둘 다) */
   border-radius: 9px;
   background: #ebf0fd;
   color: var(--kbt-navy);
   font-size: 16px;
   font-weight: 500;
 }
+/* 누름: 녹화에 상세 버튼 누름은 없음 → 계좌 화면 '이체하기' 누름과 같게 (100ms 뒤 0.92배 어둡게 + 0.97배) */
+.kbt-btn {
+  transition:
+    transform 70ms ease-out,
+    filter 0s;
+}
+.kbt-btn:active {
+  transform: scale(0.97);
+  filter: brightness(0.92);
+  transition:
+    transform 70ms ease-out 100ms,
+    filter 0s 100ms;
+}
 .kbt-btn svg {
   display: block;
+  margin-left: 2px; /* 아이콘+글자 묶음이 버튼 가운데보다 1~1.5px 오른쪽 (녹화 입금 236~356 / 버튼 30~560px) */
+}
+
+/* 주소로 바로 열었는데 거래를 못 받았을 때 (녹화에 없음 — 이체 화면 .kbs-fail 과 같은 모양) */
+.kbt-fail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 300px;
+  text-align: center;
+  font-size: 15px;
+  color: #55565a;
+}
+.kbt-fail p {
+  margin: 0;
+}
+.kbt-fail button {
+  margin-top: 8px;
+  color: var(--kbt-navy);
 }
 
 /* 이 화면으로 들어오고 나갈 때는 ScreenStack 의 케이뱅크 가로 밀기(새 화면 · 밑 화면 시차 밀기)를 끄고 위 올라오기/내려가기만 (녹화엔 가로 움직임 없음, 밑 계좌 화면은 그대로) */

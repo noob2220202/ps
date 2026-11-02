@@ -299,7 +299,8 @@ function AccountsTab({ run }: { run: Run }) {
       {/* 콕뱅크는 농협 계좌만, 하나원큐는 하나은행 계좌만 */}
       {APP !== "kakao" ? (
         <>
-          <h3 className="tab__h">{APP === "nh" ? "농협" : "하나은행"} 계좌 추가</h3>
+          {/* 케이뱅크는 케이뱅크 계좌만 (서버도 다른 은행은 거절) */}
+          <h3 className="tab__h">{APP === "nh" ? "농협" : APP === "kbank" ? "케이뱅크" : "하나은행"} 계좌 추가</h3>
           <AddOwnBankAccount run={run} />
         </>
       ) : (
