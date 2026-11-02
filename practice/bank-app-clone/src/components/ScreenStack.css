@@ -63,6 +63,15 @@ html[data-app="kbank"][data-os="android"] .layer--push-exit:has(~ .layer--push-e
 html[data-app="kbank"][data-os="android"] .layer--pop-enter:has(~ .layer--pop-exit > .kbs) {
   animation: kb-under-in var(--nav-ms) cubic-bezier(0.22, 0, 0.38, 1) both;
 }
+/* 이체 완료(.kbd) → 홈: 홈 오른쪽 끝 녹화 x 37 → 287 → 420 → 571 → 589 (1257~1263 프레임), 완료는 오른쪽으로 빠짐 */
+html[data-app="kbank"][data-os="android"] .layer--pop-enter:has(~ .layer--pop-exit > .kbd) {
+  animation: kb-page-in var(--nav-ms) cubic-bezier(0.22, 0, 0.38, 1) both;
+}
+@keyframes kb-page-in {
+  from {
+    translate: -100% 0;
+  }
+}
 @keyframes kb-under-out {
   to {
     translate: -20% 0;

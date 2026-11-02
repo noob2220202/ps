@@ -114,8 +114,8 @@
   top: 6.3px;
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.4px;
-  word-spacing: -0.8px;
+  letter-spacing: -0.65px;
+  word-spacing: -0.6px;
 }
 /* 접힌 뒤엔 '사장님' 뒤가 없음 (접히는 동안만 잘린 채 보임, 녹화 410~416) */
 .kbh-pill--closed .kbh-pill__more,

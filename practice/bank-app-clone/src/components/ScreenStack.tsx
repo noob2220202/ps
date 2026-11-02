@@ -28,7 +28,9 @@ const HANA_ANDROID = APP === "hana" && OS === "android";
 // 케이뱅크(갤럭시) 녹화: 새 화면(대개 뼈대 로딩 상태)이 오른쪽에서 밀고 들어옴, 뒤 화면은 그대로 (19.73~19.93초 왼끝 49→31→20→11→3→0%)
 const KBANK_ANDROID = APP === "kbank" && OS === "android";
 // 거래 상세(/tx/)는 아래에서 올라옴 445ms · 내려감 413ms (raw 58.94~59.32초 · 65.21~65.62초, 움직임은 kbank-tx.css), 그 밖의 밀기는 200ms
-const kbankMs = (anim: Anim | null, path: string) => (path.startsWith("/tx/") ? (anim === "pop" ? 413 : 445) : 200);
+// 이체 완료 → 홈('확인' = 기록을 첫 칸까지 걷는 POP)은 완료가 오른쪽으로 빠지며 홈이 왼쪽에서 같이 밀려 옴 ≈250ms (녹화 41.87~42.10초)
+const kbankMs = (anim: Anim | null, path: string) =>
+  path.startsWith("/tx/") ? (anim === "pop" ? 413 : 445) : path === "/send/done" ? 250 : 200;
 const navMs = (anim: Anim | null, path = "") =>
   KBANK_ANDROID ? kbankMs(anim, path) : HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS];
 // i-ONE Bank(갤럭시) 녹화: 화면 사이는 대부분 전환 없이 한 번에 바뀜(로딩 점·빈 바탕은 src/ibk/loading.ts).
@@ -103,8 +105,6 @@ export function ScreenStack({ render }: { render: Render }) {
     // 스와이프로 이미 화면을 밀어냈으면 pop 애니메이션을 또 하지 않는다.
     // 안드로이드(카카오뱅크 영상)는 뒤로가기가 즉시 바뀌므로 pop 애니메이션 없음. 콕뱅크는 짧게 흐려짐.
     if (skipAnim.current || (OS === "android" && anim === "pop" && !NH_ANDROID)) anim = null;
-    // 케이뱅크 이체 완료 → 홈('확인'이 기록을 첫 칸까지 걷음 = POP): 녹화(41.8~42.1초)는 홈이 한 번에 나옴
-    if (KBANK_ANDROID && anim === "pop" && prevTop.pathname === "/send/done") anim = null;
     skipAnim.current = false;
     drag.current = null;
     setDragging(false);

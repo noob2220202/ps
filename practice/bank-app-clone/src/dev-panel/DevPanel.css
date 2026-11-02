@@ -480,6 +480,14 @@
 .dev-panel--ibk .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
   color: #fff;
 }
+/* 케이뱅크: 이체하기 버튼 진파랑 (#0012a5) */
+.dev-panel--kbank {
+  --yellow: #0012a5;
+  --yellow-pressed: #000d80;
+}
+.dev-panel--kbank .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
+  color: #fff;
+}
 /* 하나원큐: 하나 초록 버튼 */
 .dev-panel--hana {
   --yellow: #00a38e;
