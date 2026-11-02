@@ -175,6 +175,20 @@ export interface NewTransaction {
   at?: string; // 없으면 서버가 "지금"으로
 }
 
+// 🔔 관리 패널: 상세거래내역 시트에 보이는 값을 통째로 고치기 (들어 있는 자리만 바꿈)
+export interface TransactionEdit {
+  merchant?: string;
+  amount?: number; // 출금은 음수
+  tag?: TxTag;
+  at?: string; // "2026-10-27T11:37:12"
+  kind?: string; // 거래구분 ("" 이면 tag로 계산한 기본값으로 되돌아감)
+  memo?: string;
+  // 상대은행·상대계좌·상대계좌 예금주명: 셋을 같이 보냄. 셋 다 채우면 저장(출금 거래면 "다시이체"도 뜸), 하나라도 비우면 지움
+  counterBank?: string;
+  counterNumber?: string;
+  counterHolder?: string;
+}
+
 // ----- 에러 응답 -----
 export interface ApiErrorBody {
   code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "PROFILE_REQUIRED" | "PROFILE_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";

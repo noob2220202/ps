@@ -479,30 +479,111 @@ function findTx(id) {
   return t;
 }
 
-app.get("/api/transactions/:id", (req, res) => {
-  const t = findTx(req.params.id);
+// GET과 PATCH(저장 뒤)가 같은 모양을 돌려주게 모아 둠
+function txDetailJson(id) {
+  const t = findTx(id);
   const tx = listTransactions(t.account_id).find((x) => x.id === String(t.id));
   const card = tx.tag === "#체크카드";
   const sent = db().prepare("SELECT * FROM transfers WHERE out_tx_id = ?").get(t.id);
-  res.json({
+  return {
     ...tx,
     transactedAt: `${tx.at.slice(0, 10).replaceAll("-", ".")} ${tx.at.slice(11, 19)}`,
-    kind: KIND_BY_TAG[tx.tag],
+    kind: t.kind || KIND_BY_TAG[tx.tag], // 🔔 패널에서 직접 지정했으면 그 값, 아니면 tag로 기본값
     ...(card && { cardInfo: `체크카드 (${getProfile().cardLast4})`, address: "서울 예시구 샘플로 123", phone: "02)000-0000" }),
     memo: t.memo ?? "",
-    // 내가 보낸 이체면 받은 은행/계좌 (콕뱅크 거래 상세의 입금은행·입금계좌)
+    // 내가 보낸 이체면(또는 🔔 패널에서 상대 정보를 지정했으면) 받은 은행/계좌 (콕뱅크 거래 상세의 입금은행·입금계좌)
     ...(sent && { transfer: { bank: bankInfo(bankByCode(sent.bank_code)), number: sent.number, holder: sent.holder } }),
-  });
-});
+  };
+}
 
-// 거래메모 저장 (콕뱅크 거래 상세)
+app.get("/api/transactions/:id", (req, res) => res.json(txDetailJson(req.params.id)));
+
+// 거래 전체 수정 (🔔 관리 패널: 상세거래내역 시트에 보이는 모든 값을 직접 바꿀 수 있게).
+// 메모만 보내면 콕뱅크 거래 상세의 "메모 저장"과 같이 동작함(기존 동작 그대로).
 app.patch("/api/transactions/:id", (req, res) => {
   const t = findTx(req.params.id);
-  const memo = String(req.body?.memo ?? "").trim();
-  const max = APP === "ibk" ? 25 : 20; // i-ONE Bank 메모는 25자
-  if (memo.length > max) throw bad(`거래메모는 ${max}자 이하`, { memo: `${max}자 이하` });
-  db().prepare("UPDATE transactions SET memo = ? WHERE id = ?").run(memo || null, t.id);
-  res.json({ id: String(t.id), memo });
+  const body = req.body ?? {};
+  const fields = {};
+  const sets = [];
+  const vals = [];
+
+  if ("memo" in body) {
+    const memo = String(body.memo ?? "").trim();
+    const max = APP === "ibk" ? 25 : 20; // i-ONE Bank 메모는 25자
+    if (memo.length > max) fields.memo = `${max}자 이하`;
+    else {
+      sets.push("memo = ?");
+      vals.push(memo || null);
+    }
+  }
+  if ("merchant" in body) {
+    const merchant = String(body.merchant ?? "").trim();
+    if (!merchant) fields.merchant = "이름을 입력해 주세요";
+    else if (merchant.length > 20) fields.merchant = "20자 이하";
+    else {
+      sets.push("merchant = ?");
+      vals.push(merchant);
+    }
+  }
+  if ("tag" in body) {
+    if (!TAGS.includes(body.tag)) fields.tag = "알 수 없는 거래 종류";
+    else {
+      sets.push("tag = ?");
+      vals.push(body.tag);
+    }
+  }
+  if ("kind" in body) {
+    sets.push("kind = ?");
+    vals.push(String(body.kind ?? "").trim().slice(0, 20) || null); // 비우면 tag로 계산한 기본값으로 되돌아감
+  }
+  if ("at" in body) {
+    if (Number.isNaN(Date.parse(body.at))) fields.at = "날짜 형식 오류";
+    else {
+      sets.push("at = ?");
+      vals.push(String(body.at).slice(0, 19).padEnd(19, ":00"));
+    }
+  }
+  let balanceDelta = 0;
+  if ("amount" in body) {
+    if (!Number.isInteger(body.amount) || body.amount === 0) fields.amount = "0이 아닌 금액을 입력해 주세요";
+    else if (Math.abs(body.amount) > 10_000_000) fields.amount = "한 번에 1천만원까지";
+    else {
+      balanceDelta = body.amount - t.amount;
+      sets.push("amount = ?");
+      vals.push(body.amount);
+    }
+  }
+  const touchesCounter = "counterBank" in body || "counterNumber" in body || "counterHolder" in body;
+  const counterBank = touchesCounter && body.counterBank ? bankByCode(body.counterBank) : null;
+  if (touchesCounter && body.counterBank && !counterBank) fields.counterBank = "알 수 없는 은행";
+  if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
+
+  const acct = findAccount(t.account_id);
+  if (acct.balance + balanceDelta < 0) throw new HttpError(400, "INSUFFICIENT_BALANCE", `잔액이 부족해요 (현재 ${acct.balance.toLocaleString("ko-KR")}원)`);
+
+  transaction(() => {
+    if (sets.length) db().prepare(`UPDATE transactions SET ${sets.join(", ")} WHERE id = ?`).run(...vals, t.id);
+    if (balanceDelta) db().prepare("UPDATE accounts SET balance = balance + ? WHERE id = ?").run(balanceDelta, t.account_id);
+    // 상대 은행·계좌·예금주명: 셋 다 채우면 "다시이체" 버튼이 뜨는 이체 기록으로 올리고(진짜 송금과 같은 자리), 비우면 지움
+    if (touchesCounter) {
+      const number = String(body.counterNumber ?? "").replace(/\D/g, "");
+      const holder = String(body.counterHolder ?? "").trim();
+      const existing = db().prepare("SELECT id FROM transfers WHERE out_tx_id = ?").get(t.id);
+      if (counterBank && number && holder) {
+        const amount = Math.abs(body.amount ?? t.amount);
+        const at = sets.includes("at = ?") ? vals[sets.indexOf("at = ?")] : t.at;
+        if (existing)
+          db().prepare("UPDATE transfers SET bank_code = ?, number = ?, holder = ?, amount = ? WHERE id = ?").run(counterBank.code, number, holder, amount, existing.id);
+        else
+          db()
+            .prepare("INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES (?, ?, ?, ?, ?, ?, ?)")
+            .run(t.account_id, counterBank.code, number, holder, amount, at, t.id);
+      } else if (existing) {
+        db().prepare("DELETE FROM transfers WHERE id = ?").run(existing.id);
+      }
+    }
+  });
+  res.json(txDetailJson(t.id));
 });
 
 // 거래 삭제 → 그 거래가 없던 일이 되므로 잔액도 되돌림

@@ -71,7 +71,8 @@ const SCHEMA = `
     at         TEXT NOT NULL,              -- "2026-10-27T11:37:12"
     merchant   TEXT NOT NULL,
     amount     INTEGER NOT NULL,           -- 출금은 음수
-    tag        TEXT NOT NULL
+    tag        TEXT NOT NULL,
+    kind       TEXT                        -- 거래구분 직접 지정(🔔 관리 패널). 비어 있으면 tag로 기본값 계산
   );
   CREATE INDEX IF NOT EXISTS idx_tx_account_at ON transactions (account_id, at DESC);
 
@@ -143,6 +144,7 @@ function migrate(d) {
   const columns = (table) => d.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
   if (!columns("accounts").includes("name")) d.exec("ALTER TABLE accounts ADD COLUMN name TEXT"); // 상품 이름 (콕뱅크 "자립예탁금")
   if (!columns("transactions").includes("memo")) d.exec("ALTER TABLE transactions ADD COLUMN memo TEXT"); // 콕뱅크 거래메모
+  if (!columns("transactions").includes("kind")) d.exec("ALTER TABLE transactions ADD COLUMN kind TEXT"); // 🔔 패널에서 거래구분 직접 지정
   if (!columns("profile").includes("card_spend")) d.exec("ALTER TABLE profile ADD COLUMN card_spend INTEGER");
   if (!columns("profile").includes("cashback_count")) d.exec("ALTER TABLE profile ADD COLUMN cashback_count INTEGER NOT NULL DEFAULT 2");
   if (!columns("accounts").includes("safebox")) d.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");

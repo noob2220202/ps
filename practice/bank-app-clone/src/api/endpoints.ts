@@ -9,6 +9,8 @@ import type {
   Profile,
   Recipient,
   Transaction,
+  TransactionDetail,
+  TransactionEdit,
   TransferResult,
 } from "./types";
 
@@ -38,6 +40,8 @@ export const api = {
     http.post<Transaction>(paths.transactions(accountId), body),
   deleteTransaction: (txId: string) => http.delete(paths.transaction(txId)),
   updateMemo: (txId: string, memo: string) => http.patch<{ id: string; memo: string }>(paths.transaction(txId), { memo }),
+  // 🔔 관리 패널: 상세거래내역 시트의 값을 통째로 고침 (이름·금액·날짜시간·거래구분·상대은행/계좌/예금주명·메모)
+  updateTransaction: (txId: string, patch: TransactionEdit) => http.patch<TransactionDetail>(paths.transaction(txId), patch),
   reset: (mode: "empty" | "example") => http.post<void>("/api/reset", { mode }),
 
   // 프로필 (접속할 때 고르는 것)

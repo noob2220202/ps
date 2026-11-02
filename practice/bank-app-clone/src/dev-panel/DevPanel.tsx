@@ -2,7 +2,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { ApiError } from "../api/client";
 import { api, formatAccountNumber, paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
-import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TxTag } from "../api/types";
+import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TransactionDetail, TxTag } from "../api/types";
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
@@ -685,13 +685,15 @@ const TAGS: [TxTag, string][] = [
 
 function TxTab({ run }: { run: Run }) {
   const home = useApi<HomeData>(paths.home);
+  const banks = useApi<Bank[]>(paths.banks);
   const [accountId, setAccountId] = useState("main");
   const [amount, setAmount] = useState(5000);
   const [merchant, setMerchant] = useState("편의점");
   const [tag, setTag] = useState<TxTag>("#체크카드");
   const list = useApi<Transaction[]>(paths.transactions(accountId));
+  const [editing, setEditing] = useState<string | null>(null);
 
-  if (home.status !== "done") return <div className="tab">불러오는 중…</div>;
+  if (home.status !== "done" || banks.status !== "done") return <div className="tab">불러오는 중…</div>;
   const accounts = home.data.accounts;
   const current = accounts.find((a) => a.id === accountId) ?? accounts[0];
 
@@ -743,19 +745,132 @@ function TxTab({ run }: { run: Run }) {
       </div>
 
       <h3 className="tab__h">최근 거래</h3>
+      <p className="tab__hint">거래를 누르면 상세거래내역 시트에 보이는 값을 전부 고칠 수 있어요 (시간까지).</p>
       {list.status === "done" && list.data.length === 0 && <p className="tab__hint">거래가 없어요.</p>}
       {list.status === "done" &&
         list.data.slice(0, 10).map((t) => (
-          <div key={t.id} className="tx-row">
-            <span>
-              {t.date} {t.merchant}
-            </span>
-            <span className={t.amount > 0 ? "tx-row__in" : ""}>{t.amount > 0 ? `+${won(t.amount)}` : won(t.amount)}</span>
-            <button aria-label="거래 삭제" onClick={() => run(() => api.deleteTransaction(t.id), "거래를 지웠어요")}>
-              <Icon name="close" size={14} stroke={2} />
-            </button>
+          <div key={t.id}>
+            <div className="tx-row">
+              <button type="button" className="tx-row__main" onClick={() => setEditing(editing === t.id ? null : t.id)}>
+                <span>
+                  {t.date} {t.merchant}
+                </span>
+                <span className={t.amount > 0 ? "tx-row__in" : ""}>{t.amount > 0 ? `+${won(t.amount)}` : won(t.amount)}</span>
+              </button>
+              <button aria-label="거래 삭제" onClick={() => run(() => api.deleteTransaction(t.id), "거래를 지웠어요")}>
+                <Icon name="close" size={14} stroke={2} />
+              </button>
+            </div>
+            {editing === t.id && <TxEditForm tx={t} banks={banks.data} run={run} onSaved={() => setEditing(null)} />}
           </div>
         ))}
+    </div>
+  );
+}
+
+const SIGN_OPTIONS: ["out" | "in", string][] = [
+  ["out", "출금"],
+  ["in", "입금"],
+];
+
+// 상세거래내역 시트에 보이는 값 전부: 이름·금액(입금/출금)·날짜시간(초까지)·거래구분·상대은행·상대계좌·상대계좌 예금주명·메모
+function TxEditForm({ tx, banks, run, onSaved }: { tx: Transaction; banks: Bank[]; run: Run; onSaved: () => void }) {
+  const detail = useApi<TransactionDetail>(paths.transaction(tx.id));
+  const [merchant, setMerchant] = useState(tx.merchant);
+  const [sign, setSign] = useState<"out" | "in">(tx.amount < 0 ? "out" : "in");
+  const [amount, setAmount] = useState(Math.abs(tx.amount));
+  const [tag, setTag] = useState<TxTag>(tx.tag);
+  const [date, setDate] = useState(tx.at.slice(0, 10));
+  const [time, setTime] = useState(tx.at.slice(11, 19));
+  const [kind, setKind] = useState("");
+  const [bank, setBank] = useState(banks.find((b) => b.code === "kakao") ?? banks[0]);
+  const [counterNumber, setCounterNumber] = useState("");
+  const [counterHolder, setCounterHolder] = useState("");
+  const [memo, setMemo] = useState("");
+  const [busy, setBusy] = useState(false);
+  // 상세 조회가 끝나면 그 값으로 한 번만 채움 (타이핑하는 중에 다시 덮어쓰지 않게)
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  if (detail.status === "done" && loadedFor !== tx.id) {
+    setLoadedFor(tx.id);
+    setKind(detail.data.kind);
+    setMemo(detail.data.memo ?? "");
+    if (detail.data.transfer) {
+      setBank(banks.find((b) => b.code === detail.data.transfer!.bank.code) ?? bank);
+      setCounterNumber(detail.data.transfer.number);
+      setCounterHolder(detail.data.transfer.holder);
+    }
+  }
+  const ready = detail.status === "done" && loadedFor === tx.id;
+
+  const save = async () => {
+    if (busy || !ready) return;
+    setBusy(true);
+    const ok = await run(
+      () =>
+        api.updateTransaction(tx.id, {
+          merchant,
+          amount: sign === "out" ? -amount : amount,
+          tag,
+          at: `${date}T${time}`,
+          kind,
+          memo,
+          counterBank: bank.code,
+          counterNumber,
+          counterHolder,
+        }),
+      "거래를 고쳤어요",
+    );
+    setBusy(false);
+    if (ok) onSaved();
+  };
+
+  return (
+    <div className="tx-edit">
+      <Field label="이름">
+        <input value={merchant} onChange={(e) => setMerchant(e.target.value)} maxLength={20} />
+      </Field>
+      <div className="row">
+        <Field label="거래내용">
+          <Segmented value={sign} options={SIGN_OPTIONS} onChange={setSign} />
+        </Field>
+      </div>
+      <Field label="금액">
+        <MoneyInput value={amount} onChange={setAmount} quick={[1000, 5000, 10000, 50000]} />
+      </Field>
+      <div className="row">
+        <Field label="날짜">
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </Field>
+        <Field label="시간">
+          <input type="time" step={1} value={time} onChange={(e) => setTime(e.target.value)} />
+        </Field>
+      </div>
+      <Field label="거래 종류">
+        <Segmented value={tag} options={TAGS} onChange={setTag} />
+      </Field>
+      <Field label="거래구분">
+        <input value={kind} onChange={(e) => setKind(e.target.value)} maxLength={20} placeholder={ready ? undefined : "불러오는 중…"} disabled={!ready} />
+      </Field>
+      <Field label="상대은행">
+        <BankSelect banks={banks} value={bank} onChange={setBank} />
+      </Field>
+      <Field label="상대계좌">
+        <NumberInput bank={bank} value={counterNumber} onChange={setCounterNumber} />
+      </Field>
+      <Field label="상대계좌 예금주명">
+        <input value={counterHolder} onChange={(e) => setCounterHolder(e.target.value)} maxLength={20} placeholder="계좌·예금주명을 비우면 상대 정보 없음" />
+      </Field>
+      <Field label="메모">
+        <input value={memo} onChange={(e) => setMemo(e.target.value)} maxLength={25} placeholder={ready ? undefined : "불러오는 중…"} disabled={!ready} />
+      </Field>
+      <div className="row">
+        <button type="button" className="btn btn--sm" disabled={busy || !ready} onClick={save}>
+          저장
+        </button>
+        <button type="button" className="btn btn--sm btn--ghost" onClick={onSaved}>
+          닫기
+        </button>
+      </div>
     </div>
   );
 }
