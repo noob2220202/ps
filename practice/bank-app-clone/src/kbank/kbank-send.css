@@ -276,12 +276,18 @@
   place-items: center;
 }
 /* AI 알약: 93.1~290.3 × 676.2~727 (프레임 700, 가운데 x 191.7 · 바닥에서 72.7), 흰 바탕 + 파란 번짐, 글자 16 700 x 133.4
-   번짐: 알약 가장자리 rgb(224,236,253) → 22dp 밖에서 흰색 (프레임 682~701 세로·가로 줄) = 0 0 24px rgba(41,124,241,.29) */
+   번짐: 알약 가장자리 rgb(224,236,253) → 22dp 밖에서 흰색 (프레임 682~701 세로·가로 줄) = 0 0 24px rgba(41,124,241,.29)
+   폭은 글자에 맞춤 (가운데 고정): 글자 왼쪽 39.6 + 글자 폭 + 오른쪽 20.25 — 첫 녹화 '이체를 도와주러 온 AI'(글자 137.5) 197.2,
+   두 번째 녹화 '보낼 계좌 찾기 어려우세요?'(171.8) 75.5~307.3 = 231.8 (V2 프레임 690~711 번짐 경계, 가운데 191.6) → 오른쪽 20.1 · 20.4 */
 .kbs-ai {
   position: absolute;
-  left: calc(50% - 98.9px);
+  left: 0;
+  right: 0.6px; /* 가운데 191.7 */
+  margin: 0 auto;
+  width: fit-content;
+  padding: 0 20.25px 0 39.6px;
+  box-sizing: border-box;
   bottom: calc(var(--kbs-floor) + 56.7px);
-  width: 197.2px;
   height: 51px;
   border-radius: 26px;
   background: #fff;
@@ -312,16 +318,21 @@
   box-shadow: 0 0 24px rgba(41, 124, 241, 0.29);
   z-index: -1;
 }
+/* 두 녹화(첫 690~701 · 두 번째 690~711 평균)와 겹쳐 보고 아이콘은 0.6 아래, 글자는 0.6 왼쪽 · 0.7 위였음 → 옮김 (두 문구 같은 값).
+   글자 세로는 top 소수가 CSS 1px 기준선 반올림에 먹혀서(0.35 → 0) transform 으로 내림 (FONT.md) */
 .kbs-ai img {
   position: absolute;
   left: 14.5px;
-  top: 14.5px;
+  top: 14.2px;
   width: 22.1px;
   height: 23.4px;
 }
 .kbs-ai span {
-  position: absolute;
-  left: 39.6px;
+  position: relative;
+  left: 0.6px;
+  display: inline-block;
+  transform: translateY(0.7px);
+  white-space: nowrap;
 }
 @keyframes kbs-ai-in {
   from {
@@ -819,6 +830,15 @@
     opacity: 0;
     transform: translateY(46px);
   }
+}
+/* 중복 이체 확인창 글 (KbankDialog, 두 번째 녹화 정지 893~920 평균과 겹쳐 잼): 녹화 줄 간격이 고르지 않음 —
+   줄 간격 24.4 로 놓으면 둘째·셋째 줄만 1.27 · 1.43 위 (첫째·넷째는 0.13 · 0.23 위, 기기 화소 1개 0.65 안) → 둘째·셋째 줄을 내림.
+   위치는 기기 화소 단위로 반올림되어 셋째 줄은 0.95 로 놓아야 녹화와 0.1 안 */
+.kbs-dup > :nth-child(2) {
+  top: 1.27px;
+}
+.kbs-dup > :nth-child(3) {
+  top: 0.95px;
 }
 .kbs-error {
   position: absolute;

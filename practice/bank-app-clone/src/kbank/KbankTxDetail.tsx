@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { api, paths } from "../api/endpoints";
 import type { HomeData, Transaction, TransactionDetail, TransferRecipients } from "../api/types";
-import { useApi } from "../api/useApi";
+import { prefetch, useApi } from "../api/useApi";
+import { useLayerActive } from "../platform/LayerContext";
 import { KbankCopyIcon } from "./common";
-import { kbankBankName } from "./bank";
+import { kbankBankName, kbankBankShort, kbankKindLabel } from "./bank";
 import { KbankClose } from "./header";
 import { useKbankGo } from "./nav";
 import { kbNf, useKbankStatusBar } from "./theme";
@@ -12,13 +13,14 @@ import "./kbank-tx.css";
 
 // 거래 상세 (녹화 59~82초, 프레임 1770~2460). 계좌 화면 위로 아래에서 올라오는 전체 화면, 오른쪽 위 ×.
 // 이름 · 메모 입력 ✎ · 거래 일시/구분/금액(복사) · 회색 상자(이체 금액·수수료) · 계좌 잔액 · 상대 정보(입금) 또는 받는 계좌·받는 분에게 표기(출금)
-// · 내보내기(입금) / 내보내기 | 이체확인증(출금) — 버튼은 무반응.
+// · 내보내기(입금) / 내보내기 | 이체확인증(출금). 이체확인증 → /receipt/:txId (KbankReceipt, 두 번째 녹화 45.7초), 내보내기는 무반응.
 // 올라오기 445ms cubic-bezier(.46,0,.17,1) (raw 58.94~59.32초 × 위치로 맞춤, 오차 6px), 내려가기 413ms cubic-bezier(.78,0,.555,1) (65.21~65.62초, 오차 2px).
 // 움직이는 동안 반투명 (아래 계좌 화면이 비침): 올라올 때 0.45 → 1, 내려갈 때 1 → 0.6. 값은 kbank-tx.css
 
 const MEMO_MAX = 20;
-// 녹화는 이체가 모두 '전자금융' (서버 기본 거래구분 '이체')
-const kindLabel = (kind: string) => (kind === "이체" ? "전자금융" : kind);
+const seenKeys = new Set<string>(); // 그린 적 있는 방문 기록 칸 (최근 30개)
+// '이체확인증' 손 뗀 뒤 확인증이 올라오기 시작할 때까지 (두 번째 녹화 241 · 275 · 300ms — 앱이 불러오는 시간)
+const RECEIPT_DELAY = 250;
 const KIND_BY_TAG: Record<string, string> = { "#체크카드": "체크카드결제", "#자동이체": "자동이체", "#예금이자": "예금이자", "#이체": "이체" };
 // 계좌 화면에서 넘겨준 거래(location.state.tx)로 먼저 그림 → 상세를 받는 동안에도 올라오는 화면에 내용이 보임 (녹화도 처음부터 내용이 있음).
 // 출금 이체인지는 목록 행의 toBank(받은 은행)로 알 수 있으니 모양(받는 계좌 · 버튼 2개)은 처음부터 맞게 그리고, 받는 계좌 값만 상세가 오면 채움
@@ -113,8 +115,16 @@ export function KbankTxDetail() {
   const { txId = "" } = useParams();
   const go = useKbankGo();
   const location = useLocation();
-  // 앱 안에서 열었을 때만 올라오기 (주소로 바로 열면 그냥 보임)
-  const [enter] = useState(() => location.key !== "default");
+  // 앱 안에서 열었을 때만 올라오기 (주소로 바로 열면 그냥 보임). 이체확인증에서 돌아와 다시 그려질 때(한 번 그린 기록 칸, 또는 주소로 연 확인증의
+  // '확인'이 바꿔 놓은 칸 fromReceipt)도 그냥 보임 (녹화 52.056초). ScreenStack 이 <Routes location> 으로 그려 useNavigationType 은 늘 POP → 칸 key 로 가림 (IbkResults 와 같음)
+  const [enter] = useState(
+    () => location.key !== "default" && !seenKeys.has(location.key) && !(location.state as { fromReceipt?: boolean } | null)?.fromReceipt,
+  );
+  useEffect(() => {
+    seenKeys.delete(location.key);
+    seenKeys.add(location.key);
+    if (seenKeys.size > 30) seenKeys.delete(seenKeys.values().next().value as string);
+  }, [location.key]);
   const detail = useApi<TransactionDetail>(paths.transaction(txId));
   const passed = (location.state as { tx?: Transaction } | null)?.tx;
   const full = detail.data;
@@ -124,6 +134,23 @@ export function KbankTxDetail() {
 
   const close = () => (window.history.state?.idx > 0 ? go(-1) : go(`/account/${tx?.accountId ?? "main"}`, { replace: true }));
 
+  // 이체확인증: 손 뗀 뒤 250ms 에 열기. 기다리는 동안 × · 뒤로로 이 화면을 떠났으면(맨 위 층이 아니면) 열지 않음
+  const active = useLayerActive();
+  const live = useRef(active);
+  const receiptTimer = useRef(0);
+  useEffect(() => {
+    live.current = active;
+  });
+  useEffect(() => () => window.clearTimeout(receiptTimer.current), []);
+  const openReceipt = () => {
+    if (!tx || receiptTimer.current) return;
+    void prefetch(paths.account(tx.accountId)); // 확인증 '출금계좌' (보통 계좌 화면에서 이미 받아 둠)
+    receiptTimer.current = window.setTimeout(() => {
+      receiptTimer.current = 0;
+      if (live.current) go(`/receipt/${tx.id}`, { state: { accountId: tx.accountId } });
+    }, RECEIPT_DELAY);
+  };
+
   const inbound = (tx?.amount ?? 0) > 0;
   const abs = Math.abs(tx?.amount ?? 0);
   // 출금 이체(받는 계좌가 있음): 상세가 오면 transfer, 오기 전엔 목록 행의 toBank 로 판단 → 처음부터 출금 모양
@@ -131,15 +158,19 @@ export function KbankTxDetail() {
   const sent = full?.transfer;
   // 받는 분에게 표기: 보낼 때 적은 글자, 없으면 내 이름 (상세가 와야 앎 → 그 전엔 빈칸)
   const memoTo = full ? full.memoTo || home.data?.profile.userName || "" : "";
-  // 입금 상대 은행: 받는 분 목록(최근·즐겨찾기)에 같은 이름이 있으면 그 은행 (서버 거래에는 보낸 은행이 없음). 목록을 받기 전엔 빈칸 (이름만 먼저 나왔다 바뀌지 않게)
+  // 입금 '상대 정보' = 실제로 보낸 계좌의 예금주 + 짧은 은행 이름 (두 번째 녹화 66 · 81초: 목록 이름이 같은 두 입금이 '○○ 카카오뱅크' · '△△(주) 신한').
+  // 보낸 분은 상세의 transfer (🔔 거래 편집의 상대 은행·계좌·예금주, 예시 데이터) → 상세가 와야 앎 (계좌 화면이 입금 행 상세를 미리 받아 둠). 그 전엔 빈칸.
+  // 보낸 분이 없으면 받는 분 목록(최근·즐겨찾기)에서 같은 이름을 찾아 그 은행(짧은 이름), 없으면 이름만. 목록을 받기 전엔 빈칸 (이름만 먼저 나왔다 바뀌지 않게)
   // 출금인데 이체가 아닌 것(체크카드 결제 등, 녹화에 없음)은 가맹점 이름만
   const from = (() => {
     if (!tx) return null;
     if (!inbound) return tx.merchant;
+    if (!full) return null;
+    if (full.transfer) return `${full.transfer.holder} ${kbankBankShort(full.transfer.bank, full.transfer.number)}`;
     if (people.status === "loading") return null;
     const d = people.data;
     const hit = d && [...d.recent, ...d.favorites].find((r) => r.holder === tx.merchant);
-    return hit ? `${tx.merchant} ${kbankBankName(hit.bank, hit.number)}` : tx.merchant;
+    return hit ? `${tx.merchant} ${kbankBankShort(hit.bank, hit.number)}` : tx.merchant;
   })();
 
   return (
@@ -164,7 +195,7 @@ export function KbankTxDetail() {
             </div>
             <div className="kbt-row" style={{ top: 250.45 }}>
               <dt>거래 구분</dt>
-              <dd>{kindLabel(tx.kind)}</dd>
+              <dd>{kbankKindLabel(tx.kind)}</dd>
             </div>
             <div className="kbt-row" style={{ top: 287.1 }}>
               <dt>거래 금액</dt>
@@ -212,7 +243,9 @@ export function KbankTxDetail() {
                   <UploadIcon />
                   내보내기
                 </button>
-                <button className="kbt-btn kbt-btn--half">이체확인증</button>
+                <button className="kbt-btn kbt-btn--half" onClick={openReceipt}>
+                  이체확인증
+                </button>
               </div>
             </>
           ) : (

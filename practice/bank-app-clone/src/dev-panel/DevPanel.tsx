@@ -2,7 +2,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { ApiError } from "../api/client";
 import { api, formatAccountNumber, paths } from "../api/endpoints";
 import { useApi } from "../api/useApi";
-import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TransactionDetail, TxTag } from "../api/types";
+import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TransactionDetail, TransferRecipients, TxTag } from "../api/types";
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
 import { THEME_CHOICE } from "../platform/theme";
@@ -13,7 +13,8 @@ import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { APP, currentProfileId, setCurrentProfile } from "../profile/session";
+import { APP, HAS_INTRO, currentProfileId, setCurrentProfile } from "../profile/session";
+import { kbAdEnabled, kbAdHiddenUntil, kbAdResetHide, kbVariantMode, setKbAdEnabled, setKbVariantMode } from "../kbank/prefs";
 import "./DevPanel.css";
 
 // 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
@@ -158,6 +159,7 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
       <Field label="테마">
         <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
       </Field>
+      {APP === "kbank" && <KbankTakeTwo run={run} home={initial} />}
 
       <h3 className="tab__h">내 정보</h3>
       <Field label="이름">
@@ -188,6 +190,98 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
         </button>
       </div>
     </div>
+  );
+}
+
+// 케이뱅크 두 번째 녹화에서 새로 나온 것 (src/kbank/prefs.ts — 이 브라우저·프로필에만 저장):
+//  - 홈 첫 진입 광고 바텀시트 켜기/끄기, '일주일간 보지 않기' 지우기 (앱을 켤 때 첫 홈에서만 뜸 → 다음에 켤 때부터)
+//  - 알약 문구(홈 머리줄 알약 · 이체 '어디로' AI 알약): 번갈아 / 첫 녹화 / 두 번째 녹화 (다음에 앱을 켤 때부터 — 한 실행 안에서는 두 알약이 같은 문구)
+//  - 중복 이체 확인창 시험: 예시 이체는 날짜가 밀려 '오늘 같은 이체'가 없을 수 있어 하나 넣어 둠
+// kbank2(첫 녹화 인트로 재현)는 광고 없음 · 첫 녹화 문구 고정이라 바꾸지 않음
+function KbankTakeTwo({ run, home }: { run: Run; home: HomeData }) {
+  const [ad, setAd] = useState(kbAdEnabled);
+  const [hideUntil, setHideUntil] = useState(kbAdHiddenUntil);
+  const [mode, setMode] = useState(kbVariantMode);
+  const [openedAt] = useState(Date.now); // 패널을 연 때 ('보지 않기' 기간이 지났는지)
+  const from = home.accounts[0]?.id ?? "main";
+  const recent = useApi<TransferRecipients>(paths.recipients(from)).data?.recent[0];
+  if (HAS_INTRO)
+    return (
+      <Field label="두 번째 녹화 (광고 시트 · 알약 문구)">
+        <p className="tab__hint">이 서버(kbank2)는 첫 녹화 재현이라 광고 시트 없음 · 첫 녹화 문구로 고정이에요.</p>
+      </Field>
+    );
+  const hidden = hideUntil > openedAt;
+  const until = new Date(hideUntil);
+  return (
+    <>
+      <h3 className="tab__h">두 번째 녹화</h3>
+      {/* label(Field) 로 감싸지 않음 — 안내 글을 누르면 첫 버튼('켜기' · '번갈아')이 눌려 설정이 몰래 바뀌었음 */}
+      <div className="field">
+        <span className="field__label">홈 첫 진입 광고 시트 (다음에 앱을 켤 때부터)</span>
+        <Segmented
+          value={ad ? "on" : "off"}
+          options={[
+            ["on", "켜기"],
+            ["off", "끄기"],
+          ]}
+          onChange={(v) => {
+            setKbAdEnabled(v === "on");
+            setAd(v === "on");
+          }}
+        />
+      </div>
+      <div className="row">
+        <button
+          className="btn btn--sm"
+          disabled={!hidden}
+          onClick={() => {
+            kbAdResetHide();
+            setHideUntil(0);
+          }}
+        >
+          '일주일간 보지 않기' 지우기
+        </button>
+      </div>
+      <p className="tab__hint">
+        {hidden
+          ? `'일주일간 보지 않기'로 ${until.getMonth() + 1}월 ${until.getDate()}일 ${String(until.getHours()).padStart(2, "0")}:${String(until.getMinutes()).padStart(2, "0")}까지 안 보여요.`
+          : "'일주일간 보지 않기'를 누르지 않았어요."}
+      </p>
+      <div className="field">
+        <span className="field__label">알약 문구 (홈 · 이체 AI 알약, 다음에 앱을 켤 때부터)</span>
+        <Segmented
+          value={mode}
+          options={[
+            ["alternate", "번갈아"],
+            ["v1", "첫 녹화"],
+            ["v2", "두 번째 녹화"],
+          ]}
+          onChange={(v) => {
+            setKbVariantMode(v);
+            setMode(v);
+          }}
+        />
+      </div>
+      <p className="tab__hint">번갈아 = 앱을 켤 때마다 첫 녹화 · 두 번째 녹화 문구를 번갈아 (● 녹화도 새로 켠 것으로 셈).</p>
+      {/* 여기도 label 로 감싸지 않음 — 안내 글을 눌러도 버튼이 눌려 1원이 나갔음 */}
+      <div className="field">
+        <span className="field__label">중복 이체 확인창 시험</span>
+        <button
+          className="btn btn--sm"
+          disabled={!recent}
+          onClick={() =>
+            recent &&
+            run(() => api.transfer({ fromAccountId: from, bankCode: recent.bank.code, number: recent.number, amount: 1 }), `${recent.holder}님께 1원을 보냈어요`)
+          }
+        >
+          오늘 같은 이체 하나 넣기
+        </button>
+        <p className="tab__hint">
+          {recent ? `최근 보낸 계좌 맨 위 ${recent.holder}님께 지금 1원을 보내 둠 → 앱에서 같은 분께 1원을 보내면 확인창이 떠요.` : "최근 보낸 계좌가 없어요."}
+        </p>
+      </div>
+    </>
   );
 }
 

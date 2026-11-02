@@ -441,34 +441,51 @@ export function seedIbkEmpty(d, userName) {
 
 // ---------- 케이뱅크 초기 데이터 (전부 가상) ----------
 // 녹화 홈은 입출금통장 하나(듀얼K 입출금통장, 케이뱅크 3-3-6 번호). 받는 분·이체·거래 이름과 번호는 모두 지어낸 값
-// (농협은 녹화처럼 '지역농축협'으로 보이게 농축협 14자리 — src/kbank/bank.ts)
+// (농협은 녹화처럼 '지역농축협'으로 보이게 농축협 14 · 11자리 — src/kbank/bank.ts. 50만원 받는 분은 11자리(3-2-6): 녹화 이체확인증 '받는계좌'가
+// '농축협 [번호]' 한 줄(≈130dp, 칸 148 안 — 두 번째 녹화 74초)이라 14자리면 두 줄로 넘어감)
 const KBANK_ACCOUNTS = [["main", "main", "100-000-123456", "듀얼K 입출금통장", 1, 502779]];
 const KBANK_PAYEES = [
   ["kakao", "3333000000011", "이서준", 0], // 녹화의 최근 보낸 계좌 ☆ 는 모두 빈 별 (23초) — 관리 패널에서 켤 수 있음
-  ["nh", "35200000000022", "박하늘", 0],
+  ["nh", "35200000022", "박하늘", 0],
   ["mg", "9003000000033", "김민지", 0],
   ["nh", "35200000000044", "정예시", 0],
   ["shinhan", "110000000055", "최샘플", 0],
   ["kb", "98270000000066", "오가상", 0],
 ];
-// [시각, 은행, 번호, 이름, 금액] — '최근 보낸 계좌'·거래 상세의 상대 정보용 예전 이체
+// [시각, 은행, 번호, 이름, 금액] — '최근 보낸 계좌'·거래 상세의 상대 정보·이체확인증용 예전 이체.
+// 시각은 초까지 (이체확인증 거래일시가 초까지 보임 — 두 번째 녹화 46·74초)
 const KBANK_TRANSFERS = [
   ["2026-10-20 12:10:00", "kb", "98270000000066", "오가상", 30000],
   ["2026-10-24 09:30:00", "shinhan", "110000000055", "최샘플", 12000],
   ["2026-10-27 19:02:00", "nh", "35200000000044", "정예시", 50000],
-  ["2026-10-29 08:15:00", "mg", "9003000000033", "김민지", 8000],
-  ["2026-11-02 11:25:00", "nh", "35200000000022", "박하늘", 500000],
-  ["2026-11-02 11:48:00", "nh", "35200000000022", "박하늘", 500000],
-  ["2026-11-02 18:12:00", "kakao", "3333000000011", "이서준", 1],
+  ["2026-10-29 08:15:42", "mg", "9003000000033", "김민지", 8000],
+  ["2026-11-02 11:25:21", "nh", "35200000022", "박하늘", 500000],
+  ["2026-11-02 11:48:10", "nh", "35200000022", "박하늘", 500000],
+  ["2026-11-02 18:12:37", "kakao", "3333000000011", "이서준", 1],
 ];
-// 받은 돈 (녹화 거래내역처럼 파랑 +)
+// 받은 돈 (녹화 거래내역처럼 파랑 +) · 체크카드.
+// 다섯째 칸 = 입금을 실제로 보낸 계좌 [은행, 번호, 예금주] — 목록 이름과 다를 수 있음 (두 번째 녹화 66·81초 · 첫 녹화 75초: 목록 이름이 같은 두 입금의
+// 상대 정보가 '[이름] 카카오뱅크' · '(주)[간편결제 회사] 신한'). 🔔 패널 거래 편집의 상대 정보와 같은 자리(transfers, 입금 거래에 연결)에 둠 — '최근 보낸 계좌'엔 안 나옴
 const KBANK_TX = [
   ["2026-10-15T09:00:00", "홍길동", 300000, "#이체"],
   ["2026-10-21T13:27:06", "예시마트", -23800, "#체크카드"],
-  ["2026-11-02T11:23:00", "이서준", 500000, "#이체"],
-  ["2026-11-02T11:47:00", "이서준", 500000, "#이체"],
+  ["2026-11-02T11:23:05", "이서준", 500000, "#이체", ["kakao", "3333000000011", "이서준"]],
+  ["2026-11-02T11:47:12", "이서준", 500000, "#이체", ["shinhan", "140000000088", "(주)예시페이"]],
   ["2026-11-02T18:10:00", "이서준", 1, "#이체"],
 ];
+// 두 번째 녹화용 덧붙임 (kbank 만): 계좌 거래내역이 18행이 되게 10월 말 체크카드 5건 · 이체 1건 — 맨위로 ↑ 문턱 1150dp 를 넘게 스크롤되도록
+// (두 번째 녹화 60.7초). kbank2(첫 녹화 재현, INTRO)는 첫 녹화처럼 12행(최대 스크롤 1070dp)이라 넣지 않음.
+// 10-28 정예시는 '최근 보낸 계좌' 차례가 바뀌지 않게 10-27 과 10-29 사이
+const KBANK_TX_MORE = INTRO
+  ? []
+  : [
+      ["2026-10-26T18:34:51", "샘플서점", -12000, "#체크카드"],
+      ["2026-10-28T12:41:09", "예시분식", -7500, "#체크카드"],
+      ["2026-10-30T19:22:48", "샘플마트", -15400, "#체크카드"],
+      ["2026-10-31T08:52:16", "예시카페", -4800, "#체크카드"],
+      ["2026-10-31T13:05:33", "예시편의점", -2600, "#체크카드"],
+    ];
+const KBANK_TRANSFERS_MORE = INTRO ? [] : [["2026-10-28 20:41:37", "nh", "35200000000044", "정예시", 25000]];
 
 const kbankBase = (d, userName, balance) => {
   wipe(d);
@@ -477,9 +494,9 @@ const kbankBase = (d, userName, balance) => {
   d.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, name, sort) VALUES (?, ?, 'kbank', ?, ?, ?, ?)").run(id, kind, number, balance, name, sort);
 };
 
-// 예시 거래 시각은 녹화 날(2026-11-02, 마지막 18:12) 그대로. 그보다 이른 때 예시로 되돌리면 모두 그만큼 하루씩 앞당김 —
+// 예시 거래 시각은 녹화 날(2026-11-02, 마지막 18:12:37) 그대로. 그보다 이른 때 예시로 되돌리면 모두 그만큼 하루씩 앞당김 —
 // 지금 한 이체가 '미래' 예시 거래 사이에 끼어 그 뒤 거래들의 잔액이 어긋났음 (13:52 이체 위에 18:12 '잔액 502,776' 등). 순서·간격은 그대로
-const KBANK_LAST = "2026-11-02T18:12:00";
+const KBANK_LAST = "2026-11-02T18:12:37";
 const DAY = 86_400_000;
 const kbankShift = () => {
   const ahead = Date.parse(KBANK_LAST) - Date.now();
@@ -497,13 +514,17 @@ export function seedKbankExample(d, userName = "홍길동") {
   transaction(() => {
     kbankBase(d, userName, KBANK_ACCOUNTS[0][5]);
     const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
-    for (const [at, ...rest] of KBANK_TX) tx.run(shiftIso(at, days), ...rest);
-    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
-    for (const row of KBANK_PAYEES) payee.run(...row);
     const tr = d.prepare(
       "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",
     );
-    for (const [at, bank, number, holder, amount] of KBANK_TRANSFERS) {
+    for (const [at, merchant, amount, tag, sender] of [...KBANK_TX, ...KBANK_TX_MORE]) {
+      const iso = shiftIso(at, days);
+      const id = tx.run(iso, merchant, amount, tag).lastInsertRowid;
+      if (sender) tr.run(...sender, Math.abs(amount), iso, id); // 입금 보낸 분 (연결된 거래 amount > 0)
+    }
+    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
+    for (const row of KBANK_PAYEES) payee.run(...row);
+    for (const [at, bank, number, holder, amount] of [...KBANK_TRANSFERS, ...KBANK_TRANSFERS_MORE]) {
       const iso = shiftIso(at.replace(" ", "T"), days);
       tr.run(bank, number, holder, amount, iso, tx.run(iso, holder, -amount, "#이체").lastInsertRowid);
     }

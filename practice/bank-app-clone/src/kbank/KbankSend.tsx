@@ -2,14 +2,17 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { api, paths } from "../api/endpoints";
-import type { Account, Bank, HomeData, Recipient, TransferRecipients } from "../api/types";
+import type { Account, Bank, HomeData, NewTransfer, Recipient, TransferRecipients, TransferResult } from "../api/types";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { useLayerActive } from "../platform/LayerContext";
+import { HAS_INTRO } from "../profile/session";
 import { kbankBankName } from "./bank";
 import { Checking, KbankBankLogo, KbankPair, KbankPencil, type KbankDoneState } from "./common";
+import { KbankDialog } from "./KbankDialog";
 import { KbankHeader } from "./header";
 import { KbankKeypad, KbankWonDigits } from "./keypad";
+import { kbLaunchVariant } from "./prefs";
 import { kbBackLevel, kbHistoryGo, kbPress, kbReadWon, useKbankBackStep } from "./sendback";
 import { kbNf, noop, useKbankStatusBar } from "./theme";
 import "./kbank-send.css";
@@ -20,6 +23,7 @@ import "./kbank-send.css";
 //   amount  ○○(끝 4자리) 에서 / ○○ 님에게 · 얼마를 보내시겠어요? · 칩 · 숫자판 · 다음 (726~)
 //   confirm K › B · ○○님에게 N원을 보낼까요? · 표시·시간 표 · 보내기 → 확인중 (912~)
 // 실제 앱은 보내기 뒤 보안 비밀번호(녹화 35초 검정) → 클론은 건너뛰고 완료(/send/done, '보내는 중이에요'부터)로
+// 두 번째 녹화(28~33초 프레임 851~996): 오늘 같은 계좌·같은 금액으로 보낸 이체가 있으면 '확인중' 뒤 중복 확인창 (서버 409 DUPLICATE_TODAY)
 type Stage = "skel" | "who" | "amount" | "confirm";
 type To = Recipient;
 
@@ -30,6 +34,10 @@ const CHECK_MS = 900; // 보내기 → '··· 확인중' 최소 시간 (녹화 
 // 확인 단계에 들어선 뒤 이만큼은 '보내기' 를 받지 않음: '다음' 과 '보내기' 가 같은 자리(19.5~364.5 × 723.1~779.1)라 '다음' 을 빠르게 두 번 누르면
 // 확인 화면을 못 보고 이체됐음 (실제 앱은 보내기 뒤 비밀번호가 있어 이렇게 안 됨). 이름·'보낼까요?' 가 다 나타나는 때(+100 + 310ms, .kbs-cfin--1)
 const CONFIRM_GUARD_MS = 410;
+// 중복 확인창 '확인' 을 뗀 뒤 완료 화면까지 (두 번째 녹화: 뗀 30.81초 → 31.94초 비밀번호 검정 — 클론은 비밀번호를 건너뛰니 그 자리에서 완료로)
+const DUP_GO_MS = 1150;
+const DUP_LINES = ["고객님, 지금 처리하시려는 이체 거래와", "오늘 동일하게 처리한 이체 건이", "존재합니다.", "그래도 이체하시겠습니까?"]; // 줄바꿈 고정 (프레임 905)
+const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms));
 
 export function KbankSend() {
   useKbankStatusBar();
@@ -53,6 +61,8 @@ export function KbankSend() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [popSeq, setPopSeq] = useState(0);
+  const [dup, setDup] = useState<"open" | "closing" | null>(null); // 중복 이체 확인창 (닫힘 움직임 끝까지 "closing")
+  const dupReq = useRef<NewTransfer | null>(null); // 확인창 '확인' 뒤 다시 보낼 이체 (checkDuplicate 없이)
   const [stars, setStars] = useState<Record<string, boolean>>({}); // ☆ 누른 결과 (서버 반영 전에 바로 보이게)
   // 받는 분 직접 입력
   const [digits, setDigits] = useState("");
@@ -132,30 +142,59 @@ export function KbankSend() {
   };
 
   // 보내기 → '··· 확인중' → (비밀번호 생략) → 완료 화면으로 바꿈 (기록에서 이체 화면 자리를 완료로)
+  const finish = async (result: TransferResult) => {
+    if (!account) return;
+    const state: KbankDoneState = { result, from: { id: account.id, bank: account.bank, number: account.number ?? "" } };
+    leaving.current = true;
+    await kbHistoryGo(-kbBackLevel()); // 단계마다 쌓은 뒤로가기 칸을 먼저 걷음
+    navigate("/send/done", { replace: true, state });
+  };
+  const fail = (e: unknown) => {
+    setSending(false);
+    setError(e instanceof ApiError ? e.message : "연결에 실패했어요. 잠시 후 다시 시도해 주세요");
+  };
   const send = async () => {
     if (sending || !to || !account) return;
     if (performance.now() - confirmAt.current < CONFIRM_GUARD_MS) return;
     setSending(true);
+    const req: NewTransfer = {
+      fromAccountId: account.id,
+      bankCode: to.bank.code,
+      number: to.number,
+      amount,
+      memoTo: (memoTo ?? me).trim(),
+      memoMe: (memoMe ?? to.holder).trim(),
+    };
+    const shown = wait(CHECK_MS);
     try {
-      const [result] = await Promise.all([
-        api.transfer({
-          fromAccountId: account.id,
-          bankCode: to.bank.code,
-          number: to.number,
-          amount,
-          memoTo: (memoTo ?? me).trim(),
-          memoMe: (memoMe ?? to.holder).trim(),
-        }),
-        new Promise((r) => setTimeout(r, CHECK_MS)),
-      ]);
-      const state: KbankDoneState = { result, from: { id: account.id, bank: account.bank, number: account.number ?? "" } };
-      leaving.current = true;
-      await kbHistoryGo(-kbBackLevel()); // 단계마다 쌓은 뒤로가기 칸을 먼저 걷음
-      navigate("/send/done", { replace: true, state });
+      // kbank2(첫 녹화 재현)는 확인창 없음 — 예시 데이터에 녹화 날 같은 1원 이체가 있어 첫 녹화 흐름과 어긋남
+      const [result] = await Promise.all([api.transfer({ ...req, checkDuplicate: !HAS_INTRO }), shown]);
+      await finish(result);
     } catch (e) {
-      setSending(false);
-      setError(e instanceof ApiError ? e.message : "연결에 실패했어요. 잠시 후 다시 시도해 주세요");
+      if (!(e instanceof ApiError && e.code === "DUPLICATE_TODAY")) return fail(e);
+      await shown; // 확인창은 '확인중' 뒤 (녹화 852 → 880, 약 0.9초). 그동안 아래 버튼은 '··· 확인중' 그대로
+      if (!activeRef.current || leaving.current) return setSending(false);
+      dupReq.current = req;
+      setDup("open");
     }
+  };
+  // 확인창: 손 뗀 순간 닫힘 시작. '확인' → 막 아래 '확인중' 그대로 다시 보내고(이번엔 중복 검사 없이) 1150ms 뒤 완료로
+  const dupChoose = async (ok: boolean) => {
+    setDup("closing");
+    const req = dupReq.current;
+    dupReq.current = null;
+    if (!ok || !req) return;
+    try {
+      const [result] = await Promise.all([api.transfer(req), wait(DUP_GO_MS)]);
+      await finish(result);
+    } catch (e) {
+      fail(e);
+    }
+  };
+  // '취소'·뒤로: 닫힘 움직임(300ms)이 끝나면 '보내기' 로 되돌림 (이체 안 함)
+  const dupClosed = (ok: boolean) => {
+    setDup(null);
+    if (!ok) setSending(false);
   };
 
   const stepBack = () => {
@@ -184,7 +223,7 @@ export function KbankSend() {
   };
   // 앞으로 가기(PC 브라우저)로 예전 단계 칸(ibkBack)에 들어오면 그 칸을 걷음 — 받는 분 화면에서 칸만 남아 뒤로 한 번이 헛돌았음.
   // 지금 단계가 쌓는 칸 수보다 깊으면 남의 칸
-  const ownLevel = (stage === "amount" || stage === "confirm" ? 1 : 0) + (bankSheet ? 1 : 0);
+  const ownLevel = (stage === "amount" || stage === "confirm" ? 1 : 0) + (bankSheet ? 1 : 0) + (dup === "open" ? 1 : 0);
   const ownRef = useRef(ownLevel);
   useEffect(() => {
     ownRef.current = ownLevel;
@@ -306,6 +345,9 @@ export function KbankSend() {
           </div>
         </div>
       )}
+      {dup && (
+        <KbankDialog lines={DUP_LINES} className="kbs-dup" onChoose={(ok) => void dupChoose(ok)} onClosed={dupClosed} />
+      )}
       {(data.status === "error" || home.status === "error") && (
         <div className="kbs-fail">
           <p>정보를 불러오지 못했어요</p>
@@ -374,6 +416,7 @@ function Who({
   lookupError: string | null;
 }) {
   const [pressed, setPressed] = useState<string | null>(null);
+  const [v2] = useState(() => kbLaunchVariant() === "v2"); // AI 알약 문구: 이번 실행의 문구 (홈 알약과 같은 값, prefs.ts)
   const mine: Row[] = data.mine
     .filter((m) => m.number)
     .map((m) => ({ key: `m-${m.accountId}`, r: { bank: m.bank, number: digitsOf(m.number), holder: m.holder, accountId: m.accountId }, name: m.label }));
@@ -468,10 +511,10 @@ function Who({
           </div>
         </div>
       </div>
-      {/* 떠 있는 '이체를 도와주러 온 AI' 알약 (무반응) */}
+      {/* 떠 있는 AI 알약 (무반응): 첫 녹화 '이체를 도와주러 온 AI' · 두 번째 녹화 '보낼 계좌 찾기 어려우세요?' (프레임 670~723) */}
       <button className="kbs-ai" onClick={noop}>
         {localAsset("kbank-send-ai") && <img src={localAsset("kbank-send-ai")} alt="" draggable={false} />}
-        <span>이체를 도와주러 온 AI</span>
+        <span>{v2 ? "보낼 계좌 찾기 어려우세요?" : "이체를 도와주러 온 AI"}</span>
       </button>
     </>
   );

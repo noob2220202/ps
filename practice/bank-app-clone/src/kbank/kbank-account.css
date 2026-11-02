@@ -413,3 +413,41 @@
   border-radius: 0;
   background: #f2f2f2;
 }
+
+/* ---------- 맨 위로 ↑ (두 번째 녹화 60.7~96.0초, 프레임 1823~2884) ----------
+   흰 원 지름 47 (1895~1905 가로 · 세로 줄 흰 범위 ≈46.5~47), 가운데 x 192(화면 가운데) · y 733.3 → 앱 바닥에서 원 아래끝까지 43.1 (= 제스처 16 + 27.1,
+   아이폰은 홈 인디케이터 위 27.1). 그림자는 아래가 더 짙고 길게 (원 아래 6px 녹화 246, 8dp 까지 250 이하), 뒤 행 구분선을 가림.
+   나타남 52 아래에서 260ms cubic-bezier(.3,.1,.15,1) (1823 화살 위 1203px → 1828 1164px), 진해지기는 위치보다 빠름 (남은 거리 37.7 · 24.7 · 15.6 에서
+   화살 진하기 .32 · .54 · .70 → 투명도 160ms ease-out), 숨음 52 아래로 225ms cubic-bezier(.45,0,.75,.16) (2881~2884) */
+.kba-up {
+  position: absolute;
+  left: calc(50% - 23.5px);
+  bottom: calc(max(16px, var(--safe-bottom, 0px)) + 27.1px);
+  z-index: 3;
+  width: 47px;
+  height: 47px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09); /* 원 아래 · 위 · 옆 줄 밝기 RMS 1.7 · 0.9 · 1.0 (0 2px 8px .08 은 3.4 · 0.9 · 1.4) */
+  opacity: 0;
+  transform: translateY(52px);
+  pointer-events: none;
+  transition:
+    transform 225ms cubic-bezier(0.45, 0, 0.75, 0.16),
+    opacity 225ms cubic-bezier(0.45, 0, 0.75, 0.16);
+  -webkit-tap-highlight-color: transparent;
+}
+.kba-up--on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    transform 260ms cubic-bezier(0.3, 0.1, 0.15, 1),
+    opacity 160ms cubic-bezier(0, 0, 0.58, 1);
+}
+.kba-up svg {
+  position: absolute;
+  left: 0.5px; /* 화살은 46 상자 좌표 그대로 (원만 0.5 씩 넓힘) */
+  top: 0.5px;
+  display: block;
+}

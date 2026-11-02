@@ -2,8 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { Account, Transaction } from "../api/types";
-import { prefetch, useApi } from "../api/useApi";
+import { prefetch, prefetchMissing, useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
+import { HAS_INTRO } from "../profile/session";
 import { KbankCopyIcon, KbankDigits } from "./common";
 import { KbankHeader } from "./header";
 import { useKbankGo } from "./nav";
@@ -25,6 +26,10 @@ const PEEK_MS = 140;
 const TITLE_AT = 50;
 // 돋보기 줄이 머리줄 밑에 붙는 스크롤 위치: 위 요약 335.7 + 회색 띠 17 − 붙는 자리 1.3 (kbank-account.css)
 const STICK_AT = 351.4;
+// 맨 위로 ↑ 가 나타나는 스크롤 위치 (두 번째 녹화 60.7초 프레임 1823: 1064dp 에 멈췄을 땐 없고 1190dp 에선 있음, 나타나기 시작 ≈1185).
+// kbank2(첫 녹화 재현)는 첫 녹화 전체에 ↑ 가 없어서 그리지 않음
+const UP_AT = 1150;
+const UP_BTN = !HAS_INTRO;
 
 // 뒤로 돌아왔을 때(거래 상세 닫기) 스크롤 위치 그대로 + 뼈대 없이 (녹화 65.6초 등). 화면 기록(location.key)마다 저장.
 // 방문할 때마다 늘지 않게 최근 20개만 (Map 은 넣은 순서 — 가장 오래된 것부터 지움)
@@ -109,15 +114,27 @@ export function KbankAccount() {
   const [peek, setPeek] = useState(() => !back && acc.status === "done" && txs.status === "done");
   const [titled, setTitled] = useState(false);
   const [stuck, setStuck] = useState(false);
+  // 맨 위로 ↑: 아래로 내려 문턱을 넘으면 나타나고, 위로 스크롤이 시작되면(위치 상관없이) 숨음 (녹화 60.7초 나타남 → 96.0초 위로 끌자 숨음).
+  // 거래 상세에서 돌아와 스크롤을 되살릴 때 문턱 아래가 아니면 처음부터 보임 (녹화: 상세를 열고 닫는 동안 계속 보임)
+  const [upBtn, setUpBtn] = useState(() => (seen.get(location.key) ?? 0) > UP_AT);
+  const lastTop = useRef(0);
   const scroller = useRef<HTMLDivElement>(null);
   const ready = (waited || peek) && acc.status === "done" && txs.status === "done";
   // 못 받았으면 뼈대 대신 다시 시도 (녹화에 없음 — 이체 화면 .kbs-fail 과 같은 모양)
   const failed = acc.status === "error" || txs.status === "error";
 
-  // 입금 거래 상세의 '상대 정보' 은행은 받는 분 목록에서 찾음 → 미리 받아 둠 (상세가 올라올 때 이름 뒤에 은행이 늦게 붙지 않게)
+  // 입금 거래 상세의 '상대 정보': 보낸 분은 상세에만 있고(두 번째 녹화 66 · 81초), 없으면 받는 분 목록에서 은행을 찾음 → 둘 다 미리 받아 둠
+  // (조회 API 지연 250ms — 행을 누를 때 받기 시작하면 상세가 다 올라온 뒤에야 글자가 붙었음)
   useEffect(() => {
     void prefetch(paths.recipients(accountId));
   }, [accountId]);
+  const inboundIds = (txs.data ?? [])
+    .filter((t) => t.amount > 0)
+    .map((t) => t.id)
+    .join(",");
+  useEffect(() => {
+    for (const id of inboundIds ? inboundIds.split(",") : []) void prefetchMissing(paths.transaction(id)); // 받아 둔 건 다시 받지 않음
+  }, [inboundIds]);
 
   useEffect(() => {
     if (waited) return;
@@ -135,13 +152,18 @@ export function KbankAccount() {
     if (!ready || !scroller.current) return;
     const top = seen.get(location.key) ?? 0;
     scroller.current.scrollTop = top;
+    lastTop.current = top;
     setTitled(top > TITLE_AT);
     setStuck(top >= STICK_AT);
+    setUpBtn(top > UP_AT);
     if (!seen.has(location.key)) remember(location.key, 0);
   }, [ready, location.key]);
 
   const onScroll = () => {
     const top = scroller.current?.scrollTop ?? 0;
+    if (top < lastTop.current) setUpBtn(false);
+    else if (top > lastTop.current && top > UP_AT) setUpBtn(true);
+    lastTop.current = top;
     remember(location.key, top);
     setTitled(top > TITLE_AT);
     setStuck(top >= STICK_AT);
@@ -229,6 +251,22 @@ export function KbankAccount() {
               )}
             </div>
           </div>
+          {/* 누름은 녹화에 없음(손으로 올렸음) → 부드럽게 맨 위로. 올라가기 시작하면 위 규칙대로 숨음 */}
+          {UP_BTN && (
+            <button
+              className={`kba-up ${upBtn ? "kba-up--on" : ""}`}
+              aria-label="맨 위로"
+              aria-hidden={!upBtn}
+              tabIndex={upBtn ? 0 : -1}
+              onClick={() => scroller.current?.scrollTo({ top: 0, behavior: "smooth" })}
+            >
+              {/* ↑: 원 상자(46) 안 좌표. 프레임 1895~1905 평균 잉크 x 183.5~199.8 · y 724.4~742.0 → 대 x 191.67 (원 가운데보다 0.33 왼쪽), 꼭지 y 725.1,
+                  날개 끝 (184.3 · 199.05, 732.1), 대 끝 741.2. 찍어 겹쳐 보니 잉크가 0.65 위 · 0.89배 → 0.65 내리고 굵기 1.5 → 1.6 */}
+              <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden>
+                <path d="M22.67 31.55V15.5M15.3 22.45l7.37-6.95 7.38 6.95" fill="none" stroke="#3c3d42" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
         </>
       )}
       <KbankHeader

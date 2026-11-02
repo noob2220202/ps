@@ -1,0 +1,110 @@
+/* 가운데 확인창 (KbankDialog.tsx). 두 번째 녹화 프레임 880~934 (중복 이체), 정지 구간 평균에서 잰 값.
+   값은 녹화 px ÷ 1.53646, 앱 y = 화면 y − 33.2. 글꼴은 Pretendard(.kb, ss01) — 녹화 dp = CSS px (FONT.md) */
+
+/* 막 아래 화면의 누름·스크롤을 막는 칸 (상태바 밑 앱 전체, 머리줄 '취소' · 아래 '확인중' 위) */
+.kbdlg {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+/* 막: rgba(0,0,0,.70), 앱 y 0~784.9 — 아래 15dp 제스처 띠는 어둡게 안 함 (광고 시트 막과 같음). 아이폰(녹화 없음)은 화면 끝까지.
+   상자는 막 영역 세로 가운데 (녹화 273.6~511.7 → 가운데 392.65, 막 가운데 392.45). 막 진하기는 바탕색으로 바꿈 (상자까지 흐려지지 않게) */
+.kbdlg-dim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 15px;
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  animation: kbdlg-dim-in 300ms linear backwards;
+}
+html[data-os="ios"] .kbdlg-dim {
+  bottom: 0;
+}
+/* 상자: x 19.5~364.5 (폭 345) · 높이 238.1, #fff, r 20, 그림자 없음.
+   안쪽: 글 첫 줄 상자 위 +32.05 (lh1 위 308.8 − 줄 간격 반 3.2), 버튼 435.4~491.3, 아래 여백 20.3 · 오른쪽 20.4 (확인 오른쪽 끝 344.1) */
+.kbdlg-box {
+  flex: 1;
+  margin: 0 19.5px;
+  padding: 32.05px 20.4px 20.3px 20px;
+  border-radius: 20px;
+  background: #fff;
+  animation: kbdlg-in 250ms cubic-bezier(0.1, 0, 0.2, 1) 50ms backwards; /* 열린 뒤엔 움직임 값을 남기지 않음 — both 면 합성 층으로 그려져 상자가 1 기기px 오른쪽에 붙었음 */
+}
+/* 글: 18px 700 #171717, 줄 간격 24.4 (lh1 위 308.8 / 333.4 / 357.6 / 381.9 — 픽셀 담당 맞춤 700 오차 8%, 500 은 24%), 줄바꿈 고정.
+   가운데 192.0 (녹화 첫 줄 56.7~327.3) — 상자 안쪽 왼·오른 여백이 20 · 20.4 라 오른쪽을 0.4 넓힘 */
+.kbdlg-msg {
+  margin: 0 -0.4px 0 0;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24.4px;
+  color: #171717;
+}
+.kbdlg-msg > span {
+  display: block;
+  position: relative;
+}
+/* 버튼: 높이 56, 취소 39.5~187.7 · 확인 195.5~344.1 (사이 7.8), r 12, 18px 500 — 글자 lh1 위 454.2 (버튼 가운데) */
+.kbdlg-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7.8px;
+  height: 56px;
+  margin-top: 32.15px;
+}
+.kbdlg-btns button {
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 500;
+}
+/* 취소 = 완료 화면 추가이체(.kbd-again) 색 (녹화 바탕 (236,241,254) · 글자 (17,29,137)) */
+.kbdlg-cancel {
+  background: #ebf0fd;
+  color: #0b1a8c;
+}
+.kbdlg-ok {
+  background: #0012a5;
+  color: #fff;
+}
+/* 누름: 누르는 순간 바탕만 ×0.905 (확인 #0012a5 → #001195, 크기 그대로 — 프레임 885~889). 취소는 녹화에 없음 → 같은 비율 */
+.kbdlg-ok:active {
+  background: #001195;
+}
+.kbdlg-cancel:active {
+  background: #d5d9e5;
+}
+@keyframes kbdlg-dim-in {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+@keyframes kbdlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(42px);
+  }
+}
+/* 닫힘 (손 뗀 순간, 프레임 889~899): 막 300ms linear, 상자 250ms 끝으로 갈수록 빨라짐 */
+.kbdlg--out .kbdlg-dim {
+  animation: kbdlg-dim-out 300ms linear both;
+}
+.kbdlg--out .kbdlg-box {
+  animation: kbdlg-out 250ms cubic-bezier(0.45, 0, 0.75, 0.16) both;
+}
+@keyframes kbdlg-dim-out {
+  to {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+@keyframes kbdlg-out {
+  to {
+    opacity: 0;
+    transform: translateY(42px);
+  }
+}

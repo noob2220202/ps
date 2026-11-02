@@ -1,0 +1,314 @@
+/* 이체확인증 (KbankReceipt.tsx). 녹화 두 번째 프레임 2240~2330('500,000 원', avg_certB) · 1400~1550('1 원', 받는계좌 두 줄, avg_certA).
+   값 = 녹화 px ÷ 1.53646, y 는 − 33.2 (앱 영역). 카드 안 좌표는 카드 왼위(앱 9.5, 58.9) 기준.
+   카드 안 글자는 녹화가 기기 기본 글꼴(Pretendard 아님) → Pretendard 로 겹쳐 맞춘 크기·굵기 (소수 px).
+   크롬은 글자 기준선을 CSS 1px 단위로 놓음 → 글자 상자는 정수 top 에 두고 소수 위치는 transform 으로 (kbank-home.css 와 같은 방법).
+   위치·굵기는 시험 프로필로 녹화와 같은 글자(500,000 원 · 2026.11.02 11:25:21 · 전자금융 · 0원 · 라벨 · 안내)를 찍어 avg_certB 와 잉크를 겹쳐 맞춤
+   (scratchpad V2/build/k01 cmp.py: 상관 최대 이동 · 잉크 무게중심 · 잉크 상자 셋이 ±0.45 안).
+   굵기: 300 · 350 · 400 을 바꿔 찍어 잉크 오차(상관 최대 위치에서 RMS ÷ 녹화 잉크)가 가장 작은 것 — 라벨 400, 값 Roboto 400 (날짜 오차 Pretendard 119 → 68),
+   안내 300 (55.9, 400 은 59.5). 색과 제목 · '원' 굵기는 글자 잉크 합(클론 ÷ 녹화, avg_certB)을 1 가까이로 맞춤: 처음 값(#a4a4a4 · #4a4a4a · #84868d,
+   제목 400 · '원' 500)은 0.79~0.89 라 녹화보다 옅었음 → 라벨 #939393 · 값 #333 · 안내 #686a71, 제목 450 · '원' 550 으로 0.93~1.04
+   (값의 날짜만 1.22 — Roboto 숫자가 녹화 숫자보다 굵음, 금액 숫자는 폭 때문에 400 그대로 0.87). 위치는 그대로(상관 이동 ±0.46 안) */
+.kb.kbc {
+  background: transparent; /* 올라오는 동안 위쪽은 밑 거래 상세가 그대로 보임 (가로 밀림·어두워짐 없음) */
+}
+
+/* ---------- 들어오기 (원본 pts 74.27~74.67 · 90.69~91.12초) ----------
+   머리줄·본문은 거래 상세 올라오기(kbank-tx.css kbt-up)와 같은 445ms cubic-bezier(.46,0,.17,1) — 위치 RMS 11 · 14px.
+   투명도: 페이지·'확인' 모두 .70 → 1 같은 곡선 (녹화 '확인' 바탕 (76,88,193) = #0012a5 의 .70, 페이지 .72 → .95 at +270ms).
+   '확인'은 제자리 (움직이지 않음). 머리줄 > '확인' > 본문 순으로 쌓임 → 머리줄과 본문을 따로 같은 움직임으로 올림 */
+.kbc--enter .kbc-page,
+.kbc--enter .kbc-head {
+  animation:
+    kbc-up 445ms cubic-bezier(0.46, 0, 0.17, 1) backwards,
+    kbc-fade 445ms cubic-bezier(0.46, 0, 0.17, 1) backwards;
+}
+.kbc--enter .kbc-bottom {
+  animation: kbc-fade 445ms cubic-bezier(0.46, 0, 0.17, 1) backwards;
+}
+/* 끝난 뒤엔 움직임 값을 남기지 않음(backwards) — 남기면 합성 층으로 그려져 글자·버튼이 주소로 바로 연 화면과 기기px 하나씩 어긋났음 */
+@keyframes kbc-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes kbc-fade {
+  from {
+    opacity: 0.7;
+  }
+}
+
+/* ---------- 페이지 (흰 바탕 + 회색 띠 + 카드) ---------- */
+.kbc-page {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #ffffff;
+}
+/* 회색 바탕 y 48.4~673.8 #f7f7fa, 그 아래 흰색 (경계선 없음). 위끝은 머리줄 흰 바닥이 덮음 */
+.kbc-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48px;
+  height: 625.8px;
+  background: #f7f7fa;
+}
+/* 카드 x 9.5~374.25 · y 58.9~574.4, 모서리 0, 테두리 없음. 그림자는 가우스 맞춤 (아래 그림자가 조금 더 짙음) */
+.kbc-card {
+  position: absolute;
+  left: 9.5px;
+  right: 9.75px;
+  top: 59px; /* 58.9 — 안 글자 기준선이 정수 위치에서 시작하게 */
+  height: 515.5px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 1.3px 8.9px rgba(0, 0, 0, 0.23);
+}
+/* 'Kbank': 시작화면 글자(kbank-wordmark.svg)와 같은 모양, 색만 #10063f. 상자 x 44.5 · y 78.6, 55.75 × 13.95 (겹쳐 보면 잉크 ±0.17 안) */
+.kbc-logo {
+  position: absolute;
+  left: 35px;
+  top: 19.7px;
+  width: 55.75px;
+  height: 13.95px;
+  background: #10063f;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.kbc-logo--text {
+  background: none;
+  font-size: 15px;
+  line-height: 14px;
+  font-weight: 800;
+  color: #10063f;
+}
+/* '이체확인증' 20px #040207 (명세 400, 잉크 합 맞춰 450): x 44.8 · top 101.3 (+0.6 겹쳐 맞춤) */
+.kbc-title {
+  position: absolute;
+  left: 35.3px;
+  top: 42px;
+  transform: translateY(0.6px);
+  margin: 0;
+  font-size: 20px;
+  line-height: 20px;
+  font-weight: 450;
+  color: #040207;
+  white-space: nowrap;
+}
+/* 라벨 (이체금액 · 표 왼쪽): 12.6px 400 #939393 (녹화 가장 진한 화소 #959595~#a0a0a1, 잉크 합 맞춤), x 44.5. 상자 위 = 행 가운데 − 5.45 (명세 − 6.6 은 겹쳐 보니 라벨 10줄 모두 1.2~1.8 높았음) */
+.kbc-label {
+  position: absolute;
+  left: 0;
+  top: -7px;
+  transform: translateY(1.55px);
+  font-size: 12.6px;
+  line-height: 12.6px;
+  font-weight: 400;
+  color: #939393;
+  white-space: nowrap;
+}
+.kbc-amt__label {
+  left: 35px;
+  top: 91px; /* 150.4 → 겹쳐 보고 151.3 */
+  transform: translateY(1.3px);
+  color: #959498;
+}
+/* 금액 '500,000' 28.5px 400 검정, 오른쪽 끝 317.4 · top 142.7 / 한 칸 띄고 '원' 22.5px 550 (명세 500, 잉크 합 맞춤), x 320.1~339.5 · top 146.0 */
+.kbc-amt__num,
+.kbc-amt__won {
+  position: absolute;
+  color: #000000;
+  white-space: nowrap;
+}
+.kbc-amt__num {
+  right: 56.85px;
+  top: 84px;
+  transform: translateY(0.2px);
+  font-size: 28.5px;
+  line-height: 28.5px;
+  font-weight: 400; /* 450 이면 잉크 합은 녹화와 같아지지만(0.87 → 0.96) 폭이 4 넓어져 상관 이동 −1.0 → 400 그대로 */
+}
+.kbc-n1 {
+  margin: 0 0.12em;
+}
+.kbc-amt__won {
+  right: 34.75px;
+  top: 87px;
+  transform: translateY(0.4px);
+  font-size: 22.5px;
+  line-height: 22.5px;
+  font-weight: 550;
+}
+/* 구분선 1px, x 44.3~339.7: 금액 아래 #bbbbbb, 표 가운데 · 끝 #efefef. 녹화 선 가운데(기기 행 잉크 무게중심) 188.85 · 383.4 · 506.7.
+   top 의 소수는 CSS 1px 로 붙어 버려서(129.1 · 129.4 가 같은 행) 정수 top + transform */
+.kbc-line {
+  position: absolute;
+  left: 34.8px;
+  right: 34.55px;
+  height: 1px;
+  background: #efefef;
+}
+.kbc-line--amt {
+  top: 129px;
+  transform: translateY(0.57px);
+  background: #bbbbbb;
+}
+.kbc-line--mid {
+  top: 323.6px;
+}
+.kbc-line--end {
+  top: 447px;
+  transform: translateY(0.36px);
+}
+/* 표 행: 행마다 가운데 y 에 놓고(높이 0, KbankReceipt.tsx 의 translateY) 라벨은 위로 5.45, 값은 가운데 맞춤 — 값이 두 줄이어도 다음 행 자리는 그대로 */
+.kbc-row {
+  position: absolute;
+  left: 35px;
+  right: 34.75px;
+  top: 0;
+  height: 0;
+}
+/* 값 13.9px 400 #333 (명세 #222, 녹화 가장 진한 화소 #080808~#262626 · 잉크 합 맞춤) 오른쪽 정렬 (끝 339.5), 겹쳐 맞춤. 폭 148(내용 폭 절반)을 넘으면 낱말 사이에서만 두 줄 (녹화 '카카오뱅크 13자리' → 두 줄, '농축협 10자리' 한 줄).
+   녹화 숫자는 고정폭(기기 글꼴) — '2026.11.02 11:25:21' 잉크 폭 124.3 · 12자리 계좌 91.1 이 Roboto 와 같음 (Pretendard 는 117.2 로 좁음,
+   tnum 이면 132 로 넓음) → 숫자·영문은 Roboto, 한글은 Pretendard */
+.kbc-value {
+  position: absolute; /* 상자 가운데 = 행 가운데 + 0.35 (transform 안 글자도 기기px 로 붙어서 0.65 단위로 움직임) */
+  right: 0;
+  top: 0;
+  max-width: 148px;
+  transform: translateY(calc(-50% + 0.35px));
+  text-align: right;
+  word-break: keep-all;
+  font-family: Roboto, "Pretendard Variable", Pretendard, sans-serif;
+  font-feature-settings: normal;
+  font-size: 13.9px;
+  line-height: 12.7px; /* 두 줄일 때 줄 간격: 명세 13.7 은 잉크 위끝 간격(한글 줄 · 숫자 줄은 잉크 위가 1.0 다름) → 겹쳐 보고 12.7 */
+  font-weight: 400;
+  color: #333333;
+}
+/* 안내 2줄 13.4px 300 #686a71 (명세 #84868d, 잉크 합 맞춤): x 44.6 · top 521.1 / 535.1 (줄바꿈 고정). 줄마다 정수 top + transform 으로 겹쳐 맞춤 */
+.kbc-note {
+  position: absolute;
+  left: 35.1px;
+  top: 462px;
+  margin: 0;
+  font-size: 13.4px;
+  line-height: 13.4px;
+  font-weight: 300;
+  color: #686a71;
+  white-space: nowrap;
+}
+.kbc-note span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(0.9px);
+}
+.kbc-note span + span {
+  top: 14px;
+  transform: translateY(1.1px);
+}
+/* 주소로 바로 열었는데 거래를 못 받았을 때 (녹화에 없음 — 거래 상세 .kbt-fail 과 같은 모양) */
+.kbc-fail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 200px;
+  text-align: center;
+  font-size: 15px;
+  color: #55565a;
+}
+.kbc-fail p {
+  margin: 0;
+}
+.kbc-fail button {
+  margin-top: 8px;
+  color: #0012a6;
+}
+/* 연습용 무늬 (녹화에 없음): 카드 위에 옅게 비스듬히 — 글자는 그대로 읽히게 */
+.kbc-mark {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.kbc-mark p {
+  margin: 0 0 0 -180px;
+  width: 720px;
+  line-height: 58px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 18, 165, 0.07);
+  white-space: nowrap;
+  transform: rotate(-24deg);
+  transform-origin: 50% 50%;
+}
+.kbc-mark p:nth-child(even) {
+  text-indent: 150px;
+}
+
+/* ---------- 바닥 '확인': 이체 .kbs-btn 과 같음 (x 19.5~364.5 · y 723.1~779.1, 반지름 12, #0012a5, 18px 500 흰색). 누름 표시 없음 ---------- */
+.kbc-bottom {
+  position: absolute;
+  left: 19.5px;
+  right: 19.5px;
+  bottom: calc(max(16px, var(--safe-bottom, 0px)) + 4.8px);
+  height: 56px;
+  z-index: 2;
+  transform: translate(-0.5px, 0.5px); /* 그려진 가장자리가 녹화(19.61~364.34 · 723.3~779.2)보다 0.4~0.66 오른쪽 · 0.5 위였음 */
+}
+.kbc-ok {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: #0012a5;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 글자는 바탕 보정(.kbc-bottom transform)을 되돌려 녹화 자리로 (avg_certB 대비 1.16 아래 · 0.56 왼쪽이었음) */
+.kbc-ok span {
+  display: inline-block;
+  transform: translate(0.56px, -1.16px);
+}
+
+/* ---------- 머리줄 y 0~48.4 흰색 (제목·‹·× 없음), 오른쪽 ↓ 누름 칸 x 326~374 ---------- */
+.kbc-head {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.kbc-head__bar {
+  position: relative;
+  height: 48.9px; /* 48.4 — 회색 위끝이 녹화(기기 행 125.7)보다 0.6 기기px 위로 그려져서 */
+  background: #ffffff;
+  pointer-events: auto;
+}
+.kbc-down {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  width: 48px;
+  height: 48px;
+}
+.kbc-down svg {
+  display: block;
+}
+
+/* 이 화면으로 들어올 때는 ScreenStack 의 케이뱅크 가로 밀기 · 밑 화면 어두워짐을 끄고 위 올라오기만 (녹화엔 가로 움직임 없음, 밑 거래 상세는 그대로).
+   닫힘('확인' · 뒤로)과 앞으로 가기로 다시 들어오기는 ScreenStack 이 전환 없이 바로 걷음 (녹화 52.032 → 52.056 · 77.723 → 77.748 · 94.227 → 94.252초) */
+html[data-app="kbank"] .layer.layer--push-enter:has(> .kbc),
+html[data-app="kbank"] .layer.layer--push-exit:has(~ .layer--push-enter > .kbc) {
+  animation: none;
+  box-shadow: none;
+}
+html[data-app="kbank"] .layer.layer--push-exit:has(~ .layer--push-enter > .kbc) > .layer__dim {
+  animation: none;
+  opacity: 0;
+}

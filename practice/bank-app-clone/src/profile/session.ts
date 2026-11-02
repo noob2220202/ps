@@ -19,8 +19,10 @@ export function setCurrentProfile(id: string | null) {
   }
 }
 
-// 이 서버가 어느 앱인지. 서버 하나는 앱 하나만 연다 (카카오뱅크 9101, 콕뱅크 9103, 하나원큐 9105, i-ONE Bank 9107 — 데이터도 따로)
-// 배포 땐 서버가 index.html에 window.__BANK_APP__ 을 넣어 주고, 개발 땐 VITE_APP=nh (npm run dev:nh) / hana (dev:hana) / ibk (dev:ibk)
+// 이 서버가 어느 앱인지. 서버 하나는 앱 하나만 연다 (카카오뱅크 9101, 콕뱅크 9103, 하나원큐 9105, i-ONE Bank 9107, 케이뱅크 9109,
+// 녹화 인트로를 켠 케이뱅크 kbank2 9111 — 데이터도 따로)
+// 배포 땐 서버가 index.html에 window.__BANK_APP__ 을 넣어 주고, 개발 땐 VITE_APP=nh (npm run dev:nh) / hana (dev:hana) / ibk (dev:ibk) /
+// kbank (dev:kbank 화면 5177 · API 8791) / kbank2 (dev:kbank2 화면 5178 · API 8792)
 export type AppName = "kakao" | "nh" | "hana" | "ibk" | "kbank";
 declare global {
   interface Window {

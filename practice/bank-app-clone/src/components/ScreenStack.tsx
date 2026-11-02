@@ -33,10 +33,13 @@ const KBANK_ANDROID = APP === "kbank" && OS === "android";
 // 거래 상세(/tx/)는 OS 와 상관없이 kbank-tx.css 의 올라오기 445ms · 내려가기 413ms (층 가로 밀기는 끔). 아이폰도 그 움직임이 끝났을 때 걷음 —
 // iOS 전환 타이머(420ms)로 걷으면 상세가 덜 올라온 채(위끝 4~9px) 밑 계좌 층이 사라져 상태바 밑에 검은 띠가 3~4프레임 보였음 (raf-tx)
 const kbankTx = (path: string) => APP === "kbank" && path.startsWith("/tx/");
-type KbAnim = "acc" | "send" | "pop" | "tx";
+// 이체확인증(/receipt/, 두 번째 녹화 45.7 · 73.9 · 90.2초)도 OS 와 상관없이 올라오기 445ms(거래 상세와 같은 움직임, kbank-receipt.css) · 밑 거래 상세는 그대로.
+// 닫기('확인' · 뒤로)는 전환 없이 손 뗀 프레임에 바로 (52.032 → 52.056 · 77.723 → 77.748 · 94.227 → 94.252초). /tx/ 아래 두지 않음 — 'tx' 로 잡히면 닫을 때 413ms 내려감
+const kbankReceipt = (path: string) => APP === "kbank" && path.startsWith("/receipt/");
+type KbAnim = "acc" | "send" | "pop" | "tx" | "receipt";
 const kbankAnim = (anim: Anim, path: string): KbAnim =>
-  path.startsWith("/tx/") ? "tx" : anim === "pop" ? "pop" : path.startsWith("/send") ? "send" : "acc";
-const KBANK_MS: Record<KbAnim, number> = { acc: 287, send: 328, pop: 296, tx: 445 };
+  path.startsWith("/tx/") ? "tx" : path.startsWith("/receipt/") ? "receipt" : anim === "pop" ? "pop" : path.startsWith("/send") ? "send" : "acc";
+const KBANK_MS: Record<KbAnim, number> = { acc: 287, send: 328, pop: 296, tx: 445, receipt: 445 };
 const kbankMs = (anim: Anim | null, path: string) => {
   const k = kbankAnim(anim ?? "push", path);
   return k === "tx" && anim === "pop" ? 413 : KBANK_MS[k];
@@ -115,7 +118,14 @@ export function ScreenStack({ render }: { render: Render }) {
 
     // 스와이프로 이미 화면을 밀어냈으면 pop 애니메이션을 또 하지 않는다.
     // 안드로이드(카카오뱅크 영상)는 뒤로가기가 즉시 바뀌므로 pop 애니메이션 없음. 콕뱅크는 짧게 흐려짐.
-    if (skipAnim.current || (OS === "android" && anim === "pop" && !NH_ANDROID)) anim = null;
+    // 케이뱅크 이체확인증에서 뒤로는 갤럭시·아이폰 모두 바로 (위 kbankReceipt). 앞으로 가기로 확인증에 다시 들어갈 때(POP)도 전환 없이 —
+    // 거래 상세 'tx' 내려가기가 걸리면 밑에 그려진 층 없이 확인증이 올라와 위쪽에 검은 띠가 보였음 (확인증도 한 번 그린 칸이면 올라오지 않음)
+    if (
+      skipAnim.current ||
+      (OS === "android" && anim === "pop" && !NH_ANDROID) ||
+      (anim === "pop" && (kbankReceipt(prevTop.pathname) || kbankReceipt(location.pathname)))
+    )
+      anim = null;
     skipAnim.current = false;
     drag.current = null;
     setDragging(false);
@@ -125,8 +135,9 @@ export function ScreenStack({ render }: { render: Render }) {
     if (!anim) return;
 
     const path = anim === "pop" ? prevTop.pathname : location.pathname;
-    const kbAnimEnd = KBANK_ANDROID || kbankTx(path);
-    const ms = kbankTx(path) ? kbankMs(anim, path) : navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
+    const up = kbankTx(path) || kbankReceipt(path); // 아래에서 올라오는 화면 (아이폰도 같은 움직임)
+    const kbAnimEnd = KBANK_ANDROID || up;
+    const ms = up ? kbankMs(anim, path) : navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
     setAnimMs(ms);
     if (kbAnimEnd) setKbAnim(kbankAnim(anim, path));
     // 케이뱅크는 움직임이 실제로 끝났을 때 걷음 (onKbAnimEnd) — 돌아가는 화면을 새로 그리느라 첫 프레임이 늦게 나온 만큼(≈45ms) 타이머가 먼저 끝나
@@ -141,10 +152,15 @@ export function ScreenStack({ render }: { render: Render }) {
     setEnterAnim(null);
     setKbAnim(null);
   };
-  // 케이뱅크 전환 끝: 위 층의 가로 밀기(층 자신), 거래 상세는 .kbt 의 올라오기·내려가기
+  // 케이뱅크 전환 끝: 위 층의 가로 밀기(층 자신), 거래 상세는 .kbt 의 올라오기·내려가기,
+  // 이체확인증은 .kbc 안(루트 · 머리줄 · 본문)의 올라오기 (kbc-up, 루트에 거래 상세 키프레임을 써도 kbt-up)
   const onKbAnimEnd = (e: AnimationEvent<HTMLDivElement>) => {
     const t = e.target as HTMLElement;
-    if (t === e.currentTarget ? e.animationName.startsWith("layer-slide-") : t.classList.contains("kbt") && /^kbt-(up|down)$/.test(e.animationName)) endAnim();
+    if (t === e.currentTarget) {
+      if (e.animationName.startsWith("layer-slide-")) endAnim();
+    } else if (kbAnim === "receipt") {
+      if (/^kb[ct]-up$/.test(e.animationName) && t.closest(".kbc")) endAnim();
+    } else if (t.classList.contains("kbt") && /^kbt-(up|down)$/.test(e.animationName)) endAnim();
   };
 
   // i-ONE Bank 전환 끝: 메뉴 밀기(menu-*)는 층 자신의, 본문 밀기(body-*)는 새 화면 .ibk-body 의 애니메이션이 끝났을 때

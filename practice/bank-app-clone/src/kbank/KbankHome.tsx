@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { formatAccountNumber, paths } from "../api/endpoints";
 import type { Account, HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
@@ -6,9 +6,13 @@ import { localAsset } from "../assets/Asset";
 import { DevPanel } from "../dev-panel/DevPanel";
 import { useLayerActive } from "../platform/LayerContext";
 import { RESTART_EVENT } from "../platform/recorder";
+import { HAS_INTRO, currentProfileId } from "../profile/session";
+import { KbankAdSheet, type KbankAdStage } from "./KbankAdSheet";
 import { KbankCopyIcon, KbankDigits } from "./common";
 import { useKbankGo } from "./nav";
 import { useKbankSent } from "./notice";
+import { kbBackLevel } from "./sendback";
+import { kbAdCloseForLaunch, kbAdHideWeek, kbAdShouldShow, kbLaunchVariant } from "./prefs";
 import { KbankTabBar } from "./tabbar";
 import { kbNf, noop, useKbankStatusBar } from "./theme";
 import "./kbank-home.css";
@@ -26,7 +30,10 @@ const FIRST_AT = { skeleton: 167, content: 267 };
 //   알약: 작은 '● ㅅ'(폭 29.0) 292~305 → 305.5~316 펼침(350ms ease, 회색) → 318.5~327 파랑으로(300ms) → 406.5~418 접힘(380ms, 회색) '● 사장님'
 //   'ONE 11월 쓴 돈' 넘김 칸은 319 에 끼어듦(움직임 없이) (+900)
 //   309~328 동안 카드 전체가 12.1dp 아래로 내려가 있다가 329 에 제자리 (+567 ~ +1233, 둘 다 한 번에)
-const FRESH = { balance: 467, pillOpen: 450, pillBlue: 880, carousel: 900, bump: 567, bumpEnd: 1233, pillClose: 3817 };
+//   두 번째 녹화: 지난번에 보여 준 잔액을 회색으로 → +467 검정 → +567(녹화 236) 새 값과 다르면 굴림 (219~245, 광고 막 아래)
+const FRESH = { balance: 467, roll: 567, pillOpen: 450, pillBlue: 880, carousel: 900, bump: 567, bumpEnd: 1233, pillClose: 3817 };
+// 광고 바텀시트 (두 번째 녹화 230~236, 원본 pts): 막이 한 프레임에 깔림 +358 → 시트가 올라오기 시작 +430 (KbankAdSheet)
+const AD = { dim: 358, up: 430 };
 // 돌아왔을 때 (이체 완료 → 홈, 녹화 1255.5 화면이 밀려 들어오기 시작 = 0): 1268~1269 잔액 연회색(+417, 67ms) ·
 //   1271.3~1298 숫자가 위에서 내려오며 바뀜(+527 → 첫 움직임이 한 프레임 늦어 +500, 850ms, 옛 숫자는 아래로 빠짐)
 //   자물쇠 1269.5~1272 파랑(+467) · 1274~1276 열림(+617) = 자물쇠 한 바퀴가 −133 에서 시작한 것과 같음
@@ -38,8 +45,30 @@ const ROLL_MS = 850;
 
 // 앱을 켠 뒤 한 번만: 알약 펼침 · 넘김 칸 끼어듦 (돌아온 42초엔 처음부터 '● 사장님' · 넘김 칸 있음)
 let booted = false;
-// 계좌별 마지막으로 보여 준 잔액 (돌아왔을 때 옛 잔액 → 새 잔액으로 굴림)
+// 계좌별 마지막으로 보여 준 잔액 (돌아왔을 때 옛 잔액 → 새 잔액으로 굴림). 이 브라우저(localStorage)에도 프로필별로 남겨
+// 앱을 새로 켜면 그 값에서 굴림 (두 번째 녹화 219~245: 지난번 0원 회색 → 1원). 저장이 막힌 브라우저면 이번 실행만
 const lastShown = new Map<string, number>();
+const balKey = (acc: string) => `kb-bal-${currentProfileId() ?? "none"}-${acc}`;
+function shownGet(acc: string): number | undefined {
+  const k = balKey(acc);
+  const m = lastShown.get(k);
+  if (m !== undefined) return m;
+  try {
+    const v = localStorage.getItem(k);
+    return v != null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+function shownSet(acc: string, v: number) {
+  const k = balKey(acc);
+  lastShown.set(k, v);
+  try {
+    localStorage.setItem(k, String(v));
+  } catch {
+    /* 막힘 → 이번 실행만 */
+  }
+}
 // '● 녹화' 는 페이지를 새로 읽지 않고 시작화면부터 다시 띄움(RESTART_EVENT) → 그 뒤 홈도 '처음 들어올 때' 시간표로 (kbank2 인트로 녹화 9.47~13.9초)
 window.addEventListener(RESTART_EVENT, () => {
   booted = false;
@@ -99,14 +128,36 @@ export function KbankHome() {
   const [shown, setShown] = useState<{ value: number; from: number | null; n: number } | null>(null);
   // 돌아온 직후 굴림 시각(BACK.roll) 전엔 새 잔액이 먼저 와도 기다림 (녹화: 회색 깜빡 → 굴림 순서)
   const holdRoll = useRef(false);
+  // 알약 문구: 앱을 켤 때마다 첫 녹화('홈에서 한눈에 확인하세요' 👀) / 두 번째 녹화('필요한 기능을 쉽게 찾아보세요' 🔍) 중 하나 (prefs.ts, kbank2 는 첫 녹화 고정)
+  const [variant] = useState(kbLaunchVariant);
+  // 광고 바텀시트: 앱을 켠 뒤 첫 홈에서만 (일주일간 보지 않기 · 이번 실행 닫음 · 관리 패널 끔 · kbank2 는 prefs.ts 가 거름)
+  const [adWanted] = useState(() => first && kbAdShouldShow());
+  const [ad, setAd] = useState<KbankAdStage>("off");
+  const closeAd = (week: boolean) => {
+    if (week) kbAdHideWeek();
+    else kbAdCloseForLaunch();
+    setAd("off");
+  };
 
   const balance = account?.balance;
   const accountId = account?.id;
   const accountRef = useRef(account);
+  const activeRef = useRef(active);
+  const adRef = useRef(ad);
   // 아래 시간표(레이아웃 효과)보다 먼저 돌아야 같은 커밋에 온 계좌를 봄
   useLayoutEffect(() => {
     accountRef.current = account;
+    activeRef.current = active;
+    adRef.current = ad;
   });
+  // 앞으로 가기(PC 브라우저)로 광고 시트가 쌓았던 뒤로가기 칸에 다시 들어오면 그 칸을 걷음 — 시트 없이 칸만 남아 뒤로 한 번이 헛돌지 않게 (KbankSend 와 같음)
+  useEffect(() => {
+    const drop = () => {
+      if (activeRef.current && adRef.current === "off" && kbBackLevel() > 0) window.history.back();
+    };
+    window.addEventListener("popstate", drop);
+    return () => window.removeEventListener("popstate", drop);
+  }, []);
 
   // 그리기 전에 돌려야 잔액이 내용과 같은 프레임에 보이고(녹화 292) 시간표도 내용이 보인 때부터 셈
   useLayoutEffect(() => {
@@ -126,8 +177,25 @@ export function KbankHome() {
     };
     setLock("gray");
     if (visit === 0) {
-      setShown({ value: acc.balance, from: null, n: 0 });
-      lastShown.set(acc.id, acc.balance);
+      // 지난번에 보여 준 잔액이 있으면 그 값 → +567 에 새 값으로 굴림. kbank2(첫 녹화 재현)는 첫 녹화처럼 지금 잔액 그대로
+      const saved = HAS_INTRO ? undefined : shownGet(acc.id);
+      const old = saved ?? acc.balance;
+      setShown({ value: old, from: null, n: 0 });
+      if (saved === undefined) shownSet(acc.id, acc.balance);
+      else {
+        holdRoll.current = true;
+        at(FRESH.roll, () => {
+          holdRoll.current = false;
+          const now = accountRef.current?.balance ?? old;
+          shownSet(acc.id, now);
+          if (now !== old) setShown((s) => ({ value: now, from: old, n: (s?.n ?? 0) + 1 }));
+        });
+      }
+      if (adWanted) {
+        // 다른 화면으로 먼저 떠났으면 띄우지 않음
+        at(AD.dim, () => activeRef.current && setAd("dim"));
+        at(AD.up, () => setAd((s) => (s === "dim" ? "up" : s)));
+      }
       at(67, () => setFresh(false));
       at(FRESH.balance, () => setGray(false));
       at(FRESH.pillOpen, () => setPill("open"));
@@ -138,7 +206,7 @@ export function KbankHome() {
       at(FRESH.pillClose, () => setPill("closed"));
       lockLoop(0);
     } else {
-      const old = lastShown.get(acc.id) ?? acc.balance;
+      const old = shownGet(acc.id) ?? acc.balance;
       holdRoll.current = true;
       setShown({ value: old, from: null, n: 0 });
       setGray(false);
@@ -151,7 +219,7 @@ export function KbankHome() {
       at(BACK.roll, () => {
         holdRoll.current = false;
         const now = accountRef.current?.balance ?? old;
-        lastShown.set(acc.id, now);
+        shownSet(acc.id, now);
         if (now !== old) setShown((s) => ({ value: now, from: old, n: (s?.n ?? 0) + 1 }));
       });
       lockLoop(BACK.lock);
@@ -161,14 +229,14 @@ export function KbankHome() {
       lt.forEach(clearTimeout);
       holdRoll.current = false;
     };
-  }, [ready, visit]);
+  }, [ready, visit, adWanted]);
 
   // 홈을 보고 있는 동안 잔액이 바뀌면(관리 패널 등) 바로 굴려서 새 값으로
   useEffect(() => {
     if (!active || balance === undefined || !accountId || !shown || holdRoll.current) return;
-    const last = lastShown.get(accountId);
+    const last = shownGet(accountId);
     if (last === undefined || last === balance) return;
-    lastShown.set(accountId, balance);
+    shownSet(accountId, balance);
     setShown((s) => ({ value: balance, from: s?.value ?? last, n: (s?.n ?? 0) + 1 }));
     // shown 은 시작 여부만 봄
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,6 +251,8 @@ export function KbankHome() {
 
   const [panelOpen, setPanelOpen] = useState(false);
   const month = new Date().getMonth() + 1;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  usePullGreeting(scrollRef, ready);
 
   const copy = (acc: Account) => {
     navigator.clipboard?.writeText(formatAccountNumber(acc.bank?.pattern, acc.number ?? "")).catch(() => {});
@@ -199,7 +269,11 @@ export function KbankHome() {
       )}
       {ready && account && (
         <>
-          <div className="kbh-scroll">
+          <div className="kbh-scroll" ref={scrollRef}>
+            {/* 맨 위에서 당겨 내리면 머리줄과 카드 사이에 보이는 인사말 (두 번째 녹화 17.5~17.9초). 계절 문구 하나 고정 */}
+            <p className="kbh-t kbh-greet" aria-hidden>
+              단풍보다 {userName}님의 하루가 더 빛나길 <span className="kbh-greet__leaf">🍁</span>
+            </p>
             <div className={`kbh-page ${bump ? "kbh-page--bump" : ""}`} style={{ ["--kbh-extra" as string]: others.length }}>
               {/* 계좌 카드 */}
               <div className={`kbh-card kbh-acct ${carousel ? "kbh-acct--more" : ""}`} onClick={() => go(`/account/${encodeURIComponent(account.id)}`)}>
@@ -317,10 +391,12 @@ export function KbankHome() {
 
               {/* 흩어져 있는 내 계좌 */}
               <div className="kbh-card kbh-link">
-                <span className="kbh-coin" aria-hidden>
-                  <Pic name="kbank-home-coin3" className="kbh-art" />
-                  <Pic name="kbank-home-coin1" className="kbh-art" />
-                  <Pic name="kbank-home-coin2" className="kbh-art" />
+                {/* 남색 → 노랑 → 파랑 S (첫 녹화) → 하늘색 → 초록·파랑 S (두 번째 녹화 13.2~16.5초 노랑 → 파랑 S → 하늘색 → 흰 원 S).
+                    kbank2(첫 녹화 재현)는 첫 녹화의 세 장 그대로 */}
+                <span className={`kbh-coin ${HAS_INTRO ? "kbh-coin--v1" : ""}`} aria-hidden>
+                  {(HAS_INTRO ? COINS.slice(0, 3) : COINS).map((c) => (
+                    <Pic key={c} name={`kbank-home-${c}`} className="kbh-art" />
+                  ))}
                 </span>
                 <p className="kbh-t kbh-link__t">흩어져 있는 내 계좌</p>
                 <button className="kbh-link__btn" onClick={noop}>
@@ -373,13 +449,13 @@ export function KbankHome() {
           {!waiting && (
             <>
               <h1 className="kbh-t kbh-head__title">홈</h1>
-              <button className={`kbh-pill kbh-pill--${pill}`} onClick={noop}>
+              <button className={`kbh-pill kbh-pill--${pill} kbh-pill--${variant}`} onClick={noop}>
                 <span className="kbh-pill__in">
                   <i className="kbh-pill__dot" />
                   <span className="kbh-t kbh-pill__text">
-                    사장님<span className="kbh-pill__more">, 홈에서 한눈에 확인하세요</span>
+                    사장님<span className="kbh-pill__more">{variant === "v2" ? ", 필요한 기능을 쉽게 찾아보세요" : ", 홈에서 한눈에 확인하세요"}</span>
                   </span>
-                  <Pic name="kbank-home-eyes" className="kbh-pill__eyes" />
+                  {variant === "v2" ? <Pic name="kbank-home-magnifier" className="kbh-pill__mag" /> : <Pic name="kbank-home-eyes" className="kbh-pill__eyes" />}
                 </span>
               </button>
               <button className="kbh-bell" onClick={() => setPanelOpen(true)} aria-label="알림 (관리 패널)">
@@ -400,6 +476,7 @@ export function KbankHome() {
         </header>
       )}
       {phase === "content" && !waiting && <KbankTabBar active="홈" />}
+      <KbankAdSheet stage={ad} onClose={closeAd} />
       <DevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   );
@@ -445,6 +522,8 @@ function ExtraAccount({ account, onOpen, onSend, onCopy }: { account: Account; o
   );
 }
 
+const COINS = ["coin3", "coin1", "coin2", "coin4", "coin5"];
+
 // 실시간 추천 (녹화 16.5~16.9초, 셋째 카드는 화면 밖으로 잘려 '알뜰 / 기 / 5천' 까지만 보임 — 뒷글자는 지어 넣되
 // 가운데 맞춤 줄의 왼끝이 녹화와 같도록 폭을 고름: 둘째 줄 '5천' 잉크 왼끝 353.4 ↔ '5천원 페이백')
 const RECS = [
@@ -454,7 +533,8 @@ const RECS = [
 ];
 
 
-// 잔액: 큰 숫자 + '원'. 굴릴 때 바뀐 자리만 옛 숫자는 아래로 빠지고 새 숫자가 위에서 내려옴 (녹화 1271~1298)
+// 잔액: 큰 숫자 + '원'. 굴릴 때 바뀐 자리만 — 줄면 옛 숫자는 아래로 빠지고 새 숫자가 위에서 내려옴 (첫 녹화 1271~1298 · 두 번째 1144~1155),
+// 늘면 옛 숫자는 위로 빠지고 새 숫자가 아래에서 올라옴 (두 번째 녹화 236~245 0 → 1)
 function Balance({ shown, gray }: { shown: { value: number; from: number | null; n: number } | null; gray: boolean }) {
   if (!shown) return <p className="kbh-t kbh-acct__bal" />;
   const next = `${kbNf.format(shown.value)}원`;
@@ -468,6 +548,7 @@ function Balance({ shown, gray }: { shown: { value: number; from: number | null;
   const len = Math.max(prev.length, next.length);
   const a = prev.padStart(len, " ");
   const b = next.padStart(len, " ");
+  const up = shown.value > shown.from;
   return (
     <p key={shown.n} className={`kbh-t kbh-acct__bal ${gray ? "kbh-acct__bal--gray" : ""}`} aria-label={next}>
       {[...b].map((ch, i) =>
@@ -476,7 +557,7 @@ function Balance({ shown, gray }: { shown: { value: number; from: number | null;
             {ch}
           </span>
         ) : (
-          <span key={i} className="kbh-roll">
+          <span key={i} className={`kbh-roll ${up ? "kbh-roll--up" : ""}`}>
             <span className="kbh-roll__old"><KbankDigits prefix="kbh" text={a[i].trim()} /></span>
             <span className={`kbh-roll__new ${ch === "1" ? "kbh-n1" : ""}`}>{ch.trim()}</span>
           </span>
@@ -518,4 +599,170 @@ function Gear() {
 function Pic({ name, className = "" }: { name: string; className?: string }) {
   const src = localAsset(name);
   return src ? <img className={className} src={src} alt="" draggable={false} /> : <i className={className} />;
+}
+
+// 맨 위에서 당겨 내리기 (두 번째 녹화 17.38~17.89초, 원본 프레임 시각으로 카드 위끝을 잼): 카드 묶음이 끈 거리 × 0.5 만큼 내려가고
+// 최대 47.5 (녹화 카드 위끝 140 → 213px). 인사말은 0.6배로 따라 내려오며(잉크 아래끝 76.1 @43 → 79.4 @47.5) 나타남.
+// 불투명도는 당긴 거리 30 → 42 에서 0 → 1 을 목표로 시간 상수 50ms 로 따라감 — 녹화는 놓은 뒤에도 한 프레임 더 진해짐
+// (가장 진한 잉크 202 · 191 · 177 · 165 · 155 → 놓고 148 · 152 · 160 · 179 · 193, 25ms 간격). 놓으면 250ms ease 로 제자리
+// (녹화 2116 → 2147: 남은 거리 .92 · .81 · .61 · .44 · .36 · .22 · .15 · .08 — 200ms 에 97%). 새로고침 표시 없음.
+// PC 는 마우스 끌기, 폰은 터치. 맨 위(scrollTop 0)에서 아래로 끌 때만, 위로 끌면 보통 스크롤. 끄는 동안은 누름 표시를 풂(kbank-home.css)
+// 놓은 뒤에는 인사말이 더 빨리 옅어짐 (시간 상수 25ms — 50 그대로면 약하게 당긴 13~17dp 에서 녹화보다 오래 남았음: 가장 진한 화소 녹화 220 · 223, 클론 204 · 210)
+const PULL = { k: 0.5, max: 47.5, slop: 4, releaseMs: 250, from: 30, to: 42, tau: 50, tauBack: 25 };
+const easeCss = cubicBezier(0.25, 0.1, 0.25, 1);
+
+function usePullGreeting(ref: RefObject<HTMLDivElement | null>, on: boolean) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!on || !el) return;
+    let pull = 0; // 지금 당긴 거리 (dp)
+    let op = 0; // 인사말 불투명도 (0~1, CSS 에서 × 0.35)
+    let raf = 0;
+    let last = 0;
+    let drag: { x: number; y: number; id: number | null; base: number; pulling: boolean } | null = null;
+    let rel: { from: number; t0: number } | null = null;
+    let swallowUntil = 0; // 마우스로 당긴 뒤 따라오는 click 은 버림
+
+    const paint = () => {
+      if (pull > 0.01 || op > 0.002) {
+        el.style.setProperty("--kbh-pull", `${pull.toFixed(2)}px`);
+        el.style.setProperty("--kbh-greet", op.toFixed(3));
+        el.dataset.pull = drag?.pulling ? "drag" : "back";
+      } else {
+        el.style.removeProperty("--kbh-pull");
+        el.style.removeProperty("--kbh-greet");
+        delete el.dataset.pull;
+      }
+    };
+    const tick = (now: number) => {
+      const dt = last ? Math.min(64, now - last) : 16;
+      last = now;
+      if (rel) {
+        const t = Math.min(1, (now - rel.t0) / PULL.releaseMs);
+        pull = rel.from * (1 - easeCss(t));
+        if (t >= 1) {
+          rel = null;
+          pull = 0;
+        }
+      }
+      const target = Math.min(1, Math.max(0, (pull - PULL.from) / (PULL.to - PULL.from)));
+      op += (target - op) * (1 - Math.exp(-dt / (drag?.pulling ? PULL.tau : PULL.tauBack)));
+      if (!drag?.pulling && !rel && op < 0.003) op = 0;
+      paint();
+      raf = drag?.pulling || rel || op > 0 ? requestAnimationFrame(tick) : 0;
+      if (!raf) last = 0;
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    const start = (x: number, y: number, id: number | null) => {
+      drag = el.scrollTop <= 0 ? { x, y, id, base: pull, pulling: false } : null;
+    };
+    // 이 끌기를 당김으로 가져갔으면 true
+    const move = (x: number, y: number) => {
+      if (!drag) return false;
+      const dy = y - drag.y;
+      const dx = Math.abs(x - drag.x);
+      if (!drag.pulling) {
+        if (Math.max(dx, Math.abs(dy)) < PULL.slop) return false;
+        if (dy <= 0 || dx > dy || el.scrollTop > 0) {
+          drag = null; // 위로(보통 스크롤) · 옆으로 끌기는 당김 아님
+          return false;
+        }
+        drag.pulling = true;
+        rel = null;
+      }
+      pull = Math.min(PULL.max, Math.max(0, drag.base + dy * PULL.k));
+      kick();
+      return true;
+    };
+    const end = () => {
+      const was = drag?.pulling;
+      drag = null;
+      if (!was) return;
+      swallowUntil = performance.now() + 300;
+      rel = { from: pull, t0: performance.now() };
+      kick();
+    };
+
+    // 마우스 (터치는 아래 touch* 로 — 터치의 pointer 는 스크롤이 시작되면 pointercancel 로 끊김)
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" && e.button === 0) start(e.clientX, e.clientY, e.pointerId);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!drag || drag.id !== e.pointerId) return;
+      if (!(e.buttons & 1)) return end(); // 폰 밖에서 뗌
+      if (move(e.clientX, e.clientY) && !el.hasPointerCapture(e.pointerId)) el.setPointerCapture(e.pointerId);
+    };
+    const onUp = (e: PointerEvent) => {
+      if (drag && drag.id === e.pointerId) end();
+    };
+    const onClick = (e: MouseEvent) => {
+      if (performance.now() < swallowUntil) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    };
+    const onSelect = (e: Event) => {
+      if (drag) e.preventDefault(); // 마우스로 끄는 동안 글자가 선택되지 않게
+    };
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) start(e.touches[0].clientX, e.touches[0].clientY, null);
+      else if (drag?.id === null) end();
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!drag || drag.id !== null || e.touches.length !== 1) return;
+      if (move(e.touches[0].clientX, e.touches[0].clientY) && e.cancelable) e.preventDefault();
+    };
+    const onTouchEnd = () => {
+      if (drag?.id === null) end();
+    };
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
+    el.addEventListener("click", onClick, true);
+    el.addEventListener("selectstart", onSelect);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("pointerdown", onDown);
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerup", onUp);
+      el.removeEventListener("pointercancel", onUp);
+      el.removeEventListener("click", onClick, true);
+      el.removeEventListener("selectstart", onSelect);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+      el.style.removeProperty("--kbh-pull");
+      el.style.removeProperty("--kbh-greet");
+      delete el.dataset.pull;
+    };
+  }, [ref, on]);
+}
+
+// CSS cubic-bezier 와 같은 곡선 (뉴턴법으로 x → t)
+function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
+  const cx = 3 * x1;
+  const bx = 3 * (x2 - x1) - cx;
+  const ax = 1 - cx - bx;
+  const cy = 3 * y1;
+  const by = 3 * (y2 - y1) - cy;
+  const ay = 1 - cy - by;
+  return (x: number) => {
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const e = ((ax * t + bx) * t + cx) * t - x;
+      const d = (3 * ax * t + 2 * bx) * t + cx;
+      if (Math.abs(e) < 1e-5 || !d) break;
+      t = Math.min(1, Math.max(0, t - e / d));
+    }
+    return ((ay * t + by) * t + cy) * t;
+  };
 }

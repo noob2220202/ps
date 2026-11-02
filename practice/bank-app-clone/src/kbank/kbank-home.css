@@ -135,6 +135,26 @@
   width: 20.8px;
   height: 16.9px;
 }
+/* 두 번째 녹화 문구 '사장님, 필요한 기능을 쉽게 찾아보세요' + 🔍 (219~349): 펼친 알약 x 101~503px (65.7~328.0) → 폭 262.6 (= 234.6 + 43px),
+   오른쪽 끝·시간표·글자 자리(왼끝 + 21.7)는 첫 녹화와 같음 */
+.kbh-pill--v2.kbh-pill--open,
+.kbh-pill--v2.kbh-pill--blue,
+.kbh-pill--v2 .kbh-pill__in {
+  width: 262.6px;
+}
+/* 🔍 (home-v2.py magnifier, 알약 바탕을 걷은 그림): 상자 x 460~494px · y 80~110px (299.4 · 앱 18.87, 22.13 × 19.53) = 알약 왼끝 65.8 + 233.6 · 위 + 3.67
+   (잉크 x 302~317 · y 20.8~36.4) */
+.kbh-pill__mag {
+  position: absolute;
+  left: 233.6px;
+  top: 3.67px;
+  width: 22.13px;
+  height: 19.53px;
+}
+.kbh-pill--closed .kbh-pill__mag {
+  visibility: hidden;
+  transition: visibility 0s 400ms;
+}
 
 /* 종 + 빨간 뱃지: 뱃지 x 526~569px · y 64~89px (342.3~370.6 · 앱 8.5~26.7) #f9515b,
    종 잉크(녹화 334~379 평균) 옆선 x 348.2 · 362.5 → 아래로 벌어져 밑줄 y 34.4 (x 345.9~364.8), 추 354.0 둘레 35.1~38.4 (#29323e) */
@@ -175,6 +195,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+  overscroll-behavior-y: contain; /* 맨 위에서 당길 때 폰 브라우저의 당겨서 새로고침으로 번지지 않게 (당김은 KbankHome usePullGreeting) */
 }
 .kbh-scroll::-webkit-scrollbar {
   display: none;
@@ -182,6 +203,52 @@
 /* 처음 들어올 때 녹화 309~328 (+567 ~ +1233ms) 카드 전체가 12.1dp(18.6px) 아래에 있다가 한 번에 제자리 */
 .kbh-page--bump {
   transform: translateY(12.1px);
+}
+/* 당겨 내리기 (두 번째 녹화 17.38~17.89초): 카드 묶음은 당긴 거리만큼(--kbh-pull = 끈 거리 × 0.5, 최대 47.5) 내려감 */
+.kbh-scroll[data-pull] .kbh-page {
+  transform: translateY(var(--kbh-pull));
+}
+.kbh-scroll[data-pull] .kbh-page--bump {
+  transform: translateY(calc(12.1px + var(--kbh-pull)));
+}
+/* 인사말: '단풍보다 ○○○님의 하루가 더 빛나길 🍁' — 머리줄('홈' #141821) 과 같은 글자색을 반투명으로 (가장 진한 잉크 (148,157,171) =
+   바탕 (218,227,241) 위 #141821 × .345, 🍁 도 같은 비율로 옅음 (225,190,169) → 줄 전체 opacity, 최대 .35).
+   15px 500, 잉크 묶음이 화면 가운데 (최대 당김 x 71.6~312.4: 글 71.6~291.6, 🍁 296.8~312.4).
+   최대 당김(47.5) 때 글 잉크 y 65.1~78.7 (원본 프레임 2113) → 글자 상자 위 64.95 = 35.8 + 0.6 × 47.5 + 0.65. 머리줄(z 2) 밑으로 지나감 */
+.kbh-greet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 35.8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: #141821;
+  opacity: calc(var(--kbh-greet, 0) * 0.35);
+  transform: translateY(calc(var(--kbh-pull, 0px) * 0.6 + 0.65px)); /* + 0.65: 겹쳐 보고 잉크가 0.65 위였음 (기준선은 CSS 1px 단위라 transform 으로) */
+  pointer-events: none;
+}
+/* 🍁 그림 문자: 녹화(갤럭시) 잎은 주황(바탕을 덜면 ≈ (238,121,35)), Noto 는 빨강 → 색만 주황 쪽으로. 글과 잎 사이 잉크 간격 녹화 5.2 · 클론 6.5 → 1.3 당김.
+   Noto 잎은 줄기가 길어 녹화 잎(최대 당김 잉크 296.8~312.4 × 63.8~78.1)보다 2.6 아래로 김 → 가로 1.04 · 세로 0.88 배로 줄이고 1.5 올림 */
+.kbh-greet__leaf {
+  display: inline-block;
+  margin-left: -1.3px;
+  filter: hue-rotate(18deg);
+  transform: translate(0.3px, -1.5px) scale(1.04, 0.88);
+}
+.kbh-scroll:not([data-pull]) .kbh-greet {
+  visibility: hidden;
+}
+/* 끄는 동안 누름 표시를 풂 (안드로이드: 끌기가 시작되면 누름이 풀림) */
+.kbh-scroll[data-pull] {
+  user-select: none;
+}
+.kbh-scroll[data-pull] .kbh-acct__btn {
+  transform: none;
+  filter: none;
+}
+.kbh-scroll[data-pull] :is(.kbh-rec__item, .kbh-opinion, .kbh-quick__item)::after {
+  opacity: 0;
 }
 /* 맨 아래까지 내리면 1375px(895dp) 내려감 (녹화 496~508) → 내용 높이 800 + 895 = 1695 (아이폰은 탭바가 더 높은 만큼 늘려
    맨 아래 '간편 홈 모드' 와 탭바 사이가 같게).
@@ -312,6 +379,29 @@
   }
   to {
     transform: translate(-50%, 1.33em);
+  }
+}
+/* 늘 때는 반대로: 옛 숫자는 위로, 새 숫자가 아래에서 (두 번째 녹화 236~245 '0' → '1'). 길이·곡선은 같게 둠 (녹화 ≈300ms, 앞이 빠른 곡선이라 비슷해 보임) */
+.kbh-roll--up .kbh-roll__new {
+  animation-name: kbh-roll-in-up;
+}
+.kbh-roll--up .kbh-roll__old {
+  animation-name: kbh-roll-out-up;
+}
+@keyframes kbh-roll-in-up {
+  from {
+    transform: translateY(1.33em);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes kbh-roll-out-up {
+  from {
+    transform: translate(-50%, 0);
+  }
+  to {
+    transform: translate(-50%, -1.33em);
   }
 }
 /* 가져오기 / 이체하기: x 61.4~288.9px · 301.5~529.1px (39.9~188.1 · 196.2~344.3), y 287.3~354.7px (앱 153.8~197.6), r ≈ 12px(8), #ecf2f6, 글자 #1c226e.
@@ -525,6 +615,15 @@
   border: 1px solid #ececec;
   border-radius: 14px;
 }
+/* 바로가기 누름 덮개(녹화에 없음): 아이콘 네모 자리에만 (아래 .kbh-rec__item::after 와 같은 덮개, 특이도를 높여 자리만 바꿈) */
+.kbh-quick .kbh-quick__item::after {
+  inset: auto;
+  left: 16.3px;
+  top: 15.2px;
+  width: 48.4px;
+  height: 48.4px;
+  border-radius: 14px;
+}
 .kbh-quick__art {
   position: absolute;
 }
@@ -665,7 +764,10 @@
 .kbh-link {
   height: 80px;
 }
-/* 동그라미: 잉크 x 61~122px · y 1523~1584px (39.7~80.1 · 앱 958~998.4), 약 1.17초마다 다음 은행으로 겹쳐 바뀜 (녹화 442 남색 · 450~482 노랑 · 487~ 파랑) */
+/* 동그라미: 잉크 x 61~122px · y 1523~1584px (39.7~80.1 · 앱 958~998.4), 약 1.26초마다 다음 은행으로 겹쳐 바뀜 (녹화 442 남색 · 450~482 노랑 · 487~ 파랑).
+   두 번째 녹화(396~494)는 노랑 → 파랑 S → 하늘색 → 초록·파랑 S 로 이어짐 → 다섯 장: 남색 → 노랑 → 파랑 S → 하늘색 → 초록·파랑 S.
+   장당 1.26초 · 주기 6.3초 (원본 pts 로 잰 바뀌는 가운데 13.55 · 14.79 · 16.075초 → 간격 1.24 · 1.285, 첫 녹화 448.5 → 486 = 1.25초.
+   명세의 1.17 은 7% 빨랐음), 바뀌는 방식은 그대로 겹침(교차 페이드 130ms, 두 번째 녹화 406 · 486 에서 확인) */
 .kbh-coin {
   left: 16.3px;
   top: 16.2px;
@@ -677,27 +779,61 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  animation: kbh-coin 3.51s linear infinite;
+  animation: kbh-coin 6.3s linear infinite;
 }
 .kbh-coin img:nth-child(2) {
-  animation-delay: -2.34s;
+  animation-delay: -5.04s;
 }
 .kbh-coin img:nth-child(3) {
-  animation-delay: -1.17s;
+  animation-delay: -3.78s;
+}
+.kbh-coin img:nth-child(4) {
+  animation-delay: -2.52s;
+}
+.kbh-coin img:nth-child(5) {
+  animation-delay: -1.26s;
 }
 .kbh--fresh .kbh-coin img {
   opacity: 0;
   animation: none;
 }
-@keyframes kbh-coin {
+/* kbank2(첫 녹화 재현): 첫 녹화의 세 장. 첫 녹화 프레임으로 다시 재면 장당 1.25초(448.5 → 486)라 두 번째 녹화와 같은 1.26초 · 주기 3.78초 */
+.kbh-coin--v1 img {
+  animation-name: kbh-coin-v1;
+  animation-duration: 3.78s;
+}
+.kbh-coin--v1 img:nth-child(2) {
+  animation-delay: -2.52s;
+}
+.kbh-coin--v1 img:nth-child(3) {
+  animation-delay: -1.26s;
+}
+/* 0~33.33% 보임 → 36.77% 사라짐 (130ms ÷ 3.78초) → 96.56% 다시 나타나기 시작 → 100% 보임 */
+@keyframes kbh-coin-v1 {
   0%,
-  33.3% {
+  33.33% {
     opacity: 1;
   }
-  37% {
+  36.77% {
     opacity: 0;
   }
-  96.3% {
+  96.56% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+/* 0~20% 보임 → 22.06% 사라짐 (130ms ÷ 6.3초) → 97.94% 다시 나타나기 시작 → 100% 보임 */
+@keyframes kbh-coin {
+  0%,
+  20% {
+    opacity: 1;
+  }
+  22.06% {
+    opacity: 0;
+  }
+  97.94% {
     opacity: 0;
   }
   100% {
@@ -768,6 +904,25 @@
 }
 .kbh-rec__item--pick {
   background: #f9edfc;
+}
+/* 카드 누름 (두 번째 녹화 391 '히든카드', 끌기 직전 1프레임): 손가락을 대고 100ms 뒤 카드 전체에 회색 덮개 — 바탕 246 → 220 (×0.894),
+   글자·그림도 같이 어두워짐, 크기 변화 없음. 끌기 시작하면 바로 풀림(392). 계좌 화면 .kba-row:active 와 같은 방식 (의견 카드 · 바로가기도 같게) */
+.kbh-rec__item::after,
+.kbh-opinion::after,
+.kbh-quick__item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.105);
+  opacity: 0;
+  pointer-events: none;
+}
+.kbh-rec__item:active::after,
+.kbh-opinion:active::after,
+.kbh-quick__item:active::after {
+  opacity: 1;
+  transition: opacity 0s 100ms;
 }
 /* 꼬리표: 녹화 x 80~133px · y 1800~1829px (51.3~86.7 · 앱 1138.4~1157) — 추천 흰 바탕 보라 글자, 순위는 연한 파랑 바탕 파란 글자.
    '추천'·'1위' 알약 폭(녹화 465: 35.4 · 30.2)과 글자 가운데(카드 왼끝 + 29.65 · 27.45) → 카드 왼끝 + 12.1, 좌우 여백 8 */

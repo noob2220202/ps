@@ -594,6 +594,9 @@ app.patch("/api/transactions/:id", (req, res) => {
 app.delete("/api/transactions/:id", (req, res) => {
   const t = findTx(req.params.id);
   transaction(() => {
+    // 입금 거래에 붙은 보낸 분 기록(🔔 상대 정보 · 케이뱅크 예시)은 같이 지움 — 남기면 out_tx_id 가 NULL 이 되어 SENT() 가 '보낸 이체'로 셈
+    // ('최근 보낸 계좌' · 이체 기록 · 1일 한도에 섞였음). 출금 거래의 이체 기록은 예전처럼 남김
+    if (t.amount > 0) db().prepare("DELETE FROM transfers WHERE out_tx_id = ?").run(t.id);
     db().prepare("DELETE FROM transactions WHERE id = ?").run(t.id);
     db().prepare("UPDATE accounts SET balance = balance - ? WHERE id = ?").run(t.amount, t.account_id);
   });
@@ -666,6 +669,11 @@ app.delete("/api/payees/:id", (req, res) => {
 });
 
 // ---------- 이체 ----------
+// 내가 '보낸' 이체 기록만 고르는 조건. 🔔 패널 거래 편집의 상대 정보(counterBank…)는 입금 거래에도 transfers 행을 붙임
+// (보낸 분 — i-ONE 상세 상대은행, 케이뱅크 입금 상세 '상대 정보', 거래 상세 응답 transfer 로 나감). 그런 행(연결된 거래 amount > 0)은
+// '최근 보낸 계좌' · 이체 기록 · 오늘 보낸 금액 · 중복 이체 검사에서 뺌. 출금 거래가 지워진 기록(out_tx_id NULL)은 예전처럼 남김
+const SENT = (t) => `NOT EXISTS (SELECT 1 FROM transactions x WHERE x.id = ${t}.out_tx_id AND x.amount > 0)`;
+
 // 받는 계좌 찾기: 내 계좌 → 등록된 받는 분 순서. 없으면 404 (진짜 앱의 "계좌정보를 확인해 주세요")
 function findRecipient(bankCode, number) {
   const bank = bankByCode(bankCode);
@@ -691,11 +699,12 @@ app.get("/api/transfer/recipients", (req, res) => {
       const acc = toAccount(a, profile);
       return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName, balance: acc.balance };
     });
-  // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이
+  // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이. 입금 거래에 붙인 보낸 분 기록은 뺌 (SENT)
   const recent = db()
     .prepare(
       `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite, p.receive_error
          FROM transfers t LEFT JOIN payees p ON p.bank_code = t.bank_code AND p.number = t.number
+        WHERE ${SENT("t")}
         GROUP BY t.bank_code, t.number ORDER BY last_at DESC LIMIT 20`,
     )
     .all()
@@ -719,9 +728,11 @@ app.get("/api/transfer/recipients", (req, res) => {
 // 콕뱅크 1일 송금 한도 (영상: "1일 송금 잔여한도 1,000,000원")
 const NH_DAILY_LIMIT = 1_000_000;
 const sentToday = (fromId) =>
-  db().prepare("SELECT COALESCE(SUM(amount), 0) AS s FROM transfers WHERE from_account_id = ? AND at LIKE ?").get(fromId, `${nowIso().slice(0, 10)}%`).s;
+  db()
+    .prepare(`SELECT COALESCE(SUM(amount), 0) AS s FROM transfers t WHERE from_account_id = ? AND at LIKE ? AND ${SENT("t")}`)
+    .get(fromId, `${nowIso().slice(0, 10)}%`).s;
 
-// 이체 기록 (IBK 이체결과조회 · 이체확인증): 최근 것부터. ?from=계좌id 면 그 계좌에서 보낸 것만
+// 이체 기록 (IBK 이체결과조회 · 이체확인증): 최근 것부터. ?from=계좌id 면 그 계좌에서 보낸 것만 (입금 거래의 보낸 분 기록은 빼고)
 const toTransfer = (t) => {
   const from = db().prepare("SELECT number FROM accounts WHERE id = ?").get(t.from_account_id);
   return {
@@ -741,8 +752,8 @@ const toTransfer = (t) => {
 app.get("/api/transfers", (req, res) => {
   const from = req.query.from ? String(req.query.from) : null;
   const rows = from
-    ? db().prepare("SELECT * FROM transfers WHERE from_account_id = ? ORDER BY at DESC, id DESC").all(from)
-    : db().prepare("SELECT * FROM transfers ORDER BY at DESC, id DESC").all();
+    ? db().prepare(`SELECT * FROM transfers t WHERE from_account_id = ? AND ${SENT("t")} ORDER BY at DESC, id DESC`).all(from)
+    : db().prepare(`SELECT * FROM transfers t WHERE ${SENT("t")} ORDER BY at DESC, id DESC`).all();
   res.json(rows.map(toTransfer));
 });
 app.get("/api/transfers/:id", (req, res) => {
@@ -770,14 +781,15 @@ app.post("/api/transfers", (req, res) => {
     throw new HttpError(400, "LIMIT_EXCEEDED", `1일 송금 한도(${NH_DAILY_LIMIT.toLocaleString("ko-KR")}원)를 넘었어요`);
 
   // 케이뱅크 '오늘 동일하게 처리한 이체 건이 존재합니다' (두 번째 녹화 29초): 오늘 같은 출금 계좌에서 같은 은행·번호·금액으로 '보낸' 이체가 있으면
-  // 보내지 않고 409 → 확인창 '확인' 뒤 checkDuplicate 없이 다시 보냄. 보낸 것만 셈 (출금 거래 amount < 0 — 입금 거래에 붙인 상대 기록은 뺌)
+  // 보내지 않고 409 → 확인창 '확인' 뒤 checkDuplicate 없이 다시 보냄. 보낸 것만 셈 (출금 거래 amount < 0 — 입금 거래에 붙인 상대 기록은 뺌).
+  // 날짜·금액·계좌는 거래내역에 보이는 출금 거래 값으로 봄 (🔔 패널에서 거래 날짜를 고치면 transfers.at 은 그대로라서). 지운 거래는 셈하지 않음
   if (checkDuplicate === true) {
     const dup = db()
       .prepare(
         `SELECT 1 FROM transfers tr JOIN transactions t ON t.id = tr.out_tx_id
-         WHERE tr.from_account_id = ? AND tr.bank_code = ? AND tr.number = ? AND tr.amount = ? AND t.amount < 0 AND substr(tr.at, 1, 10) = ?`,
+         WHERE t.account_id = ? AND tr.bank_code = ? AND tr.number = ? AND t.amount = ? AND substr(t.at, 1, 10) = ?`,
       )
-      .get(from.id, to.bank.code, to.number, amount, at.slice(0, 10));
+      .get(from.id, to.bank.code, to.number, -amount, at.slice(0, 10));
     if (dup) throw new HttpError(409, "DUPLICATE_TODAY", "오늘 동일하게 처리한 이체 건이 존재합니다");
   }
 

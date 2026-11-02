@@ -10,11 +10,13 @@
   text-align: inherit;
 }
 
-/* 올라오기: × 위치(화면 y)로 잰 곡선 — raw 58.969 1156px … 59.294 78px (멈춤). 처음 ~200ms 는 반투명(계좌 화면이 비침, 투명도 0.46~0.61) */
+/* 올라오기: × 위치(화면 y)로 잰 곡선 — raw 58.969 1156px … 59.294 78px (멈춤). 처음 ~200ms 는 반투명(계좌 화면이 비침, 투명도 0.46~0.61).
+   끝난 뒤엔 움직임 값을 남기지 않음(backwards) — both 로 남기면 합성 층으로 그려져 '받는 분에게 표기' 글자가 주소로 바로 연 화면보다
+   2 기기px(1.3dp) 위에 붙었음 (이체확인증 kbank-receipt.css 와 같은 이유) */
 .kbt--enter {
   animation:
-    kbt-up 445ms cubic-bezier(0.46, 0, 0.17, 1) both,
-    kbt-up-fade 445ms linear both;
+    kbt-up 445ms cubic-bezier(0.46, 0, 0.17, 1) backwards,
+    kbt-up-fade 445ms linear backwards;
 }
 @keyframes kbt-up {
   from {
@@ -184,15 +186,16 @@
   font-size: 16px;
   font-weight: 500;
 }
-/* 누름: 녹화에 상세 버튼 누름은 없음 → 계좌 화면 '이체하기' 누름과 같게 (100ms 뒤 0.92배 어둡게 + 0.97배) */
+/* 누름 (두 번째 녹화 '이체확인증' 45.7초 1373~1379 · 73.9초 2217~2224 · 90.2초 2706~2717): 100ms 뒤 바탕 #ecf1fe → (224,229,240) = 0.95배,
+   크기 0.977배 (70ms ease-out). 떼면 색은 바로, 크기는 50~70ms 에 돌아옴. '내보내기'도 같은 값 */
 .kbt-btn {
   transition:
     transform 70ms ease-out,
     filter 0s;
 }
 .kbt-btn:active {
-  transform: scale(0.97);
-  filter: brightness(0.92);
+  transform: scale(0.98);
+  filter: brightness(0.95);
   transition:
     transform 70ms ease-out 100ms,
     filter 0s 100ms;

@@ -1,4 +1,4 @@
-import { HAS_INTRO } from "../profile/session";
+import { HAS_INTRO, currentProfileId } from "../profile/session";
 import { RESTART_EVENT } from "../platform/recorder";
 
 // 케이뱅크 두 번째 녹화(광고 시트 · 홈 알약/AI 알약 두 번째 문구)의 켜기·끄기와 문구 고르기.
@@ -9,7 +9,7 @@ export type KbVariant = "v1" | "v2"; // v1 = 첫 녹화 문구, v2 = 두 번째 
 export type KbVariantMode = "alternate" | KbVariant; // alternate = 앱을 켤 때마다 번갈아
 
 const DAY = 86_400_000;
-const key = (k: string) => `kb-${k}-${sessionStorage.getItem("profile") ?? "none"}`;
+const key = (k: string) => `kb-${k}-${currentProfileId() ?? "none"}`;
 function read(k: string): string | null {
   try {
     return localStorage.getItem(key(k));
@@ -44,11 +44,9 @@ export const kbVariantMode = (): KbVariantMode => {
   const m = read("variant");
   return m === "v1" || m === "v2" ? m : "alternate";
 };
-export const setKbVariantMode = (m: KbVariantMode) => {
-  write("variant", m === "alternate" ? null : m);
-  launch = null;
-};
-// 이번 실행의 문구 (처음 부를 때 정하고 실행 내내 같음)
+// 다음 실행(새로고침 · ● 녹화)부터 적용 — 실행 도중 바꾸면 이미 그린 홈 알약과 새로 여는 이체 AI 알약 문구가 서로 달라졌음
+export const setKbVariantMode = (m: KbVariantMode) => write("variant", m === "alternate" ? null : m);
+// 이번 실행의 문구 (처음 부를 때 정하고 실행 내내 같음 — 홈 알약과 이체 AI 알약이 같은 문구)
 export function kbLaunchVariant(): KbVariant {
   if (HAS_INTRO) return "v1";
   if (launch) return launch;
