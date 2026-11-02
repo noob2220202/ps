@@ -24,53 +24,61 @@
 }
 
 /* ---------- 머리줄 (header.tsx) ---------- */
+/* 높이는 다른 화면 배치 때문에 56 그대로 두고, 글자·아이콘만 녹화 가운데줄(앱 y 24.1 = 화면 88px)에 맞춤.
+   녹화 머리줄 실제 바닥은 앱 y ≈ 48 (계좌 화면 스크롤 시 내용이 잘리는 곳, 프레임 1371 화면 126px) */
 .kb-header {
   position: relative;
   height: 56px;
   flex-shrink: 0;
+  background: #ffffff;
 }
 .kb-header__back {
   position: absolute;
   left: 0;
   top: 0;
-  width: 44px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
 }
 .kb-header__back svg,
 .kb-header__x svg {
   display: block;
 }
+/* 제목 18px 600: 한글 잉크 위 = top + 0.0635em → 잉크 가운데 24.1 (프레임 1500 화면 y 76~100px) */
 .kb-header__title {
   position: absolute;
   left: 60px;
   right: 60px;
-  top: 0;
+  top: 15.1px;
   margin: 0;
-  line-height: 50px;
+  line-height: 18px;
   text-align: center;
   font-size: 18px;
   font-weight: 600;
+  color: #161719;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* '관리' 16px: 잉크 y 16.9~31.2 (화면 77~99px), 오른쪽 끝 362.5 (517~557px) */
 .kb-header__right {
   position: absolute;
-  right: 21px;
-  top: 0;
-  height: 50px;
+  right: 20.4px;
+  top: 17.2px;
+  line-height: 16px;
   display: flex;
   align-items: center;
   font-size: 16px;
+  color: #161719;
 }
 .kb-header__right button {
   font: inherit;
   color: inherit;
+  line-height: inherit;
 }
 .kb-header__x {
   position: absolute;
-  right: 4px;
+  right: 8px;
   top: 0;
-  width: 44px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
 }
