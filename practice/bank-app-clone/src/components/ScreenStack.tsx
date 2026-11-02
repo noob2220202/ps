@@ -25,7 +25,9 @@ const EASE = "cubic-bezier(.2,.8,.2,1)";
 // 하나원큐(갤럭시) 녹화: 새 화면이 오른쪽에서 밀고 들어옴 ≈330ms 감속 (라이트 30fps: 6.067s 462px → 6.433s 6px)
 const NH_ANDROID = APP !== "kakao" && OS === "android";
 const HANA_ANDROID = APP === "hana" && OS === "android";
-const navMs = (anim: Anim | null) => (HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS]);
+// 케이뱅크(갤럭시) 녹화: 새 화면(대개 뼈대 로딩 상태)이 오른쪽에서 밀고 들어옴, 뒤 화면은 그대로 (19.73~19.93초 왼끝 49→31→20→11→3→0%)
+const KBANK_ANDROID = APP === "kbank" && OS === "android";
+const navMs = (anim: Anim | null) => (KBANK_ANDROID ? 250 : HANA_ANDROID ? 330 : NH_ANDROID ? (anim === "pop" ? 100 : 80) : TIMING.nav[OS]);
 // i-ONE Bank(갤럭시) 녹화: 화면 사이는 대부분 전환 없이 한 번에 바뀜(로딩 점·빈 바탕은 src/ibk/loading.ts).
 // 이동할 때 location.state.ibkAnim 으로 고른 곳만 밀기 (src/ibk/nav.ts: 메뉴 열기·닫기, 본문만 밀기)
 const IBK_ANDROID = APP === "ibk" && OS === "android";

@@ -13,6 +13,8 @@ npm run dev        # 카카오뱅크: API 서버 + 화면 동시 실행 → http
 npm run dev:nh     # NH 콕뱅크:  → http://localhost:5174 (API 8788)
 npm run dev:hana   # 하나원큐:   → http://localhost:5175 (API 8789)
 npm run dev:ibk    # i-ONE Bank: → http://localhost:5176 (API 8790)
+npm run dev:kbank  # 케이뱅크:   → http://localhost:5177 (API 8791)
+npm run dev:kbank2 # 케이뱅크 + 녹화 인트로: → http://localhost:5178 (API 8792)
 ```
 
 ### VPS에 띄우기 (포트 9101)
@@ -35,13 +37,23 @@ npm run start:hana                     # http://서버IP:9105
 # IBK기업은행 i-ONE Bank도 서버를 하나 더 (같은 빌드, 포트 9107, 데이터 따로)
 npm run start:ibk                      # http://서버IP:9107
 # pm2 start "npm run start:ibk" --name ibk
+
+# 케이뱅크도 서버를 하나 더 (같은 빌드, 포트 9109, 데이터 따로)
+npm run start:kbank                    # http://서버IP:9109
+# pm2 start npm --name kbank -- run start:kbank
+
+# kbank2 = 같은 케이뱅크 화면 + 녹화 인트로 (포트 9111, 데이터·계정 따로)
+npm run start:kbank2                   # http://서버IP:9111
+# pm2 start npm --name kbank2 -- run start:kbank2
 ```
 
 서버 하나가 화면과 API를 같이 줍니다. 포트 변경은 `PORT=8080 npm start`.
 **서버 하나는 앱 하나만** 엽니다: `npm start` = 카카오뱅크(기본 9101, 데이터 `server/data/`),
 `npm run start:nh` (= `APP=nh`) = NH 콕뱅크(기본 9103, 데이터 `server/data-nh/`),
 `npm run start:hana` (= `APP=hana`) = 하나원큐(기본 9105, 데이터 `server/data-hana/`),
-`npm run start:ibk` (= `APP=ibk`) = IBK기업은행 i-ONE Bank(기본 9107, 데이터 `server/data-ibk/`). 프로필 목록부터 전부 따로입니다.
+`npm run start:ibk` (= `APP=ibk`) = IBK기업은행 i-ONE Bank(기본 9107, 데이터 `server/data-ibk/`),
+`npm run start:kbank` (= `APP=kbank`) = 케이뱅크(기본 9109, 데이터 `server/data-kbank/`),
+`npm run start:kbank2` (= `APP=kbank2`) = 케이뱅크 + 녹화 인트로(기본 9111, 데이터 `server/data-kbank2/`). 프로필 목록부터 전부 따로입니다.
 데이터는 `server/data/`(SQLite)에 저장되고 커밋되지 않습니다. 프로필 목록은 `app.db`, 프로필별 은행 데이터는 `profiles/<id>.db`.
 폴더째 지우면 예시 데이터의 "홍길동" 프로필 하나로 다시 시작. 예전 버전의 `bank.db`가 있으면 첫 프로필로 자동으로 옮겨집니다.
 
@@ -172,6 +184,28 @@ python3 scripts/ibk-crops/crops.py --video i-ONE녹화.mp4 --model RealESRGAN_x4
 ```
 
 IBK 로고(마름모 심볼, 원 로고)는 벡터(SVG)라서 크기를 키워도 선명해요 (`src/assets/local/ibk-ci-symbol.svg`, `ibk-logo-ibk.svg`).
+
+## 💜 케이뱅크 (다섯 번째 앱) · kbank2 (녹화 인트로)
+
+포트 9109(`npm run start:kbank`)로 들어가면 로그인 → 프로필 고르기 → 시작화면('Kbank') → 케이뱅크 홈.
+실제 앱 화면 녹화 한 개(2026-11-02, 갤럭시 제스처 내비게이션, 590 × 1280 = 384 × 833dp)를 프레임 단위로 재서 그렸어요. 라이트만 있어요.
+간편비밀번호 화면은 보안 화면이라 녹화가 검게 찍혀서 건너뜁니다 (이체 '보내기' 뒤도 같음).
+
+- **홈**: '홈' · ● 사장님 알약 · 🔔(관리 패널) / 계좌 카드(가져오기 · 이체하기) / 카드 · 안내 · 바로가기 / 내 자산 / 추천 서비스 / 아래 탭바
+- **계좌**: 잔액 · 가져오기/이체하기 · 거래내역(입금 파랑 +, 출금 −, 잔액). 거래를 누르면 **거래 상세**가 아래에서 올라옴(메모 입력, 상대 정보)
+- **이체**: '어디로 돈을 보낼까요?'(최근 보낸 계좌 ☆) → '얼마를 보내시겠어요?'(+1만/+10만/+100만/전액, 숫자판) → '보낼까요?' → 보내는 중이에요 → 보냈어요
+- 받는 분은 🔔 관리 → 받는 분 탭에 등록한 계좌만 보낼 수 있어요. 계좌 추가는 케이뱅크 계좌만
+
+**kbank2** (포트 9111, `npm run start:kbank2`)는 화면은 같고, **화면 녹화를 시작하면 실제 기기 영상(기기 홈 화면 → 금융 폴더 → K 아이콘 탭)을
+먼저 틀고 그대로 앱 시작화면으로 이어서** 한 번의 녹화로 찍힙니다 (i-ONE Bank 단독판처럼). 영상 끝 장면이 시작화면 'Kbank'로 넘어가는 중이라
+클론 시작화면과 같은 자리에서 이어지고, 상태바 시각·배터리도 영상 값(6:11 · 24)으로 맞춰서 시작해요.
+폰 아래 `인트로 켜기 / 인트로 끄기`로 고를 수 있고, kbank2 상태바에는 영상 속 기기처럼 빨간 녹화 알약과 깜빡이는 캠코더 표시가 늘 있어요.
+kbank·kbank2 는 데이터·계정이 따로입니다.
+
+```bash
+# 앱 아이콘: App Store 원본(1024px)을 받아 갤럭시 아이콘 모양으로 (인터넷 필요)
+python3 scripts/kbank-crops/appicon.py
+```
 
 ## 폰 아래 스위치 줄 (PC)
 
