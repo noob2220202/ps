@@ -7,3 +7,10 @@ export function kbankBankName(bank: Pick<Bank, "code" | "name">, number = ""): s
   if (bank.code === "nh" && number.replace(/\D/g, "").length !== 13) return "지역농축협";
   return bank.name;
 }
+
+// 짧은 은행 이름 (이체확인증 '받는계좌', 입금 상세 '상대 정보' — 두 번째 녹화 46·66·81초).
+// 농협은 위와 같은 규칙으로 13자리가 아니면 '농축협', 그 밖은 서버 short ('카카오뱅크' · '신한' · '국민' · '새마을' …)
+export function kbankBankShort(bank: Pick<Bank, "code" | "short">, number = ""): string {
+  if (bank.code === "nh" && number.replace(/\D/g, "").length !== 13) return "농축협";
+  return bank.short;
+}

@@ -49,6 +49,7 @@ import { KbankAccount } from "./kbank/KbankAccount";
 import { KbankTxDetail } from "./kbank/KbankTxDetail";
 import { KbankSend } from "./kbank/KbankSend";
 import { KbankDone } from "./kbank/KbankDone";
+import { KbankReceipt } from "./kbank/KbankReceipt";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
@@ -116,6 +117,7 @@ const renderKbankRoute = (location: Location) => (
     <Route path="/" element={<KbankHome />} />
     <Route path="/account/:accountId" element={<KbankAccount />} />
     <Route path="/tx/:txId" element={<KbankTxDetail />} />
+    <Route path="/receipt/:txId" element={<KbankReceipt />} />
     <Route path="/send" element={<KbankSend />} />
     <Route path="/send/done" element={<KbankDone />} />
   </Routes>

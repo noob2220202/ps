@@ -141,6 +141,7 @@ export interface NewTransfer {
   amount: number;
   memoTo?: string; // 받는 분에게 표기 (기본: 내 이름)
   memoMe?: string; // 나에게 표기 (기본: 받는 분 이름)
+  checkDuplicate?: boolean; // 케이뱅크: 오늘 같은 계좌·같은 금액으로 보낸 이체가 있으면 409 DUPLICATE_TODAY (보내지 않음) → 확인창 뒤 이 값 없이 다시 보냄
 }
 
 export interface TransferResult {
@@ -192,7 +193,7 @@ export interface TransactionEdit {
 
 // ----- 에러 응답 -----
 export interface ApiErrorBody {
-  code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "PROFILE_REQUIRED" | "PROFILE_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";
+  code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "PROFILE_REQUIRED" | "PROFILE_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "DUPLICATE_TODAY" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";
   message: string;
   fields?: Record<string, string>; // 입력값별 에러 메시지
 }

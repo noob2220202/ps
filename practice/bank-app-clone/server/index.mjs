@@ -752,7 +752,7 @@ app.get("/api/transfers/:id", (req, res) => {
 });
 
 app.post("/api/transfers", (req, res) => {
-  const { fromAccountId, bankCode, number, amount, memoTo, memoMe } = req.body ?? {};
+  const { fromAccountId, bankCode, number, amount, memoTo, memoMe, checkDuplicate } = req.body ?? {};
   const from = findAccount(fromAccountId);
   const to = findRecipient(bankCode, number);
   const fields = {};
@@ -768,6 +768,18 @@ app.post("/api/transfers", (req, res) => {
   const at = nowIso();
   if (db().app === "nh" && sentToday(from.id) + amount > NH_DAILY_LIMIT)
     throw new HttpError(400, "LIMIT_EXCEEDED", `1일 송금 한도(${NH_DAILY_LIMIT.toLocaleString("ko-KR")}원)를 넘었어요`);
+
+  // 케이뱅크 '오늘 동일하게 처리한 이체 건이 존재합니다' (두 번째 녹화 29초): 오늘 같은 출금 계좌에서 같은 은행·번호·금액으로 '보낸' 이체가 있으면
+  // 보내지 않고 409 → 확인창 '확인' 뒤 checkDuplicate 없이 다시 보냄. 보낸 것만 셈 (출금 거래 amount < 0 — 입금 거래에 붙인 상대 기록은 뺌)
+  if (checkDuplicate === true) {
+    const dup = db()
+      .prepare(
+        `SELECT 1 FROM transfers tr JOIN transactions t ON t.id = tr.out_tx_id
+         WHERE tr.from_account_id = ? AND tr.bank_code = ? AND tr.number = ? AND tr.amount = ? AND t.amount < 0 AND substr(tr.at, 1, 10) = ?`,
+      )
+      .get(from.id, to.bank.code, to.number, amount, at.slice(0, 10));
+    if (dup) throw new HttpError(409, "DUPLICATE_TODAY", "오늘 동일하게 처리한 이체 건이 존재합니다");
+  }
 
   const me = getProfile().userName;
   const memoToText = memoTo?.trim() || me; // 받는 분 통장에 찍힐 이름 (기본: 내 이름)
