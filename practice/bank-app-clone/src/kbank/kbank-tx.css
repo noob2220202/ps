@@ -111,10 +111,12 @@
   margin: 0;
 }
 /* 줄: 이름 14px #626066 (잉크 x 31), 값 14px #1b1b1b (잉크 오른쪽 558) — 간격 55px = 35.8dp */
+/* 줄 좌우: 폰 원점을 기기 화소에 맞춰 찍어(창 768) 녹화 tx_3(1781~1957)와 겹쳐 봄 — 1차 19.3 / 20.6 은 이름 열이 0.62 왼쪽,
+   값 오른끝이 0.2~1.2 왼쪽이었음 (1차 측정에 900폭 창의 반 화소 어긋남이 섞였던 것) */
 .kbt-row {
   position: absolute;
-  left: 19.3px;
-  right: 20.6px;
+  left: 19.9px;
+  right: 19.8px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -136,7 +138,7 @@
 }
 .kbt-amt__copy {
   display: block;
-  margin: -0.1px 1.6px 0 6.8px;
+  margin: -0.1px 2.3px 0 6.6px; /* 줄 right 를 19.8 로 옮긴 뒤 겹쳐 봄: 금액 끝 339.30 · 복사 347.28~362.32 (녹화) */
 }
 .kbt-amt__copy svg {
   display: block;
@@ -152,8 +154,8 @@
   background: #f6f7fa;
 }
 .kbt-row--box {
-  left: 19.6px;
-  right: 20.7px;
+  left: 20.2px;
+  right: 19.9px;
 }
 .kbt-row--box dt {
   color: #626369;

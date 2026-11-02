@@ -289,8 +289,8 @@ function AccountsTab({ run }: { run: Run }) {
       {home.data.accounts.map((a) => (
         <AccountEditor key={a.id} account={a} bank={banks.data.find((b) => b.code === a.bank?.code)} run={run} />
       ))}
-      {/* 이번달 쓴 돈·캐시백은 카카오뱅크 홈에만 있음 */}
-      {APP === "kakao" && (
+      {/* 이번달 쓴 돈·캐시백은 카카오뱅크 홈에만 있음. 케이뱅크 홈 'ONE n월 쓴 돈' 도 이번달 쓴 돈 (캐시백 칸 없음) */}
+      {(APP === "kakao" || APP === "kbank") && (
         <>
           <h3 className="tab__h">카드</h3>
           <CardEditor key={`${home.data.profile.cardSpend}-${home.data.profile.cashbackCount}`} home={home.data} run={run} />
@@ -300,7 +300,7 @@ function AccountsTab({ run }: { run: Run }) {
       {APP !== "kakao" ? (
         <>
           {/* 케이뱅크는 케이뱅크 계좌만 (서버도 다른 은행은 거절) */}
-          <h3 className="tab__h">{APP === "nh" ? "농협" : APP === "kbank" ? "케이뱅크" : "하나은행"} 계좌 추가</h3>
+          <h3 className="tab__h">{ownBank().name} 계좌 추가</h3>
           <AddOwnBankAccount run={run} />
         </>
       ) : (
@@ -421,7 +421,7 @@ function CardEditor({ home, run }: { home: HomeData; run: Run }) {
   const [count, setCount] = useState(home.profile.cashbackCount);
   return (
     <div className="add-bank">
-      <Field label={`이번달 쓴 돈 ${auto ? "(지금: 체크카드 거래 합계로 자동)" : "(지금: 직접 입력한 값)"}`}>
+      <Field label={`${APP === "kbank" ? "ONE 이번 달 쓴 돈" : "이번달 쓴 돈"} ${auto ? "(지금: 체크카드 거래 합계로 자동)" : "(지금: 직접 입력한 값)"}`}>
         <MoneyInput value={spend} onChange={setSpend} quick={[10000, 100000, 1000000]} />
       </Field>
       <div className="row">
@@ -436,20 +436,22 @@ function CardEditor({ home, run }: { home: HomeData; run: Run }) {
           자동 계산으로
         </button>
       </div>
-      <Field label="현금 돌려받을 기회">
-        <div className="chips-row">
-          <button className="chip-btn" onClick={() => setCount(Math.max(0, count - 1))}>
-            −
-          </button>
-          <span className="count-value">{count}건</span>
-          <button className="chip-btn" onClick={() => setCount(Math.min(99, count + 1))}>
-            +
-          </button>
-          <button className="btn btn--sm" style={{ marginLeft: "auto" }} onClick={() => run(() => api.updateProfile({ cashbackCount: count }), `${count}건으로 바꿨어요`)}>
-            저장
-          </button>
-        </div>
-      </Field>
+      {APP === "kakao" && (
+        <Field label="현금 돌려받을 기회">
+          <div className="chips-row">
+            <button className="chip-btn" onClick={() => setCount(Math.max(0, count - 1))}>
+              −
+            </button>
+            <span className="count-value">{count}건</span>
+            <button className="chip-btn" onClick={() => setCount(Math.min(99, count + 1))}>
+              +
+            </button>
+            <button className="btn btn--sm" style={{ marginLeft: "auto" }} onClick={() => run(() => api.updateProfile({ cashbackCount: count }), `${count}건으로 바꿨어요`)}>
+              저장
+            </button>
+          </div>
+        </Field>
+      )}
     </div>
   );
 }
@@ -533,8 +535,9 @@ const OWN_BANK = {
   ibk: { code: "ibk", name: "기업은행", placeholder: "보통예금", numberLabel: "기업은행 계좌번호 (14자리)" },
   kbank: { code: "kbank", name: "케이뱅크", placeholder: "듀얼K 입출금통장", numberLabel: "케이뱅크 계좌번호 (12자리)" },
 };
+const ownBank = () => OWN_BANK[APP === "hana" || APP === "ibk" || APP === "kbank" ? APP : "nh"];
 function AddOwnBankAccount({ run }: { run: Run }) {
-  const own = OWN_BANK[APP === "hana" || APP === "ibk" || APP === "kbank" ? APP : "nh"];
+  const own = ownBank();
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [balance, setBalance] = useState(0);

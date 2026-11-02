@@ -10,7 +10,7 @@
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { isIntroOn, syncBlink } from "./intro";
-import { setBattery, setClock } from "./deviceStatus";
+import { setBattery, setClock, syncClock } from "./deviceStatus";
 import { OS } from "./platform";
 import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
 import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
@@ -231,16 +231,36 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     await started;
     await nextFrame();
     // 영상을 틀고, 끝나면 바로 시작화면 (영상과 폰 틀이 같은 기기·같은 비율이라 상태바·손잡이가 안 끊기고 한 번의 녹화로 이어짐)
+    // 시각·배터리는 녹화 동안만 영상 값으로 — 끝나면 사용자가 정해 둔 값으로 되돌림 (deviceStatus 는 localStorage 에 저장돼 그대로 남았음)
+    const before = deviceStatusNow();
     setClock(INTRO.clock);
     setBattery(INTRO.battery);
     const minute = setTimeout(() => state.status === "recording" && setClock("06:12"), INTRO.nextMinuteMs);
     const stopKeep = keepCapturing(target);
-    recorder.addEventListener("stop", () => (clearTimeout(minute), stopKeep()), { once: true });
+    recorder.addEventListener("stop", () => (clearTimeout(minute), stopKeep(), restoreDeviceStatus(before)), { once: true });
     await playIntro(intro, target);
   } else {
     await sleep(600);
     window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
   }
+}
+
+// 상태바 배터리·시계 지금 값 (deviceStatus.ts 가 localStorage 'deviceStatus' 에 둔 것. 없으면 그 기본값 62% · 실제 시각)
+function deviceStatusNow(): { battery: number; offset: number | null } {
+  try {
+    const v = JSON.parse(localStorage.getItem("deviceStatus") ?? "null");
+    if (v && typeof v.battery === "number") return { battery: v.battery, offset: typeof v.offset === "number" ? v.offset : null };
+  } catch {
+    // 못 읽으면 기본값
+  }
+  return { battery: 62, offset: null };
+}
+// 되돌림: 정한 시각은 setClock 이 분 단위라 '지금 그 시각'의 분까지만 (초는 0 부터 다시 — 다음 분으로 넘어가는 때가 1분 안에서 어긋날 수 있음)
+function restoreDeviceStatus(s: { battery: number; offset: number | null }) {
+  setBattery(s.battery);
+  if (s.offset === null) return syncClock();
+  const t = new Date(Date.now() + s.offset);
+  setClock(`${t.getHours()}:${String(t.getMinutes()).padStart(2, "0")}`);
 }
 
 // 녹화가 끊기지 않게: 인트로 영상(2.6초 동안 화면 전체가 30fps 로 바뀜)이 끝나면 크롬 화면 캡처가 '움직이는 영역'을 그 영상으로 잡은 채

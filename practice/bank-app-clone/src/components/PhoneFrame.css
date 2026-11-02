@@ -347,6 +347,22 @@ html[data-app="kbank"] .statusbar--android {
   color: #494949;
   transition: none;
 }
+/* 꺼진 화면(PhoneOff, 검정) 처럼 상태바 글자가 밝아야 할 때: 녹화 기기 색 #494949 대신 흰색 (아이콘의 #494949 칠·선도, 그 위 흰 글자는 어둡게) */
+html[data-app="kbank"] .statusbar--android.statusbar--light {
+  color: #ffffff;
+}
+html[data-app="kbank"] .statusbar--light :is(.kb-sb-icons, .kb-sb-left) [fill="#494949"] {
+  fill: #ffffff;
+}
+html[data-app="kbank"] .statusbar--light .kb-sb-left [stroke="#494949"] {
+  stroke: #ffffff;
+}
+html[data-app="kbank"] .statusbar--light :is(.kb-sb-icons, .kb-sb-notif) :is(text, [fill="#fff"]) {
+  fill: #494949;
+}
+html[data-app="kbank"] .statusbar--light .kb-sb-notif [stroke="#fff"] {
+  stroke: #494949;
+}
 html[data-app="kbank"] .statusbar--android .statusbar__carrier {
   position: absolute;
   left: 11.2px;

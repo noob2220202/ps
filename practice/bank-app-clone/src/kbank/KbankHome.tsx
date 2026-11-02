@@ -1,14 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { formatAccountNumber, paths } from "../api/endpoints";
 import type { Account, HomeData } from "../api/types";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { DevPanel } from "../dev-panel/DevPanel";
 import { useLayerActive } from "../platform/LayerContext";
-import { KbankCopyIcon } from "./KbankAccount";
+import { RESTART_EVENT } from "../platform/recorder";
+import { KbankCopyIcon, KbankDigits } from "./common";
+import { useKbankGo } from "./nav";
+import { useKbankSent } from "./notice";
 import { KbankTabBar } from "./tabbar";
-import { useKbankStatusBar } from "./theme";
+import { kbNf, noop, useKbankStatusBar } from "./theme";
 import "./kbank-home.css";
 
 // 케이뱅크 홈 (녹화 9.47~19.5초 프레임 284~585, 이체 뒤 돌아온 42~43초 1250~1300).
@@ -38,16 +40,22 @@ const ROLL_MS = 850;
 let booted = false;
 // 계좌별 마지막으로 보여 준 잔액 (돌아왔을 때 옛 잔액 → 새 잔액으로 굴림)
 const lastShown = new Map<string, number>();
-
-const nf = new Intl.NumberFormat("ko-KR");
+// '● 녹화' 는 페이지를 새로 읽지 않고 시작화면부터 다시 띄움(RESTART_EVENT) → 그 뒤 홈도 '처음 들어올 때' 시간표로 (kbank2 인트로 녹화 9.47~13.9초)
+window.addEventListener(RESTART_EVENT, () => {
+  booted = false;
+  lastShown.clear();
+});
+// 종 뱃지: 녹화 첫 홈 295 (F560), 이체를 마치고 돌아오면 296 (F1290 · 43.6초) → 이번 실행에서 마친 이체 수만큼 늘림
+const BADGE = 295;
 
 type Pill = "mini" | "open" | "blue" | "closed";
 type Lock = "gray" | "blue" | "open";
 
 export function KbankHome() {
   useKbankStatusBar();
-  const navigate = useNavigate();
+  const go = useKbankGo();
   const active = useLayerActive();
+  const notices = BADGE + useKbankSent().count;
   const home = useApi<HomeData>(paths.home);
   const [first] = useState(() => !booted);
   useEffect(() => {
@@ -64,6 +72,9 @@ export function KbankHome() {
 
   const accounts = home.data?.accounts ?? [];
   const account: Account | undefined = accounts.find((a) => a.id === "main") ?? accounts[0];
+  // 🔔 관리 패널로 더한 케이뱅크 계좌 (녹화엔 계좌 하나뿐): 대표 계좌 카드 밑에 같은 모양의 카드로 (넘김 칸 없이)
+  const others = accounts.filter((a) => a !== account);
+  const spent = home.data?.monthlyCardSpend ?? 0; // 이번 달 체크카드 합계 또는 🔔 직접 입력 (녹화 0원)
   const userName = home.data?.profile.userName ?? "";
   const ready = phase === "content" && !!account;
   // 자료를 못 받았으면 다시 시도 (녹화에 없음 — 계좌 화면 .kba-fail 과 같은 모양), 아직 받는 중이면 뼈대를 그대로 둠
@@ -103,11 +114,15 @@ export function KbankHome() {
     if (!ready || !acc) return;
     const t: number[] = [];
     const at = (ms: number, f: () => void) => t.push(window.setTimeout(f, ms));
+    // 자물쇠 한 바퀴의 타이머는 따로 들고 바퀴마다 바꿈 (t 에 계속 쌓이지 않게 — 앞 바퀴 것은 다음 바퀴가 시작될 때 이미 다 돎)
+    let lt: number[] = [];
     const lockLoop = (start: number) => {
-      at(start, () => setLock("gray"));
-      at(start + LOCK.blue, () => setLock("blue"));
-      at(start + LOCK.open, () => setLock("open"));
-      at(start + LOCK.period, () => lockLoop(0));
+      lt = [
+        window.setTimeout(() => setLock("gray"), start),
+        window.setTimeout(() => setLock("blue"), start + LOCK.blue),
+        window.setTimeout(() => setLock("open"), start + LOCK.open),
+        window.setTimeout(() => lockLoop(0), start + LOCK.period),
+      ];
     };
     setLock("gray");
     if (visit === 0) {
@@ -143,6 +158,7 @@ export function KbankHome() {
     }
     return () => {
       t.forEach(clearTimeout);
+      lt.forEach(clearTimeout);
       holdRoll.current = false;
     };
   }, [ready, visit]);
@@ -167,7 +183,6 @@ export function KbankHome() {
 
   const [panelOpen, setPanelOpen] = useState(false);
   const month = new Date().getMonth() + 1;
-  const soon = () => {};
 
   const copy = (acc: Account) => {
     navigator.clipboard?.writeText(formatAccountNumber(acc.bank?.pattern, acc.number ?? "")).catch(() => {});
@@ -185,9 +200,9 @@ export function KbankHome() {
       {ready && account && (
         <>
           <div className="kbh-scroll">
-            <div className={`kbh-page ${bump ? "kbh-page--bump" : ""}`}>
+            <div className={`kbh-page ${bump ? "kbh-page--bump" : ""}`} style={{ ["--kbh-extra" as string]: others.length }}>
               {/* 계좌 카드 */}
-              <div className={`kbh-card kbh-acct ${carousel ? "kbh-acct--more" : ""}`} onClick={() => navigate(`/account/${encodeURIComponent(account.id)}`)}>
+              <div className={`kbh-card kbh-acct ${carousel ? "kbh-acct--more" : ""}`} onClick={() => go(`/account/${encodeURIComponent(account.id)}`)}>
                 <p className="kbh-t kbh-acct__title">
                   {account.label}
                   <span className="kbh-acct__no">{formatAccountNumber(account.bank?.pattern, account.number ?? "")}</span>
@@ -219,16 +234,16 @@ export function KbankHome() {
                   className="kbh-acct__btn kbh-acct__send"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/send?from=${encodeURIComponent(account.id)}`);
+                    go(`/send?from=${encodeURIComponent(account.id)}`);
                   }}
                 >
                   이체하기
                 </button>
                 {carousel && (
                   <div className="kbh-one" onClick={(e) => e.stopPropagation()}>
-                    <Pic name="kbank-home-card" className="kbh-one__card kbh-art" />
+                    <Pic name="kbank-home-card-s" className="kbh-one__card kbh-art" />
                     <p className="kbh-t kbh-one__l1">ONE {month}월 쓴 돈</p>
-                    <p className="kbh-t kbh-one__l2">0원</p>
+                    <p className="kbh-t kbh-one__l2">{kbNf.format(spent)}원</p>
                     <div className="kbh-one__dots" aria-hidden>
                       <i className="on" />
                       <i />
@@ -239,6 +254,9 @@ export function KbankHome() {
                   </div>
                 )}
               </div>
+              {others.map((a) => (
+                <ExtraAccount key={a.id} account={a} onOpen={() => go(`/account/${encodeURIComponent(a.id)}`)} onSend={() => go(`/send?from=${encodeURIComponent(a.id)}`)} onCopy={() => copy(a)} />
+              ))}
 
               {/* 안전한 금융거래 안내 */}
               <div className="kbh-card kbh-safe">
@@ -246,12 +264,12 @@ export function KbankHome() {
                 <p className="kbh-t kbh-safe__l2">최신 정보를 확인하고 있어요</p>
                 <p className="kbh-t kbh-safe__l3">기간 내 고객확인을 이행하지 않을 경우,</p>
                 <p className="kbh-t kbh-safe__l4">관련 법에 따라 이용이 제한됩니다.</p>
-                <button className="kbh-safe__x" onClick={soon} aria-label="닫기">
+                <button className="kbh-safe__x" onClick={noop} aria-label="닫기">
                   <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
                     <path d="M1.8 1.8 10.2 10.2M10.2 1.8 1.8 10.2" stroke="#7e7e84" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 </button>
-                <button className="kbh-safe__go" onClick={soon}>
+                <button className="kbh-safe__go" onClick={noop}>
                   지금 확인할게요
                 </button>
                 <span className={`kbh-lock kbh-lock--${lock}`} aria-hidden>
@@ -269,7 +287,7 @@ export function KbankHome() {
                   { label: "자동충전", art: "charge" },
                   { label: "편집하기", art: "edit" },
                 ].map((q, i) => (
-                  <button key={q.art} className={`kbh-quick__item kbh-quick__item--${i}`} onClick={soon}>
+                  <button key={q.art} className={`kbh-quick__item kbh-quick__item--${i}`} onClick={noop}>
                     <i className="kbh-quick__box" />
                     <Pic name={`kbank-home-${q.art}`} className={`kbh-quick__art kbh-quick__art--${q.art} kbh-art`} />
                     <span className="kbh-t">{q.label}</span>
@@ -280,16 +298,16 @@ export function KbankHome() {
               {/* 내 자산 */}
               <div className="kbh-card kbh-asset">
                 <p className="kbh-t kbh-asset__title">내 자산</p>
-                <button className="kbh-asset__edit" onClick={soon}>
+                <button className="kbh-asset__edit" onClick={noop}>
                   <span className="kbh-t">편집</span>
                   <Gear />
                 </button>
                 <p className="kbh-t kbh-asset__sec">카드</p>
                 <Pic name="kbank-home-card" className="kbh-asset__card kbh-art" />
                 <p className="kbh-t kbh-asset__l1">ONE {month}월 쓴 돈</p>
-                <p className="kbh-t kbh-asset__l2">0원</p>
+                <p className="kbh-t kbh-asset__l2">{kbNf.format(spent)}원</p>
                 <i className="kbh-asset__line" />
-                <button className="kbh-asset__all" onClick={soon}>
+                <button className="kbh-asset__all" onClick={noop}>
                   <span className="kbh-t">내 자산 모두 보기</span>
                   <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden>
                     <path d="M1 1.75 7 7 1 12.25" fill="none" stroke="#686868" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -305,7 +323,7 @@ export function KbankHome() {
                   <Pic name="kbank-home-coin2" className="kbh-art" />
                 </span>
                 <p className="kbh-t kbh-link__t">흩어져 있는 내 계좌</p>
-                <button className="kbh-link__btn" onClick={soon}>
+                <button className="kbh-link__btn" onClick={noop}>
                   연결하기
                 </button>
               </div>
@@ -316,7 +334,7 @@ export function KbankHome() {
                 <p className="kbh-t kbh-rec__l2">실시간 추천 서비스예요</p>
                 <div className="kbh-rec__row">
                   {RECS.map((r) => (
-                    <button key={r.tag} className={`kbh-rec__item kbh-rec__item--${r.kind}`} onClick={soon}>
+                    <button key={r.tag} className={`kbh-rec__item kbh-rec__item--${r.kind}`} onClick={noop}>
                       <span className="kbh-rec__tag">{r.tag}</span>
                       {r.art && <Pic name={r.art} className={`kbh-rec__art kbh-rec__art--${r.kind} kbh-art`} />}
                       <b className="kbh-rec__title">{r.title}</b>
@@ -328,7 +346,7 @@ export function KbankHome() {
               </div>
 
               {/* 의견 */}
-              <button className="kbh-opinion" onClick={soon}>
+              <button className="kbh-opinion" onClick={noop}>
                 <Pic name="kbank-home-pen" className="kbh-opinion__pen" />
                 <span className="kbh-t kbh-opinion__l1">새로워진 케이뱅크 홈</span>
                 <span className="kbh-t kbh-opinion__l2">{userName}님의 의견이 궁금해요</span>
@@ -338,11 +356,11 @@ export function KbankHome() {
               </button>
 
               <div className="kbh-foot">
-                <button className="kbh-t" onClick={soon}>
+                <button className="kbh-t" onClick={noop}>
                   간편 홈 모드
                 </button>
                 <i />
-                <button className="kbh-t" onClick={soon}>
+                <button className="kbh-t" onClick={noop}>
                   홈 화면 설정
                 </button>
               </div>
@@ -355,7 +373,7 @@ export function KbankHome() {
           {!waiting && (
             <>
               <h1 className="kbh-t kbh-head__title">홈</h1>
-              <button className={`kbh-pill kbh-pill--${pill}`} onClick={soon}>
+              <button className={`kbh-pill kbh-pill--${pill}`} onClick={noop}>
                 <span className="kbh-pill__in">
                   <i className="kbh-pill__dot" />
                   <span className="kbh-t kbh-pill__text">
@@ -375,7 +393,7 @@ export function KbankHome() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="kbh-bell__badge">295</span>
+                <span className="kbh-bell__badge">{notices}</span>
               </button>
             </>
           )}
@@ -383,6 +401,46 @@ export function KbankHome() {
       )}
       {phase === "content" && !waiting && <KbankTabBar active="홈" />}
       <DevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
+    </div>
+  );
+}
+
+// 더한 계좌 카드 (녹화에 없음): 대표 계좌 카드와 같은 자리·글자 (이름·번호·복사 · ⋮ · 잔액 · 가져오기/이체하기), 넘김 칸 없음
+function ExtraAccount({ account, onOpen, onSend, onCopy }: { account: Account; onOpen: () => void; onSend: () => void; onCopy: () => void }) {
+  return (
+    <div className="kbh-card kbh-acct" onClick={onOpen}>
+      <p className="kbh-t kbh-acct__title">
+        {account.label}
+        <span className="kbh-acct__no">{formatAccountNumber(account.bank?.pattern, account.number ?? "")}</span>
+        <button
+          className="kbh-acct__copy"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCopy();
+          }}
+          aria-label="계좌번호 복사"
+        >
+          <KbankCopyIcon color="#67676a" size={12.4} />
+        </button>
+      </p>
+      <button className="kbh-acct__more" onClick={(e) => e.stopPropagation()} aria-label="더보기">
+        <i />
+        <i />
+        <i />
+      </button>
+      <p className="kbh-t kbh-acct__bal"><KbankDigits prefix="kbh" text={`${kbNf.format(account.balance)}원`} /></p>
+      <button className="kbh-acct__btn kbh-acct__get" onClick={(e) => e.stopPropagation()}>
+        가져오기
+      </button>
+      <button
+        className="kbh-acct__btn kbh-acct__send"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSend();
+        }}
+      >
+        이체하기
+      </button>
     </div>
   );
 }
@@ -395,20 +453,18 @@ const RECS = [
   { tag: "2위", kind: "rank", art: "", title: "알뜰폰 요금제", desc: ["기본료 할인", "5천원 페이백"] },
 ];
 
-// 굵은 금액 줄의 '1' 은 Pretendard 보다 좌우가 넓음 (FONT.md) → '1' 만 span 으로 감싸 좌우 여백 (홈은 '1' 폭 = '0' 폭이 되게 0.095em, kbank-home.css)
-const ones = (s: string) => s.split(/(1)/).map((p, i) => (p === "1" ? <span key={i} className="kbh-n1">1</span> : p));
 
 // 잔액: 큰 숫자 + '원'. 굴릴 때 바뀐 자리만 옛 숫자는 아래로 빠지고 새 숫자가 위에서 내려옴 (녹화 1271~1298)
 function Balance({ shown, gray }: { shown: { value: number; from: number | null; n: number } | null; gray: boolean }) {
   if (!shown) return <p className="kbh-t kbh-acct__bal" />;
-  const next = `${nf.format(shown.value)}원`;
+  const next = `${kbNf.format(shown.value)}원`;
   if (shown.from == null)
     return (
       <p className={`kbh-t kbh-acct__bal ${gray ? "kbh-acct__bal--gray" : ""}`} aria-label={next}>
-        {ones(next)}
+        <KbankDigits prefix="kbh" text={next} />
       </p>
     );
-  const prev = `${nf.format(shown.from)}원`;
+  const prev = `${kbNf.format(shown.from)}원`;
   const len = Math.max(prev.length, next.length);
   const a = prev.padStart(len, " ");
   const b = next.padStart(len, " ");
@@ -421,7 +477,7 @@ function Balance({ shown, gray }: { shown: { value: number; from: number | null;
           </span>
         ) : (
           <span key={i} className="kbh-roll">
-            <span className="kbh-roll__old">{ones(a[i].trim())}</span>
+            <span className="kbh-roll__old"><KbankDigits prefix="kbh" text={a[i].trim()} /></span>
             <span className={`kbh-roll__new ${ch === "1" ? "kbh-n1" : ""}`}>{ch.trim()}</span>
           </span>
         ),

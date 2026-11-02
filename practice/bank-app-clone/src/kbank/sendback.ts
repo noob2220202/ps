@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
+import { kbNf } from "./theme";
 import type { KbankKey } from "./keypad";
 
-// 안드로이드 뒤로(3버튼 바 <)를 이체 화면 안에서 받기 — 금액·확인 단계는 뒤로 한 번에 한 단계씩.
+// 안드로이드 뒤로(녹화 기기는 제스처 내비게이션: 가장자리에서 밀기 · PC 는 브라우저 뒤로)를 이체 화면 안에서 받기 — 금액·확인 단계는 뒤로 한 번에 한 단계씩.
 // active 인 동안 방문 기록 한 칸(주소·라우터 상태 그대로 + ibkBack 깊이)을 쌓아 두고, 뒤로가기로 그 칸이 빠지면 onBack.
 // 깊이 표시는 i-ONE 과 같은 history.state.ibkBack 을 씀 → 공용 ScreenStack 이 '화면 안 뒤로가기 칸'으로 알아봄(iOS 가장자리 끌기 막음)
 export const kbBackLevel = () => (window.history.state as { ibkBack?: number } | null)?.ibkBack ?? 0;
@@ -53,8 +54,6 @@ export function useKbankBackStep(active: boolean, onBack: () => void, key?: unkn
     return () => window.clearTimeout(t);
   }, [active, key]);
 }
-
-export const kbNf = new Intl.NumberFormat("ko-KR");
 
 // 금액 읽기: 만 미만은 "2,000원", 만 이상은 "1만 5,000원" (프레임 860 '1원')
 export function kbReadWon(n: number) {

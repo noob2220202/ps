@@ -1,6 +1,7 @@
 // 녹화 인트로 (kbank2 서버만, session.ts HAS_INTRO): 켜면 녹화 시작 때 폰 화면에 실제 기기 인트로 영상(기기 홈 화면 → 금융 폴더 →
 // K 아이콘 탭 → 시작화면이 반쯤 떠오름)을 먼저 틀고, 끝나자마자 앱 시작화면으로 이어 붙인다 (recorder.ts).
-// 폰 아래 스위치 줄에서 켜고 끔. <html data-intro="on"> 에 기억됨 (i-ONE Bank 단독판 ibk-app 과 같은 방식)
+// 폰 아래 스위치 줄에서 켜고 끔 (갤럭시 모드만). 이 브라우저의 localStorage 'intro' 에 기억됨 (기본 켜짐).
+// 인트로를 끄면 상태바의 화면녹화 표시도 없음 (PhoneFrame KbankLeft) — kbank 와 같은 상태바
 import { useSyncExternalStore } from "react";
 import { HAS_INTRO } from "../profile/session";
 
@@ -16,13 +17,11 @@ function stored(): boolean {
 }
 
 let on = HAS_INTRO && stored();
-if (HAS_INTRO) document.documentElement.dataset.intro = on ? "on" : "off";
 
 export const isIntroOn = () => on;
 
 export function setIntro(next: boolean) {
   on = HAS_INTRO && next;
-  document.documentElement.dataset.intro = on ? "on" : "off";
   try {
     localStorage.setItem(KEY, on ? "on" : "off");
   } catch {

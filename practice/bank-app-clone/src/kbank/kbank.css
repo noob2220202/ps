@@ -2,10 +2,7 @@
    값은 녹화 px ÷ 1.53646 (theme.ts kb()), 앱 영역 y 는 상태바 33.2 를 뺀 값 (kbY()) */
 @import "./fonts.css"; /* 글꼴 판정: Pretendard 유지 + 곧은 6·9(ss01) */
 .kb {
-  --kb-blue: #0212a4; /* 로고·브랜드 */
   --kb-text: #191919;
-  --kb-sub: #6b6b6b;
-  --kb-line: #ececec;
   position: absolute;
   inset: 0;
   overflow: hidden;

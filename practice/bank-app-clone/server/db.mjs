@@ -444,7 +444,7 @@ export function seedIbkEmpty(d, userName) {
 // (농협은 녹화처럼 '지역농축협'으로 보이게 농축협 14자리 — src/kbank/bank.ts)
 const KBANK_ACCOUNTS = [["main", "main", "100-000-123456", "듀얼K 입출금통장", 1, 502779]];
 const KBANK_PAYEES = [
-  ["kakao", "3333000000011", "이서준", 1],
+  ["kakao", "3333000000011", "이서준", 0], // 녹화의 최근 보낸 계좌 ☆ 는 모두 빈 별 (23초) — 관리 패널에서 켤 수 있음
   ["nh", "35200000000022", "박하늘", 0],
   ["mg", "9003000000033", "김민지", 0],
   ["nh", "35200000000044", "정예시", 0],
@@ -477,18 +477,34 @@ const kbankBase = (d, userName, balance) => {
   d.prepare("INSERT INTO accounts (id, kind, bank_code, number, balance, name, sort) VALUES (?, ?, 'kbank', ?, ?, ?, ?)").run(id, kind, number, balance, name, sort);
 };
 
+// 예시 거래 시각은 녹화 날(2026-11-02, 마지막 18:12) 그대로. 그보다 이른 때 예시로 되돌리면 모두 그만큼 하루씩 앞당김 —
+// 지금 한 이체가 '미래' 예시 거래 사이에 끼어 그 뒤 거래들의 잔액이 어긋났음 (13:52 이체 위에 18:12 '잔액 502,776' 등). 순서·간격은 그대로
+const KBANK_LAST = "2026-11-02T18:12:00";
+const DAY = 86_400_000;
+const kbankShift = () => {
+  const ahead = Date.parse(KBANK_LAST) - Date.now();
+  return ahead > 0 ? Math.ceil(ahead / DAY) : 0;
+};
+const shiftIso = (iso, days) => {
+  if (!days) return iso;
+  const t = new Date(Date.parse(iso) - days * DAY);
+  const p = (n) => String(n).padStart(2, "0");
+  return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}T${p(t.getHours())}:${p(t.getMinutes())}:${p(t.getSeconds())}`;
+};
+
 export function seedKbankExample(d, userName = "홍길동") {
+  const days = kbankShift();
   transaction(() => {
     kbankBase(d, userName, KBANK_ACCOUNTS[0][5]);
     const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
-    for (const row of KBANK_TX) tx.run(...row);
+    for (const [at, ...rest] of KBANK_TX) tx.run(shiftIso(at, days), ...rest);
     const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
     for (const row of KBANK_PAYEES) payee.run(...row);
     const tr = d.prepare(
       "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",
     );
     for (const [at, bank, number, holder, amount] of KBANK_TRANSFERS) {
-      const iso = at.replace(" ", "T");
+      const iso = shiftIso(at.replace(" ", "T"), days);
       tr.run(bank, number, holder, amount, iso, tx.run(iso, holder, -amount, "#이체").lastInsertRowid);
     }
   }, d);

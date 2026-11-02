@@ -2,22 +2,17 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { api, paths } from "../api/endpoints";
-import type { Account, Bank, HomeData, Recipient, TransferRecipients, TransferResult } from "../api/types";
+import type { Account, Bank, HomeData, Recipient, TransferRecipients } from "../api/types";
 import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
-import { BankIcon } from "../components/BankIcon";
+import { useLayerActive } from "../platform/LayerContext";
 import { kbankBankName } from "./bank";
+import { Checking, KbankBankLogo, KbankPair, KbankPencil, type KbankDoneState } from "./common";
 import { KbankHeader } from "./header";
 import { KbankKeypad, KbankWonDigits } from "./keypad";
-import { kbBackLevel, kbHistoryGo, kbNf, kbPress, kbReadWon, useKbankBackStep } from "./sendback";
-import { useKbankStatusBar } from "./theme";
+import { kbBackLevel, kbHistoryGo, kbPress, kbReadWon, useKbankBackStep } from "./sendback";
+import { kbNf, noop, useKbankStatusBar } from "./theme";
 import "./kbank-send.css";
-
-// 완료 화면(/send/done)으로 넘기는 값 (location.state)
-export interface KbankDoneState {
-  result: TransferResult; // 서버 응답: to(받는 분), amount, balanceAfter …
-  from: { id: string; bank: Bank; number: string };
-}
 
 // 이체 (녹화 21.5~35초, 프레임 645~1060). 한 화면이 단계로 바뀜:
 //   skel    회색 뼈대 (665~676, ≈370ms) — 머리줄 ‹ 도 없음
@@ -29,17 +24,12 @@ type Stage = "skel" | "who" | "amount" | "confirm";
 type To = Recipient;
 
 const digitsOf = (s = "") => s.replace(/\D/g, "");
-const soon = () => {}; // 기능 없는 버튼: 눌러도 아무 일 없음
 const SKEL_MS = 370; // 뼈대 665 → 내용 677 (12프레임)
 const PICK_MS = 300; // 행을 떼고 금액 화면이 붙기까지 (녹화 ≈ 0.7초 중 통신 시간을 줄임)
 const CHECK_MS = 900; // 보내기 → '··· 확인중' 최소 시간 (녹화 990~1040 은 그 뒤 비밀번호)
-
-// 은행 원 로고: 녹화에 나온 것(카카오뱅크·케이뱅크·농축협·새마을금고)은 녹화에서 잘라 키운 그림(scripts/kbank-crops/send.py), 나머지는 공용 BankIcon
-export function KbankBankLogo({ bank, size }: { bank: Pick<Bank, "code" | "name" | "short" | "color"> & Partial<Bank>; size: number }) {
-  const src = localAsset(`kbank-bank-${bank.code}`);
-  if (src) return <img className="kb-logo" src={src} alt={bank.name} width={size} height={size} draggable={false} />;
-  return <BankIcon bank={bank as Bank} size={size} />;
-}
+// 확인 단계에 들어선 뒤 이만큼은 '보내기' 를 받지 않음: '다음' 과 '보내기' 가 같은 자리(19.5~364.5 × 723.1~779.1)라 '다음' 을 빠르게 두 번 누르면
+// 확인 화면을 못 보고 이체됐음 (실제 앱은 보내기 뒤 비밀번호가 있어 이렇게 안 됨). 이름·'보낼까요?' 가 다 나타나는 때(+100 + 310ms, .kbs-cfin--1)
+const CONFIRM_GUARD_MS = 410;
 
 export function KbankSend() {
   useKbankStatusBar();
@@ -71,6 +61,15 @@ export function KbankSend() {
   const [lookupError, setLookupError] = useState<string | null>(null);
   const busy = useRef(false);
   const leaving = useRef(false);
+  const confirmAt = useRef(0);
+  const pickTimer = useRef(0);
+  // 이 화면이 맨 위에 있는지 (뒤로가기로 밀려 나가는 중이면 false). 나간 뒤 끝난 타이머·조회가 단계를 바꾸지 않게
+  const active = useLayerActive();
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+  useEffect(() => () => clearTimeout(pickTimer.current), []);
 
   // 뼈대는 최소 370ms, 데이터가 오면 내용으로 (한 번에)
   const [skelDone, setSkelDone] = useState(false);
@@ -81,6 +80,7 @@ export function KbankSend() {
   if (stage === "skel" && skelDone && ready) setStage("who");
 
   const toStage = (s: Stage) => {
+    if (s === "confirm") confirmAt.current = performance.now();
     setStage(s);
     setSeq((n) => n + 1);
   };
@@ -95,8 +95,9 @@ export function KbankSend() {
   const pick = (r: To) => {
     if (busy.current) return;
     busy.current = true;
-    window.setTimeout(() => {
+    pickTimer.current = window.setTimeout(() => {
       busy.current = false;
+      if (!activeRef.current || leaving.current) return; // 그사이 ‹·뒤로로 나갔으면 금액으로 가지 않음 (나가는 층에 뒤로가기 칸이 쌓였음)
       choose(r);
       toStage("amount");
     }, PICK_MS);
@@ -108,6 +109,7 @@ export function KbankSend() {
     setLookupError(null);
     try {
       const r = await api.lookupAccount(code, digits);
+      if (!activeRef.current || leaving.current) return;
       choose(r);
       setTyping(false);
       toStage("amount");
@@ -132,6 +134,7 @@ export function KbankSend() {
   // 보내기 → '··· 확인중' → (비밀번호 생략) → 완료 화면으로 바꿈 (기록에서 이체 화면 자리를 완료로)
   const send = async () => {
     if (sending || !to || !account) return;
+    if (performance.now() - confirmAt.current < CONFIRM_GUARD_MS) return;
     setSending(true);
     try {
       const [result] = await Promise.all([
@@ -171,11 +174,29 @@ export function KbankSend() {
     popSeq,
   );
   useKbankBackStep(bankSheet, () => setBankSheet(false));
-  // ‹ : 받는 분 화면이면 이체를 나감, 아니면 한 단계 뒤로
+  // ‹ : 받는 분 화면이면 이체를 나감(주소로 바로 열었으면 출금 계좌 화면으로), 아니면 한 단계 뒤로
   const headerBack = () => {
-    if (stage === "who" || stage === "skel") navigate(-1);
-    else stepBack();
+    if (stage !== "who" && stage !== "skel") return stepBack();
+    leaving.current = true;
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate(`/account/${encodeURIComponent(from)}`, { replace: true });
   };
+  // 앞으로 가기(PC 브라우저)로 예전 단계 칸(ibkBack)에 들어오면 그 칸을 걷음 — 받는 분 화면에서 칸만 남아 뒤로 한 번이 헛돌았음.
+  // 지금 단계가 쌓는 칸 수보다 깊으면 남의 칸
+  const ownLevel = (stage === "amount" || stage === "confirm" ? 1 : 0) + (bankSheet ? 1 : 0);
+  const ownRef = useRef(ownLevel);
+  useEffect(() => {
+    ownRef.current = ownLevel;
+  }, [ownLevel]);
+  useEffect(() => {
+    const drop = () => {
+      if (activeRef.current && !leaving.current && kbBackLevel() > ownRef.current) window.history.back();
+    };
+    drop();
+    window.addEventListener("popstate", drop);
+    return () => window.removeEventListener("popstate", drop);
+  }, []);
   // 취소: 이체를 나감 (쌓아 둔 뒤로가기 칸 + 이체 화면 한 칸)
   const cancel = () => {
     if (sending) return;
@@ -241,6 +262,7 @@ export function KbankSend() {
             account={account}
             to={to}
             amount={amount}
+            over={over}
             typed={typed}
             onClear={() => {
               setAmount(0);
@@ -258,7 +280,7 @@ export function KbankSend() {
               setAmount(Math.min(add === null ? account.balance : amount + add, 99_999_999_999));
             }}
           />
-          <div className="kbs-bottom kbs-fade kbs-fade--3">
+          <div className="kbs-bottom">
             <button className="kbs-btn" disabled={amount <= 0 || over} onClick={next}>
               다음
             </button>
@@ -298,18 +320,6 @@ export function KbankSend() {
         </div>
       )}
     </div>
-  );
-}
-
-// '··· 확인중' (프레임 982~1044): 점 셋이 차례로 2.85dp 뛰어오름 (0.63초 주기, 0.18초씩 늦게)
-export function Checking() {
-  return (
-    <span className="kbs-checking">
-      <i />
-      <i />
-      <i />
-      <span>확인중</span>
-    </span>
   );
 }
 
@@ -382,7 +392,7 @@ function Who({
             <button role="tab" aria-selected className="on">
               계좌번호
             </button>
-            <button role="tab" aria-selected={false} onClick={soon}>
+            <button role="tab" aria-selected={false} onClick={noop}>
               휴대폰번호
             </button>
           </div>
@@ -407,7 +417,7 @@ function Who({
           {mine.map((row, i) => (
             <WhoRow key={row.key} row={row} top={375.9 - 56 + 78.1 * i - 39.05} pressed={pressed === row.key} onPress={setPressed} onPick={onPick} />
           ))}
-          <button className="kbs-other" style={{ top: 375.9 - 56 + 78.1 * mine.length - 16.25 }} onClick={soon}>
+          <button className="kbs-other" style={{ top: 375.9 - 56 + 78.1 * mine.length - 16.25 }} onClick={noop}>
             <i className="kbs-other__plus">
               <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
                 <path d="M7 0.8v12.4M0.8 7h12.4" stroke="#6d7583" strokeWidth="1.5" strokeLinecap="round" />
@@ -417,7 +427,7 @@ function Who({
           </button>
           <div className="kbs-recent" style={{ top: 78.1 * mine.length }}>
             <h3 className="kbs-t kbs-sec kbs-sec--recent">최근 보낸 계좌</h3>
-            <button className="kbs-edit" onClick={soon}>
+            <button className="kbs-edit" onClick={noop}>
               편집하기
               <KbankPencil size={11.5} color="#0312a0" />
             </button>
@@ -459,7 +469,7 @@ function Who({
         </div>
       </div>
       {/* 떠 있는 '이체를 도와주러 온 AI' 알약 (무반응) */}
-      <button className="kbs-ai" onClick={soon}>
+      <button className="kbs-ai" onClick={noop}>
         {localAsset("kbank-send-ai") && <img src={localAsset("kbank-send-ai")} alt="" draggable={false} />}
         <span>이체를 도와주러 온 AI</span>
       </button>
@@ -506,7 +516,21 @@ function WhoRow({
 }
 
 // ---------- 금액 (프레임 760 · 860) ----------
-function Amount({ account, to, amount, typed, onClear }: { account: Account; to: To; amount: number; typed: number; onClear: () => void }) {
+function Amount({
+  account,
+  to,
+  amount,
+  over,
+  typed,
+  onClear,
+}: {
+  account: Account;
+  to: To;
+  amount: number;
+  over: boolean;
+  typed: number;
+  onClear: () => void;
+}) {
   const last4 = digitsOf(account.number).slice(-4);
   return (
     <div className="kbs-amt">
@@ -514,11 +538,11 @@ function Amount({ account, to, amount, typed, onClear }: { account: Account; to:
         <KbankBankLogo bank={account.bank} size={20.8} />
         <b>{`${kbankBankName(account.bank, account.number)}(${last4})`}</b> 에서
       </p>
-      <p className="kbs-amt__line kbs-amt__line--to kbs-fade kbs-fade--1">
+      <p className="kbs-amt__line kbs-amt__line--to kbs-fade kbs-fade--to">
         <KbankBankLogo bank={to.bank} size={20.8} />
         <b>{`${kbankBankName(to.bank, to.number)} ${to.holder}`}</b> 님에게
       </p>
-      <div className="kbs-amt__field kbs-fade kbs-fade--2">
+      <div className="kbs-amt__field kbs-fade">
         {amount > 0 ? (
           <>
             <span className="kbs-amt__value">
@@ -539,8 +563,9 @@ function Amount({ account, to, amount, typed, onClear }: { account: Account; to:
           </>
         )}
       </div>
-      <p className="kbs-amt__avail kbs-fade kbs-fade--2">
-        <span>{amount > 0 ? kbReadWon(amount) : "출금 가능금액"}</span>
+      {/* 출금 가능금액을 넘으면(녹화에 없음) '다음' 을 막고 이 줄 앞 글자만 빨간 안내로 바꿈 — 다른 세 앱처럼 막힌 이유를 알려 줌 */}
+      <p className={`kbs-amt__avail kbs-fade ${over ? "kbs-amt__avail--over" : ""}`}>
+        <span>{over ? "출금 가능금액 초과" : amount > 0 ? kbReadWon(amount) : "출금 가능금액"}</span>
         <i className="kbs-amt__sep" />
         <u>{kbNf.format(account.balance)}원</u>
       </p>
@@ -580,13 +605,13 @@ function Confirm({
         <MemoRow label="내 통장에 표시" value={memoMe} onSave={onMemoMe} />
         <div className="kbs-table__row">
           <span>보낼 시간</span>
-          <button className="kbs-table__val" onClick={soon}>
+          <button className="kbs-table__val" onClick={noop}>
             바로 보낼게요
             <Pencil />
           </button>
         </div>
       </div>
-      <button className="kbs-addon kbs-cfup kbs-cfup--1" onClick={soon}>
+      <button className="kbs-addon kbs-cfup" onClick={noop}>
         부가기능 설정
         <svg width="8" height="13" viewBox="0 0 8 13" aria-hidden>
           <path d="M1.3 1.2 6.6 6.5l-5.3 5.3" fill="none" stroke="#292929" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -596,39 +621,6 @@ function Confirm({
   );
 }
 
-// K › B (확인) — 보내는 중에는 › 가 ››› 로 펼쳐져 늘었다 줄었다 함 (kbank-send.css .kbs-pair__run)
-export function KbankPair({ from, to, className = "", moving = false }: { from: Bank; to: Bank; className?: string; moving?: boolean }) {
-  return (
-    <div className={`kbs-pair ${className}`}>
-      <KbankBankLogo bank={from} size={48.8} />
-      {moving ? (
-        <span className="kbs-pair__run" aria-hidden>
-          {[0, 1, 2].map((i) => (
-            <svg key={i} width="9" height="14" viewBox="0 0 9 14">
-              <path d="M1.8 1.6 7 7l-5.2 5.4" fill="none" stroke="#4862f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          ))}
-        </span>
-      ) : (
-        <svg className="kbs-pair__gt" width="9" height="14" viewBox="0 0 9 14" aria-hidden>
-          <path d="M1.8 1.6 7 7l-5.2 5.4" fill="none" stroke="#4862f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-      <KbankBankLogo bank={to} size={48.8} />
-    </div>
-  );
-}
-
-// ✎ 뚜껑이 떨어진 연필: 왼쪽 아래 끝이 직각으로 깎인 몸통(폭 4.47) + 0.55 틈 + 둥근 뚜껑 (프레임 682~701 '편집하기' · 927~977 표).
-//   16 칸에 잉크 0.4~15.65 · 0.6~15.85 → 표는 16 (녹화 잉크 326.1~341.7 × 551.9~567.5 = 15.6, 몸통 폭 4.3), '편집하기' 는 11.5 (343.6~354.7 = 11.1)
-export function KbankPencil({ size = 16, color = "#2a2d33", className = "kbs-pen" }: { size?: number; color?: string; className?: string }) {
-  return (
-    <svg className={className} width={size} height={size} viewBox="0 0 16 16" aria-hidden>
-      <path d="M0.4 15.85V12.69L8.95 4.14 12.11 7.3 3.56 15.85Z" fill={color} />
-      <path d="M9.34 3.75 11.83 1.26A2.235 2.235 0 0 1 14.99 4.42L12.5 6.91Z" fill={color} />
-    </svg>
-  );
-}
 const Pencil = () => <KbankPencil />;
 
 // 표시 이름: ✎ 를 누르면 그 자리에서 고침 (녹화에 없음 — 가장 단순하게)

@@ -1,3 +1,8 @@
+/* 상태바('SKT' 400 · 시각 700 · 배터리 숫자 500, PhoneFrame KbankIcons · 시각 폭을 재는 canvas)는 녹화 기기처럼 Roboto.
+   i-ONE(ibk.css)도 같은 파일을 불러 오지만 그쪽을 바꿔도 케이뱅크 상태바가 조용히 다른 글꼴이 되지 않게 여기서도 직접 (Vite 가 한 번만 넣음) */
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/700.css";
 /* 케이뱅크 글꼴: 녹화 글자 82곳(한글 53 · 숫자 29)을 후보 11종(Pretendard · Noto Sans KR · IBM Plex Sans KR · Gothic A1 · Nanum Gothic ·
    NanumSquare · Spoqa Han Sans Neo · SUIT · Wanted Sans · Roboto · Inter)으로 그려 크기·위치·굵기를 맞춘 뒤 잉크 오차를 비교함 (FONT.md).
    한글: Pretendard 10.0% (다음 Wanted Sans 11.2 · SUIT 13.2 · Noto 18.9), 가로세로비 1.000, 맞춘 크기가 정수 dp(±0.05)

@@ -35,6 +35,17 @@
   height: 50px;
   z-index: 3;
 }
+/* 돋보기 줄이 붙은 동안만 머리줄 흰 바닥을 2 더 아래로 (머리줄 끝 50.0 · 붙은 줄 위끝 49.3 이 기기px 로 반올림되며
+   한 줄(앱 49.46~50.11)에 밑 거래 글자 조각이 비쳤음 — acct_s700 기기 행 127, 녹화 1498~1522 는 깨끗). 붙은 줄은 위 11 이 빈 흰 바탕이라 안 가려짐 */
+.kba-header--stuck::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - 1px); /* 머리줄 바닥과 겹쳐 그림 (맞닿기만 하면 두 반화소 경계 사이로 또 비침) */
+  height: 3px;
+  background: #ffffff;
+}
 .kba-header .kb-header__title {
   opacity: 0;
   transition: opacity 220ms ease-out;
@@ -341,7 +352,7 @@
 .kba-row__amt--in {
   color: #4460ff;
 }
-/* 굵은 금액 숫자 (BoldNum): '1' 좌우 +0.054em, '0' 좌우 −0.025em (프레임 630 · 1340 · 1500 금액 9줄 맞춤) */
+/* 굵은 금액 숫자 (common.tsx KbankDigits): '1' 좌우 +0.054em, '0' 좌우 −0.025em (프레임 630 · 1340 · 1500 금액 9줄 맞춤) */
 .kba-n1 {
   margin: 0 0.054em;
 }

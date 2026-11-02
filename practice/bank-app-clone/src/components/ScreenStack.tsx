@@ -30,6 +30,9 @@ const HANA_ANDROID = APP === "hana" && OS === "android";
 //   acc  = 계좌로 287ms (43.69~43.97초, RMS 3.6px)  · send = 이체로 328ms (21.88~22.20초, RMS 4.7px)
 //   pop  = 뒤로 296ms (이체 완료 '확인' → 홈 41.78~42.08초, RMS 1.7px) · tx = 거래 상세 올라옴 445ms · 내려감 413ms (움직임은 kbank-tx.css)
 const KBANK_ANDROID = APP === "kbank" && OS === "android";
+// 거래 상세(/tx/)는 OS 와 상관없이 kbank-tx.css 의 올라오기 445ms · 내려가기 413ms (층 가로 밀기는 끔). 아이폰도 그 움직임이 끝났을 때 걷음 —
+// iOS 전환 타이머(420ms)로 걷으면 상세가 덜 올라온 채(위끝 4~9px) 밑 계좌 층이 사라져 상태바 밑에 검은 띠가 3~4프레임 보였음 (raf-tx)
+const kbankTx = (path: string) => APP === "kbank" && path.startsWith("/tx/");
 type KbAnim = "acc" | "send" | "pop" | "tx";
 const kbankAnim = (anim: Anim, path: string): KbAnim =>
   path.startsWith("/tx/") ? "tx" : anim === "pop" ? "pop" : path.startsWith("/send") ? "send" : "acc";
@@ -122,12 +125,13 @@ export function ScreenStack({ render }: { render: Render }) {
     if (!anim) return;
 
     const path = anim === "pop" ? prevTop.pathname : location.pathname;
-    const ms = navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
+    const kbAnimEnd = KBANK_ANDROID || kbankTx(path);
+    const ms = kbankTx(path) ? kbankMs(anim, path) : navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
     setAnimMs(ms);
-    if (KBANK_ANDROID) setKbAnim(kbankAnim(anim, path));
+    if (kbAnimEnd) setKbAnim(kbankAnim(anim, path));
     // 케이뱅크는 움직임이 실제로 끝났을 때 걷음 (onKbAnimEnd) — 돌아가는 화면을 새로 그리느라 첫 프레임이 늦게 나온 만큼(≈45ms) 타이머가 먼저 끝나
     // 뒤로 갈 때 나가는 화면이 70% 지점에서 사라졌음 (rAF 기록 nav_pop). 타이머는 끝 이벤트가 안 올 때 대비
-    const id = setTimeout(endAnim, KBANK_ANDROID ? ms + 300 : ms);
+    const id = setTimeout(endAnim, kbAnimEnd ? ms + 300 : ms);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);

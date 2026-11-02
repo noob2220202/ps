@@ -6,6 +6,7 @@ import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
 import { THEME } from "../platform/theme";
 import { APP, HAS_INTRO } from "../profile/session";
 import { BLINK_MS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
+import { useKbankSent } from "../kbank/notice";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -96,6 +97,7 @@ function seamColor(bg: string) {
 function StatusBar() {
   const { bg, fg } = useStatusBarStyle();
   const time = useClock();
+  const intro = useIntro();
   const seam = seamColor(bg);
   // 그라데이션 밑 바탕색도 그 색으로: 아이폰은 바탕색이 200ms 전환이라, 비워 두면(투명) 단색 화면으로 돌아갈 때 검정에서 밝아짐
   const background = seam === bg ? bg : `${bg} ${seam}`;
@@ -104,7 +106,8 @@ function StatusBar() {
     <div className={`statusbar statusbar--${fg} statusbar--${OS}`} style={{ background, ...(APP !== "kakao" && { boxShadow: `0 1px 0 ${seam}` }) }}>
       <span className="statusbar__time">{time}</span>
       {OS === "android" && APP === "kbank" && <span className="statusbar__carrier">SKT</span>}
-      {OS === "android" && APP === "kbank" && HAS_INTRO && <KbankRecLeft time={time} />}
+      {/* 화면녹화 표시는 인트로를 켠 kbank2 만 (인트로를 끄면 kbank 와 같은 상태바) */}
+      {OS === "android" && APP === "kbank" && <KbankLeft time={time} rec={HAS_INTRO && intro} />}
       {OS === "ios" ? <IosIcons /> : APP === "ibk" ? <IbkIcons /> : APP === "kbank" ? <KbankIcons /> : <AndroidIcons />}
     </div>
   );
@@ -175,13 +178,50 @@ function KbankIcons() {
   );
 }
 
+// 케이뱅크 상태바 왼쪽 (시각 뒤): kbank2 화면녹화 표시 + 이체 알림 아이콘 (src/kbank/notice.ts).
+// 알림 아이콘 (녹화 F1150~1330 평균, 잉크 0.3 경계): 칸 하나 16.6 — 케이뱅크 'K' 는 어두운 둥근 네모(14 × 13.6, y 11.1~24.7)에 흰 K,
+// 카카오뱅크 'B' 는 같은 칸 가운데에 굵은 B(9.1 × 12.4, y 11.7~24.1, 왼쪽 세로 틈). 새 알림이 앞(왼쪽)에 붙고 캠코더 괄호는 칸만큼 오른쪽으로.
+// 첫 칸 왼끝: 녹화 표시가 있으면 괄호 자리(107.4), 없으면 알약 자리(68.8)
+const NOTIF_W = 16.6;
+function KbankLeft({ time, rec }: { time: string; rec: boolean }) {
+  const sent = useKbankSent();
+  const icons = [...(sent.kakao ? ["B"] : []), ...(sent.count ? ["K"] : [])];
+  const dx = useTimeShift(time);
+  const x0 = rec ? 107.4 : 68.8;
+  return (
+    <>
+      {icons.length > 0 && (
+        <svg className="kb-sb-left kb-sb-notif" width="384" height="33.2" viewBox="0 0 384 33.2" aria-hidden>
+          <g transform={dx ? `translate(${dx} 0)` : undefined}>
+            {icons.map((k, i) => {
+              const x = x0 + i * NOTIF_W;
+              return k === "K" ? (
+                <g key={k} transform={`translate(${x} 11.1)`}>
+                  <rect width="14" height="13.6" rx="4.6" fill="#494949" />
+                  <path d="M5 3.5v6.6M9.6 3.5 5.3 7.2M6.6 6.1l3.2 4" fill="none" stroke="#fff" strokeWidth="1.55" />
+                </g>
+              ) : (
+                <g key={k} transform={`translate(${x + 2.45} 11.7)`}>
+                  <path d="M0 0h5.6a2.95 2.95 0 0 1 2.3 4.8L7.4 5.9l.6.6A3.1 3.1 0 0 1 5.9 12.4H0Z" fill="#494949" />
+                  <rect x="3.8" y="3" width="1.2" height="6.4" rx="0.5" fill="#fff" />
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+      )}
+      {rec && <KbankRecLeft time={time} shift={icons.length * NOTIF_W} />}
+    </>
+  );
+}
+
 // kbank2(녹화 인트로) 상태바 왼쪽: 인트로 영상 속 기기처럼 늘 화면녹화 중 표시 (위와 같은 평균 프레임에서 잼) —
 // 빨간 알약 68.8~102.26 × 8.49~27.15 (가운데 85.53, 17.82: 흰 점 r 2.6 + 대각선 네 곳이 끊긴 흰 고리 r 4.78 · 두께 1.15)
 // + 둥근 모서리 괄호(바깥 108.04~120.24 × 11.78~24.11, 두께 1.15, 팔 길이 2.8) 안에서 0.986초 주기로 깜빡이는 캠코더
 // (몸통 110.5~116 × 15.6~20.2, 렌즈 끝 117.9). 영상이 끝날 때 위상을 영상과 맞춤 (intro.ts syncBlink)
 // 괄호·캠코더(.kb-sb-dim)는 영상이 끝난 직후 다른 상태바 글자와 같이 서서히 나타남 (빨간 알약은 그대로)
 // 시각이 '6:11' 보다 길면(예: 12:34) 그만큼 오른쪽으로 (실제 기기처럼 시각 뒤에 3.7dp 띄워 이어 붙음)
-function KbankRecLeft({ time }: { time: string }) {
+function KbankRecLeft({ time, shift = 0 }: { time: string; shift?: number }) {
   const epoch = useBlinkEpoch();
   const dx = useTimeShift(time);
   // 고리: 둘레 2π·4.78 = 30.03 을 네 토막(6.11) + 틈(1.4)으로, 첫 토막 가운데가 3시 방향 → 틈이 대각선
@@ -191,7 +231,7 @@ function KbankRecLeft({ time }: { time: string }) {
         <rect x="68.8" y="8.49" width="33.46" height="18.66" rx="9.33" fill="#c42223" />
         <circle cx="85.53" cy="17.82" r="2.6" fill="#fff" />
         <circle cx="85.53" cy="17.82" r="4.78" fill="none" stroke="#fff" strokeWidth="1.15" strokeDasharray="6.11 1.4" strokeDashoffset="3.055" />
-        <g className="kb-sb-dim">
+        <g className="kb-sb-dim" transform={shift ? `translate(${shift} 0)` : undefined}>
           <path
             d="M108.6 15.3v-1.74a1.2 1.2 0 0 1 1.2-1.2h1.6M116.9 12.36h1.56a1.2 1.2 0 0 1 1.2 1.2v1.74M119.66 20.8v1.53a1.2 1.2 0 0 1-1.2 1.2h-1.56M111.4 23.53h-1.6a1.2 1.2 0 0 1-1.2-1.2V20.8"
             fill="none"

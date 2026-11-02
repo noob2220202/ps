@@ -23,10 +23,6 @@
   z-index: 2;
   background: #fff;
 }
-.kbs-cancel {
-  font-size: 16px;
-  color: #1b1b1b;
-}
 .kb-logo {
   display: block;
   border-radius: 50%;
@@ -296,7 +292,7 @@
   color: #141316;
   z-index: 1;
   isolation: isolate;
-  animation: kbs-ai-in 260ms ease-out both;
+  animation: kbs-ai-in 160ms cubic-bezier(0, 0, 0.58, 1) both; /* 내용이 나타난 원본 22.533초부터 0.20 → 0.83 @+42 → 0.99 @+142ms */
 }
 /* 알약 둘레의 흰 번짐(뒤 목록 글자가 흐려 보임, 프레임 700 '새마을금고' 줄) 위에 파란 번짐 */
 .kbs-ai::before {
@@ -330,7 +326,7 @@
 @keyframes kbs-ai-in {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.96); /* 너무 빨라 녹화에서 확대 여부는 확인 안 됨 → 약하게 */
   }
 }
 
@@ -342,6 +338,16 @@
   bottom: calc(var(--kbs-floor) + 4.8px);
   height: 56px;
   z-index: 2;
+}
+/* 버튼 아래 칸(앱 바닥까지 4.8 + 손잡이 16 / 아이폰 홈 인디케이터 34)을 흰 바탕으로 가림 — 받는 분 직접 입력 중 목록 행이 버튼 밑으로 비쳤음 (아이폰 i-07) */
+.kbs-bottom::after {
+  content: "";
+  position: absolute;
+  left: -19.5px;
+  right: -19.5px;
+  top: 100%;
+  height: calc(var(--kbs-floor) + 4.8px);
+  background: #fff;
 }
 .kbs-btn {
   width: 100%;
@@ -404,22 +410,18 @@
   }
 }
 
-/* 단계 들어올 때: 받는 분 → 금액은 한 번에 비고 줄마다 33ms 차이로 130ms 페이드 (프레임 726~731) */
+/* 단계 들어올 때: 받는 분 화면은 한 번에 비고(원본 24.164초 F725) 출금 줄·자리표시·출금가능금액·칩·숫자판이 거의 한꺼번에
+   290ms cubic-bezier(.4,0,.2,1) 로 나타남 (자리표시 진하기 0.04 @24.198 · 0.25 · 0.66 · 0.87 · 0.97 @24.397, RMS 0.014).
+   받는 분 줄만 한 칸(25ms) 늦음. 머리줄 '취소' 와 '다음'(흐린 바탕)은 바로 나타남. 이 클래스는 금액 단계에서만 씀 */
 .kbs-stage {
   position: absolute;
   inset: 0;
 }
 .kbs-fade {
-  animation: kbs-fade 130ms linear both;
+  animation: kbs-fade 290ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
-.kbs-fade--1 {
-  animation-delay: 33ms;
-}
-.kbs-fade--2 {
-  animation-delay: 67ms;
-}
-.kbs-fade--3 {
-  animation-delay: 100ms;
+.kbs-fade--to {
+  animation-delay: 25ms;
 }
 @keyframes kbs-fade {
   from {
@@ -484,9 +486,12 @@
   align-items: center;
   margin-left: -1.7px;
 }
-/* 굵은 금액의 '1': 좌우 0.06em 넓게 (FONT.md '1' 뒤 +0.071em) */
-.kbs-one {
+/* 굵은 금액의 '1': 좌우 0.06em 넓게 (FONT.md '1' 뒤 +0.071em), '0' 은 계좌 화면 굵은 금액과 같이 −0.025em (KbankDigits) */
+.kbs-n1 {
   margin: 0 0.06em;
+}
+.kbs-n0 {
+  margin: 0 -0.025em;
 }
 /* 방금 누른 자리: 160ms 페이드 (프레임 763~768) */
 .kbs-new {
@@ -535,6 +540,10 @@
   background: #e4e4e4;
   margin: 0 8px 0 8.1px;
 }
+/* 출금 가능금액을 넘었을 때 (녹화에 없음): 앞 글자만 오류색 (이체 오류 문구 .kbs-error 와 같은 #e5372b) */
+.kbs-amt__avail--over > span {
+  color: #e5372b;
+}
 .kbs-amt__avail u {
   font-weight: 500;
   color: #28272a;
@@ -548,7 +557,7 @@
   right: 0;
   bottom: calc(var(--kbs-floor) + 73.4px);
   height: 319.9px;
-  animation: kbs-fade 130ms linear 100ms both;
+  animation: kbs-fade 290ms cubic-bezier(0.4, 0, 0.2, 1) both; /* 칩·숫자판도 자리표시와 같은 곡선 (±0.05) */
 }
 /* 칩: 390.6~422.5, 폭 80.1 · 사이 8.2 (경계 19.5|99.6 108.0|188.1 195.9|276.0 284.4|364.5), #ecf1fe, 글자 14 400 #091a8a (FONT.md 맞춤 363~389) */
 .kbs-chips {
@@ -790,26 +799,25 @@
   font-size: 15px;
   color: #292929;
 }
-/* 처음 들어올 때: 금액 화면은 한 번에 사라지고(912) 로고·'N원을' → 이름·'보낼까요?' → 아래 줄 → 표(아래서 살짝) 순서 (912~924) */
+/* 처음 들어올 때: 금액 화면은 한 번에 사라지고(원본 30.348초 F910 = 0) 로고·'N원을' 은 ease-out 310ms
+   (진하기 0.15 @+25 · 0.47 @+100 · 0.75 @+175 · 0.94 @+250 · 0.99 @+300, RMS 0.010) → 이름·'보낼까요?'·아래 줄은 함께 +100ms 부터
+   ease-in-out 310ms (0.05 @+151 · 0.33 @+225 · 0.61 @+275 · 0.85 @+325 · 0.96 @+375, RMS 0.009) → 표·부가기능은 +185ms 부터
+   ease-out 330ms 로 46dp 아래에서 올라옴 (표 dy 37.1 @+225 · 18.2 @+325 · 5.2 @+424 · 0 @+525, RMS 0.16) */
 .kbs-cfin {
-  animation: kbs-fade 130ms linear both;
+  animation: kbs-fade 310ms cubic-bezier(0, 0, 0.58, 1) both;
 }
-.kbs-cfin--1 {
-  animation-delay: 130ms;
-}
+.kbs-cfin--1,
 .kbs-cfin--2 {
-  animation-delay: 170ms;
+  animation-delay: 100ms;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
 }
 .kbs-cfup {
-  animation: kbs-up 250ms ease-out 200ms both;
-}
-.kbs-cfup--1 {
-  animation-delay: 230ms;
+  animation: kbs-up 330ms cubic-bezier(0, 0, 0.58, 1) 185ms both;
 }
 @keyframes kbs-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(46px);
   }
 }
 .kbs-error {

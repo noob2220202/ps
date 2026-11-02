@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { api, paths } from "../api/endpoints";
 import type { HomeData, Transaction, TransactionDetail, TransferRecipients } from "../api/types";
 import { useApi } from "../api/useApi";
-import { KbankCopyIcon } from "./KbankAccount";
+import { KbankCopyIcon } from "./common";
 import { kbankBankName } from "./bank";
 import { KbankClose } from "./header";
-import { useKbankStatusBar } from "./theme";
+import { useKbankGo } from "./nav";
+import { kbNf, useKbankStatusBar } from "./theme";
 import "./kbank-tx.css";
 
 // 거래 상세 (녹화 59~82초, 프레임 1770~2460). 계좌 화면 위로 아래에서 올라오는 전체 화면, 오른쪽 위 ×.
@@ -15,7 +16,6 @@ import "./kbank-tx.css";
 // 올라오기 445ms cubic-bezier(.46,0,.17,1) (raw 58.94~59.32초 × 위치로 맞춤, 오차 6px), 내려가기 413ms cubic-bezier(.78,0,.555,1) (65.21~65.62초, 오차 2px).
 // 움직이는 동안 반투명 (아래 계좌 화면이 비침): 올라올 때 0.45 → 1, 내려갈 때 1 → 0.6. 값은 kbank-tx.css
 
-const nf = new Intl.NumberFormat("ko-KR");
 const MEMO_MAX = 20;
 // 녹화는 이체가 모두 '전자금융' (서버 기본 거래구분 '이체')
 const kindLabel = (kind: string) => (kind === "이체" ? "전자금융" : kind);
@@ -45,13 +45,40 @@ function UploadIcon() {
   );
 }
 
+// 메모: 저장하면 서버 응답을 기다리지 않고 바로 새 값 (응답 값으로 맞추고, 실패하면 원래 값으로 되돌림 — IBK IbkHistory 처럼).
+// 입력 중에 × · 뒤로로 닫아도(화면이 사라질 땐 blur 가 안 옴) 바뀐 글을 저장
 function Memo({ tx }: { tx: TransactionDetail }) {
   const [draft, setDraft] = useState<string | null>(null);
-  const save = () => {
+  const [saved, setSaved] = useState<string | null>(null); // 저장한 값 (서버 데이터가 다시 올 때까지 이걸 보여 줌)
+  // 서버 데이터가 저장한 값으로 바뀌어 오면 그걸 따름 (그 뒤 🔔 로 바꾼 값도 보이게)
+  if (saved !== null && (tx.memo ?? "") === saved) setSaved(null);
+  const shown = saved ?? tx.memo ?? "";
+  const save = (v: string) => {
+    if (v === shown) return;
+    setSaved(v);
+    api
+      .updateMemo(tx.id, v)
+      .then((r) => setSaved(r.memo ?? v))
+      .catch(() => setSaved(null));
+  };
+  const commit = () => {
     const v = (draft ?? "").trim();
     setDraft(null);
-    if (v !== (tx.memo ?? "")) void api.updateMemo(tx.id, v).catch(() => {});
+    save(v);
   };
+  // 닫힐 때 아직 입력 중이던 글
+  const pending = useRef({ draft, shown, id: tx.id });
+  useEffect(() => {
+    pending.current = { draft, shown, id: tx.id };
+  });
+  useEffect(
+    () => () => {
+      const { draft: d, shown: s, id } = pending.current;
+      const v = (d ?? "").trim();
+      if (d !== null && v !== s) void api.updateMemo(id, v).catch(() => {});
+    },
+    [],
+  );
   if (draft !== null)
     return (
       <input
@@ -61,15 +88,15 @@ function Memo({ tx }: { tx: TransactionDetail }) {
         maxLength={MEMO_MAX}
         placeholder="메모 입력"
         onChange={(e) => setDraft(e.target.value)}
-        onBlur={save}
+        onBlur={commit}
         onKeyDown={(e) => {
           if (e.key === "Enter") e.currentTarget.blur();
         }}
       />
     );
   return (
-    <button className="kbt-memo" onClick={() => setDraft(tx.memo ?? "")}>
-      {tx.memo || "메모 입력"}
+    <button className="kbt-memo" onClick={() => setDraft(shown)}>
+      {shown || "메모 입력"}
       {/* 연필: 잉크 x 131~153 · y 242~264px, #6c707c (머티리얼 edit 모양) */}
       <svg className="kbt-memo__pen" width="20" height="20" viewBox="0 0 24 24" aria-hidden>
         <path
@@ -84,7 +111,7 @@ function Memo({ tx }: { tx: TransactionDetail }) {
 export function KbankTxDetail() {
   useKbankStatusBar();
   const { txId = "" } = useParams();
-  const navigate = useNavigate();
+  const go = useKbankGo();
   const location = useLocation();
   // 앱 안에서 열었을 때만 올라오기 (주소로 바로 열면 그냥 보임)
   const [enter] = useState(() => location.key !== "default");
@@ -95,7 +122,7 @@ export function KbankTxDetail() {
   const home = useApi<HomeData>(paths.home);
   const people = useApi<TransferRecipients>(paths.recipients(tx?.accountId ?? "main"));
 
-  const close = () => (window.history.state?.idx > 0 ? navigate(-1) : navigate(`/account/${tx?.accountId ?? "main"}`, { replace: true }));
+  const close = () => (window.history.state?.idx > 0 ? go(-1) : go(`/account/${tx?.accountId ?? "main"}`, { replace: true }));
 
   const inbound = (tx?.amount ?? 0) > 0;
   const abs = Math.abs(tx?.amount ?? 0);
@@ -143,7 +170,7 @@ export function KbankTxDetail() {
               <dt>거래 금액</dt>
               <dd className="kbt-amt">
                 {inbound ? "+" : "-"}
-                {nf.format(abs)}원
+                {kbNf.format(abs)}원
                 <button
                   className="kbt-amt__copy"
                   aria-label="금액 복사"
@@ -157,7 +184,7 @@ export function KbankTxDetail() {
           <div className="kbt-box">
             <div className="kbt-row kbt-row--box" style={{ top: 17.6 }}>
               <dt>이체 금액</dt>
-              <dd>{nf.format(abs)} 원</dd>
+              <dd>{kbNf.format(abs)} 원</dd>
             </div>
             <div className="kbt-row kbt-row--box" style={{ top: 45.9 }}>
               <dt>수수료</dt>
@@ -166,7 +193,7 @@ export function KbankTxDetail() {
           </div>
           <div className="kbt-row" style={{ top: 418.85 }}>
             <dt>계좌 잔액</dt>
-            <dd>{nf.format(tx.balanceAfter)} 원</dd>
+            <dd>{kbNf.format(tx.balanceAfter)} 원</dd>
           </div>
           <div className="kbt-line" style={{ top: 452.8 }} />
           {outbound ? (

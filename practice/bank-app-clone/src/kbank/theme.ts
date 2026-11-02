@@ -6,7 +6,8 @@ export const KB_SCALE = 590 / 384;
 export const KB_TOP = 33.2; // 상태바 아래끝 = 앱 영역 위끝 (dp)
 export const KB_NAV = 16; // 아래 제스처 영역 (탭바·버튼이 이만큼 위로)
 
-// 녹화 px → dp. 앱 영역 안 y 는 kbY(녹화 y) (상태바 높이를 뺌)
+// 녹화 px → dp. 앱 영역 안 y 는 kbY(녹화 y) (상태바 높이를 뺌). 코드에선 안 부르고, CSS 주석의 '녹화 px ÷ 1.53646 (− 33.2)' 환산식을
+// 한곳에 적어 둔 것 (재기 도구·문서가 이 이름으로 가리킴)
 export const kb = (recPx: number) => recPx / KB_SCALE;
 export const kbY = (recY: number) => recY / KB_SCALE - KB_TOP;
 
@@ -16,3 +17,8 @@ export const KB_STATUS = "#ffffff";
 export function useKbankStatusBar(bg: string = KB_STATUS) {
   useStatusBar(bg, "dark");
 }
+
+// 금액 쓰기 (1,234)
+export const kbNf = new Intl.NumberFormat("ko-KR");
+// 기능 없는 버튼: 눌러도 아무 일 없음 (녹화에 없는 화면으로 가는 것 — 안내창도 띄우지 않음)
+export const noop = () => {};

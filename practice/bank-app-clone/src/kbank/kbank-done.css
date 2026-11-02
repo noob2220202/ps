@@ -42,21 +42,12 @@
   align-items: center;
   justify-content: center;
 }
-/* ✓ 잉크 165.3~218.7 × 169.2~206.3, 그려짐 (1155~1160, ≈170ms). 가운데 x 192 기준 */
+/* ✓ 잉크 165.3~218.7 × 169.2~206.3. 가운데 x 192 기준. 선을 그려 나가지 않고 온전한 모양이 흐리게 아래(10)에서 올라옴 (.kbd-rise) */
 .kbd-check {
   position: absolute;
   left: calc(50% - 28px);
   top: 168.6px;
-}
-.kbd-check path {
-  stroke-dasharray: 72;
-  stroke-dashoffset: 72;
-  animation: kbd-draw 200ms ease-out forwards;
-}
-@keyframes kbd-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
+  --kbd-rise: 10px;
 }
 /* 받는계좌 | 은행 번호 : 16 400, 잉크 359.9~374.9 (프레임 1170~1189) */
 .kbd-rcv {
@@ -72,15 +63,20 @@
   background: #dcdcdc;
   margin: 0 7px;
 }
-/* 떠오르기: 200ms (1155~1160) */
-.kbd-up {
-  animation: kbd-up 200ms ease-out both;
+/* 보냈어요 등장: 로고가 사라진 때(원본 38.421초, F1153 = done 단계 시작)부터 모두 함께 310ms ease-in-out 으로 진해지며 올라옴.
+   진하기 0.04 @+41 · 0.30 · 0.57 · 0.82 · 0.96 · 0.99 @+291ms (RMS 0.008). 올라오는 거리는 요소마다 다름 (--kbd-rise, 마지막 장면과 맞춘 dy):
+   ✓ 10 · '보냈어요' 5 · 공유·메세지 줄 15 · 의견 카드 41 · 추가이체/확인 0 (위끝 723.19 그대로, 진하기만) */
+.kbd-rise {
+  animation: kbd-rise 310ms cubic-bezier(0.42, 0, 0.58, 1) both;
 }
-@keyframes kbd-up {
+@keyframes kbd-rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--kbd-rise, 0px));
   }
+}
+.kbd-sent {
+  --kbd-rise: 5px;
 }
 /* 공유 원 91.1~134.7 · 메세지 알약 147.1~293.5, 412.9~456.5 (#eef2f6, 가로·세로 줄 경계 프레임 1170~1189). 묶음 가운데 x 192.3 */
 .kbd-acts {
@@ -89,6 +85,7 @@
   right: 0;
   top: 412.9px;
   height: 43.6px;
+  --kbd-rise: 15px;
 }
 .kbd-share {
   position: absolute;
@@ -154,7 +151,7 @@
     transform: translateY(-14px);
   }
 }
-/* 말풍선: 121.1~318.9 × 477.7~512.2 #4361ff (가운데 줄 경계), 꼭지 x 220.3 위로 3.9, 반지름 ≈ 9.
+/* 말풍선: 한 프레임 사이에 한 번에 나타남 (원본 38.837 0.00 → 38.862 1.00, 페이드 없음). 121.1~318.9 × 477.7~512.2 #4361ff (가운데 줄 경계), 꼭지 x 220.3 위로 3.9, 반지름 ≈ 9.
    글자 14 700 흰색 (맞춤: 폭비 1.000, 400·500 은 너무 가늚) 잉크 x 137.3 · 위 488.1, × 잉크 289.6~300.7 × 490.1~500.5 */
 .kbd-tip {
   position: absolute;
@@ -171,7 +168,6 @@
   align-items: center;
   padding-left: 16px;
   box-sizing: border-box;
-  animation: kbd-in 170ms linear both;
 }
 .kbd-tip::before {
   content: "";
@@ -200,6 +196,7 @@
   border-radius: 12px;
   background: #eef2f6;
   text-align: left;
+  --kbd-rise: 41px;
 }
 .kbd-fb > * {
   position: absolute;
@@ -239,6 +236,7 @@
   height: 56px;
   display: flex;
   gap: 7.8px;
+  --kbd-rise: 0px;
 }
 .kbd-btns button {
   height: 100%;
@@ -255,4 +253,18 @@
   flex: 1;
   background: #0212a3;
   color: #fff;
+}
+
+/* 확인 → 홈: 맨 위층에 고정한 탭바 (KbankDone FloatingTabBar). 글꼴은 .kb 와 같게, 누름은 받지 않음 */
+.kbd-tabfloat {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-feature-settings: "ss01";
+}
+/* 그동안 밀려 들어오는 홈 층의 탭바는 숨김 (두 개가 어긋나 겹쳐 보이지 않게) */
+.phone__viewport:has(> .kbd-tabfloat) .kbh-tabbar:not(.kbd-tabfloat .kbh-tabbar) {
+  visibility: hidden;
 }
