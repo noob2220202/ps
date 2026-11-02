@@ -3,7 +3,7 @@ import "./kbank-home.css"; // 탭바 스타일(kbh-tabbar)도 홈 CSS 에 있음
 
 // 케이뱅크 아래 탭바 (홈·상품·혜택·서비스·전체). 녹화 16.5~16.9초(프레임 496~508) 에서 잰 값.
 // 흰 바탕, 위 모서리 둥긂(r ≈ 21dp, 녹화 32px), 윗선 1px #e4e8ee (녹화 y 1172).
-// 아이콘 그림: 녹화에서 잘라 4배 (scripts/kbank-crops/home.py tab-*), 글자: 활성 #0212a4 · 나머지 #6b6e72
+// 아이콘 그림: 녹화에서 잘라 4배 (scripts/kbank-crops/home.py tab-*), 글자: 활성 #0212a4 · 나머지 #5c5f63
 export type KbankTab = "홈" | "상품" | "혜택" | "서비스" | "전체";
 const TABS: { label: KbankTab; art: string }[] = [
   { label: "홈", art: "kbank-home-tab-home" },

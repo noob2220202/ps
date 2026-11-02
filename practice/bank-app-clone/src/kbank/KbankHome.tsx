@@ -290,8 +290,8 @@ export function KbankHome() {
                       <span className="kbh-rec__tag">{r.tag}</span>
                       {r.art && <Pic name={r.art} className={`kbh-rec__art kbh-rec__art--${r.kind} kbh-art`} />}
                       <b className="kbh-w kbh-rec__title">{r.title}</b>
-                      <span className="kbh-w kbh-rec__desc">{r.desc[0]}</span>
-                      <span className="kbh-w kbh-rec__desc">{r.desc[1]}</span>
+                      <span className="kbh-w kbh-rec__desc kbh-rec__desc--1">{r.desc[0]}</span>
+                      <span className="kbh-w kbh-rec__desc kbh-rec__desc--2">{r.desc[1]}</span>
                     </button>
                   ))}
                 </div>
@@ -329,12 +329,9 @@ export function KbankHome() {
                 <span className="kbh-pill__in">
                   <i className="kbh-pill__dot" />
                   <span className="kbh-t kbh-pill__text">
-                    사장님
-                    <span className="kbh-pill__more">
-                      , 홈에서 한눈에 확인하세요
-                      <Pic name="kbank-home-eyes" className="kbh-pill__eyes" />
-                    </span>
+                    사장님<span className="kbh-pill__more">, 홈에서 한눈에 확인하세요</span>
                   </span>
+                  <Pic name="kbank-home-eyes" className="kbh-pill__eyes" />
                 </span>
               </button>
               <button className="kbh-bell" onClick={() => setPanelOpen(true)} aria-label="알림 (관리 패널)">
@@ -353,7 +350,7 @@ export function KbankHome() {
           )}
         </header>
       )}
-      {phase !== "white" && <KbankTabBar active="홈" />}
+      {phase === "content" && <KbankTabBar active="홈" />}
       <DevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   );

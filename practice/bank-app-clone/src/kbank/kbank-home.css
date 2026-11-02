@@ -92,35 +92,44 @@
   position: absolute;
   left: 0;
   top: 0;
+  width: 235px;
   height: 100%;
-  display: flex;
-  align-items: center;
   white-space: nowrap;
 }
-/* 점: 녹화 415~424px → 지름 6, 가운데가 알약 왼끝 + 13.7 */
+/* 점: 녹화 415~424px → 지름 6.5, 가운데가 알약 왼끝 + 13.7 */
 .kbh-pill__dot {
-  width: 6.2px;
-  height: 6.2px;
-  margin-left: 10.6px;
-  margin-right: 3.6px;
+  position: absolute;
+  left: 10.4px;
+  top: 10px;
+  width: 6.6px;
+  height: 6.6px;
   border-radius: 50%;
   background: currentColor;
 }
+/* 글자: 녹화 글꼴은 한글이 넓고 띄어쓰기가 좁음 → '사장님' 폭에 맞춰 15px, 띄어쓰기·자간을 줄여 글줄 폭을 맞춤.
+   '사장님' 잉크 x 427~486px(277.9~317.0) = 알약 왼끝 + 18.2, 펼친 글줄 x 178~454px (115.9~296.1) */
 .kbh-pill__text {
-  font-size: 13.8px;
+  position: absolute;
+  left: 18px;
+  top: 6.3px;
+  font-size: 15px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
+  letter-spacing: -0.3px;
+  word-spacing: -2.2px;
 }
-.kbh-pill__more {
-  display: flex;
-  align-items: center;
+/* 접힌 뒤엔 '사장님' 뒤가 없음 (접히는 동안만 잘린 채 보임, 녹화 410~416) */
+.kbh-pill--closed .kbh-pill__more,
+.kbh-pill--closed .kbh-pill__eyes {
+  visibility: hidden;
+  transition: visibility 0s 400ms;
 }
-/* 👀: 잉크 x 455~487px · y 86~103px (앱 296.1~317.6 · 22.8~34.5) */
+/* 👀: 상자 x 459~491px · y 82~108px (298.7 · 앱 20.2) = 알약 왼끝 + 205 */
 .kbh-pill__eyes {
+  position: absolute;
+  left: 205px;
+  top: 4.9px;
   width: 20.8px;
   height: 16.9px;
-  margin-left: 1.5px;
 }
 
 /* 종 + 빨간 뱃지: 뱃지 x 526~569px · y 64~89px (342.3~371 · 앱 8.5~25.4) #f9515b, 종 잉크 x 530~558px · y ~70~110px (#29323e) */
@@ -406,7 +415,7 @@
   background: #4260fe;
   color: #fff;
   font-size: 14.8px;
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
 }
 /* 자물쇠: 상자 x 428~518px · y 742~864px (278.6 · 앱 449.7, 58.6 × 79.4) — 잠긴 회색 → 잠긴 파랑 → 열림 */
@@ -494,7 +503,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 74.2px;
+  top: 75px;
   text-align: center;
   font-size: 13px;
   font-weight: 500;
@@ -759,11 +768,11 @@
   transform-origin: center;
   transform: scaleX(1.16);
 }
-.kbh-rec__desc:nth-of-type(3) {
+.kbh-rec__desc--1 {
   top: 117.8px;
 }
-.kbh-rec__desc:nth-of-type(4) {
-  top: 134px;
+.kbh-rec__desc--2 {
+  top: 136.3px;
 }
 
 /* ---------- 의견: 앱 y 1343 (2113px) ~ 1417.5 (2229px), #d8dce7, r 22 ---------- */
@@ -810,7 +819,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 1471.9px;
+  top: 1472.9px;
 }
 .kbh-foot > * {
   position: absolute;
@@ -872,7 +881,7 @@
 .kbh-tabbar__tab i {
   position: absolute;
   left: 50%;
-  top: 5.8px;
+  top: 6.4px;
   width: 29.9px;
   height: 29.3px;
   margin-left: -15px;
@@ -882,12 +891,12 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 37.4px;
+  top: 38.3px;
   text-align: center;
   font-size: 10.5px;
   font-weight: 500;
   line-height: 1;
-  color: #6b6e72;
+  color: #5c5f63;
 }
 .kbh-tabbar__tab.on span {
   color: #0212a4;
