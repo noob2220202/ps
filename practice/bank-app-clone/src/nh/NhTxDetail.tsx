@@ -16,7 +16,8 @@ const MEMO_CHIPS = ["식비", "생활/마트", "경조사/모임", "쇼핑", "�
 const MEMO_MAX = 20;
 const digitsOf = (s: string) => s.replace(/\D/g, "");
 // 빠른송금 등록·동일내역 송금 동그라미 그림은 판 상자만큼 잘려 있음 (48 자리 안)
-const TXD_INK = [0.27, 0.27, 47.73, 47.73] as const;
+const QUICK_INK = [0.4, 0.4, 47.6, 47.6] as const;
+const SAME_INK = [0.4, 0.27, 47.6, 47.73] as const;
 
 // 거래 상세 (스크린샷 2026-10-28 9:48, 녹화2 43.5~53초)
 // 위: 이름 · ±금액 [복사] → 거래메모 ? · 칩(가로 스크롤 + ⌄) · 메모 칸 0/20 → 거래정보 표
@@ -196,11 +197,11 @@ export function NhTxDetail() {
             <div className="nh-txd__actions">
               {/* 빠른송금(금액까지 저장해 두는 송금)은 우리 데이터에 없는 기능이라 모양만 */}
               <button className="nh-txd__quick">
-                <NhImg name={NH_LIGHT ? "nh-quick-register-light" : "nh-quick-register"} w={48} h={48} ink={TXD_INK} fallback={<span>⚡</span>} />
+                <NhImg name={NH_LIGHT ? "nh-quick-register-light" : "nh-quick-register"} w={48} h={48} ink={QUICK_INK} fallback={<span>⚡</span>} />
                 빠른송금 등록
               </button>
               <button className="nh-txd__same" onClick={sendAgain}>
-                <NhImg name={NH_LIGHT ? "nh-same-send-light" : "nh-same-send"} w={48} h={48} ink={TXD_INK} fallback={<span>₩</span>} />
+                <NhImg name={NH_LIGHT ? "nh-same-send-light" : "nh-same-send"} w={48} h={48} ink={SAME_INK} fallback={<span>₩</span>} />
                 동일내역 송금
               </button>
             </div>

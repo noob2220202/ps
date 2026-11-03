@@ -410,9 +410,9 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: 100%;
+  top: calc(100% - 1px); /* 카드 그림이 끈 고리에서 끝나므로(36px) 거기서 바로 이어지게 */
   width: 2px;
-  height: 45px;
+  height: 46px;
   margin-left: -1px;
   background: var(--home-lanyard);
 }

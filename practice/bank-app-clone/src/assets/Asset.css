@@ -154,7 +154,8 @@
 .asset--shortcut-timetable.asset--local > img,
 .asset--shortcut-allowance.asset--local > img,
 .asset--shortcut-coupon.asset--local > img,
-.asset--friends.asset--local > img {
+.asset--friends.asset--local > img,
+.asset--card.asset--local > img {
   position: absolute;
   object-fit: fill;
 }
@@ -167,52 +168,60 @@
 }
 /* 배너 그림 셋: 예전 98×77 칸(원본 453,258 에서 196×154 로 자른 틀) 안 잉크 위치 */
 .asset--banner-mcard.asset--local > img {
-  left: 16px;
-  top: 14.33px;
-  width: 71.33px;
-  height: 56px;
+  left: 16.67px;
+  top: 15px;
+  width: 70.33px;
+  height: 54.67px;
 }
 .asset--banner-pcbang.asset--local > img {
-  left: 20px;
-  top: 5px;
-  width: 69.67px;
-  height: 71.33px;
+  left: 20.33px;
+  top: 5.67px;
+  width: 68.67px;
+  height: 70.33px;
 }
 .asset--banner-friday.asset--local > img {
-  left: 2.67px;
-  top: 7px;
-  width: 94px;
-  height: 63.33px;
+  left: 3px;
+  top: 7.33px;
+  width: 93.33px;
+  height: 62.33px;
 }
 /* 바로가기 넷: 실제 크기(원본 px ÷ 2), 예전 잉크 가운데에 (예전엔 정사각 틀을 27px 로 맞춰서 정부지원금은 7% 작고 용돈은 4% 컸음) */
 .asset--shortcut-subsidy.asset--local > img {
-  left: 0.67px;
-  top: 0.63px;
-  width: 25.67px;
-  height: 26.67px;
+  left: 1.33px;
+  top: 1.29px;
+  width: 24.33px;
+  height: 25.67px;
 }
 .asset--shortcut-timetable.asset--local > img {
-  left: 1.33px;
-  top: 1.67px;
-  width: 25px;
-  height: 24.33px;
+  left: 1.67px;
+  top: 2px;
+  width: 24.33px;
+  height: 23.33px;
 }
 .asset--shortcut-allowance.asset--local > img {
-  left: 2.17px;
-  top: 2.17px;
-  width: 23px;
-  height: 23px;
+  left: 2.51px;
+  top: 2.51px;
+  width: 22.33px;
+  height: 22.33px;
 }
 .asset--shortcut-coupon.asset--local > img {
-  left: 1.33px;
-  top: 4px;
-  width: 24.67px;
-  height: 19.33px;
+  left: 1.67px;
+  top: 4.67px;
+  width: 24px;
+  height: 18.33px;
 }
 /* 계좌 상세 캐릭터: 녹화(480px)에서 연보라 바탕을 걷어 낸 그림. 아래 끝은 말풍선 바로 위에서 잘림(칸 밖은 안 보임) */
 .asset--friends.asset--local > img {
-  left: 12.26px;
-  top: 11.05px;
-  width: 146.67px;
-  height: 99.79px;
+  left: 12.93px;
+  top: 11.72px;
+  width: 145.66px;
+  height: 99.12px;
+}
+/* 카드 둘: 다크 홈(바탕 #272727)에서 잘라 흰 부분까지 깨끗한 누끼. 예전과 같은 배율(26×37 칸에 cover = 원본 px × 0.514).
+   아래 끝 = 끈 고리 끝(원본 1037px) → 끈(.spend__thumb::after)이 바로 이어짐 */
+.asset--card.asset--local > img {
+  left: -0.02px;
+  top: 0.34px;
+  width: 26.04px;
+  height: 35.63px;
 }
