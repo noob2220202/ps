@@ -422,6 +422,23 @@ html[data-app="kbank"] .statusbar--android .statusbar__time {
 .kb-sb-rec {
   animation: kb-sb-rec-blink 986ms linear infinite;
 }
+/* kbank2: 인트로 영상이 도는 동안 — 영상 속 시계·빨간 녹화 알약·캠코더는 지워 둠(recorder.ts INTRO) → 우리 상태바를 영상(z 999) 위로 올려
+   그 셋만 흰색으로 그림 (지금 시각이 찍히게). 'SKT' · 오른쪽 아이콘(배터리 24 등)은 영상에 그대로 있으니 숨김. 바탕은 비워서 영상이 보이게 */
+html[data-intro-play] .phone > .statusbar {
+  z-index: 1000;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff;
+}
+html[data-intro-play] .phone > .statusbar :is(.statusbar__carrier, .statusbar__right--kbank, .kb-sb-notif) {
+  visibility: hidden;
+}
+html[data-intro-play] .phone > .statusbar .kb-sb-left [fill="#494949"] {
+  fill: #ffffff;
+}
+html[data-intro-play] .phone > .statusbar .kb-sb-left [stroke="#494949"] {
+  stroke: #ffffff;
+}
 /* kbank2: 인트로 영상이 끝난 직후 상태바 글자·아이콘이 영상 속 흰색(어두운 기기 홈 화면 테마)에서 #494949 로 바뀜.
    녹화 원본 5.615~5.788초 'SKT' 잉크 253 → 197 → 161 → 131 → 104 → 79 → 75 → 74 (흰 바탕이라 투명도 0 → 1 과 같음):
    영상 끝 + 15ms 부터 165ms cubic-bezier(0,0,.4,1) 로 맞춤 (오차 RMS 0.018). 빨간 녹화 알약은 그대로 (recorder.ts playIntro) */

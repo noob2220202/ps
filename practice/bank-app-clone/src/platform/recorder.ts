@@ -9,8 +9,8 @@
 // 코덱: 안드로이드 크롬의 mp4(H.264 하드웨어 인코더)는 프레임이 깨진 파일이 나와서 webm(VP9/VP8)으로 저장
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
-import { isIntroOn, syncBlink } from "./intro";
-import { setBattery, setClock, syncClock } from "./deviceStatus";
+import { BLINK_MS, isIntroOn, syncBlink } from "./intro";
+import { setBattery } from "./deviceStatus";
 import { OS } from "./platform";
 import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
 import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
@@ -21,15 +21,15 @@ import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
 //   -colorspace bt709 -color_primaries bt709 -color_trc bt709 에 mp4 는 -c:v libx264 -profile:v high -level 3.1 -bf 0 -crf 20 -movflags +faststart,
 //   webm 은 -c:v libvpx-vp9 -crf 24 -b:v 0 -row-mt 1. mp4 는 B 프레임 없이(-bf 0) — 있으면 첫 장면이 0.233초에서 시작해(편집 목록)
 //   브라우저 시간·길이가 webm 과 달라짐. 프레임 평균 오차(녹화 30fps 프레임 대비) mp4 0.70 · webm 0.77 / 255
-// 상태바 값도 영상 그대로 맞춰 둠 (영상이 끝나고 우리 상태바로 넘어갈 때 시각·배터리가 뚝 바뀌어 보이지 않게)
+// 상태바 배터리는 영상 값으로 맞춰 둠 (영상이 끝나고 우리 상태바로 넘어갈 때 뚝 바뀌어 보이지 않게)
 const INTRO = {
   sources: [
     { src: kbankIntroMp4, type: 'video/mp4; codecs="avc1.64001F"' },
     { src: kbankIntroWebm, type: 'video/webm; codecs="vp9"' },
   ],
-  clock: "06:11",
-  // 녹화 시계는 14.92초(영상 첫 장면 + 11.88초)에 6:11 → 6:12 (74.81초에 6:13). setClock 은 분까지라 그때 6:12 로 한 번 더 맞춤
-  nextMinuteMs: 11_880,
+  // 시각은 영상에서 지워 둠 (영상 속 시계 · 빨간 녹화 알약 · 캠코더 자리: delogo=x=57:y=11:w=135:h=34) → 영상이 도는 동안에도
+  // 우리 상태바의 시각 · 알약 · 캠코더를 영상 위에 올려 그려서(PhoneFrame.css [data-intro-play]) 녹화에 지금 시각이 찍힘.
+  // 만드는 명령은 위와 같고 -vf 끝에 ,delogo=x=57:y=11:w=135:h=34 를 붙임
   battery: 24,
   // 영상 끝(녹화 5.60초)에 캠코더 표시가 켜진 지: 영상 속 켜짐 2.200초(77장 중 67번째) → 끝 2.567초 = 0.37초째. 꺼짐은 녹화 5.713~5.738초 사이
   blinkOnMs: 370,
@@ -231,13 +231,11 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     await started;
     await nextFrame();
     // 영상을 틀고, 끝나면 바로 시작화면 (영상과 폰 틀이 같은 기기·같은 비율이라 상태바·손잡이가 안 끊기고 한 번의 녹화로 이어짐)
-    // 시각·배터리는 녹화 동안만 영상 값으로 — 끝나면 사용자가 정해 둔 값으로 되돌림 (deviceStatus 는 localStorage 에 저장돼 그대로 남았음)
+    // 배터리만 녹화 동안 영상 값으로 (시각은 지금 시각 그대로 — 영상 속 시계는 지워 둠). 끝나면 사용자가 정해 둔 값으로 되돌림
     const before = deviceStatusNow();
-    setClock(INTRO.clock);
     setBattery(INTRO.battery);
-    const minute = setTimeout(() => state.status === "recording" && setClock("06:12"), INTRO.nextMinuteMs);
     const stopKeep = keepCapturing(target);
-    recorder.addEventListener("stop", () => (clearTimeout(minute), stopKeep(), restoreDeviceStatus(before)), { once: true });
+    recorder.addEventListener("stop", () => (stopKeep(), restoreDeviceStatus(before)), { once: true });
     await playIntro(intro, target);
   } else {
     await sleep(600);
@@ -245,22 +243,18 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   }
 }
 
-// 상태바 배터리·시계 지금 값 (deviceStatus.ts 가 localStorage 'deviceStatus' 에 둔 것. 없으면 그 기본값 62% · 실제 시각)
-function deviceStatusNow(): { battery: number; offset: number | null } {
+// 상태바 배터리 지금 값 (deviceStatus.ts 가 localStorage 'deviceStatus' 에 둔 것. 없으면 그 기본값 62%)
+function deviceStatusNow(): { battery: number } {
   try {
     const v = JSON.parse(localStorage.getItem("deviceStatus") ?? "null");
-    if (v && typeof v.battery === "number") return { battery: v.battery, offset: typeof v.offset === "number" ? v.offset : null };
+    if (v && typeof v.battery === "number") return { battery: v.battery };
   } catch {
     // 못 읽으면 기본값
   }
-  return { battery: 62, offset: null };
+  return { battery: 62 };
 }
-// 되돌림: 정한 시각은 setClock 이 분 단위라 '지금 그 시각'의 분까지만 (초는 0 부터 다시 — 다음 분으로 넘어가는 때가 1분 안에서 어긋날 수 있음)
-function restoreDeviceStatus(s: { battery: number; offset: number | null }) {
+function restoreDeviceStatus(s: { battery: number }) {
   setBattery(s.battery);
-  if (s.offset === null) return syncClock();
-  const t = new Date(Date.now() + s.offset);
-  setClock(`${t.getHours()}:${String(t.getMinutes()).padStart(2, "0")}`);
 }
 
 // 녹화가 끊기지 않게: 인트로 영상(2.6초 동안 화면 전체가 30fps 로 바뀜)이 끝나면 크롬 화면 캡처가 '움직이는 영역'을 그 영상으로 잡은 채
@@ -300,6 +294,8 @@ function loadIntro(target: HTMLElement) {
       video.removeEventListener("canplaythrough", onReady);
       video.removeEventListener("error", onError);
       if (!ok) video.remove();
+      // 영상이 폰을 덮는 순간부터 우리 상태바(시각 · 알약 · 캠코더)를 영상 위로 (영상 속 시계는 지워 둠 — 녹화 첫 프레임부터 지금 시각)
+      else document.documentElement.dataset.introPlay = "on";
       resolve(ok ? video : null);
     };
     const onReady = () => finish(true);
@@ -352,6 +348,7 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement) {
       for (let i = 0; i < 6 && !target.querySelector(".kb-splash"); i++) await oneFrame();
       // 영상 속 캠코더 깜빡임을 우리 상태바가 같은 위상으로 이어 받음 (영상이 끝난 때 기준 — 기다린 만큼 더함)
       syncBlink(INTRO.blinkOnMs + (performance.now() - endAt));
+      delete d.introPlay;
       video.remove();
       resolve();
     };
@@ -359,6 +356,9 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement) {
     const guard = setTimeout(done, (Number.isFinite(video.duration) ? video.duration * 1000 : 3000) + 3000);
     video.addEventListener("ended", done, { once: true });
     video.addEventListener("error", done, { once: true });
+    // 캠코더 깜빡임은 영상 끝에 켜진 지 blinkOnMs 가 되도록 첫 장면 위상으로 맞춤 (상태바는 loadIntro 때부터 영상 위)
+    const lenMs = (Number.isFinite(video.duration) ? video.duration : 2.567) * 1000;
+    syncBlink((((INTRO.blinkOnMs - lenMs) % BLINK_MS) + BLINK_MS) % BLINK_MS);
     video.play().catch(done);
   });
 }
