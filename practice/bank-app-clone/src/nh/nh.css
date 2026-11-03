@@ -396,7 +396,6 @@
   display: block;
   width: 100%;
   height: 100%;
-  transform: scale(1.1); /* 가장자리 흰 테두리를 원 밖으로 */
 }
 .nh-seg--box {
   align-self: center;

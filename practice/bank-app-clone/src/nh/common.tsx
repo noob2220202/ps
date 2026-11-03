@@ -68,8 +68,8 @@ export function NhAccountIcon({ size = 26, plain = false }: { size?: number; pla
   );
 }
 
-// 은행 동그라미 아이콘. 카카오뱅크에서 잘라 온 로고는 가장자리에 흰 테두리가 남아 있어서
-// 어두운 콕뱅크 화면에선 살짝 확대해서 원 밖으로 잘라냄. 농협은 콕뱅크의 노란 동그라미(nh-bank)
+// 은행 동그라미 아이콘. 공용 로고(bank-*.png)는 원이 캔버스에 꽉 차서(흰 테두리 없음) 그대로 원 안에.
+// 농협은 콕뱅크의 노란 동그라미(nh-bank)
 export function NhBankIcon({ bank, size = 34 }: { bank: Bank; size?: number }) {
   const logo = localAsset(bank.code === "nh" ? "nh-bank" : `bank-${bank.code}`);
   if (!logo) return <BankIcon bank={bank} size={size} />;

@@ -176,7 +176,7 @@ const TILES: {
     sub: "한정수량!",
     title: "특판상품",
     img: "nh-gh-tile-sale",
-    at: [309.6, 1246.2, 36, 36.2],
+    at: [309, 1246.2, 36, 36.2],
   },
   {
     sub: "내게 딱맞는!",
@@ -322,7 +322,7 @@ export function NhHome() {
               </span>
               <Img
                 name="nh-gh-mydata"
-                at={[274.4, 1527, 56.8, 55.8]}
+                at={[274.4, 1525.5, 56.8, 55.8]}
                 base={[24, 1493.6]}
               />
             </button>

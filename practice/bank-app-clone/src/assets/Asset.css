@@ -214,14 +214,14 @@
 .asset--friends.asset--local > img {
   left: 12.93px;
   top: 11.72px;
-  width: 145.66px;
+  width: 145.33px;
   height: 99.12px;
 }
 /* 카드 둘: 다크 홈(바탕 #272727)에서 잘라 흰 부분까지 깨끗한 누끼. 예전과 같은 배율(26×37 칸에 cover = 원본 px × 0.514).
    아래 끝 = 끈 고리 끝(원본 1037px) → 끈(.spend__thumb::after)이 바로 이어짐 */
 .asset--card.asset--local > img {
-  left: -0.02px;
-  top: 0.34px;
-  width: 26.04px;
-  height: 35.63px;
+  left: 0.323px;
+  top: 0.683px;
+  width: 25.697px;
+  height: 35.287px;
 }

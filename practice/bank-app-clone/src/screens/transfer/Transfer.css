@@ -221,6 +221,15 @@
 .bank-sheet__item:active {
   opacity: 0.6;
 }
+/* 녹화의 로고 원 지름은 20.5px (자리 22px 은 그대로, 가운데에) */
+.bank-sheet__item > img {
+  width: 20.5px;
+  height: 20.5px;
+  margin: 0 0.75px;
+}
+.bank-sheet__item > .kakao-circle {
+  transform: scale(0.9318); /* 22 → 20.5 */
+}
 
 /* ---------- 계좌번호 입력 시트 ---------- */
 .number-sheet {

@@ -660,7 +660,7 @@ export function NhRegister() {
               name="nh-register-char"
               w={104}
               h={89.6}
-              ink={[3.33, 3, 97.33, 83.27]}
+              ink={[3.88, 3, 97.33, 83.27]}
               className="nh-reg__char"
               fallback={<span />}
             />
