@@ -536,6 +536,25 @@ export function seedKbankEmpty(d, userName) {
   transaction(() => kbankBase(d, userName, 0), d);
 }
 
+// kbank2 전용 "테스트" 프로필: 2026-11-02 거래내역 8건 (이름·계좌번호는 모두 가상값으로 바꿈 — 실명·실계좌는 커밋 금지 규칙)
+const KBANK_TEST_TX = [
+  ["2026-11-02T11:23:00", "김도윤(카카오뱅크)", 500000, "#이체"],
+  ["2026-11-02T11:23:03", "최하은(농협) 0241099887", -300000, "#이체"],
+  ["2026-11-02T11:43:00", "예시모터스", 4290000, "#이체"],
+  ["2026-11-02T11:48:10", "최하은(농협) 0241099887", -500000, "#이체"],
+  ["2026-11-02T12:47:39", "카카오페이", -400000, "#이체"],
+  ["2026-11-02T12:57:28", "샘플모터스", 5800000, "#이체"],
+  ["2026-11-02T14:22:50", "최하은(농협) 0241099887", -7000000, "#이체"],
+  ["2026-11-02T14:46:41", "정예준", -300000, "#이체"],
+];
+export function seedKbankTestProfile(d) {
+  transaction(() => {
+    kbankBase(d, "테스트", 2272491); // 마지막 거래(14:46:41) 뒤 잔액 — 거래내역은 최신 거래부터 거꾸로 잔액을 계산해서 보여 줌
+    const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
+    for (const [at, merchant, amount, tag] of KBANK_TEST_TX) tx.run(at, merchant, amount, tag);
+  }, d);
+}
+
 // 앱별 "예시 데이터로 / 빈 상태로"
 export const SEEDS = {
   kakao: { example: (d) => seedExample(d), empty: seedEmpty },
@@ -558,4 +577,14 @@ if (!registry.prepare("SELECT 1 FROM profiles").get()) {
   registry
     .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, 'boy', ?, datetime('now', 'localtime'))")
     .run(id, name, COLORS[0]);
+}
+
+// kbank2: "테스트" 이름 프로필이 아직 없으면 만든다. 서버를 새로 켤 때마다 확인해서,
+// 이미 돌아가던 서버에 git pull → 재시작만 해도 (프로필이 이미 있어도) 들어가게 함
+if (INTRO && !registry.prepare("SELECT 1 FROM profiles WHERE name = ?").get("테스트")) {
+  const id = newProfileId();
+  seedKbankTestProfile(profileDb(id));
+  registry
+    .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, '테스트', 'star', ?, datetime('now', 'localtime'))")
+    .run(id, COLORS[1]);
 }
