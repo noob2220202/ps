@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useApi } from "../../api/useApi";
 import { paths } from "../../api/endpoints";
-import type { Account, Transaction } from "../../api/types";
+import type { Account, HomeData, Transaction } from "../../api/types";
 import { ErrorState } from "../../components/ErrorState";
 import { useScrollFrame } from "../../hooks/useScrollTop";
 import { useStatusBar } from "../../hooks/useStatusBar";
@@ -12,6 +12,7 @@ import { Asset } from "../../assets/Asset";
 import { BackButton, GearButton } from "../../components/NavButtons";
 import { TxList } from "../../components/TxList";
 import { KakaoCircle } from "../../components/art";
+import { SuspendedDialog } from "../../components/SuspendedDialog";
 import "./AccountDetail.css";
 
 // 타이핑은 글자마다 state가 바뀐다. 화면 컴포넌트에서 바로 쓰면 한 글자마다 화면 "전체"가
@@ -58,6 +59,9 @@ export function AccountDetailScreen() {
   const account = useApi<Account>(paths.account(accountId));
   const txList = useApi<Transaction[]>(paths.transactions(accountId));
   const loaded = account.status === "done" && txList.status === "done";
+  // 계좌 지급정지(🔔 패널, 연습용)면 이체하기 대신 '고객센터로 문의해주세요.' 팝업
+  const home = useApi<HomeData>(paths.home);
+  const [suspendedOpen, setSuspendedOpen] = useState(false);
   useStatusBar(loaded && !scrolled ? "#f1e9fd" : "var(--light-bg)", "dark");
 
   const failed = account.status === "error" ? account : txList.status === "error" ? txList : null;
@@ -109,7 +113,10 @@ export function AccountDetailScreen() {
           </div>
         </div>
         <div className="balance-card__actions">
-          <button className="light-btn pressable" onClick={() => navigate(`/transfer?from=${accountId}`)}>
+          <button
+            className="light-btn pressable"
+            onClick={() => (home.data?.profile.suspended ? setSuspendedOpen(true) : navigate(`/transfer?from=${accountId}`))}
+          >
             이체하기
           </button>
           <button className="light-btn pressable">채우기</button>
@@ -125,7 +132,7 @@ export function AccountDetailScreen() {
         items={txs.slice(0, 3)}
         onSelect={(tx) => navigate(`/account/${accountId}/tx/${tx.id}`, { state: { tx } })}
       />
-
+      {suspendedOpen && <SuspendedDialog onClose={() => setSuspendedOpen(false)} />}
     </div>
   );
 }

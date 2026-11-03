@@ -72,7 +72,7 @@ function nowIso() {
 
 const getProfile = () => {
   const p = db().prepare("SELECT * FROM profile WHERE id = 1").get();
-  return { userName: p.user_name, cardLast4: p.card_last4, cardSpend: p.card_spend, cashbackCount: p.cashback_count };
+  return { userName: p.user_name, cardLast4: p.card_last4, cardSpend: p.card_spend, cashbackCount: p.cashback_count, suspended: !!p.suspended };
 };
 
 function toAccount(row, profile = getProfile()) {
@@ -363,7 +363,7 @@ app.get("/api/banks", (_req, res) => res.json(BANKS.map(bankInfo)));
 app.get("/api/profile", (_req, res) => res.json(getProfile()));
 
 app.patch("/api/profile", (req, res) => {
-  const { userName, cardLast4, cardSpend, cashbackCount } = req.body ?? {};
+  const { userName, cardLast4, cardSpend, cashbackCount, suspended } = req.body ?? {};
   const fields = {};
   if (userName !== undefined && !(typeof userName === "string" && /^.{1,10}$/u.test(userName.trim()))) fields.userName = "이름은 1~10자";
   if (cardLast4 !== undefined && !(typeof cardLast4 === "string" && /^\d{4}$/.test(cardLast4))) fields.cardLast4 = "숫자 4자리";
@@ -371,13 +371,15 @@ app.patch("/api/profile", (req, res) => {
   if (cardSpend !== undefined && cardSpend !== null && !(Number.isInteger(cardSpend) && cardSpend >= 0 && cardSpend <= 1_000_000_000))
     fields.cardSpend = "0원 이상 10억원 이하";
   if (cashbackCount !== undefined && !(Number.isInteger(cashbackCount) && cashbackCount >= 0 && cashbackCount <= 99)) fields.cashbackCount = "0~99건";
+  if (suspended !== undefined && typeof suspended !== "boolean") fields.suspended = "켜기/끄기";
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   const p = getProfile();
-  db().prepare("UPDATE profile SET user_name = ?, card_last4 = ?, card_spend = ?, cashback_count = ? WHERE id = 1").run(
+  db().prepare("UPDATE profile SET user_name = ?, card_last4 = ?, card_spend = ?, cashback_count = ?, suspended = ? WHERE id = 1").run(
     userName !== undefined ? String(userName).trim() : p.userName,
     cardLast4 ?? p.cardLast4,
     cardSpend !== undefined ? cardSpend : p.cardSpend,
     cashbackCount ?? p.cashbackCount,
+    (suspended ?? p.suspended) ? 1 : 0,
   );
   res.json(getProfile());
 });
@@ -787,6 +789,8 @@ app.post("/api/transfers", (req, res) => {
     if (v !== undefined && (typeof v !== "string" || v.trim().length > 20)) fields[k] = "20자 이하";
   if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
   if (to.accountId === from.id) throw bad("같은 계좌로는 보낼 수 없어요");
+  // 카카오뱅크 계좌 지급정지 (🔔 패널, 연습용): 보내지 않고 403 → 화면은 '고객센터로 문의해주세요.' 팝업
+  if (db().app === "kakao" && getProfile().suspended) throw new HttpError(403, "ACCOUNT_SUSPENDED", "고객센터로 문의해주세요.");
   if (from.balance < amount)
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `출금 가능 금액(${from.balance.toLocaleString("ko-KR")}원)을 넘었어요`);
 

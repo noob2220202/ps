@@ -1,0 +1,126 @@
+/* 계좌 지급정지 팝업 (SuspendedDialog.tsx). 폰 전체(상태바 포함)를 덮음 — 상태바(z 10)·제스처바 위, 🔔 관리 패널(z 30) 아래 */
+.susp {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24.3px 26px; /* 상자 가운데가 화면 가운데보다 약간 위 (스크린샷 상자 가운데 y 377.8 / 화면 390) */
+  background: rgba(0, 0, 0, 0.58);
+  animation: susp-dim 180ms ease-out;
+}
+.susp__box {
+  position: relative;
+  width: 100%;
+  padding: 33px 15.75px 16.1px;
+  border-radius: 19px;
+  background: #ffffff;
+  color: #171717;
+  text-align: center;
+  animation: susp-in 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+/* 연습용 표시: 제목 위 빈 칸 (상자 위끝 8 ~ 24) */
+.susp__mark {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #e5484d;
+  letter-spacing: -0.2px;
+}
+.susp__title {
+  margin: 0;
+  font-size: 16.3px; /* 스크린샷 글자 폭에 맞춤 (17px 은 4.8% 넓었음) */
+  line-height: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.susp__desc {
+  margin: 7.8px 0 0;
+  font-size: 13.5px;
+  line-height: 19px;
+  color: #555555;
+  letter-spacing: -0.3px;
+}
+.susp__desc span {
+  display: block;
+  white-space: nowrap;
+}
+.susp__code {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  margin-top: 15.8px;
+  font-size: 13.5px;
+  color: #171717;
+  letter-spacing: -0.3px;
+}
+.susp__code svg {
+  transition: transform 150ms;
+}
+.susp__code--open svg {
+  transform: rotate(180deg);
+}
+.susp__codeval {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: #777777;
+}
+.susp__bot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 101.7px;
+  height: 35px;
+  margin: 26px auto 0;
+  border: 1px solid #e3e3e3;
+  border-radius: 18px;
+  font-size: 13.7px;
+  color: #171717;
+  letter-spacing: -0.3px;
+}
+.susp__ok {
+  display: block;
+  width: 100%;
+  height: 51.8px;
+  margin-top: 33.8px;
+  border-radius: 12px;
+  background: var(--yellow);
+  font-size: 16.2px;
+  color: #1c1c1c;
+}
+.susp__ok:active {
+  background: var(--yellow-pressed);
+}
+html[data-theme="dark"] .susp__box {
+  background: #2b2b2b;
+  color: #ffffff;
+}
+html[data-theme="dark"] .susp__desc {
+  color: #a8a8a8;
+}
+html[data-theme="dark"] :is(.susp__code, .susp__bot) {
+  color: #ffffff;
+}
+html[data-theme="dark"] .susp__bot {
+  border-color: #474747;
+}
+@keyframes susp-dim {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes susp-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}

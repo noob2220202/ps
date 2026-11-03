@@ -23,6 +23,7 @@ export interface Profile {
   cardSpend: number | null; // 이번달 쓴 돈 직접 입력값 (null = 체크카드 거래 합계로 자동)
   cashbackCount: number; // 현금 돌려받을 기회 N건
   cardLast4: string;
+  suspended?: boolean; // 카카오뱅크 계좌 지급정지 (🔔 패널, 연습용) — 켜면 이체를 누를 때 '고객센터로 문의해주세요.' 팝업, 서버도 403
 }
 
 export interface Bank {
@@ -193,7 +194,7 @@ export interface TransactionEdit {
 
 // ----- 에러 응답 -----
 export interface ApiErrorBody {
-  code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "PROFILE_REQUIRED" | "PROFILE_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "DUPLICATE_TODAY" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";
+  code: "VALIDATION" | "NOT_FOUND" | "CONFLICT" | "PROFILE_REQUIRED" | "PROFILE_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "LIMIT_EXCEEDED" | "DUPLICATE_TODAY" | "ACCOUNT_SUSPENDED" | "ACCOUNT_NOT_FOUND" | "SERVER_ERROR";
   message: string;
   fields?: Record<string, string>; // 입력값별 에러 메시지
 }

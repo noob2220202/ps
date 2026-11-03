@@ -8,6 +8,7 @@ import { BankIcon } from "../../components/BankIcon";
 import { ArcSpinner } from "../../components/art";
 import { BackButton } from "../../components/NavButtons";
 import { Dialog, Keypad, Sheet } from "../../components/Sheet";
+import { SuspendedDialog } from "../../components/SuspendedDialog";
 import { applyKey } from "../../lib/keypad";
 import { Icon } from "../../components/icons/Icon";
 import { useStatusBar } from "../../hooks/useStatusBar";
@@ -42,6 +43,7 @@ export function AmountScreen() {
   const [sheet, setSheet] = useState<SheetName>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suspendedOpen, setSuspendedOpen] = useState(false);
   useStatusBar(sheet ? "#808080" : "#ffffff", "dark");
 
   // 새로고침 등으로 받는 분 정보가 없으면 홈으로
@@ -70,7 +72,9 @@ export function AmountScreen() {
       navigate("/transfer/done", { replace: true, state: { result } satisfies DoneState });
     } catch (e) {
       setSending(false);
-      setError(e instanceof ApiError ? e.message : "연결에 실패했어요");
+      // 계좌 지급정지(🔔 패널, 연습용): 이체 화면을 거쳐 왔어도 보내는 순간 같은 팝업
+      if (e instanceof ApiError && e.code === "ACCOUNT_SUSPENDED") setSuspendedOpen(true);
+      else setError(e instanceof ApiError ? e.message : "연결에 실패했어요");
     }
   };
 
@@ -219,6 +223,7 @@ export function AmountScreen() {
       </Sheet>
 
       <Dialog message={error} onClose={() => setError(null)} />
+      {suspendedOpen && <SuspendedDialog onClose={() => setSuspendedOpen(false)} />}
     </div>
   );
 }

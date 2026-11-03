@@ -305,7 +305,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 |---|---|---|---|
 | GET | `/api/home` | 홈 화면 데이터 한 번에 | 200 |
 | GET | `/api/banks` | 추가할 수 있는 은행 목록 | 200 |
-| GET / PATCH | `/api/profile` | 이름·카드 끝 4자리 | 200, 400(형식 오류) |
+| GET / PATCH | `/api/profile` | 이름·카드 끝 4자리 · `suspended`(카카오뱅크 계좌 지급정지, 연습용) | 200, 400(형식 오류) |
 | POST | `/api/accounts` | 다른 은행 계좌 추가 `{bankCode, number, balance}` | **201**, 400(자릿수), 409(중복) |
 | GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액·계좌번호 수정 | 200, 404 |
 | DELETE | `/api/accounts/:id` | 다른 은행 계좌 삭제 (카카오뱅크 통장은 거부) | **204**, 400, 404 |
@@ -316,7 +316,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 | PATCH / DELETE | `/api/payees/:id` | 이름·번호·☆ 수정 / 삭제 | 200, **204** |
 | GET | `/api/transfer/recipients?from=` | 이체 첫 화면: 내 계좌 + 최근 이체 | 200 |
 | GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 | 200, **404**(ACCOUNT_NOT_FOUND) |
-| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크) |
+| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크), 403(`ACCOUNT_SUSPENDED` — 카카오뱅크 계좌 지급정지를 켠 프로필, 화면은 `SuspendedDialog` 팝업) |
 | GET | `/api/transfers?from=` | 내가 보낸 이체 기록 (입금 거래에 붙인 보낸 분 기록은 뺌) | 200 |
 | POST | `/api/reset` | 초기 데이터로 | 204 |
 
