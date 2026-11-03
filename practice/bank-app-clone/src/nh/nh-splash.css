@@ -5,12 +5,6 @@
 .nh-splash__px {
   transform-origin: 0 0;
 }
-/* 녹화와 같은 배율(1dp = 1.25 기기 px)이면 잘라 온 픽셀 그대로 */
-@media (resolution: 1.25dppx) {
-  .nh-splash__px img {
-    image-rendering: pixelated;
-  }
-}
 
 /* "금융, 정보, 쇼핑을 한 번에" (녹화 잉크 x 125–355, y 380–403) */
 .nh-splash__tag {

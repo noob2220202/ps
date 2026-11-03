@@ -197,14 +197,6 @@
   color: var(--nh-purple);
 }
 
-/* 녹화(480px = 1.25배)에서 잘라 온 그림: 1.25배 화면에선 기기 픽셀에 1:1로 (부드럽게 다시 뽑으면 흐려짐).
-   translate 는 1 CSS px 단위로 놓이는 자리를 녹화에서 자른 자리(캐릭터 x 176, 확성기 x 28 px)에 맞춘 것 */
-@media (resolution: 1.25dppx) {
-  .nh-reg .nh-img {
-    image-rendering: pixelated;
-  }
-}
-
 /* 아래 버튼 글자: 공용 버튼보다 조금 위 (녹화2 62.5 '취소'·'다음' 잉크 중심 y 982.7 px) */
 .nh-reg .nh-bottom .nh-btn {
   padding-bottom: 1.2px;

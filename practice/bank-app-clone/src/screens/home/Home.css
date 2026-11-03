@@ -537,9 +537,12 @@
   font-size: 10.5px;
   color: var(--home-sub);
 }
+/* 출처 로고: 광고 카드(#f7f7f7) 위 흰 네모 타일 째 (원본 72.6~96 × 1212~1235.1px).
+   예전 16px 틀(원본 68~100px)과 같은 자리 → 양옆 여백으로 뒤 글자 위치 유지 */
 .native-ad__logo {
-  width: 16px;
-  height: auto;
+  width: 11.7px;
+  height: 11.55px;
+  margin: 0 2px 0 2.3px;
 }
 .native-ad__image {
   border-radius: 6px;

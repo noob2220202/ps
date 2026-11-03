@@ -150,12 +150,6 @@
   text-align: center;
   word-break: break-all; /* "아이엠뱅크(대 / 구은행)", "뱅크오브아메리 / 카" 처럼 글자 단위로 줄바꿈 */
 }
-/* 녹화(480px = 1.25배)에서 그대로 잘라 온 45px 아이콘(36dp): 1.25배 화면에선 기기 픽셀에 1:1로 (부드럽게 다시 뽑으면 반 픽셀 밀려 흐려짐) */
-@media (resolution: 1.25dppx) {
-  .nh-banks__grid .nh-bank-sq {
-    image-rendering: pixelated;
-  }
-}
 .nh-bank-sq {
   display: block;
   flex-shrink: 0;

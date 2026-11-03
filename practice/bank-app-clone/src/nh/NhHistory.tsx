@@ -144,7 +144,8 @@ function InfoIcon() {
 
 // 잘라 온 그림을 SVG <image>로: <img>는 그리는 상자가 CSS px 정수로 반올림돼 다시 샘플링(흐려짐)되지만
 // SVG 안 좌표는 반올림되지 않아 기기 px에 1:1로 놓을 수 있음 (x·y는 기기 px 격자에 맞춘 미세 보정)
-function CrispImg({ name, w, h, x = 0, y = 0, className, fallback }: { name: string; w: number; h: number; x?: number; y?: number; className: string; fallback: ReactNode }) {
+// ink: 그림 파일이 잉크 상자만큼 잘려 있을 때 그 상자 [x, y, 폭, 높이] (w × h 자리 기준, x·y 이동 전)
+function CrispImg({ name, w, h, x = 0, y = 0, ink, className, fallback }: { name: string; w: number; h: number; x?: number; y?: number; ink?: readonly [number, number, number, number]; className: string; fallback: ReactNode }) {
   const src = localAsset(name);
   if (!src)
     return (
@@ -152,9 +153,10 @@ function CrispImg({ name, w, h, x = 0, y = 0, className, fallback }: { name: str
         {fallback}
       </span>
     );
+  const [ix, iy, iw, ih] = ink ?? [0, 0, w, h];
   return (
     <svg className={`nh-img nh-hist-img ${className}`} width={w} height={h} aria-hidden>
-      <image href={src} x={x} y={y} width={w} height={h} />
+      <image href={src} x={x + ix} y={y + iy} width={iw} height={ih} />
     </svg>
   );
 }
@@ -342,7 +344,7 @@ function HistoryScreen({ accountId }: { accountId: string }) {
         ) : missing ? null : (
           <>
             <div className="nh-hist__acct">
-              <CrispImg name="nh-history-acct" w={40.5333} h={41.0667} x={-0.4} y={-0.1333} className="nh-hist__icon" fallback={<span>🟡</span>} />
+              <CrispImg name="nh-history-acct" w={40.5333} h={41.0667} x={-0.4} y={-0.1333} ink={[0, 2.003, 39.866, 39.067]} className="nh-hist__icon" fallback={<span>🟡</span>} />
               <span className="nh-hist__name">
                 <b>{a?.label ?? " "}</b>
                 <button onClick={openPicker}>
@@ -398,7 +400,7 @@ function HistoryScreen({ accountId }: { accountId: string }) {
             <div className="nh-hist__chips">
               <button className="send" onClick={() => goLoad(`/send?from=${accountId}`)}>
                 <Hairline className="nh-hist__sendline" />
-                <CrispImg name="nh-history-coin" w={23.4667} h={23.4667} x={0.2} y={0.2} className="nh-hist__coin" fallback={<span>🪙</span>} />
+                <CrispImg name="nh-history-coin" w={23.4667} h={23.4667} x={0.2} y={0.2} ink={[1.676, 1.676, 19.447, 19.447]} className="nh-hist__coin" fallback={<span>🪙</span>} />
                 <span>송금</span>
               </button>
               <button className={filter === "out" ? "on" : ""} aria-pressed={filter === "out"} onClick={() => setFilter((f) => (f === "out" ? "all" : "out"))}>

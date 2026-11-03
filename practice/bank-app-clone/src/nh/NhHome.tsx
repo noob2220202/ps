@@ -15,7 +15,8 @@ import { useNhStatusBar } from "./theme";
 //   맨 위: 큰글 스위치 + MY·검색·알림·메뉴 / NH농협·다른금융 탭, 전체계좌 > / 계좌 카드(옆으로 넘김) / 등록계좌 ⌄
 //   콕추천(가로 카드) / 광고 배너(3초마다 넘어감, n/9 ⏸ 전체보기 >) / 금융상품 / 마이데이터 / 아래 탭바
 // 아래로 스크롤하면 위 계좌 영역이 작은 카드(번호 ⌄, 잔액 [송금])로 접혀 위에 붙고, 탭바는 숨고 ↑ 버튼이 나옴.
-// 그림은 scripts/nh-crops/home-general.py 가 녹화에서 자른 nh-gh-*.png (흰 카드 안 그림이라 바탕 흰색 그대로)
+// 그림은 녹화에서 자른 nh-gh-*.png (scripts/nh-crops/home-general.py 를 4배로 키워 다시 만듦). 흰 카드 안 그림이라 바탕은 정확히 흰색,
+// 둘레 흰 여백은 잘라 냈고 자리(at)는 잉크 상자 그대로
 
 // 콕추천 카드 9장 (녹화: 1번 MY 소비 다이어리, 2번 공공…, 9번 동전 손. 공식 사진: 준조합원 가입, 고향사랑…, 클로버(AD)).
 // 나머지 글은 추측
@@ -169,25 +170,25 @@ const TILES: {
     sub: "방방콕콕",
     title: "황금쌀 찾기",
     img: "nh-gh-tile-rice",
-    at: [130.4, 1245.6, 44, 34.4],
+    at: [130.4, 1246, 44, 34],
   },
   {
     sub: "한정수량!",
     title: "특판상품",
     img: "nh-gh-tile-sale",
-    at: [308.4, 1245.6, 37.6, 37.6],
+    at: [309.6, 1246.2, 36, 36.2],
   },
   {
     sub: "내게 딱맞는!",
     title: "예·적금 찾기",
     img: "nh-gh-tile-target",
-    at: [133.6, 1381.6, 37.6, 37.6],
+    at: [134.2, 1381.6, 37, 37.6],
   },
   {
     sub: "안전한 재테크",
     title: "금융상품몰",
     img: "nh-gh-tile-mall",
-    at: [304.4, 1380.8, 44, 39.2],
+    at: [305, 1380.8, 43.4, 39.2],
   },
 ];
 
@@ -287,7 +288,7 @@ export function NhHome() {
             <button className="nh-gh__wcard nh-gh__notice">
               <Img
                 name="nh-gh-fin-notice"
-                at={[43.2, 827.6, 52.8, 47.2]}
+                at={[43.8, 828.8, 52.2, 45.4]}
                 base={[24, 800.8]}
               />
               <b>농협 생활 백서</b>
@@ -321,7 +322,7 @@ export function NhHome() {
               </span>
               <Img
                 name="nh-gh-mydata"
-                at={[273.2, 1528, 63.2, 64]}
+                at={[274.4, 1527, 56.8, 55.8]}
                 base={[24, 1493.6]}
               />
             </button>
@@ -576,11 +577,11 @@ function RecCarousel() {
   );
 }
 const REC_STEP = 248 + 16;
-// 콕추천 그림 자리 (카드 왼쪽 위 기준 dp): 녹화에서 자른 자리
+// 콕추천 그림 자리 (카드 왼쪽 위 기준 dp): 녹화에서 자른 그림의 잉크 상자
 const REC_IMG: Record<string, [number, number, number, number]> = {
-  "nh-gh-rec-diary": [238 - 68, 452.4 - 410.4, 68, 64],
-  "nh-gh-rec-tax": [160, 32, 74.5, 53],
-  "nh-gh-rec-coin": [248 - 48, 454.8 - 410.4, 48, 54.4],
+  "nh-gh-rec-diary": [170, 43.2, 67.6, 62.8],
+  "nh-gh-rec-tax": [160.63, 32.63, 73.24, 52.4],
+  "nh-gh-rec-coin": [200, 44.4, 48, 54.4],
 };
 function RecImg({ name }: { name: string }) {
   const [x, y, w, h] = REC_IMG[name];
@@ -665,17 +666,17 @@ function Banners() {
     </>
   );
 }
-// 배너 그림 자리 (녹화 페이지 dp: x, y, 폭, 높이) — home-general.py 출력
+// 배너 그림 자리 (녹화 페이지 dp: x, y, 폭, 높이) — 잉크 상자 (글자 잔상을 지우고 흰 여백을 잘라 낸 뒤)
 const BANNER_IMG: Record<string, [number, number, number, number]> = {
-  "nh-gh-banner-1": [196.8, 568.2, 163.2, 116],
-  "nh-gh-banner-2": [220.8, 568.2, 139.2, 105.6],
-  "nh-gh-banner-3": [230.4, 568.2, 129.6, 104.8],
-  "nh-gh-banner-4": [196, 568.2, 164, 100],
-  "nh-gh-banner-5": [198.4, 553, 161.6, 131.2],
-  "nh-gh-banner-6": [197.6, 568.2, 162.4, 116],
-  "nh-gh-banner-7": [244.8, 561, 115.2, 116],
-  "nh-gh-banner-8": [196, 568.2, 164, 100],
-  "nh-gh-banner-9": [196, 568.2, 164, 101.6],
+  "nh-gh-banner-1": [217.2, 601.4, 142.8, 83.6],
+  "nh-gh-banner-2": [222, 566.4, 121.4, 107.6],
+  "nh-gh-banner-3": [231.6, 567.2, 127.8, 110],
+  "nh-gh-banner-4": [249.2, 577.6, 84, 82.2],
+  "nh-gh-banner-5": [196.4, 552.8, 163.6, 132.2],
+  "nh-gh-banner-6": [217.2, 566.2, 142.8, 118.8],
+  "nh-gh-banner-7": [196, 561.6, 164, 114.2],
+  "nh-gh-banner-8": [249.4, 577.6, 77.4, 83.6],
+  "nh-gh-banner-9": [234.8, 569.4, 107, 101.4],
 };
 
 // 금융상품 큰 카드 + 점 4개 (손으로 넘김)
@@ -704,7 +705,7 @@ function Savings() {
             <span className="nh-gh__saving-name">{s.name}</span>
             <Img
               name="nh-gh-fin-saving"
-              at={[237.6, 1017.2, 111.2, 97.6]}
+              at={[239, 1017, 110, 98.8]}
               base={[24, 920.8]}
             />
           </button>

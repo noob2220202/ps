@@ -1,5 +1,5 @@
 These images are from Microsoft Fluent Emoji (https://github.com/microsoft/fluentui-emoji),
-resized to 128x128.
+the original 256x256 "3D" PNGs (unchanged).
 
 MIT License
 

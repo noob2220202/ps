@@ -546,14 +546,6 @@
     opacity: 0;
   }
 }
-/* 스크린샷(720px = 1.875배)에서 그대로 잘라 온 그림: 1.875배 화면에선 기기 픽셀에 1:1로 (부드럽게 다시 뽑으면 흐려짐) */
-@media (resolution: 1.875dppx) {
-  .nh-acard__icon,
-  .nh-arow__icon,
-  .nh-acard__ball > .nh-img {
-    image-rendering: pixelated;
-  }
-}
 .nh-acard__ball i {
   position: absolute;
   top: 23.07px;

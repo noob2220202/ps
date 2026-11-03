@@ -24,6 +24,13 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 const HOME = { show: 566, lift: 56 };
 
+// 메시지 보내기 타일 그림은 판(둥근 사각)만큼 잘려 있음: 51.2 자리 안의 판 상자 [x, y, 폭, 높이]
+const MSG_INK = {
+  card: [1.8, 1.2, 48.2, 47.8],
+  kakao: [1.8, 1.2, 47.8, 48],
+  mms: [1.6, 1.2, 47.8, 48],
+} as const;
+
 export function NhDone() {
   const navigate = useNavigate();
   const go = useNhGo(); // 누르면 점 3개 로딩 후 이동
@@ -127,7 +134,7 @@ export function NhDone() {
             ] as const
           ).map(([k, label]) => (
             <button key={k}>
-              <NhImg name={nhPic(`nh-msg-${k}`)} w={51.2} h={51.2} fallback={<span>💬</span>} />
+              <NhImg name={nhPic(`nh-msg-${k}`)} w={51.2} h={51.2} ink={MSG_INK[k]} fallback={<span>💬</span>} />
               {label}
             </button>
           ))}

@@ -4,7 +4,8 @@ import { KakaoCircle } from "./art";
 
 // 다른 은행 아이콘. src/assets/local/bank-<code>.png 가 있으면 그 로고를,
 // 없으면 은행 대표색 원 + 짧은 이름을 그린다 (로고는 상표라 저장소엔 안 넣음).
-// DB증권처럼 흰 바탕 아이콘도 있어서 흰 바탕 + 아주 옅은 테두리를 깔아 원 모양을 유지한다.
+// 로고 그림은 원이 캔버스에 꽉 찬 144px (가장자리 바탕 번짐 없음) → 흰 바탕을 깔면 어두운 화면에서 흰 테두리가 비쳐서 안 깜.
+// DB증권처럼 흰 원 아이콘은 아주 옅은 테두리로 원 모양을 유지 (실제 앱도 아이콘마다 옅은 테두리).
 // (outline은 내용 위에 그려지므로 이미지 가장자리에도 보인다. box-shadow inset은 이미지에 가려짐)
 export function BankIcon({ bank, size = 34 }: { bank: Bank; size?: number }) {
   const logo = localAsset(`bank-${bank.code}`);
@@ -18,7 +19,6 @@ export function BankIcon({ bank, size = 34 }: { bank: Bank; size?: number }) {
         style={{
           borderRadius: "50%",
           flexShrink: 0,
-          background: "#fff",
           outline: "1px solid rgba(0, 0, 0, 0.07)",
           outlineOffset: -1,
         }}

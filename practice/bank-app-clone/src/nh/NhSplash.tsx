@@ -68,40 +68,40 @@ export function NhSplash({ onDone }: { onDone: () => void }) {
 
   return (
     <div className={`screen nh nh-splash nh-splash--${phase}`}>
-      {/* 어두운 화면 (흰 창 아래에 미리 깔아 둠). 그림은 녹화(480px)에서 잘라 온 자리 그대로 */}
-      <Px at={[196, 108]} top={28}>
-        <NhImg name="nh-nonghyup" w={88} h={54} fallback={null} />
+      {/* 어두운 화면 (흰 창 아래에 미리 깔아 둠). 그림은 녹화(480px)에서 잘라 4배로 키운 것, 자리는 잉크 상자 (녹화 px) */}
+      <Px at={[201.5, 114.25]} top={28}>
+        <NhImg name="nh-nonghyup" w={77.25} h={42.5} fallback={null} />
       </Px>
       <p className="nh-splash__tag">
         금융, 정보, 쇼핑을 <b>한 번에</b>
       </p>
       <Px
-        at={[118, 430]}
+        at={[124.75, 437]}
         top={28}
         className="nh-splash__word nh-splash__word--nh"
       >
-        <NhImg name="nh-wordmark-nh" w={88} h={48} fallback={<b>NH</b>} />
+        <NhImg name="nh-wordmark-nh" w={76} h={32.75} fallback={<b>NH</b>} />
       </Px>
       <Px
-        at={[206, 412]}
+        at={[213.75, 419.25]}
         top={28}
         className="nh-splash__word nh-splash__word--kok"
       >
-        <NhImg name="nh-wordmark-kok" w={73} h={86} fallback={<b>콕</b>} />
+        <NhImg name="nh-wordmark-kok" w={57.75} h={71.5} fallback={<b>콕</b>} />
       </Px>
       <Px
-        at={[279, 427]}
+        at={[285, 433.75]}
         top={28}
         className="nh-splash__word nh-splash__word--bank"
       >
-        <NhImg name="nh-wordmark-bank" w={83} h={56} fallback={<b>뱅크</b>} />
+        <NhImg name="nh-wordmark-bank" w={70.5} h={42.25} fallback={<b>뱅크</b>} />
       </Px>
       {/* 점 3개: 로딩 막과 같은 자리 (상태바 아래~제스처바 위의 가운데에서 0.8 위) */}
       <span className="nh-splash__dots">
         <NhDots />
       </span>
-      <Px at={[196, 894]} top={28}>
-        <NhImg name="nh-ma" w={88} h={60} fallback={null} />
+      <Px at={[201.75, 899.75]} top={28}>
+        <NhImg name="nh-ma" w={76.75} h={48.5} fallback={null} />
       </Px>
       {(phase === "launch" || phase === "white" || phase === "fade") && (
         <Launch phase={phase} />
@@ -146,7 +146,7 @@ function Launch({ phase }: { phase: "launch" | "white" | "fade" }) {
 
 const S = 1.25; // 녹화 px / dp
 
-// 녹화(480px)에서 잘라 온 그림(안의 NhImg w/h = 그림 px)을 녹화 px 자리 (x, y)에 정확히: 정수 CSS px + translate + scale(0.8)
+// 녹화(480px)에서 잘라 온 그림(안의 NhImg w/h = 녹화 px 크기)을 녹화 px 자리 (x, y)에 정확히: 정수 CSS px + translate + scale(0.8)
 // top: 부모 상자의 화면 위 위치(dp), origin: 부모가 이미 옮겨 둔 만큼(dp)
 function Px({
   at: [x, y],

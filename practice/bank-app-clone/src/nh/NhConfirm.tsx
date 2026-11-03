@@ -153,7 +153,7 @@ export function NhConfirm() {
       </div>
 
       <Sheet open={verify} onClose={() => setVerify(false)} kind="nhverify" className="nh-vf">
-        <NhImg name={nhPic("nh-shield")} w={46.4} h={52.8} className="nh-vf__shield" fallback={<span style={{ fontSize: 36 }}>🛡️</span>} />
+        <NhImg name={nhPic("nh-shield")} w={46.4} h={52.8} ink={[1, 1, 43.73, 49.79]} className="nh-vf__shield" fallback={<span style={{ fontSize: 36 }}>🛡️</span>} />
         <h2 className="nh-vf__title">
           받는 분이 맞는지
           <br />

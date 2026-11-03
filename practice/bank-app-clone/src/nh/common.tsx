@@ -7,12 +7,19 @@ import "./nh.css";
 
 // 콕뱅크 화면들이 같이 쓰는 조각. 이미지는 src/assets/local/nh-*.png (scripts/extract-nh.py) 가 있으면 그걸, 없으면 대체 그림
 
-export function NhImg({ name, w, h, fallback, className = "" }: { name: string; w: number; h?: number; fallback: ReactNode; className?: string }) {
+// ink: 그림 파일이 잉크 상자만큼만 잘려 있을 때 그 상자 [x, y, 폭, 높이] (w × h 자리 안에서). 자리 크기·위치는 그대로
+export function NhImg({ name, w, h, fallback, className = "", ink }: { name: string; w: number; h?: number; fallback: ReactNode; className?: string; ink?: readonly [number, number, number, number] }) {
   const src = localAsset(name);
   if (!src)
     return (
       <span className={`nh-img nh-img--fallback ${className}`} style={{ width: w, height: h ?? w }}>
         {fallback}
+      </span>
+    );
+  if (ink)
+    return (
+      <span className={`nh-img nh-img--ink ${className}`} style={{ width: w, height: h ?? w }}>
+        <img src={src} alt="" style={{ left: ink[0], top: ink[1], width: ink[2], height: ink[3] }} draggable={false} />
       </span>
     );
   return <img className={`nh-img ${className}`} src={src} alt="" width={w} height={h} draggable={false} />;
@@ -45,13 +52,17 @@ export function NhAppIcon({ size = 46 }: { size?: number }) {
 }
 
 // 노란 농협 계좌 아이콘 (+ 대표계좌 별). plain: 별 없는 것 (콕송금 출금계좌)
+// nh-account.png 는 잉크 상자만큼 잘려 있음: 29 자리 안에서 x 1, y 1.667, 28 × 27.333
 export function NhAccountIcon({ size = 26, plain = false }: { size?: number; plain?: boolean }) {
+  const usePlain = plain && !!localAsset("nh-account-plain");
+  const k = size / 29;
   return (
     <NhImg
-      name={plain && localAsset("nh-account-plain") ? "nh-account-plain" : "nh-account"}
+      name={usePlain ? "nh-account-plain" : "nh-account"}
       w={size}
       h={size}
       className="nh-account-icon"
+      ink={usePlain ? undefined : [1 * k, 1.667 * k, 28 * k, 27.333 * k]}
       fallback={<span style={{ fontSize: size * 0.55 }}>🟡</span>}
     />
   );

@@ -90,9 +90,12 @@
   transform: none;
 }
 
+/* 앨범 로고: 녹화 멈춘 구간 평균을 4배로 키워 윤곽을 딴 벡터(album-logo.svg, 잉크에 꼭 맞음).
+   실제 크기 = 녹화 잉크 128.75 × 35.75px × 0.75. 예전 그림 틀(104 × 37.24) 가운데 그대로라 아래 글자 위치는 안 바뀜 */
 .splash__ad-logo {
-  width: 104px; /* 원본(영상) 로고 폭 128px × 0.75 + 살짝 */
-  height: auto;
+  width: 96.56px;
+  height: 26.81px;
+  margin: 4.95px 4.33px 5.48px 3.1px;
 }
 .splash__ad-text {
   margin: 12px 0 14px;

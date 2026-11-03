@@ -181,7 +181,7 @@ function EmptyCard({ shop, onShop }: { shop: string; onShop: () => void }) {
   return (
     <div className="nh-acard nh-acard--empty">
       <span className="nh-acard__ball">
-        <NhImg name="nh-accounts-more" w={51.2} h={51.2} fallback={<span />} />
+        <NhImg name="nh-accounts-more" w={51.2} h={51.2} ink={[1.6, 1.6, 48, 48]} fallback={<span />} />
         <i />
         <i />
         <i />
@@ -209,6 +209,7 @@ function AcctIcon({
       name="nh-accounts-acct"
       w={42.67}
       h={41.6}
+      ink={[1, 1, 40.03, 38.94]}
       className={className}
       fallback={<span>🟡</span>}
     />
@@ -659,6 +660,7 @@ export function NhRegister() {
               name="nh-register-char"
               w={104}
               h={89.6}
+              ink={[3.33, 3, 97.33, 83.27]}
               className="nh-reg__char"
               fallback={<span />}
             />
@@ -688,6 +690,7 @@ export function NhRegister() {
               name={nhPic("nh-register-notice")}
               w={24}
               h={24.8}
+              ink={[1, 1.34, 21, 21.78]}
               fallback={<span>📢</span>}
             />
             <b>확인하세요</b>

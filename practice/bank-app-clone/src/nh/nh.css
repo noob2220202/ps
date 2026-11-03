@@ -40,6 +40,14 @@
   flex-shrink: 0;
   object-fit: contain;
 }
+/* 잉크 상자만큼 잘린 그림: 자리는 그대로 두고 그 안에 그림만 제자리에 */
+.nh-img--ink {
+  position: relative;
+}
+.nh-img--ink > img {
+  position: absolute;
+  display: block;
+}
 .nh-img--fallback {
   display: grid;
   place-items: center;

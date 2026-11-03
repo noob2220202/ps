@@ -142,3 +142,77 @@
   width: 97px;
   height: 58px;
 }
+
+/* ---------- 실제 그림의 칸 안 위치 ----------
+   그림은 잉크(보이는 부분)에 맞춰 여백 없이 잘라 3배 해상도로 만들었다 (스크린샷 720px = 1dp 2px → 원본 px × 1.5).
+   그래서 칸(span) 크기는 그대로 두고, 그림을 원래 보이던 자리에 절대 위치로 놓는다. 값 = (원본 좌표 − 예전 그림 원점) ÷ 2 */
+.asset--tmoney.asset--local > img,
+.asset--banner-mcard.asset--local > img,
+.asset--banner-pcbang.asset--local > img,
+.asset--banner-friday.asset--local > img,
+.asset--shortcut-subsidy.asset--local > img,
+.asset--shortcut-timetable.asset--local > img,
+.asset--shortcut-allowance.asset--local > img,
+.asset--shortcut-coupon.asset--local > img,
+.asset--friends.asset--local > img {
+  position: absolute;
+  object-fit: fill;
+}
+/* 티머니 T: 실제 앱처럼 34dp 회색 원 가운데에 실제 크기(원본 30 × 32.5px)로 (예전엔 T 를 원 크기로 키워 두 배 크게 보였음) */
+.asset--tmoney.asset--local > img {
+  left: 9.88px;
+  top: 9.13px;
+  width: 15.06px;
+  height: 16.25px;
+}
+/* 배너 그림 셋: 예전 98×77 칸(원본 453,258 에서 196×154 로 자른 틀) 안 잉크 위치 */
+.asset--banner-mcard.asset--local > img {
+  left: 16px;
+  top: 14.33px;
+  width: 71.33px;
+  height: 56px;
+}
+.asset--banner-pcbang.asset--local > img {
+  left: 20px;
+  top: 5px;
+  width: 69.67px;
+  height: 71.33px;
+}
+.asset--banner-friday.asset--local > img {
+  left: 2.67px;
+  top: 7px;
+  width: 94px;
+  height: 63.33px;
+}
+/* 바로가기 넷: 실제 크기(원본 px ÷ 2), 예전 잉크 가운데에 (예전엔 정사각 틀을 27px 로 맞춰서 정부지원금은 7% 작고 용돈은 4% 컸음) */
+.asset--shortcut-subsidy.asset--local > img {
+  left: 0.67px;
+  top: 0.63px;
+  width: 25.67px;
+  height: 26.67px;
+}
+.asset--shortcut-timetable.asset--local > img {
+  left: 1.33px;
+  top: 1.67px;
+  width: 25px;
+  height: 24.33px;
+}
+.asset--shortcut-allowance.asset--local > img {
+  left: 2.17px;
+  top: 2.17px;
+  width: 23px;
+  height: 23px;
+}
+.asset--shortcut-coupon.asset--local > img {
+  left: 1.33px;
+  top: 4px;
+  width: 24.67px;
+  height: 19.33px;
+}
+/* 계좌 상세 캐릭터: 녹화(480px)에서 연보라 바탕을 걷어 낸 그림. 아래 끝은 말풍선 바로 위에서 잘림(칸 밖은 안 보임) */
+.asset--friends.asset--local > img {
+  left: 12.26px;
+  top: 11.05px;
+  width: 146.67px;
+  height: 99.79px;
+}
