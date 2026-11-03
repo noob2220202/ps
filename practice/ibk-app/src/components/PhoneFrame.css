@@ -323,7 +323,8 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
 }
 /* 녹화 인트로가 도는 동안: 영상 속 시계는 지워 둠(scripts/intro-erase-clock.py) → 우리 상태바를 영상(z 999) 위로 올려 시각만 그림
    (지금 시각이 찍히게). 알림·캠코더·LTE·배터리는 영상에 그대로 있으니 숨기고, 바탕은 비워서 영상이 보이게.
-   영상 끝 무렵 영상 글자처럼 흐려졌다가(79·80번째 장면) 진한 회색(81번째부터) — recorder.ts INTRO_FADE_AT · INTRO_DARK_AT */
+   글자는 영상 속 글자처럼: 압축으로 살짝 흐리고 순백이 아님 (#f0f0f0 + blur 0.4px — 원본 '10:00' 과 겹쳐 잰 차이 17.2 → 7.1 / 255).
+   영상 끝 무렵은 영상 글자처럼 79 · 80번째 장면 흐려짐, 81 반쯤 어두움, 82~ 진한 글자 (장면마다 겹쳐 고른 값, recorder.ts introClockStep) */
 html[data-intro-play] .phone > .statusbar {
   z-index: 1000;
   background: transparent !important;
@@ -332,14 +333,23 @@ html[data-intro-play] .phone > .statusbar {
 html[data-intro-play] .phone > .statusbar .statusbar__right--ibk {
   visibility: hidden;
 }
-html[data-intro-play="on"] .phone > .statusbar .statusbar__time {
-  color: #ffffff;
+html[data-intro-play] .phone > .statusbar .statusbar__time {
+  color: #f0f0f0;
+  filter: blur(0.4px);
 }
-html[data-intro-play="fade"] .phone > .statusbar .statusbar__time {
-  color: rgba(255, 255, 255, 0.2);
+html[data-intro-play="f79"] .phone > .statusbar .statusbar__time {
+  color: rgba(240, 240, 240, 0.15);
+}
+html[data-intro-play="f80"] .phone > .statusbar .statusbar__time {
+  color: rgba(240, 240, 240, 0.1);
+}
+html[data-intro-play="f81"] .phone > .statusbar .statusbar__time {
+  color: rgba(20, 15, 15, 0.6);
+  filter: blur(1px);
 }
 html[data-intro-play="dark"] .phone > .statusbar .statusbar__time {
-  color: #3a3a3a;
+  color: rgba(25, 12, 12, 0.7);
+  filter: blur(0.8px);
 }
 .ibk-sb-pct {
   position: absolute;

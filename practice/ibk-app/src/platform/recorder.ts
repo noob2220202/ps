@@ -17,9 +17,11 @@ import introSrc from "../assets/intro/ibk-open-intro.mp4";
 // 인트로 재생 전에 이 값으로 맞춰 둔다. 시계는 영상에서 지워 두고(scripts/intro-erase-clock.py) 영상이 도는 동안 우리 상태바의
 // 시각을 영상 위로 올려 그림 (PhoneFrame.css [data-intro-play]) → 녹화에 지금 시각이 찍힘
 const INTRO_BATTERY = 38;
-// 영상 속 상태바 글자가 앱 쪽 색으로 바뀌는 장면: 79번째(2.633초)부터 흐려지고 81번째(2.700초)부터 진한 회색
-const INTRO_FADE_AT = 79 / 30;
-const INTRO_DARK_AT = 81 / 30;
+// 영상 속 상태바 글자가 앱 쪽 색으로 바뀌는 장면 (30fps 장면 번호): 79 · 80 흐려짐, 81 반쯤 어두움, 82~ 진한 글자 → PhoneFrame.css 단계별 색
+const introClockStep = (t: number) => {
+  const n = Math.floor(t * 30 + 0.01);
+  return n >= 82 ? "dark" : n >= 79 ? `f${n}` : "on";
+};
 // 영상이 끝나는 순간(2.80초) 상태바 캠코더 표시는 2.55초에 켜져서 0.25초째 켜져 있는 중
 const INTRO_BLINK_ON_MS = 250;
 
@@ -236,9 +238,9 @@ function playIntro(target: HTMLElement) {
     };
     video.addEventListener("ended", done, { once: true });
     video.addEventListener("error", done, { once: true });
-    // 영상이 덮는 동안 우리 상태바 시각을 영상 위에 (흰색 → 영상 끝 무렵 영상 글자처럼 흐려졌다가 진한 회색)
+    // 영상이 덮는 동안 우리 상태바 시각을 영상 위에 (흰색 → 영상 끝 무렵 영상 글자처럼 흐려졌다가 진한 글자)
     d.introPlay = "on";
-    const step = (t: number) => (d.introPlay = t >= INTRO_DARK_AT ? "dark" : t >= INTRO_FADE_AT ? "fade" : "on");
+    const step = (t: number) => (d.introPlay = introClockStep(t));
     const onFrame = (_now: number, meta: { mediaTime: number }) => {
       if (!d.introPlay) return;
       step(meta.mediaTime);
