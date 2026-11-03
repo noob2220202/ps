@@ -12,6 +12,9 @@
 앱스토어 스크린샷(1242×2688, 밝은 모드, 1 dp ≈ 1.888 px)에서: 콕추천 '준조합원 가입' 그림
 화면 위치(dp)는 아래 표에 적은 값. 필요: ffmpeg, Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse, os, subprocess, tempfile
 import numpy as np
 from PIL import Image

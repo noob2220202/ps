@@ -48,5 +48,10 @@ export function useNow() {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
+  // 시각을 바꾸면(관리 패널) 다음 1초를 기다리지 않고 바로 — 녹화 첫 장면에 예전 분이 찍히지 않게
+  useEffect(() => {
+    const t = setTimeout(() => setNow(Date.now()));
+    return () => clearTimeout(t);
+  }, [offset]);
   return new Date(now + (offset ?? 0));
 }

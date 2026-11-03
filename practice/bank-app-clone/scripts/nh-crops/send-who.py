@@ -8,6 +8,9 @@
 - 바탕(시트 #28333e / 페이지 #17161b)이 보이는 네 모서리는 둥근 사각형 마스크로 투명하게 하고, 경계 픽셀은 바탕색을 빼서 원래 색으로 되돌림.
 필요: ffmpeg, Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import subprocess
 import sys
 import tempfile

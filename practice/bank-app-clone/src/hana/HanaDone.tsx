@@ -6,6 +6,7 @@ import { hanaBankName, hanaNumber, nf } from "./bank";
 import { ChevronDown, HanaHeader, HomeIcon, StarIcon } from "./common";
 import type { HanaDoneState } from "./HanaSend";
 import { useHanaStatusBar } from "./theme";
+import { ibkToFirst, useIbkBackHandler } from "../ibk/nav";
 import "./hana-done.css";
 
 // 이체 완료 (라이트 녹화 41~48초): 초록 체크(연민트 원)가 그려지고 "지역농축협 ○○○ 님에게 1원을 이체했어요".
@@ -17,6 +18,12 @@ export function HanaDone() {
   const [star, setStar] = useState(!!state?.result.to.favorite); // 이미 자주쓰는 계좌면 켜진 채로
   const [notice, setNotice] = useState<string | null>(null);
   useHanaStatusBar();
+  // 홈 · 거래내역 · 뒤로: 이체 칸들을 기록 첫 칸(홈)까지 걷고 가기 (예전엔 replace 라 그 아래 '누구에게 보낼까요?' 가 남아 뒤로 하면 다시 떴음)
+  const leave = async (to?: string) => {
+    if (!(await ibkToFirst())) navigate("/", { replace: true });
+    if (to) navigate(to);
+  };
+  useIbkBackHandler(!!state, () => void leave());
   if (!state) return <Navigate to="/" replace />;
   const { result, fromNumber, memoTo, memoMe } = state;
   const to = result.to;
@@ -29,7 +36,7 @@ export function HanaDone() {
     <div className="screen hana hana-done">
       <HanaHeader
         right={
-          <button className="hana-header__icon" onClick={() => navigate("/", { replace: true })} aria-label="홈">
+          <button className="hana-header__icon" onClick={() => void leave()} aria-label="홈">
             <HomeIcon />
           </button>
         }
@@ -110,7 +117,7 @@ export function HanaDone() {
         <button className="hana-btn hd-share" onClick={() => {}}>
           공유
         </button>
-        <button className="hana-btn" onClick={() => navigate(`/history/${result.fromAccountId}`, { replace: true })}>
+        <button className="hana-btn" onClick={() => void leave(`/history/${result.fromAccountId}`)}>
           거래내역 조회
         </button>
       </div>

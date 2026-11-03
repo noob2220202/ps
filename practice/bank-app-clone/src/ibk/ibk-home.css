@@ -484,6 +484,10 @@
   width: 35.15px;
   height: 36px;
 }
+/* i-ONE 가드 그림만 녹화보다 0.6px 왼쪽이라 오른쪽으로 (화면 반올림까지 녹화와 겹쳐 맞춘 값) */
+.ibh-tile--late3 .ibh-tile__art {
+  left: 9px;
+}
 /* + 16 × 16 선 1.6 #7a7d84, 가운데 클론 323.5 · 녹화 622.85 */
 .ibh-tile__plus {
   position: absolute;

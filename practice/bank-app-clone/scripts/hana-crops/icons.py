@@ -10,6 +10,9 @@
 위아래 색으로 메워서(hana-home-bg-light.jpg). 둘 다 상태바 아래(28dp)부터.
 필요: Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 from pathlib import Path
 

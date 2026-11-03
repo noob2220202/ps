@@ -42,7 +42,7 @@ const seenKeys = new Set<string>(); // 이미 그린 방문 기록 칸
 const CARD = { x: 18.5, y: 147 };
 const SHORTCUTS = [
   { label: "이벤트", img: "ibk-menu-gift", x: 34.81, art: [37, 163, 15.25, 16.5], pen: 59.5, tw: 35 },
-  { label: "인증/보안", img: "ibk-menu-lock", x: 105.11, art: [107.5, 161.5, 15.75, 18], pen: 130.4, tw: 51 },
+  { label: "인증/보안", img: "ibk-menu-lock", x: 105.11, art: [107.6667, 161.5, 15.6667, 18], pen: 130.4, tw: 51 },
   { label: "고객센터", img: "ibk-menu-headset", x: 190.05, art: [192.25, 161.5, 19, 17.75], pen: 216.6, tw: 45 },
   { label: "플라워", img: "ibk-menu-flower", x: 285.73, art: [287.5, 162.25, 17.25, 18], pen: 311.0, tw: 34 },
 ];

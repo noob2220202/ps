@@ -5,6 +5,7 @@ import type { TransferResult } from "../../api/types";
 import { Icon } from "../../components/icons/Icon";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { won } from "../../lib/format";
+import { ibkToFirst, useIbkBackHandler } from "../../ibk/nav";
 import "./Transfer.css";
 
 export interface DoneState {
@@ -19,11 +20,13 @@ export function TransferDoneScreen() {
   useEffect(() => {
     if (!state) navigate("/", { replace: true });
   }, [state, navigate]);
+  // 확인 · 뒤로(기기·브라우저) 둘 다: 이체 칸들을 기록 첫 칸(홈)까지 걷음 (예전엔 뒤로 하면 새 이체 화면이 떴음)
+  const close = async () => {
+    if (!(await ibkToFirst())) navigate("/", { replace: true });
+  };
+  useIbkBackHandler(!!state, close);
   if (!state) return null;
   const { to, amount } = state.result;
-
-  // 기록: 홈 → 이체 → 완료(금액 화면을 replace) 이므로 두 칸 뒤가 홈
-  const close = () => navigate(-2);
 
   return (
     <div className="screen done">

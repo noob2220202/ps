@@ -5,6 +5,9 @@
 
 화면별 정밀 이미지는 scripts/nh-crops/*.py (화면 담당별) 가 만든다. 필요: ffmpeg, Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[0]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import subprocess
 import tempfile

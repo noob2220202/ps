@@ -28,6 +28,10 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
+/* 새마을금고 원은 녹화보다 녹화 1px(57 중 1) 위에 있어서 아래로 (그림이 판에 꽉 차 PNG 안에선 못 옮김) */
+.kb-logo--mg {
+  translate: 0 1.754%;
+}
 
 /* ---------- 뼈대 (프레임 670, #eff0f3) ---------- */
 .kbs-sk {
@@ -323,10 +327,10 @@
 /* 그림은 잉크 상자로 다듬음 (녹화 169~197 × 1114.5~1145px, 1차 상자 166 · 1111 기준 +3 · +3.5) */
 .kbs-ai img {
   position: absolute;
-  left: 16.45px;
-  top: 16.47px;
-  width: 18.2px;
-  height: 19.82px;
+  left: 17.533px;
+  top: 17.332px;
+  width: 16.467px;
+  height: 18.312px;
 }
 .kbs-ai span {
   position: relative;

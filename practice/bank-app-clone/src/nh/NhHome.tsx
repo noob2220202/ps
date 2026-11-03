@@ -252,6 +252,16 @@ export function NhHome() {
                 </p>
                 <button onClick={() => go("/accounts")}>계좌 연결하기</button>
               </div>
+            ) : home.status === "error" ? (
+              // 불러오기 실패: 계좌 카드 자리에 안내 + 다시 시도 (예전엔 빈 카드만 남아 새로고침 말고는 방법이 없었음)
+              <div className="nh-gh__card nh-gh__card--empty">
+                <p>
+                  일시적인 오류가 발생했어요
+                  <br />
+                  계좌 정보를 불러오지 못했어요
+                </p>
+                <button onClick={home.retry}>다시 시도</button>
+              </div>
             ) : (
               <AccountCards
                 accounts={accounts}
@@ -400,7 +410,7 @@ export function NhHome() {
           <button key={t}>
             <i
               style={{
-                ["--m" as string]: `url(${localAsset(`nh-gh-tab-${k + 1}`) ?? ""})`,
+                ["--m" as string]: `url("${localAsset(`nh-gh-tab-${k + 1}`) ?? ""}")`, // 따옴표: 빌드 때 작은 SVG 는 data: 주소로 박혀서(작은따옴표 포함) 없으면 무효
               }}
             />
             {t}

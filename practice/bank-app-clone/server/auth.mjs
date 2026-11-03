@@ -107,7 +107,13 @@ export function readCookie(req, name = COOKIE) {
   const raw = req.headers.cookie ?? "";
   for (const part of raw.split(";")) {
     const i = part.indexOf("=");
-    if (i > 0 && part.slice(0, i).trim() === name) return decodeURIComponent(part.slice(i + 1).trim());
+    if (i > 0 && part.slice(0, i).trim() === name) {
+      try {
+        return decodeURIComponent(part.slice(i + 1).trim());
+      } catch {
+        return null; // 깨진 쿠키는 세션 없음으로 (예전엔 요청마다 500)
+      }
+    }
   }
   return null;
 }

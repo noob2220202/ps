@@ -7,6 +7,9 @@
 (멈춘 구간 평균 → Real-ESRGAN 4배 → 역투영 → 바탕 걷기). 이 녹화는 가로로 늘어나지 않음(1.0).
 이름·번호가 들어간 영역은 자르지 않음. 상자는 녹화 화면 px, 구간은 30fps 프레임 번호 (프레임 n = n/30 초, 처음부터 fps=30 으로 뽑은 번호).
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import subprocess
 import argparse
 import sys

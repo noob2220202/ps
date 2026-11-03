@@ -47,7 +47,7 @@ export function KbankCopyIcon({ color, size = 14.3 }: { color: string; size?: nu
 // 상자 = 녹화에서 잡은 원 상자 크기, 원은 가운데. 나머지는 공용 BankIcon
 export function KbankBankLogo({ bank, size }: { bank: Pick<Bank, "code" | "name" | "short" | "color"> & Partial<Bank>; size: number }) {
   const src = localAsset(`kbank-bank-${bank.code}`);
-  if (src) return <img className="kb-logo" src={src} alt={bank.name} width={size} height={size} draggable={false} />;
+  if (src) return <img className={`kb-logo kb-logo--${bank.code}`} src={src} alt={bank.name} width={size} height={size} draggable={false} />;
   return <BankIcon bank={bank as Bank} size={size} />;
 }
 

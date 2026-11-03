@@ -9,6 +9,9 @@
                              별이 덮은 오른쪽 위 모서리는 아이콘이 좌우 대칭(가운데 x 71.5px)이라 왼쪽 위를 뒤집어 채움
 - nh-history-coin.png        '송금' 칩 앞 동전 (x 66–110, y 565–609 px, 칩 안쪽 바탕도 #18171c)
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 from collections import deque
 from pathlib import Path

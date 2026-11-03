@@ -14,6 +14,9 @@
 - 동그라미 아이콘은 4배로 그린 원으로 잘라 가장자리를 부드럽게
 - 나머지는 바깥 배경만 투명하게 (누끼) → 라이트/다크 어느 배경에도 올라감
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[0]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 from collections import deque
 from pathlib import Path

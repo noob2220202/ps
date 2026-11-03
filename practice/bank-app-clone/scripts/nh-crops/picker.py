@@ -11,6 +11,9 @@
 아이콘 위치(녹화 px)는 클론 화면을 같은 스크롤로 그렸을 때의 위치이고, 실제 프레임에서 가장자리에 다시 맞춰 보정함.
 필요: ffmpeg, Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import subprocess
 import tempfile

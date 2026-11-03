@@ -227,27 +227,6 @@
   margin-top: 8px;
   color: #0012a6;
 }
-/* 연습용 무늬 (녹화에 없음): 카드 위에 옅게 비스듬히 — 글자는 그대로 읽히게 */
-.kbc-mark {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.kbc-mark p {
-  margin: 0 0 0 -180px;
-  width: 720px;
-  line-height: 58px;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(0, 18, 165, 0.07);
-  white-space: nowrap;
-  transform: rotate(-24deg);
-  transform-origin: 50% 50%;
-}
-.kbc-mark p:nth-child(even) {
-  text-indent: 150px;
-}
 
 /* ---------- 바닥 '확인': 이체 .kbs-btn 과 같음 (x 19.5~364.5 · y 723.1~779.1, 반지름 12, #0012a5, 18px 500 흰색). 누름 표시 없음 ---------- */
 .kbc-bottom {

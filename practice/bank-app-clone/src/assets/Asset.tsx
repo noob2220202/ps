@@ -17,11 +17,11 @@ import moneyBag from "./fluent/money-bag.png";
 import "./Asset.css";
 
 // 화면에 들어가는 이미지 "자리(slot)" 목록.
-// 실무에선 디자이너가 준 이미지 파일을 넣는데, 공개 저장소엔 브랜드 로고/사진을 올릴 수 없으니
-//  1) src/assets/local/<slot>.<light|dark>.png  (테마별 실제 이미지, .gitignore 처리)
-//  2) src/assets/local/<slot>.png               (테마 공통 실제 이미지)
+// 실제 이미지(브랜드 로고·사진)는 src/assets/local/ 에 (저장소가 비공개라 지금은 커밋돼 있음 — 공개로 바꿀 땐 .gitignore 로 뺌)
+//  1) src/assets/local/<slot>.<light|dark>.(png|svg|jpg)  (테마별 실제 이미지)
+//  2) src/assets/local/<slot>.(png|svg|jpg)               (테마 공통 실제 이미지)
 //  3) 아래 FALLBACK (저장소에 포함된 무료 에셋: Microsoft Fluent 3D 이모지, MIT)
-// 순서로 찾는다. 실제 이미지는 scripts/extract-assets.sh 로 화면 녹화에서 잘라 만들 수 있다.
+// 순서로 찾는다. 만든 방법은 README '이미지 에셋' · SOLUTION.md 24장 (예전 자르기 스크립트는 이미 있는 파일을 덮지 않음).
 export type Slot =
   | "hand"
   | "hand-tile"

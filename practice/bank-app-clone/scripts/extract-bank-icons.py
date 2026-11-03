@@ -13,6 +13,9 @@
 아이콘 위치는 좌표를 박아두지 않고 "흰 배경이 아닌 덩어리"를 찾아서 자동으로 잡는다.
 그래서 해상도가 조금 달라도 동작한다. 같은 은행이 여러 장에 있으면 해상도가 높은 스크린샷 것을 쓴다.
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[0]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import json
 import subprocess
 import sys

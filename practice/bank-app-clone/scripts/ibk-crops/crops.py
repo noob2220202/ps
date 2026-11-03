@@ -14,6 +14,9 @@
 상자(box)는 녹화 좌표. 화면에는 (상자 폭 / 1.0242) × 상자 높이 dp 로, 왼쪽 위는 x = (x0 − 0.35) / 1.0242 에 놓으면 위치가 맞음.
 필요: ffmpeg, torch(CPU 판), numpy, Pillow
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import json
 import subprocess

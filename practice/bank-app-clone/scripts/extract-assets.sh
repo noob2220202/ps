@@ -34,6 +34,8 @@ extract() {
   [ -n "$extra" ] && vf="$vf,$extra"
   local seek=()
   [ "$t" != "-" ] && seek=(-ss "$t")
+  # 이미 있는 에셋은 건너뜀 (2026-11 검수에서 다시 만든 그림을 옛 자르기로 덮지 않게) — 덮어쓰려면 FORCE=1
+  if [ -e "$OUT/$name" ] && [ "${FORCE:-}" != 1 ]; then echo "건너뜀 (이미 있음): $name"; return; fi
   ffmpeg -v error -y "${seek[@]}" -i "$input" -frames:v 1 -vf "$vf" "$OUT/$name"
   echo "  ✓ $name"
 }

@@ -16,6 +16,9 @@
 시각 기준 T0 = 30.147초 (확인 화면 마지막 프레임 30.138과 완료 화면 첫 프레임 30.155 사이).
 필요: ffmpeg, Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import re
 import subprocess

@@ -7,6 +7,9 @@
 픽셀마다 가장 가까운 '다크 바탕색'을 찾고, 그 바탕과의 거리로 그림이 얼마나 덮였는지(a)를 어림해서
 그림 색 = 바탕 + (픽셀 − 바탕) / a 를 '라이트 바탕색' 위에 다시 섞음. 바탕과 많이 다른(진한) 부분은 그대로 남음.
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 from pathlib import Path
 
 import numpy as np

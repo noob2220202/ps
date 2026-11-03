@@ -13,6 +13,9 @@
   자르는 원은 동그라미 가장자리(4배 그림 반지름 122.5 = 녹화 지름 61.3px, coin1~3 과 같음) — 상자에 꽉 찬 원(지름 74)으로 자르면
   동그라미 밖 흰 고리가 남아 흰 카드가 아닌 바탕(누름 덮개 등)에서 보였음
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import sys
 import tempfile

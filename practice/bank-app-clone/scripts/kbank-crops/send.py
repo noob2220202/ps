@@ -7,6 +7,9 @@
 다만 케이뱅크 녹화는 가로로 늘어나지 않아 가로 되돌리기 없음. 은행 로고는 녹화에 나온 것만 (카카오뱅크·케이뱅크·농축협·새마을금고)
 필요: ffmpeg, torch(CPU 판), numpy, Pillow
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import sys
 import tempfile

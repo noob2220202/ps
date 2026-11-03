@@ -8,6 +8,9 @@ iTunes 조회 API(id 1460543865 = 'i-ONE Bank - 개인고객용')로 지금 올�
 IBK CI 심볼(ibk-ci-symbol.svg, 이체확인증 로고)은 companieslogo.com 의 Industrial Bank of Korea 로고 SVG 를 그대로 씀.
 IBK 원 로고(ibk-logo-ibk.svg, 홈 '기업은행' 탭·받는 분·출금계좌 등)는 그 심볼 경로를 녹화의 원 크기에 맞춰 원으로 자른 벡터 (업스케일보다 선명).
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import io
 import json
 import urllib.request

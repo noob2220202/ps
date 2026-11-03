@@ -97,6 +97,7 @@ const checkName = (name) =>
   name === undefined ? null : typeof name !== "string" || !name.trim() || name.trim().length > 20 ? "계좌 이름은 1~20자" : null;
 
 function findAccount(id) {
+  if (typeof id !== "string") throw notFound("계좌"); // 객체 등이 오면 SQLite 바인딩이 500 을 냄
   const row = db().prepare("SELECT * FROM accounts WHERE id = ?").get(id);
   if (!row) throw notFound("계좌");
   return row;
@@ -119,8 +120,12 @@ function listTransactions(accountId) {
     });
 }
 
+// 거래 시각 입력: 'YYYY-MM-DDTHH:mm' 또는 'YYYY-MM-DDTHH:mm:ss' 만 (날짜만 · 띄어쓰기는 받지 않음 — 저장하면 목록이 깨짐)
+const isLocalIso = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(v) && !Number.isNaN(Date.parse(v));
+
 function toTransaction(t, balanceAfter) {
-  const [d, time] = t.at.split("T");
+  // 예전에 잘못 저장된 값(날짜만 · 띄어쓰기)이 있어도 목록 전체가 500 이 되지 않게
+  const [d, time = "00:00"] = t.at.split(/[T ]/);
   const [, mm, dd] = d.split("-");
   return {
     id: String(t.id),
@@ -140,15 +145,16 @@ const KIND_BY_TAG = { "#체크카드": "체크카드결제", "#자동이체": "�
 
 // ---------- 로그인 (server/auth.mjs) ----------
 app.post("/api/auth/login", (req, res) => {
-  const ip = req.ip ?? "";
-  if (tooManyFails(ip)) throw new HttpError(429, "TOO_MANY", "잠시 후 다시 시도해 주세요");
   const { username, password } = req.body ?? {};
+  // 시도 제한은 IP + 아이디 별로 (프록시 뒤에선 모두 같은 IP 라, IP 만 보면 남이 틀려도 관리자까지 막혔음)
+  const key = `${req.ip ?? ""}|${String(username ?? "").slice(0, 40)}`;
+  if (tooManyFails(key)) throw new HttpError(429, "TOO_MANY", "잠시 후 다시 시도해 주세요");
   const r = login(username, password);
   if (r.error) {
-    if (r.code !== "EXPIRED") noteFail(ip);
+    if (r.code !== "EXPIRED") noteFail(key);
     throw new HttpError(r.code === "EXPIRED" ? 403 : 401, r.code ?? "LOGIN_FAILED", r.error);
   }
-  clearFails(ip);
+  clearFails(key);
   setSessionCookie(res, r.token);
   res.json(toUser(r.user));
 });
@@ -156,6 +162,11 @@ app.post("/api/auth/logout", (req, res) => {
   logout(readCookie(req));
   clearSessionCookie(res);
   res.status(204).end();
+});
+// 로그인 확인: 로그인 안 했으면 401 대신 200 { user: null } (첫 화면마다 콘솔에 401 이 찍히지 않게)
+app.get("/api/auth/me", (req, res, next) => {
+  if (!sessionUser(readCookie(req))) return res.json({ user: null });
+  next();
 });
 // 이 아래 /api 는 로그인해야 함 (기간이 끝났거나 정지된 계정은 막음)
 app.use("/api", (req, _res, next) => {
@@ -199,7 +210,7 @@ app.post("/api/admin/users", (req, res) => {
   if (!isUsername(username)) fields.username = "아이디는 영문·숫자·_.- 3~20자";
   else if (registry.prepare("SELECT 1 FROM users WHERE username = ?").get(username)) fields.username = "이미 있는 아이디예요";
   if (!isPassword(password)) fields.password = "비밀번호는 4~64자";
-  if (!(String(plan) in PLANS)) fields.plan = "기간은 1 / 7 / 30 / forever";
+  if (!Object.hasOwn(PLANS, String(plan))) fields.plan = "기간은 1 / 7 / 30 / forever";
   if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);
   const u = createUser({ username, password, plan: String(plan) });
   addProfile(u, username.slice(0, 10), { example: true }); // 첫 프로필 (예시 데이터)
@@ -211,22 +222,23 @@ app.patch("/api/admin/users/:id", (req, res) => {
   const { plan, extend, disabled, password } = req.body ?? {};
   if (u.role === "admin" && (plan !== undefined || extend !== undefined || disabled !== undefined)) throw bad("관리자 계정은 기간·정지를 바꿀 수 없어요");
   if (plan !== undefined) {
-    if (!(String(plan) in PLANS)) throw bad("기간은 1 / 7 / 30 / forever");
+    if (!Object.hasOwn(PLANS, String(plan))) throw bad("기간은 1 / 7 / 30 / forever");
     registry.prepare("UPDATE users SET plan = ?, expires_at = ? WHERE id = ?").run(String(plan), expiryFor(String(plan)), u.id);
   }
   if (extend !== undefined) {
-    if (!(String(extend) in PLANS)) throw bad("연장은 1 / 7 / 30 / forever");
+    if (!Object.hasOwn(PLANS, String(extend))) throw bad("연장은 1 / 7 / 30 / forever");
     const base = u.expires_at && new Date(u.expires_at) > new Date() ? new Date(u.expires_at) : new Date();
     const next = String(extend) === "forever" ? null : u.expires_at === null ? null : expiryFor(String(extend), base);
     registry.prepare("UPDATE users SET plan = ?, expires_at = ? WHERE id = ?").run(next === null ? "forever" : String(extend), next, u.id);
   }
   if (disabled !== undefined) {
+    // 세션은 남겨 둠 → 쓰던 사람은 다음 요청에서 '다시 로그인' 대신 '사용이 정지된 계정이에요'(403 DISABLED)를 봄
     registry.prepare("UPDATE users SET disabled = ? WHERE id = ?").run(disabled ? 1 : 0, u.id);
-    if (disabled) registry.prepare("DELETE FROM sessions WHERE user_id = ?").run(u.id);
   }
   if (password !== undefined) {
     if (!isPassword(password)) throw bad("비밀번호는 4~64자", { password: "비밀번호는 4~64자" });
     setPassword(u.id, password);
+    if (u.id === req.user.id) setSessionCookie(res, login(u.username, password).token); // 내 비밀번호를 여기서 바꿔도 지금 기기는 그대로 로그인
   }
   res.json(adminUser(findUser(u.id)));
 });
@@ -263,7 +275,7 @@ function addProfile(user, name, { avatar = AVATARS[0], color = COLORS[0], exampl
 }
 function checkProfileFields({ name, avatar, color, os, theme }) {
   const fields = {};
-  if (name !== undefined && !/^.{1,10}$/u.test(String(name).trim())) fields.name = "이름은 1~10자";
+  if (name !== undefined && !(typeof name === "string" && /^.{1,10}$/u.test(name.trim()))) fields.name = "이름은 1~10자";
   if (avatar !== undefined && !AVATARS.includes(avatar)) fields.avatar = "알 수 없는 아바타";
   if (color !== undefined && !COLORS.includes(color)) fields.color = "알 수 없는 색";
   if (os !== undefined && !["android", "ios"].includes(os)) fields.os = "android 또는 ios";
@@ -353,8 +365,8 @@ app.get("/api/profile", (_req, res) => res.json(getProfile()));
 app.patch("/api/profile", (req, res) => {
   const { userName, cardLast4, cardSpend, cashbackCount } = req.body ?? {};
   const fields = {};
-  if (userName !== undefined && !/^.{1,10}$/u.test(String(userName).trim())) fields.userName = "이름은 1~10자";
-  if (cardLast4 !== undefined && !/^\d{4}$/.test(cardLast4)) fields.cardLast4 = "숫자 4자리";
+  if (userName !== undefined && !(typeof userName === "string" && /^.{1,10}$/u.test(userName.trim()))) fields.userName = "이름은 1~10자";
+  if (cardLast4 !== undefined && !(typeof cardLast4 === "string" && /^\d{4}$/.test(cardLast4))) fields.cardLast4 = "숫자 4자리";
   // cardSpend: null = 자동 계산으로 되돌리기
   if (cardSpend !== undefined && cardSpend !== null && !(Number.isInteger(cardSpend) && cardSpend >= 0 && cardSpend <= 1_000_000_000))
     fields.cardSpend = "0원 이상 10억원 이하";
@@ -461,10 +473,11 @@ app.post("/api/accounts/:id/transactions", (req, res) => {
   if (!Number.isInteger(amount) || amount === 0) fields.amount = "0이 아닌 금액을 입력해 주세요";
   else if (Math.abs(amount) > 10_000_000) fields.amount = "한 번에 1천만원까지";
   if (!TAGS.includes(tag)) fields.tag = "알 수 없는 거래 종류";
-  if (at !== undefined && Number.isNaN(Date.parse(at))) fields.at = "날짜 형식 오류";
+  if (at !== undefined && !isLocalIso(at)) fields.at = "날짜 형식 오류";
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   if (row.balance + amount < 0)
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `잔액이 부족해요 (현재 ${row.balance.toLocaleString("ko-KR")}원)`);
+  if (row.balance + amount > 1_000_000_000) throw bad("잔액은 10억원까지예요", { amount: "잔액은 10억원까지" }); // PATCH 잔액과 같은 상한
 
   const id = transaction(() => {
     const r = db()
@@ -541,7 +554,7 @@ app.patch("/api/transactions/:id", (req, res) => {
     vals.push(String(body.kind ?? "").trim().slice(0, 20) || null); // 비우면 tag로 계산한 기본값으로 되돌아감
   }
   if ("at" in body) {
-    if (Number.isNaN(Date.parse(body.at))) fields.at = "날짜 형식 오류";
+    if (!isLocalIso(body.at)) fields.at = "날짜 형식 오류";
     else {
       sets.push("at = ?");
       vals.push(String(body.at).slice(0, 19).padEnd(19, ":00"));
@@ -564,6 +577,7 @@ app.patch("/api/transactions/:id", (req, res) => {
 
   const acct = findAccount(t.account_id);
   if (acct.balance + balanceDelta < 0) throw new HttpError(400, "INSUFFICIENT_BALANCE", `잔액이 부족해요 (현재 ${acct.balance.toLocaleString("ko-KR")}원)`);
+  if (acct.balance + balanceDelta > 1_000_000_000) throw bad("잔액은 10억원까지예요", { amount: "잔액은 10억원까지" });
 
   transaction(() => {
     if (sets.length) db().prepare(`UPDATE transactions SET ${sets.join(", ")} WHERE id = ?`).run(...vals, t.id);

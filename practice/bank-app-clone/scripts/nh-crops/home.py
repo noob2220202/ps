@@ -13,6 +13,9 @@
 캐릭터 뒤 빛 모형 = 원형 직선 그라데이션: 중심 (359.5, 638.2)px, 반지름 354.1px, #2f4f74 → #18171c
 (홈 스크린샷 바탕 픽셀 4만 개에 맞춘 값, 오차 rmse 0.78) — CSS의 radial-gradient 와 같은 값.
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import subprocess
 import tempfile

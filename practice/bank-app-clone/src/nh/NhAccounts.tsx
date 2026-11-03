@@ -197,6 +197,9 @@ function EmptyCard({ shop, onShop }: { shop: string; onShop: () => void }) {
 }
 
 // 계좌 아이콘: 대표계좌(main)는 청록 별이 붙은 아이콘, 나머지(직접입력으로 등록한 계좌 등)는 별 없는 아이콘
+// 별 없는 노란 동그라미: 그림은 잉크 상자만큼 잘림 (37.33 자리 안)
+const PLAIN_INK = [0.3333, 0.3333, 36.3333, 36.6667] as const;
+
 function AcctIcon({
   account,
   className,
@@ -218,6 +221,7 @@ function AcctIcon({
       name="nh-history-acct-plain"
       w={37.33}
       h={37.33}
+      ink={PLAIN_INK}
       className={`${className} ${className}--plain`}
       fallback={<span>🟡</span>}
     />
@@ -642,6 +646,7 @@ export function NhRegister() {
                 name="nh-history-acct-plain"
                 w={37.33}
                 h={37.33}
+                ink={PLAIN_INK}
                 fallback={<span>🟡</span>}
               />
               <span>

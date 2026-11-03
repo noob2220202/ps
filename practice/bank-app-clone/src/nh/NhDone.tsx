@@ -11,6 +11,7 @@ import { NhCfChevron, type NhDoneState } from "./NhConfirm";
 import "./nh-done.css";
 import "./nh-confirm-mark.css";
 import { nhPic, useNhStatusBar } from "./theme";
+import { ibkToFirst, useIbkBackHandler } from "../ibk/nav";
 
 // 송금 완료 (녹화2 30.15~36초). 화면이 뜬 때(T0) 기준:
 //   +95ms 동전이 보임(앞의 로딩 막은 +170ms에 걷힘) → +400 동전이 한 바퀴 돌고 → +1.1s 사라짐 →
@@ -40,6 +41,21 @@ export function NhDone() {
   const [detail, setDetail] = useState(false);
   const mark = localAsset(nhPic("nh-done-mark"));
   useNhStatusBar("#18171c");
+  const goHome = () => {
+    if (leaving.current) return;
+    leaving.current = true;
+    withNhLoading(async () => {
+      await sleep(HOME.show);
+      // 이체 칸들을 기록 첫 칸(홈)까지 걷음 (예전엔 홈을 쌓아서, 홈에서 뒤로 하면 완료 화면이 다시 떴음)
+      if (!(await ibkToFirst())) navigate("/", { replace: true });
+      // 홈이 실제로 그려진 뒤부터 잼 (홈 첫 렌더가 느리면 막이 너무 빨리 걷히지 않게)
+      await frame();
+      await frame();
+      await sleep(HOME.lift - 17);
+    }, 0);
+  };
+  // 기기·브라우저 뒤로 = 홈 버튼
+  useIbkBackHandler(!!state, goHome);
   useEffect(() => {
     if (!state) navigate("/", { replace: true });
   }, [state, navigate]);
@@ -47,18 +63,6 @@ export function NhDone() {
   const { result, memoTo, memoMe } = state;
   const { to, amount } = result;
   const account = home.data?.accounts.find((a) => a.id === result.fromAccountId);
-  const goHome = () => {
-    if (leaving.current) return;
-    leaving.current = true;
-    withNhLoading(async () => {
-      await sleep(HOME.show);
-      navigate("/");
-      // 홈이 실제로 그려진 뒤부터 잼 (홈 첫 렌더가 느리면 막이 너무 빨리 걷히지 않게)
-      await frame();
-      await frame();
-      await sleep(HOME.lift - 17);
-    }, 0);
-  };
 
   return (
     <div className="screen nh nh-dn">
@@ -68,7 +72,7 @@ export function NhDone() {
         </button>
       </header>
       {mark ? (
-        <span className="nh-dn-mark nh-dn-mark--sprite" style={{ backgroundImage: `url(${mark})` }} />
+        <span className="nh-dn-mark nh-dn-mark--sprite" style={{ backgroundImage: `url("${mark}")` }} />
       ) : (
         <span className="nh-dn-mark nh-dn-mark--css">
           <NhImg name={nhPic("nh-coin")} w={60} h={64} className="nh-dn-mark__coin" fallback={<span style={{ fontSize: 44 }}>🪙</span>} />

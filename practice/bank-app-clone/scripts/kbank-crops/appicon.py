@@ -6,6 +6,9 @@
 녹화(금융 폴더 속 아이콘)보다 훨씬 선명. 모양은 녹화 앱 서랍에서 잰 갤럭시 아이콘 모서리(초타원 n=2.7, crops.py 의 squircle 과 같음).
 iTunes 조회 API(id 1178872627 = 케이뱅크)로 지금 올라와 있는 아이콘 주소를 얻음. 필요: numpy, Pillow, 인터넷
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import io
 import json
 import urllib.request

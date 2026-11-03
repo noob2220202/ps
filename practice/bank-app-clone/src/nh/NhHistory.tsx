@@ -518,7 +518,7 @@ function HistoryScreen({ accountId }: { accountId: string }) {
             <div className="nh-hpick__list">
               {home.data?.accounts.map((x) => (
                 <div key={x.id} className="nh-hpick__row" role="button" tabIndex={0} onClick={() => toAccount(x.id)}>
-                  <CrispImg name="nh-history-acct-plain" w={37.3333} h={37.3333} y={-0.8} className="nh-hpick__icon" fallback={<span>🟡</span>} />
+                  <CrispImg name="nh-history-acct-plain" w={37.3333} h={37.3333} y={-0.8} ink={[0.3333, 0.3333, 36.3333, 36.6667]} className="nh-hpick__icon" fallback={<span>🟡</span>} />
                   <span className="nh-hpick__info">
                     <b>{x.label}</b>
                     <span>

@@ -194,7 +194,7 @@ export function HanaAppIcon({ size = 46 }: { size?: number }) {
 export function Ic({ name, w, h, className = "" }: { name: string; w: number; h: number; className?: string }) {
   const src = localAsset(`hana-ic-${name}`);
   if (!src) return <span className={`hana-ic hana-ic--missing ${className}`} style={{ width: w, height: h }} />;
-  const style: CSSProperties = { width: w, height: h, maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` };
+  const style: CSSProperties = { width: w, height: h, maskImage: `url("${src}")`, WebkitMaskImage: `url("${src}")` };
   const a = ART[`hana-ic-${name}`];
   if (a) {
     const [bw, bh, x, y, iw, ih] = a;

@@ -137,16 +137,16 @@
   height: 18.2px;
 }
 .kbd-emoji .kbd-emoji--clover {
-  left: 3.09px;
-  top: -1.03px;
-  width: 16.29px;
-  height: 19.82px;
+  left: 3.742px;
+  top: 0.047px;
+  width: 14.77px;
+  height: 17.45px;
 }
 .kbd-emoji .kbd-emoji--bag {
-  left: 1.95px;
-  top: -1.19px;
-  width: 18.57px;
-  height: 19.99px;
+  left: 2.814px;
+  top: -0.321px;
+  width: 16.843px;
+  height: 18.034px;
 }
 .kbd-emoji__in {
   animation: kbd-roll-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1) 70ms both;

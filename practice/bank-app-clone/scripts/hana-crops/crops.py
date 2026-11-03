@@ -13,6 +13,9 @@
 그림은 자른 상자 그대로 화면에 놓으면(상자 가운데 = 원래 자리) 위치가 맞도록 상자 크기·가운데를 고정해서 자름.
 필요: ffmpeg, Pillow, numpy
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 import subprocess
 import tempfile

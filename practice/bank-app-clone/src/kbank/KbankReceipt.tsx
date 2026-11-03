@@ -14,8 +14,7 @@ import "./kbank-receipt.css";
 // 들어올 때: '확인'은 제자리에서 진해지고(.70 → 1), 머리줄·카드 쪽은 거래 상세 올라오기와 같은 445ms cubic-bezier(.46,0,.17,1) 로 올라옴
 //   (원본 pts 74.27~74.67 · 90.69~91.12초, 위치 RMS 11 · 14px). 쌓임은 머리줄 > '확인' > 카드 (녹화 1237~1239 머리줄이 버튼을 덮고 지나감) — kbank-receipt.css
 // '확인' = 뒤로 (누름 표시 없음, 손 뗀 프레임에 바로 사라짐: 52.032 → 52.056초). ↓(내려받기)는 녹화에서 안 누름 → 무반응.
-// 연습용 앱이라 카드에 옅은 '연습용 화면 · 실제 이체 아님' 무늬를 깔아 둠 (i-ONE 이체확인증 IbkCertificate 와 같은 이유 — 실제 확인증처럼 쓰이지 않게).
-// 녹화에는 없음 → 겹쳐 잴 때는 .kbc-mark 를 숨김 (display: none)
+// 카드에 '연습용' 무늬는 없음 (녹화에도 없음 — 주인이 2026-11-03 직접 뺌. i-ONE 이체확인증 IbkCertificate 에는 남아 있음)
 
 const seenKeys = new Set<string>(); // 그린 적 있는 방문 기록 칸 — 앞으로 가기로 다시 들어오면 올라오지 않음 (KbankTxDetail 과 같음)
 
@@ -100,7 +99,7 @@ export function KbankReceipt() {
         <div className="kbc-bg" />
         <section className="kbc-card">
           {logo ? (
-            <i className="kbc-logo" style={{ maskImage: `url(${logo})`, WebkitMaskImage: `url(${logo})` }} role="img" aria-label="Kbank" />
+            <i className="kbc-logo" style={{ maskImage: `url("${logo}")`, WebkitMaskImage: `url("${logo}")` }} role="img" aria-label="Kbank" />
           ) : (
             <b className="kbc-logo kbc-logo--text">Kbank</b>
           )}
@@ -140,8 +139,6 @@ export function KbankReceipt() {
               </p>
             </>
           )}
-          <div className="kbc-mark" aria-hidden>
-          </div>
         </section>
       </div>
       <div className="kbc-bottom">

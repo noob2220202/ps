@@ -15,6 +15,9 @@
                          바탕이 한 가지 색이라 사각형 그대로 자름(불투명). matte 를 쓰면 가장자리 색을 안쪽 이웃 색으로 바꾸면서
                          얇은 반짝임(#cbc09d 등)이 확성기의 청록으로 바뀌어 버림. 바탕만 녹화 #17161b → 화면 #18171c 로 옮김
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 from collections import deque
 from pathlib import Path

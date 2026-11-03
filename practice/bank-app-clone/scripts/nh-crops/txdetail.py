@@ -11,6 +11,9 @@
 - nh-quick-register.png  노란 번개 + 더하기
 - nh-same-send.png       청록 동전(₩) + 보라 화살표
 """
+import sys as _sys, pathlib as _pl  # noqa: E401
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[1]))
+import keep_assets  # noqa: E402,F401  이미 있는 에셋은 덮어쓰지 않음 (--force 로 풂)
 import argparse
 from pathlib import Path
 
