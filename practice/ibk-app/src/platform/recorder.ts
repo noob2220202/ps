@@ -10,13 +10,16 @@
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { isIntroOn, syncBlink } from "./intro";
-import { setBattery, setClock } from "./deviceStatus";
+import { setBattery } from "./deviceStatus";
 import introSrc from "../assets/intro/ibk-open-intro.mp4";
 
-// 인트로 영상(ibk-open-intro.mp4) 첫 프레임에 찍힌 상태바 값 그대로. 영상이 끝나고 우리 상태바로
-// 넘어갈 때 시간·배터리가 뚝 바뀌어 보이지 않도록, 인트로 재생 전에 이 값으로 맞춰 둔다
-const INTRO_CLOCK = "10:00";
+// 인트로 영상(ibk-open-intro.mp4) 첫 프레임에 찍힌 배터리 값 그대로. 영상이 끝나고 우리 상태바로 넘어갈 때 뚝 바뀌어 보이지 않도록
+// 인트로 재생 전에 이 값으로 맞춰 둔다. 시계는 영상에서 지워 두고(scripts/intro-erase-clock.py) 영상이 도는 동안 우리 상태바의
+// 시각을 영상 위로 올려 그림 (PhoneFrame.css [data-intro-play]) → 녹화에 지금 시각이 찍힘
 const INTRO_BATTERY = 38;
+// 영상 속 상태바 글자가 앱 쪽 색으로 바뀌는 장면: 79번째(2.633초)부터 흐려지고 81번째(2.700초)부터 진한 회색
+const INTRO_FADE_AT = 79 / 30;
+const INTRO_DARK_AT = 81 / 30;
 // 영상이 끝나는 순간(2.80초) 상태바 캠코더 표시는 2.55초에 켜져서 0.25초째 켜져 있는 중
 const INTRO_BLINK_ON_MS = 250;
 
@@ -209,8 +212,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   // 인트로 켜져 있으면: 폰 위에 실제 기기 영상(홈 화면 → 앱 찾기 → 탭)을 먼저 재생하고, 끝나자마자 바로 시작화면으로
   // (인트로 영상이 폰 프레임과 같은 기기·같은 해상도라 상태바·3버튼 내비바가 안 끊기고 한 녹화로 자연스럽게 이어짐)
   if (isIntroOn()) {
-    setClock(INTRO_CLOCK); // 영상 속 상태바 시간·배터리와 맞춰서, 영상이 끝나고 우리 상태바로 넘어갈 때 숫자가 안 튀게
-    setBattery(INTRO_BATTERY);
+    setBattery(INTRO_BATTERY); // 영상 속 배터리와 맞춰서, 영상이 끝나고 우리 상태바로 넘어갈 때 숫자가 안 튀게 (시각은 지금 시각 그대로)
     await playIntro(target);
   } else {
     await sleep(600);
@@ -225,13 +227,25 @@ function playIntro(target: HTMLElement) {
     video.muted = true;
     video.playsInline = true;
     video.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:999;";
+    const d = document.documentElement.dataset;
     const done = () => {
       syncBlink(INTRO_BLINK_ON_MS); // 영상 속 캠코더 표시 깜빡임을 우리 상태바가 같은 위상으로 이어 받음
+      delete d.introPlay;
       video.remove();
       resolve();
     };
     video.addEventListener("ended", done, { once: true });
     video.addEventListener("error", done, { once: true });
+    // 영상이 덮는 동안 우리 상태바 시각을 영상 위에 (흰색 → 영상 끝 무렵 영상 글자처럼 흐려졌다가 진한 회색)
+    d.introPlay = "on";
+    const step = (t: number) => (d.introPlay = t >= INTRO_DARK_AT ? "dark" : t >= INTRO_FADE_AT ? "fade" : "on");
+    const onFrame = (_now: number, meta: { mediaTime: number }) => {
+      if (!d.introPlay) return;
+      step(meta.mediaTime);
+      video.requestVideoFrameCallback(onFrame);
+    };
+    if ("requestVideoFrameCallback" in video) video.requestVideoFrameCallback(onFrame);
+    else (video as HTMLVideoElement).addEventListener("timeupdate", () => d.introPlay && step((video as HTMLVideoElement).currentTime));
     target.appendChild(video);
     video.play().catch(done);
   });
