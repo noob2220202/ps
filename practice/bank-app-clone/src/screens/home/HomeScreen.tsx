@@ -18,7 +18,6 @@ import { BankIcon } from "../../components/BankIcon";
 import { AiPill } from "./AiPill";
 import { BannerCarousel } from "./BannerCarousel";
 import { DevPanel } from "../../dev-panel/DevPanel";
-import { SuspendedDialog } from "../../components/SuspendedDialog";
 import { BottomNav } from "./BottomNav";
 import "./Home.css";
 
@@ -80,10 +79,7 @@ export function HomeScreen() {
     };
   }, [firstLoad]);
 
-  // 계좌 지급정지(🔔 패널, 연습용)면 이체 화면 대신 '고객센터로 문의해주세요.' 팝업
-  const [suspendedOpen, setSuspendedOpen] = useState(false);
-  const toTransfer = (from: string) =>
-    stopThen(() => (home.data?.profile.suspended ? setSuspendedOpen(true) : navigate(`/transfer?from=${from}`)));
+  const toTransfer = (from: string) => stopThen(() => navigate(`/transfer?from=${from}`));
 
   // 누르면 행 위에 스피너가 잠깐 돌고 나서 이동 (영상 18초)
   const openWithSpinner = (id: string, to: string) => {
@@ -260,7 +256,6 @@ export function HomeScreen() {
 
       <BottomNav minimized={navMin} />
       <DevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
-      {suspendedOpen && <SuspendedDialog onClose={() => setSuspendedOpen(false)} />}
     </div>
   );
 }

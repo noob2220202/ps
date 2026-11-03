@@ -72,7 +72,7 @@ export function AmountScreen() {
       navigate("/transfer/done", { replace: true, state: { result } satisfies DoneState });
     } catch (e) {
       setSending(false);
-      // 계좌 지급정지(🔔 패널, 연습용): 이체 화면을 거쳐 왔어도 보내는 순간 같은 팝업
+      // 계좌 지급정지(🔔 패널, 연습용): 받는 분 · 금액을 다 넣고 확인 시트의 '이체하기'를 누르면 서버가 막고 '고객센터로 문의해주세요.' 팝업
       if (e instanceof ApiError && e.code === "ACCOUNT_SUSPENDED") setSuspendedOpen(true);
       else setError(e instanceof ApiError ? e.message : "연결에 실패했어요");
     }

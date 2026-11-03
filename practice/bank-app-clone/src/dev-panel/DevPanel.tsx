@@ -509,12 +509,12 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   );
 }
 
-// 카카오뱅크 계좌 지급정지 (연습용): 켜면 이체를 누를 때 '고객센터로 문의해주세요.' 팝업 (SuspendedDialog — 연습용 표시가 늘 같이 나옴), 서버도 이체를 막음.
+// 카카오뱅크 계좌 지급정지 (연습용): 켜면 이체의 마지막 '이체하기'에서 서버가 막고 '고객센터로 문의해주세요.' 팝업 (SuspendedDialog — 연습용 표시가 늘 같이 나옴).
 // label(Field) 로 감싸지 않음 — 안내 글을 누르면 첫 버튼이 눌려 설정이 몰래 바뀜
 function SuspendToggle({ suspended, run }: { suspended: boolean; run: Run }) {
   return (
     <div className="field">
-      <span className="field__label">계좌 지급정지 (켜면 이체할 때 '고객센터로 문의해주세요.' 팝업 · 연습용 표시)</span>
+      <span className="field__label">계좌 지급정지 (켜면 이체 마지막 '이체하기'에서 '고객센터로 문의해주세요.' 팝업 · 연습용 표시)</span>
       <Segmented
         value={suspended ? "on" : "off"}
         options={[
