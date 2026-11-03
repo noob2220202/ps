@@ -510,7 +510,8 @@ export function IbkSheet({
 }
 
 // ---------- 은행 로고 원 ----------
-// 받는 분 목록(who 5)·금액·확인·완료의 은행 로고. 녹화에 나온 은행은 녹화에서 잘라 4배로 키운 원 (ibk-bank-<code>, 지름 30 원에 꽉 참),
+// 받는 분 목록(who 5)·금액·확인·완료의 은행 로고. 녹화에 나온 은행은 녹화의 같은 로고 장면을 모두 평균해 4배로 키운 뒤 평평한 색으로 다시 칠한 원
+// (ibk-bank-<code>, 120px, 지름 30 원에 꽉 참),
 // 기업은행은 ibk-logo-ibk.svg (IBK CI 심볼을 녹화의 원에 맞춰 원으로 자른 벡터, 원이 그림에 꽉 참), 녹화에 없는 은행은 공용 BankIcon
 export function IbkBankLogo({ bank, size = 30, className = "" }: { bank: Pick<Bank, "code"> & Partial<Bank>; size?: number; className?: string }) {
   const box: CSSProperties = { width: size, height: size };

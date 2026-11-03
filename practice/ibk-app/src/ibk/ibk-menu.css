@@ -329,28 +329,31 @@
   letter-spacing: -0.4px;
   color: #000;
 }
-/* 조회: 아이콘 녹화 26,448 ~ 52,476 → 클론 25.04 · 25.39 × 28, 제목 기준선 468.0 */
+/* 조회: 아이콘 = 잉크 상자 (클론 26.75 ~ 48.0 × 녹화 450.5 ~ 473.0, 녹화에 맞춰 다시 그린 벡터), 제목 기준선 468.0 */
 .ibm-group--inquiry {
   top: 418.6px;
   height: 28px;
 }
 .ibm-group--inquiry .ibm-group__icon {
-  left: 25.04px;
-  width: 25.39px;
-  height: 28px;
+  left: 26.75px;
+  top: 2.5px; /* 450.5 − 448 */
+  width: 21.25px;
+  height: 22.5px;
 }
 .ibm-group--inquiry b {
   top: 15px; /* 기준선 468 − 5 − 448 */
 }
-/* 이체/출금: 아이콘 녹화 23,756 ~ 54,783 → 클론 22.11 · 30.27 × 27, 제목 기준선 775.4 */
+/* 이체/출금: 아이콘 = 잉크 상자 (클론 24.0 ~ 49.5 × 녹화 757.75 ~ 780.75), 제목 기준선 775.4 */
 .ibm-group--transfer {
   top: 726.6px;
   height: 27px;
 }
 .ibm-group--transfer .ibm-group__icon {
-  left: 22.11px;
-  width: 30.27px;
-  height: 27px;
+  /* 녹화 85.5~88.9초 잉크에 맞춘 상자, 기기 px(1/3) 단위라 크롬이 다시 반올림하지 않음 */
+  left: 24px;
+  top: 2px;
+  width: 25px;
+  height: 22.6667px;
 }
 .ibm-group--transfer b {
   top: 14px; /* 기준선 775 − 5 − 756 */
@@ -744,7 +747,8 @@
   color: #2a2c2c;
   word-break: keep-all; /* 녹화: 낱말 단위로 줄바꿈 ('참고용으로만' 뒤) */
 }
-/* IBK기업은행 로고 (3-5): 심볼 = CI 벡터(잉크 녹화 270~289 × 658~676), 글자 = 녹화에서 잘라 4배 (녹화 291~374 × 657~678) */
+/* IBK기업은행 로고 (3-5): 심볼 = CI 벡터(잉크 녹화 270~289 × 658~676),
+   글자 = 녹화 평균을 4배로 키워 한 색(#0c3a6a, 녹화 78~82.5초 글자의 진한 남색)으로 다시 칠한 것. 상자 = 잉크 (녹화 293.5~371.0 × 661.25~674.75) */
 .ibc-logo__symbol,
 .ibc-logo__word,
 .ibc-logo__text {
@@ -758,10 +762,10 @@
   height: 19.52px;
 }
 .ibc-logo__word {
-  left: 283.78px;
-  top: 575.6px;
-  width: 81.04px;
-  height: 21px;
+  left: 286.22px;
+  top: 579.85px; /* 녹화 661.25 − 81.4 */
+  width: 75.75px;
+  height: 13.5px;
 }
 .ibc-logo__text {
   left: 285px;

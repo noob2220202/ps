@@ -34,7 +34,9 @@ export const useAuth = () =>
 
 export async function checkAuth() {
   try {
-    set({ status: "in", user: await http.get<User>("/api/auth/me") });
+    // 로그인 안 했으면 서버가 { user: null } (200)
+    const me = await http.get<User | { user: null }>("/api/auth/me");
+    set("username" in me ? { status: "in", user: me } : { status: "out" });
   } catch (e) {
     set({ status: "out", message: e instanceof ApiError && e.status === 403 ? e.message : undefined });
   }

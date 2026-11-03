@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { paths } from "../api/endpoints";
 import type { Account, HomeData } from "../api/types";
@@ -52,12 +52,14 @@ const TILES = [
 ];
 // 프로모 배너 5장 (spec 3-9, 녹화에 나온 순서): 바탕 · 제목 · 글자색 · 부제 · 오른쪽 그림.
 // 제목 한글은 배너 그림 글꼴이라 웹 Noto 보다 좁음(90%) — 1번(2026)은 숫자 자간이 넓어 따로 (wide)
+// 그림 상자 box = [왼쪽, 위, 폭, 높이] (배너 안, 잉크에 맞춤). 위는 배너 위끝(녹화 밝기로 691.15) 기준 — 구간마다 위끝이 달라 보이는 건
+// 연한 바탕 카드의 색차(Cb/Cr) 번짐일 뿐 실제로는 같음. 아래끝 39.7 = 탭바 밑 (녹화 730 줄부터는 탭바 그림자라 729 줄을 늘여 채움)
 const PROMOS = [
-  { bg: "#141414", color: "#fff", title: "2026 더아트프라자", art: "ibk-promo-2026", wide: true },
-  { bg: "#fa6e3c", color: "#fff", title: "계좌개설하고 주식받자!", sub: "IBK기업은행 x IBK투자증권", art: "ibk-promo-gift" },
-  { bg: "#dbf6d7", color: "#111", title: "Npay 포인트 전환 EVENT", art: "ibk-promo-npay" },
-  { bg: "#fbe5fc", color: "#111", title: "모으기 신청하고 커피 받자♥", art: "ibk-promo-pig" },
-  { bg: "#d9f4fd", color: "#111", title: "키자니아 기업은행OPEN", art: "ibk-promo-kidzania" },
+  { bg: "#141414", color: "#fff", title: "2026 더아트프라자", art: "ibk-promo-2026", box: [253.87, 8.76, 71.28, 30.94], wide: true },
+  { bg: "#fa6e3c", color: "#fff", title: "계좌개설하고 주식받자!", sub: "IBK기업은행 x IBK투자증권", art: "ibk-promo-gift", box: [260.7, 4.54, 66.39, 35.16] },
+  { bg: "#dbf6d7", color: "#111", title: "Npay 포인트 전환 EVENT", art: "ibk-promo-npay", box: [257.5, 15, 57.25, 25] }, // 초록 원 + N 은 녹화 원에 맞춘 벡터 (바탕 없음)
+  { bg: "#fbe5fc", color: "#111", title: "모으기 신청하고 커피 받자♥", art: "ibk-promo-pig", box: [255.82, 15.5, 61.51, 24.2] },
+  { bg: "#d9f4fd", color: "#111", title: "키자니아 기업은행OPEN", art: "ibk-promo-kidzania", box: [249.96, 6.875, 69.32, 33.7] },
 ];
 // 자동 넘김: 한 장이 멈춘 뒤 약 3.3초 (3.27 / 3.23 / 2.9s) 뒤 다음 장, 넘김 270ms
 const PROMO_MS = 3300;
@@ -379,9 +381,9 @@ export function IbkHome() {
   );
 }
 
-function Pic({ name, className = "" }: { name: string; className?: string }) {
+function Pic({ name, className = "", style }: { name: string; className?: string; style?: CSSProperties }) {
   const src = localAsset(name);
-  return src ? <img className={className} src={src} alt="" draggable={false} /> : <i className={`${className} ibh-pic--empty`} />;
+  return src ? <img className={className} src={src} alt="" draggable={false} style={style} /> : <i className={`${className} ibh-pic--empty`} style={style} />;
 }
 
 // 기업은행 | 다른금융 폴더 탭 (spec 3-4): 흰 탭은 카드와 한 몸, 회색 탭(#e0e5eb)은 같은 모양을 91.1 오른쪽으로 옮겨 흰 탭 뒤에.
@@ -525,7 +527,7 @@ function PromoCarousel({ onOpen }: { onOpen: () => void }) {
                 ),
               )}
             </b>
-            <Pic name={b.art} className="ibh-promo__art" />
+            <Pic name={b.art} className="ibh-promo__art" style={{ left: b.box[0], top: b.box[1], width: b.box[2], height: b.box[3] }} />
           </button>
         ))}
       </div>
