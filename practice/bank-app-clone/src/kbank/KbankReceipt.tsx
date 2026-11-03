@@ -10,7 +10,8 @@ import { kbNf, useKbankStatusBar } from "./theme";
 import "./kbank-receipt.css";
 
 // 이체확인증 (두 번째 녹화 45.7~52.1초 프레임 1377~1563 '1 원' · 73.9~77.8초 2217~2334 '500,000 원' · 90.2~94.3초 2706~2829).
-// 출금 이체 상세의 '이체확인증'에서 열림 (경로 /receipt/:txId, App.tsx). 흰 머리줄(오른쪽 ↓ 만, 제목·‹·× 없음) · 회색 바탕 위 그림자 카드 · 바닥 '확인'.
+// 이체 상세의 '이체확인증'에서 열림 (경로 /receipt/:txId, App.tsx) — 출금뿐 아니라 입금도 보낸 분 계좌를 알면 뜸(KbankTxDetail).
+// 입금이면 출금계좌·보낸사람·받는계좌·받는 분 자리가 바뀜(상대가 보낸 쪽, 내가 받는 쪽). 흰 머리줄(오른쪽 ↓ 만, 제목·‹·× 없음) · 회색 바탕 위 그림자 카드 · 바닥 '확인'.
 // 들어올 때: '확인'은 제자리에서 진해지고(.70 → 1), 머리줄·카드 쪽은 거래 상세 올라오기와 같은 445ms cubic-bezier(.46,0,.17,1) 로 올라옴
 //   (원본 pts 74.27~74.67 · 90.69~91.12초, 위치 RMS 11 · 14px). 쌓임은 머리줄 > '확인' > 카드 (녹화 1237~1239 머리줄이 버튼을 덮고 지나감) — kbank-receipt.css
 // '확인' = 뒤로 (누름 표시 없음, 손 뗀 프레임에 바로 사라짐: 52.032 → 52.056초). ↓(내려받기)는 녹화에서 안 누름 → 무반응.
@@ -70,20 +71,34 @@ export function KbankReceipt() {
   const close = () => (window.history.state?.idx > 0 ? go(-1) : go(`/tx/${txId}`, { replace: true, state: { fromReceipt: true } }));
 
   const userName = home.data?.profile.userName ?? "";
-  const sent = tx?.transfer;
-  // 이체확인증은 출금 이체에만 (앱에서는 출금 이체 상세에만 버튼이 있음). 주소로 입금 · 체크카드 거래를 열면 찾을 수 없음으로
-  const notTransfer = !!tx && (!sent || tx.amount > 0);
+  const sent = tx?.transfer; // 상대 계좌 정보 — 출금이면 보낸 돈을 받는 분, 입금이면 돈을 보낸 분
+  const inbound = (tx?.amount ?? 0) > 0;
+  // 이체확인증은 상대 계좌 정보를 아는 이체에만 (출금 이체, 또는 보낸 분 계좌를 아는 입금). 모르면(체크카드 등) 주소로 바로 열었을 때 찾을 수 없음으로
+  const notTransfer = !!tx && !sent;
   const abs = Math.abs(tx?.amount ?? 0);
-  // 값 (FINAL K01 '값' 표): 거래일시는 초까지(상세는 분까지), 출금계좌는 숫자만, 받는계좌는 짧은 은행 이름, 받는 분에게 표기는 없으면 내 이름, 수수료 '0원'(붙여 씀)
+  const myAccData = acc.data;
+  const myAcct = myAccData && myAccData.id === tx?.accountId ? (myAccData.number ?? "").replace(/\D/g, "") : ""; // 내 계좌 (숫자만, 케이뱅크라 은행 이름 없이)
+  const other = sent ? `${kbankBankShort(sent.bank, sent.number)} ${sent.number}` : ""; // 상대 계좌 (다른 은행이라 짧은 은행 이름을 붙임)
+  // 값 (FINAL K01 '값' 표): 거래일시는 초까지(상세는 분까지), 받는 분에게 표기는 없으면 내 이름, 수수료 '0원'(붙여 씀).
+  // 입금이면 출금계좌·보낸사람이 상대, 받는계좌·받는 분이 나 — 출금(내가 보낸 이체)과 자리만 바뀜
   const rows: [string, string][] = tx
-    ? [
-        ["거래일시", tx.transactedAt],
-        ["거래구분", kbankKindLabel(tx.kind)],
-        ["출금계좌", acc.data?.id === tx.accountId ? (acc.data.number ?? "").replace(/\D/g, "") : ""],
-        ["보낸사람", userName],
-        ["받는계좌", sent ? `${kbankBankShort(sent.bank, sent.number)} ${sent.number}` : ""],
-        ["받는 분", sent?.holder ?? ""],
-      ]
+    ? inbound
+      ? [
+          ["거래일시", tx.transactedAt],
+          ["거래구분", kbankKindLabel(tx.kind)],
+          ["출금계좌", other],
+          ["보낸사람", sent?.holder ?? ""],
+          ["받는계좌", myAcct],
+          ["받는 분", userName],
+        ]
+      : [
+          ["거래일시", tx.transactedAt],
+          ["거래구분", kbankKindLabel(tx.kind)],
+          ["출금계좌", myAcct],
+          ["보낸사람", userName],
+          ["받는계좌", other],
+          ["받는 분", sent?.holder ?? ""],
+        ]
     : [];
   const rows2: [string, string][] = tx
     ? [

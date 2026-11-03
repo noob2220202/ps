@@ -260,6 +260,12 @@ export function KbankTxDetail() {
                   <UploadIcon />
                   내보내기
                 </button>
+                {/* 입금도 보낸 분 계좌를 알면(sent) 이체확인증 가능 — 출금과 같은 화면, 받는 쪽만 나로 바뀜 (KbankReceipt) */}
+                {sent && (
+                  <button className="kbt-btn" onClick={openReceipt}>
+                    이체확인증
+                  </button>
+                )}
               </div>
             </>
           )}
