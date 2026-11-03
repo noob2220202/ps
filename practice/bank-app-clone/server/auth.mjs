@@ -1,7 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { DATA, SERVER_ID, registry } from "./db.mjs";
+import { COLORS, DATA, INTRO, SERVER_ID, newProfileId, profileDb, registry, seedKbankTestProfile } from "./db.mjs";
 
 // ===== 로그인 계정 (은행마다 따로 — 서버 하나 = 앱 하나, 데이터 폴더가 따로라 계정도 따로) =====
 // 관리자(admin)가 계정을 만들고 이용 기간을 정함: 1일 / 7일 / 30일 / 영구 (만든 순간부터 줄어듦)
@@ -142,4 +142,17 @@ if (!registry.prepare("SELECT 1 FROM users WHERE role = 'admin'").get()) {
     console.log(`[${SERVER_ID}] 관리자 계정을 만들었어요 → 아이디 ${username} / 비밀번호 ${password}  (${file})`);
   }
   registry.prepare("UPDATE profiles SET owner_id = ? WHERE owner_id IS NULL").run(admin.id);
+}
+
+// kbank2: "테스트" 이름 프로필이 관리자 계정에 아직 없으면 만든다 (관리자 id가 있어야 보이니 이 파일 맨 아래에서 — db.mjs 참고).
+// 서버를 새로 켤 때마다 확인해서, 이미 돌아가던 서버에 git pull → 재시작만 해도 들어가게 함
+if (INTRO) {
+  const admin = registry.prepare("SELECT id FROM users WHERE role = 'admin'").get();
+  if (admin && !registry.prepare("SELECT 1 FROM profiles WHERE name = ? AND owner_id = ?").get("테스트", admin.id)) {
+    const id = newProfileId();
+    seedKbankTestProfile(profileDb(id));
+    registry
+      .prepare("INSERT INTO profiles (id, name, avatar, color, owner_id, created_at) VALUES (?, '테스트', 'star', ?, ?, datetime('now', 'localtime'))")
+      .run(id, COLORS[1], admin.id);
+  }
 }

@@ -578,13 +578,5 @@ if (!registry.prepare("SELECT 1 FROM profiles").get()) {
     .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, ?, 'boy', ?, datetime('now', 'localtime'))")
     .run(id, name, COLORS[0]);
 }
-
-// kbank2: "테스트" 이름 프로필이 아직 없으면 만든다. 서버를 새로 켤 때마다 확인해서,
-// 이미 돌아가던 서버에 git pull → 재시작만 해도 (프로필이 이미 있어도) 들어가게 함
-if (INTRO && !registry.prepare("SELECT 1 FROM profiles WHERE name = ?").get("테스트")) {
-  const id = newProfileId();
-  seedKbankTestProfile(profileDb(id));
-  registry
-    .prepare("INSERT INTO profiles (id, name, avatar, color, created_at) VALUES (?, '테스트', 'star', ?, datetime('now', 'localtime'))")
-    .run(id, COLORS[1]);
-}
+// kbank2 "테스트" 프로필 만들기는 auth.mjs 맨 아래에서 함 (주인(owner_id)을 관리자로 정해야 해서 —
+// 관리자 계정이 이미 있는 서버에서 git pull → 재시작했을 때도 보이려면, 관리자 id가 있어야 함. db.mjs는 auth.mjs보다 먼저 실행돼 아직 모름)
