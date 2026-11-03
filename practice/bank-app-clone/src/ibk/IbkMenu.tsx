@@ -37,13 +37,14 @@ const STATUS_LATE = 50;
 
 const seenKeys = new Set<string>(); // 이미 그린 방문 기록 칸
 
-// 바로가기 카드 (1-4): 그림(녹화에서 잘라 4배)의 왼쪽 위(클론 x, 녹화 y)·크기(dp), 글자 pen x, 글자 폭(누름 칸용) — 모두 화면 기준
+// 바로가기 카드 (1-4): 누름 칸 기준 x(클론), 글자 pen x, 글자 폭(누름 칸용), 그림 = 잉크에 꽉 맞춘 상자 [왼쪽 클론 x, 위 녹화 y, 폭, 높이] — 모두 화면 기준
+// 그림은 녹화(85.5~88.9초 평균)에 겹쳐 맞춰 다시 그린 벡터를 4배 PNG 로 (잉크 밖 여백 없음)
 const CARD = { x: 18.5, y: 147 };
 const SHORTCUTS = [
-  { label: "이벤트", img: "ibk-menu-gift", x: 34.81, y: 161, w: 20.5, h: 21, pen: 59.5, tw: 35 },
-  { label: "인증/보안", img: "ibk-menu-lock", x: 105.11, y: 159, w: 21.48, h: 23, pen: 130.4, tw: 51 },
-  { label: "고객센터", img: "ibk-menu-headset", x: 190.05, y: 159, w: 23.43, h: 23, pen: 216.6, tw: 45 },
-  { label: "플라워", img: "ibk-menu-flower", x: 285.73, y: 160, w: 21.48, h: 22, pen: 311.0, tw: 34 },
+  { label: "이벤트", img: "ibk-menu-gift", x: 34.81, art: [37, 163, 15.25, 16.5], pen: 59.5, tw: 35 },
+  { label: "인증/보안", img: "ibk-menu-lock", x: 105.11, art: [107.5, 161.5, 15.75, 18], pen: 130.4, tw: 51 },
+  { label: "고객센터", img: "ibk-menu-headset", x: 190.05, art: [192.25, 161.5, 19, 17.75], pen: 216.6, tw: 45 },
+  { label: "플라워", img: "ibk-menu-flower", x: 285.73, art: [287.5, 162.25, 17.25, 18], pen: 311.0, tw: 34 },
 ];
 
 // 분류 칩 (1-6): 바깥 x (클론), 글자 pen x. 고른 칩은 진회색 채움 (녹화: '최근')
@@ -200,7 +201,7 @@ export function IbkMenu() {
             {SHORTCUTS.map((s) => (
               // 누름 칸 = 그림 왼쪽 4 ~ 글자 끝 4. 그 안의 그림·글자는 칸 기준
               <button key={s.label} className="ibm-card__item" style={{ left: s.x - CARD.x - 4, width: s.pen - s.x + s.tw + 8 }} onClick={soon}>
-                <Img name={s.img} className="ibm-card__img" style={{ left: 4, top: s.y - CARD.y, width: s.w, height: s.h }} />
+                <Img name={s.img} className="ibm-card__img" style={{ left: 4 + s.art[0] - s.x, top: s.art[1] - CARD.y, width: s.art[2], height: s.art[3] }} />
                 <span className="ibk-bl" style={{ left: s.pen - s.x + 4 }}>
                   {s.label}
                 </span>

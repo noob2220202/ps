@@ -398,21 +398,22 @@
 .ibh-quick__item:active {
   background: rgba(0, 0, 0, 0.03);
 }
-/* W 동전: 녹화 상자 (39, 502)–(61, 522) → 클론 37.7, 21.48 × 20 */
+/* ₩ 동전·신분증 지갑: 녹화(7.7~9.1초 평균)에 겹쳐 맞춰 다시 그린 벡터, 바탕 없음. 상자 = 잉크 (상자 위 = 녹화 485.2) */
+/* ₩ 동전: 클론 38.5 ~ 57.75 × 녹화 503.75 ~ 519.0 */
 .ibh-quick__recent {
   position: absolute;
-  left: 19.33px;
-  top: 16.8px;
-  width: 21.48px;
-  height: 20px;
+  left: 20.1px;
+  top: 18.55px;
+  width: 19.25px;
+  height: 15.25px;
 }
-/* 신분증·지갑: 녹화 상자 (206, 500)–(235, 524) → 클론 200.8, 28.31 × 24 */
+/* 신분증·지갑: 클론 204.0 ~ 225.75 × 녹화 503.75 ~ 519.75 (오른쪽 칸 왼쪽 = 클론 191.9) */
 .ibh-quick__id {
   position: absolute;
-  left: 8.89px;
-  top: 14.8px;
-  width: 28.31px;
-  height: 24px;
+  left: 12.1px;
+  top: 18.55px;
+  width: 21.75px;
+  height: 16px;
 }
 /* Noto 600 14.25px, 기준선 녹화 516.5 (상자 위 + 30.9) / 잉크 왼쪽 클론 65.0 · 231.2 */
 .ibh-quick__item > span {
@@ -577,13 +578,9 @@
   font-weight: 400;
   opacity: 0.8;
 }
-/* 오른쪽 그림: 녹화 상자 (255, 692)–(360, 731) → 클론 248.6, 102.52 × 39 */
+/* 오른쪽 그림: 배너마다 잉크에 맞춘 상자 (위치·크기는 IbkHome.tsx PROMOS 의 box). 바탕은 배너 색 그대로 칠한 불투명 그림 (Npay 원만 바탕 없는 벡터) */
 .ibh-promo__art {
   position: absolute;
-  left: 230.43px;
-  top: 0.7px;
-  width: 102.52px;
-  height: 39px;
 }
 .ibh-pic--empty {
   display: block;
