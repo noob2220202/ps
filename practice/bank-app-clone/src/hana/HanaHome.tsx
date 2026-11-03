@@ -6,6 +6,7 @@ import { localAsset } from "../assets/Asset";
 import { Dialog } from "../components/Sheet";
 import { DevPanel } from "../dev-panel/DevPanel";
 import { nf } from "./bank";
+import { artStyle } from "./artbox";
 import { Ic } from "./common";
 import { useHanaGo } from "./loading";
 import { HANA_LIGHT, useHanaStatusBar } from "./theme";
@@ -377,9 +378,10 @@ export function HanaHome() {
   );
 }
 
+// 잉크만 남긴 그림을 예전 상자(CSS 크기) 안 같은 자리에 (artStyle: 크기 = 잉크 상자, 나머지는 margin)
 function Pic({ name, className = "" }: { name: string; className?: string }) {
   const src = localAsset(name);
-  return src ? <img className={`hana-pic ${className}`} src={src} alt="" draggable={false} /> : <span className={`hana-pic hana-pic--empty ${className}`} />;
+  return src ? <img className={`hana-pic ${className}`} src={src} alt="" style={artStyle(name)} draggable={false} /> : <span className={`hana-pic hana-pic--empty ${className}`} />;
 }
 
 // 배너 그림: 스크린샷에서 자른 상자(138.7 × 149.3dp)를 카드 오른쪽 같은 자리에. 바뀔 때 살짝 겹쳐 사라짐

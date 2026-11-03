@@ -6,6 +6,7 @@ import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { Dialog } from "../components/Sheet";
 import { hanaBankName, hanaNumber, hanaTxKind, nf } from "./bank";
+import { artStyle } from "./artbox";
 import { ChevronRight, HanaHeader, HanaRetry, HanaSpinner, HeaderClose } from "./common";
 import { useSafeBack } from "./nav";
 import { useHanaStatusBar } from "./theme";
@@ -170,7 +171,7 @@ export function HanaTxDetail() {
 function ShareIcon({ name, w, h, fallback }: { name: string; w: number; h: number; fallback: ReactNode }) {
   const src = localAsset(`hana-share-${name}`);
   if (!src) return fallback;
-  return <img className={`htd-share__ic htd-share__ic--${name}`} src={src} alt="" style={{ width: w, height: h }} draggable={false} />;
+  return <img className={`htd-share__ic htd-share__ic--${name}`} src={src} alt="" style={artStyle(`hana-share-${name}`, w, h) ?? { width: w, height: h }} draggable={false} />;
 }
 
 // 그림이 없을 때 대신 그리는 아이콘

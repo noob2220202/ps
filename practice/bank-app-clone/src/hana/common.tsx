@@ -1,18 +1,22 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { localAsset } from "../assets/Asset";
 import type { Bank } from "../api/types";
 import { BankIcon } from "../components/BankIcon";
+import { ART } from "./art";
+import { artStyle } from "./artbox";
 import { useHanaLoading } from "./loading";
 import "./hana.css";
 
-// 하나원큐 화면들이 같이 쓰는 조각. 그림은 src/assets/local/hana-*.png (scripts/hana-crops/crops.py)
+// 하나원큐 화면들이 같이 쓰는 조각. 그림은 src/assets/local/hana-*.png (잉크만 남긴 그림 + 자리는 art.ts)
 // 값은 실제 앱 녹화(480px, 1dp = 1.25px)·스크린샷(720px, 1dp = 1.875px)에서 잰 것. 프레임 384 × 853.33dp
 
-// 은행 로고 (은행선택 타일에서 잘라 낸 투명 PNG, 51.2 × 35.2dp 상자 가운데에 로고). 없으면 공용 동그라미
+// 은행 로고 (은행선택 타일에서 잘라 낸 투명 PNG, 51.2 × 35.2dp 상자 안 원래 자리에 로고). 없으면 공용 동그라미
 export function HanaBankLogo({ code, bank, scale = 1 }: { code: string; bank?: Bank; scale?: number }) {
-  const src = localAsset(code.startsWith("tax") ? `hana-${code}` : `hana-bank-${code}`);
+  const name = code.startsWith("tax") ? `hana-${code}` : `hana-bank-${code}`;
+  const src = localAsset(name);
   if (!src) return bank ? <BankIcon bank={bank} size={26 * scale} /> : null;
-  return <img className="hana-logo" src={src} alt="" style={{ width: 51.2 * scale, height: 35.2 * scale }} draggable={false} />;
+  const box = { width: 51.2 * scale, height: 35.2 * scale };
+  return <img className="hana-logo" src={src} alt="" style={artStyle(name, box.width, box.height) ?? box} draggable={false} />;
 }
 
 // 회색 동그라미 안 은행 로고 (이체 '최근' 목록·받는 분 입력 칸)
@@ -184,12 +188,28 @@ export function HanaAppIcon({ size = 46 }: { size?: number }) {
   );
 }
 
-// 실제 앱에서 잘라 온 아이콘 (scripts/hana-crops/icons.py → hana-ic-*.png, 검은 알파 마스크).
-// mask 로 쓰고 currentColor 로 칠해서 라이트/다크 어디서나 글자색을 따라감. 크기는 잘라 낸 상자(dp, 2px 여백 포함)
+// 실제 앱에서 잘라 온 아이콘 (hana-ic-*.png, 검은 알파 마스크, 1dp 당 4px · 잉크 상자만).
+// mask 로 쓰고 currentColor 로 칠해서 라이트/다크 어디서나 글자색을 따라감. w × h 는 예전에 잘라 낸 상자(dp) = 요소 크기,
+// 마스크는 art.ts 의 잉크 자리에 (상자 밖으로 나가는 잉크가 있으면 요소를 넓히고 margin 으로 되돌림 — mask 는 요소 밖을 안 그림)
 export function Ic({ name, w, h, className = "" }: { name: string; w: number; h: number; className?: string }) {
   const src = localAsset(`hana-ic-${name}`);
   if (!src) return <span className={`hana-ic hana-ic--missing ${className}`} style={{ width: w, height: h }} />;
-  return <i className={`hana-ic ${className}`} style={{ width: w, height: h, maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` }} aria-hidden />;
+  const style: CSSProperties = { width: w, height: h, maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` };
+  const a = ART[`hana-ic-${name}`];
+  if (a) {
+    const [bw, bh, x, y, iw, ih] = a;
+    const sx = w / bw;
+    const sy = h / bh;
+    const [l, t, r, b] = [Math.min(0, x), Math.min(0, y), Math.max(bw, x + iw), Math.max(bh, y + ih)];
+    if (l < 0 || t < 0 || r > bw || b > bh) {
+      style.width = (r - l) * sx;
+      style.height = (b - t) * sy;
+      style.margin = `${t * sy}px ${(bw - r) * sx}px ${(bh - b) * sy}px ${l * sx}px`;
+    }
+    style.maskSize = style.WebkitMaskSize = `${iw * sx}px ${ih * sy}px`;
+    style.maskPosition = style.WebkitMaskPosition = `${(x - l) * sx}px ${(y - t) * sy}px`;
+  }
+  return <i className={`hana-ic ${className}`} style={style} aria-hidden />;
 }
 
 // 화면 사이 로딩 페이지 (loading.ts): 상태바는 그대로 두고 앱 영역만 빈 바탕으로 덮고, 처음엔 가운데 초록 원호

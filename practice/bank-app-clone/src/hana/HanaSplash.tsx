@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { localAsset } from "../assets/Asset";
 import { useStatusBar } from "../hooks/useStatusBar";
+import { artStyle } from "./artbox";
 import { HANA_LIGHT } from "./theme";
 
 // 시작화면 (다크 녹화 1~6초): 검은 화면 → 가운데 '1Q'가 뜸 → 양옆으로 '하나 · 원큐'가 펼쳐져 '하나 1Q 원큐' → 홈.
@@ -24,7 +25,7 @@ export function HanaSplash({ onDone }: { onDone: () => void }) {
       {phase !== "black" && (
         <div className={`hana-splash__logo hana-splash__logo--${phase}`}>
           {logo ? (
-            <img src={logo} alt="하나 1Q 원큐" draggable={false} />
+            <img src={logo} alt="하나 1Q 원큐" style={artStyle("hana-splash-logo")} draggable={false} />
           ) : (
             <span>
               하나 <b>1Q</b> 원큐

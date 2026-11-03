@@ -6,6 +6,7 @@ import { useApi } from "../api/useApi";
 import { localAsset } from "../assets/Asset";
 import { Dialog } from "../components/Sheet";
 import { hanaDay, hanaTxKind, nf } from "./bank";
+import { artStyle } from "./artbox";
 import { HanaHeader, HanaRetry, HanaSpinner, Ic } from "./common";
 import { useHanaGo } from "./loading";
 import { useSafeBack } from "./nav";
@@ -56,7 +57,7 @@ export function HanaHistory() {
         {account ? (
           <>
             <div className="hh-card__name">
-              {localAsset("hana-symbol") && <img src={localAsset("hana-symbol")} alt="" draggable={false} />}
+              {localAsset("hana-symbol") && <img src={localAsset("hana-symbol")} alt="" style={artStyle("hana-symbol")} draggable={false} />}
               {account.label}
               <button onClick={soon} aria-label="더보기">
                 <Ic name="more" w={5.9} h={17.6} />
