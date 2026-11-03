@@ -165,6 +165,31 @@
   height: 40.4px;
   display: block;
 }
+/* 네모째 다시 그린 SVG (둥근 네모 + 아이콘, 바깥 투명): 녹화 px 52.0~113.3 · 192.8~255.1 · 334.6~396.6 · 476.3~538.3 × 501.4~563.3 → 칸마다 자리 */
+.kba-tile:nth-child(1) img {
+  left: calc(50% - 20.28px);
+  top: 0.49px;
+  width: 39.99px;
+  height: 40.07px;
+}
+.kba-tile:nth-child(2) img {
+  left: calc(50% - 20.36px);
+  top: 0.33px;
+  width: 40.64px;
+  height: 39.83px;
+}
+.kba-tile:nth-child(3) img {
+  left: calc(50% - 20.44px);
+  top: 0.24px;
+  width: 40.4px;
+  height: 39.99px;
+}
+.kba-tile:nth-child(4) img {
+  left: calc(50% - 20.04px);
+  top: 0.24px;
+  width: 40.4px;
+  height: 40.32px;
+}
 .kba-tile__ph {
   border-radius: 12px;
   background: #f6f7fa;

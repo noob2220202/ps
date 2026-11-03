@@ -395,7 +395,7 @@ export function KbankHome() {
                     kbank2(첫 녹화 재현)는 첫 녹화의 세 장 그대로 */}
                 <span className={`kbh-coin ${HAS_INTRO ? "kbh-coin--v1" : ""}`} aria-hidden>
                   {(HAS_INTRO ? COINS.slice(0, 3) : COINS).map((c) => (
-                    <Pic key={c} name={`kbank-home-${c}`} className="kbh-art" />
+                    <Pic key={c} name={`kbank-home-${c}`} className={`kbh-art kbh-coin__${c}`} />
                   ))}
                 </span>
                 <p className="kbh-t kbh-link__t">흩어져 있는 내 계좌</p>

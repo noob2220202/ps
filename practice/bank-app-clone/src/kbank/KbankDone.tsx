@@ -196,10 +196,12 @@ function MsgEmoji() {
     return () => clearInterval(t);
   }, []);
   const pic = (i: number) => localAsset(EMOJI[i % EMOJI.length]);
+  // 그림마다 잉크 상자로 다듬어 자리가 다름 (kbank-done.css .kbd-emoji--smile …)
+  const kind = (i: number) => `kbd-emoji--${EMOJI[i % EMOJI.length].replace("kbank-send-", "")}`;
   return (
     <span className="kbd-emoji" aria-hidden>
-      {n > 0 && pic(n - 1) && <img key={n - 1} className="kbd-emoji__out" src={pic(n - 1)} alt="" draggable={false} />}
-      {pic(n) && <img key={n} className="kbd-emoji__in" src={pic(n)} alt="" draggable={false} />}
+      {n > 0 && pic(n - 1) && <img key={n - 1} className={`kbd-emoji__out ${kind(n - 1)}`} src={pic(n - 1)} alt="" draggable={false} />}
+      {pic(n) && <img key={n} className={`kbd-emoji__in ${kind(n)}`} src={pic(n)} alt="" draggable={false} />}
     </span>
   );
 }

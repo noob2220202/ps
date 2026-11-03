@@ -129,6 +129,25 @@
   width: 21.5px;
   height: 23.4px;
 }
+/* 그림마다 잉크 상자로 다듬음 (녹화 px: 웃는 얼굴 257.75~285.75 × 705.25~733.25 · 네잎클로버 258.75~283.75 × 703.5~734 · 돈주머니 257~285.5 × 703.25~734) */
+.kbd-emoji .kbd-emoji--smile {
+  left: 2.44px;
+  top: 0.11px;
+  width: 18.24px;
+  height: 18.2px;
+}
+.kbd-emoji .kbd-emoji--clover {
+  left: 3.09px;
+  top: -1.03px;
+  width: 16.29px;
+  height: 19.82px;
+}
+.kbd-emoji .kbd-emoji--bag {
+  left: 1.95px;
+  top: -1.19px;
+  width: 18.57px;
+  height: 19.99px;
+}
 .kbd-emoji__in {
   animation: kbd-roll-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1) 70ms both;
 }

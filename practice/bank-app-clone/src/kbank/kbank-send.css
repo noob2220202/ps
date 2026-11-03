@@ -320,12 +320,13 @@
 }
 /* 두 녹화(첫 690~701 · 두 번째 690~711 평균)와 겹쳐 보고 아이콘은 0.6 아래, 글자는 0.6 왼쪽 · 0.7 위였음 → 옮김 (두 문구 같은 값).
    글자 세로는 top 소수가 CSS 1px 기준선 반올림에 먹혀서(0.35 → 0) transform 으로 내림 (FONT.md) */
+/* 그림은 잉크 상자로 다듬음 (녹화 169~197 × 1114.5~1145px, 1차 상자 166 · 1111 기준 +3 · +3.5) */
 .kbs-ai img {
   position: absolute;
-  left: 14.5px;
-  top: 14.2px;
-  width: 22.1px;
-  height: 23.4px;
+  left: 16.45px;
+  top: 16.47px;
+  width: 18.2px;
+  height: 19.82px;
 }
 .kbs-ai span {
   position: relative;

@@ -43,7 +43,8 @@ export function KbankCopyIcon({ color, size = 14.3 }: { color: string; size?: nu
   );
 }
 
-// 은행 원 로고: 녹화에 나온 것(카카오뱅크·케이뱅크·농축협·새마을금고)은 녹화에서 잘라 키운 그림(scripts/kbank-crops/send.py), 나머지는 공용 BankIcon
+// 은행 원 로고: 녹화에 나온 것(카카오뱅크·케이뱅크·농축협·새마을금고)은 녹화에 맞춰 다시 그린 SVG(새마을금고만 그라데이션이라 PNG) —
+// 상자 = 녹화에서 잡은 원 상자 크기, 원은 가운데. 나머지는 공용 BankIcon
 export function KbankBankLogo({ bank, size }: { bank: Pick<Bank, "code" | "name" | "short" | "color"> & Partial<Bank>; size: number }) {
   const src = localAsset(`kbank-bank-${bank.code}`);
   if (src) return <img className="kb-logo" src={src} alt={bank.name} width={size} height={size} draggable={false} />;

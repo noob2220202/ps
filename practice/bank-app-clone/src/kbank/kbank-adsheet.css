@@ -63,12 +63,13 @@ html[data-os="ios"] .kbad-dim {
 .kbad-top > * {
   position: absolute;
 }
-/* 구름 말풍선 + 흰 '!' (home-v2.py adcloud): 자산 칸 x 133.4~251.9 · y 449.1~556.5 (118.45 × 107.39), 가운데 x 192.65 */
+/* 구름 말풍선 + 흰 '!' (home-v2.py adcloud): 자산 칸 x 133.4~251.9 · y 449.1~556.5 (118.45 × 107.39), 가운데 x 192.65.
+   그림은 잉크 상자로 다듬음 (녹화 212.25~379.75 × 748~898px, 1차 상자 205 · 741 기준 +7.25 · +7) */
 .kbad-art {
-  left: calc(50% - 58.58px);
-  top: 36.08px;
-  width: 118.45px;
-  height: 107.39px;
+  left: calc(50% - 53.86px);
+  top: 40.64px;
+  width: 109.01px;
+  height: 97.63px;
 }
 /* '개인사업자 신용대출도' 14px 400 #414753, 가운데, top 585.9 */
 .kbad-sub {
