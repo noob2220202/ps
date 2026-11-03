@@ -18,7 +18,6 @@ import "./kbank-receipt.css";
 // 연습용 앱이라 카드에 옅은 '연습용 화면 · 실제 이체 아님' 무늬를 깔아 둠 (i-ONE 이체확인증 IbkCertificate 와 같은 이유 — 실제 확인증처럼 쓰이지 않게).
 // 녹화에는 없음 → 겹쳐 잴 때는 .kbc-mark 를 숨김 (display: none)
 
-const MARK = "연습용 화면 · 실제 이체 아님";
 const seenKeys = new Set<string>(); // 그린 적 있는 방문 기록 칸 — 앞으로 가기로 다시 들어오면 올라오지 않음 (KbankTxDetail 과 같음)
 
 // 표 행 가운데 y (카드 안 = 앱 y − 58.9; 카드는 59 에 놓고 글자는 kbank-receipt.css 에서 겹쳐 맞춤): 녹화 거래일시 213.2 · 거래구분 242.5 · 출금계좌 271.8 · 보낸사람 301.7 · 받는계좌 331.0 · 받는 분 360.3
@@ -157,9 +156,6 @@ export function KbankReceipt() {
             </>
           )}
           <div className="kbc-mark" aria-hidden>
-            {Array.from({ length: 9 }, (_, i) => (
-              <p key={i}>{`${MARK}　　${MARK}　　${MARK}`}</p>
-            ))}
           </div>
         </section>
       </div>
