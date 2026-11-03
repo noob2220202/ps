@@ -430,8 +430,19 @@ html[data-intro-play] .phone > .statusbar {
   box-shadow: none !important;
   color: #ffffff;
 }
-html[data-intro-play] .phone > .statusbar :is(.statusbar__carrier, .statusbar__right--kbank, .kb-sb-notif) {
+html[data-intro-play] .phone > .statusbar :is(.statusbar__carrier, .kb-sb-notif, .kb-sb-icons > :not(.kb-sb-batt)) {
   visibility: hidden;
+}
+/* 배터리도 영상에서 지워 두고(delogo=x=531:y=13:w=46:h=29) 정해 둔 값으로 그림. 영상 속 색: 채움 흰색, 빈 칸은 흰색 34% (바탕 2 → 87,
+   26 → 104, 196 → 216 으로 셋 다 0.34), 숫자 #494949 */
+html[data-intro-play] .phone > .statusbar .kb-sb-batt [fill="#494949"] {
+  fill: #ffffff;
+}
+html[data-intro-play] .phone > .statusbar .kb-sb-batt__empty {
+  fill: rgba(255, 255, 255, 0.34);
+}
+html[data-intro-play] .phone > .statusbar .kb-sb-batt__num {
+  fill: #494949;
 }
 html[data-intro-play] .phone > .statusbar .kb-sb-left [fill="#494949"] {
   fill: #ffffff;

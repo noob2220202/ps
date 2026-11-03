@@ -163,16 +163,19 @@ function KbankIcons() {
           <rect x="339.03" y="14.78" width="1.58" height="8.69" rx="0.45" />
           <rect x="342.17" y="11.76" width="1.58" height="11.71" rx="0.45" />
         </g>
-        <clipPath id="kb-batt">
-          <rect x="348.9" y="11.3" width="22.7" height="13.05" rx="6.52" />
-        </clipPath>
-        <g clipPath="url(#kb-batt)">
-          <rect x="348.9" y="11.3" width="22.7" height="13.05" fill="#bab8b9" />
-          <rect x="348.9" y="11.3" width={lv - 348.9} height="13.05" fill="#494949" />
+        {/* 배터리만 묶음: kbank2 녹화 인트로 동안엔 이것만 영상 위에 그림 (PhoneFrame.css [data-intro-play]) */}
+        <g className="kb-sb-batt">
+          <clipPath id="kb-batt">
+            <rect x="348.9" y="11.3" width="22.7" height="13.05" rx="6.52" />
+          </clipPath>
+          <g clipPath="url(#kb-batt)">
+            <rect className="kb-sb-batt__empty" x="348.9" y="11.3" width="22.7" height="13.05" fill="#bab8b9" />
+            <rect x="348.9" y="11.3" width={lv - 348.9} height="13.05" fill="#494949" />
+          </g>
+          <text className="kb-sb-batt__num" x="361.2" y="21.5" textAnchor="middle" fontSize="9.6" fontWeight="500" fill="#eeeeee" fontFamily="Roboto, sans-serif">
+            {battery}
+          </text>
         </g>
-        <text x="361.2" y="21.5" textAnchor="middle" fontSize="9.6" fontWeight="500" fill="#eeeeee" fontFamily="Roboto, sans-serif">
-          {battery}
-        </text>
       </svg>
     </span>
   );

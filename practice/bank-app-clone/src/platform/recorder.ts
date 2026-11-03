@@ -10,7 +10,6 @@
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { BLINK_MS, isIntroOn, syncBlink } from "./intro";
-import { setBattery } from "./deviceStatus";
 import { OS } from "./platform";
 import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
 import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
@@ -21,16 +20,14 @@ import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
 //   -colorspace bt709 -color_primaries bt709 -color_trc bt709 에 mp4 는 -c:v libx264 -profile:v high -level 3.1 -bf 0 -crf 20 -movflags +faststart,
 //   webm 은 -c:v libvpx-vp9 -crf 24 -b:v 0 -row-mt 1. mp4 는 B 프레임 없이(-bf 0) — 있으면 첫 장면이 0.233초에서 시작해(편집 목록)
 //   브라우저 시간·길이가 webm 과 달라짐. 프레임 평균 오차(녹화 30fps 프레임 대비) mp4 0.70 · webm 0.77 / 255
-// 상태바 배터리는 영상 값으로 맞춰 둠 (영상이 끝나고 우리 상태바로 넘어갈 때 뚝 바뀌어 보이지 않게)
 const INTRO = {
   sources: [
     { src: kbankIntroMp4, type: 'video/mp4; codecs="avc1.64001F"' },
     { src: kbankIntroWebm, type: 'video/webm; codecs="vp9"' },
   ],
-  // 시각은 영상에서 지워 둠 (영상 속 시계 · 빨간 녹화 알약 · 캠코더 자리: delogo=x=57:y=11:w=135:h=34) → 영상이 도는 동안에도
-  // 우리 상태바의 시각 · 알약 · 캠코더를 영상 위에 올려 그려서(PhoneFrame.css [data-intro-play]) 녹화에 지금 시각이 찍힘.
-  // 만드는 명령은 위와 같고 -vf 끝에 ,delogo=x=57:y=11:w=135:h=34 를 붙임
-  battery: 24,
+  // 시각 · 배터리는 영상에서 지워 둠 (영상 속 시계 · 빨간 녹화 알약 · 캠코더 자리 delogo=x=57:y=11:w=135:h=34, 배터리 delogo=x=531:y=13:w=46:h=29)
+  // → 영상이 도는 동안에도 우리 상태바의 시각 · 알약 · 캠코더 · 배터리를 영상 위에 올려 그려서(PhoneFrame.css [data-intro-play])
+  // 녹화에 지금 시각과 정해 둔 배터리 값이 찍힘. 만드는 명령은 위와 같고 -vf 끝에 그 두 delogo 를 붙임
   // 영상 끝(녹화 5.60초)에 캠코더 표시가 켜진 지: 영상 속 켜짐 2.200초(77장 중 67번째) → 끝 2.567초 = 0.37초째. 꺼짐은 녹화 5.713~5.738초 사이
   blinkOnMs: 370,
 };
@@ -231,11 +228,9 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     await started;
     await nextFrame();
     // 영상을 틀고, 끝나면 바로 시작화면 (영상과 폰 틀이 같은 기기·같은 비율이라 상태바·손잡이가 안 끊기고 한 번의 녹화로 이어짐)
-    // 배터리만 녹화 동안 영상 값으로 (시각은 지금 시각 그대로 — 영상 속 시계는 지워 둠). 끝나면 사용자가 정해 둔 값으로 되돌림
-    const before = deviceStatusNow();
-    setBattery(INTRO.battery);
+    // 시각 · 배터리는 지금 값 그대로 (영상 속 시계 · 배터리는 지워 둠)
     const stopKeep = keepCapturing(target);
-    recorder.addEventListener("stop", () => (stopKeep(), restoreDeviceStatus(before)), { once: true });
+    recorder.addEventListener("stop", stopKeep, { once: true });
     await playIntro(intro, target);
   } else {
     await sleep(600);
@@ -243,19 +238,6 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   }
 }
 
-// 상태바 배터리 지금 값 (deviceStatus.ts 가 localStorage 'deviceStatus' 에 둔 것. 없으면 그 기본값 62%)
-function deviceStatusNow(): { battery: number } {
-  try {
-    const v = JSON.parse(localStorage.getItem("deviceStatus") ?? "null");
-    if (v && typeof v.battery === "number") return { battery: v.battery };
-  } catch {
-    // 못 읽으면 기본값
-  }
-  return { battery: 62 };
-}
-function restoreDeviceStatus(s: { battery: number }) {
-  setBattery(s.battery);
-}
 
 // 녹화가 끊기지 않게: 인트로 영상(2.6초 동안 화면 전체가 30fps 로 바뀜)이 끝나면 크롬 화면 캡처가 '움직이는 영역'을 그 영상으로 잡은 채
 // 0.4초 동안 새 프레임을 안 내보내고(시작화면 첫 0.4초·상태바가 바뀌는 모습이 빠짐), 그 뒤로도 0.5~0.75초 간격으로만 찍었음
