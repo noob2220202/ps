@@ -6,8 +6,6 @@ import "./SuspendedDialog.css";
 // 서버 403 ACCOUNT_SUSPENDED — AmountScreen). 상태바까지 폰 전체를 어둡게 덮음.
 // 받은 스크린샷(360dp 기기, 800px) 에서 잼: 상자 양옆 24.3 · 모서리 19, 제목 16.3px 굵게 · 본문 13.5px 세 줄(줄 간격 19) ·
 // '오류코드 보기 ∨' · 'AI 상담챗봇' 알약(101.7 × 35) · 노란 '확인'(높이 51.8, 양옆 15.75). 막은 검정 58%.
-// 연습용 앱이라 상자 맨 위에 '연습용 화면 · 실제 이용 제한 아님' 표시가 늘 같이 나옴 (끄는 설정 없음 — 실제 제한 화면처럼 쓰이지 않게)
-export const PRACTICE_MARK = "연습용 화면 · 실제 이용 제한 아님";
 
 export function SuspendedDialog({ onClose }: { onClose: () => void }) {
   const [code, setCode] = useState(false);
@@ -15,7 +13,6 @@ export function SuspendedDialog({ onClose }: { onClose: () => void }) {
   const el = (
     <div className="susp" role="alertdialog" aria-modal="true" aria-labelledby="susp-title" aria-describedby="susp-desc">
       <div className="susp__box">
-        <p className="susp__mark">{PRACTICE_MARK}</p>
         <h2 id="susp-title" className="susp__title">
           고객센터로 문의해주세요.
         </h2>
@@ -30,7 +27,7 @@ export function SuspendedDialog({ onClose }: { onClose: () => void }) {
             <path d="M3.2 5.8 8 10.6l4.8-4.8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        {code && <p className="susp__codeval">[연습용] TEST-0000</p>}
+        {code && <p className="susp__codeval">B-0112</p>}
         {/* AI 상담챗봇: 연습용이라 무반응 */}
         <button className="susp__bot">
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
