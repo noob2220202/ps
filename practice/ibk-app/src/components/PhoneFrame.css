@@ -321,34 +321,65 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
     opacity: 0;
   }
 }
-/* 녹화 인트로가 도는 동안: 영상 속 시계는 지워 둠(scripts/intro-erase-clock.py) → 우리 상태바를 영상(z 999) 위로 올려 시각만 그림
-   (지금 시각이 찍히게). 알림·캠코더·LTE·배터리는 영상에 그대로 있으니 숨기고, 바탕은 비워서 영상이 보이게.
-   글자는 영상 속 글자처럼: 압축으로 살짝 흐리고 순백이 아님 (#f0f0f0 + blur 0.4px — 원본 '10:00' 과 겹쳐 잰 차이 17.2 → 7.1 / 255).
+/* 녹화 인트로가 도는 동안: 영상 속 시계와 오른쪽 아이콘 묶음(LTE · 신호 · 38% · 배터리)은 지워 둠(scripts/intro-erase-clock.py)
+   → 우리 상태바를 영상(z 999) 위로 올려 그것들을 그림 (지금 시각 · 정해 둔 배터리 값이 찍히게, 배터리 자릿수에 따라 LTE·신호도 같이 밀림).
+   알림·캠코더(왼쪽)는 영상에 그대로 있으니 숨기고, 바탕은 비워서 영상이 보이게.
+   색은 영상 속 그대로 (원본 장면 45 에서 잼): 글자 · LTE · 신호 · 배터리 채움 거의 흰색, 데이터 화살표 흰색 30%, 배터리 빈 칸 흰색 32%,
+   꼭지 흰색 15%. 압축으로 살짝 흐림 (#f0f0f0 + blur 0.4px — 원본 '10:00' 과 겹쳐 잰 차이 17.2 → 7.1 / 255).
    영상 끝 무렵은 영상 글자처럼 79 · 80번째 장면 흐려짐, 81 반쯤 어두움, 82~ 진한 글자 (장면마다 겹쳐 고른 값, recorder.ts introClockStep) */
 html[data-intro-play] .phone > .statusbar {
   z-index: 1000;
   background: transparent !important;
   box-shadow: none !important;
 }
-html[data-intro-play] .phone > .statusbar .statusbar__right--ibk {
+html[data-intro-play] .phone > .statusbar .ibk-sb-left {
   visibility: hidden;
 }
-html[data-intro-play] .phone > .statusbar .statusbar__time {
-  color: #f0f0f0;
+html[data-intro-play] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
   filter: blur(0.4px);
 }
-html[data-intro-play="f79"] .phone > .statusbar .statusbar__time {
-  color: rgba(240, 240, 240, 0.15);
+html:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar :is(.statusbar__time, .ibk-sb-pct) {
+  color: #f0f0f0;
 }
-html[data-intro-play="f80"] .phone > .statusbar .statusbar__time {
-  color: rgba(240, 240, 240, 0.1);
+html:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [stroke="#4d4d4d"] {
+  stroke: #f0f0f0;
 }
-html[data-intro-play="f81"] .phone > .statusbar .statusbar__time {
-  color: rgba(20, 15, 15, 0.6);
+html:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [stroke="#c9c9c9"] {
+  stroke: rgba(255, 255, 255, 0.3);
+}
+html:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons :is([fill="#454545"], [fill="#4a4a4a"]) {
+  fill: #f5f5f5;
+}
+html:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [fill="#c4c4c4"] {
+  fill: rgba(255, 255, 255, 0.32);
+}
+html:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [fill="#bcbcbc"] {
+  fill: rgba(255, 255, 255, 0.15);
+}
+/* 81 · 82~ 장면: 영상 속 아이콘도 진한 색 (배터리 채움 24 · 빈 칸 50 · 꼭지 54 / 255, 장면 82) */
+html:is([data-intro-play="f81"], [data-intro-play="dark"]) .phone > .statusbar .ibk-sb-icons :is([stroke="#4d4d4d"], [stroke="#c9c9c9"]) {
+  stroke: rgb(25, 12, 12);
+}
+html:is([data-intro-play="f81"], [data-intro-play="dark"]) .phone > .statusbar .ibk-sb-icons :is([fill="#454545"], [fill="#4a4a4a"]) {
+  fill: rgb(25, 12, 12);
+}
+html:is([data-intro-play="f81"], [data-intro-play="dark"]) .phone > .statusbar .ibk-sb-icons :is([fill="#c4c4c4"], [fill="#bcbcbc"]) {
+  fill: rgb(55, 48, 48);
+}
+html[data-intro-play="f79"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  opacity: 0.15;
+}
+html[data-intro-play="f80"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  opacity: 0.1;
+}
+html[data-intro-play="f81"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  color: rgb(20, 15, 15);
+  opacity: 0.6;
   filter: blur(1px);
 }
-html[data-intro-play="dark"] .phone > .statusbar .statusbar__time {
-  color: rgba(25, 12, 12, 0.7);
+html[data-intro-play="dark"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  color: rgb(25, 12, 12);
+  opacity: 0.7;
   filter: blur(0.8px);
 }
 .ibk-sb-pct {

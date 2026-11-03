@@ -10,13 +10,10 @@
 import { useSyncExternalStore } from "react";
 import { isCapture, setCapture } from "./capture";
 import { isIntroOn, syncBlink } from "./intro";
-import { setBattery } from "./deviceStatus";
 import introSrc from "../assets/intro/ibk-open-intro.mp4";
 
-// 인트로 영상(ibk-open-intro.mp4) 첫 프레임에 찍힌 배터리 값 그대로. 영상이 끝나고 우리 상태바로 넘어갈 때 뚝 바뀌어 보이지 않도록
-// 인트로 재생 전에 이 값으로 맞춰 둔다. 시계는 영상에서 지워 두고(scripts/intro-erase-clock.py) 영상이 도는 동안 우리 상태바의
-// 시각을 영상 위로 올려 그림 (PhoneFrame.css [data-intro-play]) → 녹화에 지금 시각이 찍힘
-const INTRO_BATTERY = 38;
+// 시계 · 배터리(오른쪽 아이콘 묶음)는 영상에서 지워 두고(scripts/intro-erase-clock.py) 영상이 도는 동안 우리 상태바를 영상 위로 올려
+// 그림 (PhoneFrame.css [data-intro-play]) → 녹화에 지금 시각과 정해 둔 배터리 값이 찍힘
 // 영상 속 상태바 글자가 앱 쪽 색으로 바뀌는 장면 (30fps 장면 번호): 79 · 80 흐려짐, 81 반쯤 어두움, 82~ 진한 글자 → PhoneFrame.css 단계별 색
 const introClockStep = (t: number) => {
   const n = Math.floor(t * 30 + 0.01);
@@ -214,7 +211,6 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   // 인트로 켜져 있으면: 폰 위에 실제 기기 영상(홈 화면 → 앱 찾기 → 탭)을 먼저 재생하고, 끝나자마자 바로 시작화면으로
   // (인트로 영상이 폰 프레임과 같은 기기·같은 해상도라 상태바·3버튼 내비바가 안 끊기고 한 녹화로 자연스럽게 이어짐)
   if (isIntroOn()) {
-    setBattery(INTRO_BATTERY); // 영상 속 배터리와 맞춰서, 영상이 끝나고 우리 상태바로 넘어갈 때 숫자가 안 튀게 (시각은 지금 시각 그대로)
     await playIntro(target);
   } else {
     await sleep(600);
