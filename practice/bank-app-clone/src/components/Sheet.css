@@ -3,6 +3,10 @@
   inset: 0;
   z-index: 40;
   pointer-events: none;
+  /* 닫힌 시트(아래로 내려 둔 패널)가 화면의 스크롤 영역을 늘리지 않게 잘라 냄 — 안 그러면 이체 화면이 아래로 스크롤되어
+     숨겨 둔 은행선택 시트가 보였음 (계좌번호를 넣을 때 화면이 밀려 내려감). clip = 포커스로도 안쪽이 스크롤되지 않음 */
+  overflow: hidden;
+  overflow: clip;
 }
 .sheet--open {
   pointer-events: auto;
