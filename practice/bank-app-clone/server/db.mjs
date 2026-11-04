@@ -231,8 +231,9 @@ export function seedExample(d) {
     acc.run("nh", "external", "nh", "302-0000-0000-00", 0, 0, 2);
     const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
     for (const row of SEED_TX) tx.run(...row);
-    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder) VALUES (?, ?, ?)");
-    for (const row of SEED_PAYEES) payee.run(...row);
+    // ☆ = 이체 화면 '최근 이체'에 나옴 (카카오뱅크) — 예시는 예전 이체가 있는 3명만
+    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
+    for (const row of SEED_PAYEES) payee.run(...row, SEED_TRANSFERS.some((t) => t[1] === row[0] && t[2] === row[1]) ? 1 : 0);
     const tr = d.prepare(
       "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",
     );
