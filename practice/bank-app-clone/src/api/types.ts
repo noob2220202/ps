@@ -132,6 +132,7 @@ export interface Payee {
   number: string;
   holder: string;
   favorite: boolean;
+  showRecent?: boolean; // 카카오뱅크: 이체 화면 '최근 이체'에 보임 (🔔 받는 분, ☆ 와 따로)
   receiveError?: boolean; // i-ONE Bank: 보내면 받는 은행 오류 안내 (🔔 관리 → 받는 분에서 켬)
 }
 

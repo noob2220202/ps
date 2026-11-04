@@ -153,6 +153,7 @@ function migrate(d) {
   if (!columns("profile").includes("cashback_count")) d.exec("ALTER TABLE profile ADD COLUMN cashback_count INTEGER NOT NULL DEFAULT 2");
   if (!columns("accounts").includes("safebox")) d.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");
   if (!columns("payees").includes("receive_error")) d.exec("ALTER TABLE payees ADD COLUMN receive_error INTEGER NOT NULL DEFAULT 0");
+  if (!columns("payees").includes("show_recent")) d.exec("ALTER TABLE payees ADD COLUMN show_recent INTEGER NOT NULL DEFAULT 0"); // 카카오뱅크 '최근 이체'에 보일지 (🔔 받는 분)
   if (!columns("profile").includes("suspended")) d.exec("ALTER TABLE profile ADD COLUMN suspended INTEGER NOT NULL DEFAULT 0"); // 카카오뱅크 계좌 지급정지 (🔔 패널, 연습용)
   if (columns("profile").includes("mini_account_no")) {
     // mini 계좌 삭제: 거래·이체 기록은 ON DELETE CASCADE로 같이 지워지고, mini로 "보낸" 기록만 따로 정리
@@ -231,8 +232,8 @@ export function seedExample(d) {
     acc.run("nh", "external", "nh", "302-0000-0000-00", 0, 0, 2);
     const tx = d.prepare("INSERT INTO transactions (account_id, at, merchant, amount, tag) VALUES ('main', ?, ?, ?, ?)");
     for (const row of SEED_TX) tx.run(...row);
-    // ☆ = 이체 화면 '최근 이체'에 나옴 (카카오뱅크) — 예시는 예전 이체가 있는 3명만
-    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)");
+    // show_recent = 이체 화면 '최근 이체'에 나옴 (카카오뱅크, ☆ 즐겨찾기와 따로) — 예시는 예전 이체가 있는 3명만
+    const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, show_recent) VALUES (?, ?, ?, ?)");
     for (const row of SEED_PAYEES) payee.run(...row, SEED_TRANSFERS.some((t) => t[1] === row[0] && t[2] === row[1]) ? 1 : 0);
     const tr = d.prepare(
       "INSERT INTO transfers (from_account_id, bank_code, number, holder, amount, at, out_tx_id) VALUES ('main', ?, ?, ?, ?, ?, ?)",

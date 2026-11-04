@@ -50,8 +50,8 @@ export const api = {
   deleteProfile: (id: string) => http.delete(`${paths.profiles}/${id}`),
 
   // 받는 분 (🔔 패널)
-  addPayee: (body: { bankCode: string; number: string; holder: string; favorite?: boolean }) => http.post<Payee>(paths.payees, body),
-  updatePayee: (id: string, patch: { number?: string; holder?: string; favorite?: boolean; receiveError?: boolean }) =>
+  addPayee: (body: { bankCode: string; number: string; holder: string; showRecent?: boolean }) => http.post<Payee>(paths.payees, body),
+  updatePayee: (id: string, patch: { number?: string; holder?: string; favorite?: boolean; receiveError?: boolean; showRecent?: boolean }) =>
     http.patch<Payee>(`${paths.payees}/${id}`, patch),
   deletePayee: (id: string) => http.delete(`${paths.payees}/${id}`),
 

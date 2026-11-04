@@ -626,6 +626,7 @@ const toPayee = (p) => ({
   number: p.number,
   holder: p.holder,
   favorite: !!p.favorite,
+  showRecent: !!p.show_recent, // 카카오뱅크 '최근 이체'에 보임
   ...(p.receive_error && { receiveError: true }), // i-ONE Bank: 받는 은행 오류 안내를 띄울 계좌
 });
 
@@ -663,10 +664,10 @@ app.get("/api/payees", (_req, res) => res.json(db().prepare("SELECT * FROM payee
 
 app.post("/api/payees", (req, res) => {
   const { bankCode, digits, name } = checkPayee(req.body ?? {});
-  // favorite: ☆ (카카오뱅크는 ☆ 누른 받는 분만 이체 화면 '최근 이체'에 나옴)
+  // showRecent: 카카오뱅크 이체 화면 '최근 이체'에 보이게 (☆ 즐겨찾기와 따로)
   const r = db()
-    .prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, ?)")
-    .run(bankCode, digits, name, req.body?.favorite === true ? 1 : 0);
+    .prepare("INSERT INTO payees (bank_code, number, holder, show_recent) VALUES (?, ?, ?, ?)")
+    .run(bankCode, digits, name, req.body?.showRecent === true ? 1 : 0);
   res.status(201).json(toPayee(findPayee(r.lastInsertRowid)));
 });
 
@@ -676,9 +677,10 @@ app.patch("/api/payees/:id", (req, res) => {
   const { bankCode, digits, name } = checkPayee(body, p);
   const favorite = body.favorite === undefined ? p.favorite : body.favorite ? 1 : 0;
   const receiveError = body.receiveError === undefined ? p.receive_error : body.receiveError ? 1 : 0;
+  const showRecent = body.showRecent === undefined ? p.show_recent : body.showRecent ? 1 : 0;
   db()
-    .prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ?, receive_error = ? WHERE id = ?")
-    .run(bankCode, digits, name, favorite, receiveError, p.id);
+    .prepare("UPDATE payees SET bank_code = ?, number = ?, holder = ?, favorite = ?, receive_error = ?, show_recent = ? WHERE id = ?")
+    .run(bankCode, digits, name, favorite, receiveError, showRecent, p.id);
   res.json(toPayee(findPayee(p.id)));
 });
 
@@ -711,9 +713,9 @@ app.get("/api/transfer/lookup", (req, res) => res.json(findRecipient(req.query.b
 function kakaoRecent() {
   return db()
     .prepare(
-      `SELECT p.id AS payee_id, p.bank_code, p.number, p.holder, p.receive_error,
+      `SELECT p.id AS payee_id, p.bank_code, p.number, p.holder, p.favorite, p.receive_error,
               (SELECT MAX(t.at) FROM transfers t WHERE t.bank_code = p.bank_code AND t.number = p.number AND ${SENT("t")}) AS last_at
-         FROM payees p WHERE p.favorite = 1
+         FROM payees p WHERE p.show_recent = 1
         ORDER BY last_at IS NULL, last_at DESC, p.id DESC`,
     )
     .all()
@@ -723,7 +725,7 @@ function kakaoRecent() {
       holder: r.holder,
       lastAt: r.last_at ?? null,
       payeeId: String(r.payee_id),
-      favorite: true,
+      favorite: !!r.favorite,
       ...(r.receive_error && { receiveError: true }),
     }));
 }
@@ -739,7 +741,7 @@ app.get("/api/transfer/recipients", (req, res) => {
       return { accountId: acc.id, kind: acc.kind, label: acc.label, bank: acc.bank, number: acc.number, holder: profile.userName, balance: acc.balance };
     });
   // 같은 계좌로 여러 번 보냈으면 마지막 한 번만. 받는 분이 등록돼 있으면 ☆ 상태도 같이. 입금 거래에 붙인 보낸 분 기록은 뺌 (SENT)
-  // 카카오뱅크: '최근 이체' = 🔔 받는 분에서 ☆ 를 켠 사람만 (최근에 보낸 순, 안 보낸 사람은 나중에 등록한 순) — 목록을 직접 정하려고
+  // 카카오뱅크: '최근 이체' = 🔔 받는 분에서 '최근 이체에 표시'를 켠 사람만 (☆ 즐겨찾기와 따로) (최근에 보낸 순, 안 보낸 사람은 나중에 등록한 순) — 목록을 직접 정하려고
   const recent = APP === "kakao" ? kakaoRecent() : db()
     .prepare(
       `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite, p.receive_error

@@ -693,7 +693,7 @@ function PayeesTab({ run }: { run: Run }) {
     <div className="tab">
       <p className="tab__hint">
         이체 화면에서 계좌번호를 입력하면 여기 등록된 이름이 나와요. 등록 안 된 계좌는 "계좌정보를 확인해 주세요"가 떠요.
-        (내 계좌는 등록하지 않아도 돼요){APP === "kakao" && " ★ 를 켠 받는 분만 이체 화면 '최근 이체'에 나와요."}
+        (내 계좌는 등록하지 않아도 돼요){APP === "kakao" && " '최근 이체에 표시'를 켠 받는 분만 이체 화면 '최근 이체'에 나와요."}
       </p>
       <h3 className="tab__h tab__h--first">받는 분 {payees.data.length}명</h3>
       {payees.data.map((p) => (
@@ -716,6 +716,7 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
         <span className="acct-edit__name">
           <strong>
             {payee.holder} {payee.favorite && "★"} {payee.receiveError && "⚠"}
+            {APP === "kakao" && payee.showRecent && <small> · 최근 이체</small>}
           </strong>
           <small>
             {payee.bank.short} {payee.number}
@@ -735,18 +736,18 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
             <button className="btn btn--sm" onClick={() => run(() => api.updatePayee(payee.id, { holder, number }), "받는 분 정보를 바꿨어요")}>
               저장
             </button>
-            {/* 카카오뱅크: ☆ 켠 받는 분만 이체 화면 '최근 이체'에 나옴 */}
+            {/* 카카오뱅크: 이 받는 분을 이체 화면 '최근 이체'에 보일지 (☆ 즐겨찾기와 따로) */}
             {APP === "kakao" && (
               <button
                 className="btn btn--sm btn--ghost"
                 onClick={() =>
                   run(
-                    () => api.updatePayee(payee.id, { favorite: !payee.favorite }),
-                    payee.favorite ? "최근 이체에서 뺐어요" : "최근 이체에 넣었어요",
+                    () => api.updatePayee(payee.id, { showRecent: !payee.showRecent }),
+                    payee.showRecent ? "최근 이체에서 뺐어요" : "최근 이체에 넣었어요",
                   )
                 }
               >
-                {payee.favorite ? "★ 최근 이체에서 빼기" : "☆ 최근 이체에 넣기"}
+                {payee.showRecent ? "최근 이체에서 빼기" : "최근 이체에 넣기"}
               </button>
             )}
             {/* i-ONE Bank: 실제 녹화(28초)의 받는 은행 오류 안내를 이 계좌로 재현 */}
@@ -780,7 +781,7 @@ function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
   const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" || APP === "ibk" || APP === "kbank" ? APP : "nh")) ?? banks[0]);
   const [number, setNumber] = useState("");
   const [holder, setHolder] = useState("");
-  const [star, setStar] = useState(true); // 카카오뱅크: ☆ = 이체 화면 '최근 이체'에 나옴
+  const [recent, setRecent] = useState(true); // 카카오뱅크: 이체 화면 '최근 이체'에 보이게
   return (
     <div className="add-bank">
       <BankSelect
@@ -798,14 +799,14 @@ function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
         <input value={holder} maxLength={20} placeholder="예: 김민지" onChange={(e) => setHolder(e.target.value)} />
       </Field>
       {APP === "kakao" && (
-        <button type="button" className={`chip-btn${star ? " on" : ""}`} style={{ alignSelf: "flex-start" }} onClick={() => setStar(!star)}>
-          {star ? "★ 최근 이체에 표시" : "☆ 최근 이체에 안 보임"}
+        <button type="button" className={`chip-btn${recent ? " on" : ""}`} style={{ alignSelf: "flex-start" }} onClick={() => setRecent(!recent)}>
+          {recent ? "✓ 최근 이체에 표시" : "최근 이체에 안 보임"}
         </button>
       )}
       <button
         className="btn"
         onClick={async () => {
-          if (await run(() => api.addPayee({ bankCode: bank.code, number, holder, ...(APP === "kakao" && { favorite: star }) }), `${holder}님을 등록했어요`)) {
+          if (await run(() => api.addPayee({ bankCode: bank.code, number, holder, ...(APP === "kakao" && { showRecent: recent }) }), `${holder}님을 등록했어요`)) {
             setNumber("");
             setHolder("");
           }
