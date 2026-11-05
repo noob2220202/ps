@@ -560,6 +560,7 @@ function TxTab({ run }: { run: Run }) {
   const [tag, setTag] = useState<TxTag>("#체크카드");
   const list = useApi<Transaction[]>(paths.transactions(accountId));
   const [editing, setEditing] = useState<string | null>(null);
+  const [shown, setShown] = useState(10); // 보여 줄 거래 수 (더 보기로 늘림)
 
   if (home.status !== "done" || banks.status !== "done") return <div className="tab">불러오는 중…</div>;
   const accounts = home.data.accounts;
@@ -616,7 +617,7 @@ function TxTab({ run }: { run: Run }) {
       <p className="tab__hint">거래를 누르면 상세거래내역 시트에 보이는 값을 전부 고칠 수 있어요 (시간까지).</p>
       {list.status === "done" && list.data.length === 0 && <p className="tab__hint">거래가 없어요.</p>}
       {list.status === "done" &&
-        list.data.slice(0, 10).map((t) => (
+        list.data.slice(0, shown).map((t) => (
           <div key={t.id}>
             <div className="tx-row">
               <button type="button" className="tx-row__main" onClick={() => setEditing(editing === t.id ? null : t.id)}>
@@ -632,6 +633,17 @@ function TxTab({ run }: { run: Run }) {
             {editing === t.id && <TxEditForm tx={t} banks={banks.data} run={run} onSaved={() => setEditing(null)} />}
           </div>
         ))}
+      {/* 예전엔 최근 10건만 보여서 그보다 오래된 거래는 고칠 수 없었음 → 더 보기 / 전부 보기 */}
+      {list.status === "done" && list.data.length > shown && (
+        <div className="row">
+          <button className="btn btn--sm" style={{ flex: 1 }} onClick={() => setShown(shown + 20)}>
+            더 보기 ({shown} / {list.data.length}건)
+          </button>
+          <button className="btn btn--sm btn--ghost" onClick={() => setShown(list.data.length)}>
+            전부 보기
+          </button>
+        </div>
+      )}
     </div>
   );
 }
