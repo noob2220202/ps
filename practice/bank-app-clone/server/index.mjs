@@ -435,12 +435,12 @@ app.patch("/api/accounts/:id", (req, res) => {
   if (safebox !== undefined && row.kind !== "main") throw bad("세이프박스는 카카오뱅크 통장에만 있어요");
   let formatted = row.number;
   if (number !== undefined) {
-    // 카카오뱅크 통장 번호는 고정, 콕뱅크는 대표계좌 번호도 바꿀 수 있음
-    if (row.kind !== "external" && APP === "kakao") throw bad("다른 은행 계좌만 계좌번호를 바꿀 수 있어요");
+    // 대표 통장 번호도 바꿀 수 있음 (카카오뱅크 통장은 bank_code 가 비어 있어 카카오뱅크 형식 3333-00-0000000)
+    const code = row.bank_code ?? "kakao";
     const digits = digitsOf(number);
-    const numberError = checkNumber(bankByCode(row.bank_code), digits);
+    const numberError = checkNumber(bankByCode(code), digits);
     if (numberError) throw bad(numberError, { number: numberError });
-    formatted = formatAccountNumber(row.bank_code, digits);
+    formatted = formatAccountNumber(code, digits);
   }
   db().prepare("UPDATE accounts SET balance = ?, number = ?, safebox = ?, name = ? WHERE id = ?").run(
     balance ?? row.balance,

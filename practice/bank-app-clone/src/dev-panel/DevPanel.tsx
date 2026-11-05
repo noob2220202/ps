@@ -478,7 +478,8 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
               </button>
             </>
           )}
-          {(external || own) && (
+          {/* 카카오뱅크 통장(main)도 번호를 바꿀 수 있음 — 이체 금액 화면 '(뒤 4자리)' 에 쓰임 */}
+          {(external || own || account.kind === "main") && (
             <>
               <Field label="계좌번호">
                 {own ? (
