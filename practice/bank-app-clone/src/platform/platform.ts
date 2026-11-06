@@ -1,3 +1,5 @@
+import { APP, HAS_INTRO } from "../profile/session";
+
 export type Os = "android" | "ios";
 
 const isOs = (v: string | null): v is Os => v === "android" || v === "ios";
@@ -14,7 +16,11 @@ function read(): string | null {
 const param = new URLSearchParams(location.search).get("os");
 const stored = read();
 
-export const OS: Os = isOs(param)
+// ibk2(녹화 인트로를 켠 i-ONE Bank)는 인트로 영상과 같은 갤럭시 기기 화면만 (상태바 · 3버튼 내비바를 그 기기에 맞춰 만듦) → 아이폰으로 바꾸지 않음
+export const IBK2 = APP === "ibk" && HAS_INTRO;
+export const OS: Os = IBK2
+  ? "android"
+  : isOs(param)
   ? param
   : isOs(stored)
     ? stored
@@ -30,3 +36,5 @@ try {
 
 // CSS에서 [data-os="ios"] 로 플랫폼별 스타일을 나눈다
 document.documentElement.dataset.os = OS;
+// ibk2: 인트로 영상 기기에 맞춘 상태바 · 진짜 폰에서도 프레임 그대로 (PhoneFrame.css · global.css 의 [data-ibk2])
+if (IBK2) document.documentElement.dataset.ibk2 = "on";

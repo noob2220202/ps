@@ -15,6 +15,7 @@ npm run dev:hana   # 하나원큐:   → http://localhost:5175 (API 8789)
 npm run dev:ibk    # i-ONE Bank: → http://localhost:5176 (API 8790)
 npm run dev:kbank  # 케이뱅크:   → http://localhost:5177 (API 8791)
 npm run dev:kbank2 # 케이뱅크 + 녹화 인트로: → http://localhost:5178 (API 8792)
+npm run dev:ibk2   # i-ONE Bank + 녹화 인트로: → http://localhost:5179 (API 8793)
 ```
 
 ### VPS에 띄우기 (포트 9101)
@@ -45,6 +46,10 @@ npm run start:kbank                    # http://서버IP:9109
 # kbank2 = 같은 케이뱅크 화면 + 녹화 인트로 (포트 9111, 데이터·계정 따로)
 npm run start:kbank2                   # http://서버IP:9111
 # pm2 start "npm run start:kbank2" --name kbank2
+
+# ibk2 = 같은 i-ONE Bank 화면 + 녹화 인트로 (포트 9113, 데이터·계정 따로)
+npm run start:ibk2                     # http://서버IP:9113
+# pm2 start "npm run start:ibk2" --name ibk2
 ```
 
 서버 하나가 화면과 API를 같이 줍니다. 포트 변경은 `PORT=8080 npm start`.
@@ -53,7 +58,8 @@ npm run start:kbank2                   # http://서버IP:9111
 `npm run start:hana` (= `APP=hana`) = 하나원큐(기본 9105, 데이터 `server/data-hana/`),
 `npm run start:ibk` (= `APP=ibk`) = IBK기업은행 i-ONE Bank(기본 9107, 데이터 `server/data-ibk/`),
 `npm run start:kbank` (= `APP=kbank`) = 케이뱅크(기본 9109, 데이터 `server/data-kbank/`),
-`npm run start:kbank2` (= `APP=kbank2`) = 케이뱅크 + 녹화 인트로(기본 9111, 데이터 `server/data-kbank2/`). 프로필 목록부터 전부 따로입니다.
+`npm run start:kbank2` (= `APP=kbank2`) = 케이뱅크 + 녹화 인트로(기본 9111, 데이터 `server/data-kbank2/`),
+`npm run start:ibk2` (= `APP=ibk2`) = i-ONE Bank + 녹화 인트로(기본 9113, 데이터 `server/data-ibk2/`). 프로필 목록부터 전부 따로입니다.
 데이터는 `server/data/`(SQLite)에 저장되고 커밋되지 않습니다. 프로필 목록은 `app.db`, 프로필별 은행 데이터는 `profiles/<id>.db`.
 폴더째 지우면 예시 데이터의 "홍길동" 프로필 하나로 다시 시작. 예전 버전의 `bank.db`가 있으면 첫 프로필로 자동으로 옮겨집니다.
 
@@ -75,12 +81,12 @@ push 화면 전환, 왼쪽 가장자리 스와이프 뒤로가기가 들어가 �
 
 ## 🔑 로그인 · 계정 (은행마다 따로)
 
-접속하면 로그인부터. 계정은 **관리자가 만들어 줌** (회원가입 없음). 카카오뱅크(9101)·콕뱅크(9103)·하나원큐(9105)·i-ONE Bank(9107)·케이뱅크(9109)·kbank2(9111)는 계정도 따로입니다.
+접속하면 로그인부터. 계정은 **관리자가 만들어 줌** (회원가입 없음). 카카오뱅크(9101)·콕뱅크(9103)·하나원큐(9105)·i-ONE Bank(9107)·케이뱅크(9109)·kbank2(9111)·ibk2(9113)는 계정도 따로입니다.
 - 계정마다 프로필(누구의 은행을 열까요?)이 여러 개, 프로필마다 은행 데이터가 따로
 - 이용 기간: **1일 / 7일 / 30일 / 영구** — 계정을 만든 순간부터 줄어듦. 끝나면 로그인이 막히고(쓰던 중이면 로그인 화면으로),
   관리자가 연장하면 데이터 그대로 다시 사용
 - **관리자**: 서버를 처음 켤 때 `admin` 계정이 생기고 비밀번호는 서버 로그와 `server/data/admin-password.txt`
-  (앱마다 `server/data-nh/` · `data-hana/` · `data-ibk/` · `data-kbank/` · `data-kbank2/` 의 `admin-password.txt`)에 남음. 미리 정하려면 `ADMIN_PASSWORD=... npm start`.
+  (앱마다 `server/data-nh/` · `data-hana/` · `data-ibk/` · `data-kbank/` · `data-kbank2/` · `data-ibk2/` 의 `admin-password.txt`)에 남음. 미리 정하려면 `ADMIN_PASSWORD=... npm start`.
   비밀번호를 바꾼 뒤엔 그 파일은 지워도 됨 (개발 서버 `vite` 는 `server/` · DB · 이 파일을 내주지 않게 막아 둠 — `vite.config.ts` 의 `fs.deny`)
   admin 으로 로그인 → 프로필 고르기 아래 `계정 관리` → 계정 만들기 / 연장(+1일·+7일·+30일·+영구) / 정지 / 비밀번호 바꾸기 / 삭제
 - 예전에 있던 프로필은 관리자 계정 것으로 옮겨짐
@@ -242,6 +248,12 @@ IBK 로고(마름모 심볼, 원 로고)는 벡터(SVG)라서 크기를 키워�
 kbank·kbank2 는 데이터·계정이 따로입니다. kbank2 는 첫 녹화 재현이라 두 번째 녹화의 것 중 광고 시트 · 두 번째 문구 · 저장된 잔액 굴림 ·
 동그라미 4·5번째 · 맨 위로 ↑ · 중복 확인창이 없고, 예시 거래내역도 첫 녹화처럼 12행이에요 (이체확인증 · 입금 보낸 분 · 짧은 은행 이름 · 초까지 시각은
 첫 녹화와도 맞아서 같이 씀).
+
+**ibk2** (포트 9113, `npm run start:ibk2`)는 i-ONE Bank 화면에 녹화 인트로(같은 기기 홈 화면 → 앱 찾기 → 탭, 2.8초)를 붙인 서버예요.
+예전엔 따로 있던 `practice/ibk-app` 을 여기로 합쳤어요. 인트로 기기(갤럭시 3버튼)로 고정이라 Galaxy/iPhone 스위치가 없고, 상태바에 영상 속 기기의
+알림 아이콘과 1초 주기로 깜빡이는 화면 녹화 표시가 늘 있어요. 영상 속 시계·오른쪽 아이콘(LTE·신호·%·배터리)은 지워 두고(`scripts/ibk-intro-erase.py`)
+우리 상태바를 그 위에 그려서 지금 시각·정해 둔 배터리가 찍혀요. 폰(폭 500px 이하)으로 열면 폰 틀 없이 화면 폭에 맞춰 줄여 보여요.
+ibk·ibk2 는 데이터·계정이 따로입니다.
 
 그림은 녹화 두 개에서 잘라 **AI 업스케일(Real-ESRGAN 4배)** 로 키웠고, 에셋 검수(2026-11) 뒤로는 단순한 아이콘은 SVG 로 다시 그렸어요 (이름·번호가 든 곳은 자르지 않음).
 예전 자르기 명령은 기록으로 남김 — 이제 이미 있는 파일은 건너뜀(아래 '이미지 에셋'):

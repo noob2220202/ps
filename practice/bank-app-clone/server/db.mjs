@@ -17,9 +17,10 @@ import { fileURLToPath } from "node:url";
 export const APPS = ["kakao", "nh", "hana", "ibk", "kbank"];
 const appArg = process.argv.indexOf("--app");
 export const SERVER_ID = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
-export const INTRO = SERVER_ID === "kbank2";
-export const APP = INTRO ? "kbank" : SERVER_ID;
-if (!APPS.includes(APP)) throw new Error(`APP은 kakao, nh, hana, ibk, kbank, kbank2 중 하나 (지금: ${SERVER_ID})`);
+// APP=ibk2 는 같은 i-ONE Bank 화면에 녹화 인트로(실제 기기 홈 화면 → 앱 찾기 → 탭 영상)를 켠 서버 (예전 단독 프로젝트 practice/ibk-app 을 합침)
+export const INTRO = SERVER_ID === "kbank2" || SERVER_ID === "ibk2";
+export const APP = SERVER_ID === "kbank2" ? "kbank" : SERVER_ID === "ibk2" ? "ibk" : SERVER_ID;
+if (!APPS.includes(APP)) throw new Error(`APP은 kakao, nh, hana, ibk, ibk2, kbank, kbank2 중 하나 (지금: ${SERVER_ID})`);
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA = process.env.DATA_DIR ?? resolve(here, SERVER_ID === "kakao" ? "data" : `data-${SERVER_ID}`);
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });
@@ -479,7 +480,7 @@ const KBANK_TX = [
 // 두 번째 녹화용 덧붙임 (kbank 만): 계좌 거래내역이 18행이 되게 10월 말 체크카드 5건 · 이체 1건 — 맨위로 ↑ 문턱 1150dp 를 넘게 스크롤되도록
 // (두 번째 녹화 60.7초). kbank2(첫 녹화 재현, INTRO)는 첫 녹화처럼 12행(최대 스크롤 1070dp)이라 넣지 않음.
 // 10-28 정예시는 '최근 보낸 계좌' 차례가 바뀌지 않게 10-27 과 10-29 사이
-const KBANK_TX_MORE = INTRO
+const KBANK_TX_MORE = SERVER_ID === "kbank2"
   ? []
   : [
       ["2026-10-26T18:34:51", "샘플서점", -12000, "#체크카드"],
@@ -488,7 +489,7 @@ const KBANK_TX_MORE = INTRO
       ["2026-10-31T08:52:16", "예시카페", -4800, "#체크카드"],
       ["2026-10-31T13:05:33", "예시편의점", -2600, "#체크카드"],
     ];
-const KBANK_TRANSFERS_MORE = INTRO ? [] : [["2026-10-28 20:41:37", "nh", "35200000000044", "정예시", 25000]];
+const KBANK_TRANSFERS_MORE = SERVER_ID === "kbank2" ? [] : [["2026-10-28 20:41:37", "nh", "35200000000044", "정예시", 25000]];
 
 const kbankBase = (d, userName, balance) => {
   wipe(d);

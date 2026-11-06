@@ -1,8 +1,6 @@
-/* 폰 오른쪽 바깥 (녹화는 폰 영역만 잘라서 이 막대는 안 찍힘). 화면이 좁으면 왼쪽 위 구석 */
+/* 자리(left · top)는 RecordingBar 가 폰과 겹치지 않게 계산해서 넣음 */
 .rec-bar {
   position: fixed;
-  top: max(12px, calc((100dvh - var(--frame-h)) / 2));
-  left: calc(50% + var(--frame-w) / 2 + 16px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -56,12 +54,6 @@
   font-size: 13px;
   font-weight: 500;
   opacity: 0.75;
-}
-@media (max-width: 860px) {
-  .rec-bar {
-    top: 8px;
-    left: 8px;
-  }
 }
 
 /* 가짜 포인터 (녹화 중, 폰 위에서만) */

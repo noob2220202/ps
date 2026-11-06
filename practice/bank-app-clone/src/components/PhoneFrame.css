@@ -306,6 +306,97 @@ html[data-app="ibk"] .statusbar--android .statusbar__time {
   top: 15.415px;
   line-height: 0;
 }
+/* ===== ibk2 (i-ONE Bank 녹화 인트로 · html[data-ibk2], platform.ts IBK2) ===== */
+/* 알림 아이콘(고정) · 첫 캠코더 안쪽(깜빡임): 인트로 영상 좌표 그대로 그린 384 × 29.4 SVG 두 장을 겹침 */
+.ibk-sb-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/* 화면 녹화 중 표시: 1초 주기 0.5초 켜짐 · 0.5초 꺼짐 (영상: 꺼짐 0.47초 그대로 잼). 위상은 style animation-delay 로 */
+.ibk-sb-rec {
+  animation: ibk-sb-rec-blink 1s linear infinite;
+}
+@keyframes ibk-sb-rec-blink {
+  0%,
+  49.9% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+/* 녹화 인트로가 도는 동안: 영상 속 시계와 오른쪽 아이콘 묶음(LTE · 신호 · 38% · 배터리)은 지워 둠(scripts/ibk-intro-erase.py)
+   → 우리 상태바를 영상(z 999) 위로 올려 그것들을 그림 (지금 시각 · 정해 둔 배터리 값이 찍히게, 배터리 자릿수에 따라 LTE·신호도 같이 밀림).
+   알림·캠코더(왼쪽)는 영상에 그대로 있으니 숨기고, 바탕은 비워서 영상이 보이게.
+   색은 영상 속 그대로 (원본 장면 45 에서 잼): 글자 · LTE · 신호 · 배터리 채움 거의 흰색, 데이터 화살표 흰색 30%, 배터리 빈 칸 흰색 32%,
+   꼭지 흰색 15%. 압축으로 살짝 흐림 (#f0f0f0 + blur 0.4px — 원본 '10:00' 과 겹쳐 잰 차이 17.2 → 7.1 / 255).
+   영상 끝 무렵은 영상 글자처럼 79 · 80번째 장면 흐려짐, 81 반쯤 어두움, 82~ 진한 글자 (장면마다 겹쳐 고른 값, recorder.ts ibkClockStep) */
+html[data-ibk2][data-intro-play] .phone > .statusbar {
+  z-index: 1000;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html[data-ibk2][data-intro-play] .phone > .statusbar .ibk-sb-left {
+  visibility: hidden;
+}
+html[data-ibk2][data-intro-play] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  filter: blur(0.4px);
+}
+html[data-ibk2]:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar :is(.statusbar__time, .ibk-sb-pct) {
+  color: #f0f0f0;
+}
+html[data-ibk2]:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [stroke="#4d4d4d"] {
+  stroke: #f0f0f0;
+}
+html[data-ibk2]:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [stroke="#c9c9c9"] {
+  stroke: rgba(255, 255, 255, 0.3);
+}
+html[data-ibk2]:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons :is([fill="#454545"], [fill="#4a4a4a"]) {
+  fill: #f5f5f5;
+}
+html[data-ibk2]:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [fill="#c4c4c4"] {
+  fill: rgba(255, 255, 255, 0.32);
+}
+html[data-ibk2]:is([data-intro-play="on"], [data-intro-play="f79"], [data-intro-play="f80"]) .phone > .statusbar .ibk-sb-icons [fill="#bcbcbc"] {
+  fill: rgba(255, 255, 255, 0.15);
+}
+/* 81 · 82~ 장면: 영상 속 아이콘도 진한 색 (배터리 채움 24 · 빈 칸 50 · 꼭지 54 / 255, 장면 82) */
+html[data-ibk2]:is([data-intro-play="f81"], [data-intro-play="dark"]) .phone > .statusbar .ibk-sb-icons :is([stroke="#4d4d4d"], [stroke="#c9c9c9"]) {
+  stroke: rgb(25, 12, 12);
+}
+html[data-ibk2]:is([data-intro-play="f81"], [data-intro-play="dark"]) .phone > .statusbar .ibk-sb-icons :is([fill="#454545"], [fill="#4a4a4a"]) {
+  fill: rgb(25, 12, 12);
+}
+html[data-ibk2]:is([data-intro-play="f81"], [data-intro-play="dark"]) .phone > .statusbar .ibk-sb-icons :is([fill="#c4c4c4"], [fill="#bcbcbc"]) {
+  fill: rgb(55, 48, 48);
+}
+html[data-intro-play="f79"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  opacity: 0.15;
+}
+html[data-intro-play="f80"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  opacity: 0.1;
+}
+html[data-intro-play="f81"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  color: rgb(20, 15, 15);
+  opacity: 0.6;
+  filter: blur(1px);
+}
+html[data-intro-play="dark"] .phone > .statusbar :is(.statusbar__time, .ibk-sb-icons, .ibk-sb-pct) {
+  color: rgb(25, 12, 12);
+  opacity: 0.7;
+  filter: blur(0.8px);
+}
+/* 시간 · 퍼센트: 인트로 영상(같은 기기) 상태바와 겹쳐 맞춤 (원래 IBK 녹화 좌표에서 시간 오른쪽 1 · 아래 0.75, 퍼센트 33.55 → 24.8 · 아래 0.5) */
+html[data-ibk2] .statusbar--android .statusbar__time {
+  left: 24.77px;
+  top: 16.165px;
+}
+html[data-ibk2] .ibk-sb-pct {
+  right: 24.8px;
+  top: 15.915px;
+}
 .phone__navbar--keys {
   height: 44px;
   background: #ffffff;
@@ -424,7 +515,7 @@ html[data-app="kbank"] .statusbar--android .statusbar__time {
 }
 /* kbank2: 인트로 영상이 도는 동안 — 영상 속 시계·빨간 녹화 알약·캠코더는 지워 둠(recorder.ts INTRO) → 우리 상태바를 영상(z 999) 위로 올려
    그 셋만 흰색으로 그림 (지금 시각이 찍히게). 'SKT' · 오른쪽 아이콘(배터리 24 등)은 영상에 그대로 있으니 숨김. 바탕은 비워서 영상이 보이게 */
-html[data-intro-play] .phone > .statusbar {
+html[data-intro-play]:not([data-ibk2]) .phone > .statusbar {
   z-index: 1000;
   background: transparent !important;
   box-shadow: none !important;

@@ -16,6 +16,6 @@ export default defineConfig(({ mode }) => ({
     // 개발 서버가 프로젝트 폴더를 통째로 내주므로 서버 데이터(DB·세션·관리자 비밀번호 파일)·서버 코드·압축본은 막음
     fs: { deny: ['.env', '.env.*', '*.{crt,pem}', '**/.git/**', `${ROOT}/server/**`, '**/*.db', '**/*.db-*', '**/admin-password.txt', `${ROOT}/*.zip`] },
     // API_TARGET=http://localhost:포트 로 바꿀 수 있음 (여러 앱·여러 벌을 동시에 띄워 검사할 때)
-    proxy: { '/api': process.env.API_TARGET ?? { nh: 'http://localhost:8788', hana: 'http://localhost:8789', ibk: 'http://localhost:8790', kbank: 'http://localhost:8791', kbank2: 'http://localhost:8792' }[mode] ?? 'http://localhost:8787' },
+    proxy: { '/api': process.env.API_TARGET ?? { nh: 'http://localhost:8788', hana: 'http://localhost:8789', ibk: 'http://localhost:8790', kbank: 'http://localhost:8791', kbank2: 'http://localhost:8792', ibk2: 'http://localhost:8793' }[mode] ?? 'http://localhost:8787' },
   },
 }))

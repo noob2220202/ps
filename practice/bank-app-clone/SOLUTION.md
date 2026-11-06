@@ -829,6 +829,15 @@ React 상태가 아니라 DOM 속성이라 **새로고침 없이** 바로 바뀌
 - 빨간 녹화 알약 + 캠코더 표시는 인트로를 켠 kbank2 갤럭시 모드만 (끄면 kbank 와 같은 상태바). 아이폰 모드에서는 인트로 없음.
 - 인트로 영상 파일은 빌드 하나가 모든 앱을 주므로 dist 에 늘 들어 있지만, 받는 건 kbank2 녹화 때뿐 (정적 import 는 주소만 넣음).
 
+### ibk2 — i-ONE Bank 녹화 인트로 (따로 있던 practice/ibk-app 을 합침)
+- `APP=ibk2` → 서버 APP 은 `ibk`, `INTRO` 켬, 데이터 `data-ibk2/` · 쿠키 `bank_sid_ibk2` · 기본 포트 9113. 화면 코드는 `src/ibk` 그대로.
+- 화면 쪽은 `platform.ts IBK2` (= ibk + HAS_INTRO) → `<html data-ibk2>`: 갤럭시 고정, 상태바 알림 아이콘(`IbkNotifIcons`) · 1초 주기 캠코더(`IbkRecIcon`, `BLINK_MS` 1000),
+  오른쪽 아이콘을 영상 상태바 좌표에 맞춤(LTE +7.25 · 신호 +8 · 배터리 +8.75, 아래 0.5), 좁은 화면은 폰 틀 없이 `--screen-fit` 으로 줄임.
+- 녹화(`recorder.ts playIbkIntro`): 녹화 시작 뒤 `ibk-open-intro.mp4` 를 폰 위에 틀고 끝나면 시작화면. 영상 장면 79~82 동안 상태바 색을 단계별로
+  (`ibkClockStep` → `[data-intro-play]` on/f79/f80/f81/dark), 끝날 때 캠코더 위상은 켜진 지 0.25초째.
+- `PhoneFrame.css` 의 ibk2 규칙은 모두 `html[data-ibk2]` 아래라 ibk 에는 영향 없고, kbank2 의 `[data-intro-play]` 상태바 규칙은 `:not([data-ibk2])`.
+- 녹화 막대(`RecordingBar`)는 폰과 겹치지 않는 자리(오른쪽 → 왼쪽 → 아래 → 위)를 계산해 띄우고, 자리가 없으면 숨김 (ibk-app 에서 고친 것을 모든 앱에).
+
 ### 두 번째 녹화 (2026-11-02 밤, 101.8초) — 새 화면 · 동작
 첫 녹화에 없던 것만 목록(FINAL K01~K12 · P01~P05)으로 뽑아 담당별로 만들고, 겹쳐 보기 · 흐름 · 코드 검수를 따로 돌려 고쳤다.
 kbank2(첫 녹화 재현)는 첫 녹화와 어긋나지 않게 대부분 끔 (아래 'kbank2 와 다른 점').

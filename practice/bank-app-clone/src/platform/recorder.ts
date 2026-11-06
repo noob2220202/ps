@@ -13,6 +13,19 @@ import { BLINK_MS, isIntroOn, syncBlink } from "./intro";
 import { OS } from "./platform";
 import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
 import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
+import ibkIntroMp4 from "../assets/intro/ibk-open-intro.mp4";
+import { APP } from "../profile/session";
+
+// ===== ibk2 인트로 (i-ONE Bank) =====
+// 시계 · 배터리(오른쪽 아이콘 묶음)는 영상에서 지워 두고(scripts/ibk-intro-erase.py) 영상이 도는 동안 우리 상태바를 영상 위로 올려
+// 그림 (PhoneFrame.css [data-intro-play]) → 녹화에 지금 시각과 정해 둔 배터리 값이 찍힘
+// 영상 속 상태바 글자가 앱 쪽 색으로 바뀌는 장면 (30fps 장면 번호): 79 · 80 흐려짐, 81 반쯤 어두움, 82~ 진한 글자 → PhoneFrame.css 단계별 색
+const ibkClockStep = (t: number) => {
+  const n = Math.floor(t * 30 + 0.01);
+  return n >= 82 ? "dark" : n >= 79 ? `f${n}` : "on";
+};
+// 영상이 끝나는 순간(2.80초) 상태바 캠코더 표시는 2.55초에 켜져서 0.25초째 켜져 있는 중
+const IBK_INTRO_BLINK_ON_MS = 250;
 
 // 케이뱅크 인트로 영상 = 녹화 cb67e5eb 3.03~5.60초 (30fps 로 고른 프레임 92~168, 77장 2.567초): 기기 홈 화면 → 금융 폴더 → K 탭 →
 // 시작화면이 반쯤 밝아진 데까지. 같은 장면을 mp4(H.264 High 3.1)와 webm(VP9) 두 가지로 — H.264 를 못 트는 브라우저(오픈소스 Chromium 등)는 webm.
@@ -216,14 +229,19 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   // 인트로(kbank2): 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 폰 위에 덮어 첫 장면까지 받아 둔 뒤 녹화 시작
   // → 녹화 첫 프레임이 영상 첫 장면 (받는 동안의 검은 화면이 녹화 앞에 붙지 않게)
   // 영상은 갤럭시 기기 화면이라 아이폰 모드(?os=ios)에선 틀지 않음
-  const intro = isIntroOn() && OS === "android" ? await loadIntro(target) : null;
+  const ibk = APP === "ibk";
+  const intro = !ibk && isIntroOn() && OS === "android" ? await loadIntro(target) : null;
   // 앱을 검은 화면으로 돌려 놓고, 그 모습이 한 프레임 그려진 뒤 녹화 시작 → 시작화면부터
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
   await nextFrame();
   const started = new Promise((r) => recorder.addEventListener("start", r, { once: true }));
   recorder.start();
   set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
-  if (intro) {
+  if (ibk && isIntroOn()) {
+    // ibk2: 녹화 시작 뒤 영상을 틀고, 끝나자마자 시작화면 (영상이 폰 프레임과 같은 기기·해상도라 상태바·3버튼 내비바가 안 끊김)
+    await playIbkIntro(target);
+    window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
+  } else if (intro) {
     // 녹화기가 첫 프레임을 받기 시작한 뒤에 틀어야 영상 첫 장면부터 찍힘 (바로 틀면 앞 5장쯤이 빠졌음, 시험 녹화 rec1)
     await started;
     await nextFrame();
@@ -238,6 +256,37 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   }
 }
 
+
+function playIbkIntro(target: HTMLElement) {
+  return new Promise<void>((resolve) => {
+    const video = document.createElement("video");
+    video.src = ibkIntroMp4;
+    video.muted = true;
+    video.playsInline = true;
+    video.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:999;";
+    const d = document.documentElement.dataset;
+    const done = () => {
+      syncBlink(IBK_INTRO_BLINK_ON_MS); // 영상 속 캠코더 표시 깜빡임을 우리 상태바가 같은 위상으로 이어 받음
+      delete d.introPlay;
+      video.remove();
+      resolve();
+    };
+    video.addEventListener("ended", done, { once: true });
+    video.addEventListener("error", done, { once: true });
+    // 영상이 덮는 동안 우리 상태바 시각을 영상 위에 (흰색 → 영상 끝 무렵 영상 글자처럼 흐려졌다가 진한 글자)
+    d.introPlay = "on";
+    const step = (t: number) => (d.introPlay = ibkClockStep(t));
+    const onFrame = (_now: number, meta: { mediaTime: number }) => {
+      if (!d.introPlay) return;
+      step(meta.mediaTime);
+      video.requestVideoFrameCallback(onFrame);
+    };
+    if ("requestVideoFrameCallback" in video) video.requestVideoFrameCallback(onFrame);
+    else (video as HTMLVideoElement).addEventListener("timeupdate", () => d.introPlay && step((video as HTMLVideoElement).currentTime));
+    target.appendChild(video);
+    video.play().catch(done);
+  });
+}
 
 // 녹화가 끊기지 않게: 인트로 영상(2.6초 동안 화면 전체가 30fps 로 바뀜)이 끝나면 크롬 화면 캡처가 '움직이는 영역'을 그 영상으로 잡은 채
 // 0.4초 동안 새 프레임을 안 내보내고(시작화면 첫 0.4초·상태바가 바뀌는 모습이 빠짐), 그 뒤로도 0.5~0.75초 간격으로만 찍었음

@@ -47,6 +47,8 @@ import {
 // 개발 중(npm run dev)에는 API만 8787에서 돌고, Vite 개발 서버가 /api 요청을 여기로 넘겨준다.
 
 const app = express();
+// 같은 머신의 Caddy 같은 리버스 프록시 뒤에서도 로그인 실패 횟수를 실제 접속 IP로 셈 (X-Forwarded-For 는 로컬 프록시가 붙인 것만 믿음)
+app.set("trust proxy", "loopback");
 app.use(express.json());
 
 // 스켈레톤/스피너가 실제 앱처럼 잠깐 보이도록 조회 요청에 약간의 지연 (API_DELAY_MS=0 이면 끔)
@@ -901,5 +903,5 @@ if (existsSync(dist)) {
 }
 
 const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111 }[SERVER_ID]));
+const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111, ibk2: 9113 }[SERVER_ID]));
 app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${SERVER_ID}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));
