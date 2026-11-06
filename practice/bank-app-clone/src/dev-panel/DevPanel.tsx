@@ -13,7 +13,7 @@ import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { APP, HAS_INTRO, currentProfileId, setCurrentProfile } from "../profile/session";
+import { APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
 import { kbAdEnabled, kbAdHiddenUntil, kbAdResetHide, kbVariantMode, setKbAdEnabled, setKbVariantMode } from "../kbank/prefs";
 import "./DevPanel.css";
 
@@ -151,14 +151,19 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
   return (
     <div className="tab">
       <CurrentProfile />
-      <Field label="기기">
-        <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
-      </Field>
+      {/* kakao2 는 녹화 기기(아이폰 · 라이트 모드)로 고정이라 기기 · 테마 고르기 없음 */}
+      {!KAKAO2 && (
+        <Field label="기기">
+          <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
+        </Field>
+      )}
       <CaptureToggle />
       <RecordButton onStart={onClose} />
-      <Field label="테마">
-        <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
-      </Field>
+      {!KAKAO2 && (
+        <Field label="테마">
+          <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
+        </Field>
+      )}
       {APP === "kbank" && <KbankTakeTwo run={run} home={initial} />}
 
       <h3 className="tab__h">내 정보</h3>

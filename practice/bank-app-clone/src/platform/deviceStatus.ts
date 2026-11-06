@@ -1,6 +1,7 @@
 // 상태바 배터리 잔량·시계 (폰 아래 스위치 줄에서 바꿈). 이 브라우저에 기억됨
 // 시계: 정한 시각부터 흘러감 = 실제 시각과의 차이(offset)를 저장. null 이면 실제 시각
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { KAKAO2 } from "../profile/session";
 
 type Status = { battery: number; offset: number | null };
 const KEY = "deviceStatus";
@@ -12,7 +13,7 @@ function load(): Status {
   } catch {
     // 처음이거나 못 읽으면 기본값
   }
-  return { battery: 62, offset: null };
+  return { battery: KAKAO2 ? 50 : 62, offset: null }; // kakao2: 녹화 기기 배터리 (7.9초부터 50)
 }
 
 let status = load();

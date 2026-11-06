@@ -10,7 +10,7 @@ import { Dialog, Sheet } from "../components/Sheet";
 import { Spinner } from "../components/Spinner";
 import { Icon } from "../components/icons/Icon";
 import { useStatusBar } from "../hooks/useStatusBar";
-import { OS } from "../platform/platform";
+import { DEVICE_LOCK, OS } from "../platform/platform";
 import { THEME, THEME_CHOICE } from "../platform/theme";
 import { AVATAR_COLORS, AVATAR_NAMES } from "./avatars";
 import { ProfileAvatar } from "./ProfileAvatar";
@@ -36,8 +36,8 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
   const enter = (p: AppProfile) => {
     setCurrentProfile(p.id);
     // 이 프로필이 지난번에 쓰던 기기/테마가 지금과 다르면 그걸로 다시 연다
-    // (OS/THEME는 앱이 켜질 때 한 번 정해지는 값이라 새로 불러와야 바뀜)
-    const os = p.os ?? OS;
+    // (OS/THEME는 앱이 켜질 때 한 번 정해지는 값이라 새로 불러와야 바뀜). ibk2 · kakao2 는 기기 고정이라 프로필 기기는 안 봄
+    const os = DEVICE_LOCK ?? p.os ?? OS;
     const theme = p.theme ?? THEME_CHOICE;
     if (os !== OS || theme !== THEME_CHOICE) location.assign(`/?os=${os}&theme=${theme}`);
     else onEnter();

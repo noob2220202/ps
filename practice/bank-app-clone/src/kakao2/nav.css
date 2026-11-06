@@ -1,0 +1,89 @@
+/* ===== kakao2 화면 전환 (html[data-kakao2], ScreenStack.tsx 의 layer--k2-{modal | detail | push | pop}, src/kakao2/nav.ts) =====
+   [data-os="ios"] 의 보통 push · pop (ScreenStack.css) 위에 덮어씀 */
+
+/* 층마다 따로 쌓임 맥락: 모달 밑에 그대로 둔 화면(layer--k2-under)의 z-index 요소(홈 탭바 등)가 위 층 위로 비치지 않게 */
+html[data-kakao2] .layer {
+  isolation: isolate;
+}
+
+/* 그림자 없음 (어두운 홈 위에서 안 보임 — account.md 3.1) */
+html[data-kakao2] .layer--push-enter,
+html[data-kakao2] .layer--dragging,
+html[data-kakao2] .layer--pop-exit {
+  box-shadow: none;
+}
+
+/* ---------- push (홈 → 통장, 녹화 28.43초): 새 화면 400ms cubic-bezier(.2,1,.45,1) (≈ 1 − e^(−t/75ms)), 밑 화면 −30% 같은 곡선 · 10% 어둡게.
+   새 화면 아래 두 모서리가 화면 모서리처럼 둥글고(55) 밀기가 끝나고도 77ms 더 남았다가 477ms 에 각짐 (critic.md G2, 밑 층도 그때까지) ---------- */
+html[data-kakao2] .layer--k2-push.layer--push-enter {
+  animation: ios-push-in var(--nav-ms) cubic-bezier(0.2, 1, 0.45, 1) both;
+  border-radius: 0 0 55px 55px;
+}
+html[data-kakao2] .layer--k2-push.layer--push-exit {
+  animation-timing-function: cubic-bezier(0.2, 1, 0.45, 1);
+}
+html[data-kakao2] .layer--k2-push.layer--push-exit > .layer__dim {
+  animation: k2-dim-in var(--nav-ms) cubic-bezier(0.2, 1, 0.45, 1) both;
+}
+/* 머리줄은 첫 프레임부터 제자리, 그 아래 본문만 밀려 들어오는 화면: 본문에 .k2-push-body 를 두면 층은 그대로 두고 그것만 밂
+   (통장 — account.md 3.1 '머리줄은 밀리지 않음'). 그 화면 뿌리는 본문 밖(머리줄 아래)을 칠하지 말아야 밑 홈이 보임 */
+html[data-kakao2] .layer--k2-push.layer--push-enter:has(.k2-push-body) {
+  animation: none;
+  border-radius: 0;
+}
+html[data-kakao2] .layer--k2-push.layer--push-enter .k2-push-body {
+  animation: ios-push-in var(--nav-ms) cubic-bezier(0.2, 1, 0.45, 1) both;
+  border-radius: 0 0 55px 55px;
+}
+/* 뒤로 (녹화에 없음): 보통 iOS 뒤로 (420ms) — 밑 화면 어둡게만 .10 에서 */
+html[data-kakao2] .layer--k2-pop.layer--pop-enter > .layer__dim {
+  animation: k2-dim-out var(--nav-ms) cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+html[data-kakao2] .layer--under > .layer__dim {
+  opacity: 0.1;
+}
+@keyframes k2-dim-in {
+  to {
+    opacity: 0.1;
+  }
+}
+@keyframes k2-dim-out {
+  from {
+    opacity: 0.1;
+  }
+}
+
+/* ---------- 모달 (이체 = modal, 거래상세 = detail): 화면 전체가 아래에서 올라오고(852 → 0) 닫으면 내려감. 임계 감쇠 스프링 ω 18 ≈ 500ms
+   (녹화 8.17 · 41.4초 위끝을 프레임마다 잼, critic.md C4 · X14). 거래상세는 막이 뜬 프레임보다 24ms 앞서 시작한 꼴 (첫 프레임 852 → 715).
+   밑 화면은 움직이지도 어두워지지도 않음. 걷기는 위 층 animationend (ScreenStack onK2AnimEnd) ---------- */
+html[data-kakao2] :is(.layer--k2-modal, .layer--k2-detail).layer--push-enter {
+  animation: k2-modal-up var(--nav-ms)
+    linear(0, 0.075, 0.228, 0.391, 0.537, 0.657, 0.751, 0.822, 0.874, 0.912, 0.939, 0.958, 0.971, 0.98, 0.987, 0.991, 0.994, 0.996, 0.997, 0.998, 1)
+    backwards;
+}
+html[data-kakao2] .layer--k2-detail.layer--push-enter {
+  animation-delay: -24ms;
+}
+html[data-kakao2] :is(.layer--k2-modal, .layer--k2-detail).layer--pop-exit {
+  animation: k2-modal-down var(--nav-ms)
+    linear(0, 0.075, 0.228, 0.391, 0.537, 0.657, 0.751, 0.822, 0.874, 0.912, 0.939, 0.958, 0.971, 0.98, 0.987, 0.991, 0.994, 0.996, 0.997, 0.998, 1)
+    both;
+}
+html[data-kakao2] :is(.layer--k2-modal, .layer--k2-detail):is(.layer--push-exit, .layer--pop-enter),
+html[data-kakao2] :is(.layer--k2-modal, .layer--k2-detail):is(.layer--push-exit, .layer--pop-enter) > .layer__dim {
+  animation: none;
+}
+/* 모달 밑에 그대로 둔 화면 (ScreenStack layer--k2-under): 안 보이고 눌리지도 않음 */
+html[data-kakao2] .layer--k2-under {
+  pointer-events: none;
+}
+@keyframes k2-modal-up {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+@keyframes k2-modal-down {
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}

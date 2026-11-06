@@ -904,5 +904,5 @@ if (existsSync(dist)) {
 }
 
 const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111, ibk2: 9113 }[SERVER_ID]));
+const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111, ibk2: 9113, kakao2: 9115 }[SERVER_ID]));
 app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${SERVER_ID}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));

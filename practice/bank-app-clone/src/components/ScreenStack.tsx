@@ -10,10 +10,13 @@ import {
 import { useLocation, useNavigate, useNavigationType, type Location } from "react-router-dom";
 import { TIMING } from "../config/timing";
 import { OS } from "../platform/platform";
-import { APP } from "../profile/session";
+import { APP, KAKAO2 } from "../profile/session";
 import { LayerContext } from "../platform/LayerContext";
 import { IBK_ANIM_MS, ibkAnimFor, ibkBackLevel, type IbkAnim } from "../ibk/nav";
+import { K2_NAV, k2AnimFor, k2Modal, type K2Anim } from "../kakao2/nav";
+import { k2ClockOnce } from "../kakao2/chrome";
 import "./ScreenStack.css";
+import "../kakao2/nav.css";
 
 type Anim = "push" | "pop";
 type Render = (loc: Location) => ReactNode;
@@ -49,6 +52,10 @@ const navMs = (anim: Anim | null, path = "") =>
 // i-ONE Bank(갤럭시) 녹화: 화면 사이는 대부분 전환 없이 한 번에 바뀜(로딩 점·빈 바탕은 src/ibk/loading.ts).
 // 이동할 때 location.state.ibkAnim 으로 고른 곳만 밀기 (src/ibk/nav.ts: 메뉴 열기·닫기, 본문만 밀기)
 const IBK_ANDROID = APP === "ibk" && OS === "android";
+// kakao2(아이폰 새 녹화, src/kakao2/nav.ts · nav.css): 이체 · 거래상세는 아래에서 올라오는 모달(500ms 스프링, 실제로 끝났을 때 걷음 — 케이뱅크 거래 상세처럼),
+// 그 밖의 push 는 400ms 곡선 + 아래 두 모서리 둥글게 (477ms 에 각지며 밑 층도 그때 걷음), 뒤로는 보통 iOS. 밑 화면 어둡게는 .10
+const K2_MS: Record<K2Anim, number> = { modal: K2_NAV.modal, detail: K2_NAV.modal, push: K2_NAV.push, pop: TIMING.nav.ios };
+const UNDER_DIM = KAKAO2 ? K2_NAV.underDim : 0.12;
 
 // 화면 내용은 loc/active가 그대로면 다시 그리지 않는다.
 // 드래그·전환 중 ScreenStack이 리렌더돼도 화면 트리 전체를 다시 계산하지 않게 하는 핵심.
@@ -70,6 +77,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const [ibkAnim, setIbkAnim] = useState<IbkAnim | null>(null);
   const [animMs, setAnimMs] = useState(0); // 지금 전환 길이 (--nav-ms)
   const [kbAnim, setKbAnim] = useState<KbAnim | null>(null); // 케이뱅크 갤럭시: 지금 전환 종류 (layer--kb-*)
+  const [k2Anim, setK2Anim] = useState<K2Anim | null>(null); // kakao2: 지금 전환 종류 (layer--k2-*)
   // 드래그 "중인지"만 state. 손가락 위치(dx)는 매 프레임 바뀌므로 ref + DOM 직접 조작.
   const [dragging, setDragging] = useState(false);
   const skipAnim = useRef(false);
@@ -78,6 +86,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const topEl = useRef<HTMLDivElement | null>(null);
   const underEl = useRef<HTMLDivElement | null>(null);
   const underDim = useRef<HTMLDivElement | null>(null);
+  const k2Hold = useRef(0); // kakao2 push: 밀기가 끝난 뒤 걷기까지 기다리는 타이머
 
   const top = entries[entries.length - 1];
   const below = entries.length > 1 ? entries[entries.length - 2] : null;
@@ -86,6 +95,7 @@ export function ScreenStack({ render }: { render: Render }) {
   useLayoutEffect(() => {
     if (location.key === top.key) return;
     const prevTop = top;
+    clearTimeout(k2Hold.current);
 
     let anim: Anim | null = navType === "POP" ? "pop" : navType === "PUSH" ? "push" : null;
     if (navType === "POP") {
@@ -132,17 +142,23 @@ export function ScreenStack({ render }: { render: Render }) {
     setEnterAnim(anim);
     setExiting(anim ? { loc: prevTop, anim } : null);
     setKbAnim(null);
+    setK2Anim(null);
     if (!anim) return;
 
     const path = anim === "pop" ? prevTop.pathname : location.pathname;
     const up = kbankTx(path) || kbankReceipt(path); // 아래에서 올라오는 화면 (아이폰도 같은 움직임)
     const kbAnimEnd = KBANK_ANDROID || up;
-    const ms = up ? kbankMs(anim, path) : navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
+    const k2 = KAKAO2 ? k2AnimFor(anim, path) : null;
+    const k2Up = k2 === "modal" || k2 === "detail";
+    const ms = up ? kbankMs(anim, path) : k2 ? K2_MS[k2] : navMs(anim, path); // 케이뱅크는 어느 화면이 오가는지에 따라 길이·곡선이 다름
     setAnimMs(ms);
     if (kbAnimEnd) setKbAnim(kbankAnim(anim, path));
+    setK2Anim(k2);
+    // kakao2 이체 모달 닫기: 상태바 글자가 시계까지 한 프레임에 흰색으로 (녹화 27.355초)
+    if (k2Up && anim === "pop") k2ClockOnce(0);
     // 케이뱅크는 움직임이 실제로 끝났을 때 걷음 (onKbAnimEnd) — 돌아가는 화면을 새로 그리느라 첫 프레임이 늦게 나온 만큼(≈45ms) 타이머가 먼저 끝나
-    // 뒤로 갈 때 나가는 화면이 70% 지점에서 사라졌음 (rAF 기록 nav_pop). 타이머는 끝 이벤트가 안 올 때 대비
-    const id = setTimeout(endAnim, kbAnimEnd ? ms + 300 : ms);
+    // 뒤로 갈 때 나가는 화면이 70% 지점에서 사라졌음 (rAF 기록 nav_pop). 타이머는 끝 이벤트가 안 올 때 대비. kakao2 모달 · push 도 같은 방법
+    const id = setTimeout(endAnim, kbAnimEnd || k2Up ? ms + 300 : k2 === "push" ? K2_NAV.pushHold + 300 : ms);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
@@ -151,6 +167,16 @@ export function ScreenStack({ render }: { render: Render }) {
     setExiting(null);
     setEnterAnim(null);
     setKbAnim(null);
+    setK2Anim(null);
+  };
+  // kakao2 모달: 위 층의 올라오기 · 내려가기(nav.css k2-modal-*)가 끝났을 때. push: 새 화면(또는 그 .k2-push-body) 밀기가 끝나고
+  // 77ms 뒤 — 아래 둥근 모서리가 각지는 때(녹화 28.915초 = 시작 + 477ms)까지 밑 층을 남겨 둠. 타이머로 재면 새 화면을 그리느라 늦은 만큼 일찍 끝남
+  const onK2AnimEnd = (e: AnimationEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement;
+    if (k2Anim === "push") {
+      if (e.animationName === "ios-push-in" && (t === e.currentTarget || t.classList.contains("k2-push-body")))
+        k2Hold.current = window.setTimeout(endAnim, K2_NAV.pushHold - K2_NAV.push);
+    } else if (t === e.currentTarget && /^k2-modal-(up|down)$/.test(e.animationName)) endAnim();
   };
   // 케이뱅크 전환 끝: 위 층의 가로 밀기(층 자신), 거래 상세는 .kbt 의 올라오기·내려가기,
   // 이체확인증은 .kbc 안(루트 · 머리줄 · 본문)의 올라오기 (kbc-up, 루트에 거래 상세 키프레임을 써도 kbt-up)
@@ -188,12 +214,13 @@ export function ScreenStack({ render }: { render: Render }) {
     }
     if (underDim.current) {
       underDim.current.style.transition = animate ? `opacity ${TIMING.swipeRelease}ms ${EASE}` : "none";
-      underDim.current.style.opacity = String(0.12 * (1 - p));
+      underDim.current.style.opacity = String(UNDER_DIM * (1 - p));
     }
   };
 
   // ---------- iOS: 왼쪽 가장자리 스와이프로 뒤로가기 ----------
-  const canSwipe = OS === "ios" && below !== null && exiting === null;
+  // kakao2 모달(이체 · 거래상세)은 iOS 전체 화면 모달처럼 가장자리 스와이프로 닫히지 않음
+  const canSwipe = OS === "ios" && below !== null && exiting === null && !k2Modal(top.pathname);
   // 화면 안 뒤로가기 칸(i-ONE Bank useIbkBackHandler: 시트 · 안내창 · 이체 금액/확인 단계)이 쌓여 있으면 끌지 않음. 끝까지 끌면 navigate(-1) 이
   // 그 칸만 빼고 주소(location.key)는 그대로라 위 층이 402px 밀린 채 멈췄음 (V2 s6b · V3 iosstuck). 실제 iOS 도 시트·알림이 떠 있으면 뒤로 끌기가 안 됨
   const inScreenBack = () => ibkBackLevel() > 0;
@@ -277,6 +304,8 @@ export function ScreenStack({ render }: { render: Render }) {
   const layers: { loc: Location; className: string; active: boolean; role?: "top" | "under" }[] = [];
   if (dragging && below) layers.push({ loc: below, className: "layer layer--under", active: false, role: "under" });
   if (exiting?.anim === "push") layers.push({ loc: exiting.loc, className: "layer layer--push-exit", active: false });
+  // kakao2: 모달이 떠 있는 동안 밑 화면 층을 그대로 둠 (올라올 때의 push-exit 층과 같은 key → 다시 그리지 않음). 닫으면 스크롤 · 불러온 거래가 그대로
+  else if (below && !dragging && !exiting && k2Modal(top.pathname)) layers.push({ loc: below, className: "layer layer--k2-under", active: false });
   layers.push({
     loc: top,
     className: `layer ${enterAnim ? `layer--${enterAnim}-enter` : ""} ${dragging ? "layer--dragging" : ""}`,
@@ -290,10 +319,12 @@ export function ScreenStack({ render }: { render: Render }) {
       {layers.map((l) => (
         <div
           key={l.loc.key}
-          className={ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : kbAnim ? `${l.className} layer--kb-${kbAnim}` : l.className}
+          className={
+            ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : kbAnim ? `${l.className} layer--kb-${kbAnim}` : k2Anim ? `${l.className} layer--k2-${k2Anim}` : l.className
+          }
           style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : animMs || navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
-          onAnimationEnd={ibkAnim ? onIbkAnimEnd : kbAnim ? onKbAnimEnd : undefined}
+          onAnimationEnd={ibkAnim ? onIbkAnimEnd : kbAnim ? onKbAnimEnd : k2Anim ? onK2AnimEnd : undefined}
           {...(l.active && {
             onPointerDown,
             onPointerMove,

@@ -20,20 +20,22 @@ export function setCurrentProfile(id: string | null) {
 }
 
 // 이 서버가 어느 앱인지. 서버 하나는 앱 하나만 연다 (카카오뱅크 9101, 콕뱅크 9103, 하나원큐 9105, i-ONE Bank 9107, 케이뱅크 9109,
-// 녹화 인트로를 켠 케이뱅크 kbank2 9111 — 데이터도 따로)
+// 녹화 인트로를 켠 케이뱅크 kbank2 9111 · i-ONE Bank ibk2 9113 · 카카오뱅크 kakao2 9115 — 데이터도 따로)
 // 배포 땐 서버가 index.html에 window.__BANK_APP__ 을 넣어 주고, 개발 땐 VITE_APP=nh (npm run dev:nh) / hana (dev:hana) / ibk (dev:ibk) /
-// kbank (dev:kbank 화면 5177 · API 8791) / kbank2 (dev:kbank2 화면 5178 · API 8792)
+// kbank (dev:kbank 화면 5177 · API 8791) / kbank2 (dev:kbank2 화면 5178 · API 8792) / kakao2 (dev:kakao2 화면 5180 · API 8794)
 export type AppName = "kakao" | "nh" | "hana" | "ibk" | "kbank";
 declare global {
   interface Window {
     __BANK_APP__?: AppName;
-    __BANK_INTRO__?: boolean; // kbank2 서버: 녹화 인트로 켬
+    __BANK_INTRO__?: boolean; // kbank2 · ibk2 · kakao2 서버: 녹화 인트로 켬
   }
 }
 const appName = window.__BANK_APP__ ?? import.meta.env.VITE_APP;
 export const APP: AppName = appName === "nh" || appName === "hana" || appName === "ibk" || appName === "kbank" ? appName : "kakao";
-// 녹화 인트로가 있는 서버인지 (kbank2). 배포 땐 서버가, 개발 땐 VITE_INTRO=1 (npm run dev:kbank2)
+// 녹화 인트로가 있는 서버인지 (kbank2 · ibk2 · kakao2). 배포 땐 서버가, 개발 땐 VITE_INTRO=1 (npm run dev:kbank2 등)
 export const HAS_INTRO = window.__BANK_INTRO__ === true || import.meta.env.VITE_INTRO === "1";
+// kakao2 서버 (9115): 카카오뱅크 새 녹화(2026-11, 아이폰) 화면 + 녹화 인트로. 화면은 이 상수로만 나눔 (인트로 스위치 isIntroOn() 으로 나누지 않음)
+export const KAKAO2 = APP === "kakao" && HAS_INTRO;
 
 // 화면에 쓰는 앱 이름
 export const APP_NAME: Record<AppName, string> = { kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank", kbank: "케이뱅크" };
