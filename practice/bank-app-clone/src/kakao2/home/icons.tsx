@@ -1,4 +1,5 @@
 // kakao2 홈에만 쓰는 선 아이콘 (인라인 SVG, 크기 = 녹화에서 잰 잉크 상자 pt). 공용 그림은 ../art.tsx
+import { useId } from "react";
 type P = { color?: string; className?: string };
 
 // ---------- 탭바 (녹화 1.8초 잉크 상자, 두께 2) ----------
@@ -90,6 +91,35 @@ export function K2Info() {
       <circle cx="7.75" cy="7.75" r="7.75" fill="#bababa" />
       <circle cx="7.75" cy="4.55" r="1.05" fill="#fff" />
       <path d="M7.75 7V11.4" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// ---------- AI 알약 별 ----------
+// 모양은 ../art.tsx K2AiStar 와 같은 오목한 네 꼭지 별 (16pt). 색은 녹화 2.2초 별을 자리마다 뽑아 다시 맞춤: 오른쪽 위 · 왼쪽 아래가 같은 색
+// → 왼쪽 위에서 오른쪽 아래로 (0.6, 0.8) 방향 그라데이션. 위 #13c6e5 · 왼쪽 #1dc9ca · 가운데 #66d44f · 오른쪽 #aadc17 · 아래 #b4dd16
+// (K2AiStar pill 은 거의 세로라 오른쪽 꼭지가 청록으로 나옴). 가운데 막대 1.5 × 6 #1a2419
+const PILL_STAR =
+  "M14.34 8L14.27 8.01 14.08 8.06 13.77 8.16 13.36 8.35 12.86 8.62 12.3 8.97 11.7 9.41 11.08 9.92 10.48 10.48 9.92 11.08 9.41 11.7 8.97 12.3 8.62 12.86 8.35 13.36 8.16 13.77 8.06 14.08 8.01 14.27 8 14.34 7.99 14.27 7.94 14.08 7.84 13.77 7.65 13.36 7.38 12.86 7.03 12.3 6.59 11.7 6.08 11.08 5.52 10.48 4.92 9.92 4.3 9.41 3.7 8.97 3.14 8.62 2.64 8.35 2.23 8.16 1.92 8.06 1.73 8.01 1.66 8 1.73 7.99 1.92 7.94 2.23 7.84 2.64 7.65 3.14 7.38 3.7 7.03 4.3 6.59 4.92 6.08 5.52 5.52 6.08 4.92 6.59 4.3 7.03 3.7 7.38 3.14 7.65 2.64 7.84 2.23 7.94 1.92 7.99 1.73 8 1.66 8.01 1.73 8.06 1.92 8.16 2.23 8.35 2.64 8.62 3.14 8.97 3.7 9.41 4.3 9.92 4.92 10.48 5.52 11.08 6.08 11.7 6.59 12.3 7.03 12.86 7.38 13.36 7.65 13.77 7.84 14.08 7.94 14.27 7.99Z";
+export function K2PillStar({ size = 16 }: { size?: number }) {
+  const id = useId();
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden>
+      <defs>
+        <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="4.16" y1="2.88" x2="11.84" y2="13.12">
+          <stop offset="0" stopColor="#0ac3f0" />
+          <stop offset="0.125" stopColor="#13c6e5" />
+          <stop offset="0.219" stopColor="#1dc9ca" />
+          <stop offset="0.281" stopColor="#30cea6" />
+          <stop offset="0.5" stopColor="#66d44f" />
+          <stop offset="0.719" stopColor="#9edb1b" />
+          <stop offset="0.781" stopColor="#aadc17" />
+          <stop offset="0.875" stopColor="#b4dd16" />
+          <stop offset="1" stopColor="#b9dd15" />
+        </linearGradient>
+      </defs>
+      <path d={PILL_STAR} fill={`url(#${id})`} stroke={`url(#${id})`} strokeWidth="3.32" strokeLinejoin="round" />
+      <rect x="7.25" y="5" width="1.5" height="6" rx="0.3" fill="#1a2419" />
     </svg>
   );
 }

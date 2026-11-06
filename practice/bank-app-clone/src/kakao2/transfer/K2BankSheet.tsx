@@ -1,4 +1,5 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { ApiError } from "../../api/client";
 import { api } from "../../api/endpoints";
 import type { Bank, Recipient } from "../../api/types";
@@ -68,6 +69,7 @@ const BankPicker = memo(function BankPicker({ banks, onPick, onCancel }: { banks
   const [query, setQuery] = useState("");
   const [skel, setSkel] = useState(true);
   const [compact, setCompact] = useState(false);
+  const compactNow = useRef(false);
   const listEl = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLElement>(null);
   const barTimer = useRef(0);
@@ -86,8 +88,13 @@ const BankPicker = memo(function BankPicker({ banks, onPick, onCancel }: { banks
     b.style.height = `${len}px`;
   };
   useLayoutEffect(placeBar, [compact]);
+  // 접기 · 펴기는 스크롤 이벤트 안에서 바로 그림 (flushSync) — 그냥 setState 면 스크롤 우선순위라 두 프레임 늦게 접혔음 (녹화는 끌기 첫 프레임)
   const onScroll = (el: HTMLDivElement) => {
-    setCompact(el.scrollTop > 0);
+    const c = el.scrollTop > 0;
+    if (c !== compactNow.current) {
+      compactNow.current = c;
+      flushSync(() => setCompact(c));
+    }
     placeBar();
     bar.current?.classList.add("k2bank__bar--on");
     clearTimeout(barTimer.current);
@@ -97,8 +104,40 @@ const BankPicker = memo(function BankPicker({ banks, onPick, onCancel }: { banks
     const id = setTimeout(() => setSkel(false), SKEL_MS);
     return () => clearTimeout(id);
   }, []);
-  const list = useMemo(() => (banks ?? []).filter((b) => b.name.toLowerCase().includes(query.trim().toLowerCase())), [banks, query]);
-  const sections = (["bank", "securities"] as const).map((s) => list.filter((b) => b.section === s)).filter((l) => l.length);
+  // 격자는 접힘이 바뀌어도 다시 그리지 않음 (61칸)
+  const grid = useMemo(() => {
+    if (skel || !banks)
+      return (
+        <div className="k2bank__grid" aria-label="불러오는 중">
+          {Array.from({ length: 24 }, (_, i) => (
+            <span key={i} className="k2bank__skel">
+              <i />
+              <b />
+            </span>
+          ))}
+        </div>
+      );
+    const list = banks.filter((b) => b.name.toLowerCase().includes(query.trim().toLowerCase()));
+    const sections = (["bank", "securities"] as const).map((s) => list.filter((b) => b.section === s)).filter((l) => l.length);
+    return (
+      <>
+        {sections.map((l, i) => (
+          <div key={l[0].section}>
+            {i > 0 && <hr className="k2bank__sep" />}
+            <div className="k2bank__grid">
+              {l.map((b) => (
+                <button key={b.code} className="k2bank__item" onClick={() => onPick(b)}>
+                  <BankIcon bank={b} size={22.3} />
+                  <span>{b.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+        {!list.length && <p className="k2bank__empty">검색 결과가 없어요.</p>}
+      </>
+    );
+  }, [skel, banks, query, onPick]);
 
   return (
     <div className={`k2bank__body ${compact ? "k2bank__body--compact" : ""}`}>
@@ -111,33 +150,7 @@ const BankPicker = memo(function BankPicker({ banks, onPick, onCancel }: { banks
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="은행검색" />
       </label>
       <div className="k2bank__list" ref={listEl} onScroll={(e) => onScroll(e.currentTarget)} onTransitionEnd={placeBar}>
-        {skel || !banks ? (
-          <div className="k2bank__grid" aria-label="불러오는 중">
-            {Array.from({ length: 24 }, (_, i) => (
-              <span key={i} className="k2bank__skel">
-                <i />
-                <b />
-              </span>
-            ))}
-          </div>
-        ) : (
-          <>
-            {sections.map((l, i) => (
-              <div key={l[0].section}>
-                {i > 0 && <hr className="k2bank__sep" />}
-                <div className="k2bank__grid">
-                  {l.map((b) => (
-                    <button key={b.code} className="k2bank__item" onClick={() => onPick(b)}>
-                      <BankIcon bank={b} size={22.3} />
-                      <span>{b.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {!list.length && <p className="k2bank__empty">검색 결과가 없어요.</p>}
-          </>
-        )}
+        {grid}
       </div>
       <i className="k2bank__bar" ref={bar} />
     </div>

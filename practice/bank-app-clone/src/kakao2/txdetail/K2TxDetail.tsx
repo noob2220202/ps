@@ -6,7 +6,7 @@ import { useApi } from "../../api/useApi";
 import { ErrorState } from "../../components/ErrorState";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import { signedWon, won } from "../../lib/format";
-import { K2Chevron, K2Pencil, K2Share } from "../art";
+import { K2Chevron, K2Pencil } from "../art";
 import { leaveK2Dim } from "../dim";
 import "./K2TxDetail.css";
 
@@ -15,7 +15,7 @@ import "./K2TxDetail.css";
 // 처음엔 거래 종류에 맞춘 뼈대 (값은 모두 "-", "- 검색하기", 1/N 없음) → 상세를 받고 350ms 가 지나면 한 프레임에 채우고 막을 걷음 (167ms),
 // 거래금액 · 1/N 빵나누기는 그다음 프레임 (녹화 41.750 → 41.767초). 태그 줄(#이체) · 사용처 줄 없음. 확인 → 뒤로 (아래로 내려감)
 export const K2_TXD = {
-  minLoad: 350, // 뼈대 최소 시간 (녹화는 막이 뜨고 335 · 383 · 602ms 에 채워짐 — 화면이 거의 다 올라왔을 때)
+  minLoad: 350, // 뼈대 최소 시간, 막이 뜬 때부터 (녹화는 막이 뜨고 335 · 383 · 602ms 에 채워짐 — 화면이 거의 다 올라왔을 때)
   memoMax: 20,
 } as const;
 
@@ -25,6 +25,12 @@ type Shape = "sent" | "card" | "base";
 const shapeOf = (amount: number, sent: boolean, card: boolean): Shape => (amount < 0 && sent ? "sent" : card ? "card" : "base");
 
 type Row = { label: string; value: ReactNode; className?: string; after?: ReactNode };
+
+// 로딩 막이 뜬 프레임의 시각 = 막 스피너 애니메이션의 시작 시각 (막이 없거나 이 프레임에 막 떴으면 null)
+function dimShownAt(): number | null {
+  const a = document.querySelector(".k2-dim")?.getAnimations({ subtree: true }).find((x) => typeof x.startTime === "number");
+  return a ? (a.startTime as number) : null;
+}
 
 // 메모 (녹화는 안내 글만): 누르면 입력 (20자), 서버에 저장 — 🔔 패널에서 고친 메모도 여기 보임 (케이뱅크 KbankTxDetail 의 Memo 와 같은 방식)
 function Memo({ txId, memo }: { txId: string; memo?: string }) {
@@ -81,6 +87,21 @@ function Memo({ txId, memo }: { txId: string; memo?: string }) {
   );
 }
 
+// 공유 (아래 버튼 가운데 24 상자, 흰 2pt 둥근 끝): 녹화 42.3초 잉크의 가운데선 — 화살표 꼭짓점 y 3.4 · 팔 5 · 대 끝 13.5,
+// 받침 x 4 – 20 (가운데선 사이 16) · y 16 – 20
+function Share() {
+  return (
+    <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M12 13.5V3.4M7 8.4l5-5 5 5M4 16v4h16v-4" />
+    </svg>
+  );
+}
+
+// 거래시간 값 (YYYY.MM.DD HH:MM:SS): 녹화(SF) 의 '.' · ':' · 띄어쓰기가 Pretendard 보다 넓음 (같은 문자열로 재면 4.4pt 차이, 숫자는 같음)
+// → 그 글자 둘레만 조금 띄움
+const SEP: Record<string, string> = { ".": "k2txd__dot", ":": "k2txd__colon", " ": "k2txd__gap" };
+const timeText = (s: string) => s.split(/([.: ])/).map((p, i) => (SEP[p] ? <span key={i} className={SEP[p]}>{p}</span> : p));
+
 // 줄 하나 = <dl> (이름 · 값). 값이 두 줄이면(입금계좌) 그만큼 줄이 길어짐
 function Rows({ rows }: { rows: Row[] }) {
   return (
@@ -109,10 +130,23 @@ export function K2TxDetail() {
   const detail = useApi<TransactionDetail>(paths.transaction(txId));
   const home = useApi<HomeData>(paths.home); // 받는 분에게 표기 기본값 = 내 이름
 
-  // 뼈대 최소 시간 (받아 둔 상세가 있어도 들어올 때마다)
+  // 올라오기 · 뼈대 시간을 막이 뜬 프레임에 맞춤: 목록은 누른 프레임에 막을 그리지만 이 층은 라우터 전환(startTransition)으로 1–2프레임 뒤에
+  // 붙음 (빌드 · 기기마다 다름) → k2-modal-up 의 시작 시각을 막과 같게 (nav.css 의 −24ms 는 그대로, critic.md C4)
+  const root = useRef<HTMLDivElement>(null);
+  const shownAt = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const at = (shownAt.current = dimShownAt());
+    const up = root.current
+      ?.closest(".layer")
+      ?.getAnimations()
+      .find((a) => (a as CSSAnimation).animationName === "k2-modal-up");
+    if (at !== null && up) up.startTime = at;
+  }, []);
+  // 뼈대 최소 시간 (막이 뜬 때부터, 막이 없으면 들어온 때부터. 받아 둔 상세가 있어도 들어올 때마다)
   const [minDone, setMinDone] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setMinDone(true), K2_TXD.minLoad);
+    const at = shownAt.current;
+    const t = setTimeout(() => setMinDone(true), K2_TXD.minLoad - (at === null ? 0 : performance.now() - at));
     return () => clearTimeout(t);
   }, []);
   const loaded = minDone && detail.status === "done" && home.status !== "loading";
@@ -141,7 +175,7 @@ export function K2TxDetail() {
 
   const groups: Row[][] = [
     [
-      { label: "거래시간", value: v(d?.transactedAt) },
+      { label: "거래시간", value: d?.transactedAt ? timeText(d.transactedAt) : "-" },
       { label: "거래구분", value: v(d?.kind), className: "k2txd__row--ko" },
     ],
     [
@@ -205,7 +239,7 @@ export function K2TxDetail() {
   };
 
   return (
-    <div className="k2txd">
+    <div className="k2txd" ref={root}>
       <div className="k2txd__scroll">
         <div className="k2txd__page">
           <h1 className={`k2txd__title${d ? "" : " k2txd__dash"}`}>{d ? d.merchant : "-"}</h1>
@@ -240,7 +274,7 @@ export function K2TxDetail() {
       </div>
       <div className="k2txd__foot">
         <button className="k2txd__share" aria-label="공유">
-          <K2Share />
+          <Share />
         </button>
         <button className="k2txd__ok" onClick={close}>
           <span>확인</span>

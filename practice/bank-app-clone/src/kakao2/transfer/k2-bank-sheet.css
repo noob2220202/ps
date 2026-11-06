@@ -17,23 +17,26 @@
   background: none;
   font: inherit;
   letter-spacing: inherit;
-  color: #111;
+  color: #1f1f1f;
 }
 
-/* 배경: 검정 .737 (흰 → #434343). 깔기 233ms (프레임마다 잰 진행), 걷기 210ms ease-out (패널과 같이) */
+/* 배경: 검정 .737 (흰 → #434343). 깔기 233ms (프레임마다 잰 진행), 걷기는 패널과 같은 곡선 (패널보다 반 프레임 늦게).
+   열기 · 닫기 모두 한 프레임쯤 앞당겨 시작(음수 delay): iOS 는 손을 뗀 다음 프레임에 이미 한 프레임만큼 움직여 있음 (9.875초 배경 .08 ·
+   시트 0.07, 23.618초 시트 0.06). 브라우저 전환은 시작 프레임을 0 으로 그리므로 그 한 프레임을 건너뜀 */
 .k2bank__backdrop {
   position: absolute;
   inset: 0;
   background: #000;
   opacity: 0;
-  transition: opacity 210ms cubic-bezier(0, 0, 0.58, 1);
+  transition: opacity 240ms cubic-bezier(0.2, 0, 0.4, 1) -14ms;
 }
 .k2bank--open .k2bank__backdrop {
   opacity: 0.737;
-  transition: opacity 233ms linear(0, 0.08, 0.2, 0.34, 0.45, 0.58, 0.68, 0.77, 0.83, 0.89, 0.92, 0.96, 0.98, 0.99, 1);
+  transition: opacity 233ms linear(0, 0.08, 0.2, 0.34, 0.45, 0.58, 0.68, 0.77, 0.83, 0.89, 0.92, 0.96, 0.98, 0.99, 1) -17ms;
 }
 
-/* 패널: 열기 = ζ .8 · ω 18 스프링 500ms (11pt 넘쳤다 돌아옴, 9.85초), 닫기 = 210ms cubic-bezier(0,0,.58,1) (23.60초).
+/* 패널: 열기 = ζ .8 · ω 18 스프링 500ms (11pt 넘쳤다 돌아옴, 9.85초 — 배경보다 8ms 먼저라 −25ms),
+   닫기 = 240ms cubic-bezier(.2,0,.4,1) (23.5975초 시작, 23.60 – 23.79초 12프레임에 맞춤 RMS 0.005 — 처음 두 프레임은 천천히 빨라짐).
    넘칠 때 밑이 비지 않게 아래로 16 흰 칸 (::after) */
 .k2bank__panel {
   position: absolute;
@@ -42,12 +45,12 @@
   bottom: 0;
   border-radius: 30px 30px 0 0;
   background: #fff;
-  color: #111;
+  color: #1f1f1f;
   transform: translate3d(0, 100%, 0);
   visibility: hidden;
   transition:
-    transform 210ms cubic-bezier(0, 0, 0.58, 1),
-    visibility 0s 210ms;
+    transform 240ms cubic-bezier(0.2, 0, 0.4, 1) -20ms,
+    visibility 0s 220ms;
 }
 .k2bank__panel::after {
   content: "";
@@ -63,7 +66,8 @@
   visibility: visible;
   transition:
     transform 500ms
-      linear(0, 0.053, 0.176, 0.325, 0.474, 0.61, 0.724, 0.815, 0.884, 0.934, 0.969, 0.991, 1.005, 1.012, 1.015, 1.015, 1.014, 1.011, 1.009, 1.007, 1.005, 1.004, 1.002, 1.001, 1.001, 1),
+      linear(0, 0.053, 0.176, 0.325, 0.474, 0.61, 0.724, 0.815, 0.884, 0.934, 0.969, 0.991, 1.005, 1.012, 1.015, 1.015, 1.014, 1.011, 1.009, 1.007, 1.005, 1.004, 1.002, 1.001, 1.001, 1)
+      -25ms,
     visibility 0s;
 }
 .k2bank__panel--bank {
@@ -77,8 +81,9 @@
   padding-bottom: var(--safe-bottom);
 }
 
-/* ---------- 은행선택 머리: 취소 14.5/400 (잉크 343.4 – 368.4 × 165.9), 은행선택 20/700 (24.3 · 193.8), 검색칸 18 – 375 × 233.8 – 291.8.
-   목록을 내리면(scrollTop > 0) 제목이 숨고 검색칸 · 목록이 34 올라감 — 한 프레임에. 맨 위로 돌아오면 50ms 로 펼침 ---------- */
+/* ---------- 은행선택 머리: 취소 14.5/400 #1f1f1f (잉크 343.4 – 368.4 × 165.9), 은행선택 20/700 (24.3 · 193.8), 검색칸 18 – 375 × 233.8 – 291.8.
+   목록을 내리면(scrollTop > 0) 제목이 숨고 검색칸 · 목록이 34 올라감 — 한 프레임에. 맨 위로 돌아오면 50ms 로 펼침
+   (제목도 34 위에서 검색칸과 같이 내려오며 나타남 — 22.402 · 22.418 · 22.435초) ---------- */
 .k2bank__body {
   position: absolute;
   inset: 0;
@@ -90,7 +95,7 @@
   padding: 10px;
   font-size: 14.5px;
   line-height: 14.5px;
-  color: #111;
+  color: #1f1f1f;
 }
 .k2bank__cancel:active {
   color: #cdcdcd;
@@ -103,7 +108,9 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 20px;
-  transition: opacity 50ms linear;
+  transition:
+    opacity 50ms linear,
+    transform 50ms linear;
 }
 .k2bank__search {
   position: absolute;
@@ -128,19 +135,19 @@
   line-height: 16px;
 }
 .k2bank__search input::placeholder {
-  color: #777;
+  color: #7d7d7d;
 }
-/* 목록: 위끝 307 (검색칸 아래 15), 화면 맨 아래까지 · 마지막 줄 밑 34 */
+/* 목록: 위끝 307.8 (검색칸 아래 16, 접히면 273.8 — 13 · 19초 프레임에서 잘린 줄 위끝), 화면 맨 아래까지 · 마지막 줄 밑 34 */
 .k2bank__list {
   position: absolute;
   left: 0;
   right: 0;
-  top: 167.1px;
+  top: 167.87px;
   bottom: 0;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
-  padding: 0.55px 0 var(--safe-bottom);
+  padding: 0 0 var(--safe-bottom);
   transition: top 50ms linear;
 }
 .k2bank__list::-webkit-scrollbar {
@@ -151,12 +158,13 @@
 }
 .k2bank__body--compact .k2bank__title {
   opacity: 0;
+  transform: translateY(-34px);
 }
 .k2bank__body--compact .k2bank__search {
   top: 59.9px;
 }
 .k2bank__body--compact .k2bank__list {
-  top: 133.1px;
+  top: 133.87px;
 }
 
 /* iOS 스크롤 막대: x 387 – 390, 검정 .43 (흰 바탕에서 146), 위치 · 길이는 K2BankSheet 가 */

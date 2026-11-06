@@ -9,9 +9,11 @@ import { useStatusBar } from "../../hooks/useStatusBar";
 import { won } from "../../lib/format";
 import { useLayerActive } from "../../platform/LayerContext";
 import promoIcon from "../../assets/local/k2-account-promo.png";
-import { K2BackChevron, K2ChevronDown, K2Copy, K2Gear, K2Magnifier, K2Spinner } from "../art";
+import { K2BackChevron, K2ChevronDown, K2Spinner } from "../art";
 import { cutK2Dim, isK2DimUp, K2_SPIN_ON_LIGHT, leaveK2Dim, showK2Dim } from "../dim";
+import { K2_NAV } from "../nav";
 import { K2AccountSkeleton } from "./K2AccountSkeleton";
+import { K2AcctCopy, K2AcctGear, K2AcctMagnifier } from "./icons";
 import { K2TxList } from "./K2TxList";
 import "./K2Account.css";
 
@@ -19,7 +21,7 @@ import "./K2Account.css";
 // 홈 카드에서 push: 머리줄(상태바 띠 + < · 제목 · 톱니)은 첫 프레임부터 제자리, 그 아래 본문(.k2-push-body)만 오른쪽에서 밀려 들어옴 (nav.css).
 // 본문 = 계좌번호 · 잔액 · 검색 상자 · 홍보 줄 · 거래 목록(20건씩) + 아래 고정 가져오기 / 이체하기. 거래를 누르면 로딩 막 + 거래상세 모달 (막은 상세가 걷음)
 const K2_ACCOUNT = {
-  skeletonMin: 1070, // 뼈대 최소 (28.438 → 29.507초). 받아 둔 게 있어도 들어올 때마다
+  skeletonMin: 1050, // 뼈대 최소: 녹화 첫 push 프레임 → 내용 첫 프레임 1085ms (28.438 → 29.523초) 에서 타이머 · 그리기 몫을 뺌. 받아 둔 게 있어도 들어올 때마다
   pageSize: 20, // 한 번에 보이는 거래 수 (맨 아래 스피너가 보이면 20건 더)
   moreDelay: 560, // 스피너가 보이고 다음 20건이 붙기까지 (36.36 → 36.945초, 54.10 → 54.643초)
   indicatorIdle: 1500, // 스크롤이 멈추고 스크롤 표시가 사라지기까지 (녹화에선 1.02초 멈춰도 그대로)
@@ -28,9 +30,8 @@ const K2_ACCOUNT = {
   transferCut: 67, // 막을 걷음
 } as const;
 
-// 스크롤 표시 (account.md 2.8): 폭 3, 오른쪽 3, 본문 위 3 ~ 아래 버튼 띠 위 0.6 사이
+// 스크롤 표시 (account.md 2.8): 폭 3, 오른쪽 3, 본문 위 3 ~ 아래 버튼 띠 위끝 (녹화 116 – 721)
 const IND_TOP = 3;
-const IND_GAP = 0.6;
 const IND_MIN = 36;
 
 export function K2AccountScreen() {
@@ -90,15 +91,18 @@ export function K2AccountScreen() {
     const i = indRef.current;
     const max = el.scrollHeight - el.clientHeight;
     if (!i || max <= 0) return;
-    const track = el.clientHeight - IND_TOP - (barRef.current?.offsetHeight ?? 0) - IND_GAP;
+    const track = el.clientHeight - IND_TOP - (barRef.current?.offsetHeight ?? 0);
     const len = Math.max(IND_MIN, (track * el.clientHeight) / el.scrollHeight);
     const y = IND_TOP + ((track - len) * Math.min(1, Math.max(0, el.scrollTop / max)));
     i.style.height = `${len}px`;
     i.style.transform = `translate3d(0, ${y}px, 0)`;
   }, []);
-  const hideInd = useCallback(() => {
+  const hideInd = useCallback((now?: boolean) => {
     clearTimeout(ind.current.timer);
-    indRef.current?.classList.remove("k2acct__ind--on");
+    const i = indRef.current;
+    if (!i) return;
+    i.style.transition = now ? "none" : "";
+    i.classList.remove("k2acct__ind--on");
   }, []);
   useScrollFrame(scrollEl, (top) => {
     setLine(top > 0); // 머리줄 아래 선: 조금이라도 내리면 (녹화 30.223초 첫 스크롤 프레임)
@@ -108,7 +112,7 @@ export function K2AccountScreen() {
     paintInd(scrollEl);
     indRef.current?.classList.add("k2acct__ind--on");
     clearTimeout(s.timer);
-    s.timer = window.setTimeout(hideInd, K2_ACCOUNT.indicatorIdle);
+    s.timer = window.setTimeout(() => hideInd(), K2_ACCOUNT.indicatorIdle);
   });
   // 거래가 붙어 전체 높이가 바뀌면 길이도 (보이고 있을 때만 의미 있음)
   useEffect(() => {
@@ -119,13 +123,17 @@ export function K2AccountScreen() {
     return () => clearTimeout(s.timer);
   }, []);
 
-  // 모달(거래상세 · 이체)이 덮으면 스크롤 표시를 숨김 (돌아와도 스크롤할 때까지 안 보임 — 녹화 45.17 → 45.77초).
+  // 모달(거래상세 · 이체)이 덮으면 스크롤 표시를 숨김: 막 밑에서는 그대로 보이다가 모달이 다 덮은 뒤 흐려짐 없이
+  // (녹화 41.43초 막 밑에 보임, 돌아와도 스크롤할 때까지 안 보임 — 45.17 → 45.77초).
   // 덮였다 돌아왔는데 로딩 막이 남아 있으면(상세가 걷지 못하고 뒤로 등) 걷음
   const wasActive = useRef(active);
   const sending = useRef<number[] | null>(null);
   useEffect(() => {
-    if (!active) hideInd();
-    else if (!wasActive.current && isK2DimUp() && !sending.current) cutK2Dim();
+    const s = ind.current;
+    if (!active) {
+      clearTimeout(s.timer);
+      s.timer = window.setTimeout(() => hideInd(true), K2_NAV.modal);
+    } else if (!wasActive.current && isK2DimUp() && !sending.current) cutK2Dim();
     wasActive.current = active;
   }, [active, hideInd]);
 
@@ -184,7 +192,7 @@ export function K2AccountScreen() {
           </button>
           <h1 className="k2acct__title">{title}</h1>
           <button className="k2acct__gear" aria-label="설정">
-            <K2Gear />
+            <K2AcctGear />
           </button>
         </div>
       </header>
@@ -206,28 +214,30 @@ export function K2AccountScreen() {
           <>
             <div className="k2acct__scroll" ref={setScrollEl}>
               <div className="k2acct__content">
-                <div className="k2acct__num">
-                  <span>{acc.number}</span>
-                  <K2Copy className="k2acct__copy" />
-                </div>
-                <strong className="k2acct__bal">{won(acc.balance)}</strong>
-
-                <div className="k2acct__search">
-                  <K2Magnifier width={17} height={16.7} stroke={1.7} />
-                  <span className="k2acct__filter">
-                    3개월 · 전체 · 최신순
-                    <K2ChevronDown />
-                  </span>
-                </div>
-
-                <div className="k2acct__promo">
-                  <img src={promoIcon} alt="" />
-                  <div>
-                    <small>The 체크카드 출시 이벤트</small>
-                    <strong>100% 소비 지원금</strong>
+                <div className="k2acct__head">
+                  <div className="k2acct__num">
+                    <span>{acc.number}</span>
+                    <K2AcctCopy className="k2acct__copy" />
                   </div>
+                  <strong className="k2acct__bal">{won(acc.balance)}</strong>
+
+                  <div className="k2acct__search">
+                    <K2AcctMagnifier className="k2acct__magn" />
+                    <span className="k2acct__filter">
+                      3개월 · 전체 · 최신순
+                      <K2ChevronDown />
+                    </span>
+                  </div>
+
+                  <div className="k2acct__promo">
+                    <img src={promoIcon} alt="" />
+                    <div className="k2acct__promo-text">
+                      <small>The 체크카드 출시 이벤트</small>
+                      <strong>100% 소비 지원금</strong>
+                    </div>
+                  </div>
+                  <div className="k2acct__divider" />
                 </div>
-                <div className="k2acct__divider" />
 
                 <K2TxList items={visible} onSelect={openTx} />
                 {more && (

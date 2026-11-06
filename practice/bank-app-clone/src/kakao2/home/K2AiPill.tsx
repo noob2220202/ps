@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { K2AiStar } from "../art";
 import { K2_HOME } from "./content";
+import { K2PillStar } from "./icons";
 import "./K2AiPill.css";
 
 // kakao2 홈 AI 알약 (intro.md §7, critic.md §2.1). 한 번의 바꿈 = 지우기 시작(at) 기준:
@@ -41,7 +41,7 @@ function PillStatic({ text }: { text: string }) {
   return (
     <div className="k2-pill k2-pill--glow">
       <span className="k2-pill__icon">
-        <K2AiStar variant="pill" />
+        <K2PillStar />
       </span>
       <span className="k2-pill__text">{text}</span>
     </div>
@@ -60,7 +60,7 @@ function PillCollapse({ at, text }: { at: number; text: string }) {
   return (
     <div className="k2-pill" ref={ref} style={{ animationDelay: delay }}>
       <span className="k2-pill__icon k2-pill__icon--out" style={{ animationDelay: delay }}>
-        <K2AiStar variant="pill" />
+        <K2PillStar />
       </span>
       <span className="k2-pill__text k2-pill__text--out" style={{ animationDelay: delay }}>
         {text}
@@ -90,7 +90,7 @@ function PillTyping({ at, text }: { at: number; text: string }) {
     <div className="k2-pill k2-pill--glow" style={{ animationDelay: glow }}>
       <span className="k2-pill__ring" style={{ animationDelay: `${ring}, ${ring}` }} />
       <span className="k2-pill__icon k2-pill__icon--in" style={{ animationDelay: star }}>
-        <K2AiStar variant="pill" />
+        <K2PillStar />
       </span>
       <span className="k2-pill__text k2-pill__text--in" style={{ animationDelay: `${fade}, ${pad}` }}>
         {text.slice(0, typed)}

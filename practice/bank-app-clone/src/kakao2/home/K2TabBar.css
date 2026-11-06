@@ -1,32 +1,33 @@
-/* kakao2 홈 탭바 (K2TabBar.tsx, home.md §4.14). 캡슐 x 21 – 372, 화면 y 768.4 – 830.3 (아래 21.7), 반지름 31.
+/* kakao2 홈 탭바 (K2TabBar.tsx, home.md §4.14). 캡슐 x 21 – 372, 화면 y 769 – 831 (아래 21, 녹화 px 2307 – 2492 ÷ 3), 반지름 31.
    선택 칸 4pt 안쪽 74 × 53.8 (반지름 27). 탭 가운데 62.0 · 129.2 · 196.5 · 263.7 · 330.4 (칸 67.1), 아이콘 가운데 y 792 · 글자 10/500 가운데 813.3 */
 .k2-home .k2-tab {
   position: absolute;
   left: 21px;
   right: 21px;
-  bottom: calc(var(--safe-bottom) - 12.3px);
+  bottom: calc(var(--safe-bottom) - 13px);
   z-index: 20;
-  height: 61.9px;
+  height: 62px;
   color: #f7f7f7;
-  transition: color 400ms ease;
+  transition: color 170ms linear;
 }
 .k2-home .k2-tab__glass,
 .k2-home .k2-tab__sel,
 .k2-home .k2-tab__items {
   position: absolute;
 }
-/* 유리: 밑 화면이 비침 (#1f1f1f 위 #252525). 테두리는 1pt 옅은 빛, 윗변 가장자리는 더 밝게 */
+/* 유리: 밑 화면이 비침 (아래 가장자리 막 위에서 #252525, 흰 광고가 지나가면 #878787). 테두리는 둘레 어디나 같은 1pt 빛,
+   바깥 끝이 가장 밝음 (녹화 3px: 37 위 71 · 62 · 53) */
 .k2-home .k2-tab__glass {
   inset: 0;
   border-radius: 31px;
-  background: rgba(42, 42, 42, 0.53);
+  background: rgba(43, 43, 43, 0.53);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.13),
-    inset 0 0.34px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -0.34px 0 rgba(255, 255, 255, 0.12);
-  transition: background-color 400ms ease;
+    inset 0 0 0 0.34px rgba(255, 255, 255, 0.047),
+    inset 0 0 0 0.67px rgba(255, 255, 255, 0.045),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.073);
+  transition: background-color 400ms linear;
 }
 .k2-home .k2-tab__sel {
   left: 4px;
@@ -34,8 +35,8 @@
   width: 74px;
   height: 53.8px;
   border-radius: 27px;
-  background: rgba(255, 255, 255, 0.12);
-  transition: background-color 400ms ease;
+  background: rgba(255, 255, 255, 0.13);
+  transition: background-color 100ms linear;
 }
 .k2-home .k2-tab__items {
   inset: 0;
@@ -92,27 +93,87 @@
   background: #f13b31;
 }
 
-/* 밝은 유리 (떠 있는 광고가 내려가기 시작하고 80ms 뒤부터 400ms, 녹화 4.45 – 4.85초): #1f1f1f 위 #5e5e5e, 선택 칸 #3c3c3c,
-   글자 #050505 · 선택 글자 굵게 */
+/* 밝은 유리 (떠 있는 광고가 내려가며 탭바 뒤를 지난 프레임부터, 녹화 4.433초 –): 아이콘 · 글자 170ms 에 검게 (245 · 182 · 115 · 63 · 17 · 0),
+   선택 칸 100ms, 유리 400ms 에 #1f1f1f 위 #5d5d5d. 선택 칸 #3c3c3c, 글자 #050505 · 선택 글자 굵게, 테두리 93 위 196 · 169 · 140 */
 .k2-home .k2-tab--light {
   color: #050505;
 }
-.k2-home .k2-tab--light,
-.k2-home .k2-tab--light :is(.k2-tab__glass, .k2-tab__sel) {
-  transition-delay: 80ms;
-}
 .k2-home .k2-tab--light .k2-tab__glass {
-  background-color: rgba(151, 151, 151, 0.53);
+  background-color: rgba(148, 148, 148, 0.53);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
-    inset 0 0.34px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -0.34px 0 rgba(255, 255, 255, 0.2);
+    inset 0 0 0 0.34px rgba(255, 255, 255, 0.31),
+    inset 0 0 0 0.67px rgba(255, 255, 255, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.29);
 }
 .k2-home .k2-tab--light .k2-tab__sel {
   background-color: rgba(0, 0, 0, 0.37);
 }
 .k2-home .k2-tab--light .k2-tab__item--on .k2-tab__label {
   font-weight: 700;
+}
+
+/* 떠 있는 광고가 탭바 뒤를 지나 위로 올라간 프레임(녹화 3.50초)부터 잠깐 밝은 유리 쪽으로 기울었다가 어둡게 돌아옴
+   (3.50 – 3.97초): 아이콘 247 → 127(67ms) → 247(300ms), 글자 223 → 157(100ms) → 235(467ms), 유리 41 → 56(100ms) → 37,
+   선택 칸은 처음 한두 프레임 밝은 유리 때처럼 검게 비쳤다가 다시 흰 빛 */
+.k2-home .k2-tab--pulse {
+  animation: k2-tab-pulse-ink 300ms linear;
+}
+.k2-home .k2-tab--pulse .k2-tab__label {
+  animation: k2-tab-pulse-label 467ms linear;
+}
+.k2-home .k2-tab--pulse .k2-tab__glass {
+  animation: k2-tab-pulse-glass 467ms linear;
+}
+.k2-home .k2-tab--pulse .k2-tab__sel {
+  animation: k2-tab-pulse-sel 200ms linear;
+}
+@keyframes k2-tab-pulse-ink {
+  22%,
+  33% {
+    color: #7f7f7f;
+  }
+  44.4% {
+    color: #959595;
+  }
+  55.6% {
+    color: #a9a9a9;
+  }
+  66.7% {
+    color: #c8c8c8;
+  }
+  77.8% {
+    color: #dadada;
+  }
+  88.9% {
+    color: #f0f0f0;
+  }
+}
+@keyframes k2-tab-pulse-label {
+  0% {
+    color: #e0e0e0;
+  }
+  21.4% {
+    color: #9d9d9d;
+  }
+  100% {
+    color: #ececec;
+  }
+}
+@keyframes k2-tab-pulse-glass {
+  21.4% {
+    background-color: rgba(78, 78, 78, 0.53);
+  }
+}
+@keyframes k2-tab-pulse-sel {
+  0% {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  16.7% {
+    background-color: rgba(0, 0, 0, 0.37);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0);
+  }
 }
 
 /* 통장으로 밀려날 때 (critic.md G1, 녹화 28.438초): 첫 프레임에 아이콘 · 글자 · 선택 칸이 사라지고 캡슐은 고른 회색 #4e4e4e,

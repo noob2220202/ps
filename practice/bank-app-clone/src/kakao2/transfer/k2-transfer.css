@@ -1,11 +1,12 @@
 /* kakao2 이체 (K2Transfer, transfer.md §2 · §3). 녹화 1pt = 3.0025px = CSS 1px. 아래 top 값은 상태바 띠(--k2-sb, 54) 밑에서 잰 것
-   (녹화 절대 y − 54). 글자 상자는 line-height = 글자 크기, 잉크 위치는 Pretendard 에서 재서 맞춤 (scratchpad work/transfer/tools/probe.mjs) */
+   (녹화 절대 y − 54). 글자 상자는 line-height = 글자 크기, 잉크 위치는 Pretendard 에서 재서 맞춤 (scratchpad work/transfer/tools/probe.mjs).
+   글자색은 굵은 획 한가운데 값 (가장 어두운 픽셀은 녹화 압축의 테두리라 실제보다 10 남짓 어두움): 이체 · 이름 · 최근 이체 #1f1f1f */
 .k2t {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: #fff;
-  color: #111;
+  color: #1f1f1f;
 }
 .k2t input {
   min-width: 0;
@@ -15,7 +16,7 @@
   background: none;
   font: inherit;
   letter-spacing: inherit;
-  color: #111;
+  color: #1f1f1f;
 }
 
 /* ---------- 머리 (고정, 녹화 y 54 – 286) ---------- */
@@ -45,10 +46,10 @@
   font-weight: 700;
   line-height: 22px;
 }
-/* AI 별 252.1 – 267.8 · 글자 272.1 – 354.4 (15/600 #555) · > 361.4 – 367 (오른쪽 26 띄움) */
+/* AI 별 252.5 – 267.8 · 글자 272.5 – 354.4 (15/600 #5b5b5b) · > 361.7 – 367.3 (오른쪽 26 띄움) */
 .k2t__ai {
   position: absolute;
-  right: 25.3px;
+  right: 25.6px;
   top: 74.6px;
   height: 16px;
   display: flex;
@@ -56,45 +57,30 @@
 }
 .k2t__aistar {
   position: relative;
-  top: 0.4px;
-}
-/* K2AiStar header 의 그러데이션(같은 방향 · 같은 칸 5개)을 녹화 색에 맞춰 다시 칠함: 위 꼭지 #00c4ff · 가운데 #9bda1c ·
-   아래 꼭지 #ffd900 · 왼쪽 #5bcf85 · 오른쪽 #c1db13 (9.00초 표본에 칸 색을 풀어 맞춤) */
-.k2t__aistar stop:nth-child(1) {
-  stop-color: #00b6ff;
-}
-.k2t__aistar stop:nth-child(2) {
-  stop-color: #47cca5;
-}
-.k2t__aistar stop:nth-child(3) {
-  stop-color: #b0de00;
-}
-.k2t__aistar stop:nth-child(4) {
-  stop-color: #d1d825;
-}
-.k2t__aistar stop:nth-child(5) {
-  stop-color: #ffdb00;
+  top: 0.6px;
+  overflow: visible;
 }
 .k2t__ai > span {
   position: relative;
   top: 0.75px;
-  margin-left: 4px;
+  margin-left: 4.3px;
   font-size: 15.17px; /* 15 보다 녹화 잉크 폭(82)에 맞음 */
   font-weight: 600;
   line-height: 15px;
-  color: #555;
+  color: #5b5b5b;
 }
+/* > 는 두께 1.05 (녹화 획 1.0 · 잉크 361.5 – 367.2) */
 .k2t__ai > svg:last-child {
   position: relative;
   top: 0.3px;
-  margin-left: 6px;
+  margin-left: 5.7px;
 }
 /* 올라오기 시작하고 225ms 동안 없음 (8.398초에 페이드 없이) */
 .k2t__ai--wait {
   visibility: hidden;
 }
 
-/* 검색: 돋보기 30.3 · 180.5, 글자 78.9 (16 #aaa), 밑줄 20 – 309.1 (#eee, 사진 버튼 앞에서 끊김) */
+/* 검색: 돋보기 30.3 · 180.5, 글자 78.9 (16 #afafaf), 밑줄 20 – 309.1 (#eee, 사진 버튼 앞에서 끊김) */
 .k2t__glass {
   position: absolute;
   left: 30.3px;
@@ -110,7 +96,7 @@
   line-height: 16px;
 }
 .k2t__search input::placeholder {
-  color: #aaa;
+  color: #afafaf;
 }
 .k2t__search::after {
   content: "";
@@ -150,7 +136,7 @@
   font-weight: 700;
   line-height: 26.3px; /* 글자 잉크가 가운데보다 0.7pt 위 (250.1 – 262.1) */
   align-self: flex-start;
-  color: #888;
+  color: #8e8e8e;
 }
 .k2t__tabs button + button {
   padding-left: 1.5px; /* '카카오톡 친구' 잉크 가운데 285.45 */
@@ -184,7 +170,7 @@
   font-weight: 700;
   line-height: 14px;
 }
-/* 줄 66: 원 44.3 (x 22, 위아래 가운데), 이름 16/400 · 번호 12.5 #888 (잉크 80.3), 별 18.6 (오른쪽 22.6, 원과 같은 가운데) */
+/* 줄 66: 원 44.3 (x 22, 위아래 가운데), 이름 16/400 · 번호 12.5 #8f8f8f (잉크 80.3), 별 18.6 (오른쪽 22.6, 원과 같은 가운데) */
 .k2t__row {
   width: 100%;
   height: 66px;
@@ -192,6 +178,12 @@
   align-items: center;
   padding-left: 22px;
   text-align: left;
+}
+/* 은행 로고 테두리: BankIcon 의 1pt 옅은 테두리(outline, 인라인) 대신 바깥 기기 1픽셀 (녹화: 흰 DB증권 원 가에만 237 한 줄,
+   색 있는 로고엔 테두리가 안 보임). outline 은 굵기가 CSS px 단위로 반올림돼서 그림자로. 시트 격자도 같이 */
+:is(.k2t, .k2bank) img {
+  outline: none !important;
+  box-shadow: 0 0 0 0.34px rgba(0, 0, 0, 0.07);
 }
 .k2t__text {
   flex: 1;
@@ -214,7 +206,7 @@
   margin-top: 4.93px;
   font-size: 12.5px;
   line-height: 12.5px;
-  color: #888;
+  color: #8f8f8f;
   white-space: nowrap;
 }
 .k2t__star {
@@ -273,7 +265,8 @@
 }
 
 /* ---------- + 계좌번호 직접입력: 18 – 375 × 739.7 – 799.7 (화면 아래에서 52.3), 뒤 흰 띠 없이 목록 위에 뜸.
-   누르면 글자만 #c7c7c7 (9.708초), 뗄 때 시트 ---------- */
+   + 는 글자보다 가는 10 × 10 (137.2 – 147.2 × 764.4 – 774.4), 글자 15/700 #3a3a3a 잉크 151.2 – 256.8 × 762.7 – 776.3.
+   누르면 글자 · + 만 #d4d4d4 (9.708초), 뗄 때 시트 ---------- */
 .k2t__direct {
   position: absolute;
   z-index: 2;
@@ -281,15 +274,29 @@
   right: 18px;
   bottom: calc(var(--safe-bottom) + 18.3px);
   height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 2.1px; /* + 와 글자 묶음 가운데 197 (버튼 가운데 196.5 보다 0.5 오른쪽) */
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 2px 17px rgba(0, 0, 0, 0.245);
-  padding-top: 0; /* 글자 잉크 762.4 – 776 */
-  font-size: 15.24px; /* 잉크 폭 119.9 */
+  font-size: 15px;
   font-weight: 700;
   line-height: 15px;
-  color: #2e2e2e;
+  color: #3a3a3a;
 }
-.k2t__direct:active {
-  color: #c7c7c7;
+.k2t__plus {
+  flex-shrink: 0;
+  position: relative;
+  top: -0.64px;
+  margin-right: 3.67px;
+}
+.k2t__direct > span {
+  position: relative;
+  top: 0.85px;
+}
+.k2t__direct:active,
+.k2t__direct--held {
+  color: #d4d4d4;
 }

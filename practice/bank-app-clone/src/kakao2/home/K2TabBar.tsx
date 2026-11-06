@@ -11,9 +11,10 @@ const TABS = [
 
 // kakao2 홈 탭바 (home.md §4.14): iOS 26 유리 캡슐 351 × 62, 줄어들지 않음. 어두운 유리가 기본, 떠 있는 광고가 내려간 뒤로는 밝은 유리 (400ms).
 // 빨간 점은 '전체'에만. 통장으로 밀려날 때 · 이체 모달을 닫고 돌아올 때의 모습은 K2TabBar.css (critic.md G1 · G3)
-export function K2TabBar({ tone }: { tone: "dark" | "light" }) {
+// pulse: 떠 있는 광고가 막 올라오는 중 (탭바 뒤를 지나간 뒤 잠깐 밝은 쪽으로 기울었다 돌아옴)
+export function K2TabBar({ tone, pulse = false }: { tone: "dark" | "light"; pulse?: boolean }) {
   return (
-    <nav className={`k2-tab k2-tab--${tone}`}>
+    <nav className={`k2-tab k2-tab--${tone}${pulse ? " k2-tab--pulse" : ""}`}>
       <span className="k2-tab__glass" />
       <span className="k2-tab__sel" />
       <span className="k2-tab__items">

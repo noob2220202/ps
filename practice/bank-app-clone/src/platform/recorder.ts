@@ -269,13 +269,13 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   // → 녹화 첫 프레임이 영상 첫 장면 (받는 동안의 검은 화면이 녹화 앞에 붙지 않게)
   // 영상을 찍은 기기 모드에서만 (kbank2 = 갤럭시, ?os=ios 면 틀지 않음 · kakao2 = 아이폰)
   const ibk = APP === "ibk";
-  const cfg = KAKAO2 ? KAKAO_INTRO : !ibk ? KBANK_INTRO : null;
+  const cfg = KAKAO2 ? KAKAO_INTRO : APP === "kbank" ? KBANK_INTRO : null;
   const intro = cfg && isIntroOn() && OS === INTRO_OS ? await loadIntro(target, cfg) : null;
   // 앱을 검은 화면으로 돌려 놓고, 그 모습이 한 프레임 그려진 뒤 녹화 시작 → 시작화면부터
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
   await nextFrame();
-  // kakao2: 시작화면 없이 이미 켜져 있던 앱이 열림 → 녹화 전에 홈을 영상 밑에 다 그려 둠
-  if (cfg && intro && cfg.mount === "resume") await resumeUnder(target, cfg);
+  // kakao2: 시작화면 없이 이미 켜져 있던 앱이 열림 → 녹화 전에 홈을 영상 밑에 다 그려 두고 열리는 모습의 첫 모습까지 깔아 둠
+  const launch = cfg && intro && cfg.mount === "resume" ? await resumeUnder(target, intro, cfg) : null;
   const started = new Promise((r) => recorder.addEventListener("start", r, { once: true }));
   recorder.start();
   set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
@@ -291,7 +291,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     // 시각 · 배터리는 지금 값 그대로 (영상 속 시계 · 배터리는 지워 둠)
     const stopKeep = keepCapturing(target);
     recorder.addEventListener("stop", stopKeep, { once: true });
-    await playIntro(intro, target, cfg);
+    await playIntro(intro, target, cfg, launch);
   } else {
     await sleep(600);
     window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
@@ -390,7 +390,7 @@ function loadIntro(target: HTMLElement, cfg: IntroCfg) {
 // 'ended' 는 마지막 장면이 나오고 38ms 뒤에야 와서(시험 녹화) 기다리면 회색 장면이 한 장 더 찍힘 → 장면 시각으로 맞추고 'ended' 는 대비로만
 // kakao2 (60fps): 마지막 장면(0.400초)이 1/60초 보인 뒤 = 녹화 0.4167초(H)부터 앱이 열리는 모습 (영상은 그 뒤 그림이 됨, src/kakao2/Launch.tsx)
 const oneFrame = () => new Promise((r) => requestAnimationFrame(r));
-function playIntro(video: HTMLVideoElement, target: HTMLElement, cfg: IntroCfg) {
+function playIntro(video: HTMLVideoElement, target: HTMLElement, cfg: IntroCfg, launch: K2Launch | null) {
   return new Promise<void>((resolve) => {
     let mounted = cfg.mount !== "start"; // resume: 홈은 녹화 전에 이미 밑에 그려 둠 (resumeUnder)
     const mount = () => {
@@ -399,24 +399,23 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement, cfg: IntroCfg) 
       window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
     };
     const lastFrame = video.duration - 1.5 / cfg.fps;
-    // kakao2: 끝나기 6장(0.1초) 전에 앱이 켜질 때(H = 마지막 장면이 1/60초 보인 뒤)를 정해 홈 · 상태바 · 홈 인디케이터 켜짐 연출과 녹화 점 위상을
-    // 영상 밑에 미리 그려 둠 (H 에 그리면 무거워서 마지막 장면이 3~4장 더 찍혔음). 창이 줄어든 모습이 되기 전이라 홈이 재는 폭도 그대로
-    // 열리는 모습(뒤 그림 · 앱 창 움직임)도 그때 영상 밑에 깔아 둠 (src/kakao2/Launch.tsx)
-    const prepFrom = video.duration - 6.5 / cfg.fps;
+    // kakao2: 끝나기 6장(0.1초) 전에 앱이 켜질 때(H = 마지막 장면이 1/60초 보인 뒤)를 정해 홈 · 상태바 · 홈 인디케이터 켜짐 연출과 녹화 점 위상,
+    // 열리는 모습(영상 숨기기 · 앱 창 움직임 · B 아이콘)을 그때 시작하도록 영상 밑에 걸어 둠 (H 에 하면 무거워서 마지막 장면이 3~4장 더 찍혔음,
+    // src/kakao2/Launch.tsx). 앱이 켜진 때는 애니메이션 시계(프레임 시작 시각)로: 이 장면을 고른 프레임(presentationTime) + 남은 길이.
+    // 그 프레임은 1/60초 뒤에 화면에 나오고(expectedDisplayTime), 같은 프레임에서 시작한 애니메이션도 같이 나옴. 반올림에 걸리지 않게 4ms 앞당김
+    const armFrom = video.duration - 6.5 / cfg.fps;
     let launchAt = 0;
-    let launch: ReturnType<typeof prepareK2Launch> | null = null;
-    const prepare = (meta: { mediaTime: number; expectedDisplayTime: number }) => {
-      launchAt = meta.expectedDisplayTime + (video.duration - meta.mediaTime) * 1000;
+    const arm = (meta: { mediaTime: number; presentationTime: number }) => {
+      launchAt = meta.presentationTime + (video.duration - meta.mediaTime) * 1000 - 4;
       flushSync(() => {
         setLaunchAt(launchAt);
         syncBlink(cfg.blinkOnMs - (launchAt - performance.now()));
       });
-      launch = prepareK2Launch(target, video, launchAt);
+      launch?.arm(launchAt);
     };
-    const onFrame = (_now: number, meta: { mediaTime: number; expectedDisplayTime: number }) => {
-      if (cfg.mount === "resume" && !launchAt && meta.mediaTime >= prepFrom) prepare(meta);
+    const onFrame = (_now: number, meta: { mediaTime: number; expectedDisplayTime: number; presentationTime: number }) => {
+      if (cfg.mount === "resume" && !launchAt && meta.mediaTime >= armFrom) arm(meta);
       if (meta.mediaTime < lastFrame) return video.requestVideoFrameCallback(onFrame);
-      launch?.frame();
       mount();
       // 마지막 장면이 화면에 나온 때 + 한 장면 − 반 프레임(8ms): 그다음 그리는 프레임부터 시작화면
       setTimeout(done, Math.max(0, meta.expectedDisplayTime + 1000 / cfg.fps - 8 - performance.now()));
@@ -433,9 +432,10 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement, cfg: IntroCfg) 
       if (cfg.mount === "resume") {
         // kakao2: 앱이 켜진 때(H). 장면 시각을 못 받았으면(requestVideoFrameCallback 없음 · 영상 멈춤) 지금으로 켜짐 연출을 그림
         // → 영상은 뒤 그림이 되고 앱 창이 커짐, 416ms 뒤 걷음 (src/kakao2/Launch.tsx)
-        if (!launch) prepare({ mediaTime: video.duration, expectedDisplayTime: endAt });
+        if (!launchAt) arm({ mediaTime: video.duration, presentationTime: endAt });
         delete d.introPlay;
-        launch?.start();
+        if (launch) launch.start();
+        else video.remove();
         resolve();
         return;
       }
@@ -465,8 +465,10 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement, cfg: IntroCfg) 
 }
 
 // kakao2: 녹화를 시작하기 전에 영상(맨 위) 밑에서 앱을 켜 홈까지 다 그려 둠 — 홈 데이터 · 글꼴 · 그림까지 (영상이 끝나는 순간 그대로 열리게).
-// 켜짐 연출(launch.ts)은 영상이 끝날 때까지 잡아 두고, 상태바 시각 옆은 앱 보관함처럼 달(집중 모드)
-async function resumeUnder(target: HTMLElement, cfg: IntroCfg) {
+// 켜짐 연출(launch.ts)은 영상이 끝날 때까지 잡아 두고, 상태바 시각 옆은 앱 보관함처럼 달(집중 모드). 끝으로 열리는 모습의 첫 모습을 깔고
+// 그것까지 다 그려질 때까지 기다림 (src/kakao2/Launch.tsx)
+type K2Launch = ReturnType<typeof prepareK2Launch>;
+async function resumeUnder(target: HTMLElement, video: HTMLVideoElement, cfg: IntroCfg) {
   holdLaunch();
   setK2Indicator("moon");
   await prefetch(paths.home);
@@ -478,6 +480,9 @@ async function resumeUnder(target: HTMLElement, cfg: IntroCfg) {
   const imgs = [...target.querySelectorAll<HTMLImageElement>(".phone__viewport img")];
   await Promise.race([Promise.all([document.fonts.ready, ...imgs.map((img) => img.decode().catch(() => {}))]), sleep(3000)]);
   await nextFrame();
+  const launch = prepareK2Launch(target, video);
+  for (let i = 0; i < 3; i++) await nextFrame();
+  return launch;
 }
 
 // 폰 화면 녹화 (폰 아래 [● 녹화] / 🔔 패널): 녹화하는 동안은 캡쳐모드로 테두리를 숨겼다가 끝나면 원래대로

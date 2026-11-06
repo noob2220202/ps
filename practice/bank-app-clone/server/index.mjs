@@ -506,11 +506,14 @@ function txDetailJson(id) {
   const tx = listTransactions(t.account_id).find((x) => x.id === String(t.id));
   const card = tx.tag === "#체크카드";
   const sent = db().prepare("SELECT * FROM transfers WHERE out_tx_id = ?").get(t.id);
+  // kakao2: 🔔 패널은 저장할 때 보이던 거래구분을 그대로 보내므로, 기본값과 같은 이름(일반이체 · 일반입금 · 체크카드결제 …)은 직접 지정으로 보지 않음
+  // (입금/출금이나 종류를 바꾸면 거래구분도 따라 바뀌게)
+  const kind = SERVER_ID === "kakao2" && ["일반이체", "일반입금", ...Object.values(KIND_BY_TAG)].includes(t.kind) ? null : t.kind;
   return {
     ...tx,
     transactedAt: `${tx.at.slice(0, 10).replaceAll("-", ".")} ${tx.at.slice(11, 19)}`,
     // 🔔 패널에서 직접 지정했으면 그 값, 아니면 tag로 기본값. kakao2(새 녹화)는 이체 · 종류 없음을 보낸 돈 "일반이체" / 받은 돈 "일반입금"으로
-    kind: t.kind || (SERVER_ID === "kakao2" && (tx.tag === "#이체" || tx.tag === "") ? (tx.amount < 0 ? "일반이체" : "일반입금") : KIND_BY_TAG[tx.tag]),
+    kind: kind || (SERVER_ID === "kakao2" && (tx.tag === "#이체" || tx.tag === "") ? (tx.amount < 0 ? "일반이체" : "일반입금") : KIND_BY_TAG[tx.tag]),
     ...(card && { cardInfo: `체크카드 (${getProfile().cardLast4})`, address: "서울 예시구 샘플로 123", phone: "02)000-0000" }),
     memo: t.memo ?? "",
     // 내가 보낸 이체면(또는 🔔 패널에서 상대 정보를 지정했으면) 받은 은행/계좌 (콕뱅크 거래 상세의 입금은행·입금계좌)

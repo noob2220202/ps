@@ -1,7 +1,7 @@
 // kakao2 기기 화면 위 (녹화 아이폰, 393 × 852): 상태바 · 다이나믹 아일랜드 · 홈 인디케이터 (PhoneFrame 이 KAKAO2 일 때 그림).
 // 상태바는 투명하게 화면 위에 겹침 (chrome.css) — 54pt 띠 색은 그 밑 화면이 칠하고, 여기선 글자 · 아이콘만. 글자색은 화면의 useStatusBar(bg, fg) 의 fg
 // 좌표는 모두 녹화에서 잰 pt (device.md §3 · §4): 393 × 54 SVG 한 장에 그려 0.5px 씩 튀지 않게
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { BLINK_MS, useBlinkEpoch, useIntro } from "../platform/intro";
@@ -133,20 +133,32 @@ function SbIndicator() {
   if (forced === "arrow" || launchAt === null) return <SbArrow />;
   return <SbLaunchIndicator key={launchAt} at={launchAt} />;
 }
+// 켜진 때 기준 CSS 애니메이션: 지연(음수면 그만큼 지난 자리부터)은 그린 순간(base) 기준인데, CSS 애니메이션의 시작 시각은 그린 뒤 1~2 프레임
+// 지나서야 정해져 그만큼 늦게 돎 (녹화 인트로 rAF 기록: 위치 표시 · 홈 인디케이터가 20~30ms 늦음) → 시작 시각을 base 로 박아 둠
+function useStartAt<T extends Element>(base: number) {
+  const ref = useRef<T>(null);
+  useLayoutEffect(() => {
+    ref.current?.getAnimations({ subtree: true }).forEach((a) => a instanceof CSSAnimation && (a.startTime = base));
+  }, [base]);
+  return ref;
+}
+
 // 켜진 때 기준으로 CSS 애니메이션을 그 자리부터 (음수 지연) — 4.3초 지난 뒤면 화살표만
 function SbLaunchIndicator({ at }: { at: number }) {
-  const [delay] = useState(() => at - performance.now());
+  const [base] = useState(() => performance.now());
+  const ref = useStartAt<SVGGElement>(base);
+  const delay = at - base;
   if (delay < -LAUNCH.arrowShown) return <SbArrow />;
   const style = { animationDelay: `${delay}ms` };
   return (
-    <>
+    <g ref={ref}>
       <g className="k2sb__bubble" style={style}>
         <SbBubble />
       </g>
       <g className="k2sb__arrow-in" style={style}>
         <SbArrow />
       </g>
-    </>
+    </g>
   );
 }
 const SbArrow = () => <path d={K2_ARROW_PATH} stroke="currentColor" strokeWidth={K2_ARROW_ROUND} strokeLinejoin="round" fill="currentColor" />;
@@ -165,7 +177,11 @@ function SbMoon() {
         <circle cx={m.cx} cy={m.cy} r={m.r} fill="#fff" />
         <circle cx={m.cutX} cy={m.cutY} r={m.cutR} fill="#000" />
       </mask>
-      <circle cx={m.cx} cy={m.cy} r={m.r} fill="currentColor" mask={`url(#${id})`} />
+      {/* 녹화 인트로에서만 보이는 흐린 달 (chrome.css: 또렷한 달이 그 위로 나타나며 흐림이 걷힘) */}
+      <g className="k2sb__moon-soft">
+        <circle cx={m.cx} cy={m.cy} r={m.r} fill="currentColor" mask={`url(#${id})`} />
+      </g>
+      <circle className="k2sb__moon-sharp" cx={m.cx} cy={m.cy} r={m.r} fill="currentColor" mask={`url(#${id})`} />
     </g>
   );
 }
@@ -182,8 +198,10 @@ function K2RecDot() {
   return <K2RecDotAt key={epoch} epoch={epoch} />;
 }
 function K2RecDotAt({ epoch }: { epoch: number }) {
-  const [delay] = useState(() => -((performance.now() - epoch) % BLINK_MS));
-  return <i className="k2-rec" style={{ animationDelay: `${delay}ms` }} />;
+  const [base] = useState(() => performance.now());
+  const ref = useStartAt<HTMLElement>(base);
+  const delay = -((base - epoch) % BLINK_MS);
+  return <i className="k2-rec" ref={ref} style={{ animationDelay: `${delay}ms` }} />;
 }
 
 // 홈 인디케이터: 앱이 켜진 직후에만 (흰색, 0.70 → 1.15초 나타남 · 1.902 → 2.168초 사라짐), 그 뒤로는 늘 숨김 (device.md §6)
@@ -192,7 +210,9 @@ export function K2HomeIndicator() {
   return at === null ? null : <K2HomeIndicatorAt key={at} at={at} />;
 }
 function K2HomeIndicatorAt({ at }: { at: number }) {
-  const [delay] = useState(() => at - performance.now());
+  const [base] = useState(() => performance.now());
+  const ref = useStartAt<HTMLDivElement>(base);
+  const delay = at - base;
   if (delay < -LAUNCH.homeIndicatorGone) return null;
-  return <div className="phone__home-indicator phone__home-indicator--k2" style={{ animationDelay: `${delay}ms` }} />;
+  return <div className="phone__home-indicator phone__home-indicator--k2" ref={ref} style={{ animationDelay: `${delay}ms` }} />;
 }

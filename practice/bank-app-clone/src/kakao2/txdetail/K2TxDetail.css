@@ -1,6 +1,7 @@
 /* ===== kakao2 거래상세 (K2TxDetail.tsx) =====
    녹화 41.4 · 60.1초 (txdetail.md §3–5). 화면 맨 위(상태바 띠 위끝) 기준 pt − 54 = 상태바 띠 아래 본문 기준.
-   내용 상자 x 24 – 369, 줄은 그 안에서 5pt 더 들어감. 글자 사이 −0.2px 그대로 (critic.md G7 · X16) */
+   내용 상자 x 24 – 369, 줄은 그 안에서 5pt 더 들어감. 글자 사이 −0.2px 그대로 (critic.md G7 · X16).
+   녹화는 가로만 1179 → 1180px 로 늘어남: x pt = px / 3.0025, y pt = px / 3 (스펙의 y 는 /3.0025 라 아래로 갈수록 최대 0.7pt 작음) */
 .k2txd {
   position: absolute;
   inset: 0;
@@ -8,11 +9,6 @@
   background: #fff;
   color: #1e1e1e;
   letter-spacing: -0.2px;
-}
-/* 올라오기 시작 맞춤 (critic.md C4): 목록의 로딩 막은 누른 프레임에 바로 그려지지만(외부 저장소 → 동기) 이 화면 층은 라우터 전환(startTransition)으로
-   ≈ 2프레임 뒤에 붙어, nav.css 의 −24ms 로는 녹화보다 ≈ 41ms 늦게 움직였음 (프로덕션 빌드, 막 기준 프레임마다 위끝 위치를 잼) → 그만큼 더 앞당김 */
-html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
-  animation-delay: -65ms;
 }
 
 /* 녹화는 스크롤 없음 (852pt 에 다 들어감). 화면이 낮은 폰에서만 스크롤 */
@@ -39,7 +35,7 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
 /* ---------- 머리: 이름 26/700 #1f1f1f (잉크 가운데 114) · 메모 안내 14.5 #a0a0a0 + 연필 (151) · 선 0.67pt #aaa (200.2) ---------- */
 .k2txd__title {
   margin: 0;
-  padding-top: 43.9px;
+  padding-top: 44.23px;
   font-size: 26px;
   font-weight: 700;
   line-height: 32px;
@@ -53,7 +49,7 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   align-items: center;
   max-width: 100%;
   height: 20px;
-  margin-top: 11.1px;
+  margin-top: 10.77px;
   font-size: 14.5px;
   line-height: 20px;
   color: #a0a0a0;
@@ -75,7 +71,7 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   display: block;
   width: 100%;
   height: 20px;
-  margin-top: 11.1px;
+  margin-top: 10.77px;
   padding: 0;
   border: none;
   border-bottom: 1px solid #1e1e1e;
@@ -102,7 +98,7 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   padding: 10.1px 0 10.05px;
 }
 .k2txd__hr + .k2txd__group {
-  padding: 9.6px 0 10.25px;
+  padding: 10px 0 10.13px;
 }
 .k2txd__line {
   height: 0.333px;
@@ -131,6 +127,16 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   text-align: right;
   white-space: pre-line;
   overflow-wrap: anywhere;
+}
+/* 거래시간 값의 '.' · ':' · 띄어쓰기 (녹화 글꼴만큼 넓게, 글자마다 앞뒤 간격을 잼) */
+.k2txd__dot {
+  margin-right: 0.6px;
+}
+.k2txd__colon {
+  margin: 0 0.35px 0 0.25px;
+}
+.k2txd__gap {
+  margin-right: 0.3px;
 }
 /* 거래금액 굵게, 받은 돈은 파랑 (부호 없음) */
 /* 한글 값 (거래구분 · 예금주 · 받는 분에게 표기) */
@@ -184,7 +190,7 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   color: #5b5b5b;
 }
 .k2txd__fee-row + .k2txd__fee-row {
-  margin-top: 3.67px;
+  margin-top: 4px;
 }
 .k2txd__fee-row dd {
   margin: 0;
@@ -238,15 +244,15 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   color: #999;
 }
 
-/* ---------- 아래 버튼: 공유 80.25 × 60.3 #2d324d + 확인 #fedc00, 둥근 10, 화면 아래에서 34.7 ---------- */
+/* ---------- 아래 버튼: 공유 80.25 × 60 #2d324d + 확인 #fedc00, 둥근 10, 758 – 818 (화면 아래에서 안전 영역 34 — 녹화 세로는 2556px = 852pt × 3) ---------- */
 .k2txd__foot {
   position: absolute;
   left: 16px;
   right: 16px;
-  bottom: calc(var(--safe-bottom) + 0.7px);
+  bottom: var(--safe-bottom);
   display: flex;
   gap: 7.65px;
-  height: 60.3px;
+  height: 60px;
 }
 .k2txd__share {
   display: grid;
@@ -256,9 +262,6 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   border-radius: 10px;
   background: #2d324d;
 }
-.k2txd__share svg {
-  margin-top: 1.3px;
-}
 .k2txd__ok {
   flex: 1;
   border-radius: 10px;
@@ -266,6 +269,11 @@ html[data-kakao2] .layer--k2-detail.layer--push-enter:has(> .k2txd) {
   font-size: 17px;
   font-weight: 700;
   color: #1e1e1e;
+}
+/* Pretendard 한글이 SF 보다 1기기px 낮게 앉음 → 잉크 가운데를 버튼 가운데(788)에 */
+.k2txd__ok span {
+  position: relative;
+  top: -0.33px;
 }
 /* 누르면 바탕은 그대로, 글자(아이콘)만 23% 로 한 프레임에 — 떼면 ≈ 90ms 에 돌아옴 (녹화 44.435 – 44.835초) */
 .k2txd__ok span,

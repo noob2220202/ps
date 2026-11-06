@@ -19,7 +19,7 @@ import { LAUNCH, useLaunchAt } from "../launch";
 import { CHIPS, K2_HOME, PILL_MESSAGES, PROMOS, SHORTCUTS } from "./content";
 import { K2AiPill } from "./K2AiPill";
 import { K2Banner } from "./K2Banner";
-import { K2FloatingAd, type K2AdState } from "./K2FloatingAd";
+import { K2FloatingAd } from "./K2FloatingAd";
 import { K2TabBar } from "./K2TabBar";
 import { K2Plus, K2SerifT, K2Sliders } from "./icons";
 import "./K2Home.css";
@@ -124,28 +124,43 @@ export function K2Home() {
   }, [visit]);
   const promo = PROMOS[visit && promoWait > 0 ? visit.promoFrom : promoShown];
 
-  // 스크롤: 55 넘으면 상태바 밑 회색 띠, 끝까지 내리면 떠 있는 광고, 위로 60 올리면 광고가 내려가고 탭바가 밝은 유리로 (방문마다 처음부터)
+  // 스크롤: 55 넘으면 상태바 밑 회색 띠. 떠 있는 광고는 목록 끝 아래에 붙어 스크롤과 같이 움직임 (맨 끝에서 제자리).
+  // 광고가 올라오며 탭바 뒤를 지나면 탭바가 잠깐 밝은 쪽으로 기울고, 다시 내려가며 지나면 밝은 유리로 (방문마다 처음부터).
+  // 스크롤 막대는 처음 움직인 프레임부터 이번 방문 내내. 광고 · 막대 자리는 매 프레임 DOM 에 바로
   const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
   const [edge, setEdge] = useState(false);
-  const [ad, setAd] = useState<K2AdState>("hidden");
+  const [ad, setAd] = useState<"below" | "up" | "gone">("below");
+  const [ind, setInd] = useState(false);
+  const indRef = useRef<HTMLDivElement>(null);
+  const adRef = useRef<HTMLElement>(null);
   const lastTop = useRef(0);
-  const upTravel = useRef(0);
   useScrollFrame(scrollEl, (top) => {
     setEdge(top > K2_HOME.edgeAt);
     const d = top - lastTop.current;
     lastTop.current = top;
-    if (ad === "hidden") {
-      upTravel.current = 0;
-      if (d > 0 && top >= K2_HOME.adShowAt) setAd("shown");
-    } else if (ad === "shown") {
-      upTravel.current = d < 0 ? upTravel.current - d : 0;
-      if (upTravel.current >= K2_HOME.adHideUp) setAd("gone");
+    if (d !== 0) setInd(true);
+    if (!scrollEl) return;
+    const { clientHeight: h, scrollHeight: all } = scrollEl;
+    const max = Math.max(0, all - h);
+    const bar = indRef.current;
+    if (bar) {
+      const track = h - K2_HOME.indTop - K2_HOME.indBottom;
+      const len = (track * h) / all;
+      bar.style.height = `${len}px`;
+      bar.style.transform = `translateY(${max > 0 ? ((track - len) * Math.min(1, Math.max(0, top / max))).toFixed(2) : 0}px)`;
+    }
+    const el = adRef.current;
+    if (el) {
+      const below = Math.max(0, max - top);
+      el.style.transform = `translate3d(0,${below.toFixed(2)}px,0)`;
+      el.style.visibility = below < h - el.offsetTop ? "visible" : "";
+      if (ad === "below" && d > 0 && below < K2_HOME.adPulseAt) setAd("up");
+      else if (ad === "up" && d < 0 && below > K2_HOME.adLightAt) setAd("gone");
     }
   });
 
   // 이체: 누른 프레임에 버튼이 밝게 번쩍이고 로딩 막 + 스피너. 1650ms (받는 분 목록을 더 늦게 받으면 그때) 뒤 막이 흐려지기 시작하고
-  // 50ms 뒤 이체 모달이 올라오기 시작, 남은 막은 모달의 첫 프레임에 한 번에 걷힘 (critic.md C6 · G5: T+50 에 이동과 같은 일로 걷어
-  // 같은 커밋 = 다음 프레임 ≈ T+67 에 사라짐. 타이머를 따로 두면 이체 화면을 그리느라 늦어 모달 첫 프레임보다 한 프레임 늦었음)
+  // 50ms 뒤 이체 모달이 올라오기 시작, 남은 막은 모달의 첫 프레임에 한 번에 걷힘 (critic.md C6 · G5)
   const [flash, setFlash] = useState<string | null>(null);
   const sending = useRef<number[] | null>(null);
   const alive = useRef(true);
@@ -164,9 +179,25 @@ export function K2Home() {
   const [visitSeen, setVisitSeen] = useState(visit?.id);
   if (visit && visit.id !== visitSeen) {
     setVisitSeen(visit.id);
-    setAd("hidden");
+    setAd("below");
     setFlash(null);
+    setInd(false);
   }
+
+  // 이체 모달 층이 들어온 커밋 = 홈 층이 밑으로 (active false) → 같은 커밋에 막을 걷어 모달 첫 프레임에 사라지게 (녹화 8.190초).
+  // 이동과 같은 일에서 걷으면 막이 먼저 사라지고 이체 화면을 그리는 동안(개발 빌드 ≈ 45ms) 홈이 맨얼굴로 보였음
+  const navigated = useRef(false);
+  const dropDim = () => {
+    if (!sending.current) return;
+    sending.current.forEach(clearTimeout);
+    sending.current = null;
+    navigated.current = false;
+    cutK2Dim();
+  };
+  useLayoutEffect(() => {
+    if (!active && navigated.current) dropDim();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
 
   const toTransfer = (from: string) => (e: MouseEvent) => {
     e.stopPropagation();
@@ -185,8 +216,9 @@ export function K2Home() {
             timers.push(
               window.setTimeout(() => {
                 navigate(`/transfer?from=${encodeURIComponent(from)}`);
-                cutK2Dim();
-                if (sending.current === timers) sending.current = null;
+                navigated.current = true;
+                // 남은 막은 모달 층이 실제로 그려지는 커밋에 걷음 (아래 useLayoutEffect). 그 커밋이 끝내 안 오면 그냥 걷음
+                timers.push(window.setTimeout(dropDim, 400));
               }, K2_HOME.transferNav),
             );
           },
@@ -321,8 +353,10 @@ export function K2Home() {
       </div>
 
       <div className={`k2-home__edge${edge ? " k2-home__edge--on" : ""}`} />
-      <K2FloatingAd state={ad} />
-      <K2TabBar tone={ad === "gone" ? "light" : "dark"} />
+      <div className="k2-home__edge-bottom" />
+      <div ref={indRef} className={`k2-home__ind${ind ? " k2-home__ind--on" : ""}`} />
+      <K2FloatingAd adRef={adRef} />
+      <K2TabBar tone={ad === "gone" ? "light" : "dark"} pulse={ad === "up"} />
       <DevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   );

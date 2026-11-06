@@ -1,10 +1,10 @@
 /* ===== kakao2 통장 (K2AccountScreen.tsx, account.md + critic.md 16 · X16 · G2) =====
-   좌표 = pt (= CSS px, 녹화 1180 × 2556 px / 3.0025). 머리줄 아래끝은 녹화에서 112.9 = 상태바 띠(--k2-sb 54) + 58.9.
-   글자 간격은 0 (chrome.css .k2acct), 일부만 + (계좌번호 .15 · 잔액 .2 · 금액 .15) */
+   좌표 = pt (= CSS px). 녹화는 가로 1180 px / 3.0025, 세로 2556 px / 3 (세로를 3.0025 로 나눈 account.md 값은 아래로 갈수록 ≈0.7pt 작음).
+   머리줄 아래끝 113 = 상태바 띠(--k2-sb 54) + 59. 글자 간격은 0 (chrome.css .k2acct), 녹화 글자 폭에 맞춰 일부만 + */
 
 .k2acct {
-  /* 아래 고정 띠 높이 (흐려짐 36.2 + 버튼 60 + 아래 35 = 131): 내용 아래 여백 · 스크롤 표시 칸 · 다음 쪽 불러오기 기준 */
-  --k2acct-bar: calc(96.2px + var(--safe-bottom) + 0.8px);
+  /* 아래 고정 띠 높이 (흐려짐 37 + 버튼 60 + 아래 34 = 131, 위끝 721): 내용 아래 여백 · 스크롤 표시 칸 · 다음 쪽 불러오기 기준 */
+  --k2acct-bar: calc(97px + var(--safe-bottom));
   position: absolute;
   inset: 0;
   color: #1f1f1f;
@@ -14,16 +14,16 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ---------- 머리줄 (고정, 흰색 0 – 112.9): < 11 × 20 · 제목 17/600 가운데 · 톱니 21 × 22. 가운데선 y 81 ---------- */
+/* ---------- 머리줄 (고정, 흰색 0 – 113): < 11 × 20 · 제목 17/600 가운데 · 톱니 21 × 22. 가운데선 y 81 ---------- */
 .k2acct__nav {
   position: absolute;
   inset: 0 0 auto;
   z-index: 3;
-  height: calc(var(--k2-sb) + 58.9px);
+  height: calc(var(--k2-sb) + 59px);
   padding-top: var(--k2-sb);
   background: #fff;
 }
-/* 스크롤하면(scrollTop > 0) 아래끝 머리카락 선 1 기기 px (0.33pt) #d0d0d0, 페이드 없음 */
+/* 스크롤하면(scrollTop > 0) 아래끝 머리카락 선 1 기기 px (112.67 – 113) #d0d0d0, 페이드 없음 */
 .k2acct__nav::after {
   content: "";
   position: absolute;
@@ -41,7 +41,7 @@
 }
 .k2acct__navrow {
   position: relative;
-  height: 58.9px;
+  height: 59px;
 }
 .k2acct__title {
   position: absolute;
@@ -71,14 +71,20 @@
   left: 19.5px;
 }
 .k2acct__gear {
-  left: 333.1px;
-  top: 4.9px;
+  left: 333px;
+}
+.k2acct__gear svg {
+  transform: translateX(0.3333px); /* 잉크 344.33 – 365.67 */
 }
 
 /* ---------- 본문 (머리줄 아래 전부, push 때 이것만 밀림 + 아래 두 모서리 r55 — nav.css .k2-push-body) ---------- */
+/* 녹화는 머리줄이 뜬 첫 프레임에 본문이 이미 346pt 까지 들어옴 → 한 프레임 앞당겨 시작 (두 모서리도 그만큼 일찍 각짐, critic.md G2 477ms) */
+html[data-kakao2] .layer--k2-push.layer--push-enter .k2acct__body.k2-push-body {
+  animation-delay: -17ms;
+}
 .k2acct__body {
   position: absolute;
-  inset: calc(var(--k2-sb) + 58.9px) 0 0;
+  inset: calc(var(--k2-sb) + 59px) 0 0;
   overflow: hidden;
   background: #fff;
 }
@@ -88,7 +94,8 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: none;
-  animation: k2acct-in 170ms linear both;
+  /* 녹화는 아래 버튼이 뜬 첫 프레임에 내용이 이미 ≈19% (29.523초) → 2 프레임 앞당겨 시작 (뼈대 흐려짐도) */
+  animation: k2acct-in 170ms linear -34ms both;
 }
 .k2acct__scroll::-webkit-scrollbar {
   display: none;
@@ -103,46 +110,76 @@
   }
 }
 
-/* 계좌번호 14/400 #5b5b5b 밑줄 1pt (기준선 아래 1.4) + 복사 아이콘. 줄 가운데 153.5 (본문 40.6) */
+/* 요약 (본문 0 – 285, 화면 113 – 398): 녹화 기기 px(1/3pt) 에 맞춘 자리. 상자 · 글자가 CSS px 로 붙는 브라우저(크롬 DPR 흉내 등)에서도
+   같게 자리는 정수 px 로 두고 남는 1/3pt 는 transform (transform 은 기기 px 로 그려짐) */
+.k2acct__head {
+  position: relative;
+  height: 285px;
+}
+/* 계좌번호 14/400 #5b5b5b 밑줄 1pt (160 – 161) + 복사 아이콘. 숫자 잉크 148.33 – 158.33 */
 .k2acct__num {
+  position: absolute;
+  top: 30px;
+  left: 24px;
   display: flex;
   align-items: center;
   height: 20px;
-  margin: 30.6px 0 0 24px;
   font-size: 14px;
   line-height: 20px;
-  letter-spacing: 0.15px;
+  letter-spacing: 0.3px; /* 녹화 글자 폭 (같은 번호 122.9pt) */
   color: #5b5b5b;
 }
 .k2acct__num > span {
-  text-decoration: underline 1px #5b5b5b;
-  text-underline-offset: 1.9px;
+  position: relative;
+  transform: translateY(0.3333px);
+}
+/* 밑줄은 상자로 (text-decoration 은 CSS px 로 붙어 1/3pt 를 못 맞춤): 글자 폭(뒤 간격 포함) 전체, 160 – 161 */
+.k2acct__num > span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 17px;
+  height: 1px;
+  background: #5b5b5b;
+  transform: translateY(-0.3333px);
 }
 .k2acct__copy {
-  margin-left: 2.3px;
   flex: none;
+  align-self: flex-start;
+  margin: 5px 0 0 2.3px; /* 잉크 148 – 158.67 */
 }
-/* 잔액 32/700, 줄 가운데 184.8 */
+/* 잔액 32/700, '원' 잉크 170.33 */
 .k2acct__bal {
-  display: block;
-  margin: 1.3px 0 0 24px;
+  position: absolute;
+  top: 52px;
+  left: 24px;
   font-size: 32px;
   font-weight: 700;
   line-height: 40px;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
 }
 
-/* 검색 상자 353 × 65 (236.1 – 301.1), r16, #f8f8f8 + 1pt #f2f2f2. 돋보기 17 × 16.7 왼쪽 41.6 · '3개월 · 전체 · 최신순' 13/400 + ∨ 오른쪽 352.4 */
+/* 검색 상자 353 × 65 (236.33 – 301.33), r16, #f8f8f8 + 1pt #f2f2f2. 돋보기 17 × 16.7 왼쪽 41.6 · '3개월 · 전체 · 최신순' 13/400 + ∨ 오른쪽 352.4 */
 .k2acct__search {
+  position: absolute;
+  top: 123px;
+  left: 20px;
+  right: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 65px;
-  margin: 31.3px 20px 0;
-  padding: 0 19.6px 0 20.6px;
+  padding: 0 19.6px 0 20px;
   border: 1px solid #f2f2f2;
   border-radius: 16px;
   background: #f8f8f8;
+  transform: translateY(0.3333px);
+}
+.k2acct__magn {
+  flex: none;
+  transform: translateX(0.6667px); /* 잉크 왼끝 41.67 */
 }
 .k2acct__filter {
   display: flex;
@@ -154,21 +191,28 @@
   color: #5b5b5b;
 }
 
-/* 홍보 줄 (327 – 367, 누를 수 없음): 카드 + 돈 아이콘 40 + 12/400 #5b5b5b · 15/700. 줄 가운데 336.1 · 356.4 */
+/* 홍보 줄 (327.33 – 367.33, 누를 수 없음): 카드 + 돈 아이콘 40 + 12/400 #5b5b5b · 15/700. 잉크 위끝 331 · 349.67 */
 .k2acct__promo {
-  display: flex;
-  gap: 8px;
+  position: absolute;
+  top: 214px;
+  left: 20px;
+  right: 20px;
   height: 40px;
-  margin: 25.9px 20px 0;
+  transform: translateY(0.3333px);
 }
 .k2acct__promo img {
+  display: block;
   width: 40px;
   height: 40px;
-  flex: none;
+}
+.k2acct__promo-text {
+  position: absolute;
+  top: 3px; /* 화면 330 에 놓고 −1/3 (줄의 +1/3 포함 −2/3) */
+  left: 48px;
+  transform: translateY(-0.6667px);
 }
 .k2acct__promo small {
   display: block;
-  padding-top: 2.18px;
   font-size: 12px;
   line-height: 15px;
   word-spacing: 0.5px;
@@ -176,61 +220,79 @@
 }
 .k2acct__promo strong {
   display: block;
-  margin-top: 3.2px;
+  margin-top: 3px;
   font-size: 15px;
   font-weight: 700;
   line-height: 19px;
+  letter-spacing: 0.13px;
 }
-/* 구분선 22 – 371 × 389.3 – 390 (0.67pt) #e9e9e9 */
+/* 구분선 22 – 371 × 389.67 – 390.33 (2 기기 px) #e9e9e9 */
 .k2acct__divider {
-  height: 0.67px;
-  margin: 22.37px 22px 0;
+  position: absolute;
+  top: 276px;
+  left: 22px;
+  right: 22px;
+  height: 1px;
   background: #e9e9e9;
+  transform: translateY(0.6667px) scaleY(0.6667);
+  transform-origin: top;
 }
 
-/* ---------- 거래 목록 (K2TxList.tsx): 날짜 칸 35.6 · 행 77.3, 첫 날짜 칸 위끝 397.9 ---------- */
-.k2acct .k2list {
-  margin-top: 7.86px;
-}
-/* 날짜 'MM.DD' 13/600 #3c3c3c (녹화 숫자 높이 9.33 = 13px. 녹화 글꼴은 글자 사이가 조금 넓어 +.5), 기준선 429.6 */
+/* ---------- 거래 목록 (K2TxList.tsx): 날짜 칸 35.67 · 행 77.33 (칸 높이 · 남는 1/3pt 는 K2TxList 가 칸마다), 첫 날짜 칸 위끝 398 ---------- */
+/* 날짜 'MM.DD' 14/600 #3c3c3c (녹화 글꼴 숫자는 Pretendard 보다 낮고 넓음 → 13.5px + 간격 .35 로 잉크 9.67 × 32.6 맞춤), 잉크 위끝 = 칸 위끝 + 22.67 */
 .k2acct .k2list__date {
-  height: 35.6px;
   margin: 0;
-  padding: 19.7px 20px 0;
-  font-size: 13px;
+  padding: 19px 20px 0;
+  font-size: 13.5px;
   font-weight: 600;
-  line-height: 15.9px;
-  letter-spacing: 0.5px;
+  line-height: 16px;
+  letter-spacing: 0.35px;
   color: #3c3c3c;
+  translate: 0 0.3333px; /* 칸의 1/3pt transform(K2TxList) 위에 더함 */
 }
-/* 행: 첫 줄 이름 16/400 · 금액 16/700, 둘째 줄 시각 13/400 · 거래 후 잔액 14/400 #7d7d7d 는 기준선을 맞춤 (녹화 첫 행 기준선 466 · 488.6).
-   글자 세로 위치가 1px 단위로 붙으므로(크롬) 녹화 잉크에 맞춘 값. 누른 모습 없음 */
+/* 행: 첫 줄 이름 16/400 · 금액 16/700 (한글 잉크 위끝 = 행 위끝 + 20), 둘째 줄 시각 13/400 · 거래 후 잔액 14/400 #7d7d7d
+   (숫자 기준선 = 행 위끝 + 55.33). 줄마다 기준선을 맞춤. 누른 모습 없음 */
 .k2acct .k2list__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: 22px 18px;
-  align-content: start;
-  align-items: baseline;
-  column-gap: 12px;
-  row-gap: 2.85px;
+  position: relative;
+  display: block;
   width: 100%;
-  height: 77.3px;
-  padding: 16.53px 20px 0;
+  padding: 0;
   text-align: left;
 }
+.k2acct .k2list__l1,
+.k2acct .k2list__l2 {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 12px;
+}
+.k2acct .k2list__l1 {
+  top: 17px;
+  line-height: 22px;
+  transform: translateY(-0.3333px);
+}
+.k2acct .k2list__l2 {
+  top: 41px;
+  line-height: 18px;
+  transform: translateY(0.3333px);
+}
 .k2acct .k2list__merchant {
+  flex: 0 1 auto;
+  min-width: 0;
   overflow: hidden;
   font-size: 16px;
-  line-height: 22px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 .k2acct .k2list__amount {
+  flex: none;
+  margin-right: 0.33px;
   font-size: 16px;
   font-weight: 700;
-  line-height: 22px;
   letter-spacing: 0.15px;
-  text-align: right;
   white-space: nowrap;
 }
 .k2acct .k2list__amount--in {
@@ -238,14 +300,15 @@
 }
 .k2acct .k2list__time {
   font-size: 13px;
-  line-height: 18px;
+  letter-spacing: 0.17px;
   color: #7d7d7d;
 }
 .k2acct .k2list__after {
+  margin-right: -0.24px;
+  transform: translateY(-0.3333px); /* 녹화는 같은 기준선에서 1 기기 px 위 */
   font-size: 14px;
-  line-height: 18px;
+  letter-spacing: 0.24px;
   color: #7d7d7d;
-  text-align: right;
   white-space: nowrap;
 }
 /* 맨 아래 불러오기 줄 79.7: 스피너(지름 27.6, #dfdfdf) 가운데가 줄 위에서 39.4 */
@@ -256,7 +319,7 @@
   padding-top: 24.4px;
 }
 
-/* ---------- 스크롤 표시 (iOS): x 387 – 390, 칸 본문 3 ~ 아래 띠 위 0.6. 길이 · 위치는 K2AccountScreen 이 매 프레임 ---------- */
+/* ---------- 스크롤 표시 (iOS): x 387 – 390, 칸 116 – 721 (본문 위 3 ~ 아래 띠 위끝). 길이 · 위치는 K2AccountScreen 이 매 프레임 ---------- */
 .k2acct__ind {
   position: absolute;
   top: 0;
@@ -274,7 +337,7 @@
   transition: none;
 }
 
-/* ---------- 아래 고정 띠 (721 – 852): 36pt 흰색으로 흐려짐(내용이 비침) + 가져오기 #2d324d / 이체하기 #ffde00 177.85 × 60 r12, 사이 7.65 ---------- */
+/* ---------- 아래 고정 띠 (721 – 852): 37pt 흰색으로 흐려짐(내용이 비침) + 가져오기 #2d324d / 이체하기 #ffde00 177.85 × 60 r12 (758 – 818), 사이 7.65 ---------- */
 .k2acct__bar {
   position: absolute;
   left: 0;
@@ -282,12 +345,12 @@
   bottom: 0;
   z-index: 1;
   height: var(--k2acct-bar);
-  background: linear-gradient(rgba(255, 255, 255, 0) 0.4px, #fff 37.6px); /* 녹화 투명도 0 @721.4 · .93 @756 */
+  background: linear-gradient(rgba(255, 255, 255, 0) 1px, #fff 38.2px); /* 녹화 투명도 0 @722 · .93 @756.6 */
   pointer-events: none;
 }
 .k2acct__btns {
   position: absolute;
-  inset: 36.2px 0 0;
+  inset: 37px 0 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 60px;
@@ -296,7 +359,6 @@
   pointer-events: auto;
 }
 .k2acct__btn {
-  padding-top: 0.35px;
   border-radius: 12px;
   font-size: 17px;
   font-weight: 700;
@@ -319,7 +381,7 @@
   pointer-events: none;
 }
 .k2acct__skel--out {
-  animation: k2acct-out 170ms linear both;
+  animation: k2acct-out 170ms linear -34ms both;
 }
 @keyframes k2acct-out {
   to {

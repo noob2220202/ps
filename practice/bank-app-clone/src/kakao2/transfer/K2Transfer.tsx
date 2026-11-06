@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { accountLine, api, paths } from "../../api/endpoints";
 import type { Bank, Recipient, TransferRecipients } from "../../api/types";
@@ -7,7 +7,7 @@ import { BankIcon } from "../../components/BankIcon";
 import { ErrorState } from "../../components/ErrorState";
 import { useStatusBar } from "../../hooks/useStatusBar";
 import type { AmountState } from "../../screens/transfer/TransferScreen";
-import { K2AiStar, K2Chevron, K2Close, K2Magnifier, K2Star } from "../art";
+import { K2Chevron, K2Close, K2Magnifier, K2Star } from "../art";
 import { k2ClockOnce } from "../chrome";
 import { K2BankSheet, type K2SheetKind } from "./K2BankSheet";
 import "./k2-transfer.css";
@@ -18,9 +18,10 @@ import "./k2-transfer.css";
 const SKEL_MS = 390; // 올라오기 시작 → 목록 (8.172 → 8.565초). 그동안 뼈대, '+ 계좌번호 직접입력' 없음
 const AI_MS = 225; // 'AI로 이체하기' 가 늦게 나타남 (8.398초, 페이드 없이)
 // 시트를 열고 닫을 때 상태바 글자색이 바뀌는 때 (device.md §5): 열기 = 시트 시작 + 234ms(10.092초) 흰 글자, 닫기 = +102ms(23.702초) 검은 글자. 시계는 200ms.
-// 열기는 타이머가 시트를 그린 뒤에 시작하는 만큼(≈ 15ms) 덜 기다림 (rAF 기록: 시트가 막 넘쳐 올라간 프레임에 바뀜 — 녹화와 같음)
-const SB_LIGHT_MS = 220;
-const SB_DARK_MS = 102;
+// 시트는 한 프레임쯤 앞당겨 움직이므로(k2-bank-sheet.css 음수 delay) 그만큼 덜 기다림
+// (스크린캐스트: 열기 = 시트가 막 넘쳐 올라간 프레임(−3pt), 닫기 = 첫 프레임에서 5프레임 뒤 — 둘 다 녹화와 같은 프레임)
+const SB_LIGHT_MS = 210;
+const SB_DARK_MS = 85;
 
 export function K2Transfer() {
   const navigate = useNavigate();
@@ -74,9 +75,9 @@ export function K2Transfer() {
         </button>
         <h1 className="k2t__title">이체</h1>
         <button className={`k2t__ai ${aiShown ? "" : "k2t__ai--wait"}`}>
-          <K2AiStar variant="header" className="k2t__aistar" />
+          <AiStar />
           <span>AI로 이체하기</span>
-          <K2Chevron />
+          <K2Chevron width={6} stroke={1.05} />
         </button>
         <div className="k2t__search">
           <K2Magnifier className="k2t__glass" />
@@ -145,10 +146,12 @@ export function K2Transfer() {
         )}
       </div>
 
-      {/* 목록 위에 떠 있는 흰 카드 버튼 (뒤 흰 띠 없음 — 목록이 밑 · 옆으로 보임). 뼈대 동안은 없음 */}
+      {/* 목록 위에 떠 있는 흰 카드 버튼 (뒤 흰 띠 없음 — 목록이 밑 · 옆으로 보임). 뼈대 동안은 없음.
+          뗀 뒤에도 시트가 덮을 때까지 눌린 색 그대로 (9.875초) */}
       {!skel && (
-        <button className="k2t__direct" onClick={() => setSheet("bank")}>
-          + 계좌번호 직접입력
+        <button className={`k2t__direct ${sheet ? "k2t__direct--held" : ""}`} onClick={() => setSheet("bank")}>
+          <PlusIcon />
+          <span>계좌번호 직접입력</span>
         </button>
       )}
 
@@ -188,6 +191,37 @@ function SkeletonRows() {
         </div>
       ))}
     </div>
+  );
+}
+
+// 'AI로 이체하기' 별 (9.00초, 잉크 15.3 × 15.3): K2AiStar 와 같은 모양에 녹화에서 맞춘 그러데이션 — 위 꼭지 하늘 #00c2ff →
+// 가운데 연두 → 아래 꼭지 노랑 #ffdc00, 오른쪽 아래로 18° 기울어짐 (별 안 픽셀 826개에 최소제곱, RMS 7)
+const AI_STAR =
+  "M14.34 8L14.27 8.01 14.08 8.06 13.77 8.16 13.36 8.35 12.86 8.62 12.3 8.97 11.7 9.41 11.08 9.92 10.48 10.48 9.92 11.08 9.41 11.7 8.97 12.3 8.62 12.86 8.35 13.36 8.16 13.77 8.06 14.08 8.01 14.27 8 14.34 7.99 14.27 7.94 14.08 7.84 13.77 7.65 13.36 7.38 12.86 7.03 12.3 6.59 11.7 6.08 11.08 5.52 10.48 4.92 9.92 4.3 9.41 3.7 8.97 3.14 8.62 2.64 8.35 2.23 8.16 1.92 8.06 1.73 8.01 1.66 8 1.73 7.99 1.92 7.94 2.23 7.84 2.64 7.65 3.14 7.38 3.7 7.03 4.3 6.59 4.92 6.08 5.52 5.52 6.08 4.92 6.59 4.3 7.03 3.7 7.38 3.14 7.65 2.64 7.84 2.23 7.94 1.92 7.99 1.73 8 1.66 8.01 1.73 8.06 1.92 8.16 2.23 8.35 2.64 8.62 3.14 8.97 3.7 9.41 4.3 9.92 4.92 10.48 5.52 11.08 6.08 11.7 6.59 12.3 7.03 12.86 7.38 13.36 7.65 13.77 7.84 14.08 7.94 14.27 7.99Z";
+const AI_STOPS = ["#00c2ff", "#2ec8cd", "#61d178", "#8eda23", "#bcdc13", "#f0dd08", "#ffdc00"];
+function AiStar() {
+  const id = useId();
+  return (
+    <svg className="k2t__aistar" width="15.4" height="15.4" viewBox="0 0 16 16" aria-hidden>
+      <defs>
+        <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="6.56" y1="3.55" x2="9.44" y2="12.45">
+          {AI_STOPS.map((c, i) => (
+            <stop key={c} offset={i / (AI_STOPS.length - 1)} stopColor={c} />
+          ))}
+        </linearGradient>
+      </defs>
+      {/* svg 상자는 CSS px 단위로 붙어 그려져서, 0.4pt 오른쪽 자리는 안에서 옮김 (.k2t__aistar overflow visible) */}
+      <path d={AI_STAR} transform="translate(.43 .08)" fill={`url(#${id})`} stroke={`url(#${id})`} strokeWidth="3.32" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// '+ 계좌번호 직접입력' 의 + (9.00초): 글자보다 가는 10 × 10 더하기, 두께 1.33, 둥근 끝
+function PlusIcon() {
+  return (
+    <svg className="k2t__plus" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.33" strokeLinecap="round" aria-hidden>
+      <path d="M5 .67v8.66M.67 5h8.66" />
+    </svg>
   );
 }
 

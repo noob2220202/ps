@@ -1,7 +1,7 @@
 /* ===== kakao2 앱이 열리는 모습 (Launch.tsx, 녹화 인트로가 끝난 뒤 416ms) ===== */
 
-/* 뒤에 깐 앱 보관함 (영상 마지막 장면): 폰 화면보다 사방 54pt 크게 (흐려도 가장자리가 검게 번지지 않게), 앱 창 아래 */
-.k2-launch-bg {
+/* 뒤에 깐 앱 보관함 (영상 첫 장면): 폰 화면보다 사방 54pt 크게 (흐려도 가장자리가 검게 번지지 않게), 앱 창 아래 */
+html[data-kakao2] .k2-launch-bg {
   position: absolute;
   left: -54px;
   top: -54px;
@@ -10,16 +10,24 @@
   z-index: -1;
   pointer-events: none;
 }
-/* 커지기 시작한 노란 B 아이콘 (녹화 0.417초, 0.83 배로 어두운 #ffdd01). 자리 · 크기는 Launch.tsx 가 움직임 */
-.k2-launch-icon {
+/* 커지기 시작한 노란 B 아이콘 (녹화 0.417초, 0.83 배로 어두운 #ffdd01). 자리 · 크기는 Launch.tsx 가 정하고 transform 으로 늘임 */
+html[data-kakao2] .k2-launch-icon {
   position: absolute;
   z-index: 1;
   background: #d2b70b;
+  transform-origin: 0 0;
   pointer-events: none;
 }
-.k2-launch-icon svg {
+html[data-kakao2] .k2-launch-icon svg {
   position: absolute;
   left: 52.7%;
   top: 40.9%;
   translate: -50% -50%;
+}
+/* 앱 창 안 상태바 (Launch.tsx copyStatusBar): 앱 창과 같은 크기 · 같은 움직임의 판 맨 위 (자리 · 크기는 Launch.tsx). 창 위, B 아이콘 밑
+   (z 0 = 창과 같고 DOM 순서가 뒤) */
+html[data-kakao2] .k2-launch-sb {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
 }

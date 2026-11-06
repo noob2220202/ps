@@ -8,7 +8,8 @@
   background: #1f1f1f;
   color: #fff;
 }
-/* 스크롤은 화면 맨 위(상태바 밑)부터. 스크롤 막대 없음 (critic.md G4). 끝까지 내리면 목록 카드 아래 328.7 빈칸 (최대 스크롤 566.1) */
+/* 스크롤은 화면 맨 위(상태바 밑)부터. 브라우저 스크롤 막대는 숨기고 녹화의 iOS 막대를 따로 그림 (.k2-home__ind).
+   끝까지 내리면 목록 카드 아래 257.6 빈칸 (최대 스크롤 495, 녹화의 스크롤 막대 길이 · 자리로 잼) */
 .k2-home__scroll {
   position: absolute;
   inset: 0;
@@ -168,9 +169,10 @@
   text-align: center;
   color: #1e1e1e;
 }
-/* 누른 프레임(로딩 막과 같은 프레임)에 밝게 (#ddbeaf + 흰 30%) → 500ms 동안 제 색 (녹화 6.472 – 7.0초, 막 밑에서 잼) */
+/* 누른 프레임(로딩 막과 같은 프레임)에 밝게 (#ddbeaf + 흰 30%) → 270ms 동안 제 색 (녹화 6.467 – 6.733초, 막 밑에서 잼:
+   157 · 156(50ms) · 153(100) · 151(133) · 149(167) · 147(200) · 145(267)) */
 .k2-home__send--flash {
-  animation: k2-home-flash 500ms cubic-bezier(0.42, 0, 0.58, 1) both;
+  animation: k2-home-flash 270ms cubic-bezier(0.42, 0, 0.58, 1) both;
 }
 @keyframes k2-home-flash {
   from {
@@ -178,7 +180,7 @@
   }
 }
 .k2-home__btn--flash {
-  animation: k2-home-flash-dark 500ms cubic-bezier(0.42, 0, 0.58, 1) both;
+  animation: k2-home-flash-dark 270ms cubic-bezier(0.42, 0, 0.58, 1) both;
 }
 @keyframes k2-home-flash-dark {
   from {
@@ -403,7 +405,7 @@
 
 /* ---------- 바로가기 목록: 874.9 – 1089.4, 줄 46 (가운데 913.1 · 959.2 · 1005 · 1051.1), 아이콘 가운데 48.6, 15/700 ---------- */
 .k2-home__list {
-  margin-bottom: 328.8px;
+  margin-bottom: 257.6px;
   padding: 15.2px 0 15.3px;
 }
 .k2-home__list-row {
@@ -445,4 +447,47 @@
 }
 .k2-home__edge--on {
   opacity: 1;
+}
+
+/* ---------- 탭바 둘레 아래 가장자리 막 (녹화에 늘 있음, 흐림 없이 바탕색 쪽으로): 733 부터 짙어져 탭바 위끝 769 에서 .28,
+   탭바 아래(832 –)는 .88 (녹화 1.8 – 2.2초 '상품 추가' 236 → 203 · 190 · 184, '간편 홈' 158 → 48). 떠 있는 광고 · 탭바는 이 막 위
+   (흰 광고는 그대로 밝음) ---------- */
+.k2-home__edge-bottom {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 10;
+  height: 119px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(31, 31, 31, 0) 0,
+    rgba(31, 31, 31, 0.03) 7px,
+    rgba(31, 31, 31, 0.055) 12px,
+    rgba(31, 31, 31, 0.085) 17px,
+    rgba(31, 31, 31, 0.12) 22px,
+    rgba(31, 31, 31, 0.145) 25px,
+    rgba(31, 31, 31, 0.17) 28px,
+    rgba(31, 31, 31, 0.21) 31px,
+    rgba(31, 31, 31, 0.25) 34px,
+    rgba(31, 31, 31, 0.28) 36px,
+    rgba(31, 31, 31, 0.6) 57px,
+    rgba(31, 31, 31, 0.88) 98px
+  );
+}
+
+/* ---------- iOS 스크롤 막대: x 387 – 390 (폭 3, 끝 둥글게), 검정 .29 (#1f1f1f 위 22). 로딩 막 밑 (홈의 일부) ---------- */
+.k2-home__ind {
+  position: absolute;
+  right: 3px;
+  top: 58px;
+  z-index: 11;
+  width: 3px;
+  height: 0;
+  border-radius: 1.5px;
+  background: rgba(0, 0, 0, 0.29);
+  pointer-events: none;
+  visibility: hidden;
+}
+.k2-home__ind--on {
+  visibility: visible;
 }
