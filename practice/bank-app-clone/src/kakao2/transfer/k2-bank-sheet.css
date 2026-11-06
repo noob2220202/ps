@@ -1,0 +1,234 @@
+/* kakao2 이체의 아래 시트 (K2BankSheet, transfer.md §4). 은행선택 패널 위끝 139.9 (띠 밑 85.9), 둥근 위 모서리 30.
+   아래 top 값은 패널 위끝에서 잰 것 */
+.k2bank {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.k2bank--open {
+  pointer-events: auto;
+}
+.k2bank input {
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: #111;
+}
+
+/* 배경: 검정 .737 (흰 → #434343). 깔기 233ms (프레임마다 잰 진행), 걷기 210ms ease-out (패널과 같이) */
+.k2bank__backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 210ms cubic-bezier(0, 0, 0.58, 1);
+}
+.k2bank--open .k2bank__backdrop {
+  opacity: 0.737;
+  transition: opacity 233ms linear(0, 0.08, 0.2, 0.34, 0.45, 0.58, 0.68, 0.77, 0.83, 0.89, 0.92, 0.96, 0.98, 0.99, 1);
+}
+
+/* 패널: 열기 = ζ .8 · ω 18 스프링 500ms (11pt 넘쳤다 돌아옴, 9.85초), 닫기 = 210ms cubic-bezier(0,0,.58,1) (23.60초).
+   넘칠 때 밑이 비지 않게 아래로 16 흰 칸 (::after) */
+.k2bank__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 30px 30px 0 0;
+  background: #fff;
+  color: #111;
+  transform: translate3d(0, 100%, 0);
+  visibility: hidden;
+  transition:
+    transform 210ms cubic-bezier(0, 0, 0.58, 1),
+    visibility 0s 210ms;
+}
+.k2bank__panel::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 16px;
+  background: #fff;
+}
+.k2bank__panel--open {
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+  transition:
+    transform 500ms
+      linear(0, 0.053, 0.176, 0.325, 0.474, 0.61, 0.724, 0.815, 0.884, 0.934, 0.969, 0.991, 1.005, 1.012, 1.015, 1.015, 1.014, 1.011, 1.009, 1.007, 1.005, 1.004, 1.002, 1.001, 1.001, 1),
+    visibility 0s;
+}
+.k2bank__panel--bank {
+  top: calc(var(--k2-sb) + 85.9px);
+}
+/* 계좌번호 (녹화에 없음): 카카오뱅크 .number-sheet 를 담고 내용 높이만큼 */
+.k2bank__panel--number {
+  max-height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--safe-bottom);
+}
+
+/* ---------- 은행선택 머리: 취소 14.5/400 (잉크 343.4 – 368.4 × 165.9), 은행선택 20/700 (24.3 · 193.8), 검색칸 18 – 375 × 233.8 – 291.8.
+   목록을 내리면(scrollTop > 0) 제목이 숨고 검색칸 · 목록이 34 올라감 — 한 프레임에. 맨 위로 돌아오면 50ms 로 펼침 ---------- */
+.k2bank__body {
+  position: absolute;
+  inset: 0;
+}
+.k2bank__cancel {
+  position: absolute;
+  right: 14.2px;
+  top: 16.2px;
+  padding: 10px;
+  font-size: 14.5px;
+  line-height: 14.5px;
+  color: #111;
+}
+.k2bank__cancel:active {
+  color: #cdcdcd;
+}
+.k2bank__title {
+  position: absolute;
+  left: 24px;
+  top: 52.9px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 20px;
+  transition: opacity 50ms linear;
+}
+.k2bank__search {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 93.9px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  border-radius: 10.5px;
+  background: #f8f8f8;
+  transition: top 50ms linear;
+}
+.k2bank__search input {
+  flex: 1;
+  position: relative;
+  top: 0.1px;
+  height: 58px;
+  margin-left: 13.33px;
+  font-size: 16px;
+  line-height: 16px;
+}
+.k2bank__search input::placeholder {
+  color: #777;
+}
+/* 목록: 위끝 307 (검색칸 아래 15), 화면 맨 아래까지 · 마지막 줄 밑 34 */
+.k2bank__list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 167.1px;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 0.55px 0 var(--safe-bottom);
+  transition: top 50ms linear;
+}
+.k2bank__list::-webkit-scrollbar {
+  display: none;
+}
+.k2bank__body--compact :is(.k2bank__title, .k2bank__search, .k2bank__list) {
+  transition: none;
+}
+.k2bank__body--compact .k2bank__title {
+  opacity: 0;
+}
+.k2bank__body--compact .k2bank__search {
+  top: 59.9px;
+}
+.k2bank__body--compact .k2bank__list {
+  top: 133.1px;
+}
+
+/* iOS 스크롤 막대: x 387 – 390, 검정 .43 (흰 바탕에서 146), 위치 · 길이는 K2BankSheet 가 */
+.k2bank__bar {
+  position: absolute;
+  right: 3px;
+  top: 0;
+  width: 3px;
+  border-radius: 1.5px;
+  background: rgba(0, 0, 0, 0.43);
+  opacity: 0;
+  transition: opacity 250ms ease-out;
+  pointer-events: none;
+}
+.k2bank__bar--on {
+  opacity: 1;
+  transition: none;
+}
+
+/* 두 줄 격자: 줄 52, 로고 22.3 (x 23 / 206.8 — 칸 183.8), 은행 이름 15/400 #000 (잉크 55.6 / 239.1) */
+.k2bank__grid {
+  display: grid;
+  grid-template-columns: 183.8px 1fr;
+  grid-auto-rows: 52px;
+  padding-left: 23px;
+}
+.k2bank__item {
+  display: flex;
+  align-items: center;
+  gap: 9.63px;
+  font-size: 15px;
+  line-height: 15px;
+  color: #000;
+  text-align: left;
+  white-space: nowrap;
+}
+.k2bank__item > span {
+  position: relative;
+  top: 1.15px; /* 잉크 가운데가 줄 가운데보다 0.5 아래 (327.3 – 340.3) */
+}
+.k2bank__item:active {
+  opacity: 0.6;
+}
+/* 은행 | 증권사 구분선: 25 – 368, 0.67pt #e8e8e8, 위아래 17 */
+.k2bank__sep {
+  height: 0.67px;
+  margin: 17px 25px 16.93px;
+  border: none;
+  background: #e8e8e8;
+}
+.k2bank__empty {
+  margin: 60px 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: #9a9a9a;
+}
+/* 뼈대 (10.058초): 원 22 #eaeaea + 막대 60 × 8 #f8f8f8 (글자 자리, 줄 가운데) */
+.k2bank__skel {
+  display: flex;
+  align-items: center;
+}
+.k2bank__skel > i {
+  width: 22px;
+  height: 22px;
+  margin-left: 0.15px;
+  border-radius: 50%;
+  background: #eaeaea;
+}
+.k2bank__skel > b {
+  width: 60px;
+  height: 8px;
+  margin-left: 9.85px;
+  border-radius: 2px;
+  background: #f8f8f8;
+}

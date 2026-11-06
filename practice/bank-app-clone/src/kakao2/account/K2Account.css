@@ -1,0 +1,342 @@
+/* ===== kakao2 통장 (K2AccountScreen.tsx, account.md + critic.md 16 · X16 · G2) =====
+   좌표 = pt (= CSS px, 녹화 1180 × 2556 px / 3.0025). 머리줄 아래끝은 녹화에서 112.9 = 상태바 띠(--k2-sb 54) + 58.9.
+   글자 간격은 0 (chrome.css .k2acct), 일부만 + (계좌번호 .15 · 잔액 .2 · 금액 .15) */
+
+.k2acct {
+  /* 아래 고정 띠 높이 (흐려짐 36.2 + 버튼 60 + 아래 35 = 131): 내용 아래 여백 · 스크롤 표시 칸 · 다음 쪽 불러오기 기준 */
+  --k2acct-bar: calc(96.2px + var(--safe-bottom) + 0.8px);
+  position: absolute;
+  inset: 0;
+  color: #1f1f1f;
+  /* 뿌리 바탕은 칠하지 않음: push 때 머리줄 아래로 밑 홈이 보이고 본문(.k2-push-body)만 밀려 들어옴 (nav.css) */
+}
+.k2acct button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- 머리줄 (고정, 흰색 0 – 112.9): < 11 × 20 · 제목 17/600 가운데 · 톱니 21 × 22. 가운데선 y 81 ---------- */
+.k2acct__nav {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: calc(var(--k2-sb) + 58.9px);
+  padding-top: var(--k2-sb);
+  background: #fff;
+}
+/* 스크롤하면(scrollTop > 0) 아래끝 머리카락 선 1 기기 px (0.33pt) #d0d0d0, 페이드 없음 */
+.k2acct__nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #d0d0d0;
+  transform: scaleY(0.3333);
+  transform-origin: bottom;
+  opacity: 0;
+}
+.k2acct__nav--line::after {
+  opacity: 1;
+}
+.k2acct__navrow {
+  position: relative;
+  height: 58.9px;
+}
+.k2acct__title {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  top: 16px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* 누르는 칸 44 × 44, 아이콘은 가운데: < 잉크 가운데 (41.5, 81), 톱니 (355.1, 80.9) */
+.k2acct__back,
+.k2acct__gear {
+  position: absolute;
+  top: 5px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+.k2acct__back {
+  left: 19.5px;
+}
+.k2acct__gear {
+  left: 333.1px;
+  top: 4.9px;
+}
+
+/* ---------- 본문 (머리줄 아래 전부, push 때 이것만 밀림 + 아래 두 모서리 r55 — nav.css .k2-push-body) ---------- */
+.k2acct__body {
+  position: absolute;
+  inset: calc(var(--k2-sb) + 58.9px) 0 0;
+  overflow: hidden;
+  background: #fff;
+}
+.k2acct__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  animation: k2acct-in 170ms linear both;
+}
+.k2acct__scroll::-webkit-scrollbar {
+  display: none;
+}
+/* 아래 여백 = 고정 띠: 끝까지 내리면 마지막 행이 흐려짐 시작(721)에서 끝남 */
+.k2acct__content {
+  padding-bottom: var(--k2acct-bar);
+}
+@keyframes k2acct-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 계좌번호 14/400 #5b5b5b 밑줄 1pt (기준선 아래 1.4) + 복사 아이콘. 줄 가운데 153.5 (본문 40.6) */
+.k2acct__num {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  margin: 30.6px 0 0 24px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.15px;
+  color: #5b5b5b;
+}
+.k2acct__num > span {
+  text-decoration: underline 1px #5b5b5b;
+  text-underline-offset: 1.9px;
+}
+.k2acct__copy {
+  margin-left: 2.3px;
+  flex: none;
+}
+/* 잔액 32/700, 줄 가운데 184.8 */
+.k2acct__bal {
+  display: block;
+  margin: 1.3px 0 0 24px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: 0.2px;
+}
+
+/* 검색 상자 353 × 65 (236.1 – 301.1), r16, #f8f8f8 + 1pt #f2f2f2. 돋보기 17 × 16.7 왼쪽 41.6 · '3개월 · 전체 · 최신순' 13/400 + ∨ 오른쪽 352.4 */
+.k2acct__search {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 65px;
+  margin: 31.3px 20px 0;
+  padding: 0 19.6px 0 20.6px;
+  border: 1px solid #f2f2f2;
+  border-radius: 16px;
+  background: #f8f8f8;
+}
+.k2acct__filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  word-spacing: 0.5px; /* 녹화 글꼴은 띄어쓰기가 조금 넓음 (같은 글자인데 ' · ' 마다 ≈1pt) */
+  color: #5b5b5b;
+}
+
+/* 홍보 줄 (327 – 367, 누를 수 없음): 카드 + 돈 아이콘 40 + 12/400 #5b5b5b · 15/700. 줄 가운데 336.1 · 356.4 */
+.k2acct__promo {
+  display: flex;
+  gap: 8px;
+  height: 40px;
+  margin: 25.9px 20px 0;
+}
+.k2acct__promo img {
+  width: 40px;
+  height: 40px;
+  flex: none;
+}
+.k2acct__promo small {
+  display: block;
+  padding-top: 2.18px;
+  font-size: 12px;
+  line-height: 15px;
+  word-spacing: 0.5px;
+  color: #5b5b5b;
+}
+.k2acct__promo strong {
+  display: block;
+  margin-top: 3.2px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 19px;
+}
+/* 구분선 22 – 371 × 389.3 – 390 (0.67pt) #e9e9e9 */
+.k2acct__divider {
+  height: 0.67px;
+  margin: 22.37px 22px 0;
+  background: #e9e9e9;
+}
+
+/* ---------- 거래 목록 (K2TxList.tsx): 날짜 칸 35.6 · 행 77.3, 첫 날짜 칸 위끝 397.9 ---------- */
+.k2acct .k2list {
+  margin-top: 7.86px;
+}
+/* 날짜 'MM.DD' 13/600 #3c3c3c (녹화 숫자 높이 9.33 = 13px. 녹화 글꼴은 글자 사이가 조금 넓어 +.5), 기준선 429.6 */
+.k2acct .k2list__date {
+  height: 35.6px;
+  margin: 0;
+  padding: 19.7px 20px 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 15.9px;
+  letter-spacing: 0.5px;
+  color: #3c3c3c;
+}
+/* 행: 첫 줄 이름 16/400 · 금액 16/700, 둘째 줄 시각 13/400 · 거래 후 잔액 14/400 #7d7d7d 는 기준선을 맞춤 (녹화 첫 행 기준선 466 · 488.6).
+   글자 세로 위치가 1px 단위로 붙으므로(크롬) 녹화 잉크에 맞춘 값. 누른 모습 없음 */
+.k2acct .k2list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 22px 18px;
+  align-content: start;
+  align-items: baseline;
+  column-gap: 12px;
+  row-gap: 2.85px;
+  width: 100%;
+  height: 77.3px;
+  padding: 16.53px 20px 0;
+  text-align: left;
+}
+.k2acct .k2list__merchant {
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 22px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.k2acct .k2list__amount {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.15px;
+  text-align: right;
+  white-space: nowrap;
+}
+.k2acct .k2list__amount--in {
+  color: #0076ca;
+}
+.k2acct .k2list__time {
+  font-size: 13px;
+  line-height: 18px;
+  color: #7d7d7d;
+}
+.k2acct .k2list__after {
+  font-size: 14px;
+  line-height: 18px;
+  color: #7d7d7d;
+  text-align: right;
+  white-space: nowrap;
+}
+/* 맨 아래 불러오기 줄 79.7: 스피너(지름 27.6, #dfdfdf) 가운데가 줄 위에서 39.4 */
+.k2acct .k2list__more {
+  display: flex;
+  justify-content: center;
+  height: 79.7px;
+  padding-top: 24.4px;
+}
+
+/* ---------- 스크롤 표시 (iOS): x 387 – 390, 칸 본문 3 ~ 아래 띠 위 0.6. 길이 · 위치는 K2AccountScreen 이 매 프레임 ---------- */
+.k2acct__ind {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  z-index: 2;
+  width: 3px;
+  border-radius: 1.5px;
+  background: rgba(0, 0, 0, 0.39);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease-out;
+}
+.k2acct__ind--on {
+  opacity: 1;
+  transition: none;
+}
+
+/* ---------- 아래 고정 띠 (721 – 852): 36pt 흰색으로 흐려짐(내용이 비침) + 가져오기 #2d324d / 이체하기 #ffde00 177.85 × 60 r12, 사이 7.65 ---------- */
+.k2acct__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  height: var(--k2acct-bar);
+  background: linear-gradient(rgba(255, 255, 255, 0) 0.4px, #fff 37.6px); /* 녹화 투명도 0 @721.4 · .93 @756 */
+  pointer-events: none;
+}
+.k2acct__btns {
+  position: absolute;
+  inset: 36.2px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 60px;
+  gap: 7.65px;
+  padding: 0 14.65px 0 15px;
+  pointer-events: auto;
+}
+.k2acct__btn {
+  padding-top: 0.35px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.k2acct__btn--get {
+  background: #2d324d;
+  color: #fff;
+}
+.k2acct__btn--send {
+  background: #ffde00;
+  color: #1f1f1f;
+}
+
+/* ---------- 뼈대 (K2AccountSkeleton.tsx): 막대 #f0f0f0, 밝은 띠(꼭대기 ≈ #f8f8f8, 170 폭)가 1초에 화면 x −238 → 393 (≈ 630pt/s).
+   모든 막대가 같은 화면 x 에서 밝아지게 막대마다 제 왼끝(--x)만큼 뺌. 내용이 오면 170ms 동안 흐려지며 걷힘 ---------- */
+.k2acct__skel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.k2acct__skel--out {
+  animation: k2acct-out 170ms linear both;
+}
+@keyframes k2acct-out {
+  to {
+    opacity: 0;
+  }
+}
+.k2acct__sk {
+  position: absolute;
+  background: #f0f0f0 linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.53), rgba(255, 255, 255, 0)) no-repeat;
+  background-size: 170px 100%;
+  animation: k2acct-shimmer 1000ms linear infinite;
+}
+@keyframes k2acct-shimmer {
+  from {
+    background-position: calc(-323px - var(--x)) 0;
+  }
+  to {
+    background-position: calc(308px - var(--x)) 0;
+  }
+}

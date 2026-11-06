@@ -1,0 +1,448 @@
+/* kakao2 홈 (K2Home.tsx). 치수 pt (= CSS px) = 녹화 px ÷ 3.0025, 화면 y 는 스크롤 0 기준 (home.md §3 · §4).
+   테마와 상관없이 늘 어두운 색 (바탕 #1f1f1f · 카드 #232323 + 0.67 #2a2a2a 테두리). 글자 간격 0 은 chrome.css */
+.k2-home,
+.k2-home-wait {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #1f1f1f;
+  color: #fff;
+}
+/* 스크롤은 화면 맨 위(상태바 밑)부터. 스크롤 막대 없음 (critic.md G4). 끝까지 내리면 목록 카드 아래 328.7 빈칸 (최대 스크롤 566.1) */
+.k2-home__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-top: var(--k2-sb);
+}
+.k2-home__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- 머리: 54 – 121.2 (알약은 K2AiPill.css) ---------- */
+.k2-home__head {
+  position: relative;
+  height: 67.2px;
+}
+/* 종 잉크 352 – 370 × 85.26 – 106.91, 빨간 점 지름 6 가운데 (372, 85.6) */
+.k2-home__bell {
+  position: absolute;
+  right: 9px;
+  top: 20px;
+  width: 44px;
+  height: 44px;
+}
+.k2-home__bell > svg {
+  position: absolute;
+  left: 12px;
+  top: 11.26px;
+}
+.k2-home__bell-dot {
+  position: absolute;
+  left: 29px;
+  top: 8.6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f23a31;
+}
+
+/* ---------- 카드 공통: 좌우 16, 반지름 24 ---------- */
+.k2-home__main,
+.k2-home__card {
+  position: relative;
+  display: block;
+  margin: 0 16px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.k2-home__card {
+  background: #232323;
+  box-shadow: inset 0 0 0 0.67px #2a2a2a;
+}
+/* 회색 버튼 (발급하기 · 확인하기 · 다른 은행 이체): 높이 38, #313131, 14/600 */
+.k2-home__btn {
+  position: absolute;
+  right: 18px;
+  height: 38px;
+  border-radius: 19px;
+  background: #313131;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 38px;
+  text-align: center;
+}
+/* 카드 안 큰 한 줄 (보유 카드가 없어요 · 내 신용정보): 18/700 */
+.k2-home__line {
+  position: absolute;
+  left: 65.6px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.k2-home__avatar {
+  position: absolute;
+  left: 18px;
+  width: 36px;
+  height: 36px;
+}
+
+/* ---------- 통장 카드 (살구색): 242.8 – 338.4 ---------- */
+.k2-home__main {
+  height: 95.6px;
+  background: #e9c9ba;
+  color: #1f1f1f;
+  cursor: pointer;
+}
+/* B 동그라미 지름 36 (34 – 70 × 271.8 – 307.7) */
+.k2-home__b {
+  position: absolute;
+  left: 18px;
+  top: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #d8b9aa;
+}
+.k2-home__b svg {
+  display: block;
+}
+/* 잔액 18/700 #1f1f1f (잉크 왼끝 82.9, 숫자 위끝 271.1), 이름 14/400 #6c5b54 (잉크 가운데 303.3) */
+.k2-home__main-text {
+  position: absolute;
+  left: 66.3px;
+  top: 25.7px;
+  display: flex;
+  flex-direction: column;
+}
+.k2-home__main-balance {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.k2-home__main-label {
+  display: flex;
+  align-items: center;
+  margin-top: 3.22px;
+  height: 18.7px;
+}
+.k2-home__main-name {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #6c5b54;
+  white-space: nowrap;
+}
+/* 한도계좌: 41.6 × 18.7, 0.67 테두리 #a58b80, 8/500 #7f6c63 */
+.k2-home__badge {
+  box-sizing: border-box;
+  height: 18.7px;
+  margin-left: 4px;
+  padding: 0 6.8px;
+  border: 0.67px solid #a58b80;
+  border-radius: 9.35px;
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 17.36px;
+  color: #7f6c63;
+  white-space: nowrap;
+}
+/* 이체 60.3 × 38 (298.8 – 359 × 270.8 – 308.7), #ddbeaf, 13.75/700 #1e1e1e (잉크 22.3 × 12.3) */
+.k2-home__send {
+  position: absolute;
+  right: 18px;
+  top: 28px;
+  width: 60.3px;
+  height: 38px;
+  border-radius: 19px;
+  background: #ddbeaf;
+  font-size: 13.75px;
+  font-weight: 700;
+  line-height: 38px;
+  text-align: center;
+  color: #1e1e1e;
+}
+/* 누른 프레임(로딩 막과 같은 프레임)에 밝게 (#ddbeaf + 흰 30%) → 500ms 동안 제 색 (녹화 6.472 – 7.0초, 막 밑에서 잼) */
+.k2-home__send--flash {
+  animation: k2-home-flash 500ms cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+@keyframes k2-home-flash {
+  from {
+    background-color: #eed6cd;
+  }
+}
+.k2-home__btn--flash {
+  animation: k2-home-flash-dark 500ms cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+@keyframes k2-home-flash-dark {
+  from {
+    background-color: #6f6f6f;
+  }
+}
+
+/* ---------- 둘째 카드 (홍보 줄 + 칩): 346 – 485.9 ---------- */
+.k2-home__accts {
+  margin-top: 7.6px;
+  padding: 21px 0 22px;
+}
+.k2-home__row {
+  position: relative;
+  height: 36px;
+}
+.k2-home__row + .k2-home__row {
+  margin-top: 20px;
+}
+.k2-home__row > .k2-home__avatar {
+  top: 0;
+}
+/* 홍보: 제목 17/700 #e9e9e9 (잉크 왼끝 82.3, 가운데 374.4), 설명 14/400 #9a9a9a (가운데 396.9) */
+.k2-home__promo-text,
+.k2-home__ext-text {
+  position: absolute;
+  left: 65.6px;
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+}
+.k2-home__promo-text {
+  top: -2.1px;
+}
+.k2-home__promo-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #e9e9e9;
+}
+.k2-home__promo-desc {
+  margin-top: 2.67px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #9a9a9a;
+}
+/* 다른 은행 계좌 줄 (녹화에 없음): 통장 카드와 같은 글자 자리, 회색 이체 버튼 */
+.k2-home__ext {
+  cursor: pointer;
+}
+.k2-home__ext > :first-child {
+  position: absolute;
+  left: 18px;
+  top: 0;
+}
+.k2-home__ext-text {
+  top: -3.3px;
+}
+.k2-home__ext-balance {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.k2-home__ext-label {
+  margin-top: 3.8px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.7px;
+  color: #9a9a9a;
+}
+.k2-home__ext-send {
+  top: -1px;
+  width: 60.3px;
+}
+/* 칩: 429.3 – 463.9 (높이 34.6), 33.6 에서 시작해 카드 오른끝에서 잘림 (가로 스크롤) */
+.k2-home__chips {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 34.6px;
+  margin-top: 26.3px;
+  padding-left: 17.6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.k2-home__chips::-webkit-scrollbar {
+  display: none;
+}
+.k2-home__chip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6.53px;
+  box-sizing: border-box;
+  height: 34.6px;
+  padding: 0 11.92px 0 11.03px;
+  border: 1px solid #3e3e3e;
+  border-radius: 17.3px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.k2-home__chip svg {
+  display: block;
+}
+/* 내 계좌 >: 76 폭, 글자 → 꺾쇠 8 */
+.k2-home__chip--mine {
+  gap: 7.93px;
+  padding: 0 12.63px 0 11.65px;
+}
+.k2-home__chips-divider {
+  flex-shrink: 0;
+  width: 1.3px;
+  height: 16px;
+  margin: 0 4.33px 0 4.66px;
+  background: #3a3a3a;
+}
+
+/* ---------- 카드: 493.3 – 630.8 ---------- */
+.k2-home__cards {
+  height: 137.5px;
+  margin-top: 7.4px;
+}
+/* 카드 19.8/700 (잉크 34.6 – 67.6 × 524.2 – 542.2) + 꺾쇠 6.3 × 11 #5a5a5a (77.9 – 84.3) */
+.k2-home__cards-title {
+  position: absolute;
+  left: 17.6px;
+  top: 28.95px;
+  display: flex;
+  align-items: center;
+  gap: 9.7px;
+  margin: 0;
+  font-size: 19.8px;
+  font-weight: 700;
+  line-height: 24px;
+}
+.k2-home__cards-title svg {
+  display: block;
+}
+/* ? 카드 22.7 × 36 (40.6 – 63.3 × 567.5 – 603.5, 자른 상자 25 × 38) */
+.k2-home__card-q {
+  position: absolute;
+  left: 23.5px;
+  top: 73.2px;
+  width: 25px;
+  height: 38px;
+}
+.k2-home__cards-line {
+  top: 81.1px;
+}
+.k2-home__cards-btn {
+  top: 73.2px;
+  width: 84.6px;
+}
+
+/* ---------- 내 신용정보: 638.1 – 728.7 (줄 가운데 683.4) ---------- */
+.k2-home__credit {
+  height: 90.6px;
+  margin-top: 7.3px;
+}
+.k2-home__credit > .k2-home__avatar {
+  top: 27.3px;
+}
+.k2-home__credit > .k2-home__line {
+  top: 34.3px;
+}
+.k2-home__credit-btn {
+  top: 26.3px;
+  width: 84.9px;
+}
+
+/* ---------- + 상품 추가: 735.65 – 790.25, 더하기 11.7 × 12 (162.9 – 174.5) + 14/700 #ececec (182.8 – 234.5) ---------- */
+.k2-home__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 32px);
+  height: 54.6px;
+  margin-top: 6.95px;
+  padding-left: 4.6px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  color: #ececec;
+}
+.k2-home__add svg {
+  display: block;
+}
+
+/* ---------- 간편 홈 | 화면 편집: 790.25 – 874.8 (아이콘 가운데 832.5, 글자 832.05), 14/600 #9e9e9e ---------- */
+.k2-home__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84.55px;
+}
+.k2-home__footer button {
+  display: flex;
+  align-items: center;
+  gap: 7.9px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  color: #9e9e9e;
+}
+.k2-home__footer svg {
+  display: block;
+  translate: 0 0.33px;
+}
+.k2-home__footer span {
+  translate: 0 -0.42px;
+}
+.k2-home__footer-divider {
+  width: 1.4px;
+  height: 10px;
+  margin: 0 16px;
+  background: #333;
+}
+
+/* ---------- 바로가기 목록: 874.9 – 1089.4, 줄 46 (가운데 913.1 · 959.2 · 1005 · 1051.1), 아이콘 가운데 48.6, 15/700 ---------- */
+.k2-home__list {
+  margin-bottom: 328.8px;
+  padding: 15.2px 0 15.3px;
+}
+.k2-home__list-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 46px;
+  padding-left: 17.6px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: left;
+}
+.k2-home__list-row img {
+  width: 30px;
+  height: 30px;
+  margin-right: 8.4px;
+}
+
+/* ---------- 상태바 밑 회색 띠 (스크롤 55 넘으면 한 프레임에): 흐림 없이 명암만 #282828 쪽으로 (home.md §4.1) ---------- */
+.k2-home__edge {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+  height: 85px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(40, 40, 40, 0.93) 0,
+    rgba(40, 40, 40, 0.92) 8px,
+    rgba(40, 40, 40, 0.84) 16px,
+    rgba(40, 40, 40, 0.77) 22px,
+    rgba(40, 40, 40, 0.55) 40px,
+    rgba(40, 40, 40, 0.33) 56px,
+    rgba(40, 40, 40, 0.12) 72px,
+    rgba(40, 40, 40, 0) 85px
+  );
+}
+.k2-home__edge--on {
+  opacity: 1;
+}

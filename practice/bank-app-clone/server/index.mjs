@@ -509,7 +509,8 @@ function txDetailJson(id) {
   return {
     ...tx,
     transactedAt: `${tx.at.slice(0, 10).replaceAll("-", ".")} ${tx.at.slice(11, 19)}`,
-    kind: t.kind || KIND_BY_TAG[tx.tag], // 🔔 패널에서 직접 지정했으면 그 값, 아니면 tag로 기본값
+    // 🔔 패널에서 직접 지정했으면 그 값, 아니면 tag로 기본값. kakao2(새 녹화)는 이체 · 종류 없음을 보낸 돈 "일반이체" / 받은 돈 "일반입금"으로
+    kind: t.kind || (SERVER_ID === "kakao2" && (tx.tag === "#이체" || tx.tag === "") ? (tx.amount < 0 ? "일반이체" : "일반입금") : KIND_BY_TAG[tx.tag]),
     ...(card && { cardInfo: `체크카드 (${getProfile().cardLast4})`, address: "서울 예시구 샘플로 123", phone: "02)000-0000" }),
     memo: t.memo ?? "",
     // 내가 보낸 이체면(또는 🔔 패널에서 상대 정보를 지정했으면) 받은 은행/계좌 (콕뱅크 거래 상세의 입금은행·입금계좌)
