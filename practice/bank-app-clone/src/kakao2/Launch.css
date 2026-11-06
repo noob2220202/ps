@@ -24,10 +24,27 @@ html[data-kakao2] .k2-launch-icon svg {
   top: 40.9%;
   translate: -50% -50%;
 }
-/* 앱 창 안 상태바 (Launch.tsx copyStatusBar): 앱 창과 같은 크기 · 같은 움직임의 판 맨 위 (자리 · 크기는 Launch.tsx). 창 위, B 아이콘 밑
-   (z 0 = 창과 같고 DOM 순서가 뒤) */
+/* 앱 창 안 (Launch.tsx): 줄인 홈 위끝과 창 위끝 사이 틈을 채우는 홈 바탕색 띠(창 위로 삐져나옴, 가장 큰 틈은 줄이기 전 16.7px),
+   창 내용을 어둡게 하는 검은 막(투명도 = 1 − 밝기, 띠까지), 그 위에 베낀 상태바 (녹화처럼 밝게). 홈 · 로딩 막(900) 위 */
+html[data-kakao2] .k2-launch-gap {
+  position: absolute;
+  inset: -24px 0 auto;
+  height: 24px;
+  z-index: 930;
+  background: #1f1f1f;
+  pointer-events: none;
+}
+html[data-kakao2] .k2-launch-dim {
+  position: absolute;
+  inset: -24px 0 0;
+  z-index: 940;
+  background: #000;
+  pointer-events: none;
+}
 html[data-kakao2] .k2-launch-sb {
   position: absolute;
-  z-index: 0;
+  inset: 0 0 auto;
+  height: 54px;
+  z-index: 950;
   pointer-events: none;
 }

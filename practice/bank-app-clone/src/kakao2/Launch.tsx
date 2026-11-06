@@ -1,4 +1,4 @@
-// kakao2 앱이 열리는 모습 (녹화 0.4167 → 0.833초, intro.md §5 · critic.md X20 간단한 판). 녹화 인트로 영상이 끝나는 순간(H)부터 (recorder.ts):
+// kakao2 앱이 열리는 모습 (녹화 0.4167 → 0.833초, intro.md §5 · critic.md X20 간단한 판 + 상태바는 녹화대로). 녹화 인트로 영상이 끝나는 순간(H)부터 (recorder.ts):
 // - 영상 속 앱 보관함을 뒤에 깔고 흐리게 · 어둡게. 상태바 줄은 바탕색으로 덮어 둠 (진짜 기기도 상태바 글자 · 아일랜드는 안 흐려짐)
 // - 밑에 미리 그려 둔 홈(.phone__viewport = 앱 창)이 B 아이콘 자리에서 화면 전체로 350ms 동안 커짐 (모서리 55pt, 처음엔 어둡게).
 //   처음 40ms 는 노란 B 아이콘이 창 위에 겹쳐 있다가 사라짐 (K2LaunchIcon). 홈은 녹화를 시작하기 전에 영상 밑에 다 그려 둠 (recorder.ts resumeUnder)
@@ -63,8 +63,7 @@ const MOON: [ms: number, opacity: number, blur: number][] = [
   [150, 0, 2],
 ];
 const MOON_MS = 150; // 달이 다 사라진 뒤 시각 옆 칸을 위치 표시(launch.ts 시각표)로 넘김
-const HOME_BG = "#1f1f1f"; // kakao2 홈 바탕 (창 위끝 틈)
-const GAP = 24; // 그 틈 (줄이기 전 px, 가장 큰 틈은 45ms 의 16.7)
+const HOME_BG = "#1f1f1f"; // kakao2 홈 바탕 (창 자체 바탕)
 const PAD = 54; // 흐린 뒤 그림 가장자리가 검게 번지지 않게 사방으로 늘여 둔 폭 (pt, 흐림 18 의 3배)
 const SB_ROW = 57; // 이 줄(pt, 아일랜드 아래끝 48 과 '앱 보관함' 검색칸 사이 평평한 회색)을 늘여 상태바 줄을 덮음
 const FW = 393;
@@ -98,17 +97,36 @@ export function prepareK2Launch(phone: HTMLElement, video: HTMLVideoElement) {
     back.className = "k2-launch-bg";
     phone.appendChild(back);
   }
-  // 앱 창: 지금부터 첫 모습. 시작 시각은 arm 에서. 줄인 홈 위끝이 창 위끝보다 몇 pt 아래라 그 틈은 홈 바탕색 그림자로 채움
-  const frames = viewport ? windowFrames(viewport.offsetWidth / FW, viewport.offsetHeight / FH) : [];
-  const win = viewport?.animate(frames, timing);
-  begin(win, performance.now() + 600_000);
-  // (창 자체 바탕도 같은 색으로: 줄인 홈 위끝에 밝은 바탕이 섞인 줄이 생기지 않게)
-  if (viewport) Object.assign(viewport.style, { boxShadow: `0 -${GAP}px ${HOME_BG}`, background: HOME_BG });
+  // 앱 창: 지금부터 첫 모습. 시작 시각은 arm 에서. 줄인 홈 위끝이 창 위끝보다 몇 pt 아래라 그 틈은 창 위로 삐져나온 홈 바탕색 띠로 채움
+  // (그동안 창은 넘침을 자르지 않음 — clip-path 가 자름. 창 자체 바탕도 같은 색: 줄인 홈 위끝에 밝은 바탕이 섞인 줄이 생기지 않게).
+  // 창 내용 어둡게는 창 안 맨 위 검은 막(1 − 밝기)으로 — 창 안 상태바는 녹화처럼 그 위라 밝음. 매 프레임 다시 칠할 것이 없음
+  const win = viewport?.animate(windowFrames(viewport.offsetWidth / FW, viewport.offsetHeight / FH), timing);
+  const dim = viewport ? document.createElement("div") : null;
+  const gap = viewport ? document.createElement("div") : null;
+  if (viewport && dim && gap) {
+    Object.assign(viewport.style, { background: HOME_BG, overflow: "visible" });
+    gap.className = "k2-launch-gap";
+    dim.className = "k2-launch-dim";
+    viewport.append(gap, dim);
+  }
+  const dimAnim = dim?.animate(
+    WIN.map(([ms, , , , , , br]) => ({ offset: ms / K2_LAUNCH_MS, opacity: 1 - br })),
+    timing,
+  );
+  // 상태바: 지금 모습(시각 · 달 · 배터리)을 베껴 앱 창 맨 위(어둡게 하는 막 위)에 미리 깔아 둠 (녹화 속 창 안 상태바는 어두워진 창 내용과 달리
+  // 밝음). 화면 위 상태바가 옅어지는 동안 보이다가 SB_BACK 에 한 프레임에 다시 화면 위 상태바로 (arm)
+  const sb = phone.querySelector<HTMLElement>(".phone > .statusbar");
+  const inner = sb && viewport ? copyStatusBar(sb) : null;
+  if (viewport && inner) viewport.appendChild(inner);
+  const innerAnim = inner?.animate([{ opacity: 1 }, { opacity: 1, offset: 1 - 1 / SB_BACK }, { opacity: 0 }], { duration: SB_BACK, fill: "forwards" });
+  const [s0] = SB[0];
+  const sbFade = inner ? sb?.animate([...SB, [SB_BACK, 0]].map(([ms, opacity]) => ({ offset: (ms - s0) / (SB_BACK - s0), opacity })), SB_BACK - s0) : undefined;
+  const later = performance.now() + 600_000;
+  [win, dimAnim, innerAnim, sbFade].forEach((a) => begin(a, later));
 
   let at = 0;
   let over = false;
   let moon = 0;
-  let inner: HTMLElement | null = null;
   const end = () => {
     if (over) return;
     over = true;
@@ -116,7 +134,9 @@ export function prepareK2Launch(phone: HTMLElement, video: HTMLVideoElement) {
     setK2Indicator(null);
     anims.forEach((a) => a.cancel());
     inner?.remove();
-    if (viewport) Object.assign(viewport.style, { boxShadow: "", background: "" });
+    dim?.remove();
+    gap?.remove();
+    if (viewport) Object.assign(viewport.style, { background: "", overflow: "" });
     back?.remove();
     video.remove();
     setIconAt(null);
@@ -128,7 +148,8 @@ export function prepareK2Launch(phone: HTMLElement, video: HTMLVideoElement) {
     arm: (t: number) => {
       at = t;
       d.k2Launch = "arm";
-      if (win) win.startTime = at;
+      [win, dimAnim, innerAnim].forEach((a) => a && (a.startTime = at));
+      if (sbFade) sbFade.startTime = at + s0; // 화면 위 상태바: 옅어지다 SB_BACK 에 창 안 상태바와 한 프레임에 바뀜
       const backFrames = BACK.map(([ms, blur, br]) => ({ offset: ms / K2_LAUNCH_MS, filter: `blur(${blur}px) brightness(${br})` }));
       if (back) {
         begin(video.animate([{ opacity: 0 }, { opacity: 0 }], from), at);
@@ -136,24 +157,13 @@ export function prepareK2Launch(phone: HTMLElement, video: HTMLVideoElement) {
       } else begin(video.animate(backFrames, from), at); // 캔버스가 없으면 start() 에서 영상을 뒤로
       // 아일랜드 녹화 점: 녹화가 막 시작돼 번져 보이던 점(H 에 13.7pt)이 200ms 동안 12pt 로
       begin(phone.querySelector(".k2-rec")?.animate([{ scale: "1.13" }, { scale: "1" }], { duration: 200, easing: "ease-out", fill: "backwards" }), at);
-      // 상태바: 지금 모습(시각 · 달 · 배터리)을 베껴 앱 창과 같은 움직임 · 자름으로 창 위에 두고 (H 전엔 영상 밑이라 안 보임) 화면 위 상태바는
-      // 옅게 → SB_BACK 에 한 프레임에 바꿈. 녹화 속 창 안 상태바는 어두워진 창 내용과 달리 밝아서 창(밝기 필터) 밖에 둠
-      const sb = phone.querySelector<HTMLElement>(".phone > .statusbar");
-      inner = sb && viewport ? copyStatusBar(sb) : null;
-      if (sb && viewport && inner) {
-        Object.assign(inner.style, { left: `${viewport.offsetLeft}px`, top: `${viewport.offsetTop}px`, width: `${viewport.offsetWidth}px`, height: `${viewport.offsetHeight}px` });
-        phone.appendChild(inner);
-        begin(inner.animate(frames.map((k) => ({ ...k, filter: "none" })), timing), at);
-        const [s0] = SB[0];
-        const sbFrames = [...SB, [SB_BACK, 0]].map(([ms, opacity]) => ({ offset: (ms - s0) / (SB_BACK - s0), opacity }));
-        begin(sb.animate(sbFrames, { duration: SB_BACK - s0 }), at + s0);
-        begin(inner.animate([{ opacity: 1 }, { opacity: 1, offset: 1 - 1 / SB_BACK }, { opacity: 0 }], { duration: SB_BACK, fill: "forwards" }), at);
-      }
-      // 달 (두 상태바 모두): 녹화 0.400 → 0.567초에 번지며 사라짐. 다 사라지면 시각 옆 칸을 위치 표시로
+      // 달: 녹화 0.400 → 0.567초에 번지며 사라짐 (창 안 상태바의 달은 같은 빠르기로 옅어지기만). 다 사라지면 시각 옆 칸을 위치 표시로
       const [m0] = MOON[0];
       const moonLen = MOON[MOON.length - 1][0] - m0;
       const moonFrames = MOON.map(([ms, opacity, blur]) => ({ offset: (ms - m0) / moonLen, opacity, filter: `blur(${blur}px)` }));
-      phone.querySelectorAll(".k2sb__moon").forEach((m) => begin(m.animate(moonFrames, { duration: moonLen, fill: "forwards" }), at + m0));
+      begin(sb?.querySelector(".k2sb__moon")?.animate(moonFrames, { duration: moonLen, fill: "forwards" }), at + m0);
+      const innerMoon = MOON.map(([ms, opacity]) => ({ offset: (ms - m0) / moonLen, opacity }));
+      begin(inner?.querySelector(".k2sb__moon")?.animate(innerMoon, { duration: moonLen, fill: "forwards" }), at + m0);
       moon = window.setTimeout(() => setK2Indicator(null), Math.max(0, at + MOON_MS - performance.now()));
       // 노란 B 아이콘
       flushSync(() => setIconAt(at));
@@ -169,23 +179,21 @@ export function prepareK2Launch(phone: HTMLElement, video: HTMLVideoElement) {
 }
 
 // 창 위치를 앱 창(.phone__viewport, 기준 393 × 852) 변환으로: 홈을 배율만큼 줄여 (cl, ct) 에 두고, 창 사각형(모서리 radius)만 보이게 자름.
-// 자르는 사각형은 줄인 홈 좌표 (창이 홈 위끝보다 위로 나오면 음수)
+// 자르는 사각형은 줄인 홈 좌표 (창이 홈 위끝보다 위로 나오면 음수 — 그 틈은 창 안 위로 삐져나온 띠, Launch.css .k2-launch-gap)
 function windowFrames(kx: number, ky: number): Keyframe[] {
   const f = (n: number) => n.toFixed(2);
-  const frames = WIN.map(([ms, l, t, r, b, radius, br, sc, cl, ct]) => ({
+  const frames = WIN.map(([ms, l, t, r, b, radius, , sc, cl, ct]) => ({
     offset: ms / K2_LAUNCH_MS,
     transformOrigin: "0 0",
     transform: `translate(${f(cl * kx)}px, ${f(ct * ky)}px) scale(${sc})`,
     clipPath: `inset(${f((ky * (t - ct)) / sc)}px ${f(kx * (FW - (r - cl) / sc))}px ${f(ky * (FH - (b - ct) / sc))}px ${f((kx * (l - cl)) / sc)}px round ${f(radius / sc)}px)`,
-    filter: `brightness(${br})`,
   }));
   // 416ms 에 모서리가 각짐 (끝 모습으로 남겨 두어 걷기 전 프레임부터 각지게)
   const last = frames[frames.length - 1];
   return [...frames, { ...last, offset: 1 - 1 / K2_LAUNCH_MS }, { ...last, offset: 1, clipPath: "inset(0px 0px 0px 0px round 0px)" }];
 }
 
-// 앱 창 안 상태바: 지금 상태바 SVG 를 베낀 것 (마스크 id 는 겹치지 않게 바꿈). 색은 상태바와 같은 k2sb 글자색 클래스로.
-// 앱 창(.phone__viewport)과 같은 크기의 판 맨 위에 두고 판을 창과 같이 움직임 · 자름 (Launch.css)
+// 앱 창 안 상태바: 지금 상태바 SVG 를 베낀 것 (마스크 id 는 겹치지 않게 바꿈). 색은 상태바와 같은 k2sb 글자색 클래스로 (Launch.css)
 function copyStatusBar(sb: HTMLElement) {
   const svg = sb.querySelector("svg")?.cloneNode(true) as SVGSVGElement | undefined;
   if (!svg) return null;
