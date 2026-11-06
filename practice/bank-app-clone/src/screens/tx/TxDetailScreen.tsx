@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useApi } from "../../api/useApi";
 import { paths } from "../../api/endpoints";
@@ -16,6 +16,7 @@ const memos = new Map<string, string>();
 type Row = { label: string; value?: string; strong?: boolean };
 
 function groups(d: TransactionDetail): Row[][] {
+  const t = d.transfer; // 내가 보낸 이체면 받는 계좌 정보가 옴
   return [
     [
       { label: "거래시각", value: d.transactedAt },
@@ -25,6 +26,8 @@ function groups(d: TransactionDetail): Row[][] {
       { label: "거래금액", value: signedWon(d.amount), strong: true },
       { label: "거래 후 잔액", value: won(d.balanceAfter) },
       { label: "카드정보", value: d.cardInfo },
+      ...(t ? [{ label: "입금계좌", value: `${t.bank.name} ${t.number}` }] : []),
+      ...(t ? [{ label: "받는 분에게 표기", value: d.memoTo || t.holder }] : []),
     ],
     [
       { label: "사용처", value: d.merchant },
@@ -97,10 +100,24 @@ export function TxDetailScreen() {
           {groups(detail.data).map((rows, i) => (
             <dl key={i} className="tx__group">
               {rows.map((r) => (
-                <div key={r.label} className="tx__row">
-                  <dt>{r.label}</dt>
-                  <dd className={r.strong ? "tx__strong" : ""}>{r.value}</dd>
-                </div>
+                <Fragment key={r.label}>
+                  <div className="tx__row">
+                    <dt>{r.label}</dt>
+                    <dd className={r.strong ? "tx__strong" : ""}>{r.value}</dd>
+                  </div>
+                  {r.label === "거래금액" && detail.data.transfer && (
+                    <div className="tx__feebox">
+                      <div className="tx__row">
+                        <dt>이체금액</dt>
+                        <dd>{won(Math.abs(detail.data.amount))}</dd>
+                      </div>
+                      <div className="tx__row">
+                        <dt>수수료</dt>
+                        <dd>{won(0)}</dd>
+                      </div>
+                    </div>
+                  )}
+                </Fragment>
               ))}
             </dl>
           ))}
