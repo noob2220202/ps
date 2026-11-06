@@ -96,10 +96,12 @@ export function K2StatusBar() {
         </g>
         <g fill="currentColor">
           {/* 신호 4칸 중 2칸 (폭 3, 간격 5, 아래끝 34.97) */}
-          <rect x="291.09" y="30.64" width="3" height="4.33" rx="0.75" />
-          <rect x="296.09" y="28.31" width="3" height="6.66" rx="0.75" />
-          <rect className="k2sb__off" x="301.08" y="25.98" width="3" height="8.99" rx="0.75" />
-          <rect className="k2sb__off" x="306.08" y="23.31" width="3" height="11.66" rx="0.75" />
+          <g className="k2sb__signal">
+            <rect x="291.09" y="30.64" width="3" height="4.33" rx="0.75" />
+            <rect x="296.09" y="28.31" width="3" height="6.66" rx="0.75" />
+            <rect className="k2sb__off" x="301.08" y="25.98" width="3" height="8.99" rx="0.75" />
+            <rect className="k2sb__off" x="306.08" y="23.31" width="3" height="11.66" rx="0.75" />
+          </g>
           {/* LTE: 좁은 굵은 글자 → 13.25px 620 을 가로 0.86 (잉크 315.07 – 333.39, 기준선 34.30 — 녹화 31초와 겹쳐 맞춤) */}
           <text className="k2sb__lte" transform="translate(314.65 34.3) scale(0.86 1)">
             LTE
@@ -159,7 +161,7 @@ function SbMoon() {
   const m = K2_MOON;
   return (
     <g className="k2sb__moon">
-      <mask id={id} maskUnits="userSpaceOnUse" x="75" y="23" width="13" height="14">
+      <mask id={id} maskUnits="userSpaceOnUse" x="74" y="21" width="17" height="17">
         <circle cx={m.cx} cy={m.cy} r={m.r} fill="#fff" />
         <circle cx={m.cutX} cy={m.cutY} r={m.cutR} fill="#000" />
       </mask>

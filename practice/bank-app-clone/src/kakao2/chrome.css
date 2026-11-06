@@ -153,6 +153,50 @@ html[data-kakao2] .k2sb--light {
   }
 }
 
+/* ---------- 녹화 인트로 (recorder.ts · Launch.tsx) ----------
+   영상(z 999)이 도는 동안: 영상 속 시계 + 달 · 배터리는 지워 둠(scripts/kakao-intro-erase.py) → 상태바를 영상 위로 올려 시계 · 달 · 배터리만
+   앱 보관함 색으로 (흰색, 배터리 빈 칸 · 꼭지 흰색 .48 → 바탕 #868386 위 193). 신호 · LTE · 아일랜드는 영상에 그대로 있으니 우리 것은 숨김 */
+html[data-kakao2][data-intro-play] .phone > .statusbar {
+  z-index: 1000;
+}
+html[data-kakao2][data-intro-play] .k2sb {
+  color: #fff;
+}
+html[data-kakao2][data-intro-play] .k2sb__clock {
+  fill: #fff;
+  transition: none;
+}
+html[data-kakao2][data-intro-play] :is(.k2sb__signal, .k2sb__lte, .dynamic-island) {
+  visibility: hidden;
+}
+html[data-kakao2][data-intro-play] :is(.k2sb__empty, .k2sb__cap) {
+  fill-opacity: 0.48;
+}
+/* 달: 녹화가 막 시작돼 iOS 가 상태바를 다시 그리며 흐렸다가(σ 1.17pt) 0.267초에 또렷해짐 (영상 속 LTE 와 같이). 영상을 트는 순간부터 */
+html[data-kakao2][data-intro-play] .k2sb__moon {
+  filter: blur(1.17px);
+}
+html[data-kakao2][data-intro-play="play"] .k2sb__moon {
+  animation: k2sb-moon-in 267ms linear forwards;
+}
+@keyframes k2sb-moon-in {
+  to {
+    filter: blur(0);
+  }
+}
+/* 앱이 열리는 동안(Launch.tsx): 달이 녹화 0.4 → 0.6초에 사라짐 (상태바는 하나 그대로 — critic.md X20 간단한 판) */
+html[data-kakao2][data-k2-launch] .k2sb__moon {
+  animation: k2sb-moon-out 183ms linear forwards;
+}
+@keyframes k2sb-moon-out {
+  from {
+    opacity: 0.92;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 /* ---------- 다이나믹 아일랜드 ----------
    보통: 126 × 37.33 가운데 (x 133.5). 화면 녹화 중(.dynamic-island--k2rec): 107.41 – 279.27 × 11.23 – 48.05 (녹화 31초 반값 경계),
    빨간 점 지름 12.1 가운데 (125.68, 29.53)

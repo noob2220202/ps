@@ -9,6 +9,7 @@ import { BLINK_MS, INTRO_OS, setIntro, useBlinkEpoch, useIntro } from "../platfo
 import { useKbankSent } from "../kbank/notice";
 import { K2HomeIndicator, K2Island, K2StatusBar } from "../kakao2/StatusBar";
 import { K2LoadingDim } from "../kakao2/LoadingDim";
+import { K2LaunchIcon } from "../kakao2/Launch";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -354,6 +355,8 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
         {/* kakao2 로딩 막: 화면 하나가 켜고 다른 화면이 끔 (src/kakao2/dim.ts) */}
         {KAKAO2 && <K2LoadingDim />}
       </div>
+      {/* kakao2 녹화 인트로가 끝난 순간 앱 창 위에 잠깐 겹치는 노란 B 아이콘 (src/kakao2/Launch.tsx) */}
+      {KAKAO2 && <K2LaunchIcon />}
       {navbar && APP === "ibk" ? (
         <NavKeys />
       ) : navbar && APP === "kbank" ? (

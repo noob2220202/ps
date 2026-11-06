@@ -1,0 +1,25 @@
+/* ===== kakao2 앱이 열리는 모습 (Launch.tsx, 녹화 인트로가 끝난 뒤 416ms) ===== */
+
+/* 뒤에 깐 앱 보관함 (영상 마지막 장면): 폰 화면보다 사방 54pt 크게 (흐려도 가장자리가 검게 번지지 않게), 앱 창 아래 */
+.k2-launch-bg {
+  position: absolute;
+  left: -54px;
+  top: -54px;
+  width: calc(100% + 108px);
+  height: calc(100% + 108px);
+  z-index: -1;
+  pointer-events: none;
+}
+/* 커지기 시작한 노란 B 아이콘 (녹화 0.417초, 0.83 배로 어두운 #ffdd01). 자리 · 크기는 Launch.tsx 가 움직임 */
+.k2-launch-icon {
+  position: absolute;
+  z-index: 1;
+  background: #d2b70b;
+  pointer-events: none;
+}
+.k2-launch-icon svg {
+  position: absolute;
+  left: 52.7%;
+  top: 40.9%;
+  translate: -50% -50%;
+}

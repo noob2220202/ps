@@ -513,9 +513,9 @@ html[data-app="kbank"] .statusbar--android .statusbar__time {
 .kb-sb-rec {
   animation: kb-sb-rec-blink 986ms linear infinite;
 }
-/* kbank2: 인트로 영상이 도는 동안 — 영상 속 시계·빨간 녹화 알약·캠코더는 지워 둠(recorder.ts INTRO) → 우리 상태바를 영상(z 999) 위로 올려
+/* kbank2: 인트로 영상이 도는 동안 — 영상 속 시계·빨간 녹화 알약·캠코더는 지워 둠(recorder.ts KBANK_INTRO) → 우리 상태바를 영상(z 999) 위로 올려
    그 셋만 흰색으로 그림 (지금 시각이 찍히게). 'SKT' · 오른쪽 아이콘(배터리 24 등)은 영상에 그대로 있으니 숨김. 바탕은 비워서 영상이 보이게 */
-html[data-intro-play]:not([data-ibk2]) .phone > .statusbar {
+html[data-intro-play]:not([data-ibk2]):not([data-kakao2]) .phone > .statusbar {
   z-index: 1000;
   background: transparent !important;
   box-shadow: none !important;
