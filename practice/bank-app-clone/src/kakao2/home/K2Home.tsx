@@ -16,6 +16,7 @@ import creditGauge from "../../assets/local/k2-home-gauge.png";
 import { K2Bell, K2Chevron } from "../art";
 import { cutK2Dim, K2_SPIN_ON_DARK, leaveK2Dim, showK2Dim } from "../dim";
 import { LAUNCH, useLaunchAt } from "../launch";
+import { useK2Once } from "../nav";
 import { CHIPS, K2_HOME, PILL_MESSAGES, PROMOS, SHORTCUTS } from "./content";
 import { K2AiPill } from "./K2AiPill";
 import { K2Banner } from "./K2Banner";
@@ -107,6 +108,7 @@ function useVisit(active: boolean, launchAt: number | null) {
 export function K2Home() {
   useStatusBar("#1f1f1f", "light");
   const navigate = useNavigate();
+  const once = useK2Once(); // 카드 · 다른 은행 줄: 빠르게 두 번 눌러도 한 번만 쌓임
   const home = useApi<HomeData>(paths.home);
   const active = useLayerActive();
   const launchAt = useLaunchAt();
@@ -259,7 +261,7 @@ export function K2Home() {
         <K2Banner visit={visit} held={launchAt === null} active={active} />
 
         {/* 카카오뱅크 통장: 살구색 카드 (녹화엔 세이프박스 · 저금통 칩 없음). 누르면 바로 통장으로 (누름 표시 · 스피너 없음) */}
-        <div className="k2-home__main" onClick={() => navigate(`/account/${main.id}`, { state: { label: main.label } })}>
+        <div className="k2-home__main" onClick={() => once(() => navigate(`/account/${main.id}`, { state: { label: main.label } }))}>
           <span className="k2-home__b">
             <BMark size={11} color="#fff" hole="#d8b9aa" />
           </span>
@@ -278,7 +280,7 @@ export function K2Home() {
         <section className="k2-home__card k2-home__accts">
           {/* 다른 은행 계좌 (🔔 패널에서 추가 · 삭제, 녹화엔 없음 — 홍보 줄과 같은 치수로) */}
           {externals.map((acc) => (
-            <div key={acc.id} className="k2-home__row k2-home__ext" onClick={() => navigate(`/bank/${acc.id}`)}>
+            <div key={acc.id} className="k2-home__row k2-home__ext" onClick={() => once(() => navigate(`/bank/${acc.id}`))}>
               <BankIcon bank={acc.bank} size={36} />
               <div className="k2-home__ext-text">
                 <strong className="k2-home__ext-balance">{won(acc.balance)}</strong>

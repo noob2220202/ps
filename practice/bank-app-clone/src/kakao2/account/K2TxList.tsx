@@ -17,37 +17,45 @@ function slot(top: number, h: number): CSSProperties {
   return { height: Math.round((top + h) / 3) - y, transform: dy ? `translateY(${dy.toFixed(4)}px)` : undefined };
 }
 
-export const K2TxList = memo(function K2TxList({ items, onSelect }: { items: Transaction[]; onSelect: (tx: Transaction) => void }) {
+// 날짜 칸 · 행마다 목록 위끝에서의 자리를 미리 셈 (렌더 콜백 안에서 변수를 고치지 않게)
+function layout(items: Transaction[]) {
   let at = 0;
+  const out: { date: string; head: CSSProperties; rows: { tx: Transaction; style: CSSProperties }[] }[] = [];
+  for (const [date, txs] of groupByDate(items)) {
+    const head = slot(at, DATE_PX);
+    at += DATE_PX;
+    const rows: { tx: Transaction; style: CSSProperties }[] = [];
+    for (const tx of txs) {
+      rows.push({ tx, style: slot(at, ROW_PX) });
+      at += ROW_PX;
+    }
+    out.push({ date, head, rows });
+  }
+  return out;
+}
+
+export const K2TxList = memo(function K2TxList({ items, onSelect }: { items: Transaction[]; onSelect: (tx: Transaction) => void }) {
   return (
     <div className="k2list">
-      {groupByDate(items).map(([date, txs]) => {
-        const head = slot(at, DATE_PX);
-        at += DATE_PX;
-        return (
-          <section key={date}>
-            <h3 className="k2list__date" style={head}>
-              {date}
-            </h3>
-            {txs.map((tx) => {
-              const style = slot(at, ROW_PX);
-              at += ROW_PX;
-              return (
-                <button key={tx.id} className="k2list__row" style={style} onClick={() => onSelect(tx)}>
-                  <span className="k2list__l1">
-                    <span className="k2list__merchant">{tx.merchant}</span>
-                    <span className={`k2list__amount${tx.amount > 0 ? " k2list__amount--in" : ""}`}>{signedWon(tx.amount)}</span>
-                  </span>
-                  <span className="k2list__l2">
-                    <span className="k2list__time">{tx.time}</span>
-                    <span className="k2list__after">{won(tx.balanceAfter)}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </section>
-        );
-      })}
+      {layout(items).map(({ date, head, rows }) => (
+        <section key={date}>
+          <h3 className="k2list__date" style={head}>
+            {date}
+          </h3>
+          {rows.map(({ tx, style }) => (
+            <button key={tx.id} className="k2list__row" style={style} onClick={() => onSelect(tx)}>
+              <span className="k2list__l1">
+                <span className="k2list__merchant">{tx.merchant}</span>
+                <span className={`k2list__amount${tx.amount > 0 ? " k2list__amount--in" : ""}`}>{signedWon(tx.amount)}</span>
+              </span>
+              <span className="k2list__l2">
+                <span className="k2list__time">{tx.time}</span>
+                <span className="k2list__after">{won(tx.balanceAfter)}</span>
+              </span>
+            </button>
+          ))}
+        </section>
+      ))}
     </div>
   );
 });

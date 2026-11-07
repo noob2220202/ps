@@ -71,7 +71,9 @@ export function K2Banner({ visit, held, active }: { visit: { id: number; launch:
     const d = drag.current;
     drag.current = null;
     if (!d || !trackRef.current) return;
-    trackRef.current.style.cssText = "";
+    // 끌던 자리를 지금 배너 자리로 (애니메이션으로). cssText 를 비우면 React 가 넣은 transform 까지 지워져, 배너가 그대로면(그냥 누름 ·
+    // 조금 끌기) React 가 다시 넣지 않아 맨 앞 복제(마지막 배너)가 보였음
+    Object.assign(trackRef.current.style, { transform: `translate3d(${-index * 100}%,0,0)`, transition: `transform ${K2_HOME.bannerSlide}ms cubic-bezier(.45,0,.25,1)` });
     advanced.current = true;
     lastAt.current = performance.now();
     setAnimate(true);

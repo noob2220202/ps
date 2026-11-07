@@ -11,7 +11,7 @@ import { useLayerActive } from "../../platform/LayerContext";
 import promoIcon from "../../assets/local/k2-account-promo.png";
 import { K2BackChevron, K2ChevronDown, K2Spinner } from "../art";
 import { cutK2Dim, isK2DimUp, K2_SPIN_ON_LIGHT, leaveK2Dim, showK2Dim } from "../dim";
-import { K2_NAV } from "../nav";
+import { K2_NAV, useK2Back, useK2Once } from "../nav";
 import { K2AccountSkeleton } from "./K2AccountSkeleton";
 import { K2AcctCopy, K2AcctGear, K2AcctMagnifier } from "./icons";
 import { K2TxList } from "./K2TxList";
@@ -37,6 +37,8 @@ const IND_MIN = 36;
 export function K2AccountScreen() {
   const { accountId = "main" } = useParams();
   const navigate = useNavigate();
+  const back = useK2Back();
+  const once = useK2Once(); // < 를 빠르게 두 번 눌러 두 칸 뒤로 가지 않게
   const location = useLocation();
   const active = useLayerActive();
   useStatusBar("#fff", "dark");
@@ -187,7 +189,7 @@ export function K2AccountScreen() {
     <div className="k2acct">
       <header className={`k2acct__nav${line ? " k2acct__nav--line" : ""}`}>
         <div className="k2acct__navrow">
-          <button className="k2acct__back" aria-label="뒤로" onClick={() => navigate(-1)}>
+          <button className="k2acct__back" aria-label="뒤로" onClick={() => once(back)}>
             <K2BackChevron />
           </button>
           <h1 className="k2acct__title">{title}</h1>

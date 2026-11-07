@@ -1,7 +1,6 @@
 // kakao2 공용 그림 (모두 인라인 SVG). 크기 기본값은 녹화에서 잰 잉크 상자(pt) — 화면마다 다르면 props 로.
 // 화면 전용 아이콘은 각 화면 폴더에 따로 둬도 됨
 import { useId } from "react";
-import { K2_ARROW_PATH, K2_ARROW_ROUND, K2_BUBBLE_ARROW, K2_MOON } from "./chrome";
 import "./art.css";
 
 type Ink = { color?: string; className?: string };
@@ -130,30 +129,11 @@ export function K2Gear({ height = 22, stroke = 2, color = "#000", className }: {
   );
 }
 
-// 복사 (통장 계좌번호 옆 11 × 10.6, 두께 1, #7d7d7d): 왼쪽 아래 종이 + 귀퉁이 접힌 오른쪽 위 종이
-export function K2Copy({ width = 11, height = 10.6, color = "#7d7d7d", className }: { width?: number; height?: number } & Ink) {
-  return (
-    <svg className={className} width={width} height={height} viewBox="0 0 11 10.6" fill="none" stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M3.6 3.4H2A1.5 1.5 0 0 0 .5 4.9V8.6A1.5 1.5 0 0 0 2 10.1H5.5A1.5 1.5 0 0 0 7 8.6V7.3" />
-      <path d="M7.9.5H5.1A1.5 1.5 0 0 0 3.6 2V5.8A1.5 1.5 0 0 0 5.1 7.3H9A1.5 1.5 0 0 0 10.5 5.8V3.1ZM7.9.5V2.3A.8.8 0 0 0 8.7 3.1H10.5" />
-    </svg>
-  );
-}
-
 // 연필 (머티리얼 'edit', 채움). 거래상세 메모 옆 12 × 11.6
 export function K2Pencil({ size = 12, color = "#000", className }: { size?: number } & Ink) {
   return (
     <svg className={className} width={size} height={size} viewBox="3 3 18 18" fill={color} aria-hidden>
       <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-    </svg>
-  );
-}
-
-// 공유 (거래상세 아래 버튼, 흰색 두께 2): 위 화살표 + 위가 열린 받침. 24 상자 (잉크 18.3 × 18.65)
-export function K2Share({ size = 24, stroke = 2, color = "#fff", className }: { size?: number; stroke?: number } & Ink) {
-  return (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M12 13.5V3.8M7 8.8l5-5 5 5M3.9 16.3V20h16.6v-3.7" />
     </svg>
   );
 }
@@ -170,36 +150,6 @@ export function K2Bell({ width = 17.7, height = 21, stroke = 1.8, color = "#fbfb
         strokeLinejoin="round"
       />
       <path d="M6.25 18.4A2.6 2.6 0 0 0 11.45 18.4Z" fill={color} />
-    </svg>
-  );
-}
-
-// ---------- 상태바 칸 그림 따로 (인트로 위 상태바 등): 잉크 상자에 맞춘 단독 SVG. 모양은 chrome.ts (상태바와 같은 좌표) ----------
-export function K2LocationArrow({ size = 12.33, color = "currentColor", className }: { size?: number } & Ink) {
-  return (
-    <svg className={className} width={size} height={size} viewBox="75.6 23.31 12.33 12.33" aria-hidden>
-      <path d={K2_ARROW_PATH} fill={color} stroke={color} strokeWidth={K2_ARROW_ROUND} strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function K2LocationBubble({ size = 16, className }: { size?: number; className?: string }) {
-  return (
-    <svg className={className} width={size} height={size} viewBox="73.93 21.31 16 16" aria-hidden>
-      <circle cx="81.93" cy="29.31" r="8" fill="#0187ff" />
-      <path d={K2_ARROW_PATH} transform={K2_BUBBLE_ARROW} fill="#fff" stroke="#fff" strokeWidth={K2_ARROW_ROUND} strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function K2Moon({ size = 11, color = "currentColor", className }: { size?: number } & Ink) {
-  const id = useId();
-  const m = K2_MOON;
-  return (
-    <svg className={className} width={(size * 10.8) / 11} height={size} viewBox="76.2 24.3 10.8 11" aria-hidden>
-      <mask id={id} maskUnits="userSpaceOnUse" x="76" y="24" width="11.5" height="11.5">
-        <circle cx={m.cx} cy={m.cy} r={m.r} fill="#fff" />
-        <circle cx={m.cutX} cy={m.cutY} r={m.cutR} fill="#000" />
-      </mask>
-      <circle cx={m.cx} cy={m.cy} r={m.r} fill={color} mask={`url(#${id})`} />
     </svg>
   );
 }

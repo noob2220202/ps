@@ -9,6 +9,7 @@ import { useStatusBar } from "../../hooks/useStatusBar";
 import type { AmountState } from "../../screens/transfer/TransferScreen";
 import { K2Chevron, K2Close, K2Magnifier, K2Star } from "../art";
 import { k2ClockOnce } from "../chrome";
+import { useK2Back, useK2Once } from "../nav";
 import { K2BankSheet, type K2SheetKind } from "./K2BankSheet";
 import "./k2-transfer.css";
 
@@ -25,6 +26,8 @@ const SB_DARK_MS = 85;
 
 export function K2Transfer() {
   const navigate = useNavigate();
+  const back = useK2Back();
+  const once = useK2Once(); // X · 받는 분: 빠르게 두 번 눌러도 한 번만 (두 칸 뒤로 · 금액 화면 두 번 쌓임 없이)
   const [params] = useSearchParams();
   const from = params.get("from") ?? "main";
   const data = useApi<TransferRecipients>(paths.recipients(from));
@@ -51,7 +54,10 @@ export function K2Transfer() {
   const [sheet, setSheet] = useState<K2SheetKind | null>(null);
   const [bank, setBank] = useState<Bank | null>(null);
 
-  const goAmount = useCallback((to: Recipient) => navigate("/transfer/amount", { state: { from, to } satisfies AmountState }), [navigate, from]);
+  const goAmount = useCallback(
+    (to: Recipient) => once(() => navigate("/transfer/amount", { state: { from, to } satisfies AmountState })),
+    [once, navigate, from],
+  );
   const closeSheet = useCallback(() => setSheet(null), []);
   const pickBank = useCallback((b: Bank) => {
     setBank(b);
@@ -70,7 +76,7 @@ export function K2Transfer() {
     <div className="k2t" ref={root}>
       <SheetGlyphs open={sheet !== null} />
       <div className="k2t__head">
-        <button className="k2t__close" aria-label="닫기" onClick={() => navigate(-1)}>
+        <button className="k2t__close" aria-label="닫기" onClick={() => once(back)}>
           <K2Close />
         </button>
         <h1 className="k2t__title">이체</h1>

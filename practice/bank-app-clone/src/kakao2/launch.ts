@@ -31,11 +31,7 @@ export function launchReady() {
   if (!held) setLaunchAt();
 }
 
-export const getLaunchAt = () => launchAt;
-export const subscribeLaunch = subscribe;
 export const useLaunchAt = () => useSyncExternalStore(subscribe, () => launchAt);
-// 켜진 지 몇 ms (아직 안 켜졌으면 null)
-export const launchElapsed = () => (launchAt === null ? null : performance.now() - launchAt);
 
 // 켜짐 연출 시각표 (ms, launchAt 기준 · 녹화 시각 − 0.4167초). critic.md §2.1
 export const LAUNCH = {

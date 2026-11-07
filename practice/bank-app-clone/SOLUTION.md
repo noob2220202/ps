@@ -17,6 +17,8 @@ src/
   lib/         format.ts (금액 포맷, 날짜 그룹핑) · keypad.ts (키패드 입력 계산)
   components/  PhoneFrame, TxList, Icon, Sheet(시트·키패드·알림창), BankIcon, art(로고/일러스트/스피너 SVG)
   screens/     boot / home / account / history / tx / bank(다른 은행 계좌) / transfer(이체)
+  kakao2/      kakao2(카카오뱅크 새 녹화 · 아이폰) 전용 — routes.tsx(라우트 표) · launch.ts(켜진 시각) · dim.ts(로딩 막) · nav.ts/css(전환)
+               · StatusBar · Launch(앱 창 커지기) · K2Inset · home/ account/ transfer/ txdetail/ (25장)
 ```
 
 **타이밍을 한 파일에 모은 이유**: 영상과 비교하며 속도를 맞출 때 컴포넌트를 돌아다니지 않고
@@ -918,4 +920,100 @@ DPR3 으로 놓고 보고, 기준을 정해 고침:
   아이폰에서 아래 글자가 1px 내려갔음 → margin 을 1/64 배수로 맞춰 예전 상자와 똑같이.
 - **덮어쓰기 막기**: 예전 자르기 스크립트를 다시 돌리면 옛 그림이 같은 이름으로 덮이고 CSS 자리까지 어긋남 →
   모든 자르기 스크립트가 `scripts/keep_assets.py` 를 불러 **이미 있는 파일은 건너뜀** (`--force` / `FORCE=1` 일 때만 덮어씀).
+
+## 25. kakao2 — 카카오뱅크 새 녹화(아이폰) + 녹화 인트로 (`src/kakao2/`, `scripts/kakao-intro-erase.py`)
+
+같은 카카오뱅크를 새로 찍은 아이폰 녹화(1180 × 2556, 60fps, 기기는 라이트 모드 · 홈만 앱이 어둡게 그림)로 다시 만든 변형. 붙이는 자리는 kbank2 · ibk2 와 같지만(23장)
+그 둘은 **같은 화면 + 인트로**이고 kakao2 는 **새 화면 묶음 + 인트로**라, 원래 카카오뱅크(9101)와 다른 앱이 한 픽셀도 안 바뀌게 하는 게 가장 큰 일이었다.
+녹화를 담당별 명세(인프라 · 인트로 · 홈 · 이체 · 통장 · 거래상세 · 기기)로 나눠 재고, 명세끼리 어긋난 값은 따로 검수해 한 표로 정한 뒤 만들었다.
+
+### 서버: VARIANTS 표 하나
+```js
+const VARIANTS = { kbank2: "kbank", ibk2: "ibk", kakao2: "kakao" };
+export const INTRO = Object.hasOwn(VARIANTS, SERVER_ID);
+export const APP = INTRO ? VARIANTS[SERVER_ID] : SERVER_ID;
+```
+- 전엔 `INTRO = SERVER_ID === "kbank2" || SERVER_ID === "ibk2"` 와 `APP` 의 삼항 사슬이 따로라 변형을 더할 때 두 곳을 같이 고쳐야 했음 → 표 한 줄.
+  `in` 이 아니라 `Object.hasOwn`: `in` 은 물려받은 속성(`toString` 등)도 true.
+- 이름(SERVER_ID)이 정하는 것: 데이터 `data-kakao2/` · 쿠키 `bank_sid_kakao2` · 포트 9115(`index.mjs` 표). APP 은 `kakao` 라 API · 예시 데이터는 카카오뱅크 그대로,
+  HTML 에는 `__BANK_APP__ = "kakao"` + `__BANK_INTRO__ = true` (개발은 `.env.kakao2` 의 `VITE_APP=kakao` · `VITE_INTRO=1`). 서버에서 kakao2 만 다른 건 거래구분 하나(아래).
+
+### 화면: `KAKAO2` 상수 하나, "모든 변경은 문 안에서"
+- `session.ts`: `export const KAKAO2 = APP === "kakao" && HAS_INTRO;`. 인트로 스위치(`isIntroOn()`)로 나누지 않음 — 인트로를 꺼도 화면은 kakao2 여야 하니까.
+  `session.ts` 는 아무것도 import 하지 않아서 `platform.ts` · `theme.ts` · `deviceStatus.ts` 가 가져다 써도 순환 import(초기화 전 접근) 걱정이 없음.
+- 문은 세 가지: JS `KAKAO2` · CSS `html[data-kakao2] …` 또는 kakao2 에서만 그리는 `k2-` 클래스 · 서버 `SERVER_ID === "kakao2"`. 공용 파일(ScreenStack · PhoneFrame · recorder ·
+  ProfilePicker)도 문 안에서만 고침. 빌드 하나라 모든 앱 번들에 kakao2 CSS 가 들어가므로 새 `@keyframes` 이름(34개)이 기존 것과 안 겹치는지도 확인.
+- **확인 방법**: 바꾸기 전 커밋을 worktree 로 따로 꺼내 같은 시계 · 같은 데이터로 띄우고, 다른 앱 화면과 전환 중간(60 · 150 · 300ms 에서 멈춤) 프레임을 양쪽에서 찍어 비교.
+  기준끼리도 생기는 차이(둥근 모서리 안티에일리어싱 · 깜빡이는 녹화 알약 · 250ms API 지연 전후)는 빼고 모든 짝에서 나는 차이만 셈. 서버는 같은 요청 46개를 전후 서버에 보내 응답 비교.
+- 실제로 걸린 것: ProfilePicker 를 `DEVICE_LOCK ?? p.os ?? OS` 로 고쳤더니 **ibk2**(갤럭시 고정)도 바뀌어, 아이폰으로 저장된 프로필을 고를 때 다시 불러오기를 건너뜀.
+  `DEVICE_LOCK` 은 다른 변형도 쓰는 공용 값 → `KAKAO2 ? OS : (p.os ?? OS)`. 새 변형을 위한 분기는 새 변형 이름으로.
+
+### 기기 · 테마 잠금
+- `platform.ts`: `DEVICE_LOCK = IBK2 ? "android" : KAKAO2 ? "ios" : null` → `OS` 는 늘 ios, `<html data-kakao2="on">`. 기기 스위치 · 🔔 기기 · 프로필의 기기 설정을 안 봄.
+- `theme.ts`: `lightOnly` 에 `KAKAO2` (녹화 기기가 라이트 — 앱 보관함이 밝음). 홈만 `.k2-home` 이 테마와 상관없이 어두운 색을 직접 들고 있음.
+  프로필에 저장된 테마도 안 봄 (안 그러면 테마가 다른 프로필을 고를 때마다 `?theme=` 로 다시 불러왔음).
+- 틀 393 × 852 · 모서리 55 · 상태바 54 · 아래 안전영역 34 (`global.css html[data-kakao2]`). 글꼴은 맥에서도 Pretendard — 아이폰 글꼴 목록을 그대로 두면
+  숫자 · 영문이 리눅스에선 Inter, 맥에선 SF 로 그려져 녹화에 맞춘 크기가 기계마다 달라짐.
+
+### 라우트 표 통째로 바꾸기 (`routes.tsx`)
+`App.tsx` 의 `const render = KAKAO2 ? renderKakao2Route : ROUTES[APP];` — 콕뱅크(19장)와 같은 방법이라 카카오뱅크의 `renderRoute` 는 한 줄도 안 바뀜.
+녹화에 나온 화면은 새로(`K2Home` · `K2AccountScreen` · `K2Transfer` · `K2TxDetail`), 없는 화면(다른 은행 계좌 · 금액 · 완료)은 카카오뱅크 화면을 `K2Inset` 으로 감싸 재사용.
+주소 목록이 같아서 딥링크 · 새로고침이 안 깨짐. 녹화에 스플래시가 없어서 프로필을 고르면 `boot` 가 바로 `ready`.
+
+### 상태바 · 아일랜드 · 홈 인디케이터 (`StatusBar.tsx`, `chrome.css`, `K2Inset.tsx`)
+- 다른 앱은 상태바가 위 띠로 자리를 차지하고 `useStatusBar(bg, fg)` 로 띠를 칠함. 녹화를 보면 홈 내용이 상태바 밑까지 스크롤되고, 로딩 막은 띠까지 어둡게 하는데
+  **글자는 안 어두워짐**(흰 글자 255 그대로) → 띠는 화면이 칠하고 글자만 위에 겹쳐야 함.
+- `K2StatusBar` 는 화면 위에 겹친 투명한 층(z 70, `pointer-events: none`)이고 `useStatusBar` 의 fg 만 씀. 시각 · 위치 표시 칸(달 · 파란 위치 표시 · 화살표) · 신호 · LTE · 배터리를
+  **393 × 54 SVG 한 장**에 그림 (요소마다 따로 놓으면 반올림이 달라 0.5px 씩 튐). viewport 는 852 전체, kakao2 화면은 y 0 부터 그리고 54pt 띠를 스스로 칠함.
+- 재사용 화면은 `K2Inset` 이 맨 위 54pt 띠를 **그 화면이 `useStatusBar` 로 정한 색**(`StatusBandContext`)으로 칠하고 화면을 그 아래에 둠. 띠가 층과 같이 움직여서
+  전환 중에도 밑 화면 띠가 제 색 (전역 상태바 값을 읽으면 밑 화면 띠까지 위 화면 색이 됨). 로그인 · 프로필 고르기도 같은 틀.
+- `K2Island`: 녹화 중이거나 인트로를 켜 두면 녹화 기기처럼 넓어진 아일랜드 + 1.5초 주기 빨간 점(`BLINK_MS` 1500). `K2HomeIndicator`: 켜진 직후에만 흰색으로 나타났다 사라짐.
+
+### 켜진 시각 저장소 (`launch.ts`)
+- 스플래시가 없는 대신 앱이 켜진 직후에만 도는 것이 여럿(위치 표시 → 화살표, 홈 인디케이터, AI 알약 지우고 다시 쓰기, 배너 첫 넘김, 녹화 점 위상) →
+  기준 시각 하나 `launchAt` 을 모듈 변수 + `useSyncExternalStore` 로 (콕뱅크 `loading.ts` 와 같은 작은 전역 저장소). 받는 쪽은 그 값을 `key` 로 다시 그려 처음부터.
+- 기준 = 인트로 영상이 끝나는 순간 **H = 0.4167초**(25장 ÷ 60fps). `LAUNCH` 표 = 녹화 시각 − 0.4167 (ms): 홈 인디케이터 283 → 733 나타남 · 1485 → 1751 사라짐,
+  위치 표시 316 · 4053, 화살표 4216, 배너 첫 넘김 5391, 녹화 점 위상 1173. 명세마다 '0초' 가 달랐음(H · "앱이 다 커진 때" · 영상 끝) → 한 기준으로 옮겨 적음 (한 명세는 전부 +241ms).
+- 그냥 켤 때(프로필 고름 · 새로고침): 홈이 뜨는 때 `launchReady()`. 인트로 녹화: 영상 동안 `holdLaunch()` 로 멈춰 두고 끝나는 프레임에 `setLaunchAt(t)`.
+
+### 로딩 막 하나 (`dim.ts`) · 모달과 push (`nav.ts`, `nav.css`)
+- 홈 '이체' → 이체, 통장 거래 → 거래상세는 **누른 화면이 막을 켜고 다음 화면이 끔** → 화면 상태로는 넘겨줄 수 없어 전역 하나:
+  `showK2Dim()` 그 프레임에 바로(터치 막음) · `leaveK2Dim()` 167ms `cubic-bezier(.42,0,.58,1)` 로 스피너와 함께 흐려짐(데이터를 그린 프레임에) · `cutK2Dim()` 바로 걷음.
+  `rgba(0,0,0,.34)` 로 띠까지 852pt 를 덮고 상태바 글자 · 아일랜드는 안 덮음 (PhoneFrame 이 viewport 안에 `K2LoadingDim` 하나).
+- 이체 쪽은 흐려지기가 끝까지 안 감: 프레임마다 재 보면 4단계 흐려지다 모달이 처음 움직이는 프레임에 남은 막이 한 번에 사라짐 → 흐려지기 시작 +50ms 모달, +67ms `cutK2Dim()`.
+- 막을 끌 화면이 사라지는 경우: 거래를 눌러 막이 뜬 채 로그인이 풀려(401) 로그인 화면이 뜨면 막이 입력을 막은 채 남았음 → 로그인 안 된 동안엔 `K2LoadingDim` 이 스스로 걷음.
+- 전환 종류는 ScreenStack 이 `KAKAO2` 일 때만 `k2AnimFor(anim, path)` 로 정함 (다른 앱은 className · 타이머 · `UNDER_DIM` 그대로):
+  - **modal**(이체) · **detail**(거래상세): 아래에서 올라오는 전체 화면 500ms. 위끝을 프레임마다 재 보니 임계 감쇠 스프링(ω 18)이라 `cubic-bezier` 로는 안 맞음 →
+    CSS `linear()` 에 21개 점: `linear(0, .075, .228, .391, .537, …, .998, 1)`. 거래상세는 막이 뜬 프레임보다 24ms 앞서 시작한 꼴(`animation-delay: -24ms`).
+    밑 화면은 움직이지도 어두워지지도 않고 층도 걷지 않음(`layer--k2-under` → 닫으면 스크롤 · 불러온 목록 그대로). 가장자리 스와이프는 막음. 걷기는 `animationend`.
+  - **push**(홈 → 통장): 400ms `cubic-bezier(.2,1,.45,1)`. 머리줄은 첫 프레임부터 제자리, 본문(`.k2-push-body`)만 밂. 본문 아래 두 모서리가 55로 둥글다가
+    밀기가 끝나고 77ms 뒤(477ms, `K2_NAV.pushHold`) 각짐 — 앱 창이 커질 때 모서리가 늦게 각지는 것과 같은 모양. 밑 화면은 10% 어두워짐.
+- 빠른 두 번 누르기는 `useK2Once`(첫 누름 뒤 이 층이 덮일 때까지 잠금, 이동이 없으면 1.5초), 주소로 바로 연 통장 · 이체의 `<` · X 는 `useK2Back` 이 홈으로
+  (기록 첫 칸에서 `navigate(-1)` 하면 앱 밖으로 나갔음).
+
+### 녹화와 맞추기
+- 녹화 1180px = 393pt → **1pt = 3.0025px**. 프레임은 ffmpeg 로 60fps 그대로 PNG 로 뽑아(프레임 번호 = 시각 × 60) 위치 · 색을 재고, 움직임은 한 점(위끝 · 색)을 프레임마다 재서 곡선을 맞춤.
+- 클론은 Playwright 로 DPR 3(`deviceScaleFactor: 3`)으로 찍어 녹화와 같은 화소 크기로 → 반반 붙이기 · 겹치기 · 차이 그림. 녹화의 이름 · 번호 · 잔액이 보이는 프레임은 비교에만 쓰고 커밋 안 함.
+- 비교에서 고친 예:
+  - **홈 스크롤 막대**: 검수는 오른쪽 x 387–390 열의 프레임별 **최댓값**이 바탕과 같다(32 vs 31)며 "홈엔 막대 없음"으로 정했는데, 막대는 바탕(31)보다 **어두운**(22) 검정 .29 라
+    최댓값엔 안 잡혔음. 반반 비교에서 보여서 되살림(`k2-home__ind`) — 어두운 바탕 위 어두운 것은 최솟값으로도 볼 것.
+  - **떠 있는 광고**: 명세는 '올라왔다 내려가는 시간 애니메이션'이었는데, 프레임마다 재 보니 **광고 위끝 + 스크롤 = 1162.5** 로 늘 같음 → 목록 끝에 붙어 스크롤과 같이 움직이는 것
+    (맨 끝에선 제자리 667). 시간으로 흉내 내면 스크롤 속도가 다를 때마다 어긋남. 자리는 스크롤 프레임마다 ref 로 바로 (10장).
+  - **거래구분 이름**: 녹화의 거래상세는 보낸 이체 '일반이체' · 받은 돈 '일반입금'. 서버 `txDetailJson` 이 `SERVER_ID === "kakao2"` 일 때만 이렇게 줌 —
+    명세는 `APP === "kakao" && INTRO` 였지만 카카오 변형이 또 생겨도 안 걸리게 서버 이름으로. 🔔 패널은 보이던 거래구분을 그대로 다시 보내므로 기본값과 같은 이름은 '직접 지정'으로 안 봄.
+
+### 녹화 인트로 클립과 개인정보 (`scripts/kakao-intro-erase.py`, `recorder.ts`, `Launch.tsx`)
+- 원본은 0.458초부터 커지는 앱 창 속에 **녹화한 사람의 실제 계좌 이름 · 잔액**이 보임 → 클립은 0.000~0.400초 **25장(앱 보관함에서 B 아이콘을 눌렀다 뗌)만**,
+  스크립트도 `ffmpeg -frames:v 25` 로 25장만 읽음. 그 뒤 '앱 창이 아이콘 자리에서 화면 전체로 커지는' 0.35초는 클론이 그림(`Launch.tsx`): 녹화 프레임마다 잰
+  창 위치 · 모서리 · 밝기 표를 Web Animations(`el.animate`)로, 뒤에는 멈춘 영상 마지막 장면을 흐리게 · 어둡게, 416ms 에 모서리가 각지고 영상을 걷음.
+- 지우기: 시계 + 달 · 배터리 칸을 줄마다 칸 바깥 왼쪽 · 오른쪽 세 칸 평균을 직선으로 이어 메움 (한 칸만 쓰면 압축 잡음이 가로 줄무늬로 남음). 영상이 도는 동안엔
+  우리 상태바를 그 위에 올려(`[data-intro-play]`) 녹화한 시각 · 정해 둔 배터리가 찍힘 (kbank2 와 같은 방법). 신호 · LTE · 아일랜드는 앱과 같아서 그대로.
+- 인코딩: 2배(786 × 1704)로 줄이고 RGB → bt709 tv 범위 yuv420p 를 numpy 로 직접 계산해 넘김 (ffmpeg 에 RGB 를 주면 회색이 1~2, 노란 B 가 3~10 단계 어긋났음).
+  mp4 = H.264 High 4.2 · `-bf 0`(B 프레임이 있으면 편집 목록 때문에 브라우저 시작 시각이 밀림) · `+faststart`, webm = VP9. 다시 돌리면 mp4 는 바이트까지 같음.
+- 녹화(`recorder.ts`): 은행마다 `IntroCfg`. kbank2 는 영상 뒤 시작화면을 새로 띄우지만(`mount: "start"`), kakao2 는 `"resume"` — 녹화를 시작하기 **전에** 영상 밑에서 홈을
+  데이터 · 글꼴(`document.fonts.ready`) · 그림(`img.decode()`)까지 다 그려 둠(`resumeUnder`). 끝나기 6장 전에 `requestVideoFrameCallback` 의 장면 시각으로 H 를 계산해
+  켜짐 연출을 걸어 둠 — H 에 바로 하면 무거워서 마지막 장면이 3~4장 더 찍혔음.
+- 폰 폭 393 이 홀수라 짝수 폭 창 가운데에 두면 왼끝이 0.5px 에 걸려, 크롬 탭 캡처가 프레임 폭을 392 ↔ 394 로 바꾸며 오류를 내고 왼끝에 검은 1px 줄이 생김 →
+  kakao2 녹화 동안만 폰 여백을 정수 px 로 옮김(`snapToDevicePixels` — transform 을 주면 Element Capture 가 프레임을 안 내보냈음).
+- 저장소에 개인정보 없음: 커밋한 그림 14개(`k2-*` 12개 + 클립 2개, 클립은 25장 모두)를 열어 보고, 추가된 모든 줄과 커밋 메시지를 녹화 속 이름 · 번호 · 금액과 대조. 화면은 예시 데이터(홍길동).
 
