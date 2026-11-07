@@ -269,7 +269,6 @@ export function K2Home() {
             <strong className="k2-home__main-balance">{won(main.balance)}</strong>
             <span className="k2-home__main-label">
               <span className="k2-home__main-name">{main.label}</span>
-              <span className="k2-home__badge">한도계좌</span>
             </span>
           </div>
           <button className={`k2-home__send${flash === main.id ? " k2-home__send--flash" : ""}`} onClick={toTransfer(main.id)}>
