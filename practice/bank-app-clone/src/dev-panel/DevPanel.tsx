@@ -13,7 +13,7 @@ import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { APP, HAS_INTRO, currentProfileId, setCurrentProfile } from "../profile/session";
+import { APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
 import { kbAdEnabled, kbAdHiddenUntil, kbAdResetHide, kbVariantMode, setKbAdEnabled, setKbVariantMode } from "../kbank/prefs";
 import "./DevPanel.css";
 
@@ -151,14 +151,19 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
   return (
     <div className="tab">
       <CurrentProfile />
-      <Field label="기기">
-        <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
-      </Field>
+      {/* kakao2 는 녹화 기기(아이폰 · 라이트 모드)로 고정이라 기기 · 테마 고르기 없음 */}
+      {!KAKAO2 && (
+        <Field label="기기">
+          <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
+        </Field>
+      )}
       <CaptureToggle />
       <RecordButton onStart={onClose} />
-      <Field label="테마">
-        <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
-      </Field>
+      {!KAKAO2 && (
+        <Field label="테마">
+          <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
+        </Field>
+      )}
       {APP === "kbank" && <KbankTakeTwo run={run} home={initial} />}
 
       <h3 className="tab__h">내 정보</h3>
@@ -826,6 +831,8 @@ const TAGS: [TxTag, string][] = [
   ["#자동이체", "자동이체"],
   ["#이체", "이체"],
   ["#예금이자", "이자"],
+  // 카카오뱅크만: 고르면 거래상세·거래내역의 "#체크카드" 같은 뱃지가 안 보임
+  ...(APP === "kakao" ? ([["", "없음"]] as [TxTag, string][]) : []),
 ];
 
 function TxTab({ run }: { run: Run }) {
@@ -959,6 +966,9 @@ function TxEditForm({ tx, banks, run, onSaved }: { tx: Transaction; banks: Bank[
   }
   const ready = detail.status === "done" && loadedFor === tx.id;
 
+  // 카카오뱅크는 상대 정보(상대은행·상대계좌·상대계좌 예금주명)를 "이체"에서만 둠 — 다른 종류로 바꾸면 있던 상대 정보도 지움
+  const clearCounter = APP === "kakao" && tag !== "#이체";
+
   const save = async () => {
     if (busy || !ready) return;
     setBusy(true);
@@ -971,9 +981,9 @@ function TxEditForm({ tx, banks, run, onSaved }: { tx: Transaction; banks: Bank[
           at: `${date}T${time}`,
           kind,
           memo,
-          counterBank: bank.code,
-          counterNumber,
-          counterHolder,
+          counterBank: clearCounter ? "" : bank.code,
+          counterNumber: clearCounter ? "" : counterNumber,
+          counterHolder: clearCounter ? "" : counterHolder,
         }),
       "거래를 고쳤어요",
     );
@@ -1008,15 +1018,19 @@ function TxEditForm({ tx, banks, run, onSaved }: { tx: Transaction; banks: Bank[
       <Field label="거래구분">
         <input value={kind} onChange={(e) => setKind(e.target.value)} maxLength={20} placeholder={ready ? undefined : "불러오는 중…"} disabled={!ready} />
       </Field>
-      <Field label="상대은행">
-        <BankSelect banks={banks} value={bank} onChange={setBank} />
-      </Field>
-      <Field label="상대계좌">
-        <NumberInput bank={bank} value={counterNumber} onChange={setCounterNumber} />
-      </Field>
-      <Field label="상대계좌 예금주명">
-        <input value={counterHolder} onChange={(e) => setCounterHolder(e.target.value)} maxLength={20} placeholder="계좌·예금주명을 비우면 상대 정보 없음" />
-      </Field>
+      {!clearCounter && (
+        <>
+          <Field label="상대은행">
+            <BankSelect banks={banks} value={bank} onChange={setBank} />
+          </Field>
+          <Field label="상대계좌">
+            <NumberInput bank={bank} value={counterNumber} onChange={setCounterNumber} />
+          </Field>
+          <Field label="상대계좌 예금주명">
+            <input value={counterHolder} onChange={(e) => setCounterHolder(e.target.value)} maxLength={20} placeholder="계좌·예금주명을 비우면 상대 정보 없음" />
+          </Field>
+        </>
+      )}
       <Field label="메모">
         <input value={memo} onChange={(e) => setMemo(e.target.value)} maxLength={25} placeholder={ready ? undefined : "불러오는 중…"} disabled={!ready} />
       </Field>

@@ -1,3 +1,5 @@
+import { KAKAO2 } from "../profile/session";
+
 export type Theme = "light" | "dark";
 
 const isTheme = (v: string | null): v is Theme => v === "light" || v === "dark";
@@ -31,7 +33,8 @@ const chosen = isTheme(param) ? param : param === "system" ? null : stored();
 export const THEME_CHOICE: Theme | "system" = isTheme(chosen) ? chosen : "system";
 
 // i-ONE Bank·케이뱅크는 녹화에 라이트 모드만 있어서 늘 라이트 (서버가 넣어 주는 앱 이름은 session.ts 와 같은 곳에서 읽음)
-const lightOnly = ["ibk", "kbank"].includes(window.__BANK_APP__ ?? import.meta.env.VITE_APP ?? "");
+// kakao2 는 녹화 기기가 라이트 모드 (홈만 앱이 늘 어둡게 그림) → 라이트 고정
+const lightOnly = KAKAO2 || ["ibk", "kbank"].includes(window.__BANK_APP__ ?? import.meta.env.VITE_APP ?? "");
 
 export const THEME: Theme = lightOnly
   ? "light"

@@ -17,10 +17,13 @@ import { fileURLToPath } from "node:url";
 export const APPS = ["kakao", "nh", "hana", "ibk", "kbank"];
 const appArg = process.argv.indexOf("--app");
 export const SERVER_ID = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
+// 두 번째 서버(녹화 인트로를 켠 변형) → 화면은 원래 앱. 데이터 폴더 · 쿠키 · 포트만 SERVER_ID 로 따로
 // APP=ibk2 는 같은 i-ONE Bank 화면에 녹화 인트로(실제 기기 홈 화면 → 앱 찾기 → 탭 영상)를 켠 서버 (예전 단독 프로젝트 practice/ibk-app 을 합침)
-export const INTRO = SERVER_ID === "kbank2" || SERVER_ID === "ibk2";
-export const APP = SERVER_ID === "kbank2" ? "kbank" : SERVER_ID === "ibk2" ? "ibk" : SERVER_ID;
-if (!APPS.includes(APP)) throw new Error(`APP은 kakao, nh, hana, ibk, ibk2, kbank, kbank2 중 하나 (지금: ${SERVER_ID})`);
+// APP=kakao2 는 카카오뱅크 새 녹화(2026-11, 아이폰) 화면 + 녹화 인트로(앱 보관함 → 금융 폴더 B 아이콘 탭) — 데이터는 카카오뱅크와 같은 예시
+const VARIANTS = { kbank2: "kbank", ibk2: "ibk", kakao2: "kakao" };
+export const INTRO = Object.hasOwn(VARIANTS, SERVER_ID);
+export const APP = INTRO ? VARIANTS[SERVER_ID] : SERVER_ID;
+if (!APPS.includes(APP)) throw new Error(`APP은 kakao, kakao2, nh, hana, ibk, ibk2, kbank, kbank2 중 하나 (지금: ${SERVER_ID})`);
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA = process.env.DATA_DIR ?? resolve(here, SERVER_ID === "kakao" ? "data" : `data-${SERVER_ID}`);
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });

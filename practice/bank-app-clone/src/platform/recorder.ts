@@ -8,13 +8,21 @@
 //     (주소창·상태바가 없어야 폰 위치를 정확히 계산할 수 있음)
 // 코덱: 안드로이드 크롬의 mp4(H.264 하드웨어 인코더)는 프레임이 깨진 파일이 나와서 webm(VP9/VP8)으로 저장
 import { useSyncExternalStore } from "react";
+import { flushSync } from "react-dom";
 import { isCapture, setCapture } from "./capture";
-import { BLINK_MS, isIntroOn, syncBlink } from "./intro";
+import { BLINK_MS, INTRO_OS, isIntroOn, syncBlink } from "./intro";
 import { OS } from "./platform";
 import kbankIntroMp4 from "../assets/intro/kbank-open-intro.mp4";
 import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
 import ibkIntroMp4 from "../assets/intro/ibk-open-intro.mp4";
-import { APP } from "../profile/session";
+import kakaoIntroMp4 from "../assets/intro/kakao-open-intro.mp4";
+import kakaoIntroWebm from "../assets/intro/kakao-open-intro.webm";
+import { APP, KAKAO2 } from "../profile/session";
+import { prefetch } from "../api/useApi";
+import { paths } from "../api/endpoints";
+import { holdLaunch, LAUNCH, setLaunchAt } from "../kakao2/launch";
+import { setK2Indicator } from "../kakao2/chrome";
+import { prepareK2Launch } from "../kakao2/Launch";
 
 // ===== ibk2 인트로 (i-ONE Bank) =====
 // 시계 · 배터리(오른쪽 아이콘 묶음)는 영상에서 지워 두고(scripts/ibk-intro-erase.py) 영상이 도는 동안 우리 상태바를 영상 위로 올려
@@ -33,7 +41,17 @@ const IBK_INTRO_BLINK_ON_MS = 250;
 //   -colorspace bt709 -color_primaries bt709 -color_trc bt709 에 mp4 는 -c:v libx264 -profile:v high -level 3.1 -bf 0 -crf 20 -movflags +faststart,
 //   webm 은 -c:v libvpx-vp9 -crf 24 -b:v 0 -row-mt 1. mp4 는 B 프레임 없이(-bf 0) — 있으면 첫 장면이 0.233초에서 시작해(편집 목록)
 //   브라우저 시간·길이가 webm 과 달라짐. 프레임 평균 오차(녹화 30fps 프레임 대비) mp4 0.70 · webm 0.77 / 255
-const INTRO = {
+// 앱마다 인트로 영상: 형식들 · 초당 장면 수(마지막 장면 · 한 장면 길이) · 길이(초, duration 을 못 읽을 때) · 영상이 끝날 때 상태바 녹화 표시 위상(blinkOnMs) ·
+// 앱을 띄우는 때(mount: "start" = 마지막 장면에서 시작화면부터, "resume" = 녹화 전에 홈을 영상 밑에 다 그려 두고 끝나는 순간 열리는 모습) · 첫 화면 뿌리(ready)
+type IntroCfg = {
+  sources: { src: string; type: string }[];
+  fps: number;
+  len: number;
+  blinkOnMs: number;
+  mount: "start" | "resume";
+  ready: string;
+};
+const KBANK_INTRO: IntroCfg = {
   sources: [
     { src: kbankIntroMp4, type: 'video/mp4; codecs="avc1.64001F"' },
     { src: kbankIntroWebm, type: 'video/webm; codecs="vp9"' },
@@ -43,6 +61,27 @@ const INTRO = {
   // 녹화에 지금 시각과 정해 둔 배터리 값이 찍힘. 만드는 명령은 위와 같고 -vf 끝에 그 두 delogo 를 붙임
   // 영상 끝(녹화 5.60초)에 캠코더 표시가 켜진 지: 영상 속 켜짐 2.200초(77장 중 67번째) → 끝 2.567초 = 0.37초째. 꺼짐은 녹화 5.713~5.738초 사이
   blinkOnMs: 370,
+  fps: 30,
+  len: 2.567,
+  mount: "start",
+  ready: ".kb-splash",
+};
+
+// kakao2 인트로 영상 = 녹화 IMG_5438 0.000~0.400초 (60fps 25장, 0.4167초): 앱 보관함 → 금융 폴더 B 아이콘을 눌렀다 뗌. 그 뒤 장면(커지는 앱 창)엔
+// 실제 이름 · 잔액이 보여서 넣지 않고 앱이 직접 그림 (src/kakao2/Launch.tsx) — 녹화도 시작화면 없이 바로 홈이 열림.
+// python3 scripts/kakao-intro-erase.py 녹화.MP4 src/assets/intro/kakao-open-intro: 시계 + 달 · 배터리를 지우고 2배(786 × 1704) bt709 tv 범위로,
+// mp4 는 H.264 High 4.2 (-bf 0 -crf 18 +faststart), webm 은 VP9 (-crf 24). 상태바 시계 · 달 · 배터리는 영상이 도는 동안 우리가 영상 위에 그림
+// (chrome.css [data-intro-play]). 아일랜드 녹화 점(1.5초 주기)은 영상 끝(0.4167초)에 k2-rec 1173ms 째 (launch.ts LAUNCH.recDotPhase)
+const KAKAO_INTRO: IntroCfg = {
+  sources: [
+    { src: kakaoIntroMp4, type: 'video/mp4; codecs="avc1.64002A"' },
+    { src: kakaoIntroWebm, type: 'video/webm; codecs="vp9"' },
+  ],
+  blinkOnMs: LAUNCH.recDotPhase,
+  fps: 60,
+  len: 0.4167,
+  mount: "resume",
+  ready: ".k2-home",
 };
 
 type State = { status: "idle" } | { status: "arming" } | { status: "recording"; startedAt: number; fullscreen: boolean; fakeCursor: boolean };
@@ -149,6 +188,9 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   let recordStream: MediaStream = display;
   let cleanupCanvas = () => {};
   let fakeCursor = false;
+  // kakao2: 폰 폭이 홀수(393)라 가운데에 두면 왼쪽 끝이 0.5px 에 걸려 Element · Region Capture 영상 폭이 392 ↔ 394 로 오락가락함
+  // (mp4 avc1 'codec description' 오류, 프레임 왼쪽 끝 1px 줄). 녹화하는 동안만 폰을 가까운 기기 픽셀로 옮겨 둠
+  const unsnap = KAKAO2 && (elementCapture || regionCapture) ? snapToDevicePixels(target) : () => {};
   if (elementCapture) {
     // 0) Element Capture: 진짜 포인터는 폰 위에서 숨기고(녹화에 찍히므로), 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
     const W = window as unknown as { RestrictionTarget: { fromElement(el: Element): Promise<unknown> } };
@@ -208,6 +250,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   const onFsChange = () => !document.fullscreenElement && stopCurrent?.();
   recorder.onstop = () => {
     cleanupCanvas();
+    unsnap();
     display.getTracks().forEach((t) => t.stop());
     document.removeEventListener("fullscreenchange", onFsChange);
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -226,14 +269,17 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   track.addEventListener("ended", () => stopCurrent?.());
   if (fullscreen) document.addEventListener("fullscreenchange", onFsChange);
 
-  // 인트로(kbank2): 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 폰 위에 덮어 첫 장면까지 받아 둔 뒤 녹화 시작
+  // 인트로(kbank2 · kakao2): 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭 / 앱 보관함 → B 탭)을 폰 위에 덮어 첫 장면까지 받아 둔 뒤 녹화 시작
   // → 녹화 첫 프레임이 영상 첫 장면 (받는 동안의 검은 화면이 녹화 앞에 붙지 않게)
-  // 영상은 갤럭시 기기 화면이라 아이폰 모드(?os=ios)에선 틀지 않음
+  // 영상을 찍은 기기 모드에서만 (kbank2 = 갤럭시, ?os=ios 면 틀지 않음 · kakao2 = 아이폰)
   const ibk = APP === "ibk";
-  const intro = !ibk && isIntroOn() && OS === "android" ? await loadIntro(target) : null;
+  const cfg = KAKAO2 ? KAKAO_INTRO : APP === "kbank" ? KBANK_INTRO : null;
+  const intro = cfg && isIntroOn() && OS === INTRO_OS ? await loadIntro(target, cfg) : null;
   // 앱을 검은 화면으로 돌려 놓고, 그 모습이 한 프레임 그려진 뒤 녹화 시작 → 시작화면부터
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
   await nextFrame();
+  // kakao2: 시작화면 없이 이미 켜져 있던 앱이 열림 → 녹화 전에 홈을 영상 밑에 다 그려 두고 열리는 모습의 첫 모습까지 깔아 둠
+  const launch = cfg && intro && cfg.mount === "resume" ? await resumeUnder(target, intro, cfg) : null;
   const started = new Promise((r) => recorder.addEventListener("start", r, { once: true }));
   recorder.start();
   set({ status: "recording", startedAt: Date.now(), fullscreen, fakeCursor });
@@ -241,7 +287,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     // ibk2: 녹화 시작 뒤 영상을 틀고, 끝나자마자 시작화면 (영상이 폰 프레임과 같은 기기·해상도라 상태바·3버튼 내비바가 안 끊김)
     await playIbkIntro(target);
     window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
-  } else if (intro) {
+  } else if (cfg && intro) {
     // 녹화기가 첫 프레임을 받기 시작한 뒤에 틀어야 영상 첫 장면부터 찍힘 (바로 틀면 앞 5장쯤이 빠졌음, 시험 녹화 rec1)
     await started;
     await nextFrame();
@@ -249,7 +295,7 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     // 시각 · 배터리는 지금 값 그대로 (영상 속 시계 · 배터리는 지워 둠)
     const stopKeep = keepCapturing(target);
     recorder.addEventListener("stop", stopKeep, { once: true });
-    await playIntro(intro, target);
+    await playIntro(intro, target, cfg, launch);
   } else {
     await sleep(600);
     window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
@@ -304,16 +350,16 @@ function keepCapturing(target: HTMLElement) {
 }
 
 // 틀 수 있는 영상부터 (canPlayType 이 "" 이면 뺌. 다 "" 이면 그래도 차례로 시도)
-function introSources() {
+function introSources(cfg: IntroCfg) {
   const probe = document.createElement("video");
-  const ok = INTRO.sources.filter((s) => probe.canPlayType(s.type) !== "");
-  return ok.length ? ok : INTRO.sources;
+  const ok = cfg.sources.filter((s) => probe.canPlayType(s.type) !== "");
+  return ok.length ? ok : cfg.sources;
 }
 
 // 인트로 영상을 폰 위에 덮고 끝까지 받아 둠(첫 장면이 보이는 채 멈춤). 이 형식을 못 틀면 다음 형식, 다 안 되거나 5초 안에 못 받으면 null (인트로 없이)
-function loadIntro(target: HTMLElement) {
+function loadIntro(target: HTMLElement, cfg: IntroCfg) {
   return new Promise<HTMLVideoElement | null>((resolve) => {
-    const list = introSources();
+    const list = introSources(cfg);
     let i = 0;
     const video = document.createElement("video");
     video.muted = true;
@@ -346,21 +392,37 @@ function loadIntro(target: HTMLElement) {
 // 영상을 끝까지 틀고 바로 시작화면으로. 마지막 장면(2.533초)이 나오는 순간 시작화면을 영상 밑에 미리 띄워 두고, 그 장면이 1/30초
 // 보인 뒤 곧바로 영상을 걷음 → 녹화 원본처럼 마지막 장면(5.566초, 반쯤 밝아진 회색) 다음 장면이 흰 시작화면 (사이에 검은 화면·같은 장면 반복 없이).
 // 'ended' 는 마지막 장면이 나오고 38ms 뒤에야 와서(시험 녹화) 기다리면 회색 장면이 한 장 더 찍힘 → 장면 시각으로 맞추고 'ended' 는 대비로만
+// kakao2 (60fps): 마지막 장면(0.400초)이 1/60초 보인 뒤 = 녹화 0.4167초(H)부터 앱이 열리는 모습 (영상은 그 뒤 그림이 됨, src/kakao2/Launch.tsx)
 const oneFrame = () => new Promise((r) => requestAnimationFrame(r));
-function playIntro(video: HTMLVideoElement, target: HTMLElement) {
+function playIntro(video: HTMLVideoElement, target: HTMLElement, cfg: IntroCfg, launch: K2Launch | null) {
   return new Promise<void>((resolve) => {
-    let mounted = false;
+    let mounted = cfg.mount !== "start"; // resume: 홈은 녹화 전에 이미 밑에 그려 둠 (resumeUnder)
     const mount = () => {
       if (mounted) return;
       mounted = true;
       window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));
     };
-    const lastFrame = video.duration - 1.5 / 30;
-    const onFrame = (_now: number, meta: { mediaTime: number; expectedDisplayTime: number }) => {
+    const lastFrame = video.duration - 1.5 / cfg.fps;
+    // kakao2: 끝나기 6장(0.1초) 전에 앱이 켜질 때(H = 마지막 장면이 1/60초 보인 뒤)를 정해 홈 · 상태바 · 홈 인디케이터 켜짐 연출과 녹화 점 위상,
+    // 열리는 모습(영상 숨기기 · 앱 창 움직임 · B 아이콘)을 그때 시작하도록 영상 밑에 걸어 둠 (H 에 하면 무거워서 마지막 장면이 3~4장 더 찍혔음,
+    // src/kakao2/Launch.tsx). 앱이 켜진 때는 애니메이션 시계(프레임 시작 시각)로: 이 장면을 고른 프레임(presentationTime) + 남은 길이.
+    // 그 프레임은 1/60초 뒤에 화면에 나오고(expectedDisplayTime), 같은 프레임에서 시작한 애니메이션도 같이 나옴. 반올림에 걸리지 않게 4ms 앞당김
+    const armFrom = video.duration - 6.5 / cfg.fps;
+    let launchAt = 0;
+    const arm = (meta: { mediaTime: number; presentationTime: number }) => {
+      launchAt = meta.presentationTime + (video.duration - meta.mediaTime) * 1000 - 4;
+      flushSync(() => {
+        setLaunchAt(launchAt);
+        syncBlink(cfg.blinkOnMs - (launchAt - performance.now()));
+      });
+      launch?.arm(launchAt);
+    };
+    const onFrame = (_now: number, meta: { mediaTime: number; expectedDisplayTime: number; presentationTime: number }) => {
+      if (cfg.mount === "resume" && !launchAt && meta.mediaTime >= armFrom) arm(meta);
       if (meta.mediaTime < lastFrame) return video.requestVideoFrameCallback(onFrame);
       mount();
-      // 마지막 장면이 화면에 나온 때 + 1/30초 − 반 프레임(8ms): 그다음 그리는 프레임부터 시작화면
-      setTimeout(done, Math.max(0, meta.expectedDisplayTime + 1000 / 30 - 8 - performance.now()));
+      // 마지막 장면이 화면에 나온 때 + 한 장면 − 반 프레임(8ms): 그다음 그리는 프레임부터 시작화면
+      setTimeout(done, Math.max(0, meta.expectedDisplayTime + 1000 / cfg.fps - 8 - performance.now()));
     };
     if ("requestVideoFrameCallback" in video) video.requestVideoFrameCallback(onFrame);
 
@@ -370,15 +432,25 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement) {
       ended = true;
       const endAt = performance.now();
       clearTimeout(guard);
-      // 상태바가 영상 속 흰 글자(어두운 기기 홈 화면 테마)에서 #494949 로 서서히 바뀜 (PhoneFrame.css [data-intro-end]). 영상이 끝난 때부터
       const d = document.documentElement.dataset;
+      if (cfg.mount === "resume") {
+        // kakao2: 앱이 켜진 때(H). 장면 시각을 못 받았으면(requestVideoFrameCallback 없음 · 영상 멈춤) 지금으로 켜짐 연출을 그림
+        // → 영상은 뒤 그림이 되고 앱 창이 커짐, 416ms 뒤 걷음 (src/kakao2/Launch.tsx)
+        if (!launchAt) arm({ mediaTime: video.duration, presentationTime: endAt });
+        delete d.introPlay;
+        if (launch) launch.start();
+        else video.remove();
+        resolve();
+        return;
+      }
+      // 상태바가 영상 속 흰 글자(어두운 기기 홈 화면 테마)에서 #494949 로 서서히 바뀜 (PhoneFrame.css [data-intro-end]). 영상이 끝난 때부터
       d.introEnd = "on";
       setTimeout(() => delete d.introEnd, 600); // 가장 긴 손잡이 410ms 가 끝난 뒤
       mount();
       // 시작화면이 그려질 때까지 (대개 이미 그려져 있음. 로그인·프로필 고르기 중이면 그냥 넘어감)
-      for (let i = 0; i < 6 && !target.querySelector(".kb-splash"); i++) await oneFrame();
+      for (let i = 0; i < 6 && !target.querySelector(cfg.ready); i++) await oneFrame();
       // 영상 속 캠코더 깜빡임을 우리 상태바가 같은 위상으로 이어 받음 (영상이 끝난 때 기준 — 기다린 만큼 더함)
-      syncBlink(INTRO.blinkOnMs + (performance.now() - endAt));
+      syncBlink(cfg.blinkOnMs + (performance.now() - endAt));
       delete d.introPlay;
       video.remove();
       resolve();
@@ -388,10 +460,53 @@ function playIntro(video: HTMLVideoElement, target: HTMLElement) {
     video.addEventListener("ended", done, { once: true });
     video.addEventListener("error", done, { once: true });
     // 캠코더 깜빡임은 영상 끝에 켜진 지 blinkOnMs 가 되도록 첫 장면 위상으로 맞춤 (상태바는 loadIntro 때부터 영상 위)
-    const lenMs = (Number.isFinite(video.duration) ? video.duration : 2.567) * 1000;
-    syncBlink((((INTRO.blinkOnMs - lenMs) % BLINK_MS) + BLINK_MS) % BLINK_MS);
+    const lenMs = (Number.isFinite(video.duration) ? video.duration : cfg.len) * 1000;
+    syncBlink((((cfg.blinkOnMs - lenMs) % BLINK_MS) + BLINK_MS) % BLINK_MS);
+    // kakao2: 영상이 도는 동안 상태바 달이 흐렸다가 또렷해짐 (chrome.css [data-intro-play="play"])
+    if (KAKAO2) document.documentElement.dataset.introPlay = "play";
     video.play().catch(done);
   });
+}
+
+// kakao2: 녹화를 시작하기 전에 영상(맨 위) 밑에서 앱을 켜 홈까지 다 그려 둠 — 홈 데이터 · 글꼴 · 그림까지 (영상이 끝나는 순간 그대로 열리게).
+// 켜짐 연출(launch.ts)은 영상이 끝날 때까지 잡아 두고, 상태바 시각 옆은 앱 보관함처럼 달(집중 모드). 끝으로 열리는 모습의 첫 모습을 깔고
+// 그것까지 다 그려질 때까지 기다림 (src/kakao2/Launch.tsx)
+type K2Launch = ReturnType<typeof prepareK2Launch>;
+async function resumeUnder(target: HTMLElement, video: HTMLVideoElement, cfg: IntroCfg) {
+  holdLaunch();
+  setK2Indicator("moon");
+  await prefetch(paths.home);
+  window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "resume" }));
+  // 로그인 · 프로필 고르기 중이면 홈이 안 뜨므로 4초까지만
+  const until = performance.now() + 4000;
+  while (!target.querySelector(cfg.ready) && performance.now() < until) await oneFrame();
+  await nextFrame(); // 홈이 그린 글자의 글꼴 조각 받기가 시작되도록
+  const imgs = [...target.querySelectorAll<HTMLImageElement>(".phone__viewport img")];
+  await Promise.race([Promise.all([document.fonts.ready, ...imgs.map((img) => img.decode().catch(() => {}))]), sleep(3000)]);
+  await nextFrame();
+  const launch = prepareK2Launch(target, video);
+  for (let i = 0; i < 3; i++) await nextFrame();
+  return launch;
+}
+
+// 요소의 왼쪽 · 위끝을 가장 가까운 기기 픽셀로: 여백을 조금 바꿈 (transform 을 주면 Element Capture 가 프레임을 안 내보냈음).
+// 왼쪽 여백은 auto(가운데)라 계산값을 믿지 않고 부모 왼끝에서 잼. 바꿔도 정수 픽셀이 안 되면 그대로 둠. 되돌리는 함수를 줌
+function snapToDevicePixels(el: HTMLElement) {
+  const dpr = window.devicePixelRatio || 1;
+  const off = (v: number) => (Math.round(v * dpr) - v * dpr) / dpr;
+  const r = el.getBoundingClientRect();
+  const parent = el.parentElement;
+  if (!parent || (!off(r.left) && !off(r.top))) return () => {};
+  const { marginLeft, marginTop } = el.style;
+  const undo = () => {
+    el.style.marginLeft = marginLeft;
+    el.style.marginTop = marginTop;
+  };
+  el.style.marginLeft = `${r.left - parent.getBoundingClientRect().left + off(r.left)}px`;
+  el.style.marginTop = `${parseFloat(getComputedStyle(el).marginTop) + off(r.top)}px`;
+  const after = el.getBoundingClientRect();
+  if (Math.abs(off(after.left)) > 0.01 || Math.abs(off(after.top)) > 0.01 || Math.abs(after.left - r.left) > 1 || Math.abs(after.top - r.top) > 1) undo();
+  return undo;
 }
 
 // 폰 화면 녹화 (폰 아래 [● 녹화] / 🔔 패널): 녹화하는 동안은 캡쳐모드로 테두리를 숨겼다가 끝나면 원래대로

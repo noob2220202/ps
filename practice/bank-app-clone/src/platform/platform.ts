@@ -1,4 +1,4 @@
-import { APP, HAS_INTRO } from "../profile/session";
+import { APP, HAS_INTRO, KAKAO2 } from "../profile/session";
 
 export type Os = "android" | "ios";
 
@@ -18,8 +18,10 @@ const stored = read();
 
 // ibk2(녹화 인트로를 켠 i-ONE Bank)는 인트로 영상과 같은 갤럭시 기기 화면만 (상태바 · 3버튼 내비바를 그 기기에 맞춰 만듦) → 아이폰으로 바꾸지 않음
 export const IBK2 = APP === "ibk" && HAS_INTRO;
-export const OS: Os = IBK2
-  ? "android"
+// 녹화 기기로 고정: ibk2 = 갤럭시, kakao2 = 아이폰 (영상 기기와 같은 틀 · 상태바). null 이면 기기 스위치로 고름
+export const DEVICE_LOCK: Os | null = IBK2 ? "android" : KAKAO2 ? "ios" : null;
+export const OS: Os = DEVICE_LOCK
+  ? DEVICE_LOCK
   : isOs(param)
   ? param
   : isOs(stored)
@@ -38,3 +40,5 @@ try {
 document.documentElement.dataset.os = OS;
 // ibk2: 인트로 영상 기기에 맞춘 상태바 · 진짜 폰에서도 프레임 그대로 (PhoneFrame.css · global.css 의 [data-ibk2])
 if (IBK2) document.documentElement.dataset.ibk2 = "on";
+// kakao2: 녹화 기기(393 x 852) 틀 · 글꼴 · 새 화면 스타일 (global.css 등의 html[data-kakao2])
+if (KAKAO2) document.documentElement.dataset.kakao2 = "on";

@@ -1,0 +1,289 @@
+/* ===== kakao2 거래상세 (K2TxDetail.tsx) =====
+   녹화 41.4 · 60.1초 (txdetail.md §3–5). 화면 맨 위(상태바 띠 위끝) 기준 pt − 54 = 상태바 띠 아래 본문 기준.
+   내용 상자 x 24 – 369, 줄은 그 안에서 5pt 더 들어감. 글자 사이 −0.2px 그대로 (critic.md G7 · X16).
+   녹화는 가로만 1179 → 1180px 로 늘어남: x pt = px / 3.0025, y pt = px / 3 (스펙의 y 는 /3.0025 라 아래로 갈수록 최대 0.7pt 작음) */
+.k2txd {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #1e1e1e;
+  letter-spacing: -0.2px;
+}
+
+/* 녹화는 스크롤 없음 (852pt 에 다 들어감). 화면이 낮은 폰에서만 스크롤 */
+.k2txd__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.k2txd__scroll::-webkit-scrollbar {
+  display: none;
+}
+.k2txd__page {
+  padding: var(--k2-sb) 24px 140px;
+}
+.k2txd button {
+  letter-spacing: inherit;
+}
+
+/* 글자 크기는 녹화 문자열을 Pretendard 로 그려 잉크 폭을 맞춘 값 (녹화는 SF + 애플SD산돌고딕: 한글 · 숫자 · 띄어쓰기 폭 비율이 달라 종류마다 크기를 따로).
+   이름 14 + 띄어쓰기 +0.95 · 값 14.5 (숫자) / 14.2 (한글) · 이름(제목) 26/700 · 확인 17/700 · 1/N 15.8/500 · 상자 13.2 (고정폭 숫자) */
+
+/* ---------- 머리: 이름 26/700 #1f1f1f (잉크 가운데 114) · 메모 안내 14.5 #a0a0a0 + 연필 (151) · 선 0.67pt #aaa (200.2) ---------- */
+.k2txd__title {
+  margin: 0;
+  padding-top: 44.23px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #1f1f1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.k2txd__memo {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  height: 20px;
+  margin-top: 10.77px;
+  font-size: 14.5px;
+  line-height: 20px;
+  color: #a0a0a0;
+}
+.k2txd__memo span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.k2txd__memo--set {
+  color: #1e1e1e;
+}
+/* 연필: 글자 잉크 끝 + 5pt, 12 × 11.6 검정 */
+.k2txd__pen {
+  flex-shrink: 0;
+  margin: 1px 0 0 4.4px;
+}
+.k2txd__memo-input {
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin-top: 10.77px;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid #1e1e1e;
+  border-radius: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 14.5px;
+  line-height: 20px;
+  letter-spacing: inherit;
+  color: #1e1e1e;
+}
+.k2txd__memo-input::placeholder {
+  color: #a0a0a0;
+}
+.k2txd__hr {
+  height: 0.667px;
+  margin-top: 39.2px;
+  background: #aaa;
+}
+
+/* ---------- 줄: 이름 14 #5b5b5b · 값 14.5 #1e1e1e, 줄 간격 40 (가운데 230.6 · 270.6 …), 묶음 위아래 ≈ 10 ---------- */
+.k2txd__group {
+  padding: 10.1px 0 10.05px;
+}
+.k2txd__hr + .k2txd__group {
+  padding: 10px 0 10.13px;
+}
+.k2txd__line {
+  height: 0.333px;
+  background: #e9e9e9;
+}
+.k2txd__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-height: 40px;
+  margin: 0;
+  padding: 10px 5.4px 10px 5px;
+  line-height: 20px;
+}
+.k2txd__row dt {
+  flex-shrink: 0;
+  font-size: 14px;
+  word-spacing: 0.95px;
+  color: #5b5b5b;
+}
+.k2txd__row dd {
+  min-width: 0;
+  margin: 0 0 0 16px;
+  font-size: 14.5px;
+  text-align: right;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+/* 거래시간 값의 '.' · ':' · 띄어쓰기 (녹화 글꼴만큼 넓게, 글자마다 앞뒤 간격을 잼) */
+.k2txd__dot {
+  margin-right: 0.6px;
+}
+.k2txd__colon {
+  margin: 0 0.35px 0 0.25px;
+}
+.k2txd__gap {
+  margin-right: 0.3px;
+}
+/* 거래금액 굵게, 받은 돈은 파랑 (부호 없음) */
+/* 한글 값 (거래구분 · 예금주 · 받는 분에게 표기) */
+.k2txd__ko,
+.k2txd__row--ko dd {
+  font-size: 14.2px;
+}
+.k2txd__amt dd {
+  font-weight: 700;
+}
+.k2txd__amt--in dd {
+  color: #0176c9;
+}
+/* 입금계좌 · 받는 분에게 표기: 이름이 값 첫 줄에 맞춰 위로 붙음 (가운데 +18.3, 값 한 줄짜리는 +20 → 받는 분에게 표기 값이 1.7pt 아래) */
+.k2txd__row--top dt {
+  line-height: 16.67px;
+}
+/* 입금계좌 두 줄: 예금주 / 은행 계좌번호, 줄 간격 16.67 (490.2 · 506.8) */
+.k2txd__acct dd {
+  padding-bottom: 0.32px;
+  line-height: 16.67px;
+}
+
+/* 뼈대 "-": 녹화 글꼴의 '-' 가 Pretendard 보다 0.45pt (제목 0.8pt) 낮음 */
+.k2txd__dash {
+  position: relative;
+  top: 0.45px;
+}
+.k2txd__title.k2txd__dash {
+  top: 0.8px;
+}
+.k2txd__amt .k2txd__dash {
+  top: 0;
+}
+
+/* 보낸 이체: 이체금액 · 수수료 상자 (거래금액 줄 바로 밑 351 – 422, #f3f3f3, 모서리 각짐), 13px #5b5b5b */
+.k2txd__fee {
+  box-sizing: border-box;
+  height: 70.94px;
+  margin-bottom: 9.9px;
+  padding: 13.9px 16.75px 0 16.3px;
+  background: #f3f3f3;
+}
+.k2txd__fee-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-size: 13.2px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+  color: #5b5b5b;
+}
+.k2txd__fee-row + .k2txd__fee-row {
+  margin-top: 4px;
+}
+.k2txd__fee-row dd {
+  margin: 0;
+}
+
+/* ---------- `이름` 검색하기 (#0f4c7e) + 꺾쇠: 위 0.67pt #e8e8e8 · 아래 0.33pt #e9e9e9 선 사이 44 ---------- */
+.k2txd__search {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 100%;
+  height: 44.96px;
+  padding: 0 9.33px 0 5px;
+  border-top: 0.667px solid #e8e8e8;
+  border-bottom: 0.333px solid #e9e9e9;
+  font-size: 14.4px;
+  line-height: 20px;
+  color: #0f4c7e;
+  text-align: left;
+}
+.k2txd__search span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.k2txd__chev {
+  flex-shrink: 0;
+  margin-top: 0.6px;
+}
+
+/* 1/N 빵나누기 (출금만): 52 높이, 둥근 12, 테두리 0.33pt #d1d1d1, #272727 */
+.k2txd__split {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 51.95px;
+  margin-top: 32px;
+  border: 0.333px solid #d1d1d1;
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-size: 15.8px;
+  font-weight: 500;
+  word-spacing: 0.95px;
+  color: #272727;
+}
+
+.k2txd__empty {
+  margin: 80px 0 0;
+  text-align: center;
+  color: #999;
+}
+
+/* ---------- 아래 버튼: 공유 80.25 × 60 #2d324d + 확인 #fedc00, 둥근 10, 758 – 818 (화면 아래에서 안전 영역 34 — 녹화 세로는 2556px = 852pt × 3) ---------- */
+.k2txd__foot {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: var(--safe-bottom);
+  display: flex;
+  gap: 7.65px;
+  height: 60px;
+}
+.k2txd__share {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 80.25px;
+  border-radius: 10px;
+  background: #2d324d;
+}
+.k2txd__ok {
+  flex: 1;
+  border-radius: 10px;
+  background: #fedc00;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e1e1e;
+}
+/* Pretendard 한글이 SF 보다 1기기px 낮게 앉음 → 잉크 가운데를 버튼 가운데(788)에 */
+.k2txd__ok span {
+  position: relative;
+  top: -0.33px;
+}
+/* 누르면 바탕은 그대로, 글자(아이콘)만 23% 로 한 프레임에 — 떼면 ≈ 90ms 에 돌아옴 (녹화 44.435 – 44.835초) */
+.k2txd__ok span,
+.k2txd__share svg,
+.k2txd__split span {
+  transition: opacity 90ms ease-out;
+}
+.k2txd__ok:active span,
+.k2txd__share:active svg,
+.k2txd__split:active span {
+  opacity: 0.23;
+  transition: none;
+}
