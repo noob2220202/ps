@@ -1,0 +1,392 @@
+/* ===== NH올원뱅크 시작 흐름 (launch 영역): 녹화 인트로 아이폰 홈 화면 · 흰 시작화면 · 스플래시 · 간편비밀번호 + 보안 키패드 =====
+   자리는 녹화에서 잰 화면 pt (y = 녹화 px / 3.000). 웹뷰 안 요소의 top 은 화면 y − 59 (웹뷰 59–818), 네이티브 층 요소는 화면 y 그대로.
+   launch.md §2.1 · §2.5 · §2.7, plan.md §1.1 */
+
+/* ---------- 녹화 인트로: 그린 아이폰 홈 화면 (#ao-native-scene, z 57 — 아일랜드 60 · 상태바 글자 70 아래) ---------- */
+.ao-ln-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  pointer-events: auto;
+  user-select: none;
+}
+/* 만든 배경 (그림 없음): 위 90pt 는 거의 흰색(흰 상태바 글자가 거의 안 보이게, 녹화처럼), 이름표 줄부터 푸른 회색으로 —
+   밝기 흐름만 녹화 배경에 맞춤 (y 150 ≈ 225, 200 ≈ 205, 250 ≈ 180, 가운데 ≈ 170, 아래로 어두워짐) */
+.ao-ln-scene__wall {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 40% at 25% 0%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #fbfcfe 0%, #f6f9fc 10.6%, #dde5ee 17.6%, #c8d3df 23.5%, #afbdcd 29.3%, #a3b3c6 50%, #8a9db6 75%, #6f8099 100%);
+}
+/* 393 폭 무대 (가운데 정렬, 위아래는 화면 끝까지 — 1열은 위, 검색 · 독은 아래에 붙음) */
+.ao-ln-scene__stage {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 393px;
+  margin-left: -196.5px;
+}
+/* 아이콘 64 × 64 (연속 곡률 모서리 22.5 %) + 이름표 (12 / 500 흰색, 잉크 y 150.6–161.0) */
+.ao-ln-tile {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+}
+.ao-ln-tile > svg,
+.ao-ln-tile > .ao-ln-app {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ao-ln-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.ao-ln-mini {
+  position: absolute;
+}
+.ao-ln-tile__label {
+  position: absolute;
+  left: -24px;
+  right: -24px;
+  top: 69.4px; /* 잉크 150.6–161.0 */
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 14px;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.35);
+}
+/* 검색 알약: 167.9–225.1 × 682.7–712.0, 유리 */
+.ao-ln-search {
+  position: absolute;
+  left: 167.9px;
+  bottom: 140px; /* 위끝 682.67 */
+  width: 57.2px;
+  height: 29.33px;
+  border-radius: 14.67px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
+}
+.ao-ln-search__icon {
+  flex: none;
+}
+/* 독: 12.0–380.3 × 730.6–839.3, 둥글기 40, 유리 + 밝은 테두리 (위쪽이 더 밝음) */
+.ao-ln-dock {
+  position: absolute;
+  left: 12px;
+  bottom: 12.7px; /* 위끝 730.6 */
+  width: 368.3px;
+  height: 108.7px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+}
+/* 녹아 사라짐: 장면 맨 위 흰 막 (intro.ts 가 D 부터 250ms 동안 0 → 1) */
+.ao-ln-scene__white {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+}
+
+/* ---------- 흰 시작화면 (웹뷰) ---------- */
+.ao-ln {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #ffffff;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+
+/* ---------- 스플래시 그림 (#ao-native, z 55): 화면 y 59–852 (아래 띠까지), 녹화 배율 그대로 393 × 793 ---------- */
+.ao-native-part > .ao-ln-splash {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 393px;
+  height: 793px;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+@media (max-width: 500px) {
+  .ao-native-part > .ao-ln-splash {
+    width: 100%;
+    height: auto;
+  }
+}
+@keyframes ao-ln-splash-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ao-ln-splash-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- 간편비밀번호 화면 (웹뷰, 초록 #0C8F2D) ---------- */
+.ao-ln-pin {
+  position: absolute;
+  inset: 0;
+  background: #0c8f2d;
+  color: #ffffff;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 단추 기본 모양 지우기 (:where 로 낮춰 둠 — 아래 각 단추의 글꼴 값이 이기게) */
+:where(.ao-ln-pin) button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 머리글 (59–109): "NH올원뱅크" 로고 글자 (잉크 144.96–248.46 × 73.33–94.83, 흰색 마스크) · 지구 · 메뉴 */
+.ao-ln-pin__title {
+  position: absolute;
+  left: calc(50% - 51.36px); /* 145.14 */
+  top: 14.33px; /* 73.33 */
+  width: 103.5px;
+  height: 21.5px;
+  background: #ffffff;
+  -webkit-mask: var(--ao-ln-title) center / 100% 100% no-repeat;
+  mask: var(--ao-ln-title) center / 100% 100% no-repeat;
+}
+.ao-ln-pin__title-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 11px;
+  text-align: center;
+  font-size: 22.5px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.ao-ln-pin__globe,
+.ao-ln-pin__menu {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+.ao-ln-pin__globe {
+  right: 53.94px; /* 아이콘 306.81–327.31 × 73.25–93.75 */
+  top: 2.5px;
+}
+.ao-ln-pin__menu {
+  right: 14px; /* 단추 335–379 × 62–106, 아이콘 상자 (345, 74) 24 × 20 — 정수 자리 (선 좌표는 Pin.tsx MenuSearch) */
+  top: 3px;
+}
+.ao-ln-pin__menu > svg {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+}
+/* 안내 두 줄: 19 / 500, 자간 −0.35, 줄 27 (잉크 첫 줄 y 163.0, 둘째 줄 190.0). 글자 줄은 CSS px 단위로 맞춰짐 → 줄마다 무게중심 ±0.1 */
+.ao-ln-pin__prompt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 99.4px; /* 잉크 첫 줄 163.0 */
+  margin: 0;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 27px;
+  letter-spacing: -0.35px;
+}
+/* 둘째 줄은 녹화 글꼴보다 Pretendard 의 띄어쓰기가 넓어 그만큼 좁힘 (잉크 117.9–275.4) */
+.ao-ln-pin__prompt1,
+.ao-ln-pin__prompt2 {
+  position: relative;
+}
+.ao-ln-pin__prompt1 {
+  left: -0.3px;
+}
+.ao-ln-pin__prompt2 {
+  left: 0.36px;
+  word-spacing: -1.7px;
+}
+/* 6칸: 막대 25 × 1 (가운데 x 121.56 + 30i, 위끝 261.8) — 누르면 그 칸이 점(지름 16.05, 가운데 y 253.47)으로 바뀜 */
+.ao-ln-pin__slots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ao-ln-pin__bar,
+.ao-ln-pin__dot {
+  position: absolute;
+  background: #ffffff;
+}
+.ao-ln-pin__bar {
+  left: calc(50% - 87.22px + var(--i) * 30px); /* 109.28 + 30i */
+  top: 202.8px; /* 261.8 */
+  width: 25px;
+  height: 1px;
+}
+.ao-ln-pin__dot {
+  left: calc(50% - 82.97px + var(--i) * 30px); /* 113.53 + 30i */
+  top: 186.94px; /* 245.94 — CSS px 단위로 맞춰져 무게중심 254.0 (녹화 253.6) */
+  width: 16.05px;
+  height: 16.05px;
+  border-radius: 50%;
+}
+/* 자동로그인: 체크 동그라미 16.1 (152.28–168.38 × 298.75–314.85) + 글자 16.5, 잉크 x 173.86–239.47 · y 300.67–314.0.
+   녹화 글꼴이 Pretendard 400 보다 획이 굵어(잉크 면적 +20 %) 470 으로 */
+.ao-ln-pin__auto {
+  position: absolute;
+  left: calc(50% - 43.84px); /* 152.66 */
+  top: 239.75px; /* 298.75 */
+  height: 16.1px;
+  display: flex;
+  align-items: center;
+  gap: 5.2px;
+  font-size: 16.5px;
+  font-weight: 470;
+  line-height: 16.1px;
+  letter-spacing: -1.2px;
+  white-space: nowrap;
+}
+.ao-ln-pin__check {
+  flex: none;
+  display: block;
+  margin-left: -0.33px; /* 고리 무게중심 160.37 */
+}
+.ao-ln-pin__auto > span {
+  position: relative;
+  top: 0.2px;
+}
+/* 링크 줄: 16.5 / 400 자간 −0.5, 가운데 97.92 · 294.59. 키패드 없을 때 잉크 y 770.67, 있을 때 462.0 (키패드 위로 뜀) */
+.ao-ln-pin__links {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 31.36px; /* 웹뷰 아래끝에 붙음 — 잉크 770.67–784.0 */
+  height: 20px;
+  font-size: 16.5px;
+  font-weight: 380; /* 녹화 글자 획이 Pretendard 400 보다 조금 가늚 (잉크 면적 −9 %) */
+  line-height: 20px;
+  letter-spacing: -0.6px;
+}
+.ao-ln-pin--pad .ao-ln-pin__links {
+  bottom: calc(373.03px - var(--ao-bottom)); /* 키패드(폰 아래 348) 위끝에서 25.03 위 — 잉크 462.0–475.33 */
+}
+.ao-ln-pin__links > button {
+  position: absolute;
+  top: 0;
+  width: 190px;
+  height: 20px;
+  text-align: center;
+  white-space: nowrap;
+}
+.ao-ln-pin__links > button:first-child {
+  left: calc(25% - 95.09px); /* 가운데 97.92 */
+}
+.ao-ln-pin__links > button:last-of-type {
+  left: calc(75% - 95.58px); /* 가운데 294.59 */
+}
+/* 가운데 세로줄: 흰색 1.04 × 10 (196.37–197.41, 글자 줄 잉크 위끝 + 2) */
+.ao-ln-pin__links > i {
+  position: absolute;
+  left: calc(50% - 0.05px); /* 196.45 */
+  top: 4.57px;
+  width: 1.04px;
+  height: 10px;
+  background: #ffffff;
+}
+/* 키패드가 없을 때(뜨기 전 117ms · 로그인 로딩 막 밑): 녹화(C1 6.233–6.300, 10.600)에서 링크 글자가 같은 높이로 가로만 2.6 % 좁고
+   (잉크 35.0–159.9 · 233.8–356.4), 가운데 세로줄이 1.33 × 14 (195.83–197.17 × 770.0–784.0) */
+.ao-ln-pin:not(.ao-ln-pin--pad) .ao-ln-pin__links > button:first-child {
+  transform: translateX(-0.4px) scaleX(0.974);
+}
+.ao-ln-pin:not(.ao-ln-pin--pad) .ao-ln-pin__links > button:last-of-type {
+  transform: translateX(0.6px) scaleX(0.974);
+}
+.ao-ln-pin:not(.ao-ln-pin--pad) .ao-ln-pin__links > i {
+  left: calc(50% - 0.67px);
+  top: 3.36px;
+  width: 1.33px;
+  height: 14px;
+}
+
+/* ---------- 보안 키패드 (네이티브 판 #ao-native-panel, z 53): 흰색 504 → 852, 3열 131 · 4줄 (테두리 · 눌림 표시 없음) ---------- */
+.ao-ln-pad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 348px; /* 504 → 852 */
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.ao-ln-pad__key {
+  position: absolute;
+  width: calc((100% - 1.5px) / 3); /* 130.5 */
+  height: 78px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  color: #000000;
+  font: 520 22.5px/1 var(--ao-font); /* 녹화 숫자가 조금 굵음 (잉크 면적 +7 %) */
+  letter-spacing: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ao-ln-pad__key > span {
+  position: relative;
+  top: 0.18px;
+}
+/* ↻ · ⌫ 그림 (단추는 그 위 투명한 칸): 칸 가운데 기준 — 판 폭 393 에서 ↻ 상자 (54, 764), ⌫ 상자 (310, 766) */
+.ao-ln-pad__icon {
+  position: absolute;
+  pointer-events: none;
+}
+.ao-ln-pad__icon--shuffle {
+  left: calc(100% / 6 - 11.5px);
+  top: 260px;
+}
+.ao-ln-pad__icon--back {
+  left: calc(500% / 6 - 17.5px);
+  top: 262px;
+}
