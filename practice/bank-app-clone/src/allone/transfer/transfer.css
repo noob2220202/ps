@@ -1,0 +1,1165 @@
+/* ===== NH올원뱅크 이체 영역 (src/allone/transfer/*) — 클래스 · 키프레임 모두 ao-send- 로 시작.
+   좌표 = 녹화에서 잰 잉크 상자 (transfer.md, pt = 393 × 852 틀의 CSS px). 글자는 line-height 1, top = 잉크 가운데 − 0.54 × 크기 (Pretendard)
+   본문 기준: 머리줄(59–109) 아래 → 본문 y = 화면 y − 109 ===== */
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/700.css";
+
+/* ---------- 받는 분 줄 (T1 · T6 · 출금계좌 시트) ---------- */
+.ao-send-row {
+  position: relative;
+  width: 100%;
+}
+.ao-send-row__hit {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  color: #000;
+  cursor: pointer;
+}
+.ao-send-row__hit:active {
+  background: #f7f7f7;
+}
+/* 이름: 잉크 위 +0.67 … +15.3 (16.3/500) · 둘째 줄 +22.3 … +35.0 (14.3/400 #808080), x 71 */
+.ao-send-row__name {
+  position: absolute;
+  left: 70.6px;
+  top: calc(var(--ao-send-logo) - 0.02px);
+  font-size: 16.3px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ao-send-row__sub {
+  position: absolute;
+  left: 70.6px;
+  top: calc(var(--ao-send-logo) + 21.6px);
+  font-size: 14.3px;
+  font-weight: 400;
+  line-height: 1;
+  color: #808080;
+  white-space: nowrap;
+}
+/* ☆ 잉크 x 347.3–367.3, 타일 위 +7.7 … +27.3 (20 × 19.66) */
+.ao-send-row__star,
+.ao-send-row__del {
+  position: absolute;
+  left: 335.3px;
+  top: calc(var(--ao-send-logo) - 4.3px);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.ao-send-row__star > svg {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+}
+.ao-send-row__del > svg {
+  position: absolute;
+  left: 11px;
+  top: 11px;
+}
+
+/* 빈 목록 · 연락처: 가운데 회색 14.3/400, 잉크 가운데 ≈ 620 (T1) */
+.ao-send-empty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 56px;
+  margin: 0;
+  font-size: 14.3px;
+  line-height: 1;
+  color: #808080;
+  text-align: center;
+}
+
+/* ---------- 입력 칸 (T1 계좌번호 · 은행, T5 입금계좌 · 금액, 이체 확인 메모) ---------- */
+.ao-send-field {
+  position: absolute;
+  left: 24px;
+  width: 345px;
+  height: 54px;
+  padding: 0;
+  border: 1px solid var(--ao-line, #eee);
+  border-radius: 12px;
+  background: #fff;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+}
+.ao-send-field--focus {
+  border-color: var(--ao-green);
+}
+.ao-send-field__text {
+  position: absolute;
+  left: 20.4px;
+  top: 17.25px;
+  font-size: 18.4px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ao-send-field__text--ph {
+  font-weight: 400;
+  color: #808080;
+}
+.ao-send-field__text--value,
+.ao-send-field__text--bank {
+  font-weight: 500;
+  color: #000;
+}
+.ao-send-field__caret {
+  display: inline-block;
+  margin-left: 1px;
+  vertical-align: -3px;
+}
+.ao-send-field__caret--empty {
+  position: absolute;
+  left: 20.4px;
+  top: 15.5px;
+}
+
+/* ---------- T1 누구에게 보낼까요? (C3 27.5) ---------- */
+.ao-send-who__top {
+  position: relative;
+  height: 447.33px; /* 첫 줄 위끝 556.33 (타일 570 − 13.67) */
+}
+/* 제목 잉크 x 28.98–197.5, y 135.67–155.67, 22.2/500 */
+.ao-send-who__title {
+  position: absolute;
+  left: 28.4px;
+  top: 25.2px;
+  margin: 0;
+  font-size: 22.2px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+/* 계좌번호 칸 192–246 · 은행 칸 258–312 */
+.ao-send-who__number {
+  top: 83px;
+  cursor: text;
+}
+.ao-send-who__bank {
+  top: 149px;
+}
+/* ▾ 잉크 x 336.3–348.3, y 282.0–288.7 */
+.ao-send-who__chev {
+  position: absolute;
+  left: 311.3px;
+  top: 23px;
+}
+/* 도움말 잉크 x 24.65, y 333.0–344.67, 13.2/400 #4C4C4C (오류 #FF0000) */
+.ao-send-who__help {
+  position: absolute;
+  left: 24px;
+  top: 223.25px;
+  margin: 0;
+  font-size: 13.2px;
+  line-height: 1;
+  color: #4c4c4c;
+  white-space: nowrap;
+}
+.ao-send-who__help--error {
+  color: #ff0000;
+}
+/* 다음 377–425 (48), r 6.5. 글자 잉크 394.67–410 (가운데보다 1.33 아래) */
+.ao-btn.ao-send-who__next {
+  position: absolute;
+  left: 24px;
+  top: 268px;
+  width: 345px !important;
+  padding-top: 2.5px;
+}
+/* 탭 4칸 (x 24–369, 86.25씩), 글자 잉크 477.67–493.0, 16.4. 고른 탭 500 #000, 나머지 400 #161616 (C3 27.5 · C2 21.2: 회색이 아니라 가는 검정).
+   바닥선 1pt #F5F5F5 507–508, 고른 탭 밑줄 2pt 506–508 */
+.ao-send-tabs {
+  position: absolute;
+  left: 24px;
+  top: 359px;
+  display: flex;
+  width: 345px;
+  height: 40px;
+  box-shadow: inset 0 -1px 0 #f5f5f5;
+}
+.ao-send-tabs__tab {
+  position: relative;
+  flex: 1 1 0;
+  padding: 0;
+  padding-top: 9.32px;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font);
+  font-size: 16.4px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #161616;
+  text-align: center;
+  padding-bottom: 14.28px; /* 높이 40 (버튼은 내용을 세로 가운데에 두므로 높이를 안쪽 여백으로) */
+  cursor: pointer;
+}
+.ao-send-tabs__tab--on {
+  font-weight: 500;
+  color: #000;
+}
+.ao-send-tabs__tab--on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #030303;
+}
+/* 삭제하기: 오른쪽 맞춤 잉크 x 319.1–369.0, y 535.33–548.33, 15/500, 밑줄 1pt 549–550 */
+.ao-send-who__edit {
+  position: absolute;
+  right: 23.6px;
+  top: 416.06px;
+  padding: 10px 0 10px;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000;
+  cursor: pointer;
+}
+.ao-send-who__edit > span {
+  position: relative;
+  display: inline-block;
+}
+.ao-send-who__edit > span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 13.94px;
+  height: 1px;
+  background: #000;
+}
+.ao-send-who__list {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+/* ---------- 은행 선택 시트 (invented, T6 모양: 위 118, r 24) ---------- */
+.ao-send-banksheet .ao-sheet__body {
+  padding-bottom: 30px;
+}
+.ao-send-tabs--two {
+  position: relative;
+  left: auto;
+  top: auto;
+  margin: 0 24px;
+}
+.ao-send-bankgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 115px);
+  margin: 8px 24px 0;
+}
+.ao-send-bankgrid__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 84px;
+  padding: 12px 2px 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  color: #000;
+  cursor: pointer;
+}
+.ao-send-bankgrid__cell:active {
+  background: #f7f7f7;
+}
+.ao-send-bankgrid__cell > span {
+  margin-top: 8px;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 13.1px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- T2 얼마를 보낼까요? (C3 29.5 · C2 26.0 · C3 30.7 · C3 31.08) — 스크롤 없음 ---------- */
+.ao-send-amount .ao-page__body {
+  overflow: hidden;
+}
+/* 받는 분 이름: 가운데, 잉크 113.67–128.33, 16.5/500 #141414 */
+.ao-send-amount__holder {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4.09px;
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 500;
+  line-height: 1;
+  color: #141414;
+  text-align: center;
+  white-space: nowrap;
+}
+/* 은행 + 번호: 잉크 142.33–155.0, 14.3/400 #808080, 밑줄 1pt #888 157–158 (글자 폭). 누르면 번호 복사 */
+.ao-send-amount__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 25.78px;
+  padding: 6px 0 9.7px;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font);
+  font-size: 14.3px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #808080;
+  text-align: center;
+  white-space: nowrap;
+  display: block;
+  cursor: pointer;
+}
+.ao-send-amount__line > span {
+  position: relative;
+  display: inline-block;
+}
+.ao-send-amount__line > span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16.22px;
+  height: 1px;
+  background: #888;
+}
+
+/* 금액 묶음: 판 열림 자리, 닫히면 +195 (C3 31.08). 본문 높이(틀에서 709)가 다른 화면(모바일)에서는 받는 분 줄 ~ 계좌 줄 사이 가운데에 남도록 차이의 반만큼 옮김 */
+.ao-send-amt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 354.5px);
+}
+.ao-send-amt--closed {
+  top: calc(50% - 354.5px + 195px);
+}
+.ao-send-amt > p {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+/* 자리 글: 잉크 x 90.9–303.1, y 241.33–269.33, 31.6/500 #BCBCBC */
+.ao-send-amt__ph {
+  top: 131.6px;
+  font-size: 31.6px;
+  font-weight: 500;
+  color: #bcbcbc;
+}
+/* 금액: 숫자 Roboto 500 36 (밑선 258.33, 오류 줄이면 256.33) + "원" Pretendard 400 33 (잉크 사이 9.7) */
+.ao-send-amt__val {
+  top: 119.03px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  color: #000;
+}
+.ao-send-amt__val--err {
+  top: 117.03px;
+}
+.ao-send-amt__digits {
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.ao-send-amt__won {
+  position: relative;
+  top: -2.2px;
+  margin-left: 1.93px;
+  font-size: 33px;
+  font-weight: 400;
+}
+/* 읽는 글 (넉넉할 때): 잉크 272.33–285.0, 14.4/400 #808080 */
+.ao-send-amt__cap {
+  top: 162.4px;
+  font-size: 14.4px;
+  color: #808080;
+}
+/* 출금가능금액 부족 (#FF0000) · 8.3 · 잔액채우기 (#555, 밑줄 #575757 287.33–288.33), 잉크 273.67–286.33 */
+.ao-send-amt__err {
+  top: 164.39px;
+  font-size: 14.4px;
+}
+.ao-send-amt__errtext {
+  color: #ff0000;
+}
+.ao-send-amt__link {
+  position: relative;
+  margin-left: 8.3px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #555;
+  cursor: pointer;
+}
+.ao-send-amt__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 13.94px;
+  height: 1px;
+  background: #575757;
+}
+.ao-send-amt__link::before {
+  content: "";
+  position: absolute;
+  inset: -12px -6px;
+}
+
+/* 출금계좌 줄은 본문 아래끝 기준 (판이 화면 아래에 붙으므로 모바일에서도 판 바로 위; 틀에서는 본문 709 → 위 256 / 646.33).
+   (판 열림 잉크 380.67–395.67, 닫힘 +390.33): 한도제한 11/400 x 43.6 · NH농협은행(1234) 14.3/400 #4B4B4B x 90.9
+   ("NH농협은행" 잉크 폭 67.3 · 높이 12.67 = Pretendard 14.3, 14.8 은 70 으로 넓음) ·
+   잔액 14.2/500 오른쪽 잉크 335.7 · ▾ 343.0–356.0 × 384.0–391.7 */
+.ao-send-acct {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: calc(100% - 453px);
+  height: 46px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  line-height: 1;
+  color: #000;
+  cursor: pointer;
+}
+.ao-send-acct--closed {
+  top: calc(100% - 62.67px);
+}
+.ao-send-acct > span {
+  position: absolute;
+  white-space: nowrap;
+}
+.ao-send-acct__tag {
+  left: 43.4px;
+  top: 18.23px;
+  font-size: 11px;
+  font-weight: 400;
+}
+.ao-send-acct__bank {
+  left: 89.9px;
+  top: 15.2px;
+  font-size: 14.3px;
+  font-weight: 400;
+  color: #4b4b4b;
+}
+.ao-send-acct__bank--solo {
+  left: 42.9px;
+}
+.ao-send-acct__bal {
+  right: 56.9px;
+  top: 16.33px;
+  font-size: 14.2px;
+  font-weight: 500;
+}
+.ao-send-acct__chev {
+  position: absolute;
+  right: 37px; /* 잉크 x 343–356 */
+  top: 19px;
+}
+
+/* ---------- T2 네이티브 키패드 판 (#ao-native-panel z 53): 화면 y 435 부터 화면 아래끝 852 까지 (아래 띠도 덮음) ----------
+   C3 28.963–29.146 · 1.879–2.013 을 프레임마다 잰 판 위끝 (칩 글자 · 숫자 1 두 표시가 같음): 판은 818 이 아니라 화면 아래(852)에서 들어오고
+   852 로 나감 (움직이는 동안 판 내용이 아래 띠 818–852 에 보임). 맞춘 곡선 — 들어옴 175ms cubic-bezier(.4,.2,.6,1) 화면이 바뀐 뒤 5ms 부터
+   (오차 rms 1.0pt; 818 기준 150ms cubic-bezier(.31,.18,.55,.89) 는 4.9pt) · 나감 170ms cubic-bezier(.4,0,.6,.7) (rms 1.5pt) */
+.ao-send-panelclip,
+.ao-native-part > .ao-send-panelclip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ao-send-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(383px + var(--ao-bottom, 34px));
+  background: #fff;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  pointer-events: auto;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.ao-send-panel--in {
+  animation: ao-send-panel-in 175ms cubic-bezier(0.4, 0.2, 0.6, 1) 5ms both;
+}
+.ao-send-panel--out {
+  animation: ao-send-panel-out 170ms cubic-bezier(0.4, 0, 0.6, 0.7) both;
+  pointer-events: none;
+}
+@keyframes ao-send-panel-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ao-send-panel-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+/* 칩 5개: y 439.33–473.33 (34), r 7, 1pt #F5F5F5, 글자 14.2/400 (잉크 가운데 457 = 칩 가운데 + 0.67) */
+.ao-send-chip {
+  position: absolute;
+  top: 4.33px;
+  height: 34px;
+  padding: 1.34px 0 0;
+  border: 1px solid #f5f5f5;
+  border-radius: 7px;
+  background: #fff;
+  font-family: var(--ao-font);
+  font-size: 14.2px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* 키패드 (금액 키패드 공용): 칸 131 × 줄 높이, 숫자 Roboto 700, 누름 표시 없음 */
+.ao-send-pad {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ao-send-pad__key {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font-num);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 다음: x 24–369, y 754–810 (56), r 8.5, 18.8/600 (잉크 가운데 783.33 = 가운데 + 1.33) */
+.ao-btn.ao-send-panel__next {
+  position: absolute;
+  left: 24px;
+  top: 319px;
+  width: 345px !important;
+  padding-top: 3.9px;
+}
+
+/* 출금계좌 선택 시트 (T2 계좌 줄 ▾, invented) */
+.ao-send-acctsheet .ao-sheet__body {
+  padding-bottom: 30px;
+}
+.ao-send-acctsheet__bal {
+  position: absolute;
+  right: 24px;
+  top: 24.4px;
+  font-size: 14.2px;
+  font-weight: 500;
+  line-height: 1;
+  pointer-events: none;
+}
+.ao-send-row--on .ao-send-row__name {
+  color: var(--ao-green);
+}
+
+/* ---------- T3 계좌 비밀번호 입력 (C3 32.4 · 32.5) — 시트 위 368 기준 ---------- */
+/* 계좌 줄: 가운데, 잉크 456.67–469.33, ≈14/400 #606060 */
+.ao-send-pw__acct {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 88.44px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1;
+  color: #606060;
+  text-align: center;
+  white-space: nowrap;
+}
+/* 점: Ø 20.3 #0C8F2D, 간격 22, 잉크 504.67–524.67, 가운데 x 196.3 */
+.ao-send-pw__dots {
+  position: absolute;
+  left: 0;
+  width: 392.6px;
+  top: 136.67px;
+  height: 20.3px;
+  display: flex;
+  justify-content: center;
+  gap: 1.7px;
+}
+.ao-send-pw__dots > i {
+  width: 20.3px;
+  height: 20.3px;
+  border-radius: 50%;
+  background: var(--ao-green);
+}
+/* 숫자 칸 98.25 × 65.5, 가운데 49.1 / 147.4 / 245.6 / 343.9, 숫자 잉크 가운데 587.7 / 653.8 / 719.8. 숫자 높이 18.67 → Roboto 400 26 */
+.ao-send-pw__key {
+  position: absolute;
+  width: 98.25px;
+  height: 65.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font-num);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 아래 줄 (가운데 779.7): ↻ 잉크 x 56.3–75.9 · ⌫ 184.5–208.2 · OK 319.1–339.4 (15.8/400) */
+.ao-send-pw__key--one > span {
+  transform: translateX(1.33px); /* Roboto "1" 잉크가 왼쪽으로 1.3 치우침 (C3 32.5 는 칸 가운데) */
+}
+.ao-send-pw__fn {
+  position: absolute;
+  top: 386.7px;
+  width: 64px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font);
+  font-size: 15.8px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000;
+  cursor: pointer;
+}
+.ao-send-pw__fn--shuffle {
+  left: 34.1px;
+}
+.ao-send-pw__fn--back {
+  left: 164.35px;
+}
+.ao-send-pw__fn--ok {
+  left: 295.5px;
+  font-size: 18px; /* 녹화 잉크 O 12 · K 10 폭, 높이 13.33 → Pretendard 18 */
+}
+
+/* ---------- T5 잔액채우기 (C3 8.5 · 9.0 · 11.9 · 12.05) — 본문 y = 화면 y − 109, 선택하면 아래가 +97, 최대 스크롤 66 ---------- */
+.ao-send-topup__body {
+  position: relative;
+  height: 582px; /* 한도 둘째 줄 아래 + 17 */
+}
+.ao-send-topup--sel .ao-send-topup__body {
+  height: 679.67px; /* 아래 버튼 띠(722.67) 기준 최대 스크롤 66 (C3 9.2) */
+}
+.ao-send-topup__body > p,
+.ao-send-topup__body > h2 {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* 제목 두 줄: 잉크 x 25, y 141.67–161.67 / 169.67–189.67, 22.6/500, 줄 간격 28 */
+.ao-send-topup__title {
+  left: 24.3px;
+  top: 29.25px;
+  font-size: 22.6px;
+  font-weight: 500;
+  line-height: 28px !important;
+}
+/* 이름표 14.3/400 #4E4E4E: 입금계좌 잉크 245.33–258.0 · 출금계좌 408.33–421.0 · 금액 555.33 (선택 뒤 652.33) */
+.ao-send-topup__label {
+  left: 24.3px;
+  font-size: 14.3px;
+  color: #4e4e4e;
+}
+.ao-send-topup__label--in {
+  top: 135.6px;
+}
+.ao-send-topup__label--out {
+  top: 298.6px;
+}
+.ao-send-topup__label--amt {
+  top: 445.85px;
+  font-size: 14.1px;
+}
+.ao-send-topup--sel .ao-send-topup__label--amt {
+  top: 542.85px;
+}
+/* 입금계좌 칸 272–326, r 12.5. 글자 x 46.6, 잉크 291.67–308.0. "NH농협은행" 잉크 폭 86.9 · 높이 16.33 · 덮임 506 (C3 8.5) = Pretendard 18.3/530 */
+.ao-send-topup__to {
+  top: 163px;
+  border-radius: 12.5px;
+  cursor: default;
+}
+.ao-send-topup__totext {
+  position: absolute;
+  left: 20.5px;
+  top: 18.2px;
+  font-size: 18.3px;
+  font-weight: 530;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* 잔액: 오른쪽 368, 잉크 341.33–353.0, 13.1/400 #4C4C4C ("잔액" 뒤 띄어쓰기 없음) */
+.ao-send-topup__bal {
+  right: 25px;
+  top: 231.8px;
+  font-size: 13.1px;
+  color: #4c4c4c;
+}
+/* 선택 전: 상자 435–502 (67), r 12. "출금계좌를 선택해주세요" 16.6/500 x 49.6, 잉크 462.67–477.33. ▾ 336.0–348.3 × 466.3–473.0 */
+.ao-send-topup__select {
+  top: 326px;
+  height: 67px;
+}
+.ao-send-topup__select > span {
+  position: absolute;
+  left: 24px;
+  top: 25.04px;
+  font-size: 16.6px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ao-send-topup__chev {
+  position: absolute;
+  left: 311px;
+  top: 30.3px;
+}
+/* 선택 뒤: 테 없는 묶음 435–592 (금액 입력 시트가 떠 있는 동안만 #EEE 테, C3 11.5). 타일 x 45–81 y 468.67–505 · 상품명 16.5/500 x 94.3 ·
+   둘째 줄 12.2/400 #7D7D7D ("NH농협은행" 잉크 폭 57.3 · 높이 11, C3 8.5) · ▾ 336–348 × 474.33–481 · 출금가능금액 14.4/400 #4E4E4E (오른쪽 346.6) · 금액 숫자 Roboto 500 + 원 */
+.ao-send-topup__from {
+  position: absolute;
+  left: 24px;
+  top: 326px;
+  width: 345px;
+  height: 157px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #fff;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+}
+.ao-send-topup__from--focus {
+  border-color: var(--ao-line, #eee);
+}
+.ao-send-topup__from > span {
+  position: absolute;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ao-send-topup__pname {
+  left: 68px;
+  top: 34.09px;
+  font-size: 16.5px;
+  font-weight: 500;
+}
+.ao-send-topup__psub {
+  left: 68.2px;
+  top: 57.3px;
+  font-size: 12.2px;
+  color: #7d7d7d;
+}
+.ao-send-topup__pchev {
+  position: absolute;
+  left: 311px;
+  top: 38.33px;
+}
+.ao-send-topup__avl {
+  right: 20.1px;
+  top: 97.7px;
+  font-size: 14.4px;
+  color: #4e4e4e;
+}
+.ao-send-topup__avamt {
+  right: 20.1px;
+  top: 117.74px;
+  display: flex;
+  align-items: baseline;
+}
+.ao-send-topup__avamt > .ao-num {
+  font-size: 20.5px;
+  font-weight: 500;
+}
+.ao-send-topup__avwon {
+  margin-left: 3px;
+  font-size: 16px;
+  font-weight: 500;
+}
+/* 금액 칸: 582–636 (선택 뒤 679–733), r 13. 빈 칸 "0" #808080 x 45.66 + 오른쪽 "원" 18/600, 채우면 "<금액> 원" 17.9/600 오른쪽 346.4 */
+.ao-send-topup__amt {
+  top: 473px;
+  border-radius: 13px;
+}
+.ao-send-topup--sel .ao-send-topup__amt {
+  top: 570px;
+}
+.ao-send-topup__amt > span {
+  position: absolute;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ao-send-topup__zero {
+  left: 19.7px;
+  top: 17.8px;
+  font-size: 19px;
+  font-weight: 400;
+  color: #808080;
+}
+.ao-send-topup__unit,
+.ao-send-topup__amtval {
+  right: 19.8px;
+  top: 18.1px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.ao-send-topup__amtval {
+  font-size: 17.9px;
+}
+/* 한도 두 줄: 오른쪽 368, 잉크 645.33 / 662.33 (선택 뒤 +97), 13.1/400 #4C4C4C, 값 700 검정 */
+.ao-send-topup__limit {
+  right: 24px;
+  font-size: 13.1px;
+  color: #4c4c4c;
+}
+.ao-send-topup__limit > b {
+  font-weight: 700;
+  color: #000;
+}
+.ao-send-topup__limit--1 {
+  top: 535.8px;
+}
+.ao-send-topup__limit--2 {
+  top: 552.8px;
+}
+.ao-send-topup--sel .ao-send-topup__limit--1 {
+  top: 632.8px;
+}
+.ao-send-topup--sel .ao-send-topup__limit--2 {
+  top: 649.8px;
+}
+/* 오류 (invented): 금액 칸 아래 왼쪽, #FF0000 13.1/400 */
+.ao-send-topup__error {
+  left: 24.3px;
+  top: 535.8px;
+  font-size: 13.1px;
+  color: #ff0000;
+}
+.ao-send-topup--sel .ao-send-topup__error {
+  top: 632.8px;
+}
+/* 잔액채우기 버튼 732–788 (56; C3 8.5 · 11.9 · 12.05 위끝 2196 px), r 15, 18.5/600 (잉크 752.67–769.33 = 가운데 + 1).
+   꺼짐: 바탕 #E0E0E0 · 글자 #808080 (C3 2.3 · 5.5 웹 막 밑 110 / 80, 5.6 T7 막 밑 51 / 26 — #F5F5F5 · 흰 글자면 116 / 119) */
+.ao-btn.ao-send-topup__submit {
+  padding-top: 2px;
+}
+.ao-btn--disabled.ao-send-topup__submit {
+  background: #e0e0e0;
+}
+
+/* ---------- T6 출금계좌 선택 (C3 4.5): 위 453, 첫 타일 527.33, 줄 63, 버튼 732–788 ---------- */
+.ao-send-t6__btns {
+  display: flex;
+  gap: 10px;
+}
+.ao-send-t6__btns > .ao-btn {
+  flex: none;
+  padding-top: 2px;
+}
+
+/* ---------- T7 금액 입력 (C3 6.5 · 10.95–11.15) — 시트 위 224 기준 ---------- */
+/* 금액: 가운데. 자리 "0원" 27.8/400 #525154 (잉크 303.33–328), 친 금액 숫자 Roboto 400 29 + " 원" 28.2/400 검정 (밑선 ≈ 326.6) */
+.ao-send-t7__amt {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 77.4px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  line-height: 1;
+  color: #525154;
+  white-space: nowrap;
+}
+.ao-send-t7__zero {
+  font-size: 29px;
+  font-weight: 400;
+}
+.ao-send-t7__digits {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 29px;
+  font-weight: 400;
+  color: #000;
+}
+.ao-send-t7__won {
+  margin-left: 0.6px;
+  font-size: 29px;
+  font-weight: 400;
+}
+.ao-send-t7__amt--on .ao-send-t7__won {
+  margin-left: 4.4px;
+  color: #000;
+}
+/* 새 숫자: 30pt 위에서 투명도 .1 → .3 으로 250ms 직선, 끝나면 또렷 (C3 10.746–11.03) */
+.ao-send-t7__roll {
+  display: inline-block;
+  animation-name: ao-send-roll;
+  animation-timing-function: linear;
+  animation-fill-mode: backwards;
+}
+@keyframes ao-send-roll {
+  from {
+    transform: translateY(-30px);
+    opacity: 0.1;
+  }
+  to {
+    transform: none;
+    opacity: 0.3;
+  }
+}
+/* 읽는 글: 잉크 348.33–360.33, ≈13.5/400 #4E525A */
+.ao-send-t7__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 124.04px;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1;
+  color: #4e525a;
+  text-align: center;
+  white-space: nowrap;
+}
+/* 칩 4개: y 383–417 (34), r 6, 1pt #F5F5F5, "+ 1만원" 14.4. 녹화 글자는 가늘어서 (덮임 102 / 105 / 123 / 149 → Pretendard 330)
+   잉크 394.33–407, 가운데가 칩 가운데보다 ≈0.8 왼쪽 (C3 6.5 · 11.05) */
+.ao-send-t7__chip {
+  position: absolute;
+  top: 159px;
+  height: 34px;
+  padding: 2.01px 1.6px 0 0;
+  border: 1px solid #f5f5f5;
+  border-radius: 6px;
+  background: #fff;
+  font-family: var(--ao-font);
+  font-size: 14.4px;
+  font-weight: 330;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* 확인: x 24–369, y 730–786 (56), r 5.5, 17.6/500 */
+.ao-btn.ao-send-t7__ok {
+  position: absolute;
+  left: 24px;
+  top: 506px;
+  width: 345px !important;
+}
+
+/* ---------- 이체 확인 · 이체 완료 (invented, transfer.md §5.1 · §5.2) ---------- */
+.ao-send-confirm__body,
+.ao-send-done__body {
+  position: relative;
+  padding-bottom: 24px;
+}
+.ao-send-confirm--kb .ao-send-confirm__body {
+  padding-bottom: 320px; /* 키보드에 가린 만큼 더 내려 볼 수 있게 */
+}
+/* 제목 두 줄: T5 와 같은 자리 (잉크 위 ≈ 141), 22.6/500, 줄 간격 28 */
+.ao-send-confirm__title {
+  margin: 0;
+  padding: 29.25px 24px 0 24.3px;
+  font-size: 22.6px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+/* 상자: x 24–369, 위 230, r 13, 1pt #EEE, 줄 48 (이름 14.3/400 #4E4E4E · 값 16.3/500) */
+.ao-send-box {
+  margin: 0 24px;
+  padding: 4px 20px;
+  border: 1px solid var(--ao-line, #eee);
+  border-radius: 13px;
+}
+.ao-send-confirm__box {
+  margin-top: 35.75px; /* 제목 끝(본문 85.25) → 상자 위 121 (화면 230) */
+}
+.ao-send-box__row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  color: #000;
+  text-align: left;
+}
+.ao-send-box__row--link {
+  cursor: pointer;
+}
+.ao-send-box__row--link:active {
+  background: #f7f7f7;
+}
+.ao-send-box__label {
+  flex: none;
+  font-size: 14.3px;
+  line-height: 1;
+  color: #4e4e4e;
+}
+.ao-send-box__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 12px;
+  overflow: hidden;
+  font-size: 16.3px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ao-send-box__chev {
+  flex: none;
+  margin-left: 8px;
+  color: #808080;
+}
+/* 메모 칸 (거래내역 상세 메모 칸 모양): 54, r 12, 상자 아래 16 */
+.ao-send-field.ao-send-confirm__memo {
+  position: relative;
+  left: auto;
+  display: block;
+  margin: 16px 24px 0;
+  cursor: text;
+}
+.ao-send-confirm__memotext {
+  position: absolute;
+  left: 20.4px;
+  top: 18px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ao-send-confirm__memotext--ph {
+  color: #808080;
+}
+.ao-send-confirm__caret0 {
+  position: absolute;
+  left: 20.4px;
+  top: 16px;
+}
+/* 보내기 · 확인: T5 아래 버튼과 같음 */
+.ao-btn.ao-send-confirm__send {
+  padding-top: 2px;
+}
+/* 통장 표시 입력 시트 */
+.ao-send-namesheet__field {
+  position: relative;
+  left: auto;
+  display: block;
+  margin: 8px 24px 0;
+}
+.ao-send-namesheet__help {
+  margin: 10px 24px 0;
+  font-size: 13.1px;
+  line-height: 1;
+  color: #808080;
+  text-align: right;
+}
+
+/* 이체 완료: 머리줄 자리만 (뒤로 없음), 체크 가운데 (196.5, 220), 글 잉크 위 ≈ 272 */
+.ao-send-done__head {
+  height: 50px;
+  background: #fff;
+}
+.ao-send-done__check {
+  display: block;
+  margin: 83px auto 0;
+  opacity: 0;
+}
+.ao-send-done__check--on {
+  animation: ao-send-pop 200ms ease-out both;
+}
+@keyframes ao-send-pop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.ao-send-done__title {
+  margin: 20.12px 0 0;
+  font-size: 22.6px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.ao-send-done__amt {
+  color: var(--ao-green);
+}
+.ao-send-done__box {
+  margin-top: 28px;
+}

@@ -1,18 +1,71 @@
-// [기초 단계 자리 — transfer 영역이 이 파일을 진짜 이체 완료(초록 체크 · 문구 · 상자 · 확인)로 바꿈]
-// 지금은 이동 시험용: 확인 = sendFinish (흐름에 들어오기 전 화면으로, 홈이면 새로 불러온 홈)
+// 이체 완료 (invented, transfer.md §5.2): 이체 확인을 바꿔 들어옴 (replace), 뒤로 없음.
+// 초록 체크 Ø 56 (가운데 196.5, 220) — 로딩 막이 걷히면 .8 → 1 + 나타남 200ms ease-out. 글 두 줄 + 상자 + 확인 → sendFinish (흐름 시작한 곳으로)
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useApi } from "../../api/useApi";
+import type { Bank } from "../../api/types";
+import { aoPaths, type AoHome } from "../api";
 import { useAoFlow } from "../flow";
-import { aoWon } from "../format";
-import { AoStub } from "../stub";
+import { aoBankLast4, aoDigits, aoNum, aoWon } from "../format";
+import { AoButton, AoPage, useAoLoadingVisible } from "../ui";
+import { bankLabel } from "./util";
 
 export function SendDone() {
   const [params] = useSearchParams();
   const flow = useAoFlow();
+  const home = useApi<AoHome>(aoPaths.home);
+  const banks = useApi<Bank[]>(aoPaths.banks).data;
+  const loading = useAoLoadingVisible();
+  const [shown, setShown] = useState(!loading);
+  if (!loading && !shown) setShown(true);
+
+  const fromId = params.get("from") ?? "main";
+  const from = home.data?.accounts.find((a) => a.id === fromId);
+  const holder = params.get("holder") ?? "";
+  const amount = Number(params.get("amount")) || 0;
+  const afterRaw = params.get("after");
+  const after = afterRaw !== null && afterRaw !== "" ? Number(afterRaw) : from?.balance;
+  const memo = params.get("memo") ?? "";
+
+  const rows: [string, string][] = [
+    ["받는 계좌", `${bankLabel(banks, params.get("bank") ?? "")} ${aoDigits(params.get("number"))}`],
+    ["출금 계좌", from ? aoBankLast4(from) : ""],
+    ["거래 후 잔액", after !== undefined && !Number.isNaN(after) ? aoWon(after) : ""],
+    ...(memo ? [["메모", memo] as [string, string]] : []),
+  ];
+
   return (
-    <AoStub title="이체 완료" area="transfer" back={false} links={[{ label: "확인", onPress: () => flow.sendFinish() }]}>
-      <p className="ao-stub__sub">
-        {params.get("holder")}님에게 {aoWon(Number(params.get("amount")) || 0)}을 보냈어요
-      </p>
-    </AoStub>
+    <AoPage
+      className="ao-send-done"
+      header={<div className="ao-send-done__head" />}
+      footer={
+        <AoButton className="ao-send-confirm__send" radius={15} height={56} size={18.5} onPress={() => void flow.sendFinish()}>
+          확인
+        </AoButton>
+      }
+    >
+      <div className="ao-send-done__body">
+        <svg className={`ao-send-done__check${shown ? " ao-send-done__check--on" : ""}`} width="56" height="56" viewBox="0 0 56 56" aria-hidden>
+          <circle cx="28" cy="28" r="28" fill="#0c8f2d" />
+          <path d="M17 28.6 24.6 36 39 21.2" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <h2 className="ao-send-done__title">
+          {holder}님에게
+          <br />
+          <span className="ao-send-done__amt">
+            <span className="ao-num">{aoNum(amount)}</span>원
+          </span>
+          을 보냈어요
+        </h2>
+        <div className="ao-send-box ao-send-done__box">
+          {rows.map(([label, value]) => (
+            <div key={label} className="ao-send-box__row">
+              <span className="ao-send-box__label">{label}</span>
+              <span className="ao-send-box__value">{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </AoPage>
   );
 }
