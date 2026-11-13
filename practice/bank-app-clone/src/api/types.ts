@@ -24,6 +24,11 @@ export interface Profile {
   cashbackCount: number; // 현금 돌려받을 기회 N건
   cardLast4: string;
   suspended?: boolean; // 카카오뱅크 계좌 지급정지 (🔔 패널, 연습용) — 켜면 이체를 누를 때 '고객센터로 문의해주세요.' 팝업, 서버도 403
+  // 토스만 (서버가 toss 일 때만 보냄, src/toss/api.ts)
+  pointChances?: number;
+  rewardMax?: number | null;
+  rewardDismissed?: string | null;
+  adSnoozeUntil?: string | null;
 }
 
 export interface Bank {
@@ -45,6 +50,10 @@ export interface Account {
   number?: string;
   bank: Bank; // main은 카카오뱅크
   safebox?: number; // 세이프박스 (main만, 통장 잔액과 별도)
+  // 토스만 (서버가 toss 일 때만 보냄, src/toss/api.ts): 개설일 "YYYY-MM-DD" · ★ · "money" = 토스머니
+  openedAt?: string | null;
+  favorite?: boolean;
+  role?: "money" | null;
 }
 
 export interface NewBankAccount {
@@ -65,6 +74,13 @@ export interface Transaction {
   balanceAfter: number;
   tag: TxTag;
   toBank?: { code: string; digits: number }; // 내가 보낸 이체면 받은 은행과 계좌번호 자리수
+  // 토스만 (서버가 toss 일 때만 보냄, src/toss/api.ts): 소비 분류 · 결제 수단 · 카드 · 취소 · 소비에서 제외 · 내 계좌끼리
+  category?: string | null;
+  channel?: "card" | "account" | "pay" | null;
+  cardId?: string | null;
+  cancelled?: boolean;
+  exclude?: boolean;
+  own?: boolean;
 }
 
 export interface TransactionDetail extends Transaction {
@@ -117,6 +133,8 @@ export interface MyAccountRecipient {
   number?: string;
   holder: string;
   balance: number;
+  role?: "money" | null; // 토스만
+  favorite?: boolean; // 토스만 (★)
 }
 
 export interface TransferRecipients {

@@ -10,11 +10,12 @@ import {
 import { useLocation, useNavigate, useNavigationType, type Location } from "react-router-dom";
 import { TIMING } from "../config/timing";
 import { OS } from "../platform/platform";
-import { APP, KAKAO2 } from "../profile/session";
+import { APP, KAKAO2, TOSS } from "../profile/session";
 import { LayerContext } from "../platform/LayerContext";
 import { IBK_ANIM_MS, ibkAnimFor, ibkBackLevel, type IbkAnim } from "../ibk/nav";
 import { K2_NAV, k2AnimFor, k2Modal, type K2Anim } from "../kakao2/nav";
 import { k2ClockOnce } from "../kakao2/chrome";
+import { TOSS_ANIM_END, TOSS_ANIM_MS, tossAnimFor, type TossAnim } from "../toss/nav";
 import "./ScreenStack.css";
 import "../kakao2/nav.css";
 
@@ -55,6 +56,9 @@ const IBK_ANDROID = APP === "ibk" && OS === "android";
 // kakao2(아이폰 새 녹화, src/kakao2/nav.ts · nav.css): 이체 · 거래상세는 아래에서 올라오는 모달(500ms 스프링, 실제로 끝났을 때 걷음 — 케이뱅크 거래 상세처럼),
 // 그 밖의 push 는 400ms 곡선 + 아래 두 모서리 둥글게 (477ms 에 각지며 밑 층도 그때 걷음), 뒤로는 보통 iOS. 밑 화면 어둡게는 .10
 const K2_MS: Record<K2Anim, number> = { modal: K2_NAV.modal, detail: K2_NAV.modal, push: K2_NAV.push, pop: TIMING.nav.ios };
+// 토스(갤럭시 고정, src/toss/nav.ts · nav.css): 아래에서 올라오는 push 400ms · 내려가는 pop + 드러나는 화면 내용 −5dp → 0 · cut(탭 · 증명서 단계 · 확인/완료)
+// · fade(쿠폰 광고 닫기) · reveal(이체 완료 → 쿠폰). 모두 실제로 끝났을 때 걷음 (onTossAnimEnd). NH_ANDROID 의 80/100ms 는 토스엔 안 씀
+const TOSS_ANDROID = TOSS && OS === "android";
 const UNDER_DIM = KAKAO2 ? K2_NAV.underDim : 0.12;
 
 // 화면 내용은 loc/active가 그대로면 다시 그리지 않는다.
@@ -78,6 +82,7 @@ export function ScreenStack({ render }: { render: Render }) {
   const [animMs, setAnimMs] = useState(0); // 지금 전환 길이 (--nav-ms)
   const [kbAnim, setKbAnim] = useState<KbAnim | null>(null); // 케이뱅크 갤럭시: 지금 전환 종류 (layer--kb-*)
   const [k2Anim, setK2Anim] = useState<K2Anim | null>(null); // kakao2: 지금 전환 종류 (layer--k2-*)
+  const [tossAnim, setTossAnim] = useState<TossAnim | null>(null); // 토스: 지금 전환 종류 (layer--toss-*)
   // 드래그 "중인지"만 state. 손가락 위치(dx)는 매 프레임 바뀌므로 ref + DOM 직접 조작.
   const [dragging, setDragging] = useState(false);
   const skipAnim = useRef(false);
@@ -123,6 +128,22 @@ export function ScreenStack({ render }: { render: Render }) {
       // 걷는 건 전환이 실제로 끝났을 때 (아래 onIbkAnimEnd). 길이만큼의 타이머로 걷으면 새 화면을 그리느라 첫 프레임이 늦게 나온 만큼
       // 잘려 보였음 (개발 서버: 메뉴 열기·닫기 100ms 가 0~67ms 에서, 본문 200ms 가 167~183ms 에서 끊김). 타이머는 끝 이벤트가 안 올 때 대비
       const id = setTimeout(endIbkAnim, IBK_ANIM_MS[a] + 300);
+      return () => clearTimeout(id);
+    }
+
+    if (TOSS_ANDROID) {
+      const a = tossAnimFor(navType, location, prevTop);
+      // push · load: 나가는 층이 밑, 새 층이 위 / pop · fade · reveal: 나가는 층이 위 (reveal 은 replace 로 옴)
+      const layerAnim: Anim | null = a === "push" || a === "load" ? "push" : a ? "pop" : null;
+      drag.current = null;
+      setDragging(false);
+      setTossAnim(a);
+      setEnterAnim(layerAnim);
+      setExiting(layerAnim ? { loc: prevTop, anim: layerAnim } : null);
+      if (!a) return;
+      setAnimMs(TOSS_ANIM_MS[a]);
+      // 걷는 건 움직임이 실제로 끝났을 때 (onTossAnimEnd). 타이머는 끝 이벤트가 안 올 때 대비
+      const id = setTimeout(endTossAnim, TOSS_ANIM_MS[a] + 300);
       return () => clearTimeout(id);
     }
 
@@ -198,6 +219,17 @@ export function ScreenStack({ render }: { render: Render }) {
   const onIbkAnimEnd = (e: AnimationEvent<HTMLDivElement>) => {
     const t = e.target as HTMLElement;
     if (ibkAnim?.startsWith("menu") ? t === e.currentTarget : t.classList.contains("ibk-body") && e.animationName.startsWith("ibk-in-")) endIbkAnim();
+  };
+
+  // 토스 전환 끝: 그 전환의 마지막 애니메이션 (push = 새 층 toss-push-in, pop = 드러나는 내용 toss-reveal, fade = 나가는 층 toss-fade-out,
+  // reveal = 새 층 내용 toss-reveal-in — nav.ts TOSS_ANIM_END). 안쪽 요소의 애니메이션 끝도 올라오므로 이름으로 가림
+  const endTossAnim = () => {
+    setExiting(null);
+    setEnterAnim(null);
+    setTossAnim(null);
+  };
+  const onTossAnimEnd = (e: AnimationEvent<HTMLDivElement>) => {
+    if (tossAnim && e.animationName === TOSS_ANIM_END[tossAnim]) endTossAnim();
   };
 
   // 손가락 위치를 화면 2장 + 어둡게 덮는 막에 반영. transform/opacity만 → GPU 합성만으로 처리.
@@ -320,11 +352,19 @@ export function ScreenStack({ render }: { render: Render }) {
         <div
           key={l.loc.key}
           className={
-            ibkAnim ? `${l.className} layer--ibk-${ibkAnim}` : kbAnim ? `${l.className} layer--kb-${kbAnim}` : k2Anim ? `${l.className} layer--k2-${k2Anim}` : l.className
+            ibkAnim
+              ? `${l.className} layer--ibk-${ibkAnim}`
+              : kbAnim
+                ? `${l.className} layer--kb-${kbAnim}`
+                : k2Anim
+                  ? `${l.className} layer--k2-${k2Anim}`
+                  : tossAnim
+                    ? `${l.className} layer--toss-${tossAnim}`
+                    : l.className
           }
           style={{ ["--nav-ms" as string]: `${ibkAnim ? IBK_ANIM_MS[ibkAnim] : animMs || navMs(exiting?.anim ?? enterAnim)}ms` }}
           ref={l.role === "top" ? topEl : l.role === "under" ? underEl : undefined}
-          onAnimationEnd={ibkAnim ? onIbkAnimEnd : kbAnim ? onKbAnimEnd : k2Anim ? onK2AnimEnd : undefined}
+          onAnimationEnd={ibkAnim ? onIbkAnimEnd : kbAnim ? onKbAnimEnd : k2Anim ? onK2AnimEnd : tossAnim ? onTossAnimEnd : undefined}
           {...(l.active && {
             onPointerDown,
             onPointerMove,

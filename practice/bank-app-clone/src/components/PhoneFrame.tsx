@@ -3,13 +3,14 @@ import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { DEVICE_LOCK, IBK2, OS } from "../platform/platform";
 import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
-import { THEME } from "../platform/theme";
-import { APP, HAS_INTRO, KAKAO2 } from "../profile/session";
+import { THEME, THEME_LOCK } from "../platform/theme";
+import { APP, HAS_INTRO, KAKAO2, TOSS } from "../profile/session";
 import { BLINK_MS, INTRO_OS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
 import { useKbankSent } from "../kbank/notice";
 import { K2HomeIndicator, K2Island, K2StatusBar } from "../kakao2/StatusBar";
 import { K2LoadingDim } from "../kakao2/LoadingDim";
 import { K2LaunchIcon } from "../kakao2/Launch";
+import { TossStatusBar } from "../toss/StatusBar";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -348,8 +349,8 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
             <i />
           </div>
         ))}
-      {/* kakao2: 화면 위에 겹친 투명한 상태바 (src/kakao2/StatusBar.tsx) */}
-      {KAKAO2 ? <K2StatusBar /> : <StatusBar />}
+      {/* kakao2: 화면 위에 겹친 투명한 상태바 (src/kakao2/StatusBar.tsx). 토스도 겹친 상태바 (12시간 시계 · 녹화 중 표시, src/toss/StatusBar.tsx) */}
+      {KAKAO2 ? <K2StatusBar /> : TOSS ? <TossStatusBar /> : <StatusBar />}
       <div className="phone__viewport">
         {children}
         {/* kakao2 로딩 막: 화면 하나가 켜고 다른 화면이 끔 (src/kakao2/dim.ts) */}
@@ -365,6 +366,7 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
           <i />
         </div>
       ) : navbar ? (
+        // 토스: 같은 띠를 화면 위에 겹친 층으로 + 모드 4가지 (src/toss/toss.css · band.ts)
         <div className="phone__navbar">
           <i />
         </div>
@@ -394,8 +396,8 @@ export function OsSwitch() {
         </a>
       </nav>
       )}
-      {/* kakao2 는 녹화처럼 라이트 고정 (홈만 늘 어둡게) */}
-      {!KAKAO2 && (
+      {/* kakao2 는 녹화처럼 라이트 고정 (홈만 늘 어둡게), 토스는 다크 고정 (theme.ts THEME_LOCK) */}
+      {!THEME_LOCK && (
       <nav className="os-switch">
         <a href="/?theme=light" className={THEME === "light" ? "on" : ""}>
           라이트

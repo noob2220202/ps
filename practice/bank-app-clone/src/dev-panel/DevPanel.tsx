@@ -5,7 +5,7 @@ import { useApi } from "../api/useApi";
 import type { Account, AppProfile, Bank, HomeData, Payee, Transaction, TransactionDetail, TransferRecipients, TxTag } from "../api/types";
 import { won } from "../lib/format";
 import { OS } from "../platform/platform";
-import { THEME_CHOICE } from "../platform/theme";
+import { THEME_CHOICE, THEME_LOCK } from "../platform/theme";
 import { isCapture, setCapture } from "../platform/capture";
 import { canRecord, recordPhone } from "../platform/recorder";
 import { logout, remaining, useAuth } from "../auth/auth";
@@ -15,6 +15,9 @@ import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
 import { APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
 import { kbAdEnabled, kbAdHiddenUntil, kbAdResetHide, kbVariantMode, setKbAdEnabled, setKbVariantMode } from "../kbank/prefs";
+import { TossAccountFields } from "../toss/devpanel/TossAccountFields";
+import { TossPanelSection } from "../toss/devpanel/TossPanelSection";
+import { TossTxFields } from "../toss/devpanel/TossTxFields";
 import "./DevPanel.css";
 
 // 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
@@ -151,15 +154,15 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
   return (
     <div className="tab">
       <CurrentProfile />
-      {/* kakao2 는 녹화 기기(아이폰 · 라이트 모드)로 고정이라 기기 · 테마 고르기 없음 */}
-      {!KAKAO2 && (
+      {/* kakao2 는 녹화 기기(아이폰 · 라이트 모드), 토스는 갤럭시 · 다크로 고정이라 기기 · 테마 고르기 없음 */}
+      {!KAKAO2 && APP !== "toss" && (
         <Field label="기기">
           <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
         </Field>
       )}
       <CaptureToggle />
       <RecordButton onStart={onClose} />
-      {!KAKAO2 && (
+      {!THEME_LOCK && (
         <Field label="테마">
           <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
         </Field>
@@ -389,15 +392,24 @@ function AccountsTab({ run }: { run: Run }) {
         <AccountEditor key={a.id} account={a} bank={banks.data.find((b) => b.code === a.bank?.code)} run={run} />
       ))}
       {APP === "kakao" && <SuspendToggle suspended={!!home.data.profile.suspended} run={run} />}
-      {/* 이번달 쓴 돈·캐시백은 카카오뱅크 홈에만 있음. 케이뱅크 홈 'ONE n월 쓴 돈' 도 이번달 쓴 돈 (캐시백 칸 없음) */}
-      {(APP === "kakao" || APP === "kbank") && (
+      {/* 이번달 쓴 돈·캐시백은 카카오뱅크 홈에만 있음. 케이뱅크 홈 'ONE n월 쓴 돈' 도 이번달 쓴 돈 (캐시백 칸 없음).
+          토스: 홈 '{M}월에 쓴 돈' = 소비 합계 + 캐시백 기회 */}
+      {(APP === "kakao" || APP === "kbank" || APP === "toss") && (
         <>
           <h3 className="tab__h">카드</h3>
           <CardEditor key={`${home.data.profile.cardSpend}-${home.data.profile.cashbackCount}`} home={home.data} run={run} />
         </>
       )}
-      {/* 콕뱅크는 농협 계좌만, 하나원큐는 하나은행 계좌만 */}
-      {APP !== "kakao" ? (
+      {/* 콕뱅크는 농협 계좌만, 하나원큐는 하나은행 계좌만. 토스는 토스뱅크 계좌 + 다른 은행 계좌 (여러 은행을 모아 보는 앱) */}
+      {APP === "toss" ? (
+        <>
+          <h3 className="tab__h">{ownBank().name} 계좌 추가</h3>
+          <AddOwnBankAccount run={run} />
+          <h3 className="tab__h">다른 은행 계좌 추가</h3>
+          <AddBankAccount banks={banks.data} run={run} exclude={[]} withName />
+          <TossPanelSection run={run} home={home.data} />
+        </>
+      ) : APP !== "kakao" ? (
         <>
           {/* 케이뱅크는 케이뱅크 계좌만 (서버도 다른 은행은 거절) */}
           <h3 className="tab__h">{ownBank().name} 계좌 추가</h3>
@@ -433,7 +445,11 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
         ? { name: "보통예금(IBK W통장)", number: "숫자 14자리", max: 17 }
         : APP === "kbank"
           ? { name: "듀얼K 입출금통장", number: "숫자 12자리", max: 14 }
-          : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
+          : APP === "toss"
+            ? { name: "토스뱅크 통장", number: "숫자 12자리", max: 14 }
+            : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
+  // 토스: 토스뱅크 계좌만 자유 입력(숫자 · 하이픈), 다른 은행 계좌는 카카오뱅크처럼 그 은행 형식대로 하이픈 (하나 14자리 + 하이픈이 14자에서 잘리지 않게)
+  const freeNumber = own && (APP !== "toss" || account.bank?.code === "toss");
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
@@ -476,7 +492,8 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
           {own && (
             <>
               <Field label="계좌 이름 (홈·내역에 보이는 이름)">
-                <input value={label} maxLength={20} placeholder={ownHint.name} onChange={(e) => setLabel(e.target.value)} />
+                {/* 토스의 다른 은행 계좌는 '토스뱅크 통장' 대신 흔한 이름을 보기로 (freeNumber 는 토스 밖에선 늘 own 과 같음) */}
+                <input value={label} maxLength={20} placeholder={freeNumber ? ownHint.name : "입출금통장"} onChange={(e) => setLabel(e.target.value)} />
               </Field>
               <button className="btn btn--sm" onClick={() => run(() => api.updateAccount(account.id, { name: label }), "계좌 이름을 바꿨어요")}>
                 이름 저장
@@ -487,7 +504,7 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
           {(external || own || account.kind === "main") && (
             <>
               <Field label="계좌번호">
-                {own ? (
+                {freeNumber ? (
                   // 농협은 13자리(352-0000-0000-00)와 14자리(000000-00-000000), 하나은행은 14자리(000-000000-00000) → 숫자만 받고 서버가 하이픈을 넣음
                   <input value={number} inputMode="numeric" placeholder={ownHint.number} onChange={(e) => setNumber(e.target.value.replace(/[^\d-]/g, "").slice(0, ownHint.max))} />
                 ) : (
@@ -509,6 +526,7 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
               </div>
             </>
           )}
+          {APP === "toss" && <TossAccountFields account={account} run={run} />}
         </div>
       )}
     </div>
@@ -543,7 +561,13 @@ function CardEditor({ home, run }: { home: HomeData; run: Run }) {
   const [count, setCount] = useState(home.profile.cashbackCount);
   return (
     <div className="add-bank">
-      <Field label={`${APP === "kbank" ? "ONE 이번 달 쓴 돈" : "이번달 쓴 돈"} ${auto ? "(지금: 체크카드 거래 합계로 자동)" : "(지금: 직접 입력한 값)"}`}>
+      <Field
+        label={
+          APP === "toss"
+            ? `이번 달 쓴 돈 (홈 · 소비) ${auto ? "(지금: 소비 합계로 자동)" : "(지금: 직접 입력한 값)"}`
+            : `${APP === "kbank" ? "ONE 이번 달 쓴 돈" : "이번달 쓴 돈"} ${auto ? "(지금: 체크카드 거래 합계로 자동)" : "(지금: 직접 입력한 값)"}`
+        }
+      >
         <MoneyInput value={spend} onChange={setSpend} quick={[10000, 100000, 1000000]} />
       </Field>
       <div className="row">
@@ -553,13 +577,13 @@ function CardEditor({ home, run }: { home: HomeData; run: Run }) {
         <button
           className="btn btn--sm btn--danger"
           disabled={auto}
-          onClick={() => run(() => api.updateProfile({ cardSpend: null }), "체크카드 거래 합계로 계산해요")}
+          onClick={() => run(() => api.updateProfile({ cardSpend: null }), APP === "toss" ? "소비 합계로 계산해요" : "체크카드 거래 합계로 계산해요")}
         >
           자동 계산으로
         </button>
       </div>
-      {APP === "kakao" && (
-        <Field label="현금 돌려받을 기회">
+      {(APP === "kakao" || APP === "toss") && (
+        <Field label={APP === "toss" ? "캐시백 기회" : "현금 돌려받을 기회"}>
           <div className="chips-row">
             <button className="chip-btn" onClick={() => setCount(Math.max(0, count - 1))}>
               −
@@ -611,10 +635,12 @@ function NumberInput({ bank, value, onChange }: { bank: Bank; value: string; onC
   return <input value={value} inputMode="numeric" placeholder={placeholder} onChange={(e) => onChange(formatAccountNumber(bank.pattern, e.target.value, bank.alt).slice(0, 20))} />;
 }
 
-function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
+// exclude: 은행 목록에서 뺄 은행 (카카오뱅크는 카카오뱅크 통장이 이미 있어 뺌, 토스는 [] ), withName: 계좌 이름 칸 (토스: 영하나플러스 통장 등)
+function AddBankAccount({ banks, run, exclude = ["kakao"], withName = false }: { banks: Bank[]; run: Run; exclude?: string[]; withName?: boolean }) {
   const [bank, setBank] = useState(banks.find((b) => b.code === "kb") ?? banks[1]);
   const [number, setNumber] = useState("");
   const [balance, setBalance] = useState(0);
+  const [name, setName] = useState("");
 
   return (
     <div className="add-bank">
@@ -622,12 +648,17 @@ function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
       <BankSelect
         banks={banks}
         value={bank}
-        exclude={["kakao"]}
+        exclude={exclude}
         onChange={(b) => {
           setBank(b);
           setNumber("");
         }}
       />
+      {withName && (
+        <Field label="계좌 이름">
+          <input value={name} maxLength={20} placeholder="입출금통장" onChange={(e) => setName(e.target.value)} />
+        </Field>
+      )}
       <Field label={`${bank.name} 계좌번호`}>
         <NumberInput bank={bank} value={number} onChange={setNumber} />
       </Field>
@@ -637,9 +668,15 @@ function AddBankAccount({ banks, run }: { banks: Bank[]; run: Run }) {
       <button
         className="btn"
         onClick={async () => {
-          if (await run(() => api.addBankAccount({ bankCode: bank.code, number, balance }), `${bank.name} 계좌를 추가했어요`)) {
+          if (
+            await run(
+              () => api.addBankAccount({ bankCode: bank.code, number, balance, ...(withName && name.trim() && { name: name.trim() }) }),
+              `${bank.name} 계좌를 추가했어요`,
+            )
+          ) {
             setNumber("");
             setBalance(0);
+            setName("");
           }
         }}
       >
@@ -656,8 +693,10 @@ const OWN_BANK = {
   hana: { code: "hana", name: "하나은행", placeholder: "입출금통장", numberLabel: "하나은행 계좌번호 (14자리)" },
   ibk: { code: "ibk", name: "기업은행", placeholder: "보통예금", numberLabel: "기업은행 계좌번호 (14자리)" },
   kbank: { code: "kbank", name: "케이뱅크", placeholder: "듀얼K 입출금통장", numberLabel: "케이뱅크 계좌번호 (12자리)" },
+  // 토스: 앱 id 와 은행 코드가 같은 "toss" (토스뱅크) — infra.md §4
+  toss: { code: "toss", name: "토스뱅크", placeholder: "토스뱅크 통장", numberLabel: "토스뱅크 계좌번호 (12자리)" },
 };
-const ownBank = () => OWN_BANK[APP === "hana" || APP === "ibk" || APP === "kbank" ? APP : "nh"];
+const ownBank = () => OWN_BANK[APP === "hana" || APP === "ibk" || APP === "kbank" || APP === "toss" ? APP : "nh"];
 function AddOwnBankAccount({ run }: { run: Run }) {
   const own = ownBank();
   const [name, setName] = useState("");
@@ -784,7 +823,7 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
 }
 
 function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
-  const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" || APP === "ibk" || APP === "kbank" ? APP : "nh")) ?? banks[0]);
+  const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" || APP === "ibk" || APP === "kbank" || APP === "toss" ? APP : "nh")) ?? banks[0]);
   const [number, setNumber] = useState("");
   const [holder, setHolder] = useState("");
   const [recent, setRecent] = useState(true); // 카카오뱅크: 이체 화면 '최근 이체'에 보이게
@@ -1042,6 +1081,8 @@ function TxEditForm({ tx, banks, run, onSaved }: { tx: Transaction; banks: Bank[
           닫기
         </button>
       </div>
+      {/* 토스만의 거래 칸 (분류 · 결제 수단 · 카드 · 취소됨 · 소비에서 제외): 저장은 그 칸이 따로 */}
+      {APP === "toss" && <TossTxFields tx={tx} run={run} />}
     </div>
   );
 }

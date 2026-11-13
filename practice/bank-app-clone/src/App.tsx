@@ -15,7 +15,7 @@ import { TransferScreen } from "./screens/transfer/TransferScreen";
 import { AmountScreen } from "./screens/transfer/AmountScreen";
 import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
 import { ProfilePicker } from "./profile/ProfilePicker";
-import { APP, KAKAO2, currentProfileId } from "./profile/session";
+import { APP, KAKAO2, TOSS, currentProfileId } from "./profile/session";
 import { NhSplash } from "./nh/NhSplash";
 import { NhLoadingLayer } from "./nh/common";
 import { HanaLoadingLayer } from "./hana/common";
@@ -53,6 +53,10 @@ import { KbankReceipt } from "./kbank/KbankReceipt";
 import { renderKakao2Route } from "./kakao2/routes";
 import { K2Inset } from "./kakao2/K2Inset";
 import { launchReady } from "./kakao2/launch";
+import { renderTossRoute } from "./toss/routes";
+import { TossInset } from "./toss/Inset";
+import { TossOverlay } from "./toss/Overlay";
+import { TossSplash } from "./toss/home/TossSplash";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
@@ -125,7 +129,8 @@ const renderKbankRoute = (location: Location) => (
     <Route path="/send/done" element={<KbankDone />} />
   </Routes>
 );
-const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute, ibk: renderIbkRoute, kbank: renderKbankRoute };
+// 토스 (APP=toss 9117): 화면 표는 src/toss/routes.tsx
+const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute, ibk: renderIbkRoute, kbank: renderKbankRoute, toss: renderTossRoute };
 // 카카오뱅크 kakao2 (9115): 새 녹화(아이폰) 화면 표 (src/kakao2/routes.tsx). kakao 의 renderRoute 는 그대로
 const render = KAKAO2 ? renderKakao2Route : ROUTES[APP];
 
@@ -179,14 +184,20 @@ export default function App() {
 
   return (
     <StatusBarProvider>
-      <PhoneFrame overlay={{ nh: <NhLoadingLayer />, hana: <HanaLoadingLayer />, ibk: <IbkLoadingLayer />, kbank: undefined, kakao: undefined }[APP]}>
+      <PhoneFrame
+        overlay={{ nh: <NhLoadingLayer />, hana: <HanaLoadingLayer />, ibk: <IbkLoadingLayer />, kbank: undefined, kakao: undefined, toss: <TossOverlay /> }[APP]}
+      >
         {auth.status === "checking" && <PhoneOff />}
-        {/* kakao2 는 상태바가 화면 위에 겹치므로 카카오뱅크 로그인 · 프로필 고르기를 54pt 띠 아래에 (K2Inset) */}
+        {/* kakao2 는 상태바가 화면 위에 겹치므로 카카오뱅크 로그인 · 프로필 고르기를 54pt 띠 아래에 (K2Inset). 토스도 같은 이유로 28dp 띠 아래에 (TossInset) */}
         {auth.status === "out" &&
           (KAKAO2 ? (
             <K2Inset>
               <LoginScreen message={auth.message} />
             </K2Inset>
+          ) : TOSS ? (
+            <TossInset>
+              <LoginScreen message={auth.message} />
+            </TossInset>
           ) : (
             <LoginScreen message={auth.message} />
           ))}
@@ -197,6 +208,10 @@ export default function App() {
             <K2Inset>
               <ProfilePicker onEnter={toSplash} />
             </K2Inset>
+          ) : TOSS ? (
+            <TossInset>
+              <ProfilePicker onEnter={toSplash} />
+            </TossInset>
           ) : (
             <ProfilePicker onEnter={toSplash} />
           ))}
@@ -210,6 +225,9 @@ export default function App() {
             <IbkSplash onDone={toReady} />
           ) : APP === "kbank" ? (
             <KbankSplash onDone={toReady} />
+          ) : APP === "toss" ? (
+            // 토스: 시작화면 1.2초 → 홈 (잠금 화면 없음, plan.md §0.12). 진짜 시작화면은 home 영역 (src/toss/home/TossSplash.tsx)
+            <TossSplash onDone={toReady} />
           ) : (
             <Splash onDone={toLoading} />
           ))}
