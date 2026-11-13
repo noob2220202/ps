@@ -75,6 +75,9 @@ function nowIso() {
 
 // 토스: 공용 API 에 붙는 토스 칸 · 토스 전용 API 는 server/toss-api.mjs (아래 toss = tossApi(...)). 다른 앱은 toss 가 null → 응답 그대로
 const TOSS = APP === "toss";
+// NH올원뱅크 (allone): 공용 API 에 작은 칸만 덧붙임 (한도제한 limited, 홈 ao.notice, 거래 상세 ao, 받는 분 ☆, 최근 삭제하기).
+// 다른 앱 응답은 그대로. NH 계좌는 bank_code 'nh' — 여기서 APP === "nh"(콕뱅크)를 보면 안 됨
+const ALLONE = APP === "allone";
 
 const getProfile = () => {
   const p = db().prepare("SELECT * FROM profile WHERE id = 1").get();
@@ -85,6 +88,8 @@ const getProfile = () => {
     cashbackCount: p.cashback_count,
     suspended: !!p.suspended,
     ...(TOSS && toss.profileFields(p)),
+    // 올원 정기점검 안내 (홈 ao.notice 와 같은 값, PATCH 로 보내는 이름 그대로): 보이기 · 첫 장 항목 (null = 화면 기본 문구)
+    ...(ALLONE && { noticeOn: !!p.notice_on, noticeItems: aoNoticeItems(p.notice_items) }),
   };
 };
 
@@ -103,6 +108,7 @@ function toAccount(row, profile = getProfile()) {
     bank: bankInfo(bank),
     ...(row.kind === "main" && { safebox: row.safebox }),
     ...(TOSS && toss.accountFields(row)), // openedAt · favorite · role
+    ...(ALLONE && { limited: !!row.limited }), // 올원 '한도제한' 표시 (표시만)
   };
 }
 
@@ -162,6 +168,53 @@ const KIND_BY_TAG = { "#체크카드": "체크카드결제", "#자동이체": "�
 
 // 토스 전용 칸 · API (server/toss-api.mjs). 위 도우미를 넘겨 같은 규칙(계좌 이름, 시계, 오류 모양)을 씀
 const toss = TOSS ? tossApi({ getProfile, toAccount, nowIso, bad, notFound, isLocalIso, myAccountByNumber }) : null;
+
+// ---------- NH올원뱅크 (allone) 칸 ----------
+// 정기점검 안내 시트 첫 장 항목 [{title, when}] (저장 값 JSON, NULL · 깨진 값 = null → 화면이 계산한 기본값)
+function aoNoticeItems(raw) {
+  try {
+    const items = raw ? JSON.parse(raw) : null;
+    return Array.isArray(items) ? items : null;
+  } catch {
+    return null;
+  }
+}
+// PATCH /api/profile 의 noticeOn · noticeItems 검사 → 저장 함수 (틀리면 fields 에 넣고 null)
+function aoProfilePatch(body, fields) {
+  const { noticeOn, noticeItems } = body;
+  if (noticeOn !== undefined && typeof noticeOn !== "boolean") fields.noticeOn = "켜기/끄기";
+  let items;
+  if (noticeItems === null) items = null;
+  else if (noticeItems !== undefined) {
+    const ok =
+      Array.isArray(noticeItems) &&
+      noticeItems.length <= 5 &&
+      noticeItems.every(
+        (it) =>
+          it &&
+          typeof it === "object" &&
+          typeof it.title === "string" &&
+          typeof it.when === "string" &&
+          it.title.trim().length >= 1 &&
+          it.title.trim().length <= 30 &&
+          it.when.trim().length <= 40,
+      );
+    if (!ok) fields.noticeItems = "항목은 5개까지, 제목 1~30자 · 일시 40자 이하";
+    else items = JSON.stringify(noticeItems.map((it) => ({ title: it.title.trim(), when: it.when.trim() })));
+  }
+  return () => {
+    if (noticeOn !== undefined) db().prepare("UPDATE profile SET notice_on = ? WHERE id = 1").run(noticeOn ? 1 : 0);
+    if (noticeItems !== undefined) db().prepare("UPDATE profile SET notice_items = ? WHERE id = 1").run(items);
+  };
+}
+// 거래내역 상세: 거래가 있는 계좌 + 보낸 이체면 그 받는 분(☆ 상태). 받는 분이 등록 안 됐으면 null
+function aoTxDetail(t, sent) {
+  const p = sent && db().prepare("SELECT id, favorite FROM payees WHERE bank_code = ? AND number = ?").get(sent.bank_code, sent.number);
+  return { accountId: t.account_id, payee: p ? { id: String(p.id), favorite: !!p.favorite } : null };
+}
+// '최근' 목록에서 삭제하기로 숨긴 계좌: 숨긴 시각 뒤에 보낸 이체가 있어야 다시 보임
+const AO_RECENT_VISIBLE =
+  " HAVING MAX(t.at) > COALESCE((SELECT h.hidden_at FROM recent_hidden h WHERE h.bank_code = t.bank_code AND h.number = t.number), '')";
 
 // ---------- 로그인 (server/auth.mjs) ----------
 app.post("/api/auth/login", (req, res) => {
@@ -379,6 +432,8 @@ app.get("/api/home", (_req, res) => {
     nativeAd: { source: "쿠팡 앱에서 구매하기", title: "로켓배송 오늘주문내일도착", sponsor: "Appier 광고입니다" },
     // 토스 홈: 쓴 돈 · 포인트 기회 · 리워드 배너 · 토스유스카드 · 이체 뒤 광고 안 보기 (위 카카오 배너 등은 토스 화면이 안 씀)
     ...(TOSS && { toss: toss.homeBlock(month, spend) }),
+    // 올원 홈: 정기점검 안내 시트 (보이기 · 첫 장 항목). '1일동안 안보기'는 보는 사람 브라우저(localStorage)에만
+    ...(ALLONE && { ao: { notice: { on: profile.noticeOn, items: profile.noticeItems } } }),
   });
 });
 
@@ -397,8 +452,10 @@ app.patch("/api/profile", (req, res) => {
   if (cashbackCount !== undefined && !(Number.isInteger(cashbackCount) && cashbackCount >= 0 && cashbackCount <= 99)) fields.cashbackCount = "0~99건";
   if (suspended !== undefined && typeof suspended !== "boolean") fields.suspended = "켜기/끄기";
   const tossSave = TOSS && toss.profilePatch(req.body ?? {}, fields); // pointChances · rewardMax · rewardDismissed · adSnoozeUntil
+  const aoSave = ALLONE && aoProfilePatch(req.body ?? {}, fields); // noticeOn · noticeItems (정기점검 안내)
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   if (tossSave) tossSave();
+  if (aoSave) aoSave();
   const p = getProfile();
   db().prepare("UPDATE profile SET user_name = ?, card_last4 = ?, card_spend = ?, cashback_count = ?, suspended = ? WHERE id = 1").run(
     userName !== undefined ? String(userName).trim() : p.userName,
@@ -416,11 +473,12 @@ app.get("/api/accounts/:id", (req, res) => res.json(toAccount(findAccount(req.pa
 app.post("/api/accounts", (req, res) => {
   // 콕뱅크 서버는 농협 계좌만 (은행을 안 보내면 농협). 계좌 이름(저축예금 등)도 정할 수 있음
   // 은행을 안 보내면 앱 이름 = 은행 코드 (nh · hana · ibk · kbank). 토스는 앱 이름 "toss" 가 우연히 토스뱅크 은행 코드와 같아서 토스뱅크 — 맞는 결과라 그대로 둠
-  const { bankCode = APP === "kakao" ? undefined : APP, number, balance = 0, name } = req.body ?? {};
+  // 올원은 앱 이름(allone)이 은행 코드가 아니라서 농협은행(nh)
+  const { bankCode = APP === "kakao" ? undefined : APP === "allone" ? "nh" : APP, number, balance = 0, name } = req.body ?? {};
   const bank = bankByCode(bankCode);
   const fields = {};
   if (!bank) fields.bankCode = "은행을 골라 주세요";
-  else if (bank.code === "kakao" && !TOSS) fields.bankCode = "카카오뱅크 통장은 이미 있어요"; // 토스는 여러 은행을 모아 봄 → 카카오뱅크 계좌도 추가 가능
+  else if (bank.code === "kakao" && !TOSS && !ALLONE) fields.bankCode = "카카오뱅크 통장은 이미 있어요"; // 토스는 여러 은행을 모아 봄 → 카카오뱅크 계좌도 추가 가능 (올원도 다른 은행 출금계좌)
   else if (APP === "nh" && bank.code !== "nh") fields.bankCode = "콕뱅크에는 농협 계좌만 추가할 수 있어요";
   else if (APP === "hana" && bank.code !== "hana") fields.bankCode = "하나원큐에는 하나은행 계좌만 추가할 수 있어요";
   else if (APP === "ibk" && bank.code !== "ibk") fields.bankCode = "i-ONE Bank에는 기업은행 계좌만 추가할 수 있어요";
@@ -446,7 +504,14 @@ app.post("/api/accounts", (req, res) => {
     balance,
     sort,
     name?.trim() ||
-      ({ nh: "저축예금", hana: "입출금통장", ibk: "보통예금", kbank: "듀얼K 입출금통장", toss: bank.code === "toss" ? "토스뱅크 통장" : null }[APP] ?? null),
+      ({
+        nh: "저축예금",
+        hana: "입출금통장",
+        ibk: "보통예금",
+        kbank: "듀얼K 입출금통장",
+        toss: bank.code === "toss" ? "토스뱅크 통장" : null,
+        allone: bank.code === "nh" ? "입출금통장" : null,
+      }[APP] ?? null),
   );
   if (TOSS) toss.accountCreated(id, bank.code); // 토스뱅크 계좌는 개설일 = 오늘
   res.status(201).json(toAccount(findAccount(id)));
@@ -463,6 +528,8 @@ app.patch("/api/accounts/:id", (req, res) => {
   if (!money(safebox)) throw bad("입력값을 확인해 주세요", { safebox: "0원 이상 10억원 이하" });
   if (safebox !== undefined && row.kind !== "main") throw bad("세이프박스는 카카오뱅크 통장에만 있어요");
   const tossSave = TOSS && toss.accountPatch(req.body ?? {}); // favorite · openedAt · sort · role (잘못된 값이면 여기서 400)
+  const limited = ALLONE ? req.body?.limited : undefined; // 올원 '한도제한' 표시
+  if (limited !== undefined && typeof limited !== "boolean") throw bad("입력값을 확인해 주세요", { limited: "켜기/끄기" });
   let formatted = row.number;
   if (number !== undefined) {
     // 대표 통장 번호도 바꿀 수 있음 (카카오뱅크 통장은 bank_code 가 비어 있어 카카오뱅크 형식 3333-00-0000000)
@@ -480,13 +547,14 @@ app.patch("/api/accounts/:id", (req, res) => {
     row.id,
   );
   if (tossSave) tossSave(row.id);
+  if (limited !== undefined) db().prepare("UPDATE accounts SET limited = ? WHERE id = ?").run(limited ? 1 : 0, row.id);
   res.json(toAccount(findAccount(row.id)));
 });
 
 // 다른 은행 계좌 삭제 (거래내역도 ON DELETE CASCADE로 같이 지워짐)
 app.delete("/api/accounts/:id", (req, res) => {
   const row = findAccount(req.params.id);
-  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌", ibk: "대표계좌", kbank: "대표계좌", toss: "토스뱅크 통장" }[APP]}은 지울 수 없어요`);
+  if (row.kind !== "external") throw bad(`${{ kakao: "카카오뱅크 통장", nh: "대표계좌", hana: "대표계좌", ibk: "대표계좌", kbank: "대표계좌", toss: "토스뱅크 통장", allone: "대표계좌" }[APP]}은 지울 수 없어요`);
   db().prepare("DELETE FROM accounts WHERE id = ?").run(row.id);
   res.status(204).end();
 });
@@ -552,6 +620,7 @@ function txDetailJson(id) {
     ...(sent && { transfer: { bank: bankInfo(bankByCode(sent.bank_code)), number: sent.number, holder: sent.holder } }),
     ...(sent?.memo_to && { memoTo: sent.memo_to }), // 받는 분 통장에 찍힌 글자 (케이뱅크 거래 상세 '받는 분에게 표기')
     ...(TOSS && toss.txDetailFields(t)), // 토스 상세: kindLabel (입금/출금) · counterparty (입금처 / 출금처)
+    ...(ALLONE && { ao: aoTxDetail(t, sent) }), // 올원 상세: accountId · payee {id, favorite} (☆)
   };
 }
 
@@ -709,6 +778,8 @@ app.post("/api/payees", (req, res) => {
   const r = db()
     .prepare("INSERT INTO payees (bank_code, number, holder, show_recent) VALUES (?, ?, ?, ?)")
     .run(bankCode, digits, name, req.body?.showRecent === true ? 1 : 0);
+  // 올원: 거래내역 상세 ☆ 를 등록 안 된 받는 분에게 누르면 ☆ 켠 채로 등록
+  if (ALLONE && req.body?.favorite === true) db().prepare("UPDATE payees SET favorite = 1 WHERE id = ?").run(r.lastInsertRowid);
   res.status(201).json(toPayee(findPayee(r.lastInsertRowid)));
 });
 
@@ -797,7 +868,7 @@ app.get("/api/transfer/recipients", (req, res) => {
       `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite, p.receive_error
          FROM transfers t LEFT JOIN payees p ON p.bank_code = t.bank_code AND p.number = t.number
         WHERE ${SENT("t")}
-        GROUP BY t.bank_code, t.number ORDER BY last_at DESC LIMIT 20`,
+        GROUP BY t.bank_code, t.number${ALLONE ? AO_RECENT_VISIBLE : ""} ORDER BY last_at DESC LIMIT 20`,
     )
     .all()
     // 내 계좌로 보낸 것은 뺌. 토스는 '최근 보낸 계좌'에 내 계좌도 섞여 나옴 ('내 영하나플러스 통장') — 보내는 계좌 자신만 뺌
@@ -818,6 +889,21 @@ app.get("/api/transfer/recipients", (req, res) => {
     .map((p) => ({ ...toPayee(p), payeeId: String(p.id) }));
   res.json({ mine, recent, favorites, ...(db().app === "nh" && { dailyRemaining: NH_DAILY_LIMIT - sentToday(from) }) });
 });
+
+// 올원 '최근' 삭제하기: 그 계좌를 지금 시각까지 숨김 (204). 다른 앱엔 없는 API (아래 404)
+if (ALLONE)
+  app.delete("/api/transfer/recent", (req, res) => {
+    const bank = bankByCode(req.query.bank);
+    if (!bank) throw bad("은행을 골라 주세요", { bank: "은행을 골라 주세요" });
+    const number = digitsOf(req.query.number);
+    if (!number || number.length > 20) throw bad("계좌번호를 확인해 주세요", { number: "계좌번호를 확인해 주세요" });
+    db()
+      .prepare(
+        "INSERT INTO recent_hidden (bank_code, number, hidden_at) VALUES (?, ?, ?) ON CONFLICT (bank_code, number) DO UPDATE SET hidden_at = excluded.hidden_at",
+      )
+      .run(bank.code, number, nowIso());
+    res.status(204).end();
+  });
 
 // 콕뱅크 1일 송금 한도 (영상: "1일 송금 잔여한도 1,000,000원")
 const NH_DAILY_LIMIT = 1_000_000;
@@ -947,7 +1033,7 @@ const dist = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
 if (existsSync(dist)) {
   // 화면은 세 앱이 같은 빌드를 쓰고, 어느 앱인지는 index.html에 끼워 넣어 알려준다 (window.__BANK_APP__)
   const html = readFileSync(resolve(dist, "index.html"), "utf8")
-    .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank", kbank: "케이뱅크", toss: "토스" }[APP]} 클론 연습</title>`)
+    .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank", kbank: "케이뱅크", toss: "토스", allone: "올원뱅크" }[APP]} 클론 연습</title>`)
     .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};${INTRO ? " window.__BANK_INTRO__ = true;" : ""}</script></head>`);
   app.use(express.static(dist, { index: false })); // "/" 도 아래에서 (index.html을 그대로 주면 앱 정보가 빠짐)
   // /account/main 같은 주소로 바로 들어와도 index.html을 줘야 화면 쪽 라우터가 처리할 수 있다
@@ -955,5 +1041,5 @@ if (existsSync(dist)) {
 }
 
 const portArg = process.argv.indexOf("--port");
-const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111, ibk2: 9113, kakao2: 9115, toss: 9117 }[SERVER_ID]));
+const PORT = Number(process.env.PORT ?? (portArg > 0 ? process.argv[portArg + 1] : { kakao: 9101, nh: 9103, hana: 9105, ibk: 9107, kbank: 9109, kbank2: 9111, ibk2: 9113, kakao2: 9115, toss: 9117, allone: 9119 }[SERVER_ID]));
 app.listen(PORT, "0.0.0.0", () => console.log(`bank-clone server (${SERVER_ID}) → http://localhost:${PORT}${existsSync(dist) ? "" : " (API만, dist 없음)"}`));

@@ -23,7 +23,9 @@ export function LoginScreen({ message }: { message?: string }) {
             ? "#ffffff"
             : APP === "toss"
               ? "#171619"
-              : "var(--home-bg)",
+              : APP === "allone"
+                ? "#ffffff"
+                : "var(--home-bg)",
     APP === "nh" || (THEME === "dark" && APP !== "ibk" && APP !== "kbank") ? "light" : "dark",
   );
   const [username, setUsername] = useState("");

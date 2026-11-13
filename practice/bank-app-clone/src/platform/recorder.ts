@@ -17,12 +17,13 @@ import kbankIntroWebm from "../assets/intro/kbank-open-intro.webm";
 import ibkIntroMp4 from "../assets/intro/ibk-open-intro.mp4";
 import kakaoIntroMp4 from "../assets/intro/kakao-open-intro.mp4";
 import kakaoIntroWebm from "../assets/intro/kakao-open-intro.webm";
-import { APP, KAKAO2 } from "../profile/session";
+import { ALLONE, APP, KAKAO2 } from "../profile/session";
 import { prefetch } from "../api/useApi";
 import { paths } from "../api/endpoints";
 import { holdLaunch, LAUNCH, setLaunchAt } from "../kakao2/launch";
 import { setK2Indicator } from "../kakao2/chrome";
 import { prepareK2Launch } from "../kakao2/Launch";
+import { AO_INTRO_BLINK_ON_MS, prepareAlloneIntro, runAlloneIntro, showAlloneIntro } from "../allone/intro";
 
 // ===== ibk2 인트로 (i-ONE Bank) =====
 // 시계 · 배터리(오른쪽 아이콘 묶음)는 영상에서 지워 두고(scripts/ibk-intro-erase.py) 영상이 도는 동안 우리 상태바를 영상 위로 올려
@@ -189,8 +190,8 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   let cleanupCanvas = () => {};
   let fakeCursor = false;
   // kakao2: 폰 폭이 홀수(393)라 가운데에 두면 왼쪽 끝이 0.5px 에 걸려 Element · Region Capture 영상 폭이 392 ↔ 394 로 오락가락함
-  // (mp4 avc1 'codec description' 오류, 프레임 왼쪽 끝 1px 줄). 녹화하는 동안만 폰을 가까운 기기 픽셀로 옮겨 둠
-  const unsnap = KAKAO2 && (elementCapture || regionCapture) ? snapToDevicePixels(target) : () => {};
+  // (mp4 avc1 'codec description' 오류, 프레임 왼쪽 끝 1px 줄). 녹화하는 동안만 폰을 가까운 기기 픽셀로 옮겨 둠. allone 도 같은 393 폭
+  const unsnap = (KAKAO2 || ALLONE) && (elementCapture || regionCapture) ? snapToDevicePixels(target) : () => {};
   if (elementCapture) {
     // 0) Element Capture: 진짜 포인터는 폰 위에서 숨기고(녹화에 찍히므로), 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
     const W = window as unknown as { RestrictionTarget: { fromElement(el: Element): Promise<unknown> } };
@@ -275,8 +276,13 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   const ibk = APP === "ibk";
   const cfg = KAKAO2 ? KAKAO_INTRO : APP === "kbank" ? KBANK_INTRO : null;
   const intro = cfg && isIntroOn() && OS === INTRO_OS ? await loadIntro(target, cfg) : null;
+  // allone(NH올원뱅크): 영상 대신 그린 아이폰 홈 화면 장면 (src/allone/intro.ts → launch/intro.ts). 글꼴 · 워드마크를 먼저 다 받아 둠
+  const alloneIntro = ALLONE && isIntroOn() && OS === INTRO_OS;
+  if (alloneIntro) await prepareAlloneIntro();
   // 앱을 검은 화면으로 돌려 놓고, 그 모습이 한 프레임 그려진 뒤 녹화 시작 → 시작화면부터
   window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "off" }));
+  // allone 인트로: 장면이 폰 전체를 덮은 프레임이 녹화 첫 프레임 (검은 화면 없이)
+  if (alloneIntro) showAlloneIntro();
   await nextFrame();
   // kakao2: 시작화면 없이 이미 켜져 있던 앱이 열림 → 녹화 전에 홈을 영상 밑에 다 그려 두고 열리는 모습의 첫 모습까지 깔아 둠
   const launch = cfg && intro && cfg.mount === "resume" ? await resumeUnder(target, intro, cfg) : null;
@@ -296,6 +302,15 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
     const stopKeep = keepCapturing(target);
     recorder.addEventListener("stop", stopKeep, { once: true });
     await playIntro(intro, target, cfg, launch);
+  } else if (alloneIntro) {
+    // allone: 녹화기가 첫 프레임을 받은 뒤 장면을 돌림 (kakao2 와 같은 이유). 장면이 가만히 있는 동안에도 매 프레임 찍히게 keepCapturing,
+    // 아일랜드 녹화 점 위상은 녹화 0.62초에 가장 어둡게. 앱이 열리는 순간(D) 인트로가 RESTART "start" → AlloneSplash 가 흰 화면으로 밑에
+    await started;
+    await nextFrame();
+    const stopKeep = keepCapturing(target);
+    recorder.addEventListener("stop", stopKeep, { once: true });
+    syncBlink(AO_INTRO_BLINK_ON_MS);
+    await runAlloneIntro(() => window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" })));
   } else {
     await sleep(600);
     window.dispatchEvent(new CustomEvent(RESTART_EVENT, { detail: "start" }));

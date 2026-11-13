@@ -1,4 +1,4 @@
-import { APP, HAS_INTRO, KAKAO2 } from "../profile/session";
+import { ALLONE, APP, HAS_INTRO, KAKAO2 } from "../profile/session";
 
 export type Os = "android" | "ios";
 
@@ -18,8 +18,9 @@ const stored = read();
 
 // ibk2(녹화 인트로를 켠 i-ONE Bank)는 인트로 영상과 같은 갤럭시 기기 화면만 (상태바 · 3버튼 내비바를 그 기기에 맞춰 만듦) → 아이폰으로 바꾸지 않음
 export const IBK2 = APP === "ibk" && HAS_INTRO;
-// 녹화 기기로 고정: ibk2 = 갤럭시, kakao2 = 아이폰, toss = 갤럭시 (영상 기기와 같은 틀 · 상태바). null 이면 기기 스위치로 고름
-export const DEVICE_LOCK: Os | null = IBK2 ? "android" : KAKAO2 ? "ios" : APP === "toss" ? "android" : null;
+// 녹화 기기로 고정: ibk2 = 갤럭시, kakao2 = 아이폰, toss = 갤럭시, allone = 아이폰 (영상 기기와 같은 틀 · 상태바). null 이면 기기 스위치로 고름
+// (allone 은 data-kakao2 를 켜지 않음 — kakao2 화면 전환 · 인트로 CSS 가 걸리므로. allone 틀은 html[data-app="allone"] 로)
+export const DEVICE_LOCK: Os | null = IBK2 ? "android" : KAKAO2 ? "ios" : APP === "toss" ? "android" : ALLONE ? "ios" : null;
 export const OS: Os = DEVICE_LOCK
   ? DEVICE_LOCK
   : isOs(param)

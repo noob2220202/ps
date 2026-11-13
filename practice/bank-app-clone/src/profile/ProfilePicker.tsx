@@ -14,7 +14,7 @@ import { OS } from "../platform/platform";
 import { THEME, THEME_CHOICE } from "../platform/theme";
 import { AVATAR_COLORS, AVATAR_NAMES } from "./avatars";
 import { ProfileAvatar } from "./ProfileAvatar";
-import { APP, KAKAO2, TOSS, setCurrentProfile } from "./session";
+import { ALLONE, APP, KAKAO2, TOSS, setCurrentProfile } from "./session";
 import { AppIcon } from "../components/AppBrand";
 import "./ProfilePicker.css";
 import "../auth/auth.css";
@@ -38,7 +38,9 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
             ? "#ffffff"
             : APP === "toss"
               ? "#171619"
-              : "var(--home-bg)",
+              : APP === "allone"
+                ? "#ffffff"
+                : "var(--home-bg)",
     APP === "nh" || (THEME === "dark" && APP !== "ibk" && APP !== "kbank") ? "light" : "dark",
   );
   const list = useApi<AppProfile[]>(paths.profiles);
@@ -50,9 +52,9 @@ export function ProfilePicker({ onEnter }: { onEnter: () => void }) {
     // 이 프로필이 지난번에 쓰던 기기/테마가 지금과 다르면 그걸로 다시 연다
     // (OS/THEME는 앱이 켜질 때 한 번 정해지는 값이라 새로 불러와야 바뀜). kakao2 는 기기 고정(아이폰)이라 프로필 기기는 안 봄,
     // kakao2 는 테마도 라이트 고정이라 프로필 테마를 안 봄 (다르면 고를 때마다 ?theme= 으로 다시 불러왔음)
-    // (ibk2 는 예전처럼 프로필 기기를 봄 — 다른 은행 동작 그대로). 토스도 갤럭시 · 다크 고정이라 프로필 기기 · 테마를 안 봄
-    const os = KAKAO2 || TOSS ? OS : (p.os ?? OS);
-    const theme = KAKAO2 || TOSS ? THEME_CHOICE : (p.theme ?? THEME_CHOICE);
+    // (ibk2 는 예전처럼 프로필 기기를 봄 — 다른 은행 동작 그대로). 토스도 갤럭시 · 다크 고정이라 프로필 기기 · 테마를 안 봄. allone 은 아이폰 · 라이트 고정
+    const os = KAKAO2 || TOSS || ALLONE ? OS : (p.os ?? OS);
+    const theme = KAKAO2 || TOSS || ALLONE ? THEME_CHOICE : (p.theme ?? THEME_CHOICE);
     if (os !== OS || theme !== THEME_CHOICE) location.assign(`/?os=${os}&theme=${theme}`);
     else onEnter();
   };

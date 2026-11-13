@@ -13,11 +13,13 @@ import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
+import { ALLONE, APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
 import { kbAdEnabled, kbAdHiddenUntil, kbAdResetHide, kbVariantMode, setKbAdEnabled, setKbVariantMode } from "../kbank/prefs";
 import { TossAccountFields } from "../toss/devpanel/TossAccountFields";
 import { TossPanelSection } from "../toss/devpanel/TossPanelSection";
 import { TossTxFields } from "../toss/devpanel/TossTxFields";
+import { aoApi, type AoAccount, type AoHome } from "../allone/api";
+import { NoticePanel } from "../allone/home/NoticePanel";
 import "./DevPanel.css";
 
 // 🔔 버튼으로 여는 관리 패널. 앱 화면은 실제 앱처럼 "보기"만 하고,
@@ -154,8 +156,8 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
   return (
     <div className="tab">
       <CurrentProfile />
-      {/* kakao2 는 녹화 기기(아이폰 · 라이트 모드), 토스는 갤럭시 · 다크로 고정이라 기기 · 테마 고르기 없음 */}
-      {!KAKAO2 && APP !== "toss" && (
+      {/* kakao2 · allone 은 녹화 기기(아이폰 · 라이트 모드), 토스는 갤럭시 · 다크로 고정이라 기기 · 테마 고르기 없음 */}
+      {!KAKAO2 && APP !== "toss" && !ALLONE && (
         <Field label="기기">
           <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
         </Field>
@@ -181,6 +183,8 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
       <button className="btn" onClick={() => run(() => api.updateProfile({ userName: name, cardLast4: card }), "내 정보를 저장했어요")}>
         저장
       </button>
+      {/* NH올원뱅크: 정기점검 안내 시트 (home 영역 src/allone/home/NoticePanel.tsx) */}
+      {ALLONE && <NoticePanel run={run} home={initial as AoHome} />}
 
       <h3 className="tab__h">이 프로필 데이터</h3>
       <div className="row">
@@ -409,6 +413,14 @@ function AccountsTab({ run }: { run: Run }) {
           <AddBankAccount banks={banks.data} run={run} exclude={[]} withName />
           <TossPanelSection run={run} home={home.data} />
         </>
+      ) : ALLONE ? (
+        // NH올원뱅크: NH농협은행 계좌(홈 NH농협 카드 · 내계좌) + 다른 은행 출금계좌(다른금융 · 잔액채우기에서 꺼내 옴)
+        <>
+          <h3 className="tab__h">{ownBank().name} 계좌 추가</h3>
+          <AddOwnBankAccount run={run} />
+          <h3 className="tab__h">다른 은행 계좌 추가 (잔액채우기 출금계좌)</h3>
+          <AddBankAccount banks={banks.data} run={run} exclude={[]} withName />
+        </>
       ) : APP !== "kakao" ? (
         <>
           {/* 케이뱅크는 케이뱅크 계좌만 (서버도 다른 은행은 거절) */}
@@ -447,9 +459,12 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
           ? { name: "듀얼K 입출금통장", number: "숫자 12자리", max: 14 }
           : APP === "toss"
             ? { name: "토스뱅크 통장", number: "숫자 12자리", max: 14 }
-            : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
+            : APP === "allone"
+              ? { name: "NH페이모아통장", number: "숫자 13자리", max: 16 }
+              : { name: "자립예탁금", number: "숫자 13~14자리", max: 17 };
   // 토스: 토스뱅크 계좌만 자유 입력(숫자 · 하이픈), 다른 은행 계좌는 카카오뱅크처럼 그 은행 형식대로 하이픈 (하나 14자리 + 하이픈이 14자에서 잘리지 않게)
-  const freeNumber = own && (APP !== "toss" || account.bank?.code === "toss");
+  // allone 도 같음: NH농협은행(은행 코드 nh) 계좌만 자유 입력, KB 등 다른 은행 계좌는 그 은행 형식대로
+  const freeNumber = own && ((APP !== "toss" && APP !== "allone") || account.bank?.code === (APP === "allone" ? "nh" : "toss"));
   return (
     <div className="acct-edit">
       <button className="acct-edit__head" onClick={() => setOpenEdit(!openEdit)}>
@@ -527,8 +542,30 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
             </>
           )}
           {APP === "toss" && <TossAccountFields account={account} run={run} />}
+          {ALLONE && <AoLimitedToggle account={account} run={run} />}
         </div>
       )}
+    </div>
+  );
+}
+
+// NH올원뱅크 '한도제한' 표시 (홈 카드 · 얼마를 보낼까요 계좌 줄의 빨간 글자, 표시만 — 서버 한도 없음). PATCH /api/accounts/:id { limited }
+function AoLimitedToggle({ account, run }: { account: Account; run: Run }) {
+  const limited = !!(account as AoAccount).limited;
+  return (
+    <div className="field">
+      <span className="field__label">한도제한 표시</span>
+      <Segmented
+        value={limited ? "on" : "off"}
+        options={[
+          ["on", "보이기"],
+          ["off", "숨기기"],
+        ]}
+        onChange={(v) => {
+          if ((v === "on") !== limited)
+            run(() => aoApi.setLimited(account.id, v === "on"), v === "on" ? "한도제한을 표시해요" : "한도제한 표시를 껐어요");
+        }}
+      />
     </div>
   );
 }
@@ -695,8 +732,10 @@ const OWN_BANK = {
   kbank: { code: "kbank", name: "케이뱅크", placeholder: "듀얼K 입출금통장", numberLabel: "케이뱅크 계좌번호 (12자리)" },
   // 토스: 앱 id 와 은행 코드가 같은 "toss" (토스뱅크) — infra.md §4
   toss: { code: "toss", name: "토스뱅크", placeholder: "토스뱅크 통장", numberLabel: "토스뱅크 계좌번호 (12자리)" },
+  // NH올원뱅크: 앱 id "allone" ≠ 은행 코드. NH농협은행 계좌는 은행 코드 "nh" (콕뱅크 앱 id 와 같은 글자지만 다른 것 — infra.md §4)
+  allone: { code: "nh", name: "NH농협은행", placeholder: "NH페이모아통장", numberLabel: "NH농협은행 계좌번호 (13자리)" },
 };
-const ownBank = () => OWN_BANK[APP === "hana" || APP === "ibk" || APP === "kbank" || APP === "toss" ? APP : "nh"];
+const ownBank = () => OWN_BANK[APP === "hana" || APP === "ibk" || APP === "kbank" || APP === "toss" || APP === "allone" ? APP : "nh"];
 function AddOwnBankAccount({ run }: { run: Run }) {
   const own = ownBank();
   const [name, setName] = useState("");
@@ -795,6 +834,17 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
                 {payee.showRecent ? "최근 이체에서 빼기" : "최근 이체에 넣기"}
               </button>
             )}
+            {/* NH올원뱅크: ☆ (누구에게 보낼까요 '자주' 탭 · 거래내역 상세 ☆ 와 같은 값) */}
+            {ALLONE && (
+              <button
+                className="btn btn--sm btn--ghost"
+                onClick={() =>
+                  run(() => aoApi.setFavorite(payee.id, !payee.favorite), payee.favorite ? "자주 보내는 분에서 뺐어요" : "자주 보내는 분에 넣었어요")
+                }
+              >
+                {payee.favorite ? "☆ 자주에서 빼기" : "★ 자주에 넣기"}
+              </button>
+            )}
             {/* i-ONE Bank: 실제 녹화(28초)의 받는 은행 오류 안내를 이 계좌로 재현 */}
             {APP === "ibk" && (
               <button
@@ -823,6 +873,7 @@ function PayeeEditor({ payee, run }: { payee: Payee; run: Run }) {
 }
 
 function AddPayee({ banks, run }: { banks: Bank[]; run: Run }) {
+  // 처음 고른 은행 = 그 앱 은행 (은행 코드). allone 은 마지막 "nh" = NH농협은행 (앱 id "allone" 은 은행 코드가 아님)
   const [bank, setBank] = useState(banks.find((b) => b.code === (APP === "hana" || APP === "ibk" || APP === "kbank" || APP === "toss" ? APP : "nh")) ?? banks[0]);
   const [number, setNumber] = useState("");
   const [holder, setHolder] = useState("");

@@ -92,8 +92,10 @@ html[data-app="kbank"]:not([data-os="ios"]) {
   --frame-h: 874px;
   --safe-bottom: 34px;
 }
-/* kakao2 녹화 기기 (iPhone 15 계열, 아이폰 고정): 1180 x 2556px = 393 x 852pt, 상태바 54 · 아래 안전영역 34 */
-html[data-kakao2] {
+/* kakao2 녹화 기기 (iPhone 15 계열, 아이폰 고정): 1180 x 2556px = 393 x 852pt, 상태바 54 · 아래 안전영역 34.
+   allone(NH올원뱅크)도 같은 녹화 아이폰 (흰 띠 59 / 34 는 src/allone/allone.css) */
+html[data-kakao2],
+html[data-app="allone"] {
   --frame-w: 393px;
   --frame-h: 852px;
   --safe-bottom: 34px;
@@ -158,8 +160,9 @@ button {
     0 0 0 12px #6d6d72,
     0 30px 60px rgba(0, 0, 0, 0.35);
 }
-/* kakao2 녹화 기기 화면 모서리 (iPhone 15 Pro 계열 55pt) */
-html[data-kakao2] .phone--ios {
+/* kakao2 · allone 녹화 기기 화면 모서리 (iPhone 15 Pro 계열 55pt) */
+html[data-kakao2] .phone--ios,
+html[data-app="allone"] .phone--ios {
   border-radius: 55px;
 }
 
@@ -168,7 +171,8 @@ html[data-kakao2] .phone--ios {
 @media (max-width: 500px) {
   :root,
   [data-os="ios"],
-  html[data-kakao2] {
+  html[data-kakao2],
+  html[data-app="allone"] {
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   body {
@@ -317,8 +321,9 @@ html[data-kakao2] .phone--ios {
 [data-os="ios"] body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, sans-serif;
 }
-/* kakao2: 화면 크기를 전부 Pretendard 로 맞췄으므로 맥에서도 Pretendard (어느 PC에서 녹화해도 같은 글자) */
-html[data-kakao2] body {
+/* kakao2 · allone: 화면 크기를 전부 Pretendard 로 맞췄으므로 맥에서도 Pretendard (어느 PC에서 녹화해도 같은 글자) */
+html[data-kakao2] body,
+html[data-app="allone"] body {
   font-family: "Pretendard Variable", Pretendard, sans-serif;
 }
 

@@ -4,13 +4,15 @@ import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../pla
 import { DEVICE_LOCK, IBK2, OS } from "../platform/platform";
 import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
 import { THEME, THEME_LOCK } from "../platform/theme";
-import { APP, HAS_INTRO, KAKAO2, TOSS } from "../profile/session";
+import { ALLONE, APP, HAS_INTRO, KAKAO2, TOSS } from "../profile/session";
 import { BLINK_MS, INTRO_OS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
 import { useKbankSent } from "../kbank/notice";
 import { K2HomeIndicator, K2Island, K2StatusBar } from "../kakao2/StatusBar";
 import { K2LoadingDim } from "../kakao2/LoadingDim";
 import { K2LaunchIcon } from "../kakao2/Launch";
 import { TossStatusBar } from "../toss/StatusBar";
+import { AlloneStatusBar } from "../allone/StatusBar";
+import { AlloneHomeIndicator } from "../allone/HomeIndicator";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -341,8 +343,9 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
   return (
     <div className={`phone phone--${OS}`}>
       {/* 녹화 중엔 진짜 아이폰처럼 다이나믹 아일랜드 왼쪽에 빨간 녹화 표시 (영상에도 찍힘). kakao2 는 녹화 아이폰의 넓어진 아일랜드 + 깜빡이는 점 */}
+      {/* allone(NH올원뱅크)도 같은 녹화 아이폰 → kakao2 아일랜드를 그대로 (모양은 src/allone/allone.css) */}
       {OS === "ios" &&
-        (KAKAO2 ? (
+        (KAKAO2 || ALLONE ? (
           <K2Island recording={recording} />
         ) : (
           <div className={`dynamic-island${recording ? " dynamic-island--rec" : ""}`}>
@@ -350,7 +353,10 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
           </div>
         ))}
       {/* kakao2: 화면 위에 겹친 투명한 상태바 (src/kakao2/StatusBar.tsx). 토스도 겹친 상태바 (12시간 시계 · 녹화 중 표시, src/toss/StatusBar.tsx) */}
-      {KAKAO2 ? <K2StatusBar /> : TOSS ? <TossStatusBar /> : <StatusBar />}
+      {/* allone: 겹친 상태바 + 흰 띠 위 0–59 · 아래 818–852 (웹뷰는 그 사이, src/allone/allone.css) */}
+      {KAKAO2 ? <K2StatusBar /> : TOSS ? <TossStatusBar /> : ALLONE ? <AlloneStatusBar /> : <StatusBar />}
+      {ALLONE && <div className="ao-band ao-band--top" />}
+      {ALLONE && <div className="ao-band ao-band--bottom" />}
       <div className="phone__viewport">
         {children}
         {/* kakao2 로딩 막: 화면 하나가 켜고 다른 화면이 끔 (src/kakao2/dim.ts) */}
@@ -373,6 +379,9 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
       ) : KAKAO2 ? (
         // kakao2: 앱이 켜진 직후에만 잠깐 (src/kakao2/launch.ts)
         <K2HomeIndicator />
+      ) : ALLONE ? (
+        // allone: 앱이 켜진 직후에만 잠깐 (src/allone/launch.ts)
+        <AlloneHomeIndicator />
       ) : (
         <div className={`phone__home-indicator phone__home-indicator--${fg}`} />
       )}

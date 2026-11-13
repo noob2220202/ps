@@ -10,7 +10,7 @@ import {
 import { useLocation, useNavigate, useNavigationType, type Location } from "react-router-dom";
 import { TIMING } from "../config/timing";
 import { OS } from "../platform/platform";
-import { APP, KAKAO2, TOSS } from "../profile/session";
+import { ALLONE, APP, KAKAO2, TOSS } from "../profile/session";
 import { LayerContext } from "../platform/LayerContext";
 import { IBK_ANIM_MS, ibkAnimFor, ibkBackLevel, type IbkAnim } from "../ibk/nav";
 import { K2_NAV, k2AnimFor, k2Modal, type K2Anim } from "../kakao2/nav";
@@ -59,6 +59,9 @@ const K2_MS: Record<K2Anim, number> = { modal: K2_NAV.modal, detail: K2_NAV.moda
 // 토스(갤럭시 고정, src/toss/nav.ts · nav.css): 아래에서 올라오는 push 400ms · 내려가는 pop + 드러나는 화면 내용 −5dp → 0 · cut(탭 · 증명서 단계 · 확인/완료)
 // · fade(쿠폰 광고 닫기) · reveal(이체 완료 → 쿠폰). 모두 실제로 끝났을 때 걷음 (onTossAnimEnd). NH_ANDROID 의 80/100ms 는 토스엔 안 씀
 const TOSS_ANDROID = TOSS && OS === "android";
+// NH올원뱅크(아이폰 고정, 웹뷰 앱): 화면 사이는 모두 한 프레임 CUT (녹화에 밀기 전환 · 가장자리 스와이프 없음, 기다림은 로딩 막 — src/allone/nav.ts).
+// 밑 화면 층은 숨긴 채 그대로 둠 (홈 · 거래내역조회로 돌아오면 스크롤 · 불러온 내용 그대로 — plan.md §1.5)
+const ALLONE_IOS = ALLONE;
 const UNDER_DIM = KAKAO2 ? K2_NAV.underDim : 0.12;
 
 // 화면 내용은 loc/active가 그대로면 다시 그리지 않는다.
@@ -129,6 +132,14 @@ export function ScreenStack({ render }: { render: Render }) {
       // 잘려 보였음 (개발 서버: 메뉴 열기·닫기 100ms 가 0~67ms 에서, 본문 200ms 가 167~183ms 에서 끊김). 타이머는 끝 이벤트가 안 올 때 대비
       const id = setTimeout(endIbkAnim, IBK_ANIM_MS[a] + 300);
       return () => clearTimeout(id);
+    }
+
+    if (ALLONE_IOS) {
+      drag.current = null;
+      setDragging(false);
+      setEnterAnim(null);
+      setExiting(null);
+      return;
     }
 
     if (TOSS_ANDROID) {
@@ -252,7 +263,7 @@ export function ScreenStack({ render }: { render: Render }) {
 
   // ---------- iOS: 왼쪽 가장자리 스와이프로 뒤로가기 ----------
   // kakao2 모달(이체 · 거래상세)은 iOS 전체 화면 모달처럼 가장자리 스와이프로 닫히지 않음
-  const canSwipe = OS === "ios" && below !== null && exiting === null && !k2Modal(top.pathname);
+  const canSwipe = !ALLONE_IOS && OS === "ios" && below !== null && exiting === null && !k2Modal(top.pathname);
   // 화면 안 뒤로가기 칸(i-ONE Bank useIbkBackHandler: 시트 · 안내창 · 이체 금액/확인 단계)이 쌓여 있으면 끌지 않음. 끝까지 끌면 navigate(-1) 이
   // 그 칸만 빼고 주소(location.key)는 그대로라 위 층이 402px 밀린 채 멈췄음 (V2 s6b · V3 iosstuck). 실제 iOS 도 시트·알림이 떠 있으면 뒤로 끌기가 안 됨
   const inScreenBack = () => ibkBackLevel() > 0;
@@ -334,6 +345,8 @@ export function ScreenStack({ render }: { render: Render }) {
 
   // ---------- 레이어 구성 (배열 순서 = 쌓이는 순서) ----------
   const layers: { loc: Location; className: string; active: boolean; role?: "top" | "under" }[] = [];
+  // allone: 쌓인 화면을 모두 그려 두고 맨 위만 보임 (밑 층은 숨김 · 누름 없음, allone.css .layer--ao-under)
+  if (ALLONE_IOS) for (const e of entries.slice(0, -1)) layers.push({ loc: e, className: "layer layer--ao-under", active: false });
   if (dragging && below) layers.push({ loc: below, className: "layer layer--under", active: false, role: "under" });
   if (exiting?.anim === "push") layers.push({ loc: exiting.loc, className: "layer layer--push-exit", active: false });
   // kakao2: 모달이 떠 있는 동안 밑 화면 층을 그대로 둠 (올라올 때의 push-exit 층과 같은 key → 다시 그리지 않음). 닫으면 스크롤 · 불러온 거래가 그대로

@@ -499,6 +499,14 @@
 .dev-panel--nh .btn:not(.btn--danger):not(.btn--in):not(.btn--out) {
   color: #fff;
 }
+/* NH올원뱅크: 라이트 고정 + 올원 초록 버튼 (변수만 바꿔 끼움) */
+.dev-panel--allone {
+  --yellow: #0c8f2d;
+  --yellow-pressed: #0a7524;
+}
+.dev-panel--allone .btn:not(.btn--danger):not(.btn--in):not(.btn--out):not(.btn--ghost) {
+  color: #fff;
+}
 /* 토스: 다크 고정 + 토스 파랑 버튼 (변수만 바꿔 끼움) */
 .dev-panel--toss {
   --home-card: #19181b;

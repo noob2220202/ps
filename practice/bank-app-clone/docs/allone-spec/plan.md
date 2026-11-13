@@ -114,7 +114,7 @@ Paths only need to be unique inside this server (one app per server).
 | T2 keypad panel | **native** accessory panel y 435–818, not dimmed by the web dim | transfer | T2 mount (+33–50 ms after the cut) | slides out 153 ms on ‹, 취소, 다음, 잔액채우기 link |
 | 계좌 비밀번호 입력 (T3) | **native** sheet, appears in one frame with dim .733, status glyphs stay black | transfer | T2 다음 | 4th digit → +50 ms gone; × → gone in one frame, panel slides in |
 | 금액 입력 (T7) | **native** sheet, dim .765, rise 357 ms, status glyphs turn white | transfer | auto after a 출금계좌 is chosen; 금액 field tap | × / 확인 → slide down ≈ 145 ms, dim lingers 370 ms |
-| iOS keyboard | native, slide 240 ms | foundation (`AoKeyboard`) | focus in a text field | ✓ / tap outside / navigation |
+| iOS keyboard | native, slide 290 ms (foundation re-measure) | foundation (`AoKeyboard`) | focus in a text field | ✓ / tap outside / navigation |
 | toast | overlay | foundation | `aoToast()` | 2.0 s hold, 200 ms fade |
 
 Sheets push no history entry. Browser back while a sheet is open pops the route and the sheet unmounts with it.
@@ -377,8 +377,8 @@ After each save the panel invalidates `/api/home`, the affected account paths an
 | `NativePortal.tsx` | `AoNativePortal` (also used by the T2 keypad panel and the splash) | infra §1.4 |
 | `Spinner.tsx` | `AoSpinner` {size = 61}: SVG glass coin (radial #1ac66d, ring #16b758, rim highlight, white wordmark mask 63 % of Ø) + CSS `rotateY` loop 1467 ms, `steps()` at 30 fps (keyframes launch §2.8) | launch §2.8 |
 | `Loading.tsx` + `loading.ts` | the single owner of the web dim + spinner: `aoLoad(profile)` drives §1.4 (show, deepen, cut callback, spinner-first hide), `useAoLoadingVisible()`, `onAoLoadingHidden(cb)`, `cutAoLoading()` | launch §2.8, account §3, transfer §3 |
-| `Keyboard.tsx` + `hangul.ts` (copy of `toss/transfer/hangul.ts`) | `AoKeyboard` {open, kind: "ko" \| "num", value, onChange, maxLength, onDone}: iOS 26 Korean 두벌식 (home §2.19 geometry, accessory bar ∧ ∨ ✓) and number pad (transfer §5.4), slide 240 ms `cubic-bezier(.2,.8,.2,1)`, covers the bottom band, the web view does not resize; physical keys through a hidden `<input>` | home §2.19, transfer §5.4 |
-| `BankLogo.tsx` | `AoBankLogo` {code, size = 36, radius?}: crop tile `allone-bank-<code>.png` for jb, shinhan, kakao, hana, kb, kbank, nh; others colour tile (BANKS colour) + `hana-bank-<code>` glyph as a white mask, else the short name. NH at 32 (home card, r 8) and 40 (account block, r 15.5) as CSS #0052b3 + white "NH" | infra §8, transfer §7, home §2.4, account §2.1 |
+| `Keyboard.tsx` + `hangul.ts` (copy of `toss/transfer/hangul.ts`) | `AoKeyboard` {open, kind: "ko" \| "num", value, onChange, maxLength, onDone}: iOS 26 Korean 두벌식 (home §2.19 geometry, accessory bar ∧ ∨ ✓) and number pad (transfer §5.4), slide 290 ms `cubic-bezier(.2,.4,.2,1)` (`AO_KEYBOARD`; re-measured frame by frame, the first fit was 240 ms `cubic-bezier(.2,.8,.2,1)`), panel top 545 at rest, covers the bottom band, the web view does not resize; physical keys through a hidden `<input>` | home §2.19, transfer §5.4 |
+| `BankLogo.tsx` | `AoBankLogo` {code, size = 36, radius?}: crop tile `allone-bank-<code>.png` for jb, shinhan, kakao, hana, kb, kbank, nh; others colour tile (BANKS colour) + `hana-bank-<code>` glyph as a white mask, else the short name. NH at 32 (home card) and 40 (account block) as SVG #0052b3 + white "NH": the measured 32 / 40 tiles are the same superellipse as the 36 one, so callers **omit `radius`** (it only exists to force a plain rounded rect) | infra §8, transfer §7, home §2.4, account §2.1 |
 | `Toast.tsx` + `toast.ts` | `aoToast(text, {bottom})`: pill rgba(0,0,0,.80), white Pretendard 400 14.3, padding 12 × 20, r 22, centred, fade 200 ms, hold 2000 ms | transfer §5.3 (one style for every toast) |
 | `Switch.tsx` | `AoSwitch` {size: "sm" 28×18 (잔액 숨기기) \| "lg" 52×30.6 (자동완성)}, off #6d6d6d / on #0c8f2d, knob slide 150 / 250 ms | account §2.1, home §2.19 |
 | `Skeleton.tsx` | bars `#fcfbfe` radius 8 (home only uses it; foundation owns the primitive) | home §2.17 |
@@ -408,7 +408,7 @@ notice snooze, hidden balances, recent menus, 자동완성, 잔액 숨기기, �
 | T2 panel in / out | 150 ms `cubic-bezier(.31,.18,.55,.89)` starting 33–50 ms after the cut / 153 ms `cubic-bezier(.39,.03,.70,.92)` | C3 28.988–29.146, 1.892–2.046 |
 | T7 | rise 357 ms `cubic-bezier(.19,.52,.23,1)` from +64 after dim; close ≈ 145 ms `cubic-bezier(.29,.19,.54,.75)`; dim lingers 370 ms; digit roll −30 pt → 0, opacity .1 → .3, 250 ms linear, then solid | C3 5.643–8.246, 10.746–11.03 |
 | T3 | appears and leaves in one frame; 4th digit +50 ms | C3 31.129, 32.729 |
-| keyboard | 240 ms `cubic-bezier(.2,.8,.2,1)` | C3 41.16–41.40 |
+| keyboard | in 290 ms `cubic-bezier(.2,.4,.2,1)` (rms 2 pt per frame), out 250 ms (invented); panel top 545 at rest | C3 41.146–41.513, rest C3 41.80 |
 | tab bar | hide on the first frame off the top, 440 ms ease-in-out to +135; show at the top after 80 ms, 650 ms `cubic-bezier(.2,.9,.3,1)`; at the bottom after a 200 ms debounce, 300 ms ease-out to **+14** | C1 14.533, C2 3.94–4.60, 2.558–2.858 |
 | card carousel | snap ≈ 250 ms ease-out (350 total with the flick); unseen-card loading body 420 ms; rubber-band 450 ms | C2 4.441–4.858, C3 24.96–25.51 |
 | ticker | period 2500; old text off in one frame; icon fade 150; first char +217; then one non-space char per 67 ms | C2 5.374–6.124 |
@@ -645,7 +645,7 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
 6. Dim levels: white → 118, green #0C8F2D → (45, 80, 55) ±4; deepen white → 92 ±4 after 280 ms; scrim white → 178 ±3; T7 dim luma 60, T3 68.
 7. Spinner centre (196.5, 425.8) ±1, Ø 61, loop 1467 ms, face at onset.
 8. Status-fg flip under T7: icons at +600 ms in one frame, clock +667 → +767 (C3 5.579 / 6.179 / 6.246–6.346).
-9. Keyboard vs C3 41.40: container top ≈ 541, key rows §home 2.19 ±1, slide 240 ms (41.16–41.40).
+9. Keyboard vs C3 41.80 (at rest; at 41.40 the panel is still settling at ≈ 547.7): panel top 545, key rows §home 2.19 ±1, slide 290 ms `cubic-bezier(.2,.4,.2,1)` (41.146–41.513).
 10. Recording with ● 녹화 (intro on): the first frame is the drawn scene (no black), width stays 393 pt (no 392/394 jitter), no raster in the scene except the wordmark.
 
 ### 7.2 Launch (A1)

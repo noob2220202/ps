@@ -5,6 +5,7 @@ import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 import { seedTossEmpty, seedTossExample } from "./toss-seed.mjs";
+import { seedAlloneEmpty, seedAlloneExample } from "./allone-seed.mjs";
 
 // SQLite 데이터베이스. Node 22에 내장된 node:sqlite 를 써서 따로 설치할 게 없다.
 // 넷플릭스 프로필처럼 프로필마다 DB 파일이 따로 있다 → 계좌·거래·받는 분이 서로 섞이지 않음
@@ -18,16 +19,22 @@ import { seedTossEmpty, seedTossExample } from "./toss-seed.mjs";
 // APP=toss 면 토스 / 토스뱅크 (갤럭시 · 다크 고정, 녹화 인트로 없음 — server/data-toss/). 여러 은행을 모아 보는 앱이라
 // 토스뱅크 통장(main) + 다른 은행 계좌 + 토스머니(accounts.role = 'money') · 카드 · 포인트. 토스 전용 칸·표·API는 APP === "toss" 일 때만
 // (server/toss-seed.mjs 예시 데이터, server/toss-api.mjs 소비 · 자산 · 카드 · 포인트)
-export const APPS = ["kakao", "nh", "hana", "ibk", "kbank", "toss"];
+// APP=allone 이면 NH올원뱅크 (NH농협은행 앱 — 콕뱅크 nh 와 다른 앱. 아이폰 · 라이트 고정 + 처음부터 녹화 인트로, server/data-allone/).
+// NH 계좌는 은행 코드 'nh' 로 저장 (앱 이름 allone 은 은행 코드가 아님). 올원 전용 칸·표(accounts.limited, profile.notice_*, recent_hidden)는
+// APP === "allone" 일 때만 (server/allone-seed.mjs 예시 데이터)
+export const APPS = ["kakao", "nh", "hana", "ibk", "kbank", "toss", "allone"];
 const appArg = process.argv.indexOf("--app");
 export const SERVER_ID = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
 // 두 번째 서버(녹화 인트로를 켠 변형) → 화면은 원래 앱. 데이터 폴더 · 쿠키 · 포트만 SERVER_ID 로 따로
 // APP=ibk2 는 같은 i-ONE Bank 화면에 녹화 인트로(실제 기기 홈 화면 → 앱 찾기 → 탭 영상)를 켠 서버 (예전 단독 프로젝트 practice/ibk-app 을 합침)
 // APP=kakao2 는 카카오뱅크 새 녹화(2026-11, 아이폰) 화면 + 녹화 인트로(앱 보관함 → 금융 폴더 B 아이콘 탭) — 데이터는 카카오뱅크와 같은 예시
 const VARIANTS = { kbank2: "kbank", ibk2: "ibk", kakao2: "kakao" };
-export const INTRO = Object.hasOwn(VARIANTS, SERVER_ID);
-export const APP = INTRO ? VARIANTS[SERVER_ID] : SERVER_ID;
-if (!APPS.includes(APP)) throw new Error(`APP은 kakao, kakao2, nh, hana, ibk, ibk2, kbank, kbank2, toss 중 하나 (지금: ${SERVER_ID})`);
+// 두 번째 서버가 아니라 자기 서버인데 처음부터 녹화 인트로가 있는 앱 — allone: 아이폰 홈 화면(그려서 만듦) → all one 아이콘 탭 → 앱이 켜짐
+const INTRO_APPS = ["allone"];
+const VARIANT = Object.hasOwn(VARIANTS, SERVER_ID);
+export const APP = VARIANT ? VARIANTS[SERVER_ID] : SERVER_ID;
+export const INTRO = VARIANT || INTRO_APPS.includes(APP);
+if (!APPS.includes(APP)) throw new Error(`APP은 kakao, kakao2, nh, hana, ibk, ibk2, kbank, kbank2, toss, allone 중 하나 (지금: ${SERVER_ID})`);
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA = process.env.DATA_DIR ?? resolve(here, SERVER_ID === "kakao" ? "data" : `data-${SERVER_ID}`);
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });
@@ -203,6 +210,22 @@ function migrate(d) {
         balance INTEGER NOT NULL DEFAULT 0,
         icon    TEXT,
         sort    INTEGER NOT NULL DEFAULT 0
+      );
+    `);
+  }
+  // NH올원뱅크 전용 칸·표 (다른 앱 DB 파일은 건드리지 않음). 한도제한은 badge 가 아니라 따로 — 위 UPDATE 가 main 의 badge 를 열 때마다 지움
+  if (APP === "allone") {
+    const add = (table, column, type) => columns(table).includes(column) || d.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+    add("accounts", "limited", "INTEGER NOT NULL DEFAULT 0"); // 1 = '한도제한' 표시 (홈 카드 · 얼마를 보낼까요 계좌 줄). 표시만, 서버 한도 없음
+    add("profile", "notice_on", "INTEGER NOT NULL DEFAULT 1"); // 정기점검 안내 시트 보이기
+    add("profile", "notice_items", "TEXT"); // 시트 첫 장 항목 JSON [{title, when}] (NULL = 화면이 계산한 기본값)
+    // 누구에게 보낼까요 '최근' 삭제하기: 이 시각까지 보낸 이체는 최근 목록에서 숨김 (그 뒤에 새로 보내면 다시 나옴)
+    d.exec(`
+      CREATE TABLE IF NOT EXISTS recent_hidden (
+        bank_code TEXT NOT NULL,
+        number    TEXT NOT NULL,                 -- 숫자만
+        hidden_at TEXT NOT NULL,                 -- 'YYYY-MM-DDTHH:mm:ss'
+        PRIMARY KEY (bank_code, number)
       );
     `);
   }
@@ -591,6 +614,7 @@ export const SEEDS = {
   ibk: { example: (d, name) => seedIbkExample(d, name), empty: seedIbkEmpty },
   kbank: { example: (d, name) => seedKbankExample(d, name), empty: seedKbankEmpty },
   toss: { example: (d, name) => seedTossExample(d, name), empty: (d, name) => seedTossEmpty(d, name) },
+  allone: { example: (d, name) => seedAlloneExample(d, name), empty: (d, name) => seedAlloneEmpty(d, name) },
 };
 
 // ---------- 처음 켤 때 ----------
