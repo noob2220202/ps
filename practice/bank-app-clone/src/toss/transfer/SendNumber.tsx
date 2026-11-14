@@ -224,13 +224,13 @@ export function SendNumber() {
   );
 }
 
-// S3 은행 선택 격자: 타일 99 × 85, 3칸, 간격 8.8, #28272a, 글리프 24 (타일 위 +16), 이름 14 M (잉크 위 +54.3)
+// S3 은행 선택 격자: 타일 99 × 85, 3칸, 간격 8.8, #28272a, 글리프 높이 24 · 가로로 긴 것은 28 폭까지 (타일 위 +16), 이름 14 M (잉크 위 +54.3)
 function BankGrid({ tiles, onPick }: { tiles: TossBankTile[]; onPick: (t: TossBankTile) => void }) {
   return (
     <div className="toss-send-grid">
       {tiles.map((t) => (
         <TossPressable key={t.label} className="toss-send-tile" radius={10} color="#323135" fadeIn={100} onPress={() => onPick(t)}>
-          {t.code && <BankGlyph code={t.code} size={24} />}
+          {t.code && <BankGlyph code={t.code} size={24} w={28} />}
           <span className="toss-send-tile__label">{t.label}</span>
         </TossPressable>
       ))}

@@ -29,20 +29,45 @@
   }
 }
 
-/* 은행 아이콘 (SendLogo): 하나 · NH 는 흰 글리프, KB 는 어두운 글리프 */
+/* 은행 아이콘 (SendLogo): 하나 · NH 는 흰 글리프, KB 는 어두운 글리프를 위로 3.3 올리고 밑에 작은 'KB국민은행' (B 8.500), 카카오는 그림 노랑을 바탕에 맞춤 */
 .toss-send-logo--white img {
   filter: brightness(0) invert(1);
 }
-.toss-send-logo--dark img {
+.toss-send-logo--kb {
+  position: relative;
+}
+.toss-send-logo--kb img {
   filter: brightness(0);
   opacity: 0.78;
+  translate: 0 -3.3px;
+}
+.toss-send-logo--kb::after {
+  content: "KB국민은행";
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  top: 25.8px; /* 잉크 아이콘 위 + 28.7 – 32 */
+  text-align: center;
+  font-size: 11px;
+  line-height: 11px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: rgba(70, 52, 0, 0.72);
+  scale: 0.5;
+  transform-origin: 50% 0;
+}
+.toss-send-logo--kakao img {
+  filter: brightness(0.96);
+  clip-path: inset(8%); /* 그림 네모의 가장자리 선이 안 보이게 */
 }
 .toss-send-glyph {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex; /* grid 면 img 의 % 높이가 안 먹어 세로로 긴 글리프가 칸을 넘침 */
+  align-items: center;
+  justify-content: center;
   flex: none;
 }
 .toss-send-glyph img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -76,7 +101,7 @@
   font-size: 28px;
   line-height: 28px;
   font-weight: 650;
-  color: var(--ts-title);
+  color: #ffffff; /* B 8.500 잉크 꼭대기 */
   white-space: nowrap;
 }
 .toss-send-who__tabs {
@@ -108,11 +133,11 @@
   font-size: 17px;
   line-height: 17px;
   font-weight: 600;
-  color: #8b8a8d;
+  color: #929194;
   transition: color 200ms ease-out;
 }
 .toss-send-who__tab.on > .toss-press__content {
-  color: #dedde0;
+  color: #e6e5e8;
 }
 .toss-send-who__bar {
   position: absolute;
@@ -149,7 +174,7 @@
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
-  color: #6d6c6f;
+  color: #757477;
 }
 .toss-send-who__cam {
   position: absolute;
@@ -157,7 +182,7 @@
   top: 4.4px;
   width: 48px;
   height: 48px;
-  color: #525154;
+  color: #565558;
 }
 .toss-send-who__cam > .toss-press__content {
   height: 100%;
@@ -182,7 +207,7 @@
   font-size: 17px;
   line-height: 17px;
   font-weight: 650;
-  color: #dddcdf;
+  color: #e5e4e7;
   white-space: nowrap;
 }
 .toss-send-who__sech {
@@ -192,7 +217,7 @@
   height: 49.8px;
   padding: 21.3px 0 0 25px;
   box-sizing: border-box;
-  color: #dedde0;
+  color: #e6e5e8;
 }
 .toss-send-who__count {
   position: absolute;
@@ -200,13 +225,13 @@
   top: 22.5px;
   font-size: 15px;
   line-height: 15px;
-  color: #878689;
+  color: #8b8a8d;
 }
 .toss-send-who__chev {
   position: absolute;
   left: 350.4px;
   top: 25.6px; /* 화면 333.8 */
-  color: #7e7d80;
+  color: #8e8d90; /* 선이 가늘어 녹화 꼭대기 #89888b 보다 조금 밝게 */
   transition: transform 200ms ease-out;
 }
 .toss-send-who__mine.open .toss-send-who__chev {
@@ -234,7 +259,7 @@
   box-sizing: border-box;
   font-size: 13px;
   line-height: 13px;
-  color: #58575a;
+  color: #626164;
 }
 .toss-send-who__row {
   height: 68px;
@@ -267,13 +292,13 @@
   font-size: 17px;
   line-height: 17px;
   font-weight: 650;
-  color: #dddcdf;
+  color: #e8e6e9;
 }
 .toss-send-who__sub {
   top: 39.2px; /* 잉크 +38.8 … +51.7 */
   font-size: 15px;
   line-height: 15px;
-  color: #838285;
+  color: #8f8e91;
 }
 .toss-send-star {
   position: absolute;
@@ -334,12 +359,12 @@
   font-size: 13px;
   line-height: 13px;
   font-weight: 500;
-  color: #9e9fa3;
+  color: #afaeb1; /* B 36.981 #abaaad – #b2b1b4 */
   white-space: nowrap;
   transition: color 150ms;
 }
 .toss-send-field--focus .toss-send-field__label {
-  color: var(--toss-blue);
+  color: #2c69cc; /* 파랑이지만 13px 글자는 녹화에서 #2863c3 까지만 (B 11.111) */
 }
 .toss-send-field__line {
   position: absolute;
@@ -370,7 +395,7 @@
   height: 22px;
   font-size: 22px;
   line-height: 22px;
-  color: #dddcdf;
+  color: #e1e0e3;
   white-space: nowrap;
 }
 .toss-send-num__value .toss-send-caret {
@@ -409,6 +434,10 @@
   position: absolute;
   inset: 0;
   transform: translateY(4px);
+  pointer-events: none; /* 화면 전체를 덮는 칸이라 — 위 번호 칸을 누를 수 있게 */
+}
+.toss-send-num__shift > * {
+  pointer-events: auto;
 }
 .toss-send-num--empty .toss-send-num__shift {
   transform: none;
@@ -424,7 +453,7 @@
   top: 38.3px; /* 잉크 269.6–288.8 */
   font-size: 22px;
   line-height: 22px;
-  color: #b6b5b8;
+  color: #bdbcbf;
   white-space: nowrap;
 }
 .toss-send-num__bank .toss-send-field__label {
@@ -466,7 +495,7 @@
   top: -0.4px; /* 잉크 308.0–319.7 */
   font-size: 13px;
   line-height: 13px;
-  color: #7e7d80;
+  color: #8a898c;
   white-space: nowrap;
 }
 .toss-send-num__finding {
@@ -478,7 +507,7 @@
   height: 13px;
   font-size: 13px;
   line-height: 13px;
-  color: #7e7d80;
+  color: #878689;
   white-space: nowrap;
 }
 .toss-send-num__dots {
@@ -491,7 +520,7 @@
   width: 2.4px;
   height: 2.4px;
   border-radius: 50%;
-  background: #7e7d80;
+  background: #878689;
   animation: toss-send-dot 900ms ease-in-out infinite;
 }
 .toss-send-num__dots i:nth-child(2) {
@@ -553,7 +582,7 @@
   font-size: 14.5px;
   line-height: 14.5px;
   font-weight: 500;
-  color: #b5b9c0;
+  color: #b9bdc5;
   white-space: nowrap;
 }
 .toss-send-num__ok {
@@ -635,9 +664,22 @@
 .toss-send-kbwrap .hana-kb__key--enter::after {
   content: "완료";
   font-family: var(--toss-font);
-  font-size: 20px;
+  font-size: 21px; /* 잉크 313.6–350.4 (B 11.111) */
   font-weight: 400;
-  color: #3e8fff;
+  color: #4890fd;
+}
+/* 자리 (B 11.111 에서 다시 잼): 도구줄 위 494.4 · 키 줄 549.2 / 612.4 / 675.6 / 738.8, 키 열 9.6 · 102.4 · 196.8 · 289.6 (마지막 열 85.6 폭, 오른쪽 375.2) */
+.toss-send-kbwrap .hana-kb {
+  height: 344.2px;
+}
+.toss-send-kbwrap .hana-kb__keys {
+  right: 8.8px;
+  grid-template-columns: 84.8px 84.8px 84.8px 85.6px;
+  justify-content: space-between;
+  column-gap: 0;
+}
+.toss-send-kbwrap .hana-kb__key {
+  color: #fafafa;
 }
 .toss-send-kbwrap .hana-kb__key--back::after {
   content: "";
@@ -686,7 +728,7 @@
 }
 .toss-send-tile .toss-send-glyph {
   position: absolute;
-  left: 37.5px;
+  left: 35.5px; /* 28 폭 가운데 */
   top: 16px;
 }
 .toss-send-tile__label {
@@ -697,7 +739,7 @@
   font-size: 14px;
   line-height: 18px;
   font-weight: 500;
-  color: #f2f1f4;
+  color: #fcfbfe;
   text-align: center;
   word-break: break-all;
 }
@@ -766,7 +808,7 @@
 }
 .toss-send-amt__bal em {
   font-style: normal;
-  color: #b9b8bd;
+  color: #c3c2c6; /* B 47.20 · A 130.500 */
 }
 .toss-send-amt__to {
   top: 169.1px; /* 잉크 199.0–218.5 */
@@ -783,21 +825,79 @@
   height: 15px;
   font-size: 15px;
   line-height: 15px;
-  color: #7c7a81;
+  color: #807e86; /* B 47.20 · 96.3 */
 }
 .toss-send-shield {
   margin: 0 6.1px 0 1.1px;
   flex: none;
+}
+/* 방패 안 체크: 그려짐 125ms → 머묾 → 사라짐 → 되풀이 (send-amt: 2.1초, 시작 0.2초 뒤 · send-cf: 1.04초, 0.33초 뒤) */
+.toss-send-shield__chk {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.toss-send-shield--amt .toss-send-shield__chk {
+  animation: toss-send-chk-amt 2100ms linear 200ms infinite;
+}
+.toss-send-shield--cf {
+  animation: toss-fade-in-kf 1ms linear 110ms both;
+}
+.toss-send-shield--cf .toss-send-shield__chk {
+  animation: toss-send-chk-cf 1040ms linear 330ms infinite;
+}
+@keyframes toss-send-chk-amt {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  6% {
+    stroke-dashoffset: 0;
+  }
+  36% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  36.1%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes toss-send-chk-cf {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  12% {
+    stroke-dashoffset: 0;
+  }
+  75% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  75.1%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
 }
 .toss-send-loadchip {
   display: inline-block;
   margin: -6px 0 0 11.6px;
   padding: 6px 30px 6px 8.6px;
   border-radius: 9px;
-  background: #1c1b1f;
-  font-size: 14px;
-  line-height: 14px;
-  color: #56555c;
+  background: #19181d; /* 녹화에선 거의 안 보이는 칸 (B 95.55: #18171c – #19181d) */
+  font-size: 15px;
+  line-height: 15px;
+}
+.toss-send-line .toss-send-loadchip {
+  color: #59575f; /* .toss-send-line span 의 회색보다 앞서게 */
+}
+.toss-send-amt__bal .toss-send-loadchip {
+  translate: 0 -3.6px; /* 글자 잉크 141.0 (B 95.55 · A 124.95) */
+}
+.toss-send-amt__tosub .toss-send-loadchip {
+  translate: 0 -0.8px; /* 233.0 */
 }
 .toss-send-amt__amount {
   position: absolute;
@@ -814,7 +914,7 @@
   line-height: 31px;
   font-weight: 650;
   color: #fdfcff;
-  translate: 1.6px 1px;
+  translate: 0 1px; /* 잉크 x 25.6 (B 48.212 · A 130.500) */
 }
 .toss-send-amt__val i {
   font-style: normal;
@@ -837,12 +937,22 @@
   font-size: 30px;
   line-height: 30px;
   font-weight: 500;
-  color: #727078;
+  color: #817f89; /* 녹화 잉크 꼭대기 #807e88 – #83818b */
   translate: 0 -1.2px;
 }
 .toss-send-amt__ph .toss-send-caret {
   margin-right: 1px;
   translate: 0 0.4px;
+}
+/* 내 계좌로 옮길 때는 아래줄(방패 없음) · 금액이 조금 아래 (A 128.0 · 130.500 · B 62.1–63.2: 아래줄 잉크 237.2, 금액 297.0, 안내 문구 342.8) */
+.toss-send-amt__content--own .toss-send-amt__tosub {
+  top: 208.5px;
+}
+.toss-send-amt__content--own .toss-send-amt__amount {
+  top: 262.6px;
+}
+.toss-send-amt__content--own .toss-send-amt__err {
+  top: 314px;
 }
 .toss-send-amt__err {
   top: 313.2px; /* 잉크 342.2–355.6 */
@@ -888,8 +998,12 @@
 .toss-send-pad__key:nth-child(-n + 9) {
   padding-bottom: 2.6px;
 }
+.toss-send-pad__key:nth-child(10),
 .toss-send-pad__key:nth-child(11) {
   padding-bottom: 4.4px;
+}
+.toss-send-pad__key:nth-child(10) {
+  translate: 0 -0.8px; /* 00 잉크 793.0 (0 과 같은 줄) */
 }
 .toss-send-pad__key svg {
   translate: 0 2.8px;
@@ -960,7 +1074,7 @@
 .toss-send-cf__label {
   flex: none;
   font-weight: 500;
-  color: #7d7b82;
+  color: #807e86; /* B 63.727 · 97.514 */
 }
 .toss-send-cf__val {
   flex: 1;
@@ -969,8 +1083,12 @@
   justify-content: flex-end;
   align-items: center;
   font-weight: 600;
-  color: #c1c0c5;
+  color: #c4c3c8;
   white-space: nowrap;
+}
+.toss-send-cf__val .toss-send-shield {
+  margin: 0 4.4px 0 0; /* 방패 ≈129–141.6, 글자 145.6 부터 (B 99.0) */
+  translate: 0 0.4px;
 }
 .toss-send-cf__val > span {
   overflow: hidden;
@@ -979,7 +1097,7 @@
 .toss-send-rowchev {
   flex: none;
   margin-left: 9.2px;
-  color: #b0b6bc;
+  color: #c0c1c6; /* 녹화 잉크 꼭대기 #b1b3ba – #c1c0c5 (선이 가늘어 조금 밝게) */
   animation: toss-fade-in-kf 1ms linear 50ms both;
 }
 .toss-send-cf__ok {
@@ -993,11 +1111,11 @@
   margin: 0;
   left: 0;
   right: 0;
-  bottom: 25px; /* 잉크 799.2–812.2 */
+  bottom: 24.2px; /* 잉크 799.8–812.6 */
   text-align: center;
   font-size: 15px;
   line-height: 15px;
-  color: #96959a;
+  color: #9d9ca1;
 }
 
 /* =================== S6 받는 분에게 표시 (메모) =================== */
@@ -1013,7 +1131,7 @@
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
-  color: #dcdbde;
+  color: #e0dfe2; /* B 105.761 */
 }
 .toss-send-memo__body {
   overflow: hidden;
@@ -1077,7 +1195,7 @@
   text-align: center;
   font-size: 14px;
   line-height: 14px;
-  color: #818083;
+  color: #8c8b8e; /* B 104.140 · 105.761 */
 }
 .toss-send-memo--kb .toss-send-memo__cap {
   bottom: 364.2px; /* 잉크 461.6–475.2 (키보드 위 19.5) */
@@ -1229,6 +1347,61 @@
   color: inherit;
   cursor: pointer;
 }
+.toss-send-kk__key--back svg {
+  width: 23.4px; /* 잉크 20.8 × 16 (B 104.140) */
+  height: 17.3px;
+}
+.toss-send-kk__key--lang {
+  color: #c4c4c4;
+}
+.toss-send-kk__key--sym {
+  font-size: 19px;
+}
+.toss-send-kk__key--done {
+  font-size: 15px; /* 잉크 337.8–362.6 */
+  color: #3e88eb;
+}
+
+/* 두 자판 같이: 맨 아래 ⌨ · ∨, 도구줄 ··· (B 11.111 · 104.140: ⌨ 잉크 47.6–65.2 × 824.4–834.8, ∨ 320.0–335.2 × 825.2–833.2,
+   ··· 지름 3.4 · 가운데 354.5 / 360.2 / 366.0 × 516.8, 모두 흰색) */
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) {
+  left: 47.6px;
+  right: 48.8px;
+  bottom: 4.6px;
+  height: 10.4px;
+  color: #ffffff;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) svg {
+  display: none;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom)::before {
+  content: "";
+  width: 17.6px;
+  height: 10.4px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17.6 10.4' fill='%23fff'%3E%3Cg%3E%3Crect width='2' height='2' rx='.4'/%3E%3Crect x='3.9' width='2' height='2' rx='.4'/%3E%3Crect x='7.8' width='2' height='2' rx='.4'/%3E%3Crect x='11.7' width='2' height='2' rx='.4'/%3E%3Crect x='15.6' width='2' height='2' rx='.4'/%3E%3C/g%3E%3Cg transform='translate(0 4.2)'%3E%3Crect width='2' height='2' rx='.4'/%3E%3Crect x='3.9' width='2' height='2' rx='.4'/%3E%3Crect x='7.8' width='2' height='2' rx='.4'/%3E%3Crect x='11.7' width='2' height='2' rx='.4'/%3E%3Crect x='15.6' width='2' height='2' rx='.4'/%3E%3C/g%3E%3Crect y='8.4' width='2' height='2' rx='.4'/%3E%3Crect x='3.9' y='8.4' width='9.8' height='2' rx='.6'/%3E%3Crect x='15.6' y='8.4' width='2' height='2' rx='.4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) button {
+  padding: 12px; /* 누르는 칸만 넓힘 (∨ 자리는 그대로) */
+  margin: -12px;
+  color: inherit;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) button::after {
+  content: "";
+  width: 15.2px;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15.2 8' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M.8.8 7.6 7.2 14.4.8'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:is(.toss-send-kbwrap .hana-kb__more, .toss-send-kk__more) {
+  left: 351.6px;
+  top: 20.6px;
+  translate: none;
+  width: 17.25px;
+  height: 3.4px;
+  font-size: 0;
+  letter-spacing: 0;
+  color: transparent;
+  background: radial-gradient(circle, #f7f7f7 1.55px, transparent 1.75px) 0 0 / 5.75px 3.4px repeat-x;
+}
 
 /* =================== S7 보내는 중 · S8 완료 =================== */
 .toss-send-done__body {
@@ -1270,7 +1443,7 @@
   padding: 0 16.9px;
   font-size: 17px;
   line-height: 17px;
-  color: #bebcc4;
+  color: #c3c2ca; /* B 118.211 */
   white-space: nowrap;
   max-width: 300px;
 }
@@ -1534,6 +1707,16 @@
 :is(.toss-send-amt, .toss-send-cf) .toss-dialog__actions {
   margin-top: 10px;
 }
+/* 글자 색 (B 51.012 잉크 꼭대기): 제목 #e6e5ee · 본문 #a09ea8 · 확인 #3280f5 */
+:is(.toss-send-amt, .toss-send-cf) .toss-dialog__title {
+  color: #e6e5ee;
+}
+:is(.toss-send-amt, .toss-send-cf) .toss-dialog__body {
+  color: #a09ea8;
+}
+:is(.toss-send-amt, .toss-send-cf) .toss-dialog__action--blue {
+  color: #3280f5;
+}
 
 /* 공용 큰 버튼 글자가 녹화보다 0.8–1.6dp 아래 (B 63.727 · 118.224) → 이 영역에서만 올림 */
 :is(.toss-send-num, .toss-send-cf) .toss-btn__label {
@@ -1541,4 +1724,17 @@
 }
 .toss-send-done .toss-btn__label {
   translate: 0 -1.6px;
+}
+
+/* 큰 버튼 누름: 녹화에선 짧게 눌러도 0.96 까지 줄었다가(≈70ms) 떼면 돌아옴 (B 69.54–69.73 · 109.74–109.94). 공용은 0.995 */
+:is(.toss-send-num, .toss-send-cf, .toss-send-done) .toss-btn--pressed {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+/* 큰 버튼 글자 색 (잉크 꼭대기: 파랑 버튼 #ffffff, 공유하기 #4492ff — B 63.727 · 118.211). 공용은 #f3feff · #4690f6 */
+:is(.toss-send-num, .toss-send-amt, .toss-send-cf, .toss-send-done) .toss-btn--primary:not(.toss-btn--disabled) {
+  color: #ffffff;
+}
+.toss-send-done .toss-btn--secondary {
+  color: #4492ff;
 }

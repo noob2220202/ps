@@ -1,5 +1,6 @@
 // S4 토스뱅크 송금 (금액) /send/amount?from=&to= · ?from=&bank=&number= (transfer.md §2.4 · §2.5, 녹화 B 45.030 · 48.212 · A 130.500)
-//  들어오면 ← 만 → 제목이 0.33초 뒤 250ms 에 나타남 → 내용 (잔액 로딩중 · 사기계좌 조회중 칩) → 잔액 → 조회 끝 (방패 + 번호, '내 ' 붙음)
+//  들어오면 ← 만 → 제목이 0.33초 뒤 250ms 에 나타남 → 내용 (잔액 로딩중 · 사기계좌 조회중 칩) → 잔액 + 받는 계좌 번호 (방패 자리만, 받는 분 이름은 회색)
+//  → 조회 끝 (방패 + 체크, 이름 흰색, '내 ' 붙음; 못 찾은 번호는 이름이 계속 회색 · '내 ' 없음 — B 45.03 · 47.20 · 95.55 · 96.3)
 //  화면 안 숫자판(1–9 · 00 · 0 · ←). 금액 > 0 이면 '다음' 막대가 130ms 에 올라옴. 잔액보다 많으면 빨간 글 + 다음 꺼짐
 //  다음: 찾은 받는 분 → 확인(S5, cut). 못 찾은 번호 → 점 0.44초 → D1 "계좌번호를 찾을 수 없어요" (웹 영역만 어둡게)
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -140,7 +141,7 @@ export function SendAmount() {
             <TossSpinner className="toss-send-amt__spin" />
           ) : null
         ) : (
-          <div className="toss-send-amt__content">
+          <div className={`toss-send-amt__content${t?.kind === "own" ? " toss-send-amt__content--own" : ""}`}>
             <p className="toss-send-line toss-send-amt__from">
               <b>{fromName}</b>
               <span>에서</span>
@@ -156,16 +157,16 @@ export function SendAmount() {
             </p>
             {t && lbl && (
               <>
-                <p className={`toss-send-line toss-send-amt__to${t.kind === "typed" ? " toss-send-amt__to--grey" : ""}`}>
+                <p className={`toss-send-line toss-send-amt__to${t.kind !== "own" && !(resolved && checked) ? " toss-send-amt__to--grey" : ""}`}>
                   <b>{lbl.label}</b>
                   <span>{lbl.particle}</span>
                 </p>
                 <p className="toss-send-line toss-send-amt__tosub">
                   {t.kind === "own" ? (
                     accountLine(t)
-                  ) : checked ? (
+                  ) : balShown ? (
                     <>
-                      <Shield />
+                      <Shield check={checked ? "amt" : undefined} hidden={!checked} />
                       {accountLine(t, t.kind === "typed")}
                     </>
                   ) : (
