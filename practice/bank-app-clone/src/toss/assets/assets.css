@@ -253,7 +253,7 @@
 /* 본문 */
 .toss-assets-spend__content {
   position: relative;
-  padding-bottom: 55px; /* 끝 40 + 내비 띠 15 */
+  padding-bottom: calc(40px + var(--toss-nav, 15px)); /* 끝 40 + 내비 띠 (데스크톱 15 → 55, 진짜 폰은 기기 아래 안전 영역) */
 }
 
 /* 요약 121.6–248 (126.4) */
@@ -1002,7 +1002,8 @@
   }
 }
 /* 끝날 때 빛 고리: 화면 (192, 300) 에서 퍼지는 옅은 흰 고리 (꼭대기 휘도 +11, 지나간 안쪽 +3.5), 반지름 ≈ 100 + 1.06 × ms,
-   850ms 에 사라짐 (B 158.26–159.0 프레임: y 76 · y 194 · x 379 줄의 밝기). 화면 뿌리(.toss-page)에 붙어 카드 · 탭 위로 지나감 */
+   850ms 에 사라짐 (B 158.26–159.0 프레임: y 76 · y 194 · x 379 줄의 밝기). 화면 뿌리(.toss-page)에 붙어 카드 · 탭 위로 지나감.
+   상자는 위 띠(--toss-sb) 밑부터 — 진짜 폰은 띠가 기기 안전 영역이라, 28 고정이면 머리줄에 밝기 경계가 생기고 가운데가 위로 어긋났음 */
 @property --toss-assets-ripple-r {
   syntax: "<length>";
   inherits: false;
@@ -1010,7 +1011,7 @@
 }
 .toss-assets-ptr-glow {
   position: absolute;
-  inset: 28px 0 0;
+  inset: var(--toss-sb, 28px) 0 0;
   z-index: 5;
   pointer-events: none;
   background: radial-gradient(

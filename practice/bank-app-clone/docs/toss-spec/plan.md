@@ -436,7 +436,7 @@ After every save the panel calls `invalidate` on home, `toss/spend`, `toss/asset
 | Inset for reused screens | `src/toss/Inset.tsx` | Login and ProfilePicker get a 28 dp #171619 band, then the screen (K2Inset pattern) |
 | Nav band | `src/toss/band.ts` + `toss.css` | `html[data-app="toss"] .phone__navbar { position:absolute; left:0; right:0; bottom:0; height:15px }` with the 4 modes from §0.4 via `html[data-toss-band="kb"\|"dim"\|"scrim"]`. `useTossBand(mode)` sets the mode while a component is mounted and active. HanaKeyboard reuse: `[data-hana-kb]` also maps to `kb` for toss |
 | Viewport | `toss.css` | pages are laid out 0–853.33 with `--toss-sb: 28px` on top and `--toss-nav: 15px` at the bottom. Content stops at 838.33, except the 소비 list, which extends under the band in scrim mode |
-| Mobile ≤ 500 px | `toss.css` | hide the fake status-bar contents and the band and handle. `--toss-sb: env(safe-area-inset-top)`, `--toss-nav: env(safe-area-inset-bottom)` (kbank-like) |
+| Mobile ≤ 500 px | `toss.css` | hide the fake status-bar contents and the band and handle. `--toss-sb: env(safe-area-inset-top)`, `--toss-nav: env(safe-area-inset-bottom)` (kbank-like). The home tab bar runs down through the bottom inset (the band that paints it on desktop is hidden), and the dialog card, LOAD spinner and wait box are centred in the area between the bands instead of a fixed desktop y |
 
 ### 3.2 Tokens (`src/toss/toss.css`, `:root[data-app="toss"]`; never redefine the global `--home-*`)
 - **Surfaces:**

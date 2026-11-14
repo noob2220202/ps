@@ -161,6 +161,23 @@ html[data-app="toss"][data-toss-band="scrim"] .phone__navbar i {
   html[data-app="toss"] .phone__navbar {
     display: none;
   }
+  /* 홈 탭바: 데스크톱은 아래 띠가 탭바 색(#171619)으로 이어 그리는데 폰은 그 띠가 없음 → 탭바를 기기 아래 안전 영역 끝까지
+     (안 그러면 홈 막대 밑에 더 어두운 홈 바탕 #100f12 가 비치고 탭바 옆 테두리가 중간에서 끊김). 탭 자리는 그대로 */
+  html[data-app="toss"] .toss-home-tabbar {
+    bottom: calc(-2px - var(--toss-nav, 0px));
+    height: calc(60.33px + var(--toss-nav, 0px));
+  }
+  /* 안내창 카드 · LOAD 스피너 · 기다림 상자: 데스크톱은 웹 영역(28–838.33) 가운데(≈ 433)에 고정 값으로 둠 → 폰은 띠 높이 · 창 높이가
+     달라서 그 고정 y 가 가운데에서 벗어남 (360×640 에서 ≈ 86px 아래). 웹 영역 가운데로 다시 셈 (스피너 ⌀30 · 상자 위 = 가운데 − 15) */
+  html[data-app="toss"] .toss-dialog__card {
+    top: calc(var(--toss-sb, 0px) + (100% - var(--toss-sb, 0px) - var(--toss-nav, 0px)) / 2);
+  }
+  html[data-app="toss"] .toss-load__spin {
+    top: calc((100% - var(--toss-nav, 0px)) / 2 - 15px);
+  }
+  html[data-app="toss"] .toss-wait {
+    top: calc(var(--toss-sb, 0px) + (100% - var(--toss-sb, 0px) - var(--toss-nav, 0px)) / 2 - 15px);
+  }
   /* 16px 입력칸: 배율이 1 보다 작으면(384 보다 좁은 폰, 아이폰 미니 · SE 375 등) 그려지는 글자가 16 밑으로 내려가
      iOS 사파리가 초점 때 화면을 확대하고 그대로 둠 → 배율로 나눠 그려지는 크기를 16 으로 (배율 1 이상 · 데스크톱은 그대로) */
   html[data-app="toss"] :is(.toss-send-hidden-input, .toss-cert-items__input, .login__form input, .profile-form__name) {
