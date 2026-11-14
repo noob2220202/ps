@@ -4,7 +4,7 @@
 // 줄을 누르면 카드 폭 전체 #2a2b30 (작은 버튼은 #3b3c41), 손 떼면 170ms 에 사라지고 120ms 뒤 이동 (useTossGo).
 // 다른 화면에서 돌아오면 바뀐 금액만 숫자 굴림 (boot.ts useRollValue). 시작화면에서 넘어오면 300ms 교차 + 포인트 줄 펼침.
 // 데이터: GET /api/home (accounts · toss 블록). 녹화에 있던 개인 기록(본 상품 · 방문 서비스 · 광고 문구)은 지어낸 예시로 바꿈.
-// 성인 계정 예시: 소비 카드 둘째 줄 = 신용카드 카드값, 반쪽 카드 왼쪽 = 대출 비교 (SOLUTION 27장 '성인 계정') — 자리 · 글자 크기는 녹화 그대로
+// 급여 통장 예시: 소비 카드 둘째 줄 = 신용카드 카드값, 반쪽 카드 왼쪽 = 대출 비교 (SOLUTION 27장 '예시 계좌 · 상품') — 자리 · 글자 크기는 녹화 그대로
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { paths } from "../../api/endpoints";

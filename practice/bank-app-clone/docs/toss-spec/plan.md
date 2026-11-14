@@ -6,9 +6,9 @@ This file is the single source of truth where the six area specs disagree. Read 
 
 **Privacy.** This file contains no value from the recordings. Seed values below are invented (홍길동-style). Placeholders such as `<NAME_A>` and `<ACCT_A>` only describe roles and formats. Frames and crops stay in `…/scratchpad/toss/frames/<area>/`. Never commit a frame. A crop is committed only after someone has looked at it.
 
-**Adult account.** The clone shows an **adult** Toss account (product names and copy are adult products checked on the web): the seed is a salary account with
+**Example account.** The clone's example data is a **salary account** (product names and copy are real products checked on the web): the seed has
 fixed bills and a credit card, home card 2 row 2 shows the credit card's next bill '{D}일 낼 카드값', and cards are check | credit. The recorded
-layout, positions, font sizes and colours are kept; only the content follows the adult account (sources and the full mapping: SOLUTION 27장 '성인 계정').
+layout, positions, font sizes and colours are kept; only the content follows the example account (sources and the full mapping: SOLUTION 27장 '예시 계좌 · 상품').
 
 **Units.** dp = screen coordinates of the 384 × 853.33 frame (0 = top of the status bar). Video px / 1.25 = dp. Times are real pts in seconds (A = first video, B = second video).
 
@@ -605,7 +605,7 @@ All boxes are video px (x0, y0, x1, y1) on the 480 × 1066 frame at the given pt
 ### 5.2 Home (A1)
 | asset | source | box | method | privacy |
 |---|---|---|---|---|
-| half-card illustration (iced coffee + barcode; the left card uses the adult copy and the product-menu 신용대출 icon) | B 136.113 | 380,662,452,734 | ESRGAN ×4, key out card + glow | OK |
+| half-card illustration (iced coffee + barcode; the left card uses the 대출 비교 copy and the invented SVG LoanArt in icons.tsx, not a crop) | B 136.113 | 380,662,452,734 | ESRGAN ×4, key out card + glow | OK |
 | list icons 계좌 개설 / 토스쇼핑 / 카드 혜택 추천 | B 136.113 | 38,766,74,800 · 38,826,74,860 · 38,888,74,924 | crop ×4, or SVG | OK |
 | 오늘의 딜 teal mark | A 10.698 | 360,817,412,869 | crop ×4, or SVG | OK |
 | calendar lottie key frames (+, ₩, flip) | B 128.650 / 129.251 / 127.990 | 176,232,338,406 | crop ×4; 1.9 s cross-fade loop | OK (the heads-up pill is outside the box) |

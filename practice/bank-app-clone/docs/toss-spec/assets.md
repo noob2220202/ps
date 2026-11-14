@@ -414,7 +414,7 @@ New (all gated to `APP === "toss"`; columns via `migrate()`, nullable, harmless 
 
 ### 4.3 Seed (invented, `seedTossExample`)
 Generate timestamps **relative to now** (infra.md §2.1) so the current month always has data. Include today and ≥ 6 earlier days, plus ≥ 8 transactions in the previous month.
-The clone seed is an **adult** account (the built seed is in plan.md §2.3):
+The clone seed is a **salary** account (the built seed is in plan.md §2.3):
 - Accounts, all fictional numbers:
   - main 토스뱅크 통장 (salary account)
   - hana 주거래하나 통장 (card bill · fixed bills)

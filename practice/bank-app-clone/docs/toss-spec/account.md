@@ -355,7 +355,7 @@ Existing endpoints in `server/index.mjs` that already fit:
 | Status-bar clock/battery/icons | all | device chrome (infra) | — |
 | OS notifications (messenger preview, bank push with name+balance) | B 4.0–4.6, ~75.5–78, ~128–131 | **never reproduce** | — |
 
-Seed suggestion (invented, 홍길동-style): `<NAME_A>` = 홍길동; counterparties 김철수, 이영희, 박민수; Toss acct `1000-1234-5678`; Hana own acct `123-456789-01234` (product "주거래하나 통장", 연 0.1%); adult-level balances (the built seed: plan.md §2.3); ~18 Toss transactions over 3 months mixing: own-account transfers in/out, person transfers, 카드 캐시백 (+tens of 원), 통장 이자 (+hundreds of 원), card merchants (예시마트, 샘플커피, 테스트쇼핑_PG). The product menu, rates, banner/ad copy and labels above are public UI content and can be used as-is (replace brand ads with invented ads).
+Seed suggestion (invented, 홍길동-style): `<NAME_A>` = 홍길동; counterparties 김철수, 이영희, 박민수; Toss acct `1000-1234-5678`; Hana own acct `123-456789-01234` (product "주거래하나 통장", 연 0.1%); salary-account-sized balances (the built seed: plan.md §2.3); ~18 Toss transactions over 3 months mixing: own-account transfers in/out, person transfers, 카드 캐시백 (+tens of 원), 통장 이자 (+hundreds of 원), card merchants (예시마트, 샘플커피, 테스트쇼핑_PG). The product menu, rates, banner/ad copy and labels above are public UI content and can be used as-is (replace brand ads with invented ads).
 
 ## 7. Scratch artefacts (for builders/verification)
 

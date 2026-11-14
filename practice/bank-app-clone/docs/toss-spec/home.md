@@ -406,7 +406,7 @@ interface TossHome {
 
 **Seed (invented, all fictional).**
 - Profile 홍길동, given name 길동, reward max 50,000원.
-- 토스뱅크 통장 balance 4,286,400원 (an adult salary account), number in Toss Bank format `1000-XXXX-XXXX` (12 digits, invented).
+- 토스뱅크 통장 balance 4,286,400원 (a salary account), number in Toss Bank format `1000-XXXX-XXXX` (12 digits, invented).
 - 토스머니 12,800원. 포인트 3번.
 - Credit card 토스뱅크 하나카드 Day, 결제일 13일: next bill 428,600원 (351,700원 once the 13th has passed).
 - 최근 본 상품: "바삭 감자칩 오리지널 3봉" + an invented snack thumbnail.
@@ -475,7 +475,7 @@ Crops are verified in `scratchpad/toss/frames/home/crops/`; boxes are in px@480 
 | Pay icon / bell | A 10.698 | 348,50,400,86 / 416,44,458,86 | **SVG** | OK |
 | 방문한 서비스 ticket icon | A 10.698 | 360,733,412,785 | **SVG** preferred | OK (generic icon) |
 | 오늘의 딜 teal mark | A 10.698 | 360,817,412,869 | Crop or SVG | OK (public service mark) |
-| Half-card illustration (right, 브랜드콘) | B 136.113 | 380,662,452,734 | Bottom-right of the half card (bg = card + glow; key out). The left card's recorded art is not used (adult copy + product-menu icon) | OK: generic 3-D art |
+| Half-card illustration (right, 브랜드콘) | B 136.113 | 380,662,452,734 | Bottom-right of the half card (bg = card + glow; key out). The left card's recorded art is not used (대출 비교 copy + invented SVG LoanArt, icons.tsx) | OK: generic 3-D art |
 | List icons 계좌 개설 / 토스쇼핑 / 카드 혜택 추천 | B 136.113 | 38,766,74,800 / 38,826,74,860 / 38,888,74,924 | Or SVG | OK |
 | Calendar Lottie frames ("+", "₩", flip) | B 128.650 / 129.251 / 127.990 | 176,232,338,406 (final layout) | Ad page loop | OK: generic illustration; the heads-up pill is outside the box |
 | Coupon "5000" image | B 74.942 | 28,638,104,684 | Coupon page | OK: generic ad art |
