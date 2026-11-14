@@ -118,10 +118,11 @@ export function Spend() {
     if (expanded) setExpanded(false);
     setDay(date);
     window.requestAnimationFrame(() => {
-      // 펼친 달력을 접는 중이면 지금 높이만큼 빼면 접힌 뒤 자리 (접힌 달력 아래에 그 날 머리가 옴)
+      // 펼친 달력을 접는 중이면 지금 높이만큼 빼면 접힌 뒤 자리. 그 날 묶음 위끝을 엿보기 선(spyLine)에 맞춤
+      // → 날짜 머리가 붙은 달력 바로 아래(잉크 y ≈ 284.6)에 오고, 조금 움직여도 고른 날이 그대로
       const strip = body.querySelector<HTMLElement>(".toss-assets-strip");
       const max = body.scrollHeight - body.clientHeight;
-      const target = Math.max(0, Math.min(max, el.offsetTop - (strip?.offsetHeight ?? SPEND.stripH)));
+      const target = Math.max(0, Math.min(max, el.offsetTop - (strip?.offsetHeight ?? SPEND.stripH) + SPEND.stripH - SPEND.spyLine));
       lock.current = { target, until: performance.now() + 900 };
       body.scrollTo({ top: target, behavior: "smooth" });
     });
@@ -204,17 +205,17 @@ export function Spend() {
   );
 }
 
-// ---------- 뼈대 (C1): 머리줄 없이 막대 둘 + 동그라미 · 막대 두 줄, 차례로 나타남 ----------
+// ---------- 뼈대 (C1): 머리줄 없이 막대 둘 + 동그라미 · 막대 두 줄, 차례로 나타남 (녹화 +170 · +270 · +520ms 를 450ms 안에 다 보이게 줄임) ----------
 function SpendSkeleton() {
   return (
     <div className="toss-assets-skel">
-      <TossFadeIn delay={170} duration={200}>
+      <TossFadeIn delay={120} duration={150}>
         <TossSkeleton tone="web" w={111.2} h={21.6} r={8} className="toss-assets-skel__b1" />
       </TossFadeIn>
-      <TossFadeIn delay={270} duration={200}>
+      <TossFadeIn delay={170} duration={150}>
         <TossSkeleton tone="web" w={168} h={30.4} r={8} className="toss-assets-skel__b2" />
       </TossFadeIn>
-      <TossFadeIn delay={520} duration={200}>
+      <TossFadeIn delay={260} duration={150}>
         {[0, 1].map((i) => (
           <div key={i} className="toss-assets-skel__row" style={{ top: 160 + i * 74.4 }}>
             <TossSkeleton tone="web" w={40} h={40} r={20} className="toss-assets-skel__dot" />

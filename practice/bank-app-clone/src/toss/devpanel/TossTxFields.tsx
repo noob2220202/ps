@@ -26,7 +26,10 @@ export function TossTxFields({ tx, run }: { tx: Transaction; run: TossRun }) {
   const known = !tx.category || CATEGORIES.includes(tx.category);
   const [category, setCategory] = useState(tx.category ?? "");
   const [custom, setCustom] = useState(!known);
-  const [channel, setChannel] = useState<TossChannel | "auto">(tx.channel ?? "auto");
+  // 서버는 비어 있는 결제 수단을 거래 종류로 채워 보냄 (#체크카드 → 카드, 그 밖 → 입·출금). 그 값과 같으면 '자동'으로 보임
+  //  (저장하면 비워 둠 → 나중에 위의 거래 종류를 바꾸면 결제 수단도 따라감)
+  const derived: TossChannel = tx.tag === "#체크카드" ? "card" : "account";
+  const [channel, setChannel] = useState<TossChannel | "auto">(!tx.channel || tx.channel === derived ? "auto" : tx.channel);
   const [cardId, setCardId] = useState(tx.cardId ?? "");
   const [cancelled, setCancelled] = useState(!!tx.cancelled);
   const [exclude, setExclude] = useState(!!tx.exclude);

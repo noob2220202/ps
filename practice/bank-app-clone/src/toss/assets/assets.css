@@ -280,6 +280,9 @@
   font-weight: 600;
   color: #dbd9df;
   white-space: nowrap;
+  /* 토스 글꼴 숫자가 좁음: Pretendard 22 의 높이(숫자 잉크 16)는 그대로 두고 가로만 0.906 (녹화 '-NNN,NNN원' 잉크 폭 100.8) */
+  transform: scaleX(0.906);
+  transform-origin: 0 50%;
 }
 .toss-assets-sum__diff {
   position: absolute;
@@ -321,9 +324,9 @@
 .toss-assets-sum__bar {
   position: absolute;
   left: 24px;
-  top: 77.2px; /* 198.4–211.2 */
+  top: 76.8px; /* 198.4–211.2 */
   width: 336px;
-  height: 12.4px;
+  height: 12.8px;
   display: flex;
   gap: 2.4px;
 }
@@ -633,30 +636,35 @@
   right: 0;
   height: 42.4px;
 }
-.toss-assets-skel__dot {
+.toss-assets-skel .toss-assets-skel__dot {
   position: absolute;
   left: 24px;
   top: 0.8px;
   background: #1a191c;
 }
-.toss-assets-skel__bar {
+.toss-assets-skel .toss-assets-skel__bar {
   position: absolute;
   left: 78.4px;
   top: 0;
   background: #1a191c;
 }
+/* 반짝임은 아주 옅게 (녹화: 막대 위 +2 휘도) */
+.toss-assets-skel .toss-skel::after {
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.012) 50%, transparent 70%);
+}
 
 /* =====================================================================
    자산 (/assets) — 머리줄 28–81.6 고정, 본문 81.6 부터: 총 자산 0–54.4 · 탭 54.4–105.6 (붙음) · 카드 117.6 부터
    ===================================================================== */
+/* 당기는 동안 머리줄(← · 자산 불러오기)이 당긴 만큼 흐려짐 (usePullRefresh 가 --toss-assets-hdim), 끝나면 200ms 뒤 230ms 에 돌아옴 (B 158.44–158.67) */
 .toss-assets-assets .toss-appbar__back,
 .toss-assets-assets__load {
-  transition: opacity 200ms linear;
+  opacity: var(--toss-assets-hdim, 1);
+  transition: opacity 230ms linear 200ms;
 }
-.toss-assets-assets--dim .toss-appbar__back,
-.toss-assets-assets--dim .toss-assets-assets__load {
-  opacity: 0.5;
-  transition-duration: 190ms;
+.toss-assets-ptr-drag .toss-appbar__back,
+.toss-assets-ptr-drag .toss-assets-assets__load {
+  transition: none;
 }
 .toss-assets-assets__bar .toss-appbar__right {
   right: 16px;
@@ -671,7 +679,7 @@
 }
 .toss-assets-assets__content {
   position: relative;
-  padding-bottom: 158.3px; /* 스크롤 범위 172 (녹화 B 156.09–157.04 끝까지 민 화면: 첫 카드 아래끝 274.4) */
+  padding-bottom: 158.6px; /* 스크롤 범위 172 (녹화 B 156.09–157.04 끝까지 민 화면: 첫 카드 아래끝 274.4) */
 }
 .toss-assets-total {
   height: 54.4px;
@@ -775,6 +783,9 @@
   border-radius: 22px;
   background: #201f22;
 }
+.toss-assets-card:last-of-type {
+  padding-bottom: 21.3px; /* 포인트 카드 아래끝 789.6 (B 155.32) */
+}
 .toss-assets-card__empty {
   margin: 0;
   padding: 16px 0 0;
@@ -862,13 +873,41 @@
   color: #d6d7da;
   transition-duration: 50ms;
 }
-/* 자산 줄 누름: 줄 가운데에서 가로 60% · 세로 85% 로 시작해 카드 폭까지 커짐 (녹화 B 160.604–160.736), 송금 버튼은 조금 밝게 위에 남음 */
+/* 자산 줄 누름: 줄 가운데에서 가로 60% · 세로 90% 로 시작, 세로는 25ms 만에 다 차고 가로는 230ms 에 걸쳐 카드 폭까지
+   (B 160.604–160.753 의 너비 62 · 65 · 81 · 94 · 97%), 50ms 에 나타남. 송금 버튼은 조금 밝게 위에 남음 */
 .toss-assets-row.toss-press--on > .toss-press__bg {
-  animation: toss-assets-row-grow 140ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation: toss-assets-row-grow 230ms linear both;
 }
 @keyframes toss-assets-row-grow {
-  from {
-    transform: scale(0.6, 0.85);
+  0% {
+    scale: 0.6 0.9;
+  }
+  10% {
+    scale: 0.625 1;
+  }
+  20% {
+    scale: 0.689 1;
+  }
+  30% {
+    scale: 0.809 1;
+  }
+  40% {
+    scale: 0.893 1;
+  }
+  50% {
+    scale: 0.939 1;
+  }
+  60% {
+    scale: 0.967 1;
+  }
+  70% {
+    scale: 0.983 1;
+  }
+  80% {
+    scale: 0.993 1;
+  }
+  100% {
+    scale: 1 1;
   }
 }
 .toss-assets-row--on .toss-assets-send {
@@ -890,7 +929,7 @@
   color: #fdfcfe;
 }
 .toss-assets-more {
-  margin-top: 15.6px; /* 카드 아래 (여백 겹침) 15.6 → 가운데 y 828 */
+  margin-top: 14.3px; /* 카드 아래 (여백 겹침) → 줄 803.9–851.9, 글자 잉크 820 */
   height: 48px;
 }
 .toss-assets-more > .toss-press__content {
@@ -911,23 +950,28 @@
 .toss-assets-ptr {
   position: absolute;
   left: 192px;
-  top: 145.4px;
+  top: 145.6px; /* 놓은 뒤 가운데 화면 y 227.2 (당기는 동안은 --ptr-y 만큼 위: 탭 아래끝 + 당김/2) */
   width: var(--ptr-d);
   height: var(--ptr-d);
   margin: calc(var(--ptr-d) / -2) 0 0 calc(var(--ptr-d) / -2);
+  transform: translate3d(0, var(--ptr-y, 0px), 0);
   pointer-events: none;
   z-index: 0;
 }
+/* 고리: 선 1.6 (가운데 휘도 ≈ 50, 살짝 푸름) · 안쪽으로 3dp 번지는 빛 · 속은 옅게 (+3) (B 157.888) */
 .toss-assets-ptr i {
   position: absolute;
   inset: 0;
-  border: 1.6px solid #3a393d;
+  border: 1.8px solid #403f45;
   border-radius: 50%;
+  background: rgba(190, 190, 255, 0.025);
   box-shadow:
-    0 0 6px rgba(255, 255, 255, 0.05),
-    inset 0 0 4px rgba(255, 255, 255, 0.04);
+    0 0 2px rgba(255, 255, 255, 0.03),
+    inset 0 0 6px rgba(255, 255, 255, 0.1);
   rotate: 45deg;
 }
+/* 물방울 모양 바꿈은 다 당겨졌을 때부터 (놓기 전에도, B 157.64) — 놓아도 끊기지 않고 이어짐 */
+.toss-assets-ptr--armed i,
 .toss-assets-ptr--refresh i {
   animation: toss-assets-drop 470ms ease-in-out infinite;
 }
@@ -938,39 +982,73 @@
     margin 120ms ease-out;
 }
 .toss-assets-ptr--finish {
-  animation: toss-assets-ptr-out 150ms ease-out both;
+  animation: toss-assets-ptr-out 200ms linear both;
 }
+/* 동그라미 ↔ 아래로 뾰족한 물방울: 아래 끝은 동그라미 아래끝 그대로 (테두리 상자 36.8 × 36.8 가 거의 안 변함, B 157.64 · 158.11) */
 @keyframes toss-assets-drop {
   0%,
   100% {
     border-radius: 50%;
   }
   50% {
-    border-radius: 50% 50% 0 50%;
+    border-radius: 50% 50% 22% 50%;
+    scale: 0.95;
+    translate: 0 -1.3px;
   }
 }
+/* 끝: 80ms 만에 ⌀43 · 16 위로, 흐려짐은 200ms (B 158.24–158.44) */
 @keyframes toss-assets-ptr-out {
+  0% {
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+  40% {
+    opacity: 0.5;
+    transform: translate3d(0, -16px, 0) scale(1.15);
+  }
   to {
     opacity: 0;
-    transform: translate3d(0, -14px, 0) scale(1.16);
+    transform: translate3d(0, -17px, 0) scale(1.17);
   }
+}
+/* 끝날 때 빛 고리: 화면 (192, 300) 에서 퍼지는 옅은 흰 고리 (꼭대기 휘도 +11, 지나간 안쪽 +3.5), 반지름 ≈ 100 + 1.06 × ms,
+   850ms 에 사라짐 (B 158.26–159.0 프레임: y 76 · y 194 · x 379 줄의 밝기). 화면 뿌리(.toss-page)에 붙어 카드 · 탭 위로 지나감 */
+@property --toss-assets-ripple-r {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
 }
 .toss-assets-ptr-glow {
   position: absolute;
-  left: 0;
-  top: -81.6px;
-  width: 384px;
-  height: 853.33px;
+  inset: 28px 0 0;
+  z-index: 5;
   pointer-events: none;
-  background: radial-gradient(circle at 192px 227px, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02) 45%, transparent 75%);
-  animation: toss-assets-glow 1000ms ease-out both;
-  z-index: 0;
+  background: radial-gradient(
+    circle at 192px 272px,
+    rgba(255, 255, 255, 0.015) calc(var(--toss-assets-ripple-r) - 64px),
+    rgba(255, 255, 255, 0.047) calc(var(--toss-assets-ripple-r) - 18px),
+    rgba(255, 255, 255, 0) calc(var(--toss-assets-ripple-r) + 16px)
+  );
+  animation:
+    toss-assets-ripple 850ms linear both,
+    toss-assets-ripple-out 850ms linear both;
 }
-@keyframes toss-assets-glow {
+@keyframes toss-assets-ripple {
   0% {
-    opacity: 0;
+    --toss-assets-ripple-r: 40px;
   }
-  18% {
+  5% {
+    --toss-assets-ripple-r: 140px;
+  }
+  45% {
+    --toss-assets-ripple-r: 500px;
+  }
+  100% {
+    --toss-assets-ripple-r: 980px;
+  }
+}
+@keyframes toss-assets-ripple-out {
+  0%,
+  76% {
     opacity: 1;
   }
   100% {
@@ -1124,7 +1202,7 @@
   height: 100%;
   display: grid;
   place-items: center;
-  padding-bottom: 3.2px; /* 잉크 768.8–782.4 */
+  padding-bottom: 1.6px; /* 잉크 768.8–782.4 */
   font-size: 15px;
   font-weight: 600;
   color: #e6e5ea;

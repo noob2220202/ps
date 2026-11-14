@@ -1,9 +1,11 @@
 // 자산 영역(소비 · 자산 · 내 계좌)에서 같이 쓰는 작은 그림: 은행 로고 둥근 네모 · 카드 그림 · 소비 분류 아이콘 · ◂ ▸ · ⋯ · +
 // 전부 SVG / CSS (녹화 화면을 잘라 쓰지 않음, plan.md §5.6). 값은 assets.md §2.2.5 · §7 의 잰 값
 import type { CSSProperties, ReactNode, RefObject } from "react";
+import { createPortal } from "react-dom";
 import { localAsset } from "../../assets/Asset";
 import { TossBankLogo } from "../ui/BankLogo";
 import { TossPressable } from "../ui/Pressable";
+import { useTossPageRoot } from "../ui/shared";
 import { TossSymbol } from "../ui/TossSymbol";
 import type { PullPhase } from "./usePullRefresh";
 
@@ -291,14 +293,15 @@ export function PlusGlyph({ color = "#8a898c" }: { color?: string }) {
   );
 }
 
-// 당겨서 새로고침 고리 (usePullRefresh 가 크기 · 투명도를 직접 바꿈) + 끝날 때 옅게 밝아지는 화면
+// 당겨서 새로고침 고리 (usePullRefresh 가 크기 · 자리 · 투명도를 직접 바꿈) + 끝날 때 고리 자리에서 퍼지는 옅은 빛 고리 (화면 전체 위, 화면 뿌리에 붙임)
 export function PullBlob({ phase, blobRef }: { phase: PullPhase; blobRef: RefObject<HTMLSpanElement | null> }) {
+  const root = useTossPageRoot();
   return (
     <>
-      <span ref={blobRef} className={`toss-assets-ptr toss-assets-ptr--${phase}`} style={{ "--ptr-d": "20px", opacity: 0 } as CSSProperties} aria-hidden>
+      <span ref={blobRef} className={`toss-assets-ptr toss-assets-ptr--${phase}`} style={{ "--ptr-d": "20px", "--ptr-y": "-40px", opacity: 0 } as CSSProperties} aria-hidden>
         <i />
       </span>
-      {phase === "finish" && <span className="toss-assets-ptr-glow" aria-hidden />}
+      {phase === "finish" && root && createPortal(<span className="toss-assets-ptr-glow" aria-hidden />, root)}
     </>
   );
 }

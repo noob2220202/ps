@@ -23,10 +23,13 @@ const A = {
   indW: 96.8,
   cardsAfter: 12, // 탭 아래끝 → 첫 카드
   under: 8, // 탭을 누르면 그 카드 위끝이 탭 밑 8dp 에 오게
+  spy: 221.2, // 엿보기: 카드 위끝이 본문 위에서 이만큼(화면 y 302.8) 안으로 오면 그 칸 (B 156.00–156.09: 스크롤 117 → 161 사이에 카드로 바뀜)
   show: 550, // 카드가 나타나는 때 (push 400ms 가 끝나고 150ms 뒤)
   odo: 900, // 숫자 굴림
 } as const;
 const TABS = ["계좌", "카드", "포인트"] as const;
+// 카드 위끝의 본문(스크롤) 안 자리. offsetTop 은 당김 칸(.toss-assets-pull) 기준이라 그 칸 자리를 더함
+const topOf = (s: HTMLElement) => s.offsetTop + ((s.offsetParent as HTMLElement | null)?.offsetTop ?? 0);
 
 type AssetsMemo = { scroll: number };
 
@@ -54,14 +57,14 @@ export function Assets() {
   const [tab, setTab] = useState(0);
   const pinned = useRef(0); // 탭을 눌러 부드럽게 스크롤하는 동안 엿보기를 멈춤 (타이머 id)
 
-  // 스크롤 엿보기: 맨 끝이면 마지막 칸, 아니면 위끝이 탭 밑(+8)을 지난 마지막 카드
+  // 스크롤 엿보기: 맨 끝이면 마지막 칸, 아니면 위끝이 화면 y 302.8 위로 올라온 마지막 카드 (녹화: 아래로 밀면 계좌 → 카드 → 맨 끝에서 포인트)
   const spy = useCallback((el: HTMLDivElement) => {
     const st = el.scrollTop;
     const max = el.scrollHeight - el.clientHeight;
     const list = sections.current.map((s, i) => [s, i] as const).filter(([s]) => s);
     let pick = 0;
     if (max > 1 && st >= max - 1) pick = list[list.length - 1]?.[1] ?? 0;
-    else for (const [s, i] of list) if (s!.offsetTop - st <= A.tabsH + A.under + 1) pick = i;
+    else for (const [s, i] of list) if (topOf(s!) - st <= A.spy) pick = i;
     setTab(pick);
   }, []);
   const onScroll = (e: UIEvent<HTMLDivElement>) => {
@@ -82,7 +85,7 @@ export function Assets() {
     if (!el || !s) return;
     setTab(i);
     const max = el.scrollHeight - el.clientHeight;
-    const target = Math.max(0, Math.min(max, s.offsetTop - A.tabsH - A.under));
+    const target = Math.max(0, Math.min(max, topOf(s) - A.tabsH - A.under));
     unpin();
     pinned.current = window.setTimeout(() => (pinned.current = 0), 900);
     el.scrollTo({ top: target, behavior: "smooth" });
@@ -100,8 +103,24 @@ export function Assets() {
     }
   }, [shown, revisit, saved.scroll, spy]);
 
-  // 당겨서 새로고침
-  const { wrapRef: pullRef, blobRef, phase: pullPhase, dim } = usePullRefresh({ bodyRef, enabled: shown, onRefresh: () => q.retry() });
+  // 당겨서 새로고침: 다시 받고 새 값이 오면(또는 실패하면) 끝냄
+  const waitRef = useRef<{ data: TossAssets | undefined; done: () => void } | null>(null);
+  useEffect(() => {
+    const w = waitRef.current;
+    if (w && (q.data !== w.data || q.error)) {
+      waitRef.current = null;
+      w.done();
+    }
+  }, [q.data, q.error]);
+  const { wrapRef: pullRef, blobRef, phase: pullPhase } = usePullRefresh({
+    bodyRef,
+    enabled: shown,
+    onRefresh: () =>
+      new Promise<void>((done) => {
+        waitRef.current = { data: q.data, done };
+        q.retry();
+      }),
+  });
 
   const openAccount = (a: TossAssetAccount) => {
     if (a.role === "money") return; // 토스머니: 누름 표시만
@@ -117,7 +136,7 @@ export function Assets() {
 
   return (
     <TossPage
-      className={`toss-assets-assets${dim ? " toss-assets-assets--dim" : ""}`}
+      className="toss-assets-assets"
       header={
         <TossAppBar
           className="toss-assets-assets__bar"
