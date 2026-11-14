@@ -176,7 +176,7 @@ ibk2 5179/8793/9113 · kakao2 5180/8794/9115 · toss 5181/8795/9117 → **allone
   A NULL bank_code renders as 카카오뱅크 (`toAccount`: `bankByCode(row.bank_code ?? "kakao")`).
 - [ ] **Dates relative to now.** 거래내역's default filter is "1개월", so a fixed-date seed goes empty after a month.
   Copy toss-seed's `relativeClock` pattern (`c(n, "HH:MM")`, clamp future times). Do not import it: it is private and toss is WIP.
-- [ ] **한도제한 tag trap.** `migrate()` runs `UPDATE accounts SET badge = NULL WHERE kind = 'main'` **on every DB open** (line 172).
+- [ ] **한도제한 tag trap.** (나중에 '한도제한' 은 빼고 같은 방식의 `accounts.blocked`(지급정지) 칸을 둠) `migrate()` runs `UPDATE accounts SET badge = NULL WHERE kind = 'main'` **on every DB open** (line 172).
   So `accounts.badge` cannot hold "한도제한" for the main account.
   Add a gated column instead, like toss's `add()`: `if (APP === "allone") add("accounts", "limited", "INTEGER NOT NULL DEFAULT 0")`.
   Alternatively keep it client-only. Do not touch the shared UPDATE.

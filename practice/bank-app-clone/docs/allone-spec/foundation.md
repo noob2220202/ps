@@ -113,7 +113,7 @@ Visuals: dim `rgba(55,55,55,.68)` over 59–818 (white → 119). Deepen `rgba(0,
 - `cutAoToast()`, `useAoToast()`, `endAoToast(id)`, `AoToastState`.
 
 == api.ts ==
-- Types: `AoAccount extends Account{limited?:boolean}`, `isAoNh(a)` (bank.code==="nh"), `AoNoticeItem{title,when}`, `AoNotice{on,items:AoNoticeItem[]|null}`, `AoProfile extends Profile{noticeOn?,noticeItems?}`, `AoHome{profile:AoProfile;accounts:AoAccount[];ao?:{notice?:AoNotice}}+HomeData`.
+- Types: `AoAccount extends Account{blocked?:boolean}` (지급정지; 예전 `limited` 는 지움), `isAoNh(a)` (bank.code==="nh"), `AoNoticeItem{title,when}`, `AoNotice{on,items:AoNoticeItem[]|null}`, `AoProfile extends Profile{noticeOn?,noticeItems?}`, `AoHome{profile:AoProfile;accounts:AoAccount[];ao?:{notice?:AoNotice}}+HomeData`.
 - More types: `AoTransaction`, `AoTxDetail extends TransactionDetail{ao?:{accountId;payee:{id;favorite}|null}}`, `AoRecipients`, `AoRecipient`, `AoTransferRecord`, `AoTransferResult`. `AO_TX_LIMIT=500`, `AO_TOPUP_MEMO="잔액채우기"`.
 - `aoPaths`: `home, banks, profile, payees, account(id), transactions(id)` (`…?limit=500`, always use this so the cache is shared), `transaction(id), recipients(from), transfers(from?), recent(bank,number)`.
 - `aoApi`:
@@ -182,6 +182,7 @@ Also `useAoPrefs(getter)`, `AO_RECENT_MENUS_DEFAULT=["history","send","topup"]`.
 - **AoWordmark**{width,color?="#fff",transition?,className?,style?}: height = width / `AO_WORDMARK_RATIO` (463/342), CSS mask.
 - **AoSpinner**{size?=61}: pass a new key per onset; centre at (196.5,425.8).
 - **AoBankLogo**{code,size?=36,radius?,bank?:{name?,short?,color?},className?,style?}: crop tiles for jb, shinhan, kakao, hana, kb, kbank, nh; superellipse n 2.6 at every size. **Omit radius** for the NH 32 / 40 tiles. Other banks get a colour tile with the hana glyph or a short name. `AO_NH_BLUE="#0052B3"`, type AoBankLogoProps.
+- **AoAlert** (web '안내' popup, portals into the nearest .layer, z45 below the loading dim): {open, onClose, title?="안내", children (body), code? (red line), tel?{label,numbers[]}, confirmLabel?="확인", enter?:"hidden"|"cut", className?, host?}. Opacity fade only (card 300 ms, scrim .30 340 ms), cut on 확인 release, 300 ms tap guard after close, browser back = 확인 (one same-key history entry). Scrim taps do nothing.
 - **AoLoadingLayer**, **AoToastLayer** (rendered by AlloneOverlay).
 - **AoGallery** at /dev/ui.
 - Re-exported helpers: aoLoad, showAoLoading, cutAoLoading, useAoLoadingVisible, onAoLoadingHidden, isAoLoadingUp, aoToast, cutAoToast, AO_TOAST_BOTTOM, setAoStatusFg.
@@ -190,7 +191,7 @@ Also `useAoPrefs(getter)`, `AO_RECENT_MENUS_DEFAULT=["history","send","topup"]`.
 allone.css tokens on `:root[data-app="allone"]`:
 - Surfaces and lines: --ao-bg #fff, --ao-line #eee, --ao-line-2 #dcdcdc, --ao-line-3 #f5f5f5, --ao-disabled #f5f5f5, --ao-skeleton #fcfbfe
 - Green: --ao-green #0c8f2d, --ao-green-dark #004511, --ao-green-light #12a434, --ao-green-native #003e0e, --ao-green-tint #eafeee, --ao-chip-hash #00831a, --ao-notice-title #008b1e, --ao-notice-date #00821f, --ao-page-dot #0a902b, --ao-spinner-face #1ac66d, --ao-spinner-ring #16b758
-- Other colours: --ao-blue #0052b3, --ao-out #e93535, --ao-in #1a5dd9, --ao-error #f00, --ao-limited #e94143, --ao-link #555, --ao-star #8f8f8f, --ao-star-on #ffc31a
+- Other colours: --ao-blue #0052b3, --ao-out #e93535, --ao-in #1a5dd9, --ao-error #f00, --ao-link #555, --ao-star #8f8f8f, --ao-star-on #ffc31a
 - Text: --ao-t0 #000, --ao-t1 #141414, --ao-t2 #3c3c3c, --ao-t3 #4e4e4e, --ao-t4 #4c4c4c, --ao-t5 #666, --ao-t5b #686868, --ao-t6 #808080, --ao-t7 #898989, --ao-t8 #9e9e9e, --ao-placeholder #bcbcbc
 - Dims: --ao-dim-web, --ao-dim-deep, --ao-scrim, --ao-dim-amount, --ao-dim-password
 - Fonts and bands: --ao-font (Pretendard), --ao-font-num (Roboto), --ao-top, --ao-bottom
@@ -202,10 +203,10 @@ Areas use prefixes ao-ln-, ao-home-, ao-acct-, ao-send-, and assets allone-<area
 
 == SERVER API (APP allone, port 9119, data server/data-allone, cookie bank_sid_allone) ==
 - Production HTML: `<title>올원뱅크 클론 연습</title>` and `window.__BANK_APP__="allone"; window.__BANK_INTRO__=true`.
-- NH accounts use bank_code "nh". Account JSON adds `limited:boolean`. Example: `{id:"main",kind:"main",label:"NH페이모아통장(비대면실명확인)",balance:4638,number:"302-1234-5678-91",bank:{code:"nh",name:"농협은행",short,color,section,pattern:[3,4,4,2],alt},safebox:0,limited:true}`.
+- NH accounts use bank_code "nh". Account JSON adds `blocked:boolean` (지급정지; the old `limited` column is dropped). Example: `{id:"main",kind:"main",label:"NH페이모아통장(비대면실명확인)",balance:4638,number:"302-1234-5678-91",bank:{code:"nh",name:"농협은행",short,color,section,pattern:[3,4,4,2],alt},safebox:0,blocked:false}`.
 - Profile JSON adds `noticeOn:boolean, noticeItems:[{title,when}]|null`. `GET /api/home` adds `ao:{notice:{on,items}}`.
 - `PATCH /api/profile` accepts `noticeOn:boolean` and `noticeItems:null|≤5×{title 1–30,when ≤40}` (otherwise 400 fields.noticeOn / noticeItems).
-- `PATCH /api/accounts/:id` accepts `{limited:boolean}` (otherwise 400 fields.limited).
+- `PATCH /api/accounts/:id` accepts `{blocked:boolean}` (otherwise 400 fields.blocked). `POST /api/transfers` from a blocked account → 403 `ACCOUNT_BLOCKED`.
 - `GET /api/transactions/:id` adds `ao:{accountId, payee:{id,favorite}|null}` (payee only for sent transfers matching bank+number).
 - `POST /api/payees` accepts `favorite:true`. `PATCH /api/payees/:id {favorite}`.
 - `GET /api/transfer/recipients?from=` returns `{mine (excludes from), recent (drops hidden rows until a newer transfer), favorites}`; no dailyRemaining.
@@ -215,9 +216,9 @@ Areas use prefixes ao-ln-, ao-home-, ao-acct-, ao-send-, and assets allone-<area
 - `GET /api/transfers?from=` returns today's records. Transactions: `GET /api/accounts/:id/transactions?limit=500` (balanceAfter computed); memo PATCH ≤20.
 
 Seeds:
-- Example: main 4,638 limited; kpay "NH X 카카오페이통장(비대면실명확인)" 302-8765-4321-01, 7, limited; kb KB나라사랑우대통장 123456-78-901234, 245,000; kbank MY 입출금통장 100-123-456789, 58,300.
+- Example: main 4,638; kpay "NH X 카카오페이통장(비대면실명확인)" 302-8765-4321-01, 7; kb KB나라사랑우대통장 123456-78-901234, 245,000; kbank MY 입출금통장 100-123-456789, 58,300.
 - 40 relative-date transactions (main 11 and kpay 3 in the last month). 6 payees: ☆ 김민지 and 최유나; recent = 김민지, 최유나, 박하늘, 윤하람.
-- Empty seed (and every new profile): main only, 0원, limited, notice on.
+- Empty seed (and every new profile): main only, 0원, notice on.
 
 == ASSETS (src/assets/local, via localAsset) ==
 - allone-wordmark.png: 463×342 white + alpha, 4 px/pt = 115.75×85.5 pt. Splash ink box x 138.80–254.55, y 235.92–321.42.
@@ -237,16 +238,16 @@ A1 launch 8952/5352, A2 home 8953/5353, A3 account 8954/5354, A4 transfer 8955/5
 
 SERVER (app id allone; every addition gated by APP==="allone"; NH accounts use bank_code "nh")
 - Port 9119 (--port overrides). Data dir server/data-allone/ (DATA_DIR overrides). Cookie bank_sid_allone. Prod html: <title>올원뱅크 클론 연습</title> + window.__BANK_APP__="allone"; window.__BANK_INTRO__=true.
-- Account JSON (toAccount: /api/home accounts[], GET/PATCH /api/accounts/:id, POST /api/accounts) adds `limited: boolean`.
-  Example: {id:"main",kind:"main",label:"NH페이모아통장(비대면실명확인)",balance:4638,number:"302-1234-5678-91",bank:{code:"nh",name:"농협은행",short:"농협",color:"#399F56",section:"bank",pattern:[3,4,4,2],alt:[6,2,6]},safebox:0,limited:true}.
-  recipients.mine[] items do NOT carry limited (same shape as other apps).
+- Account JSON (toAccount: /api/home accounts[], GET/PATCH /api/accounts/:id, POST /api/accounts) adds `blocked: boolean` (지급정지; the old `limited` column is dropped).
+  Example: {id:"main",kind:"main",label:"NH페이모아통장(비대면실명확인)",balance:4638,number:"302-1234-5678-91",bank:{code:"nh",name:"농협은행",short:"농협",color:"#399F56",section:"bank",pattern:[3,4,4,2],alt:[6,2,6]},safebox:0,blocked:false}.
+  recipients.mine[] items do NOT carry blocked (same shape as other apps).
 - Profile JSON (GET /api/profile, PATCH /api/profile response, /api/home.profile) adds `noticeOn: boolean, noticeItems: [{title,when}] | null` (null = client default copy). This matches client api.ts AoProfile.
 - GET /api/home adds `ao: { notice: { on: boolean, items: [{title,when}] | null } }`, mirroring profile.noticeOn/noticeItems.
 - PATCH /api/profile also accepts:
   - `noticeOn: boolean` (else 400 fields.noticeOn "켜기/끄기");
   - `noticeItems: null | Array(≤5) of {title: string, trimmed 1–30; when: string, trimmed ≤40}`, stored trimmed (else 400 fields.noticeItems).
   Response = profile JSON above.
-- PATCH /api/accounts/:id also accepts `limited: boolean` (non-boolean → 400 {code:"VALIDATION",fields:{limited:"켜기/끄기"}}). Response = account JSON.
+- PATCH /api/accounts/:id also accepts `blocked: boolean` (non-boolean → 400 {code:"VALIDATION",fields:{blocked:"켜기/끄기"}}). Response = account JSON. POST /api/transfers from a blocked account → 403 {code:"ACCOUNT_BLOCKED"}.
 - GET /api/transactions/:id (and the PATCH /api/transactions/:id response) adds `ao: { accountId: string, payee: { id: string, favorite: boolean } | null }`.
   payee = the payees row matching transfer.bank.code + transfer.number (sent transfers only). Incoming rows and own top-ups give payee null; the top-up out side has transfer {bank nh, number main digits, holder userName} and memoTo "잔액채우기".
 - POST /api/payees also accepts `favorite: true` → 201 payee with favorite:true.
@@ -257,9 +258,9 @@ SERVER (app id allone; every addition gated by APP==="allone"; NH accounts use b
 - Unchanged endpoints listed in plan §2.4 work as-is: GET /api/transfers?from= lists today's top-ups (memoTo "잔액채우기"); reset; profiles.
 
 Seeds:
-- Example accounts: main nh 4,638 limited; kpay nh "NH X 카카오페이통장(비대면실명확인)" 302-8765-4321-01 7 limited; kb "KB나라사랑우대통장" 123456-78-901234 245,000; kbank "MY 입출금통장" 100-123-456789 58,300.
+- Example accounts: main nh 4,638; kpay nh "NH X 카카오페이통장(비대면실명확인)" 302-8765-4321-01 7; kb "KB나라사랑우대통장" 123456-78-901234 245,000; kbank "MY 입출금통장" 100-123-456789 58,300.
 - 40 transactions as in plan §2.3. The main ago(12) 박하늘 row has memo "모임 회비". 6 payees, ☆ 김민지/최유나.
-- Empty seed: main only, 0원, limited, notice on.
+- Empty seed: main only, 0원, notice on.
 
 ASSETS (src/assets/local, read via localAsset):
 - allone-wordmark.png: 463×342 px, white RGB + alpha mask, 4 px/pt = 115.75×85.50 pt. Splash ink box x 138.80–254.55, y 235.92–321.42 pt.
@@ -391,7 +392,7 @@ All files are under src/allone/. Areas import these directly.
 - `/dev/ui` imports `{ AoGallery }` from `./ui/Gallery`. routes.tsx also imports `./allone.css` and `./ui/ui.css`.
 
 **api.ts**
-- Types: `AoAccount` (Account + `limited?`), `AoNoticeItem {title, when}`, `AoNotice {on, items|null}`, `AoProfile` (+ `noticeOn?`, `noticeItems?`), `AoHome` (accounts: `AoAccount[]`, `ao?: {notice?: AoNotice}`), `AoTxDetail` (+ `ao?: {accountId, payee: {id, favorite}|null}`), `AoRecipients`, `AoRecipient`, `AoTransferRecord`, `AoTransferResult`, `AoTransaction`. Also `isAoNh(a)` and `AO_TX_LIMIT = 500`.
+- Types: `AoAccount` (Account + `blocked?`), `AoNoticeItem {title, when}`, `AoNotice {on, items|null}`, `AoProfile` (+ `noticeOn?`, `noticeItems?`), `AoHome` (accounts: `AoAccount[]`, `ao?: {notice?: AoNotice}`), `AoTxDetail` (+ `ao?: {accountId, payee: {id, favorite}|null}`), `AoRecipients`, `AoRecipient`, `AoTransferRecord`, `AoTransferResult`, `AoTransaction`. Also `isAoNh(a)` and `AO_TX_LIMIT = 500`.
 - `aoPaths`: home, banks, profile, payees, account(id), `transactions(id)` (= `…/transactions?limit=500`; always use this so the cache is shared), transaction(id), recipients(from), transfers(from?), recent(bank, number).
 - `aoApi`: `updateName`, `updateNotice({noticeOn?, noticeItems?})`, `setLimited(id, bool)`, `updateMemo`, `setFavorite(payeeId, bool)`, `addPayee({bankCode, number, holder, favorite?})`, `hideRecent(bank, number)`, `lookup`, `transfer`, `topup(fromId, toAccount, amount)` (memoTo = memoMe = "잔액채우기"). Also `aoFetch.*` and `AO_TOPUP_MEMO`.
 
@@ -415,7 +416,7 @@ Also `useAoPrefs(getter)` and `AO_RECENT_MENUS_DEFAULT = ["history", "send", "to
 **motion.ts** §3.4 constants: `AO_DISSOLVE_EASE`, `AO_INTRO`, `AO_HOME_INDICATOR(_MS)`, `AO_SPLASH`, `AO_SPINNER`, `AO_DIM`, `AO_SHEET`, `AO_NOTICE`, `AO_PANEL`, `AO_AMOUNT_SHEET`, `AO_PASSWORD_SHEET`, `AO_KEYBOARD`, `AO_TABBAR`, `AO_CAROUSEL`, `AO_TICKER`, `AO_ADS`, `AO_SKELETON_STEPS`, `AO_SWITCH`, `AO_TOAST`, `AO_NAV_LOCK`.
 
 **CSS** (allone.css)
-- Tokens under `:root[data-app="allone"]`: `--ao-bg`, `--ao-line(-2,-3)`, `--ao-disabled`, `--ao-skeleton`, `--ao-green(-dark,-light,-native,-tint)`, `--ao-chip-hash`, `--ao-notice-title`, `--ao-notice-date`, `--ao-page-dot`, `--ao-spinner-face`, `--ao-spinner-ring`, `--ao-blue`, `--ao-out`, `--ao-in`, `--ao-error`, `--ao-limited`, `--ao-link`, `--ao-star(-on)`, `--ao-t0..t8`, `--ao-placeholder`, `--ao-dim-web`, `--ao-dim-deep`, `--ao-scrim`, `--ao-dim-amount`, `--ao-dim-password`, `--ao-font`, `--ao-font-num`, `--ao-top: 59px`, `--ao-bottom: 34px` (both become safe-area insets at ≤500 px).
+- Tokens under `:root[data-app="allone"]`: `--ao-bg`, `--ao-line(-2,-3)`, `--ao-disabled`, `--ao-skeleton`, `--ao-green(-dark,-light,-native,-tint)`, `--ao-chip-hash`, `--ao-notice-title`, `--ao-notice-date`, `--ao-page-dot`, `--ao-spinner-face`, `--ao-spinner-ring`, `--ao-blue`, `--ao-out`, `--ao-in`, `--ao-error`, `--ao-link`, `--ao-star(-on)`, `--ao-t0..t8`, `--ao-placeholder`, `--ao-dim-web`, `--ao-dim-deep`, `--ao-scrim`, `--ao-dim-amount`, `--ao-dim-password`, `--ao-font`, `--ao-font-num`, `--ao-top: 59px`, `--ao-bottom: 34px` (both become safe-area insets at ≤500 px).
 - Classes: `.ao-num`, `.ao-band--top/--bottom`, `.layer--ao-under`, `.ao-sb*`, `.phone__home-indicator--ao`, `.ao-native*`, `.ao-loading*`, `.ao-toast*`, `.ao-off`, `.login--allone`, `.picker--allone`, `.ao-stub*`.
 - Keyframes: `ao-home-ind`, `ao-fade-in`, `ao-fade-out`, `ao-toast-in`, `ao-toast-out`.
 
@@ -488,7 +489,7 @@ Each item was checked against the clips before it went in (frame-by-frame tracki
 - **statusFg.ts / StatusBar.tsx:** timing counted from the call (Web Animations with `startTime`); the CSS colour transitions are gone.
 - **intro.ts:** generation counter, superseded runs never start the app.
 - **ui.css:** `.ao-nsheet--closing` keeps the dim catching taps (only the card ignores them) until the sheet is closed; `.ao-banklogo` base class.
-- **allone.css:** Roboto 400/500/700 imported here (`.ao-num` no longer depends on ibk/kbank CSS); `--ao-limited #e94143`; status-bar transitions removed.
+- **allone.css:** Roboto 400/500/700 imported here (`.ao-num` no longer depends on ibk/kbank CSS); `--ao-limited #e94143` (나중에 '한도제한' 표시와 같이 뺌); status-bar transitions removed.
 - **icons.tsx:** `AoMenuSearchIcon` (measured; same on 거래내역조회, home and PIN; integer box), `AoNhSymbol` (T3 dummy-key shape),
   `AoStarIcon` (fills the measured box), PIN variants of `AoReshuffleIcon` / `AoBackspaceIcon` and `AoCheckCircleIcon` (launch measurements).
 - **Observation:** Chromium paints an inline `<svg>` at its layout box rounded to whole CSS px, so an icon box at a fractional left/top (347.38, 76.33)

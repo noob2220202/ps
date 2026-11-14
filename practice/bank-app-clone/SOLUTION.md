@@ -311,7 +311,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 | GET | `/api/banks` | 추가할 수 있는 은행 목록 | 200 |
 | GET / PATCH | `/api/profile` | 이름·카드 끝 4자리 · `suspended`(카카오뱅크 계좌 지급정지, 연습용) | 200, 400(형식 오류) |
 | POST | `/api/accounts` | 다른 은행 계좌 추가 `{bankCode, number, balance}` | **201**, 400(자릿수), 409(중복) |
-| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액·계좌번호 수정 | 200, 404 |
+| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액·계좌번호 수정 (allone 은 `blocked` 지급정지도) | 200, 404 |
 | DELETE | `/api/accounts/:id` | 다른 은행 계좌 삭제 (카카오뱅크 통장은 거부) | **204**, 400, 404 |
 | GET | `/api/accounts/:id/transactions` | 거래내역 (`?limit=`) | 200 |
 | POST | `/api/accounts/:id/transactions` | 입금/출금 만들기 | **201**, 400, 400(잔액 부족) |
@@ -320,7 +320,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 | PATCH / DELETE | `/api/payees/:id` | 이름·번호·☆ 수정 / 삭제 | 200, **204** |
 | GET | `/api/transfer/recipients?from=` | 이체 첫 화면: 내 계좌 + 최근 이체 | 200 |
 | GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 | 200, **404**(ACCOUNT_NOT_FOUND) |
-| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크), 403(`ACCOUNT_SUSPENDED` — 카카오뱅크 계좌 지급정지를 켠 프로필, 화면은 `SuspendedDialog` 팝업) |
+| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크), 403(`ACCOUNT_SUSPENDED` — 카카오뱅크 계좌 지급정지를 켠 프로필, 화면은 `SuspendedDialog` 팝업 · `ACCOUNT_BLOCKED` — allone 출금계좌 지급정지, 화면은 '안내' 팝업) |
 | GET | `/api/transfers?from=` | 내가 보낸 이체 기록 (입금 거래에 붙인 보낸 분 기록은 뺌) | 200 |
 | POST | `/api/reset` | 초기 데이터로 | 204 |
 
@@ -1038,11 +1038,12 @@ export const INTRO = VARIANT || INTRO_APPS.includes(APP);
   kbank2 · ibk2 · kakao2 는 결과가 그대로. 화면 쪽은 고칠 것 없음: `HAS_INTRO` 는 원래대로 `__BANK_INTRO__`(배포) / `.env.allone` 의 `VITE_INTRO=1`(개발),
   `KAKAO2` · `IBK2` 는 APP 도 보므로 false 그대로. `session.ts` 에 `ALLONE = APP === "allone"` 하나.
 - 이름(SERVER_ID)이 정하는 것: 데이터 `data-allone/` · 쿠키 `bank_sid_allone` · 포트 9119 · 제목 '올원뱅크 클론 연습'.
-- 올원 칸은 모두 `ALLONE` 문 안에서 덧붙임: `migrate()` 가 allone DB 에만 `accounts.limited` · `profile.notice_on` · `profile.notice_items` · `recent_hidden` 표를 만들고,
-  응답에 `limited`, 홈 `ao.notice`, 거래 상세 `ao: {accountId, payee}`(☆ 상태), `POST /api/payees` 의 `favorite`, 받는 분 '최근' 숨김(`HAVING MAX(t.at) > hidden_at`),
+- 올원 칸은 모두 `ALLONE` 문 안에서 덧붙임: `migrate()` 가 allone DB 에만 `accounts.blocked` · `profile.notice_on` · `profile.notice_items` · `recent_hidden` 표를 만들고,
+  응답에 `blocked`(지급정지), 홈 `ao.notice`, 거래 상세 `ao: {accountId, payee}`(☆ 상태), `POST /api/payees` 의 `favorite`, 받는 분 '최근' 숨김(`HAVING MAX(t.at) > hidden_at`),
   allone 서버에만 있는 `DELETE /api/transfer/recent`(다른 앱은 404). 거래내역 기간 · 입출금 · 순서 · 20건씩은 화면이 거름 (목록 API 가 500건까지 줌).
-- **한도제한을 `badge` 가 아니라 따로 칸으로**: `migrate()` 가 DB 를 열 때마다 `UPDATE accounts SET badge = NULL WHERE kind = 'main'` 을 돌려서 대표계좌 badge 는 남지 않음.
-  공용 줄을 고치지 않고 allone 칸을 새로 둠 (표시만, 서버 한도 없음).
+- **지급정지를 `badge` 가 아니라 따로 칸으로**: `migrate()` 가 DB 를 열 때마다 `UPDATE accounts SET badge = NULL WHERE kind = 'main'` 을 돌려서 대표계좌 badge 는 남지 않음.
+  공용 줄을 고치지 않고 allone 칸 `accounts.blocked` 를 새로 둠. 예전 '한도제한' 칸(`limited`) · 지어낸 이의제기 칸(`dispute_at`)은 `ALTER TABLE … DROP COLUMN` 으로 지움
+  (node:sqlite 가 DROP COLUMN 을 지원 — 이미 쓰던 data-allone DB 도 열 때 정리됨).
 - 예시 데이터는 `server/allone-seed.mjs` (`db.mjs` 가 이 파일을 import 하므로 이 파일은 `db.mjs` 를 부르지 않음). `SEEDS.allone = { example, empty }` 가 빠지면 첫 실행 · 새 프로필 · 되돌리기에서 서버가 죽음.
 
 ### 앱 id `allone` ≠ 은행 코드 `nh`
@@ -1178,11 +1179,35 @@ export const INTRO = VARIANT || INTRO_APPS.includes(APP);
 - 성공하면 `invalidate()` 뒤: 얼마를 보낼까요(T2)에서 왔으면 잔액채우기를 닫고(CUT) T2 판이 다시 올라오며 판 위에 '잔액을 채웠어요', 전체메뉴 · 다른금융 카드에서 왔으면 그 화면 그대로 + 금액 0 + 토스트.
 - 순서: 링크 → topupLink 막 밑에서 잔액채우기, +983 에 출금계좌 선택 시트(T6)가 막 밑에서 올라옴 → 행 → topupRow 막이 걷힌 프레임에 금액 입력(T7) 네이티브 막 → +64ms 부터 357ms 올라옴.
 
+### 지급정지 '안내' 팝업 (`ui/Alert.tsx` AoAlert, `transfer/blocked.ts`, `transfer/BlockedAlert.tsx`)
+- 서버: allone 이고 출금계좌 `blocked` 면 `POST /api/transfers` 가 **403 `ACCOUNT_BLOCKED`** (잔액채우기도 같은 API 라 같이 막힘). 입금 · 다른 앱은 그대로.
+- 언제 뜨나 (녹화 C3 12.75 · 33.3):
+  - **계좌 비밀번호(T2) 4번째 숫자**: password 막 동안 출금계좌를 캐시 없이 다시 받아(`checkNotBlocked`) 지급정지면 CUT 없이 막이 걷히는 프레임에 팝업.
+    확인 → 팝업 한 프레임에 사라짐 → 83ms 뒤 키패드 판이 다시 들어옴.
+  - **이체 확인 `보내기`**(도중에 걸었을 때) · **잔액채우기**: 서버 403 → 막이 걷히기 33ms 전(`enter: "cut"`) 막 밑에서 팝업. 이체 확인 · 잔액채우기 화면은 그대로.
+    T2 에서 연 잔액채우기면 확인 뒤 숨어 있던 T2 판이 잔액채우기 위로 올라와 남음 (녹화 C3 19.48 — 네이티브 판이 웹 팝업이 닫힐 때 다시 보이는 것).
+- 모양: 웹뷰 안 z45(로딩 막 아래), 배경막 .30 은 웹뷰만, 카드 24–369 × 282–595 · r12, 제목 '안내' · 본문 · 빨간 코드 줄 · 전화 아이콘 + 밑줄 번호 · 초록 테두리 `확인`.
+  나타남은 크기 변화 없는 opacity (카드 300ms · 배경막 340ms, Chrome 이 애니메이션을 한 프레임 늦게 시작하는 만큼 −23ms 앞당김). 사라짐은 확인을 뗀 프레임에 한 번에.
+- 닫힌 뒤 300ms 누름 막(두 번 누름), 떠 있는 동안 브라우저 뒤로 = 확인 (같은 key 의 방문 기록 한 칸을 넣었다가 확인으로 닫으면 뺌).
+- 문구 · 코드(`AOE00403`) · 번호(`0000-0000`)는 새로 쓰거나 지어냄 — 녹화의 안내 문장 · 식별 코드 · 실제 고객센터 번호는 쓰지 않음.
+
+### 이의제기 (`dispute/`, `home/Search.tsx`)
+- 길: 통합검색 → 결과 '이의제기 신청 및 조회' → `/dispute` 안내 → `이의제기 신청` → `/dispute/check` 신청 전 확인 6항목 → 5번 칸 → `/dispute/branch` 영업점검색.
+  `다음`(6개 다 확인하면 초록)은 누른 색만 — 그 뒤(녹화 C4 12.4~ 휴대폰 본인인증 · 신분증)는 일부러 만들지 않음. 서버 API 없음, 확인 상태는 화면 메모리(`dispute/store.ts`)만.
+- 통합검색: ↵ 는 LOAD 프로필 없이 `showAoLoading` 직접 (막 0 · 키보드 내려감 150 · 결과 167 · 막 걷힘 600). 결과 줄 = 경로 + 초록 밑줄 이름, 검색어는 경로 · 이름 어디든 (띄어쓰기 무시).
+  자동완성은 두 글자부터, 띄어쓰기 없는 낱말만 (녹화: '이의제' 목록은 이의제기 · 이의제기신청 두 줄).
+- 로딩 둘: 검색 결과 → 안내는 어두운 막 `disputeLink`(스피너 0 → 막 17 → CUT 800 → 833), 안내 화면은 흰 빈 화면 + 스피너 → 제목 없는 머리줄 + 초록 화살표(그림)
+  → 내용 +217 · 제목 +251 · 그림 +384 순서로 나옴. 이의제기 안의 이동(`disputeApply` · `branchOpen`, CUT 184 · 200)은 어두운 막 없이 **떠나는 화면의 흰 막(.51) + 스피너**
+  (`dimFade.from: 60000` 으로 공용 막을 켜지 않음 — LOAD 표에 '막 없음' 칸이 없어서).
+- 확인 6항목: `확인함` 을 누르면 그 항목이 초록이 되고 같은 프레임에 다음 항목이 나오며 맨 아래로 스크롤. 진행 막대는 sticky 108.67.
+  5번 영업점 칸 → 영업점검색(× · 한국어 키보드 · 힌트 두 줄) → ↵ 막 184/200 → 결과 줄을 누르면 키보드 닫힘 + 83ms 뒤 돌아와 칸에 들어가 있음. ← 는 안내로, 다시 들어오면 처음부터.
+- 영업점 8곳 · 주소 · 전화는 지어냄 (`02-000-…`). 안내 · 확인 항목의 긴 문장은 같은 뜻 · 비슷한 길이로 새로 씀 (줄 수를 녹화와 맞춤), 짧은 화면 이름 · 버튼 글만 녹화 그대로.
+
 ### 🔔 관리 패널
 - 기본: 기기 · 테마 칸 숨김 (kakao2 처럼 `!ALLONE` 조건 추가). 정기점검 안내 칸은 home 영역 파일(`home/NoticePanel.tsx`)을 ALLONE 일 때만 그림 —
   보이기는 서버 `profile.notice_on`, 1쪽 항목은 `profile.notice_items`(null = 화면이 오늘로 계산), '1일동안 안보기'는 보는 사람 브라우저(localStorage)라 지우기 버튼만.
 - 계좌: `OWN_BANK.allone`(은행 코드 nh · 13자리) + 다른 은행 계좌 추가(`AddBankAccount withName`, 서버도 allone 이면 카카오뱅크 계좌를 거절하지 않음). 계좌번호 자유 입력은 NH 계좌만,
-  다른 은행은 그 은행 형식 (`freeNumber`). 계좌마다 한도제한 표시 토글(`PATCH /api/accounts/:id { limited }`).
+  다른 은행은 그 은행 형식 (`freeNumber`). 계좌마다 지급정지 `걸기 / 풀기`(`PATCH /api/accounts/:id { blocked }`).
 - 받는 분: ☆ 자주 토글 (`PATCH /api/payees/:id { favorite }` — 이체 '자주' 탭 · 거래내역 상세 ☆ 와 같은 값). 거래내역 상세에서 등록 안 된 상대에 ☆ 를 누르면 `POST /api/payees { favorite: true }`.
 - 홈 머리줄 🔔 가 패널을 엶. 초록 버튼은 `.dev-panel--allone` 이 변수(`--yellow`)만 바꿔 끼움.
 
@@ -1192,6 +1217,7 @@ export const INTRO = VARIANT || INTRO_APPS.includes(APP);
   그 밖의 은행은 은행 색 타일 + 하나원큐 글리프 마스크, 안쪽이 여러 색인 글리프 20개는 흰 타일에 원래 색 (마스크로 하면 흰 덩어리).
 - `launch.py`: 스플래시는 3D 그림이라 키우지 않고 평균 그대로(3px/pt) WebP. 간편비밀번호 머리글은 '픽셀 = a·흰색 + (1−a)·초록' 의 a 를 풀어 마스크로.
 - `home.py`: 31장, 상자 테두리 중앙값 = 바탕색 → 테두리와 이어진 바탕만 걷기(그림 안쪽 흰 부분은 남김). 실제 인물 광고 · 공익 광고 자리는 지어낸 그림으로 대신.
+- `dispute.py`: 이의제기 안내 그림(클립보드 · 체크 · 돋보기) · 안내 첫 프레임의 초록 화살표 · AI톡 캐릭터(알약 안쪽만, 테두리 링은 마스크로 뺌) — 여러 프레임 평균 → ESRGAN 4배 → 바탕 걷기.
 - 모든 스크립트가 `keep_assets` (24장, 이미 있는 파일은 건너뜀) + `--out` 임시 폴더에 먼저 만들어 한 장씩 열어 본 뒤 옮김. 상자는 plan.md §5 표의 것만 읽고 제외 구간 프레임은 읽지 않음.
   스피너 · 상태바 · 아이콘 · 거래내역 · 이체 화면은 SVG · CSS (막 밑 프레임은 자르지 않음).
 

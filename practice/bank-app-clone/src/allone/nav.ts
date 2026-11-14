@@ -67,7 +67,7 @@ export const LOAD: Record<AoLoadProfile, AoLoadSpec> = {
   // T2 잔액채우기 링크: 바로 .22 더 어둡게 300ms, cut 에서 기본 막으로, T6 은 +983 부터 막 밑에서 올라옴 (영역이 marks 로), 1433 에 막 · 스피너 걷힘
   topupLink: { dimOn: 0, cut: 367, off: 1433, deepen: { from: 0, ms: 300, resetAtCut: true } },
   topupRow: { dimOn: 0, cut: 284, off: 384 }, // T6 행 → T5 계좌 표시, 막이 걷힌 프레임에 T7 네이티브 막 (C3 5.179–5.643)
-  topupSubmit: { dimOn: 0, cut: 534, off: 567, commit: true }, // 잔액채우기 버튼 (C3 12.029–12.146 + invented 끝)
+  topupSubmit: { dimOn: 0, cut: 534, off: 567, spinnerOff: 517, commit: true }, // 잔액채우기 버튼 (C3 12.029–12.146 + invented 끝, 스피너는 막보다 3프레임 먼저 꺼짐 C3 12.663)
   cancelHome: { dimOn: 0, cut: 383, off: 650, spinnerOff: 517 }, // 취소 → 새로 불러온 홈 (C3 21.596–22.246)
   finish: { dimOn: 0, cut: 383, off: 650, spinnerOff: 517 }, // 이체 완료 확인 (invented, cancelHome 과 같음)
   menu: { dimOn: 0, cut: 317, off: 367, spinnerOnlyUntil: 317 }, // 홈 ≡ (C3 38.629–38.996)

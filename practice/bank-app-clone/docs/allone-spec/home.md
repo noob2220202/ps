@@ -172,7 +172,7 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
   - Number line: "NH농협은행 <ACCT_A>" Regular 14, **#666** (bank name ls −0.4, digits ls −0.2; ink y 343.4–355.7). Then "복사" **#333** with a 1 pt underline
     (#323232, y 356.67–357.67), 4 pt after the number. The line ends at x ≈ 296.
   - ⋮ menu: 3 dots Ø 2.7, #414141, x 348.7–351.4, y 322.4–337.1 (6 pt pitch).
-  - 한도제한 tag: box **48.6 × 23.3 at x 79.3, y 366** (y px / 3), radius 4, bg ≈ #fffaf8 (barely visible).
+  - 한도제한 tag (**만들지 않음** — 사용자 요청으로 '한도제한' 표시는 앱에서 뺐음, 아래는 녹화 기록): box **48.6 × 23.3 at x 79.3, y 366** (y px / 3), radius 4, bg ≈ #fffaf8 (barely visible).
     Text "한도제한" Medium 11 / −0.3, **#e94143** (glyph core (233, 64, 66); `--ao-limited`), ink x 85.3–121.9.
   - Balance: "<AMOUNT_A>원" at x 80.6, #000. The digits are **tabular figures**: ink 15.7 tall at y 401.3–417.0, pitch 13.9 → **Pretendard 700 22,
     `tabular-nums`, ls −0.5**; "원" is **SemiBold 20** (not Bold 28).
