@@ -2,7 +2,7 @@
 //  기본 크기에서 <svg> 상자 = 녹화의 잉크 상자 (선 두께 · 둥근 끝까지 포함) → 영역은 스펙 표의 잉크 left / top 을 그대로 자리로 씀.
 //  색은 color (기본 currentColor), 두께는 stroke. 크기를 바꾸면(size / w · h) 같은 모양을 그 상자에 다시 그림 (두께는 그대로).
 // 어디서 쟀는지는 아이콘마다 적음 (C1 = …_1_3.mp4, C2 = …_1_4.mp4, C3 = …_2.mp4, pt = px / 3.0025 · y px / 3)
-import type { CSSProperties, ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 
 export interface AoIconProps {
   color?: string;
@@ -160,16 +160,21 @@ export function AoHomeIcon({ stroke = 1.5, ...p }: AoIconProps) {
 }
 
 // ---------- 메뉴 + 돋보기 (≡🔍) ----------
-// 거래내역조회 (C2 11.341 x 347.38 y 76.33) · 홈 머리줄 (C2 7.000 x 351.37) · PIN (C1 7.333, 흰색): 잉크 19.98 × 15.34, 두께 1.4
-export function AoMenuSearchIcon({ stroke = 1.4, ...p }: AoIconProps) {
-  const w = 19.98;
-  const h = 15.34;
-  const i = stroke / 2;
+// 거래내역조회 (C2 11.341) · 홈 머리줄 (C2 7.000, 4pt 오른쪽) · PIN (C1 7.333, 흰색): 셋 다 같은 모양 (줄마다 잰 끝이 같음).
+// 선 가운데 (거래내역조회 화면 좌표): 줄 y 76.93 · 83.95 · 90.94, x 348.16 → 365.92 · 354.03 · 355.93 (아래 줄이 가운데 줄보다 1.9 김),
+// 두께 1.52 둥근 끝. 돋보기 가운데 (360.96, 85.28) 반지름 4.45 두께 1.46, 손잡이 (364.11, 88.43) → (366.61, 90.92). 잉크 347.4–367.4 × 76.2–91.7.
+// 상자는 잉크 상자가 아니라 24 × 20 (왼쪽 위 = 화면 (345, 74)) — 정수 자리에 두면 소수 자리는 선 좌표에 남음
+// (크롬이 인라인 SVG 상자를 정수 px 로 맞춰 그려서, 상자를 347.38 같은 소수 자리에 두면 0.4pt 까지 어긋났음)
+export function AoMenuSearchIcon({ stroke = 1.52, ...p }: AoIconProps) {
+  const X = (v: number) => n(v - 345);
+  const Y = (v: number) => n(v - 74);
   return (
-    <Svg w={w} h={h} {...p}>
-      <path d={`M${n(i)} ${n(i)}H${n(w - i)}M${n(i)} 7.67H6.3M${n(i)} ${n(h - i)}H6.3`} {...line(stroke)} />
-      <circle cx="13.37" cy="8.92" r="4.25" {...line(stroke)} />
-      <path d={`M16.4 11.95L${n(w - i)} ${n(h - i)}`} {...line(stroke)} />
+    <Svg w={24} h={20} {...p}>
+      <path
+        d={`M${X(348.16)} ${Y(76.93)}H${X(365.92)}M${X(348.16)} ${Y(83.95)}H${X(354.03)}M${X(348.16)} ${Y(90.94)}H${X(355.93)}M${X(364.11)} ${Y(88.43)}L${X(366.61)} ${Y(90.92)}`}
+        {...line(stroke)}
+      />
+      <circle cx={X(360.96)} cy={Y(85.28)} r="4.45" {...line(stroke - 0.06)} />
     </Svg>
   );
 }
@@ -265,23 +270,57 @@ export function AoMagnifierIcon({ size = 16.32, stroke = 1.3, ...p }: AoIconProp
 }
 
 // ---------- ☆ / ★ ----------
-// 거래내역 상세 ☆ 14 × 14, 두께 1.3, 검정 (C2 18.324 x 78.6 y 133) · T1 줄 ☆: size 20, stroke 1.5, color #8f8f8f (C3 27.5 x 347.04)
+// 거래내역 상세 ☆ 14 × 14, 두께 1.3, 검정 (C2 18.324 x 78.6 y 133) · T1 줄 ☆: size 20, stroke 1.5, color #8f8f8f (C3 27.5 잉크 347.04–367.03 ×
+// 577.66–597.33 = 20 × 19.67). 녹화 별은 보통 별보다 팔이 굵고(안쪽 꼭짓점 반지름 = 바깥의 0.5) 조금 키가 큼 → 가로 · 세로 반지름을 따로 잡아
+// 둥근 끝 · 꼭짓점 둥글림(0.6)까지 넣은 잉크가 size × 0.983·size 상자를 채우게 함 (처음 모양은 0.6 좁고 1.0 낮았음)
 // filled: 칠한 별 (#ffc31a 바탕 + 같은 색 테, plan Q23)
-export function AoStarIcon({ size = 14, stroke = 1.3, filled = false, fill = "#ffc31a", color, ...p }: AoIconProps & { size?: number; filled?: boolean; fill?: string }) {
-  const i = stroke / 2;
-  // 뾰족한 별: 가로 = 1.902 R, 세로 = 1.809 R
-  const R = Math.min((size - stroke) / 1.902, (size * 0.983 - stroke) / 1.809);
-  const cx = size / 2;
-  const cy = i + R;
-  const r = R * 0.45;
-  const pts: Pt[] = [];
-  for (let k = 0; k < 10; k++) {
-    const a = -Math.PI / 2 + (k * Math.PI) / 5;
-    const rr = k % 2 ? r : R;
-    pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
+const STAR_INNER = 0.5;
+const STAR_ROUND = 0.6;
+function starPath(w: number, h: number, stroke: number) {
+  const pts = (rx: number, ry: number): Pt[] =>
+    Array.from({ length: 10 }, (_, k) => {
+      const a = -Math.PI / 2 + (k * Math.PI) / 5;
+      const rr = k % 2 ? STAR_INNER : 1;
+      return [Math.cos(a) * rr * rx, Math.sin(a) * rr * ry] as const;
+    });
+  // 둥글린 꼭짓점의 2차 곡선까지 넣은 테두리 상자 (선 가운데)
+  const bounds = (ps: readonly Pt[]) => {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    ps.forEach((c, i) => {
+      const pr = ps[(i + 9) % 10];
+      const nx = ps[(i + 1) % 10];
+      const u = (q: Pt) => {
+        const l = Math.hypot(q[0] - c[0], q[1] - c[1]);
+        const k = Math.min(STAR_ROUND, l / 2) / l;
+        return [c[0] + (q[0] - c[0]) * k, c[1] + (q[1] - c[1]) * k] as const;
+      };
+      const a = u(pr);
+      const b = u(nx);
+      for (let t = 0; t <= 1; t += 0.125) {
+        const x = (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0];
+        const y = (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1];
+        x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      }
+    });
+    return { x0, x1, y0, y1 };
+  };
+  let rx = (w - stroke) / 2;
+  let ry = (h - stroke) / 2;
+  for (let i = 0; i < 4; i++) {
+    const b = bounds(pts(rx, ry));
+    rx *= (w - stroke) / (b.x1 - b.x0);
+    ry *= (h - stroke) / (b.y1 - b.y0);
   }
+  const ps = pts(rx, ry);
+  const b = bounds(ps);
+  // 잉크 상자 왼쪽 위가 (0, 0) 이 되게 옮김
+  const dx = stroke / 2 - b.x0;
+  const dy = stroke / 2 - b.y0;
+  return roundPoly(ps.map(([x, y]) => [x + dx, y + dy] as const), STAR_ROUND);
+}
+export function AoStarIcon({ size = 14, stroke = 1.3, filled = false, fill = "#ffc31a", color, ...p }: AoIconProps & { size?: number; filled?: boolean; fill?: string }) {
   const h = size * 0.983;
-  const d = roundPoly(pts, 0.6);
+  const d = starPath(size, h, stroke);
   const c = filled ? fill : color;
   return (
     <Svg w={size} h={h} color={c} {...p}>
@@ -292,28 +331,16 @@ export function AoStarIcon({ size = 14, stroke = 1.3, filled = false, fill = "#f
 
 // ---------- ↻ 다시 섞기 ----------
 // account (T3 계좌 비밀번호 아래 줄, C3 32.5 x 56.29 y 769.67): 잉크 19.65 × 20, 두께 1.7 — 위 오른쪽이 트인 원 + 끝에 ┘ 화살촉
-// pin (간편비밀번호 키패드, C1 7.333 x 54.62 y 764.67): 잉크 22.65 × 26.66, 두께 1.5 — 마주 보는 두 호 + 꺾쇠 머리
+// pin (간편비밀번호 키패드, C1 7.333): 상자 24 × 28 (왼쪽 위 = 화면 (54, 764), 정수 자리에 둠 — 소수 자리는 선 좌표에). 마주 보는 두 호
+// (가운데 (66.05, 777.9), 선 가운데 반지름 10.95, 두께 1.05, 위아래 ±18° 가 빔) + 빈 자리에 꺾쇠: 위는 왼쪽을 향한 < (끝 (64.5, 768.3)),
+// 아래는 오른쪽을 향한 > (끝 (67.8, 787.5)), 두께 1.1 뾰족한 이음
 export function AoReshuffleIcon({ variant = "account", stroke, ...p }: AoIconProps & { variant?: "account" | "pin" }) {
   if (variant === "pin") {
-    const s = stroke ?? 1.5;
-    const w = 22.65;
-    const h = 26.66;
-    const cx = w / 2;
-    const cy = h / 2;
-    const r = w / 2 - s / 2;
-    const at = (deg: number) => [cx + Math.cos((deg * Math.PI) / 180) * r, cy + Math.sin((deg * Math.PI) / 180) * r];
-    const [ax, ay] = at(250);
-    const [bx, by] = at(110);
-    const [cx2, cy2] = at(70);
-    const [dx, dy] = at(290);
-    const head = 3.4;
+    const s = stroke ?? 1.05;
     return (
-      <Svg w={w} h={h} {...p}>
-        {/* 왼쪽 호 (위 → 아래) 와 위 꺾쇠, 오른쪽 호 (아래 → 위) 와 아래 꺾쇠 */}
-        <path d={`M${n(ax)} ${n(ay)}A${n(r)} ${n(r)} 0 0 0 ${n(bx)} ${n(by)}`} {...line(s)} />
-        <path d={`M${n(cx2)} ${n(cy2)}A${n(r)} ${n(r)} 0 0 0 ${n(dx)} ${n(dy)}`} {...line(s)} />
-        <path d={`M${n(cx + 1.2)} ${n(s / 2)}L${n(cx - 2.4)} ${n(cy - r + 0.1)}L${n(cx + 1.2)} ${n(s / 2 + head * 1.9)}`} {...line(s)} />
-        <path d={`M${n(cx - 1.2)} ${n(h - s / 2)}L${n(cx + 2.4)} ${n(cy + r - 0.1)}L${n(cx - 1.2)} ${n(h - s / 2 - head * 1.9)}`} {...line(s)} />
+      <Svg w={24} h={28} {...p}>
+        <path d="M8.65 3.49A10.95 10.95 0 0 0 8.65 24.31M15.45 3.49A10.95 10.95 0 0 1 15.45 24.31" fill="none" stroke="currentColor" strokeWidth={s} />
+        <path d="M13.8 1L10.5 4.3L13.8 7.4M10.2 20.4L13.8 23.5L10.2 27" fill="none" stroke="currentColor" strokeWidth={n(s + 0.05)} strokeLinejoin="miter" />
       </Svg>
     );
   }
@@ -335,28 +362,16 @@ export function AoReshuffleIcon({ variant = "account", stroke, ...p }: AoIconPro
 }
 
 // ---------- ⌫ 지우기 ----------
-// pentagon (간편비밀번호, C1 7.333 x 311.07 y 767.33): 잉크 31.98 × 21.34, 두께 1.6 — 왼쪽이 뾰족한 오각형 + ×
+// pentagon (간편비밀번호, C1 7.333): 상자 34 × 24 (왼쪽 위 = 화면 (310, 766), 정수 자리에 둠). 선 가운데: 뾰족한 끝 (311.91, 777.89),
+// 위 · 아래 모서리 x 321.94 · 322.01, 위 768.0 · 아래 788.0, 오른쪽 342.35, 두께 1.3 뾰족한 이음 + 안쪽 × (가운데 (330.34, 778.0), 잉크 10 × 10)
 // tag (T3 계좌 비밀번호, C3 32.5 x 184.85 y 771.67): 잉크 22.98 × 16, 두께 1.5 — 오른쪽 모서리가 둥근 꼬리표 + ×
 export function AoBackspaceIcon({ variant = "tag", stroke, ...p }: AoIconProps & { variant?: "pentagon" | "tag" }) {
   if (variant === "pentagon") {
-    const s = stroke ?? 1.6;
-    const w = 31.98;
-    const h = 21.34;
-    const i = s / 2;
-    const d = roundPoly(
-      [
-        [i, h / 2],
-        [10.6, i],
-        [w - i, i],
-        [w - i, h - i],
-        [10.6, h - i],
-      ],
-      [0.4, 0.4, 0, 0, 0.4],
-    );
+    const s = stroke ?? 1.3;
     return (
-      <Svg w={w} h={h} {...p}>
-        <path d={d} {...line(s, "butt")} strokeLinejoin="miter" />
-        <path d={`M16.2 ${n(h / 2 - 4.4)}l8.8 8.8M25 ${n(h / 2 - 4.4)}l-8.8 8.8`} {...line(s)} />
+      <Svg w={34} h={24} {...p}>
+        <path d="M1.91 11.89L11.94 2H32.35V22H12.01Z" fill="none" stroke="currentColor" strokeWidth={s} strokeLinejoin="miter" />
+        <path d="M15.78 7.44L24.9 16.56M24.9 7.44L15.78 16.56" fill="none" stroke="currentColor" strokeWidth={s} />
       </Svg>
     );
   }
@@ -396,16 +411,17 @@ export function AoKeypadBackIcon({ stroke = 1.5, ...p }: AoIconProps) {
 }
 
 // ---------- ✓ 동그라미 ----------
-// 간편비밀번호 자동로그인 (C1 7.333 x 152.21 y 298.67, 흰색): 잉크 16.32 정사각, 테 1.3 + 안쪽 체크 ≈ 7 × 5. checked 면 칠한 원 (invented)
-export function AoCheckCircleIcon({ size = 16.32, stroke = 1.3, checked = false, ...p }: AoIconProps & { size?: number; checked?: boolean }) {
+// 간편비밀번호 자동로그인 (C1 7.333, 흰색): 상자 16.1 정사각, 고리 가운데 (160.33, 306.8) 반지름 7.5 두께 1.08, 체크 잉크 156.9–163.5 ×
+// 305.0–309.7 두께 1. checked 면 칠한 원 + 초록 체크 두께 1.3 (지어낸 모양 — 녹화엔 끈 모습만)
+export function AoCheckCircleIcon({ size = 16.1, stroke = 1.08, checked = false, ...p }: AoIconProps & { size?: number; checked?: boolean }) {
+  const k = size / 16.1;
   const c = size / 2;
-  const k = size / 16.32;
   return (
     <Svg w={size} h={size} {...p}>
-      <circle cx={n(c)} cy={n(c)} r={n(c - stroke / 2)} {...line(stroke)} fill={checked ? "currentColor" : "none"} />
+      <circle cx={n(c)} cy={n(c)} r={n(7.5 * k)} fill={checked ? "currentColor" : "none"} stroke="currentColor" strokeWidth={stroke} />
       <path
-        d={`M${n(c - 3.5 * k)} ${n(c + 0.1 * k)}L${n(c - 1.1 * k)} ${n(c + 2.4 * k)}L${n(c + 3.5 * k)} ${n(c - 2.4 * k)}`}
-        {...line(stroke)}
+        d={`M${n(5.07 * k)} ${n(8.15 * k)}L${n(7.07 * k)} ${n(10.35 * k)}L${n(10.77 * k)} ${n(6.75 * k)}`}
+        {...line(checked ? 1.3 : 1)}
         stroke={checked ? "#0c8f2d" : "currentColor"}
       />
     </Svg>
@@ -428,21 +444,37 @@ export function AoPinIcon({ size = 16.7, stroke = 1.5, color = "#171717", ...p }
   );
 }
 
-// ---------- NH 표시 (고리 + V) ----------
-// T3 계좌 비밀번호 빈 키 (C3 32.5 x 334.05 y 577): 잉크 18.66 × 21, #d4d4d8 (칠한 모양)
-export function AoNhSymbol({ color = "#d4d4d8", className, style, size = 18.66 }: { color?: string; className?: string; style?: CSSProperties; size?: number }) {
-  const w = 18.66;
-  const h = 21;
-  const cx = w / 2;
+// ---------- NH 표시 (고리 + 날개 + 거꾸로 된 세모) ----------
+// T3 계좌 비밀번호 빈 키 (C3 32.4 x 334.05 y 577): 잉크 18.67 × 21.67, #d4d4d8 (칠한 모양). 두꺼운 고리(바깥 Ø 18.7) + 비스듬한 두 날개 +
+// 가운데 위가 V 로 파인 거꾸로 된 세모, 셋 사이는 얇은 틈 (틈은 mask 로 비움 — 바탕이 무엇이든). 좌표는 녹화 px (3 px = 1 pt), viewBox 로 줄임
+export function AoNhSymbol({ color = "#d4d4d8", className, style, size = 18.67 }: { color?: string; className?: string; style?: CSSProperties; size?: number }) {
+  const id = useId();
+  const w = 18.67;
+  const h = 21.67;
   return (
-    <Svg w={w} h={h} W={size} H={(size * h) / w} color={color} className={className} style={style}>
-      {/* 고리 */}
-      <path d={`M${cx} 5.6a7.7 7.7 0 1 1 0 15.4a7.7 7.7 0 1 1 0-15.4Zm0 4.1a3.6 3.6 0 1 0 0 7.2a3.6 3.6 0 1 0 0-7.2Z`} fill="currentColor" fillRule="evenodd" />
-      {/* 양쪽 날개 (가운데가 V 로 트임) */}
-      <path d={`M0 1.2H5.2L${cx - 0.55} 9.9L${cx - 2.6} 10.2C3.2 8.7 0.9 6.2 0 1.2Z`} fill="currentColor" />
-      <path d={`M${w} 1.2H${w - 5.2}L${cx + 0.55} 9.9L${cx + 2.6} 10.2C${w - 3.2} 8.7 ${w - 0.9} 6.2 ${w} 1.2Z`} fill="currentColor" />
-      <path d={`M${cx - 2.2} 0L${cx} 4.6L${cx + 2.2} 0Z`} fill="currentColor" />
-    </Svg>
+    <svg
+      width={n(size)}
+      height={n((size * h) / w)}
+      viewBox="3 7 56 65"
+      className={className}
+      style={{ display: "block", flexShrink: 0, color, ...style }}
+      aria-hidden
+    >
+      <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="76">
+        <rect x="0" y="0" width="64" height="76" fill="#fff" />
+        {/* 고리 안 구멍 · 세모 둘레 틈 */}
+        <circle cx="31" cy="44" r="12.5" fill="#000" />
+        <path d="M16 6H46L31 34Z" fill="#000" />
+      </mask>
+      <g fill="currentColor">
+        <g mask={`url(#${id})`}>
+          <circle cx="31" cy="43" r="28" />
+          <path d="M3 8H8L21 16 27 27 12 22 3 19.5Z" />
+          <path d="M59 8H54L41 16 35 27 50 22 59 19.5Z" />
+        </g>
+        <path d="M20 8H27L31 11 35 8H42L31 28Z" />
+      </g>
+    </svg>
   );
 }
 

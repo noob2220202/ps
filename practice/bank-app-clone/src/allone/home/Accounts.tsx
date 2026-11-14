@@ -1,5 +1,5 @@
 // 홈 계좌 칸 (home.md §2.4, 쪽 227–550): NH농협 · 다른금융 탭, 쪽 표시 알약 "‹ i | n ›", 끝없이 도는 카드 넘기기, 민트빛.
-//  - 카드 353 × 222 (x 20), 간격 10 → 양쪽 이웃이 10 씩 보임. 놓으면 305ms 로 맞춰 서거나 제자리로 (아래 SNAP_*)
+//  - 카드 353 × 222 (x 20), 간격 10 → 양쪽 이웃이 10 씩 보임. 놓으면 305ms 로 맞춰 서거나 제자리로 (motion.ts AO_CAROUSEL)
 //  - 처음 보는 카드는 "상품명을 조회 중이에요 / 조회 중입니다" 를 끌기 시작부터 420ms 보여 준 뒤 한 프레임에 채움
 //  - NH농협 카드: 한도해제(아무 일 없음) · 거래내역 · 이체. 다른금융 카드(지어냄): 잔액채우기 · 거래내역
 //  - 숨김 / 보기 (계좌별, 이 브라우저), 복사 + 토스트
@@ -14,10 +14,8 @@ import { bezier, mod, useLoopPager, visibleSlots } from "./pager";
 
 type Tab = "nh" | "other";
 const PITCH = 363; // 카드 353 + 간격 10
-// 놓은 뒤 맞춰 서기 · 제자리로: 둘 다 305ms cubic-bezier(.3,.43,.3,1) (C2 4.507–4.783 카드 2 타일 rms 1.0pt, C3 25.192–25.433 rms 0.24pt).
-// motion.ts AO_CAROUSEL 의 250ms · 450ms 는 손가락이 끄는 시간까지 넣어 잰 값이라 여기서 다시 맞춤
-const SNAP_MS = 305;
-const SNAP_EASE = bezier(0.3, 0.43, 0.3, 1);
+// 놓은 뒤 맞춰 서기 · 제자리로: 둘 다 305ms cubic-bezier(.3,.43,.3,1) (motion.ts AO_CAROUSEL — C2 4.507–4.783 카드 2 타일 rms 1.0pt, C3 25.192–25.433 rms 0.24pt)
+const SNAP_EASE = bezier(...AO_CAROUSEL.easePoints);
 const HIDE = { visibility: "hidden" } as const;
 
 export interface AccountsProps {
@@ -49,9 +47,9 @@ export function Accounts({ accounts, filled, open, onCopy, onHistory, onSend, on
   const pager = useLoopPager({
     count,
     pitch: PITCH,
-    snapMs: SNAP_MS,
-    backMs: SNAP_MS,
-    stepMs: SNAP_MS,
+    snapMs: AO_CAROUSEL.snap,
+    backMs: AO_CAROUSEL.rubber,
+    stepMs: AO_CAROUSEL.snap,
     ease: SNAP_EASE,
     disabled: !filled || list.length < 2,
     onDragStart: () => reveal([`${tab}:${mod(indexRef.current - 1, count)}`, `${tab}:${mod(indexRef.current + 1, count)}`]),

@@ -3,6 +3,7 @@
 //  showAlloneScene()             RESTART "off" 직후 — 장면이 폰 전체를 덮음 (녹화 첫 프레임). 상태바 글자 흰색
 //  playAlloneIntro({ onStart })  녹화가 시작된 뒤 — 시각표를 돌림, D 에 aoSetLaunchAt(D) + 상태바 글자 → 검정(D+100 부터) + onStart()
 //                                (= RESTART "start", 그 밑에 AlloneSplash 가 흰 화면으로 그려짐). 장면을 걷으면 끝나는 Promise
+//                                (새 녹화에 밀려나면 onStart 없이 바로 끝남 — 이음새 ../intro.ts 가 밀려난 녹화의 onStart 를 막음)
 // 시각표 (녹화 첫 프레임 t0 기준, C1 그대로): +650 아이콘 누름 (한 프레임에 색만 #034913 / #919291, 크기 그대로)
 //   +900 = D 손 뗌 — 아이콘이 100ms ease-out 으로 원래 색, 장면 전체가 250ms 동안 흰색으로 (녹화에서 잰 곡선 AO_DISSOLVE_EASE)
 //   D+100 상태바 글자 흰색 → 검정 (217ms, 녹화에서 잰 곡선). 누름 · 녹아 사라짐은 미리 걸어 둔 애니메이션이라 그 프레임에 DOM 변경이 없음
@@ -19,14 +20,8 @@ import { AlloneScene } from "./Scene";
 // 녹화기가 이 함수를 부르는 때("start" 알림 + 한 프레임)는 기기마다 늦어질 수 있어 장면을 깐 때를 기준으로 (없으면 부른 때 − 두 프레임)
 const FIRST_FRAME_AFTER_SHOW = 24;
 const FIRST_FRAME_LAG = 33;
-// 상태바(AlloneStatusBar)는 지연 타이머가 끝난 다음 프레임에 바뀌기 시작함 (평균 반 프레임 늦음) → 반 프레임 일찍 부탁해
-// 정한 시각에 가장 가까운 프레임에 (한 프레임을 다 당기면 프레임 위상에 따라 한 프레임 일찍 시작했음)
-const STATUS_RENDER_LAG = 8;
-// 상태바 글자 흰색 → 검정: 녹화 C1 의 시계 · LTE · 배터리 셋 다 D+100 에 움직이기 시작해 D+317 에 끝남 (천천히 시작해 천천히 끝나는 곡선,
-// 16.67ms 마다 잰 값). plan 의 "녹아 사라짐 곡선 + 33ms" 는 녹화보다 최대 .2 앞섬 → 잰 값을 씀 (motion.ts AO_INTRO.statusDelay 는 그대로)
-const GLYPH_DELAY = 100;
-const GLYPH_MS = 217;
-const GLYPH_EASE = "linear(0, .015, .06, .14, .23, .34, .455, .57, .69, .8, .88, .95, .985, 1)";
+// 상태바 글자 흰색 → 검정: 녹화 C1 의 시계 · LTE · 배터리 셋 다 D+100 에 움직이기 시작해 D+317 에 끝남 (motion.ts AO_INTRO.statusDelay ·
+// statusMs · statusEase). 상태바는 지연을 부른 시각부터 잼 (statusFg.ts) → D 부터 지난 만큼만 뺌
 // 장면을 걷는 때: 다 흰색(D+250)이 된 뒤 두 프레임 더 — 밑의 흰 시작화면이 이미 그려져 있음
 const REMOVE_AFTER = AO_INTRO.dissolve + 50;
 
@@ -40,9 +35,6 @@ try {
 }
 
 let gen = 0; // 녹화를 다시 시작하면 이전 시각표는 멈춤
-// 새 녹화가 이 시각표를 밀어냈을 때: 끝내지 않음 — 끝내면 이음새(../intro.ts runAlloneIntro)가 "인트로가 onStart 를 안 불렀다"고 보고
-// 지난 녹화의 RESTART "start" 를 새 장면 밑에 보내 버림
-const superseded = () => new Promise<void>(() => {});
 let shownAt: number | null = null; // 장면을 깐 때 (performance.now)
 let anims: Animation[] = []; // 지금 장면에 걸어 둔 애니메이션
 const cancelAnims = () => {
@@ -94,12 +86,12 @@ export async function playAlloneIntro({ onStart }: { onStart(): void }): Promise
   });
 
   await sleep(D - performance.now());
-  if (my !== gen) return superseded();
+  if (my !== gen) return; // 새 녹화에 밀려남: 이음새가 지난 녹화의 onStart 를 막음
   // D: 앱이 켜짐 (홈 인디케이터 · 시작화면 시각표가 여기서부터). 상태바 글자는 D+100 부터 217ms 동안 검정 (녹화에서 잰 곡선)
   aoSetLaunchAt(D);
   const lag = performance.now() - D;
-  const delay = Math.max(0, GLYPH_DELAY - lag - STATUS_RENDER_LAG);
-  setAoStatusFg("dark", { iconsDelay: delay, iconsMs: GLYPH_MS, clockDelay: delay, clockMs: GLYPH_MS, easing: GLYPH_EASE });
+  const delay = Math.max(0, AO_INTRO.statusDelay - lag);
+  setAoStatusFg("dark", { iconsDelay: delay, iconsMs: AO_INTRO.statusMs, clockDelay: delay, clockMs: AO_INTRO.statusMs, easing: AO_INTRO.statusEase });
   onStart();
 
   await sleep(D + REMOVE_AFTER - performance.now());

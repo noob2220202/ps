@@ -4,7 +4,7 @@
 //  → 457 의 줄부터 거래 행 (120 + 줄 1, 잔액 숨기기면 95). 행을 누르면 거래내역 상세 (입금 txIn 184ms · 출금 txOut 1100ms, 더 어두워지는 막)
 // 상세에서 돌아오면 이 층은 밑에 숨어 있던 그대로 (스크롤 · 불러온 줄 수 유지). 새 거래가 생기면(이체 완료 뒤) 맨 위로.
 // 녹화의 첫 프레임 32pt 빈칸(웹뷰 그리기 흔적)은 따라 하지 않음 (plan Q18)
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type UIEvent } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type UIEvent } from "react";
 import { useParams } from "react-router-dom";
 import { getVersion, subscribeVersion } from "../../api/client";
 import { prefetch, useApi } from "../../api/useApi";
@@ -13,39 +13,13 @@ import { aoPaths, type AoAccount, type AoTransaction } from "../api";
 import { aoBankName } from "../bank";
 import { aoVisit, useAoFlow } from "../flow";
 import { aoAccountNumber, aoTime, aoTxLabel, aoWon } from "../format";
-import { aoLock, useAoBack } from "../nav";
+import { aoLoad } from "../loading";
+import { aoLock, LOAD, useAoBack } from "../nav";
 import { aoPrefs, useAoPrefs } from "../prefs";
-import { AoBankLogo, AoButton, AoChevronDownIcon, AoHeader, AoPage, AoSpinner, AoSwitch, showAoLoading } from "../ui";
+import { AoBankLogo, AoButton, AoChevronDownIcon, AoHeader, AoPage, AoSpinner, AoSwitch } from "../ui";
 import { ACCT_FILTER_DEFAULT, ACCT_MORE_MS, ACCT_PAGE, acctDate, acctRows, acctSummary, type AcctFilter } from "./list";
 import { AcctAccountSheet, AcctFilterSheet } from "./Sheets";
 import "./account.css";
-
-// 조회 조건을 바꾼 뒤의 로딩 막 (녹화에 없음 — account.md §5.2 의 600ms): 스피너는 567 에, 막은 600 에 걷힘, 줄은 567 에 막 밑에서 바뀜
-const FILTER_LOAD_MS = 600;
-
-function useFilterLoading() {
-  const alive = useRef(true);
-  const hide = useRef<(() => void) | null>(null);
-  const timer = useRef(0);
-  useEffect(() => {
-    alive.current = true;
-    return () => {
-      alive.current = false;
-      window.clearTimeout(timer.current);
-      hide.current?.();
-    };
-  }, []);
-  return useCallback((onCut: () => void) => {
-    const h = showAoLoading();
-    hide.current = h;
-    timer.current = window.setTimeout(() => {
-      if (!alive.current) return;
-      onCut();
-      h(); // 스피너 먼저, 33ms 뒤 막
-      hide.current = null;
-    }, FILTER_LOAD_MS - 33);
-  }, []);
-}
 
 // NH 40 타일 x 24–64, y 136–176 (AoBankLogo 는 자리를 style 로 받음)
 const LOGO_AT = { position: "absolute", left: 24, top: 27 } as const;
@@ -107,7 +81,6 @@ export function History() {
   const [sheetExit, setSheetExit] = useState<"slide" | "cut">("slide");
   const bodyRef = useRef<HTMLDivElement>(null);
   const moreTimer = useRef(0);
-  const filterLoad = useFilterLoading();
 
   useEffect(() => aoVisit("history"), []);
   useEffect(() => () => window.clearTimeout(moreTimer.current), []);
@@ -145,17 +118,20 @@ export function History() {
     setSheet(null);
   };
 
-  // 조회 조건: 시트는 막 밑에 그대로 두었다가 cut 에 한 프레임에 사라지고 줄 · 기간 · 요약이 바뀜, 맨 위부터
+  // 조회 조건 (nav.ts LOAD.acctFilter, invented 600ms): 시트는 막 밑에 그대로 두었다가 cut(567) 에 한 프레임에 사라지고 줄 · 기간 · 요약이 바뀜,
+  // 맨 위부터. 스피너 567 · 막 600 에 걷힘. 막 동안 뒤로 가면(cut 전) 막만 걷히고 조건은 그대로
   const applyFilter = (f: AcctFilter) => {
-    if (!aoLock(FILTER_LOAD_MS + 100)) return;
-    filterLoad(() => {
-      setSheetExit("cut");
-      setSheet(null);
-      setFilter(f);
-      setCount(ACCT_PAGE);
-      window.clearTimeout(moreTimer.current);
-      setMore(false);
-      bodyRef.current?.scrollTo({ top: 0 });
+    if (!aoLock(LOAD.acctFilter.off + 100)) return;
+    void aoLoad("acctFilter", {
+      onCut: () => {
+        setSheetExit("cut");
+        setSheet(null);
+        setFilter(f);
+        setCount(ACCT_PAGE);
+        window.clearTimeout(moreTimer.current);
+        setMore(false);
+        bodyRef.current?.scrollTo({ top: 0 });
+      },
     });
   };
 

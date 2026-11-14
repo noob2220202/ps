@@ -865,7 +865,7 @@ app.get("/api/transfer/recipients", (req, res) => {
   // 카카오뱅크: '최근 이체' = 🔔 받는 분에서 '최근 이체에 표시'를 켠 사람만 (☆ 즐겨찾기와 따로) (최근에 보낸 순, 안 보낸 사람은 나중에 등록한 순) — 목록을 직접 정하려고
   const recent = APP === "kakao" ? kakaoRecent() : db()
     .prepare(
-      `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite, p.receive_error
+      `SELECT t.bank_code, t.number, t.holder, MAX(t.at) AS last_at, p.id AS payee_id, p.favorite, p.receive_error${ALLONE ? ", p.holder AS payee_holder" : ""}
          FROM transfers t LEFT JOIN payees p ON p.bank_code = t.bank_code AND p.number = t.number
         WHERE ${SENT("t")}
         GROUP BY t.bank_code, t.number${ALLONE ? AO_RECENT_VISIBLE : ""} ORDER BY last_at DESC LIMIT 20`,
@@ -876,7 +876,7 @@ app.get("/api/transfer/recipients", (req, res) => {
     .map((r) => ({
       bank: bankInfo(bankByCode(r.bank_code)),
       number: r.number,
-      holder: r.holder,
+      holder: (ALLONE && r.payee_holder) || r.holder, // 올원: 받는 분으로 등록돼 있으면 그 이름 (🔔 받는 분에서 이름을 바꾸면 '최근' 에도)
       lastAt: r.last_at,
       ...(r.payee_id && { payeeId: String(r.payee_id), favorite: !!r.favorite }),
       ...(r.receive_error && { receiveError: true }),

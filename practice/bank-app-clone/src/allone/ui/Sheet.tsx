@@ -94,8 +94,9 @@ export function AoSheet({
           aria-modal
           style={{
             borderRadius: `${radius}px ${radius}px 0 0`,
-            // 웹뷰 아래끝(818)에 붙고 높이로 위끝을 정함 (진짜 폰에서 웹뷰 높이가 달라도 시트 높이는 그대로)
-            ...(top !== undefined ? { height: 818 - top } : { maxHeight: 818 - maxTop }),
+            // 웹뷰 아래끝(818)에 붙고 높이로 위끝을 정함 (진짜 폰에서 웹뷰 높이가 달라도 시트 높이는 그대로).
+            // 다만 웹뷰가 그보다 낮은 폰이면 위 40 은 남김 — 제목 · × 가 화면 밖으로 나가지 않고 위쪽 배경막을 눌러 닫을 수 있게 (본문은 스크롤)
+            ...(top !== undefined ? { height: `min(${818 - top}px, calc(100% - 40px))` } : { maxHeight: `min(${818 - maxTop}px, calc(100% - 40px))` }),
           }}
         >
           {(title != null || showClose) && (

@@ -61,6 +61,7 @@ import { renderAlloneRoute } from "./allone/routes";
 import { AlloneOverlay } from "./allone/Overlay";
 import { AlloneSplash } from "./allone/launch/AlloneSplash";
 import { aoLaunchReady } from "./allone/launch";
+import { aoHistoryGoFirst } from "./allone/nav";
 import { AoNativePortal } from "./allone/ui/NativePortal";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
@@ -162,6 +163,11 @@ export default function App() {
   // onDone이 렌더마다 새 함수면 Splash의 effect가 다시 돌아서 타이머가 리셋됨 → useCallback
   const toLoading = useCallback(() => setBoot("loading"), []);
   const toReady = useCallback(() => setBoot("ready"), []);
+  // allone: 로그인 cut(+2033) 250ms 전에 홈을 간편비밀번호 화면 밑에 숨겨 미리 그려 둠 (AlloneSplash onPrepare) → cut 에는 보이기만.
+  // cut 에 처음 그리면 배치에 40ms 남짓 걸려 막 밑의 홈이 4프레임쯤 늦게 보였음. 시작 흐름을 벗어나면(꺼짐 · 프로필 고르기) 지움
+  const [aoPre, setAoPre] = useState(false);
+  const aoPrepare = useCallback(() => setAoPre(true), []);
+  if (aoPre && boot !== "splash" && boot !== "ready") setAoPre(false);
   // 로그인: 켜질 때 확인 → 안 돼 있으면 로그인 화면. 로그인하면 (다른 계정일 수 있으니) 프로필 고르기부터
   const auth = useAuth();
   const userId = auth.status === "in" ? auth.user.id : null;
@@ -177,7 +183,11 @@ export default function App() {
   const navigate = useNavigate();
   useEffect(() => {
     const onRestart = (e: Event) => {
-      if ((e as CustomEvent).detail === "off") {
+      if ((e as CustomEvent).detail === "off" && ALLONE) {
+        // allone: 앱의 첫 칸으로 돌아가 "/" 로 바꿈 — 다시 켠 앱에서 뒤로가 녹화 전 화면(이체 흐름 등)으로 가지 않게 (그 칸들은 앞으로 가기 칸이 되어 버려짐)
+        setBoot("off");
+        void aoHistoryGoFirst().then(() => navigate("/", { replace: true }));
+      } else if ((e as CustomEvent).detail === "off") {
         navigate("/", { replace: true });
         setBoot("off");
       } else {
@@ -260,12 +270,20 @@ export default function App() {
             <TossSplash onDone={toReady} />
           ) : APP === "allone" ? (
             // NH올원뱅크: 흰 시작화면 → 스플래시 → 간편비밀번호 → 로그인 로딩 → 홈 (launch 영역, src/allone/launch/AlloneSplash.tsx)
-            <AlloneSplash onDone={toReady} />
+            <AlloneSplash onDone={toReady} onPrepare={aoPrepare} />
           ) : (
             <Splash onDone={toLoading} />
           ))}
         {auth.status === "in" && boot === "loading" && <BootLoading onDone={toReady} />}
-        {auth.status === "in" && boot === "ready" && <ScreenStack render={render} />}
+        {auth.status === "in" &&
+          (boot === "ready" || (aoPre && boot === "splash")) &&
+          (ALLONE ? (
+            <div className={`ao-stack${boot === "ready" ? "" : " ao-stack--pre"}`}>
+              <ScreenStack render={render} />
+            </div>
+          ) : (
+            <ScreenStack render={render} />
+          ))}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />

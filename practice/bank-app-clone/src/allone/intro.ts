@@ -27,22 +27,28 @@ export function prepareAlloneIntro(): Promise<void> {
   return Promise.race([Promise.all([fonts, mask]).then(() => undefined), timeout(3000)]);
 }
 
+// 녹화(장면)마다 +1. 새 녹화가 시작되면 지난 녹화의 runAlloneIntro 는 아무것도 켜지 않고 끝남
+let gen = 0;
+
 // RESTART "off" 직후: 장면이 폰 전체를 덮음 (홈 인디케이터는 D 까지 멈춤)
 export function showAlloneIntro() {
+  gen++;
   aoHoldLaunch();
   showAlloneScene();
 }
 
 // 녹화가 시작된 뒤: 장면을 돌리고 D 에 onStart. 장면이 다 사라지면 끝
 export function runAlloneIntro(onStart: () => void): Promise<void> {
+  const my = gen;
   let started = false;
   const start = () => {
-    if (started) return;
+    // 그사이 새 녹화가 시작됐으면(멈추고 0.9초 안에 다시 ● 녹화) 지난 녹화의 RESTART "start" 를 새 장면 밑에 보내지 않음
+    if (started || my !== gen) return;
     started = true;
     if (aoLaunchHeld()) aoSetLaunchAt();
     onStart();
   };
   return playAlloneIntro({ onStart: start })
     .catch(() => {})
-    .then(start); // 인트로가 onStart 를 안 부르고 끝나도 앱은 켬
+    .then(start); // 인트로가 onStart 를 안 부르고 끝나도 앱은 켬 (밀려난 녹화는 빼고)
 }

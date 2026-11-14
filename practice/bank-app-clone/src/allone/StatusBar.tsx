@@ -5,7 +5,7 @@
 //          + 아래 점 4개(3 × 3.67, y 31.97–35.64), 모두 채움
 //  - LTE 잉크 316.07–334.39 × 24.98–34.30 (K2 와 같은 글꼴 · 배율, +1.0)
 //  - 배터리 몸통 340.72–364.36 × 22.65–35.64, 잔량/100 만큼 왼쪽부터 채움, 빈 칸 .333, 꼭지 365.36–366.69, 숫자는 뚫어서 가운데 352.54
-// 글자색: 화면의 useStatusBar fg, 네이티브 막이 덮어쓰면 그 값 (statusFg.ts — 아이콘 · 시계 따로 지연 · 길이)
+// 글자색: 화면의 useStatusBar fg, 네이티브 막이 덮어쓰면 그 값 (statusFg.ts — 아이콘 · 시계 따로 지연 · 길이, 부른 때부터 잼)
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { useDeviceStatus, useNow } from "../platform/deviceStatus";
@@ -61,8 +61,10 @@ const BAR_BOTTOM = 30.64;
 const DOT = { y: 31.97, h: 3.67 };
 const BATT = { x: 340.72, y: 22.65, w: 23.64, h: 12.99, numX: 352.54, numY: 33.31 };
 
-type Shown = { icons: AoFg; clock: AoFg; iconsMs: number; clockMs: number; easing: string };
 const NO_DELAY: AoStatusFgState["timing"] = { iconsDelay: 0, iconsMs: 0, clockDelay: 0, clockMs: 0, easing: "linear" };
+const COLOR: Record<AoFg, string> = { dark: "#000000", light: "#ffffff" };
+const EMPTY_OPACITY: Record<AoFg, number> = { dark: 0.333, light: 0.46 }; // allone.css .ao-sb__empty
+const CAP_OPACITY: Record<AoFg, number> = { dark: 0.31, light: 0.43 }; // allone.css .ao-sb__cap
 
 export function AlloneStatusBar() {
   const style = useStatusBarStyle();
@@ -74,35 +76,51 @@ export function AlloneStatusBar() {
   const level = Math.max(0, Math.min(100, battery));
   const maskId = useId();
 
-  // 아이콘 · 시계를 따로: 덮어쓰기(statusFg)가 바뀐 때는 그 지연 · 길이. 덮어쓰기를 풀었는데(null) 화면 fg 가 조금 뒤에 바뀌는 경우
-  // (인트로: 덮어쓰기를 푼 다음 프레임에 AlloneSplash 가 "dark") 도 그 값으로 — 0.5초 안에 실제로 바뀌는 첫 번째에만. 그 밖의 화면 fg 바뀜은 한 프레임에
-  const [shown, setShown] = useState<Shown>(() => ({ icons: target, clock: target, iconsMs: 0, clockMs: 0, easing: "linear" }));
+  // 글자색은 같은 커밋에 바로 target 클래스로 바꾸고, 지연 · 길이는 Web Animations 로 옛 색을 붙잡았다가 바꿈 — 시작 시각(startTime)을
+  // setAoStatusFg 를 부른 때로 박으므로 타이머 · React 의 그리기 차례 · 프레임 위상과 상관없이 "부른 때 + 지연" 에 정확히 (T7 +600 / +667, 인트로 D+100).
+  // 아이콘 · 시계를 따로. 덮어쓰기를 풀었는데(null) 화면 fg 가 조금 뒤에 바뀌는 경우(0.5초 안의 첫 번째)도 그 지연 · 길이로, 시각은 바뀐 때부터.
+  // 그 밖의 화면 fg 바뀜은 한 프레임에
+  const icons = useRef<SVGGElement>(null);
+  const clockEl = useRef<SVGTextElement>(null);
+  const empty = useRef<SVGRectElement>(null);
+  const cap = useRef<SVGPathElement>(null);
   const seen = useRef(ov.seq);
   const applied = useRef<AoFg>(target);
   const pending = useRef<{ timing: AoStatusFgState["timing"]; until: number } | null>(null);
-  const timers = useRef<number[]>([]);
-  useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
+  const anims = useRef<Animation[]>([]);
+  useEffect(() => () => anims.current.forEach((a) => a.cancel()), []);
   useLayoutEffect(() => {
-    const now = performance.now();
+    const t0 = performance.now();
+    let at = t0;
     if (seen.current !== ov.seq) {
       seen.current = ov.seq;
-      pending.current = { timing: ov.timing, until: now + 500 };
+      pending.current = { timing: ov.timing, until: t0 + 500 };
+      at = ov.at; // 덮어쓰기와 같은 커밋에 바뀜 → 부른 때부터
     }
     if (target === applied.current) return;
+    const from = applied.current;
     applied.current = target;
-    const t = pending.current && now <= pending.current.until ? pending.current.timing : NO_DELAY;
+    const t = pending.current && t0 <= pending.current.until ? pending.current.timing : NO_DELAY;
     pending.current = null;
-    timers.current.forEach((id) => window.clearTimeout(id));
-    timers.current = [];
-    const apply = (part: "icons" | "clock", delay: number, ms: number) => {
-      const fn = () =>
-        setShown((s) => (part === "icons" ? { ...s, icons: target, iconsMs: ms, easing: t.easing } : { ...s, clock: target, clockMs: ms, easing: t.easing }));
-      if (delay > 0) timers.current.push(window.setTimeout(fn, delay));
-      else fn();
+    // 아직 움직이는 중이면 지금 보이는 색에서 이어감
+    const running = anims.current.filter((a) => a.playState === "running");
+    const live = (el: Element | null, prop: "color" | "fill") => (el && running.length ? getComputedStyle(el)[prop] : COLOR[from]);
+    const fromIcons = live(icons.current, "color");
+    const fromClock = live(clockEl.current, "fill");
+    anims.current.forEach((a) => a.cancel());
+    anims.current = [];
+    const hold = (el: Element | null, frames: Keyframe[], delay: number, duration: number) => {
+      if (!el?.animate || (delay <= 0 && duration <= 0)) return;
+      // fill "backwards": 지연 동안 옛 값, 끝나면 클래스(새 값)
+      const a = el.animate(frames, { delay, duration, easing: duration > 0 ? t.easing : "linear", fill: "backwards" });
+      a.startTime = at;
+      anims.current.push(a);
     };
-    apply("icons", t.iconsDelay, t.iconsMs);
-    apply("clock", t.clockDelay, t.clockMs);
-  }, [target, ov.seq, ov.timing]);
+    hold(icons.current, [{ color: fromIcons }, { color: COLOR[target] }], t.iconsDelay, t.iconsMs);
+    hold(empty.current, [{ fillOpacity: EMPTY_OPACITY[from] }, { fillOpacity: EMPTY_OPACITY[from] }], t.iconsDelay, 0);
+    hold(cap.current, [{ fillOpacity: CAP_OPACITY[from] }, { fillOpacity: CAP_OPACITY[from] }], t.iconsDelay, 0);
+    hold(clockEl.current, [{ fill: fromClock }, { fill: COLOR[target] }], t.clockDelay, t.clockMs);
+  }, [target, ov.seq, ov.timing, ov.at]);
 
   const clock = useInk(time, CLOCK_FONT);
   const num = useInk(String(level), NUM_FONT);
@@ -110,19 +128,12 @@ export function AlloneStatusBar() {
   const numX = num ? BATT.numX - (num.r - num.l) / 2 : BATT.numX;
 
   return (
-    <div
-      className={`statusbar statusbar--${shown.icons} ao-sb ao-sb--icons-${shown.icons} ao-sb--clock-${shown.clock}`}
-      style={{
-        ["--ao-sb-icons-ms" as string]: `${shown.iconsMs}ms`,
-        ["--ao-sb-clock-ms" as string]: `${shown.clockMs}ms`,
-        ["--ao-sb-ease" as string]: shown.easing,
-      }}
-    >
+    <div className={`statusbar statusbar--${target} ao-sb ao-sb--icons-${target} ao-sb--clock-${target}`}>
       <svg className="ao-sb__svg" width="393" height="54" viewBox="0 0 393 54" aria-hidden>
-        <text className="ao-sb__clock" x={clockX} y={CLOCK_Y} textAnchor="middle">
+        <text ref={clockEl} className="ao-sb__clock" x={clockX} y={CLOCK_Y} textAnchor="middle">
           {time}
         </text>
-        <g className="ao-sb__icons" fill="currentColor">
+        <g ref={icons} className="ao-sb__icons" fill="currentColor">
           {/* 듀얼 SIM 신호: 위 막대 4칸 + 아래 점 4개 */}
           {COLS.map((x, i) => (
             <rect key={`b${x}`} x={x} y={BAR_TOPS[i]} width="3" height={(BAR_BOTTOM - BAR_TOPS[i]).toFixed(2)} rx="0.75" />
@@ -142,10 +153,10 @@ export function AlloneStatusBar() {
             </text>
           </mask>
           <g mask={`url(#${maskId})`}>
-            <rect className="ao-sb__empty" x={BATT.x} y={BATT.y} width={BATT.w} height={BATT.h} />
+            <rect ref={empty} className="ao-sb__empty" x={BATT.x} y={BATT.y} width={BATT.w} height={BATT.h} />
             <rect className={level <= 20 ? "ao-sb__low" : undefined} x={BATT.x} y={BATT.y} width={(BATT.w * level) / 100} height={BATT.h} />
           </g>
-          <path className="ao-sb__cap" d="M365.36 27.32A1.33 1.64 0 0 1 365.36 30.6Z" />
+          <path ref={cap} className="ao-sb__cap" d="M365.36 27.32A1.33 1.64 0 0 1 365.36 30.6Z" />
         </g>
       </svg>
     </div>

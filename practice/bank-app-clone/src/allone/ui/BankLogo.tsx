@@ -122,7 +122,10 @@ export function AoBankLogo({ code, size = 36, radius, bank, className, style }: 
   const [short0, color0] = BANKS[code] ?? [code, "#8E8E93"];
   const short = bank?.short ?? short0;
   const label = bank?.name ?? (code === "nh" ? "NH농협은행" : short);
-  const box: CSSProperties = { position: "relative", display: "inline-block", width: size, height: size, flexShrink: 0, ...style };
+  // 자리(position · display · flex-shrink)는 클래스 .ao-banklogo (ui.css, 0 특이도 :where) — 영역 className 이 position: absolute 같은 걸 주면 그게 이김.
+  // 크기만 인라인 (style 은 그 위에 덮음)
+  const box: CSSProperties = { width: size, height: size, ...style };
+  const cls = `ao-banklogo${className ? ` ${className}` : ""}`;
 
   const crop = CROPS.includes(code) && !(code === "nh" && (size !== 36 || radius !== undefined)) ? localAsset(`allone-bank-${code}`) : undefined;
   if (crop)
@@ -133,8 +136,8 @@ export function AoBankLogo({ code, size = 36, radius, bank, className, style }: 
         width={size}
         height={size}
         draggable={false}
-        className={className}
-        style={{ ...box, display: "block", ...(radius !== undefined && { borderRadius: radius }) }}
+        className={cls}
+        style={{ ...box, ...(radius !== undefined && { borderRadius: radius }) }}
       />
     );
 
@@ -150,7 +153,7 @@ export function AoBankLogo({ code, size = 36, radius, bank, className, style }: 
     );
   const mark = short.replace(/(은행|증권|투자)$/, "").slice(0, 3);
   return (
-    <span role="img" aria-label={label} className={className} style={box}>
+    <span role="img" aria-label={label} className={cls} style={box}>
       <svg viewBox="0 0 36 36" width={size} height={size} style={{ position: "absolute", inset: 0, display: "block" }} aria-hidden>
         {shape}
         {code === "nh" && <path d={NH_LETTERS} fill="#ffffff" />}

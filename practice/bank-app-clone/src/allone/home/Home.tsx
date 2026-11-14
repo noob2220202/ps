@@ -4,7 +4,7 @@
 //    (C1 12.150 막 걷힘 → 12.183 알약 · 12.267 배너 · 12.500 카드 · 12.700 아래 칸 · 12.733 시트, 프레임마다 잼)
 //    그냥 뒤로 돌아온 홈은 그대로 (뼈대 · 시트 없음)
 //  - 아래 탭 바: 맨 위를 떠나면 숨고, 맨 위와 맨 끝(+14)에서만 다시 나옴 (§2.16)
-import { useCallback, useEffect, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { useApi } from "../../api/useApi";
 import { DevPanel } from "../../dev-panel/DevPanel";
@@ -29,12 +29,12 @@ import "./home.css";
 type Step = 0 | 1 | 2 | 3 | 4;
 type Bar = "top" | "mid" | "bottom";
 
-// 뼈대 단계 시각 (막이 걷힌 뒤 ms). motion.ts AO_SKELETON_STEPS 는 배너가 +150 이지만 C1 프레임으로는 +117 (12.267), 알약은 +33 (12.183)
+// 뼈대 단계 시각 (막이 걷힌 뒤 ms, motion.ts AO_SKELETON_STEPS: 알약 +33 · 배너 +117 · 카드 +350 · 아래 칸 +550)
 const STEP_AT = {
-  pill: 33,
-  banner: 117,
-  card: AO_SKELETON_STEPS[2],
-  lower: AO_SKELETON_STEPS[3],
+  pill: AO_SKELETON_STEPS[1],
+  banner: AO_SKELETON_STEPS[2],
+  card: AO_SKELETON_STEPS[3],
+  lower: AO_SKELETON_STEPS[4],
 };
 // 로그인 뒤 처음 그릴 때만 배너 그림이 늦게 뜸 (C1 13.000 = 막 걷힘 +850). 취소 · 이체 완료로 다시 그릴 때는 바로 (C3 22.250)
 const BANNER_ART_FIRST = 850;
@@ -60,6 +60,10 @@ export function Home() {
     homeRef.current = home.data;
   });
   const bigText = useAoPrefs(aoPrefs.bigText);
+  // 아래 칸은 홈이 처음 그려진 뒤에 따로 (startTransition — 잘게 나눠 그림): 로그인 cut(+2033) 에 홈 전체를 한 번에 그리면 70ms 남짓 걸려
+  // 막 밑의 홈이 4프레임쯤 늦게 보이고 스피너가 멈칫했음. 숨긴 채 다 그려 두는 것은 같아서 H4 는 여전히 한 프레임에 보이기만 함
+  const [lowerReady, setLowerReady] = useState(false);
+  useEffect(() => startTransition(() => setLowerReady(true)), []);
 
   // ---- 새로 불러온 홈: 뼈대 단계 + 정기점검 시트 ----
   const waitDim = useRef<(() => void) | null>(null); // 막이 걷히길 기다리는 중이면 그 구독 끊기
@@ -167,9 +171,11 @@ export function Home() {
           />
           {/* 아래 칸은 처음부터 숨겨 그려 둠 (H4 에서 한 프레임에 보이기만 — 무거운 그림 준비가 +583 정기점검 시트를 늦추지 않게) */}
           <div className="ao-home-lowerwrap" hidden={step < 4}>
-            <LowerActive.Provider value={active && step >= 4}>
-              <Lower freshKey={fresh} />
-            </LowerActive.Provider>
+            {lowerReady && (
+              <LowerActive.Provider value={active && step >= 4}>
+                <Lower freshKey={fresh} />
+              </LowerActive.Provider>
+            )}
           </div>
         </div>
       </div>

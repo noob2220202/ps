@@ -3,7 +3,7 @@
 // 비밀번호는 보이는 것뿐: 숫자는 기억하지 않고 몇 개 눌렀는지만 이 화면 상태에 (보내지 · 저장하지 · 남기지 않음)
 import { useState } from "react";
 import { AO_PASSWORD_SHEET } from "../motion";
-import { AoBackspaceIcon, AoNativeSheet, AoReshuffleIcon } from "../ui";
+import { AoBackspaceIcon, AoNativeSheet, AoNhSymbol, AoReshuffleIcon } from "../ui";
 
 const COLS = [49.1, 147.4, 245.6, 343.9];
 const ROWS = [219.7, 285.8, 351.8]; // 시트 위(368) 기준 숫자 잉크 가운데 587.7 / 653.8 / 719.8 (C3 32.4)
@@ -67,7 +67,7 @@ export function PasswordSheet({ open, account, onClose, onDone }: { open: boolea
           aria-label={d ?? "빈 키"}
           onClick={d ? press : undefined}
         >
-          {d ? <span className="ao-num">{d}</span> : <NhDummy />}
+          {d ? <span className="ao-num">{d}</span> : <AoNhSymbol />}
         </button>
       ))}
       <button type="button" className="ao-send-pw__fn ao-send-pw__fn--shuffle" aria-label="다시 섞기" onClick={() => setBlank(dummies())}>
@@ -81,22 +81,5 @@ export function PasswordSheet({ open, account, onClose, onDone }: { open: boolea
         OK
       </button>
     </AoNativeSheet>
-  );
-}
-
-// 빈 키의 NH 표시 (C3 32.4 잉크 18.65 × 21.67, #D4D4D8): 고리 + 양쪽 날개 + 가운데 거꾸로 된 세모 (윗변 V 홈).
-// 세모 둘레의 틈은 흰색으로 덮어 냄 (시트 바탕이 흰색). 좌표는 녹화 px (3 px = 1 pt)
-function NhDummy() {
-  return (
-    <svg width="18.67" height="21.67" viewBox="3 7 56 65" aria-hidden>
-      <g fill="#d4d4d8">
-        <circle cx="31" cy="43" r="28" />
-        <path d="M3 8H8L21 16 27 27 12 22 3 19.5Z" />
-        <path d="M59 8H54L41 16 35 27 50 22 59 19.5Z" />
-      </g>
-      <circle cx="31" cy="44" r="12.5" fill="#fff" />
-      <path d="M16 6H46L31 34Z" fill="#fff" />
-      <path d="M20 8H27L31 11 35 8H42L31 28Z" fill="#d4d4d8" />
-    </svg>
   );
 }

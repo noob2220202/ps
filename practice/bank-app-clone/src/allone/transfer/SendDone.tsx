@@ -1,11 +1,11 @@
-// 이체 완료 (invented, transfer.md §5.2): 이체 확인을 바꿔 들어옴 (replace), 뒤로 없음.
+// 이체 완료 (invented, transfer.md §5.2): 이체 확인을 바꿔 들어옴 (replace), 뒤로 없음 — 브라우저 뒤로도 확인과 같음 (useAoDoneBack: 보낸 이체를 T2 에서 또 보내지 않게).
 // 초록 체크 Ø 56 (가운데 196.5, 220) — 로딩 막이 걷히면 .8 → 1 + 나타남 200ms ease-out. 글 두 줄 + 상자 + 확인 → sendFinish (흐름 시작한 곳으로)
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useApi } from "../../api/useApi";
 import type { Bank } from "../../api/types";
 import { aoPaths, type AoHome } from "../api";
-import { useAoFlow } from "../flow";
+import { useAoDoneBack, useAoFlow } from "../flow";
 import { aoBankLast4, aoDigits, aoNum, aoWon } from "../format";
 import { AoButton, AoPage, useAoLoadingVisible } from "../ui";
 import { bankLabel } from "./util";
@@ -13,6 +13,7 @@ import { bankLabel } from "./util";
 export function SendDone() {
   const [params] = useSearchParams();
   const flow = useAoFlow();
+  useAoDoneBack();
   const home = useApi<AoHome>(aoPaths.home);
   const banks = useApi<Bank[]>(aoPaths.banks).data;
   const loading = useAoLoadingVisible();

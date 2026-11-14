@@ -8,7 +8,7 @@
 //  ×  · 확인: 뒤로 (거래내역조회는 스크롤 그대로). 자동이체 등록 › 은 아무 일 없음 (plan §1.7)
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { prefetchMissing, useApi } from "../../api/useApi";
+import { useApi } from "../../api/useApi";
 import { aoApi, aoPaths, AO_TOPUP_MEMO, type AoAccount, type AoTxDetail } from "../api";
 import { aoBankName } from "../bank";
 import { useAoFlow } from "../flow";
@@ -122,7 +122,6 @@ export function TxDetail() {
 
   const resend = () => {
     if (!t?.transfer) return;
-    void prefetchMissing(aoPaths.banks); // 얼마를 보낼까요의 은행 이름 (막 동안 받아 둠 — 없으면 막이 걷힌 뒤 잠깐 은행 코드가 보임)
     void flow.goAmount({
       from: t.ao?.accountId ?? t.accountId,
       to: { bankCode: t.transfer.bank.code, number: t.transfer.number, holder: t.transfer.holder },

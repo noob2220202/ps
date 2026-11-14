@@ -19,14 +19,15 @@ export interface AoStatusFgState {
   fg: AoFg | null;
   timing: Required<AoStatusFgTiming>;
   seq: number;
+  at: number; // 부른 시각 (performance.now) — 지연 · 길이는 이 시각부터 잼 (React 가 그리는 데 걸린 시간 · 프레임 위상과 상관없이)
 }
 
 const ZERO: Required<AoStatusFgTiming> = { iconsDelay: 0, iconsMs: 0, clockDelay: 0, clockMs: 0, easing: "linear" };
-let state: AoStatusFgState = { fg: null, timing: ZERO, seq: 0 };
+let state: AoStatusFgState = { fg: null, timing: ZERO, seq: 0, at: 0 };
 const listeners = new Set<() => void>();
 
 export function setAoStatusFg(fg: AoFg | null, timing: AoStatusFgTiming = {}) {
-  state = { fg, timing: { ...ZERO, ...timing }, seq: state.seq + 1 };
+  state = { fg, timing: { ...ZERO, ...timing }, seq: state.seq + 1, at: performance.now() };
   listeners.forEach((fn) => fn());
 }
 // 녹화 다시 시작 · 로그아웃 (AlloneOverlay): 덮어쓰기 없이 바로

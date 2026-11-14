@@ -138,6 +138,16 @@
     height: auto;
   }
 }
+/* 그림(393:793)보다 세로로 긴 폰: 그림 위를 흰색으로 채움 (그림 위쪽은 흰색) — 안 채우면 밑에 그려 둔 간편비밀번호 화면의 초록 띠가 보였음 */
+@media (max-width: 500px) and (max-aspect-ratio: 393/793) {
+  .ao-native-part > .ao-ln-splash {
+    top: 0;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    background: #ffffff;
+  }
+}
 @keyframes ao-ln-splash-in {
   from {
     opacity: 0;
@@ -208,7 +218,7 @@
   top: 2.5px;
 }
 .ao-ln-pin__menu {
-  right: 14px; /* 단추 335–379 × 62–106, 아이콘 상자 (345, 74) 24 × 20 — 정수 자리 (선 좌표는 Pin.tsx MenuSearch) */
+  right: 14px; /* 단추 335–379 × 62–106, 아이콘 상자 (345, 74) 24 × 20 정수 자리 — 공용 AoMenuSearchIcon (거래내역조회 · 홈 머리줄과 같은 모양) */
   top: 3px;
 }
 .ao-ln-pin__menu > svg {

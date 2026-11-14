@@ -6,13 +6,13 @@ import { logoBank, type PadKey } from "./util";
 import "./transfer.css";
 
 // ---------- 받는 분 줄 (T1 · T6 · 출금계좌 시트) ----------
-// 36pt 은행 타일 x 24, 이름 16.3/500 x 71, 둘째 줄 14.3/400 #808080. 줄 높이 h (T1 63.33 · T6 63), 타일은 가운데
+// 36pt 은행 타일 x 24, 이름 16.3/500 x 71, 둘째 줄 14.3/400 #808080. 줄 높이 h (T1 · T6 63 — 녹화 C3 27.500 · C2 21.200 의 ☆ · 타일 간격 189px = 63pt), 타일은 가운데
 export function SendRow({
   code,
   bank,
   name,
   sub,
-  h = 63.33,
+  h = 63,
   onPress,
   right,
   className,

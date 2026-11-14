@@ -8,7 +8,11 @@ export const AO_INTRO = {
   press: 250, // 누른 채 (0.650 → 0.900 = D)
   release: 100, // 손을 떼면 아이콘이 원래 색으로 (ease-out)
   dissolve: 250, // D → D+250 흰색으로
-  statusDelay: 33, // 상태바 글자 흰색 → 검정: 같은 곡선, D+33 부터
+  // 상태바 글자 흰색 → 검정: D+100 부터 217ms, 천천히 시작해 천천히 끝나는 곡선 (C1 시계 · LTE · 배터리 채움 셋 다 같음, 16.67ms 마다 잰 값).
+  // 처음 표의 "녹아 사라짐 곡선 + 33ms" 는 녹화보다 최대 .2 앞섰음
+  statusDelay: 100,
+  statusMs: 217,
+  statusEase: "linear(0, .015, .06, .14, .23, .34, .455, .57, .69, .8, .88, .95, .985, 1)",
   whiteHold: 1200, // 흰 시작화면 (녹아 사라진 뒤 1.20초, 스플래시는 D+1450)
   splashAt: 1450, // D 기준 스플래시 그림이 나타나기 시작
   pressColor: "#034913", // 누른 아이콘 바탕 (원래 #0C8F2D)
@@ -79,13 +83,18 @@ export const AO_SHEET = {
 // 정기점검 시트: 막이 걷힌 뒤 +583ms 에 미끄러짐 없이 나타남 (배경막만 300ms), 닫으면 한 프레임에
 export const AO_NOTICE = { afterDim: 583, autoAdvance: 4000, slide: 300 } as const;
 
-// 금액 키패드 판(T2, 네이티브): 들어옴 150ms (화면이 바뀐 뒤 33–50ms 부터) · 나감 153ms
+// 금액 키패드 판(T2, 네이티브, 화면 y 435–852): 화면 아래끝(852)에서 들어오고 852 로 나감 — 818 이 아님, 움직이는 동안 판 내용이 아래 띠
+// 818–852 에 보임. C3 28.963–29.146 · 1.879–2.046 을 프레임마다 잰 판 위끝 (칩 글자 · 숫자 줄이 같음):
+// 들어옴 175ms cubic-bezier(.4,.2,.6,1), 화면이 바뀐 뒤 5ms 부터 (rms 1–1.4pt) · 나감 170ms cubic-bezier(.4,0,.6,.7) (rms 1.5–2.2pt).
+// 처음 표의 818 기준 150ms (.31,.18,.55,.89) / 153ms (.39,.03,.70,.92) 는 녹화와 5–40pt 어긋났음. transfer.css 가 같은 수를 씀
 export const AO_PANEL = {
-  in: 150,
-  inDelay: 40,
-  inEase: "cubic-bezier(.31, .18, .55, .89)",
-  out: 153,
-  outEase: "cubic-bezier(.39, .03, .70, .92)",
+  top: 435,
+  from: 852, // 화면 아래끝 (판 높이만큼 = translateY(100%))
+  in: 175,
+  inDelay: 5,
+  inEase: "cubic-bezier(.4, .2, .6, 1)",
+  out: 170,
+  outEase: "cubic-bezier(.4, 0, .6, .7)",
 } as const;
 
 // 금액 입력 시트(T7, 네이티브): 막이 걷힌 프레임 +64ms 부터 357ms 올라옴, 닫기 ≈145ms 내려간 뒤 막이 370ms 더 남음.
@@ -111,24 +120,50 @@ export const AO_PASSWORD_SHEET = { afterLastDigit: 50 } as const;
 // 내려감 250ms (invented). ui/Keyboard.tsx 가 이 값을 씀
 export const AO_KEYBOARD = { slide: 290, ease: "cubic-bezier(.2, .4, .2, 1)", out: 250, outEase: "cubic-bezier(.4, 0, .6, 1)", top: 545 } as const;
 
-// 홈 아래 탭 바
+// 홈 아래 탭 바 (쪽 743–818) 와 내 자산 확인 알약: 둘은 곡선이 따로 (탭 바가 알약 위에 그려지고, 알약이 더 빨리 내려가 탭 바 뒤로 들어감).
+// 프레임마다 잰 값 (탭 바 = 홈 아이콘 줄, 알약 = 위끝). home.css 가 같은 수를 transition 으로 씀
+//  - 숨김 (스크롤 이벤트부터, C1 14.517–15.0): 탭 바 490ms cubic-bezier(.4,0,.2,1) 로 +75 (rms .5pt, 한 프레임 앞서 시작 = 지연 −17),
+//    알약 620ms cubic-bezier(.2,.05,.1,1) 로 +135 (rms .9pt)
+//  - 맨 위로 돌아옴 (맨 위 닿음 C2 3.858 → 3.903 부터): 탭 바 952ms cubic-bezier(.22,-.12,.03,1) (rms .1pt), 알약 731ms cubic-bezier(.16,.29,.07,1)
+//    (rms .4pt). 지연 8ms + 그리는 한 프레임 ≈ 녹화의 38–45ms
+//  - 맨 끝 (끝 닿음 C2 2.358 → 2.395 부터): 탭 바만, 맨 위로 돌아올 때 곡선의 앞부분으로 +14.33 에서 멈춤 = 424ms linear(…) (rms .2pt). 알약은 안 나옴
+//  - 가운데에서 위로 올려도 안 나옴
 export const AO_TABBAR = {
-  hide: 440,
-  hideEase: "ease-in-out",
-  hideBy: 135,
-  showTopDelay: 80,
-  showTop: 650,
-  showTopEase: "cubic-bezier(.2, .9, .3, 1)",
-  bottomDebounce: 200,
-  bottomShow: 300,
-  bottomRest: 14, // 맨 아래에서는 +14 에 멈춤
+  bar: {
+    hideBy: 75,
+    hide: 490,
+    hideDelay: -17,
+    hideEase: "cubic-bezier(.4, 0, .2, 1)",
+    showTop: 952,
+    showTopEase: "cubic-bezier(.22, -.12, .03, 1)",
+    bottom: 424,
+    bottomEase: "linear(0, 0, 0, 0.041, 0.125, 0.244, 0.368, 0.479, 0.575, 0.656, 0.726, 0.787, 0.841, 0.888, 0.93, 0.967, 1)",
+    bottomRest: 14.33, // 맨 끝에서는 +14.33 에 멈춤
+  },
+  pill: {
+    hideBy: 135,
+    hide: 620,
+    hideEase: "cubic-bezier(.2, .05, .1, 1)",
+    showTop: 731,
+    showTopEase: "cubic-bezier(.16, .29, .07, 1)",
+  },
+  showTopDelay: 8,
 } as const;
 
-// 홈 계좌 카드 넘기기 · 오늘의 혜택 글자 · 광고 넘기기 · 뼈대(스켈레톤)
-export const AO_CAROUSEL = { snap: 250, total: 350, unseenBody: 420, rubber: 450 } as const;
+// 홈 계좌 카드 넘기기: 손을 뗀 때부터 맞춰 서기 · 제자리로 둘 다 305ms cubic-bezier(.3,.43,.3,1) (C2 4.507–4.783 rms 1.1pt, C3 25.192–25.433 rms .24pt).
+// 처음 표의 250 · 450ms 는 손가락이 끄는 시간까지 넣어 잰 값이었음. 처음 보는 카드의 "조회 중" 몸통 420ms
+export const AO_CAROUSEL = {
+  snap: 305,
+  rubber: 305,
+  ease: "cubic-bezier(.3, .43, .3, 1)",
+  easePoints: [0.3, 0.43, 0.3, 1] as const,
+  unseenBody: 420,
+} as const;
+// 오늘의 혜택 글자 · 광고 넘기기
 export const AO_TICKER = { period: 2500, iconFade: 150, firstChar: 217, perChar: 67 } as const;
 export const AO_ADS = { interval: 4000, slide: 180 } as const; // interval invented
-export const AO_SKELETON_STEPS = [0, 150, 350, 550] as const; // 막이 걷힌 뒤 H1 → H2 → H3 → H4
+// 뼈대(스켈레톤): 막이 걷힌 뒤 H1 → 알약 → H2 배너 → H3 카드 → H4 아래 칸 (C1 프레임 차이: 막 12.150 · 알약 12.183 · 배너 12.267 · 카드 12.500 · 아래 12.700)
+export const AO_SKELETON_STEPS = [0, 33, 117, 350, 550] as const;
 
 // 스위치: 자동완성 색은 한 프레임에 · 손잡이 250ms, 큰글 손잡이 200ms (invented)
 export const AO_SWITCH = { knob: 250, bigTextKnob: 200, small: 150 } as const;

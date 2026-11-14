@@ -95,6 +95,8 @@ export function ScreenStack({ render }: { render: Render }) {
   const underEl = useRef<HTMLDivElement | null>(null);
   const underDim = useRef<HTMLDivElement | null>(null);
   const k2Hold = useRef(0); // kakao2 push: 밀기가 끝난 뒤 걷기까지 기다리는 타이머
+  // allone: 뒤로로 걷은 칸들 (가까운 것부터). 브라우저 앞으로가 그 칸으로 오면 밑 층들을 그대로 두고 다시 쌓음 (plan.md §1.5 — 홈 · 목록이 다시 그려지지 않게). push 하면 버림
+  const aoForward = useRef<Location[]>([]);
 
   const top = entries[entries.length - 1];
   const below = entries.length > 1 ? entries[entries.length - 2] : null;
@@ -106,7 +108,23 @@ export function ScreenStack({ render }: { render: Render }) {
     clearTimeout(k2Hold.current);
 
     let anim: Anim | null = navType === "POP" ? "pop" : navType === "PUSH" ? "push" : null;
-    if (navType === "POP") {
+    if (ALLONE_IOS && navType !== "REPLACE") {
+      const i = entries.findIndex((e) => e.key === location.key);
+      const j = aoForward.current.findIndex((e) => e.key === location.key);
+      if (navType === "PUSH") {
+        aoForward.current = [];
+        setEntries([...entries, location]);
+      } else if (i >= 0) {
+        aoForward.current = [...entries.slice(i + 1), ...aoForward.current];
+        setEntries(entries.slice(0, i + 1));
+      } else if (j >= 0) {
+        setEntries([...entries, ...aoForward.current.slice(0, j), location]);
+        aoForward.current = aoForward.current.slice(j + 1);
+      } else {
+        aoForward.current = [];
+        setEntries([location]);
+      }
+    } else if (navType === "POP") {
       setEntries((es) => {
         const i = es.findIndex((e) => e.key === location.key);
         return i >= 0 ? es.slice(0, i + 1) : [location];

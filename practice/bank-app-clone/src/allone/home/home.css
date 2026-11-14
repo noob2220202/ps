@@ -126,7 +126,7 @@
 .ao-home-big--on .ao-home-big__label {
   transform: translateX(-21px);
 }
-/* 아이콘 (44 × 44 누름 칸): 지갑 잉크 x 278.1 y 76.33 · 종 315.74 / 74.0 · 메뉴+돋보기 351.37 / 76.33 */
+/* 아이콘 (44 × 44 누름 칸): 지갑 잉크 x 278.1 y 76.33 · 종 315.74 / 74.0 · 메뉴+돋보기 상자 349 / 74 (잉크 351.4 / 76.2) */
 .ao-home-hdr__icon {
   position: absolute;
   width: 44px;
@@ -156,8 +156,8 @@
   top: 3px;
 }
 .ao-home-hdr__icon--menu > svg {
-  left: 12.37px;
-  top: 14.33px;
+  left: 10px; /* 상자 (349, 74) 24 × 20 정수 자리 = 거래내역조회 머리줄 + 4 (icons.tsx AoMenuSearchIcon) */
+  top: 12px;
 }
 /* 오늘 운세 말풍선 (쪽 100–138, 머리줄 밑에 걸려 내용이 지나가도 그대로): 검정 #020202 x 20–105.2, 몸통 106–138 둥글기 8,
    위 꼭지 끝 y 100 · 가운데 x 63 (폭 8 × 높이 6). 글 Medium 14 / −0.9 흰색 잉크 x 32 · y 115.67–127 + 흰 밑줄 127.67–128.67, 🍀 x 80.27 */
@@ -443,7 +443,7 @@
   line-height: 25.3px;
   letter-spacing: -0.3px;
   text-align: center;
-  color: #e94143; /* 녹화 글자 가운데 색 (233, 64, 66) — 토큰 --ao-limited #e94848 보다 조금 진함 */
+  color: var(--ao-limited); /* #e94143, 녹화 글자 가운데 색 (233, 64, 66) */
 }
 .ao-home-card__bal {
   left: 59.4px;

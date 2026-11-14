@@ -32,7 +32,8 @@ export type AoLoadProfile =
   | "menu"
   | "search"
   | "menuLink"
-  | "resend";
+  | "resend"
+  | "acctFilter";
 
 export interface AoLoadSpec {
   dimOn: number;
@@ -45,6 +46,8 @@ export interface AoLoadSpec {
   dimFade?: { from: number; ms: number; deep: boolean };
   // 검정 .22 한 겹을 from 부터 ms 동안 ease-out 으로 더 깜. resetAtCut: cut 에서 한 프레임에 기본 막으로 (잔액채우기 링크)
   deepen?: { from: number; ms: number; resetAtCut?: boolean };
+  // 돈이 오가는 막 (보내기 · 잔액채우기): 막 동안 브라우저 뒤로를 무시 — 막 · 할 일 · cut 은 그대로 돌고, 결과(이체 완료 · 토스트)는 도착한 칸에서 (loading.ts)
+  commit?: boolean;
 }
 
 export const LOAD: Record<AoLoadProfile, AoLoadSpec> = {
@@ -57,17 +60,19 @@ export const LOAD: Record<AoLoadProfile, AoLoadSpec> = {
   sendFromHome: { dimOn: 0, cut: 284, off: 417 }, // 홈 카드 이체 C3 26.146–26.563
   lookup: { dimOn: 0, cut: 384, off: 417 }, // T1 다음 (invented) — 404 면 cut 없이 걷힘
   password: { dimOn: 0, cut: 450, off: 483 }, // 4번째 계좌 비밀번호 숫자 +50 → 이체 확인 C3 32.729–33.213
-  send: { dimOn: 0, cut: 967, off: 1000 }, // 이체 확인 보내기 (invented) — POST /api/transfers
+  send: { dimOn: 0, cut: 967, off: 1000, commit: true }, // 이체 확인 보내기 (invented) — POST /api/transfers
   // T2 잔액채우기 링크: 바로 .22 더 어둡게 300ms, cut 에서 기본 막으로, T6 은 +983 부터 막 밑에서 올라옴 (영역이 marks 로), 1433 에 막 · 스피너 걷힘
   topupLink: { dimOn: 0, cut: 367, off: 1433, deepen: { from: 0, ms: 300, resetAtCut: true } },
   topupRow: { dimOn: 0, cut: 284, off: 384 }, // T6 행 → T5 계좌 표시, 막이 걷힌 프레임에 T7 네이티브 막 (C3 5.179–5.643)
-  topupSubmit: { dimOn: 0, cut: 534, off: 567 }, // 잔액채우기 버튼 (C3 12.029–12.146 + invented 끝)
+  topupSubmit: { dimOn: 0, cut: 534, off: 567, commit: true }, // 잔액채우기 버튼 (C3 12.029–12.146 + invented 끝)
   cancelHome: { dimOn: 0, cut: 383, off: 650, spinnerOff: 517 }, // 취소 → 새로 불러온 홈 (C3 21.596–22.246)
   finish: { dimOn: 0, cut: 383, off: 650, spinnerOff: 517 }, // 이체 완료 확인 (invented, cancelHome 과 같음)
   menu: { dimOn: 0, cut: 317, off: 367, spinnerOnlyUntil: 317 }, // 홈 ≡ (C3 38.629–38.996)
   search: { dimOn: 0, cut: 167, off: 167, dimFade: { from: 33, ms: 120, deep: true } }, // 전체메뉴 검색 줄 (C3 39.813–39.979)
   menuLink: { dimOn: 0, cut: 267, off: 300 }, // 메뉴 · 검색 결과 링크, 다른금융 잔액채우기 (invented)
   resend: { dimOn: 0, cut: 967, off: 1000 }, // 거래내역 상세 다시보내기 (invented, replace)
+  // 거래내역조회 조회 조건 적용 (invented, account.md §5.2 의 600ms): 줄은 567 에 막 밑에서 바뀌고 스피너 567 · 막 600 에 걷힘. 화면이 바뀌지 않음
+  acctFilter: { dimOn: 0, cut: 567, off: 600 },
 };
 
 // ---------- location.state ----------
@@ -103,6 +108,12 @@ export function aoCarry(from: unknown, replace: boolean | undefined, extra?: Rec
 // ---------- 방문 기록 ----------
 export const aoHereKey = () => (window.history.state as { key?: string } | null)?.key;
 export const aoHistoryIdx = () => (window.history.state as { idx?: number } | null)?.idx ?? 0;
+// 지금 칸의 location.state (react-router 가 history.state.usr 에 둠) — 화면이 사라진 뒤에도 지금 칸을 알아야 할 때 (flow.ts)
+export const aoHereState = (): unknown => (window.history.state as { usr?: unknown } | null)?.usr;
+// 이 문서(페이지를 연 · 새로고침한 때)의 첫 칸. 그보다 앞 칸은 새로고침 전 문서라 history.go 로 가면 페이지를 다시 엶 (읽기만 함)
+const firstIdx = aoHistoryIdx();
+// 앱의 첫 칸으로 돌아감 (녹화 다시 시작: App.tsx). 그 위 칸들은 앞으로 가기 칸이 되어 다음 이동에 버려짐
+export const aoHistoryGoFirst = () => aoHistoryGo(-Math.max(0, aoHistoryIdx() - firstIdx));
 // history.go(delta) 하고 도착(popstate)까지 기다림. 범위 밖이라 popstate 가 안 오면 300ms 뒤 끝
 export function aoHistoryGo(delta: number) {
   if (!delta) return Promise.resolve();
@@ -118,6 +129,23 @@ export function aoHistoryGo(delta: number) {
   });
 }
 
+// ---------- 뒤로(popstate)를 react-router 보다 먼저 받기 ----------
+// 막 · 잠금(loading.ts)과 이체 완료 지킴이(flow.ts)는 도착한 화면이 그려지기 전에 알아야 함: React 19 는 popstate 안에서 화면 바꿈을 바로 그려서
+// (그 사이 밑 화면의 useAoReturn 이 돎) react-router 뒤에 붙인 window 수신은 그 뒤에야 불리고, 그새 사라진 화면이 붙인 수신은 아예 안 불림.
+// 그래서 수신 하나를 AlloneOverlay 가 앱이 켜질 때 붙임 (자식의 useLayoutEffect 라 BrowserRouter 의 history.listen 보다 먼저) — 여기에 등록한 것은 그 순서로 불림
+const popFirst = new Set<() => void>();
+export function onAoPopFirst(cb: () => void) {
+  popFirst.add(cb);
+  return () => void popFirst.delete(cb);
+}
+export function aoListenPopFirst() {
+  const fn = () => {
+    for (const cb of [...popFirst]) if (popFirst.has(cb)) cb(); // 도중에 빠진 것은 부르지 않음 (DOM 수신과 같게)
+  };
+  window.addEventListener("popstate", fn);
+  return () => window.removeEventListener("popstate", fn);
+}
+
 // ---------- 이동 잠금 ----------
 let lockedUntil = 0;
 // 다른 곳(flow.ts)이 직접 이동할 때도 같은 잠금. 잠겨 있으면 false
@@ -127,6 +155,8 @@ export function aoLock(ms: number = AO_NAV_LOCK) {
   lockedUntil = now + ms;
   return true;
 }
+// 지금 잠겨 있는지 (잠그지 않고 보기만)
+export const aoLocked = () => performance.now() < lockedUntil;
 // 잠금을 풂 (이동이 취소됐을 때: 404 조회 등)
 export const aoUnlock = () => void (lockedUntil = 0);
 

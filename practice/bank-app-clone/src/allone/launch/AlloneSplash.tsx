@@ -4,6 +4,7 @@
 //   D+4100  간편비밀번호 화면으로 167ms 교차 페이드 (그림만 사라지고 밑에 미리 그려 둔 초록 화면이 드러남)
 //   D+4384  보안 키패드가 한 프레임에 (교차 페이드 끝 + 117ms), 아래 링크 줄이 키패드 위로 뜀
 //   6번째 숫자 → +67ms 로딩 막 + 스피너 (그 프레임에 키패드 사라짐, 링크 줄은 다시 아래로) → 홈 데이터를 막 동안 받음
+//   → +1783ms 홈을 이 화면 밑에 숨겨 미리 그림 (onPrepare — 첫 배치가 cut 프레임을 늦추지 않게)
 //   → +2033ms 막 밑에서 홈으로 (onDone → ScreenStack) → +2183 스피너 · +2233 막 걷힘 (aoLoad "login", loading.ts)
 // 스플래시 · 교차 페이드는 CSS 애니메이션을 그린 때로 박아 둔 것(타이머 흔들림 없음), 화면이 바뀌는 때는 그 시각의 첫 프레임 (frame.ts)
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -13,6 +14,7 @@ import { useStatusBar } from "../../hooks/useStatusBar";
 import { aoPaths } from "../api";
 import { useAoLaunchAt } from "../launch";
 import { aoLoad } from "../loading";
+import { LOAD } from "../nav";
 import { AO_INTRO, AO_LAUNCH_NO_INTRO_LEAD, AO_SPLASH } from "../motion";
 import { AoNativePortal } from "../ui/NativePortal";
 import { atFrame, flushNow, pinStart } from "./frame";
@@ -44,7 +46,9 @@ function warmFonts() {
 
 type Stage = "white" | "under" | "pin"; // under = 그림 밑에 간편비밀번호 화면을 그려 둠, pin = 그림을 걷음
 
-export function AlloneSplash({ onDone }: { onDone: () => void }) {
+const PREPARE_LEAD = 250; // cut 몇 ms 전에 홈을 숨겨 미리 그릴지 (배포판: 그리기 ≈ 11ms + 첫 배치 ≈ 25ms)
+
+export function AlloneSplash({ onDone, onPrepare }: { onDone: () => void; onPrepare?: () => void }) {
   useStatusBar("#ffffff", "dark");
   // D: useAoLaunchAt — App 이 useLayoutEffect 로 정하면 그리기 전에 바로 다시 그려 이번 D 를 받음 (첫 그리기의 지난 값은 화면에 안 나감)
   const [base] = useState(() => performance.now());
@@ -54,8 +58,10 @@ export function AlloneSplash({ onDone }: { onDone: () => void }) {
   const [keypad, setKeypad] = useState(false);
   const [loading, setLoading] = useState(false);
   const done = useRef(onDone);
+  const prepare = useRef(onPrepare);
   useEffect(() => {
     done.current = onDone;
+    prepare.current = onPrepare;
   });
   useEffect(warmFonts, []);
 
@@ -93,6 +99,7 @@ export function AlloneSplash({ onDone }: { onDone: () => void }) {
     void aoLoad("login", {
       task: prefetch(aoPaths.home),
       onShow: () => alive.current && flushNow(() => setLoading(true)), // 막이 켜진 그 프레임에 키패드를 없앰
+      marks: [{ at: LOAD.login.cut - PREPARE_LEAD, run: () => alive.current && prepare.current?.() }],
       onCut: () => {
         cut = true;
         if (alive.current) done.current();

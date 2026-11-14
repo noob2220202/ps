@@ -88,14 +88,14 @@
   left: 11.74px;
   top: 12.67px;
 }
-/* ≡🔍 잉크 x 347.38 y 76.33 */
+/* ≡🔍 상자 (345, 74) 24 × 20 — 정수 자리 (잉크 347.4–367.4 × 76.2–91.7, icons.tsx AoMenuSearchIcon) */
 .ao-hdr__btn--menu {
   left: 340px;
   width: 38px;
 }
 .ao-hdr__btn--menu > svg {
-  left: 7.38px;
-  top: 14.33px;
+  left: 5px;
+  top: 12px;
 }
 /* × 잉크 x 348.71 y 75.67 */
 .ao-hdr__btn--close {
@@ -327,7 +327,8 @@
 .ao-sheet--closing .ao-sheet__scrim {
   animation: ao-ui-fade-out 150ms linear both;
 }
-.ao-sheet--closing {
+/* 내려가는 150ms 동안 시트는 누름을 받지 않고, 배경막은 계속 받음 — 두 번 누름의 둘째가 밑 화면으로 새지 않게 (배경막 누름은 열린 동안만 onClose, .ao-nsheet--closing 과 같은 생각) */
+.ao-sheet--closing .ao-sheet__card {
   pointer-events: none;
 }
 @keyframes ao-sheet-rise {
@@ -387,6 +388,16 @@
   padding: 0 24px 30px;
 }
 
+/* ---------- AoBankLogo: 자리 기본값은 0 특이도 — 영역 클래스(한 개짜리라도)가 position · display 를 바꿀 수 있음 ---------- */
+:where(.ao-banklogo) {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+:where(img.ao-banklogo) {
+  display: block;
+}
+
 /* ---------- AoNativeSheet: 네이티브 막 + 시트 (#ao-native, 창 전체) ---------- */
 .ao-nsheet {
   position: absolute;
@@ -418,10 +429,9 @@
 }
 .ao-nsheet--closing .ao-nsheet__card {
   animation: ao-nsheet-down 145ms cubic-bezier(0.29, 0.19, 0.54, 0.75) both;
-}
-.ao-nsheet--closing {
   pointer-events: none;
 }
+/* 닫는 동안(내려가는 145ms + 막이 남는 370ms) 막은 누름을 계속 받음 — 밑의 웹 화면으로 새지 않게 (막 누름은 열린 동안만 onDimClick) */
 @keyframes ao-nsheet-rise {
   from {
     transform: translateY(100%);

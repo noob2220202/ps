@@ -103,17 +103,8 @@ export function SendWho() {
   const onNext = () => {
     if (!canNext || !bank) return;
     setFocus(false);
-    let holder = "";
-    const code = bank.code;
-    void flow.go(() => `/send/amount?from=${encodeURIComponent(from)}&bank=${code}&number=${number}&holder=${encodeURIComponent(holder)}`, {
-      via: "lookup",
-      prefetch: [aoPaths.home],
-      task: () =>
-        aoApi.lookup(code, number).then((r) => {
-          holder = r.holder;
-        }),
-      onError: () => setLookupError(true),
-    });
+    // lookup 막 동안 계좌 조회 (예금주는 조회 결과로), 404 면 이동 없이 도움말이 빨간 글자로
+    void flow.goAmount({ from, to: { bankCode: bank.code, number }, via: "lookup", onError: () => setLookupError(true) });
   };
 
   const openRow = (r: Row) => {
@@ -152,7 +143,7 @@ export function SendWho() {
   const editing = edit && tab === "recent" && rows.recent.length > 0; // 지울 줄이 없으면 편집도 끝
 
   const bankTabs = useMemo(() => aoBankTabs(banks ?? []), [banks]);
-  const listH = list.length ? list.length * 63.33 : 140;
+  const listH = list.length ? list.length * 63 : 140;
 
   return (
     <AoPage

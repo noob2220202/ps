@@ -1,9 +1,6 @@
 /* ===== NH올원뱅크 이체 영역 (src/allone/transfer/*) — 클래스 · 키프레임 모두 ao-send- 로 시작.
    좌표 = 녹화에서 잰 잉크 상자 (transfer.md, pt = 393 × 852 틀의 CSS px). 글자는 line-height 1, top = 잉크 가운데 − 0.54 × 크기 (Pretendard)
    본문 기준: 머리줄(59–109) 아래 → 본문 y = 화면 y − 109 ===== */
-@import "@fontsource/roboto/400.css";
-@import "@fontsource/roboto/500.css";
-@import "@fontsource/roboto/700.css";
 
 /* ---------- 받는 분 줄 (T1 · T6 · 출금계좌 시트) ---------- */
 .ao-send-row {
@@ -498,8 +495,8 @@
 
 /* ---------- T2 네이티브 키패드 판 (#ao-native-panel z 53): 화면 y 435 부터 화면 아래끝 852 까지 (아래 띠도 덮음) ----------
    C3 28.963–29.146 · 1.879–2.013 을 프레임마다 잰 판 위끝 (칩 글자 · 숫자 1 두 표시가 같음): 판은 818 이 아니라 화면 아래(852)에서 들어오고
-   852 로 나감 (움직이는 동안 판 내용이 아래 띠 818–852 에 보임). 맞춘 곡선 — 들어옴 175ms cubic-bezier(.4,.2,.6,1) 화면이 바뀐 뒤 5ms 부터
-   (오차 rms 1.0pt; 818 기준 150ms cubic-bezier(.31,.18,.55,.89) 는 4.9pt) · 나감 170ms cubic-bezier(.4,0,.6,.7) (rms 1.5pt) */
+   852 로 나감 (움직이는 동안 판 내용이 아래 띠 818–852 에 보임). 맞춘 곡선 (= motion.ts AO_PANEL) — 들어옴 175ms cubic-bezier(.4,.2,.6,1)
+   화면이 바뀐 뒤 5ms 부터 (오차 rms 1.0pt; 818 기준 150ms cubic-bezier(.31,.18,.55,.89) 는 4.9pt) · 나감 170ms cubic-bezier(.4,0,.6,.7) (rms 1.5pt) */
 .ao-send-panelclip,
 .ao-native-part > .ao-send-panelclip {
   position: absolute;

@@ -11,6 +11,7 @@ import { useEffect, useLayoutEffect } from "react";
 import { useAuth } from "../auth/auth";
 import { RESTART_EVENT } from "../platform/recorder";
 import { cutAoLoading } from "./loading";
+import { aoListenPopFirst } from "./nav";
 import { AO_NATIVE_IDS, aoNativeReset, setAoNativeHost, useAoScene, type AoNativeLayer } from "./native";
 import { resetAoStatusFg } from "./statusFg";
 import { cutAoToast } from "./toast";
@@ -35,6 +36,31 @@ const attachScene = attach("scene");
 const onRestart = (e: Event) => (e as CustomEvent).detail === "off" && clearNative();
 
 export function AlloneOverlay() {
+  // 뒤로(popstate)를 react-router 보다 먼저 받는 수신 (nav.ts). 자식의 useLayoutEffect 는 BrowserRouter 의 history.listen 보다 먼저 돎
+  useLayoutEffect(aoListenPopFirst, []);
+  // 진짜 폰 화면(500px 이하)에서 393 폭 폰을 창 폭에 맞추는 배율 (allone.css)
+  useLayoutEffect(() => {
+    const root = document.documentElement.style;
+    // 기기 화면 크기(CSS px): 시각 뷰포트 × 배율 — 393 폭 폰이 창보다 넓게 그려진 순간에는 모바일 크롬이 레이아웃 뷰포트를 393 으로 넓히고 화면을 줄여 보여서
+    // innerWidth 가 393 이 되므로 (그러면 배율 1 에 갇힘) 줄인 배율을 곱해 되돌림. 손가락으로 확대해도 값은 그대로
+    const vv = window.visualViewport;
+    const fit = () => {
+      const w = vv ? vv.width * vv.scale : window.innerWidth;
+      const h = vv ? vv.height * vv.scale : window.innerHeight;
+      const f = w / 393;
+      root.setProperty("--ao-fit", String(f));
+      root.setProperty("--ao-phone-h", `${h / f}px`);
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    vv?.addEventListener("resize", fit);
+    return () => {
+      window.removeEventListener("resize", fit);
+      vv?.removeEventListener("resize", fit);
+      root.removeProperty("--ao-fit");
+      root.removeProperty("--ao-phone-h");
+    };
+  }, []);
   useEffect(() => {
     window.addEventListener(RESTART_EVENT, onRestart);
     return () => window.removeEventListener(RESTART_EVENT, onRestart);

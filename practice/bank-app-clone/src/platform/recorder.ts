@@ -191,7 +191,8 @@ export async function startRecording(target: HTMLElement, onStop?: () => void) {
   let fakeCursor = false;
   // kakao2: 폰 폭이 홀수(393)라 가운데에 두면 왼쪽 끝이 0.5px 에 걸려 Element · Region Capture 영상 폭이 392 ↔ 394 로 오락가락함
   // (mp4 avc1 'codec description' 오류, 프레임 왼쪽 끝 1px 줄). 녹화하는 동안만 폰을 가까운 기기 픽셀로 옮겨 둠. allone 도 같은 393 폭
-  const unsnap = (KAKAO2 || ALLONE) && (elementCapture || regionCapture) ? snapToDevicePixels(target) : () => {};
+  // allone: DPR 3 에서는 크롬이 자리를 1/64px 단위로 내려 저장해(63.6667 → 63.65625) 0.01 검사에 걸려 되돌려졌음 → 1/64px 까지 봐줌 (kakao2 는 그대로)
+  const unsnap = (KAKAO2 || ALLONE) && (elementCapture || regionCapture) ? snapToDevicePixels(target, ALLONE ? 1 / 64 + 0.001 : undefined) : () => {};
   if (elementCapture) {
     // 0) Element Capture: 진짜 포인터는 폰 위에서 숨기고(녹화에 찍히므로), 폰 바깥 요소로 그린 가짜 포인터를 보여 줌
     const W = window as unknown as { RestrictionTarget: { fromElement(el: Element): Promise<unknown> } };
@@ -505,8 +506,8 @@ async function resumeUnder(target: HTMLElement, video: HTMLVideoElement, cfg: In
 }
 
 // 요소의 왼쪽 · 위끝을 가장 가까운 기기 픽셀로: 여백을 조금 바꿈 (transform 을 주면 Element Capture 가 프레임을 안 내보냈음).
-// 왼쪽 여백은 auto(가운데)라 계산값을 믿지 않고 부모 왼끝에서 잼. 바꿔도 정수 픽셀이 안 되면 그대로 둠. 되돌리는 함수를 줌
-function snapToDevicePixels(el: HTMLElement) {
+// 왼쪽 여백은 auto(가운데)라 계산값을 믿지 않고 부모 왼끝에서 잼. 바꿔도 정수 픽셀이 안 되면(tol CSS px 넘게 어긋나면) 그대로 둠. 되돌리는 함수를 줌
+function snapToDevicePixels(el: HTMLElement, tol = 0.01) {
   const dpr = window.devicePixelRatio || 1;
   const off = (v: number) => (Math.round(v * dpr) - v * dpr) / dpr;
   const r = el.getBoundingClientRect();
@@ -520,7 +521,7 @@ function snapToDevicePixels(el: HTMLElement) {
   el.style.marginLeft = `${r.left - parent.getBoundingClientRect().left + off(r.left)}px`;
   el.style.marginTop = `${parseFloat(getComputedStyle(el).marginTop) + off(r.top)}px`;
   const after = el.getBoundingClientRect();
-  if (Math.abs(off(after.left)) > 0.01 || Math.abs(off(after.top)) > 0.01 || Math.abs(after.left - r.left) > 1 || Math.abs(after.top - r.top) > 1) undo();
+  if (Math.abs(off(after.left)) > tol || Math.abs(off(after.top)) > tol || Math.abs(after.left - r.left) > 1 || Math.abs(after.top - r.top) > 1) undo();
   return undo;
 }
 

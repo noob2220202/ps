@@ -4,37 +4,45 @@
 //  f.goHistory(accountId, via = "history")            거래내역조회 /history/:id   (메뉴 · 검색에서는 "menuLink")
 //  f.goTx(txId, "in" | "out")                          거래내역 상세 /tx/:id       (txIn 184 · txOut 1100, 더 어둡게)
 //  f.goSend({ from, origin, via })                     누구에게 보낼까요 /send?from= (origin home → sendFromHome, history → sendFromList, menu → menuLink)
-//  f.goAmount({ from, to: { bankCode, number, holder }, replace, via })
+//  f.goAmount({ from, to: { bankCode, number, holder }, replace, via, onError })
 //                                                      얼마를 보낼까요 /send/amount?… — via 없음 = 바로 CUT (T1 행), "lookup" = 계좌 조회 후
-//                                                      (예금주는 조회 결과로, 404 면 이동 없이 false), "resend" = 다시보내기 (replace)
+//                                                      (예금주는 조회 결과로, 404 면 이동 없이 false + onError — 잠금 · 맨 위 아님의 false 와 구별),
+//                                                      "resend" = 다시보내기 (replace). 막이 있으면 홈 · 은행 목록을 막 동안 받아 둠
 //  f.goTopup({ to, from, origin })                     잔액채우기 /topup?to=&from=&origin= (origin amount → topupLink, menu · card → menuLink)
 //  f.goMenu() · f.goSearch()                           전체메뉴 (menu) · 통합검색 (search)
 //  f.goHome()                                          홈으로 (새로 불러오지 않음, 홈은 밑에 그대로)
 //  f.goHomeFresh()                                     취소: cancelHome 막 밑에서 홈으로 + aoHomeFresh 알림 (홈이 뼈대 · 정기점검 시트를 다시)
 //  f.sendFinish()                                      이체 완료 확인: finish 막 밑에서 이체 흐름 전 화면으로 (홈이면 새로 불러온 홈)
 //  f.go(to, { via, prefetch, task, replace, state })   그 밖 (막 없이 = useAoGo 와 같음)
-//  모두 Promise<boolean> (이동했으면 true). 맨 위가 아닌 층의 누름 · 잠금 중의 누름은 false
+//  모두 Promise<boolean> (이동했으면 true). 맨 위가 아닌 층의 누름 · 잠금 중의 누름은 바로 false (막을 띄우지 않음)
+//  f.canGo()                                           지금 이동을 받을지 (맨 위 층 · 잠금 아님) — 이동 전에 네이티브 판을 먼저 움직이는 화면이 미리 확인
 //  새 칸의 location.state.aoVia = 들어올 때 쓴 프로필 (화면이 막 시각표에 맞춰 할 일이 있으면: 예 T5 의 T6 +983)
 //
 //  useAoHomeFresh(cb)   홈이 받음: 새로 불러온 홈으로 돌아온 순간 (아직 막 밑) — 막이 걷히면(onAoLoadingHidden) 뼈대 단계 · 정기점검 시트
 //  aoVisit(menuKey)     만든 화면이 열릴 때 부름 → 전체메뉴 최근 이용메뉴 (prefs.ts)
+//  useAoDoneBack()      이체 완료가 부름: 이 칸을 떠나는 브라우저 뒤로 = 확인 (도착한 칸에서 finish 막 → 흐름 전 화면). 보낸 이체를 T2 에서 또 보내지 않게
 import { useCallback, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, type NavigateFunction } from "react-router-dom";
 import { invalidate } from "../api/client";
 import { prefetch } from "../api/useApi";
 import { useLayerActive } from "../platform/LayerContext";
 import { aoApi, aoPaths } from "./api";
 import { aoLoad } from "./loading";
 import { AO_NAV_LOCK } from "./motion";
+import { onAoNativeReset } from "./native";
 import {
   aoCarry,
+  aoHereKey,
+  aoHereState,
   aoHistoryGo,
   aoHistoryIdx,
   aoLock,
+  aoLocked,
   aoOrigin,
   aoSendDepth,
   aoUnlock,
   goHomeNow,
+  onAoPopFirst,
   LOAD,
   type AoLoadProfile,
   type AoOrigin,
@@ -57,6 +65,56 @@ export function useAoHomeFresh(cb: () => void) {
 }
 
 export const aoVisit = (menuKey: string) => aoPrefs.pushRecentMenu(menuKey);
+
+// ---------- 이체 완료 확인 (finish 막 → 이체 흐름 전 화면) ----------
+// state · pathname = 출발한 칸 (확인 = 이체 완료 칸, 완료에서 뒤로 = 도착한 칸). 흐름 깊이만큼 뒤로 (홈이면 새로 불러온 홈, 거래내역조회면 목록을 다시 받아 새 올원이체가 맨 위)
+function runFinish(navigate: NavigateFunction, state: unknown, pathname: string) {
+  const depth = aoSendDepth(state);
+  const origin = aoOrigin(state) ?? "home";
+  return aoLoad("finish", {
+    onCut: () => {
+      stopDoneWatch(); // 아래 뒤로는 확인이 하는 것 — 완료 칸 지킴이가 또 받지 않게
+      invalidate(); // 홈 · 계좌 · 거래내역 · 받는 분 목록 다시 받기
+      const back = depth > 0 && aoHistoryIdx() >= depth ? aoHistoryGo(-depth) : goHomeNow(navigate, state, pathname);
+      void back.then(() => origin === "home" && emitHomeFresh());
+    },
+  });
+}
+
+// 이체 완료 칸 지킴이: 그 칸을 떠나는 뒤로(브라우저 · 확인 막 도중 포함)는 확인과 같게. 화면이 아니라 여기(모듈)에 두어 완료 화면이 사라지는 뒤로도 받음.
+// 확인의 finish 가 cut 에서 끄고, 녹화 다시 시작 · 로그아웃(onAoNativeReset) · 완료 화면이 없어질 때도 끔
+let doneWatch: (() => void) | null = null;
+function stopDoneWatch() {
+  const stop = doneWatch;
+  doneWatch = null;
+  stop?.();
+}
+export function useAoDoneBack() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    stopDoneWatch();
+    const key = aoHereKey();
+    const onPop = () => {
+      if (aoHereKey() === key) return;
+      stopDoneWatch();
+      // 확인의 finish 가 돌던 중이면 그것을 멈추고 도착한 칸에서 다시 (잠금은 이것이 이어 받음)
+      aoUnlock();
+      aoLock(LOAD.finish.off + 100);
+      void runFinish(navigate, aoHereState(), window.location.pathname);
+    };
+    const offReset = onAoNativeReset(stopDoneWatch);
+    // react-router 보다 먼저 받음 (nav.ts onAoPopFirst — 늦게 받으면 완료 화면이 이미 사라지며 이 수신도 떼어진 뒤)
+    const offPop = onAoPopFirst(onPop);
+    const stop = () => {
+      offPop();
+      offReset();
+    };
+    doneWatch = stop;
+    return () => {
+      if (doneWatch === stop) stopDoneWatch();
+    };
+  }, [navigate]);
+}
 
 export interface AoFlowGo {
   via?: AoLoadProfile;
@@ -91,8 +149,16 @@ export function useAoFlow() {
     (to: string | (() => string), o: AoFlowGo = {}): Promise<boolean> => {
       if (!active) return Promise.resolve(false);
       if (!aoLock(o.via ? LOAD[o.via].off + 100 : AO_NAV_LOCK)) return Promise.resolve(false);
-      const state = aoCarry(location.state, o.replace, { ...o.state, aoVia: o.via ?? null });
-      const nav = () => navigate(typeof to === "function" ? to() : to, { replace: o.replace, state });
+      const extra = { ...o.state, aoVia: o.via ?? null };
+      const state = aoCarry(location.state, o.replace, extra);
+      const here = aoHereKey();
+      // 돈이 오가는 막(send) 동안 브라우저 뒤로로 다른 칸에 내려왔으면: 바꿀 칸(이체 확인)은 이미 없으므로 도착한 칸 위에 새로 쌓음 —
+      // 깊이 · 이체 흐름 값은 도착한 칸에서 이어 받고(확인이 흐름 전 화면으로 정확히 돌아가게), 앞으로 가기 칸(떠난 이체 확인)은 버려짐 (다시 보내기 방지)
+      const nav = () => {
+        const path = typeof to === "function" ? to() : to;
+        if (o.replace && aoHereKey() !== here) navigate(path, { state: aoCarry(aoHereState(), false, extra) });
+        else navigate(path, { replace: o.replace, state });
+      };
       if (!o.via) {
         nav();
         return Promise.resolve(true);
@@ -137,7 +203,19 @@ export function useAoFlow() {
   );
 
   const goAmount = useCallback(
-    ({ from, to, replace = false, via }: { from: string; to: AoAmountTarget; replace?: boolean; via?: AoLoadProfile }) => {
+    ({
+      from,
+      to,
+      replace = false,
+      via,
+      onError,
+    }: {
+      from: string;
+      to: AoAmountTarget;
+      replace?: boolean;
+      via?: AoLoadProfile;
+      onError?: (error: unknown) => void; // 막 동안의 조회가 실패했을 때 (예: 404)
+    }) => {
       // 이체 흐름 밖(거래내역 상세 다시보내기)에서 들어오면 여기서 흐름 시작 (돌아갈 곳 = 거래내역조회)
       const inFlow = aoSendDepth(location.state) > 0;
       const extra = inFlow ? {} : { aoSendDepth: 1, aoOrigin: "history" as AoOrigin };
@@ -147,7 +225,9 @@ export function useAoFlow() {
         via,
         replace,
         state: extra,
-        prefetch: via ? [aoPaths.home] : undefined,
+        // T2 가 그리는 출금계좌 줄 · 받는 분 은행 이름 (없으면 막이 걷힌 뒤 잠깐 은행 코드가 보임)
+        prefetch: via ? [aoPaths.home, aoPaths.banks] : undefined,
+        onError,
         task:
           via === "lookup"
             ? () =>
@@ -190,19 +270,12 @@ export function useAoFlow() {
   // 이체 완료 확인: 흐름에 들어오기 전 화면으로 (홈이면 새로 불러온 홈, 거래내역조회면 목록을 다시 받아 새 올원이체가 맨 위)
   const sendFinish = useCallback(() => {
     if (!active || !aoLock(LOAD.finish.off + 100)) return Promise.resolve(false);
-    const { state, pathname } = location;
-    const depth = aoSendDepth(state);
-    const origin = aoOrigin(state) ?? "home";
-    return aoLoad("finish", {
-      onCut: () => {
-        invalidate(); // 홈 · 계좌 · 거래내역 · 받는 분 목록 다시 받기
-        const back = depth > 0 && aoHistoryIdx() >= depth ? aoHistoryGo(-depth) : goHomeNow(navigate, state, pathname);
-        void back.then(() => origin === "home" && emitHomeFresh());
-      },
-    });
+    return runFinish(navigate, location.state, location.pathname);
   }, [active, navigate, location]);
 
-  return { go, goHistory, goTx, goSend, goAmount, goTopup, goMenu, goSearch, goHome, goHomeFresh, sendFinish };
+  const canGo = useCallback(() => active && !aoLocked(), [active]);
+
+  return { go, canGo, goHistory, goTx, goSend, goAmount, goTopup, goMenu, goSearch, goHome, goHomeFresh, sendFinish };
 }
 
 // 화면이 자기 location.state 에서 읽는 값

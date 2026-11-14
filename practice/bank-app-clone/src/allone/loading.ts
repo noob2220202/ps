@@ -8,7 +8,8 @@
 //    - 스피너는 spinnerOff(없으면 off − 33)에, 막은 off 에 걷힘 → onHidden (그 프레임에 — T7 막을 같은 프레임에 켜려면 여기서)
 //    - deepen: 검정 .22 한 겹을 더 깜 (거래 상세 · 잔액채우기 링크). menu: 스피너만 먼저. search: 막이 120ms 동안 서서히
 //    - marks: [{ at, run }] 표 시각에 맞춰 더 할 일 (cut 뒤 시각은 cut 이 밀린 만큼 같이 밀림). 예: 잔액채우기 링크 T6 +983
-//    - 막 동안 브라우저 뒤로(popstate)로 화면이 바뀌면 cut 하지 않고 막을 바로 걷음 (false)
+//    - 막 동안 브라우저 뒤로(popstate)로 화면이 바뀌면 cut 하지 않고 막을 바로 걷음 (false) + 이동 잠금을 풂 (도착한 화면을 바로 누를 수 있게).
+//      돈이 오가는 프로필(LOAD commit: 보내기 · 잔액채우기)은 뒤로를 무시: 막 · 할 일 · cut 이 그대로 돌고, 화면이 도착한 칸에서 결과를 보임
 //    돌려준 Promise: 막이 걷힐 때 cut 했으면 true
 //  showAoLoading({ spinner, dim, deep }) 표에 없는 경우 직접 켬 → 돌려준 hide() 로 끔 (스피너 먼저, 33ms 뒤 막)
 //  cutAoLoading()        바로 다 걷음 (녹화 다시 시작 · 로그아웃 · 뒤로) — 숨김 알림(onAoLoadingHidden)은 안 보냄
@@ -16,7 +17,7 @@
 //  onAoLoadingHidden(cb) 막이 다 걷힐 때마다 cb({ profile, at }) (정기점검 시트 +583ms 등). 돌려준 함수로 그만 받음
 import { useSyncExternalStore } from "react";
 import { AO_DIM } from "./motion";
-import { aoHereKey, LOAD, type AoLoadProfile } from "./nav";
+import { aoHereKey, aoUnlock, LOAD, onAoPopFirst, type AoLoadProfile } from "./nav";
 
 export interface AoLoadingState {
   onset: number; // 스피너가 켜질 때마다 새 번호 (AoSpinner key → 앞면부터)
@@ -94,9 +95,10 @@ export function aoLoad(profile: AoLoadProfile, o: AoLoadOptions = {}): Promise<b
     let reachedCut = false;
     const here = aoHereKey();
 
+    let offPop = () => {};
     const stop = () => {
       timers.forEach((t) => window.clearTimeout(t));
-      window.removeEventListener("popstate", onPop);
+      offPop();
       if (!finished) {
         finished = true;
         resolve(false);
@@ -104,13 +106,15 @@ export function aoLoad(profile: AoLoadProfile, o: AoLoadOptions = {}): Promise<b
     };
     current = { id, stop };
     const live = () => current?.id === id;
-    // 막 동안 뒤로: cut 전이면 막을 바로 걷고 끝
+    // 막 동안 뒤로: cut 전이면 막을 바로 걷고 끝 (이 이동이 건 잠금도 풂). 돈이 오가는 막은 그대로 (결과는 도착한 칸에서)
     const onPop = () => {
-      if (!live() || cutDone || aoHereKey() === here) return;
+      if (!live() || cutDone || aoHereKey() === here || spec.commit) return;
       stopCurrent();
       if (state) set(null);
+      aoUnlock();
     };
-    window.addEventListener("popstate", onPop);
+    // react-router 보다 먼저 받음 (nav.ts onAoPopFirst): 돌아간 화면(useAoReturn)이 막 · 잠금이 이미 걷힌 상태를 봄
+    offPop = onAoPopFirst(onPop);
 
     // ---- 켜기 ----
     const show = () => {
@@ -166,7 +170,7 @@ export function aoLoad(profile: AoLoadProfile, o: AoLoadOptions = {}): Promise<b
     function doCut() {
       if (!live() || cutDone) return;
       cutDone = true;
-      window.removeEventListener("popstate", onPop);
+      offPop();
       const delay = Math.max(0, elapsed() - spec.cut); // 데이터가 늦은 만큼 뒤 시각을 밀어 줌
       const after = (ms: number, fn: () => void) => at(ms + delay, fn);
       if (spec.deepen?.resetAtCut && state?.deep) patch({ deep: null });
@@ -222,3 +226,5 @@ const subscribe = (fn: () => void) => (listeners.add(fn), () => void listeners.d
 export const useAoLoading = () => useSyncExternalStore(subscribe, () => state);
 export const useAoLoadingVisible = () => useSyncExternalStore(subscribe, () => state !== null);
 export const isAoLoadingUp = () => state !== null;
+// 지금 떠 있는 막의 프로필 (없거나 showAoLoading 이면 null)
+export const aoLoadingProfile = () => state?.profile ?? null;

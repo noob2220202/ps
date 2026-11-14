@@ -12,7 +12,7 @@ import { aoBankName } from "../bank";
 import { aoViaOf } from "../flow";
 import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLine, aoDailyRemaining, aoNum, aoTopupError } from "../format";
 import { AO_AMOUNT_SHEET } from "../motion";
-import { LOAD, useAoBack } from "../nav";
+import { aoHereKey, LOAD, useAoBack } from "../nav";
 import { AoBankLogo, AoButton, AoChevronDownIcon, AoHeader, AoPage, AoSheet, aoLoad, aoToast } from "../ui";
 import { AmountSheet } from "./AmountSheet";
 import { SendRow } from "./parts";
@@ -67,7 +67,7 @@ export function Topup() {
   }, []);
 
   const openT6 = () => {
-    if (busy || t7Up) return;
+    if (busy) return;
     setT6Exit("slide");
     setT6(true);
   };
@@ -98,8 +98,8 @@ export function Topup() {
   const daily = from ? aoDailyRemaining(transfers.data) : 0;
   const submitting = useRef(false);
   const submit = () => {
-    // T7 막이 아직 남아 있으면(닫힌 뒤 370ms) 누름이 막을 지나 여기로 옴 — 무시 (확인 두 번 누름)
-    if (!from || !to || busy || submitting.current || t7Up) return;
+    // T7 가 닫히는 동안(내려감 + 막 370ms)의 누름은 네이티브 막이 받음 (ui.css .ao-nsheet--closing) — 여기로 오지 않음
+    if (!from || !to || busy || submitting.current) return;
     const err = aoTopupError(amount, from.balance, daily);
     setError(err);
     if (err) {
@@ -111,12 +111,15 @@ export function Topup() {
     submitting.current = true;
     setBusy(true);
     const amt = amount;
+    // 막 동안 브라우저 뒤로를 눌렀으면(topupSubmit 은 뒤로를 무시하고 끝까지 돎) 이미 이 화면을 떠났으므로 cut 의 뒤로는 하지 않음. 토스트는 도착한 화면에
+    const here = aoHereKey();
     void aoLoad("topupSubmit", {
-      // 채운 뒤 홈 데이터까지 새로 받아 두고 cut (T2 계좌 줄 잔액이 막 밑에서 이미 바뀌어 있게)
-      task: () => aoApi.topup(from.id, to, amt).then(() => prefetch(aoPaths.home)),
+      // 채우기만 기다림 (POST 가 성공하면 무효화로 열린 화면들이 홈 데이터를 다시 받음 — 같은 주소를 또 받으면 브라우저 연결 수(6)에 막혀 cut 이 250ms 늦었음).
+      // T2 계좌 줄 잔액은 그 다시 받기로 막 밑에서 바뀜
+      task: () => aoApi.topup(from.id, to, amt),
       onCut: () => {
         setAmount(0);
-        if (origin === "amount") back();
+        if (origin === "amount" && aoHereKey() === here) back();
       },
       onHidden: () => {
         submitting.current = false;
@@ -181,7 +184,7 @@ export function Topup() {
           type="button"
           className="ao-send-field ao-send-topup__amt"
           onClick={() => {
-            if (t7Up || busy) return;
+            if (busy) return;
             if (!sel) return openT6();
             openT7(46);
           }}

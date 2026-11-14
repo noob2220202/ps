@@ -1,4 +1,7 @@
 import { Route, Routes, type Location } from "react-router-dom";
+// 공용 CSS 를 화면 모듈보다 먼저: 번들에서 영역 CSS 가 뒤에 오므로 같은 특이도면 영역 규칙이 이김 (.ao-switch 를 클래스 하나로 옮기는 것 등)
+import "./allone.css";
+import "./ui/ui.css";
 import { Home } from "./home/Home";
 import { Menu } from "./home/Menu";
 import { Search } from "./home/Search";
@@ -10,8 +13,6 @@ import { SendConfirm } from "./transfer/SendConfirm";
 import { SendDone } from "./transfer/SendDone";
 import { Topup } from "./transfer/Topup";
 import { AoGallery } from "./ui/Gallery";
-import "./allone.css";
-import "./ui/ui.css";
 
 // NH올원뱅크 (APP=allone 으로 띄운 서버, 9119). 화면 표는 plan.md §1.2 — 화면 사이는 모두 CUT (ScreenStack allone 갈래),
 // 기다림은 로딩 막 프로필 (nav.ts LOAD · flow.ts). 데이터도 따로 (server/data-allone). 주소가 다른 앱과 겹쳐도 됨 (서버 하나는 앱 하나만)

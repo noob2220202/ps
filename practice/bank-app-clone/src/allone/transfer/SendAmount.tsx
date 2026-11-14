@@ -1,6 +1,6 @@
 // T2 얼마를 보낼까요? (transfer.md §2.1 · §2.3 · §3.3–3.10 · §5.5, C3 29.2 · C2 26.0 · C3 30.7 · C3 31.05)
 // 웹 화면(받는 분 · 금액 · 출금계좌 줄) + 네이티브 키패드 판(칩 · 키패드 · 다음, 화면 y 435–818, 웹 로딩 막에 덮이지 않음).
-// 판이 열리고 닫힐 때 화면은 한 프레임에 다시 배치되고 판만 미끄러짐 (화면 아래끝에서 들어옴 175ms, 나감 170ms — transfer.css).
+// 판이 열리고 닫힐 때 화면은 한 프레임에 다시 배치되고 판만 미끄러짐 (화면 아래끝에서 들어옴 175ms, 나감 170ms — motion.ts AO_PANEL, transfer.css).
 // 다음 → 판 나감 → +133ms 계좌 비밀번호(T3) → 4번째 숫자 +50ms → password 막(483) → 이체 확인.
 // 출금가능금액 부족 | 잔액채우기 → 판 나감 + topupLink 막 → 잔액채우기(T5). 돌아오면 판이 다시 들어옴
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,8 +11,11 @@ import { aoPaths, type AoAccount, type AoHome } from "../api";
 import { aoBankName } from "../bank";
 import { useAoFlow } from "../flow";
 import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLast4, aoBankLine, aoCanSend, aoDigits, aoNum, aoWon } from "../format";
+import { AO_PANEL } from "../motion";
+import { aoLoadingProfile, onAoLoadingHidden } from "../loading";
 import { aoNativeHost, onAoNativeReset } from "../native";
 import { useAoBack, useAoReturn } from "../nav";
+import { useLayerActive } from "../../platform/LayerContext";
 import { AoButton, AoChevronDownIcon, AoHeader, AoNativePortal, AoPage, AoSheet, aoToast } from "../ui";
 import { PasswordSheet } from "./Password";
 import { AmountPad, SendRow } from "./parts";
@@ -34,7 +37,7 @@ const CHIP_X: [number, number][] = [
   [306.08, 371.02],
 ];
 const DOWN = 133; // 다음 → 판 나감 → T3 (C3 30.996 → 31.129)
-const PANEL_OUT = 170; // 판 나감 (transfer.css, C3 1.879–2.046 에 맞춤)
+const PANEL_OUT = AO_PANEL.out; // 판 나감 (transfer.css 와 같은 수, C3 1.879–2.046 에 맞춤)
 const TOAST_PANEL = 419; // 판 위 16
 
 export function SendAmount() {
@@ -69,10 +72,31 @@ export function SendAmount() {
     later(PANEL_OUT + 20, () => setPanel((p) => (p === "out" ? "off" : p)));
   }, []);
 
-  // 위 화면(잔액채우기 · 이체 확인)에서 돌아오면 판이 다시 들어옴 (C3 20.446 → 20.496)
+  // 위 화면(잔액채우기 · 이체 확인)에서 돌아오면 판이 다시 들어옴 (C3 20.446 → 20.496).
+  // 보내기 · 완료 확인 막 동안 브라우저 뒤로로 돌아왔으면 판은 그대로 둠: 막이 끝나면 이체 완료가 이 칸 위에 쌓이거나(send) 흐름 전 화면으로 감(finish).
+  // 그러지 못하고 막만 걷히면(보내기 실패) 그때 판이 들어옴
+  const heldPanel = useRef<(() => void) | null>(null);
+  useEffect(() => () => heldPanel.current?.(), []);
+  const active = useLayerActive();
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
   useAoReturn(() => {
     setPw(false);
     setAcctSheet(false);
+    heldPanel.current?.();
+    heldPanel.current = null;
+    const p = aoLoadingProfile();
+    if (p === "send" || p === "finish") {
+      const off = onAoLoadingHidden(() => {
+        off();
+        heldPanel.current = null;
+        if (activeRef.current) panelIn(); // 이체 완료가 위에 쌓였으면 그대로 (다음에 돌아올 때 다시 정함)
+      });
+      heldPanel.current = off;
+      return;
+    }
     panelIn();
   });
   // 녹화 다시 시작 · 로그아웃: 판은 화면과 같이 사라짐 — 남은 그림자 판만 치움
@@ -91,7 +115,7 @@ export function SendAmount() {
 
   // ---- 이동 ----
   const panelRef = useRef<HTMLDivElement>(null);
-  // 이동이 거절되면 (잠금 중 · 맨 위 층이 아님) 판을 다시 올림 — 판만 내려가고 화면에 갇히지 않게
+  // 이동을 받지 않을 때(잠금 중 · 맨 위 층이 아님)는 판을 움직이지 않음 (flow.canGo). 그래도 거절되면 판을 다시 올림 — 판만 내려가고 화면에 갇히지 않게
   const unlessMoved = (go: Promise<boolean>) => void go.then((ok) => !ok && panelIn());
   const onBack = () => {
     // 화면은 바로 T1 으로 CUT, 판은 그 위에서 170ms 동안 내려감 (화면과 함께 사라지지 않게 그림자 판으로). 이동했을 때만
@@ -99,10 +123,12 @@ export function SendAmount() {
     if (back() && panel === "in") ghostOut(el);
   };
   const onCancel = () => {
+    if (!flow.canGo()) return;
     panelOut();
     unlessMoved(flow.goHomeFresh());
   };
   const onTopup = () => {
+    if (!flow.canGo()) return;
     panelOut();
     markTopupLink();
     unlessMoved(flow.goTopup({ to: fromId, origin: "amount" }));
@@ -122,7 +148,8 @@ export function SendAmount() {
     unlessMoved(flow.go(`/send/confirm?${q}`, { via: "password", prefetch: [aoPaths.home, aoPaths.banks] }));
   };
   const onAcct = () => {
-    if (acctSheet) return;
+    // 판이 다 들어와 있을 때만 (시트를 고르거나 닫은 뒤 판이 다시 들어오기 전의 누름이 시트를 또 열어 판과 엇갈리지 않게)
+    if (acctSheet || panel !== "in") return;
     panelOut();
     later(PANEL_OUT, () => setAcctSheet(true));
   };
@@ -244,7 +271,7 @@ export function SendAmount() {
   );
 }
 
-// 판 그림자: 화면이 먼저 사라져도 판이 153ms 동안 내려가는 모습을 남김 (React 밖의 복사본, 끝나면 지움)
+// 판 그림자: 화면이 먼저 사라져도 판이 170ms 동안 내려가는 모습을 남김 (React 밖의 복사본, 끝나면 지움)
 function ghostOut(el: HTMLElement | null) {
   const host = aoNativeHost("panel");
   if (!el || !host) return;

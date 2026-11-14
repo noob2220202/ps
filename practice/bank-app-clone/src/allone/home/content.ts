@@ -207,7 +207,7 @@ export function noticePages(items: AoNoticeItem[] | null | undefined, today = ne
       title: ["", "고객센터", " 운영시간 안내"],
       items: [
         { title: "평일 상담", when: "09:00 ~ 18:00 (공휴일 제외)" },
-        { title: "분실 · 사고 신고", when: "24시간 365일 운영" },
+        { title: "AI톡 상담", when: "24시간 365일 운영" },
       ],
     },
     {

@@ -1,6 +1,10 @@
 /* ===== NH올원뱅크 (html[data-app="allone"]) — 토큰 · 기기 화면 위(흰 띠 · 상태바 · 아일랜드 · 홈 인디케이터) · 네이티브 층 · 로딩 막 · 토스트 · 로그인 / 프로필 고르기 =====
    한 번들에 모든 앱 CSS 가 들어가므로 올원만 고르는 선택자(html[data-app="allone"] 또는 ao- 클래스)만 씀. 키프레임도 ao- 로 시작.
    전역 --home-* 토큰은 다시 정하지 않음 (프로필 고르기 .picker--allone 안에서만). plan.md §3.1 · §3.2 */
+/* .ao-num 의 Roboto (400 · 500 · 700) — 다른 앱 CSS(ibk · kbank)에 기대지 않고 여기서 */
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/700.css";
 
 :root[data-app="allone"] {
   /* 바탕 · 선 */
@@ -29,7 +33,7 @@
   --ao-out: #e93535; /* 출금 */
   --ao-in: #1a5dd9; /* 입금 */
   --ao-error: #ff0000;
-  --ao-limited: #e94848; /* 한도제한 */
+  --ao-limited: #e94143; /* 한도제한 글자 (홈 카드 C2 7.000 글자 가운데 (233, 64, 66)) */
   --ao-link: #555555;
   --ao-star: #8f8f8f;
   --ao-star-on: #ffc31a;
@@ -67,10 +71,17 @@
 }
 
 /* ---------- 진짜 폰 화면 (500px 이하): 띠 = 기기 안전 영역, 가짜 상태바 · 아일랜드 · 홈 인디케이터는 global.css 가 숨김 ---------- */
+/* 화면 폭이 393 이 아니어도 393pt 좌표 그대로: 폰을 393 폭으로 두고 창 폭에 맞게 배율(zoom, ibk2 와 같은 방법) — 360 폭에서 오른쪽이 잘리거나
+   430 폭에서 웹 화면 · 네이티브 키패드 판이 어긋나지 않게. 높이는 창 높이 / 배율 (--ao-fit · --ao-phone-h 는 Overlay.tsx 가 창 크기로 정함), 띠도 배율로 나눔 */
 @media (max-width: 500px) {
   :root[data-app="allone"] {
-    --ao-top: env(safe-area-inset-top, 0px);
-    --ao-bottom: env(safe-area-inset-bottom, 0px);
+    --ao-top: calc(env(safe-area-inset-top, 0px) / var(--ao-fit, 1));
+    --ao-bottom: calc(env(safe-area-inset-bottom, 0px) / var(--ao-fit, 1));
+  }
+  html[data-app="allone"]:not([data-ibk2]) .phone {
+    width: 393px;
+    height: var(--ao-phone-h, 100dvh);
+    zoom: var(--ao-fit, 1);
   }
 }
 
@@ -97,13 +108,21 @@ html[data-app="allone"] .phone__viewport {
   bottom: 0;
   height: var(--ao-bottom);
 }
+/* 화면 묶음 (App.tsx): 로그인 cut 전에 홈을 간편비밀번호 화면 밑에 숨겨 미리 그려 둘 때 --pre (보이지도 눌리지도 않음, 배치는 미리 됨) */
+.ao-stack {
+  display: contents;
+}
+.ao-stack--pre {
+  visibility: hidden;
+  pointer-events: none;
+}
 /* 밑에 숨어 있는 화면 층 (ScreenStack allone 갈래: 화면 사이는 CUT, 밑 층은 그대로 두어 돌아오면 스크롤 · 내용 그대로) */
 html[data-app="allone"] .layer--ao-under {
   visibility: hidden;
   pointer-events: none;
 }
 
-/* ---------- 상태바 (StatusBar.tsx): 화면 위에 겹친 투명한 층, 글자 · 아이콘만 ---------- */
+/* ---------- 상태바 (StatusBar.tsx): 화면 위에 겹친 투명한 층, 글자 · 아이콘만. 색 바뀜의 지연 · 길이는 StatusBar.tsx 가 Web Animations 로 ---------- */
 html[data-app="allone"] .phone > .statusbar {
   position: absolute;
   inset: 0 0 auto;
@@ -130,14 +149,12 @@ html[data-app="allone"] .phone > .statusbar {
   font-size: 16.2px;
   font-weight: 600;
   fill: #000;
-  transition: fill var(--ao-sb-clock-ms, 0ms) var(--ao-sb-ease, linear);
 }
 .ao-sb--clock-light .ao-sb__clock {
   fill: #fff;
 }
 .ao-sb__icons {
   color: #000;
-  transition: color var(--ao-sb-icons-ms, 0ms) var(--ao-sb-ease, linear);
 }
 .ao-sb--icons-light .ao-sb__icons {
   color: #fff;
