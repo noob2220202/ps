@@ -671,7 +671,7 @@ function NumberInput({ bank, value, onChange }: { bank: Bank; value: string; onC
   return <input value={value} inputMode="numeric" placeholder={placeholder} onChange={(e) => onChange(formatAccountNumber(bank.pattern, e.target.value, bank.alt).slice(0, 20))} />;
 }
 
-// exclude: 은행 목록에서 뺄 은행 (카카오뱅크는 카카오뱅크 통장이 이미 있어 뺌, 토스는 [] ), withName: 계좌 이름 칸 (토스: 영하나플러스 통장 등)
+// exclude: 은행 목록에서 뺄 은행 (카카오뱅크는 카카오뱅크 통장이 이미 있어 뺌, 토스는 [] ), withName: 계좌 이름 칸 (토스: 주거래하나 통장 등)
 function AddBankAccount({ banks, run, exclude = ["kakao"], withName = false }: { banks: Bank[]; run: Run; exclude?: string[]; withName?: boolean }) {
   const [bank, setBank] = useState(banks.find((b) => b.code === "kb") ?? banks[1]);
   const [number, setNumber] = useState("");

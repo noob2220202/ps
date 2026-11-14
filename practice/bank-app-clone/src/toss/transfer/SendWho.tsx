@@ -60,7 +60,7 @@ export function SendWho() {
   // ★ 누른 뒤 서버 값이 새로 올 때까지 화면이 먼저 바꿈 (그때의 응답 객체와 같을 때만)
   const [fav, setFav] = useState<Record<string, { on: boolean; data: unknown }>>({});
   const data = rec.data;
-  // 최근에 연결한 계좌부터 (녹화: 토스머니 · 자립예탁금 · 입출금통장 · 영하나플러스 통장 = 내 계좌 순서의 거꾸로)
+  // 최근에 연결한 계좌부터 (녹화처럼 내 계좌 순서의 거꾸로 — 예시: 토스머니 · 자립예탁금 · 입출금통장 · 주거래하나 통장)
   const mine = data ? [...data.mine].reverse().map(mineRow) : [];
   const recent = data ? data.recent.map((r) => recentRow(r, data.mine)) : [];
   const isFav = (r: RowItem) => (fav[r.key] && fav[r.key].data === data ? fav[r.key].on : r.favorite);

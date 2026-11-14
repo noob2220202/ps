@@ -137,9 +137,9 @@ export const ACCT_MENU: AcctMenuSection[] = [
   },
 ];
 
-// 유용한 정보 (공개 기사 제목 · 썸네일 toss-acct-info-1/2)
+// 유용한 정보 (썸네일 toss-acct-info-1/2. 1 은 공개 주제로 지어낸 제목, 2 는 공개 기사 제목)
 export const ACCT_INFO = [
-  { thumb: "info-1", title: "청년문화예술패스, 이달 말 신청 마감돼요" },
+  { thumb: "info-1", title: "문화비 소득공제, 연말정산 전에 챙겨요" },
   { thumb: "info-2", title: "퇴직금 계산, 기준부터 알아봐요" },
 ];
 

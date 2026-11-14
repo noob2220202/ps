@@ -15,7 +15,7 @@ export interface SendTarget {
   digits: string; // 숫자만
   holder: string; // 예금주 (내 계좌면 내 이름)
   accountId?: string; // own
-  name?: string; // own: 계좌 이름 (영하나플러스 통장)
+  name?: string; // own: 계좌 이름 (주거래하나 통장)
   money?: boolean; // own: 토스머니 (번호를 보여 주지 않음)
   payeeId?: string;
 }
@@ -32,7 +32,7 @@ export const verbCta = (t: SendTarget | null | undefined) => (isMove(t) ? "옮�
 export const verbSending = (t: SendTarget | null | undefined) => (isMove(t) ? "옮길게요" : "보낼게요");
 export const verbDone = (t: SendTarget | null | undefined) => (isMove(t) ? "옮겼어요" : "보냈어요");
 
-// 받는 쪽 이름 + 조사: 내 영하나플러스 통장 + 으로 / 김철수 + 님에게 / 하나은행 계좌 + 로
+// 받는 쪽 이름 + 조사: 내 주거래하나 통장 + 으로 / 김철수 + 님에게 / 하나은행 계좌 + 로
 export function toLabel(t: SendTarget) {
   if (t.kind === "own") return { label: `내 ${t.name ?? ""}`, particle: roOnly(t.name ?? "") };
   if (t.kind === "payee") return { label: t.holder, particle: "님에게" };
