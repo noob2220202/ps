@@ -166,7 +166,7 @@ The spinner is centred on the **screen** at (196.5, 425.8), not on the web view,
 
 | from | control | to |
 |---|---|---|
-| home card (NH농협 tab) | 거래내역 / 이체 / 한도해제 | `/history/:id` (`history`) / `/send?from=:id` (`sendFromHome`) / no-op |
+| home card (NH농협 tab) | 거래내역 / 이체 / ATM출금 | `/history/:id` (`history`) / `/send?from=:id` (`sendFromHome`) / no-op |
 | home card (다른금융 tab, invented) | 잔액채우기 / 거래내역 | `/topup?to=main&from=:id&origin=card` / `/history/:id` |
 | home header | wallet, 큰글, 오늘 운세, name / **bell** / ≡ | no-op (큰글 knob animates only) / **DevPanel** / `/menu` |
 | home | 복사 / 숨김 / pager ‹ › / 내 자산 확인 pill / tab 홈 | copy + toast / hide balance / page ±1 / smooth-scroll to 내 자산 / scroll to top |
@@ -178,7 +178,7 @@ The spinner is centred on the **screen** at (196.5, 425.8), not on the web view,
 | T2 | 잔액채우기 link / 다음 / account row ▾ | `/topup?to=:from&origin=amount` / T3 → confirm / 출금계좌 sheet |
 
 ### 1.7 Unbuilt controls and invented controls that work
-**Silent no-op (press feedback where the recording has one):** tabs 금융상품 / 내 자산 / 포인트쌓기 / 생활혜택, wallet, 오늘 운세, name, 한도해제, ⋮, banner,
+**Silent no-op (press feedback where the recording has one; ATM출금 on the home card has none at all):** tabs 금융상품 / 내 자산 / 포인트쌓기 / 생활혜택, wallet, 오늘 운세, name, ⋮, banner,
 ads, 내 모임, 금융일정, 내 소비, 내 자산 chips, 생활자산, NH금융그룹, 홈 화면 설정, 전체메뉴 unlinked rows, pins, globe, gear, name ›, **로그아웃**, AI톡,
 quick icons, 계좌관리, 자동이체 등록, 농협 계좌등록 / 타행 계좌등록, 연락처 tab (grey empty text in the page), PIN globe / menu / 로그인 방식 변경하기 /
 간편비밀번호 재등록 / 자동로그인 (visual toggle only).

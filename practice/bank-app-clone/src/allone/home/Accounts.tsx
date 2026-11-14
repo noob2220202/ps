@@ -1,7 +1,7 @@
 // 홈 계좌 칸 (home.md §2.4, 쪽 227–550): NH농협 · 다른금융 탭, 쪽 표시 알약 "‹ i | n ›", 끝없이 도는 카드 넘기기, 민트빛.
 //  - 카드 353 × 222 (x 20), 간격 10 → 양쪽 이웃이 10 씩 보임. 놓으면 305ms 로 맞춰 서거나 제자리로 (motion.ts AO_CAROUSEL)
 //  - 처음 보는 카드는 "상품명을 조회 중이에요 / 조회 중입니다" 를 끌기 시작부터 420ms 보여 준 뒤 한 프레임에 채움
-//  - NH농협 카드: 한도해제(아무 일 없음) · 거래내역 · 이체. 다른금융 카드(지어냄): 잔액채우기 · 거래내역
+//  - NH농협 카드: ATM출금(눌리지 않음, 누름 표시도 없음) · 거래내역 · 이체. 다른금융 카드(지어냄): 잔액채우기 · 거래내역
 //  - 숨김 / 보기 (계좌별, 이 브라우저), 복사 + 토스트
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { isAoNh, type AoAccount } from "../api";
@@ -203,8 +203,8 @@ function Card({ a, style, hidden, onCopy, onHide, onHistory, onSend, onTopup }: 
       <div className="ao-home-card__btns">
         {nh ? (
           <>
-            <button type="button" className="ao-home-card__btn">
-              한도해제
+            <button type="button" className="ao-home-card__btn ao-home-card__btn--inert" tabIndex={-1} aria-disabled>
+              ATM출금
             </button>
             <button type="button" className="ao-home-card__btn" onClick={onHistory}>
               거래내역

@@ -490,6 +490,10 @@
 .ao-home-card__btn:active {
   background: #f5f5f5;
 }
+/* ATM출금: 눌러도 아무 일 없고 누름 색도 안 바뀜 */
+.ao-home-card__btn--inert:active {
+  background: #fff;
+}
 .ao-home-card__wait {
   left: 59.6px;
   top: 96.7px; /* 잉크 가운데 405.2 */

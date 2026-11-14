@@ -178,7 +178,7 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
     `tabular-nums`, ls −0.5**; "원" is **SemiBold 20** (not Bold 28).
   - 숨김 pill: **42 × 26 at y 397–423** (radius 13), white, border 1 pt #eeeeee. Text "숨김" Regular 12.5 / −0.6, #000.
     It sits 4 pt after the balance.
-  - Buttons 한도해제 / 거래내역 / 이체: y 451.6–493.6 (h 42), x 39.0–138.6 / 146.9–246.1 / 254.5–354.0 (99.5 wide, gap 8.3).
+  - Buttons ATM출금 / 거래내역 / 이체: y 451.6–493.6 (h 42), x 39.0–138.6 / 146.9–246.1 / 254.5–354.0 (99.5 wide, gap 8.3).
     Radius 10, white, border 1 pt **#dcdcdc**. Text Regular 15.5 / −0.6, #000, centred (ink y 465.6–478.9).
   - Padding: 19 left and right (39 = 20 + 19), top 29 to the logo, bottom 21.4 under the buttons.
 - **Card loading body** (H9, first view of a card): the name line becomes "상품명을 조회 중이에요" (same SemiBold 15, #000).
@@ -466,7 +466,7 @@ Each fresh mount of the home (after login, or after a dim-loaded return) runs th
 | pager ‹ › | invented: page ±1, 300 ms |
 | tap **거래내역** | no pressed state. In the same frame (C2 9.008) the web dim (luma ≈ 114) + spinner appear. Cut to 거래내역조회 at ≈ 9.96 (≈ 0.95 s; the account spec owns the target) |
 | tap **이체** | dim + spinner at C3 26.146 → cut ≈ 26.56 (0.41 s) → transfer "누구에게 보낼까요?" with this card as the 출금 account |
-| tap **한도해제**, ⋮, 오늘 운세, name, 큰글, wallet | no-op (큰글 animates its knob 200 ms as an invented nicety, no effect) |
+| tap **ATM출금** (no press colour either), ⋮, 오늘 운세, name, 큰글, wallet | no-op (큰글 animates its knob 200 ms as an invented nicety, no effect) |
 | tap **숨김** | invented: balance → "잔액 숨김" (Regular 17, #808080) and the pill text → "보기". Stored per account in localStorage |
 | tap **복사** | invented: copy "NH농협은행 <number>" + toast "계좌번호가 복사되었어요" (black 80 %, radius 8, white Regular 14, 2 s, 16 pt above the tab bar or the bottom edge) |
 | tap **bell** | opens the DevPanel (the clone's 관리 패널 convention, README "🔔 관리 패널") |
