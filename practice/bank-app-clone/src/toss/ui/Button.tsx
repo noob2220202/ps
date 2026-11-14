@@ -5,6 +5,7 @@
 //  loading: 글자가 100ms 에 사라지고 점 3개 (⌀6.4, 간격 15, 750ms 주기, 200ms 차이, 투명도 .3→1 · 크기 .75→1)
 //  BarCTA: 화면 폭 꽉 찬 막대 (금액 화면 '다음', 0–384 · 56, 모서리 0, 글자 17 M)
 import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { tossScaleOf } from "../phoneSnap";
 
 export type TossButtonVariant = "primary" | "weak" | "grey" | "secondary";
 
@@ -26,9 +27,10 @@ export function TossButton({ variant = "primary", disabled, loading, bar, onPres
   const down = (e: PointerEvent<HTMLButtonElement>) => {
     if (disabled || loading || !ref.current) return;
     const b = ref.current.getBoundingClientRect();
-    const x = e.clientX - b.left;
-    const y = e.clientY - b.top;
-    const r = Math.hypot(Math.max(x, b.width - x), Math.max(y, b.height - y));
+    const k = tossScaleOf(ref.current); // 폰 zoom (진짜 폰 화면) → 버튼 안 px 로
+    const x = (e.clientX - b.left) / k;
+    const y = (e.clientY - b.top) / k;
+    const r = Math.hypot(Math.max(x, b.width / k - x), Math.max(y, b.height / k - y));
     setRipple((p) => ({ x, y, r, on: true, n: (p?.n ?? 0) + 1 }));
   };
   const up = () => setRipple((p) => (p ? { ...p, on: false } : p));

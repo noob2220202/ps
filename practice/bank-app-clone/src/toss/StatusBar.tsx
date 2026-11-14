@@ -8,7 +8,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { useRecorder } from "../platform/recorder";
-import { useTossPhoneSnap } from "./phoneSnap";
+import { useTossPhoneFit, useTossPhoneSnap } from "./phoneSnap";
 
 const FONT = { weight: 400, size: 14 } as const;
 const CLOCK_X = 28; // 시계 잉크 왼끝
@@ -75,6 +75,7 @@ export function TossStatusBar() {
   const pctX = pctInk ? PCT_RIGHT - pctInk.r : PCT_RIGHT - 25;
   const root = useRef<HTMLDivElement>(null);
   useTossPhoneSnap(root); // 폰 테두리를 기기 화소에 맞춤
+  useTossPhoneFit(); // 진짜 폰 화면: 384 폭을 창 폭에 맞춤
   return (
     <div ref={root} className="statusbar toss-sb" aria-hidden>
       <svg className="toss-sb__svg" width="384" height="28" viewBox="0 0 384 28">

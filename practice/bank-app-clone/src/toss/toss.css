@@ -145,11 +145,18 @@ html[data-app="toss"][data-toss-band="scrim"] .phone__navbar i {
   background: #646366;
 }
 
-/* ---------- 진짜 폰 화면 (500px 이하): 가짜 상태바 · 내비 띠를 숨기고 기기 안전 영역만큼 비움 (kbank 처럼) ---------- */
+/* ---------- 진짜 폰 화면 (500px 이하): 가짜 상태바 · 내비 띠를 숨기고 기기 안전 영역만큼 비움 (kbank 처럼) ----------
+   화면 폭이 384 가 아니어도 384dp 좌표 그대로: 폰을 384 폭으로 두고 창 폭에 맞게 배율(zoom, allone 과 같은 방법) — 360 폭에서 오른쪽(🔔)이 잘리거나
+   412 폭에서 오른쪽 아이콘이 안쪽에 몰리지 않게. 높이는 창 높이 / 배율 (--toss-fit · --toss-phone-h 는 phoneSnap.ts useTossPhoneFit), 띠도 배율로 나눔 */
 @media (max-width: 500px) {
   :root[data-app="toss"] {
-    --toss-sb: env(safe-area-inset-top, 0px);
-    --toss-nav: env(safe-area-inset-bottom, 0px);
+    --toss-sb: calc(env(safe-area-inset-top, 0px) / var(--toss-fit, 1));
+    --toss-nav: calc(env(safe-area-inset-bottom, 0px) / var(--toss-fit, 1));
+  }
+  html[data-app="toss"]:not([data-ibk2]) .phone {
+    width: 384px;
+    height: var(--toss-phone-h, 100dvh);
+    zoom: var(--toss-fit, 1);
   }
   html[data-app="toss"] .phone__navbar {
     display: none;

@@ -8,6 +8,7 @@ import { applyKey, type PadKey } from "../../lib/keypad";
 import { useLayerActive } from "../../platform/LayerContext";
 import { num, won } from "../format";
 import { useTossGo } from "../nav";
+import { tossScaleOf } from "../phoneSnap";
 import { TossAppBar, TossButton, TossDialog, TossPage, TossSpinner } from "../ui";
 import { TossRedirect } from "../ui/Redirect";
 import { AmountKeypad } from "./AmountKeypad";
@@ -128,7 +129,7 @@ function AmountBody() {
     const x = el.getBoundingClientRect().left;
     if (lastX.current !== null && Math.abs(lastX.current - x) > 0.5) {
       el.style.transition = "none";
-      el.style.transform = `translateX(${lastX.current - x}px)`;
+      el.style.transform = `translateX(${(lastX.current - x) / tossScaleOf(el)}px)`; // 폰 zoom (진짜 폰 화면) → 요소 안 px
       void el.offsetWidth;
       el.style.transition = "";
       el.style.transform = "";
