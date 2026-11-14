@@ -1090,7 +1090,7 @@ export const INTRO = VARIANT || INTRO_APPS.includes(APP);
 - 지연은 **부른 시각부터** 잼: `setAoStatusFg` 가 `performance.now()` 를 같이 저장하고, `AlloneStatusBar` 는 같은 커밋에 클래스를 바꾼 뒤 옛 색을 Web Animations(`startTime` = 부른 시각)로 붙잡음.
   처음엔 CSS transition 이라 React 가 그리는 시간 · 프레임 위상만큼 밀렸음.
 - `null` + 타이밍이면 500ms 안에 오는 화면 fg 바뀜에도 같은 타이밍 (시작화면의 `useStatusBar("dark")` 가 한 프레임 뒤에 와서 글자가 검정으로 튀었음).
-- 상태바는 K2StatusBar 를 옮겨 와 맞춘 393 × 54 SVG 한 장: 시계 잉크 가운데 x 60.0(옆 표시 없음), 듀얼 SIM 신호(위 막대 4 + 아래 점 4), LTE · 배터리 · 숫자는 kakao2 보다 1.0~1.33pt 오른쪽,
+- 상태바는 K2StatusBar 를 옮겨 와 맞춘 393 × 54 SVG 한 장: 시계 잉크 가운데 x 60.0(옆 표시 없음), 신호 막대 4칸(kakao2 와 같은 모양), LTE · 배터리 · 숫자는 kakao2 보다 1.0~1.33pt 오른쪽,
   배터리 빈 칸 .333 · 기본 50. 아일랜드 · 빨간 점(1.5초 주기)은 같은 기기라 `K2Island` 를 그대로 import.
 
 ### 인트로를 그린 이유 (`launch/Scene.tsx`, `launch/intro.ts`, `intro.ts`, `recorder.ts`)

@@ -1,8 +1,8 @@
 // NH올원뱅크 상태바 (녹화 아이폰 393 × 852, PhoneFrame 이 ALLONE 일 때 그림). kakao2 K2StatusBar 를 옮겨 와 올원 녹화에 맞춤 (infra.md §1.2, plan.md §3.1):
 //  - 393 × 54 SVG 한 장, 화면 위에 겹친 층 (z 70). 흰 띠(0–59)는 PhoneFrame 의 .ao-band--top 이 칠함
 //  - 시계 "H:MM" Pretendard 600 16.2, 잉크 가운데 x 60.0 (옆 표시 없음 — 위치 화살표 · 달 없음), 기준선 34.97
-//  - 신호: 듀얼 SIM — 위 4칸 막대(폭 3, x 292.09 / 297.09 / 302.08 / 307.08, 아래끝 30.64, 위끝 26.64 / 25.98 / 24.31 / 22.65)
-//          + 아래 점 4개(3 × 3.67, y 31.97–35.64), 모두 채움
+//  - 신호: 막대 4칸 (폭 3, x 292.09 / 297.09 / 302.08 / 307.08, 아래끝 30.64, 위끝 26.64 / 25.98 / 24.31 / 22.65), 모두 채움
+//          (kakao2 K2StatusBar 와 같은 모양 — 점 4개짜리 듀얼 SIM 표시는 안 그림)
 //  - LTE 잉크 316.07–334.39 × 24.98–34.30 (K2 와 같은 글꼴 · 배율, +1.0)
 //  - 배터리 몸통 340.72–364.36 × 22.65–35.64, 잔량/100 만큼 왼쪽부터 채움, 빈 칸 .333, 꼭지 365.36–366.69, 숫자는 뚫어서 가운데 352.54
 // 글자색: 화면의 useStatusBar fg, 네이티브 막이 덮어쓰면 그 값 (statusFg.ts — 아이콘 · 시계 따로 지연 · 길이, 부른 때부터 잼)
@@ -58,7 +58,6 @@ const CLOCK_Y = 34.97;
 const COLS = [292.09, 297.09, 302.08, 307.08];
 const BAR_TOPS = [26.64, 25.98, 24.31, 22.65];
 const BAR_BOTTOM = 30.64;
-const DOT = { y: 31.97, h: 3.67 };
 const BATT = { x: 340.72, y: 22.65, w: 23.64, h: 12.99, numX: 352.54, numY: 33.31 };
 
 const NO_DELAY: AoStatusFgState["timing"] = { iconsDelay: 0, iconsMs: 0, clockDelay: 0, clockMs: 0, easing: "linear" };
@@ -134,12 +133,9 @@ export function AlloneStatusBar() {
           {time}
         </text>
         <g ref={icons} className="ao-sb__icons" fill="currentColor">
-          {/* 듀얼 SIM 신호: 위 막대 4칸 + 아래 점 4개 */}
+          {/* 신호 막대 4칸 (kakao2 와 같은 모양) */}
           {COLS.map((x, i) => (
             <rect key={`b${x}`} x={x} y={BAR_TOPS[i]} width="3" height={(BAR_BOTTOM - BAR_TOPS[i]).toFixed(2)} rx="0.75" />
-          ))}
-          {COLS.map((x) => (
-            <rect key={`d${x}`} x={x} y={DOT.y} width="3" height={DOT.h} rx="1" />
           ))}
           {/* LTE: 13.25px 620 을 가로 0.86 (kakao2 와 같은 글자, 1.0pt 오른쪽) */}
           <text className="ao-sb__lte" transform="translate(315.65 34.3) scale(0.86 1)">
