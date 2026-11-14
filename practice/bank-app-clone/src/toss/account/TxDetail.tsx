@@ -14,11 +14,11 @@ import { AcctButton, AcctChevron, AcctPic, AcctTxIcon } from "./parts";
 import { ACCT_DETAIL, useAcctPhases, useAcctRevisit } from "./timeline";
 import "./account.css";
 
-// 줄마다 높이 (다음 줄 잉크까지, 녹화 A 57.75 · 105.76: 적요 241.6 · 거래 유형 296.0 · 입금처 347.2 · 출금처 394.4 · 메모 445.6 · 일시 501.6 · 거래 후 잔액 556.0 · 받는 분 통장표시 611.2, 마지막 줄 → 선 41.6, 기기 px 맞춤 40.8)
+// 줄마다 높이 (다음 줄 잉크까지, 녹화 A 57.75 · 105.76: 적요 241.6 · 거래 유형 296.0 · 입금처 347.2 · 출금처 394.4 · 메모 445.6 · 일시 501.6 · 거래 후 잔액 556.0 · 받는 분 통장표시 611.2, 마지막 줄 → 선 41.6, 그려지는 줄이 녹화의 기기 px 줄(652.8 · 597.6)에 오도록 41.2)
 const ROW_H = { 적요: 54.4, "거래 유형": 51.2, 입금처: 47.2, 출금처: 51.2, 메모: 56, 일시: 54.4, "거래 후 잔액": 55.2, "받는 분 통장표시": 55.2 } as const;
 type RowKey = keyof typeof ROW_H;
 const FIRST = 241.6; // 첫 줄 잉크 (화면 dp)
-const LAST_TO_LINE = 40.8;
+const LAST_TO_LINE = 41.2;
 
 // 계좌 표기: "내 토스뱅크 1000-1234-5678" · 다른 사람은 "하나은행 123-456789-01234". 토스머니는 번호 없이
 const mine = (a: { bank: { name: string }; number?: string; label?: string; role?: string | null } | undefined) =>

@@ -31,6 +31,7 @@ function RefreshGlyph() {
 // /account/:accountId — 다른 은행 계좌 상세 (account.md §2.7 S4, 녹화 B 161.5–164.9초 영하나플러스 통장).
 // 거래내역과 같은 뼈대: 머리줄 제목 = 계좌 이름, 오른쪽 새로고침(들어오면 돌다가 ✓) · 흐린 톱니. 계좌번호는 숫자만, 잔액은 한 번 반짝임.
 // 목록은 아이콘 없이 MM.DD (그날 첫 줄만), 입금은 '+' 없이 파랑. 보내기는 토스뱅크 계좌일 때만 송금으로 (다른 은행은 누름 표시만, plan.md §1.2)
+// 내용은 위에서부터 차례로 나타남 (녹화 B 162.68–163.3: 잔액은 바로, 아래로 갈수록 dp 당 0.46ms 늦게 500ms)
 export function OtherAccount() {
   const { accountId = "" } = useParams();
   const { goSend } = useTossFlow();
@@ -57,7 +58,7 @@ export function OtherAccount() {
 
   const right = (
     <div className="toss-acct-other__hr">
-      <span className={`toss-acct-other__refresh${refreshed ? " toss-acct-other__refresh--done" : ""}`}>
+      <span className={`toss-acct-other__refresh${refreshed ? " toss-acct-other__refresh--done" : ""}${failed ? " toss-acct-other__refresh--off" : ""}`}>
         <span className="toss-acct-other__spin">
           <RefreshGlyph />
         </span>
@@ -73,8 +74,8 @@ export function OtherAccount() {
 
   return (
     <TossPage
-      className="toss-acct-other"
-      header={<TossAppBar title={a?.label ?? home.data?.accounts.find((x) => x.id === accountId)?.label ?? ""} right={right} progress={<TossProgressBar ready={barReady} />} />}
+      className={`toss-acct-other${revisit ? "" : " toss-acct-other--reveal"}`}
+      header={<TossAppBar title={a?.label ?? home.data?.accounts.find((x) => x.id === accountId)?.label ?? ""} right={right} progress={<TossProgressBar ready={barReady || failed} />} />}
       dock={phase >= 1 ? <AcctBottomBar onSend={isToss ? () => goSend({ from: accountId }) : undefined} /> : undefined}
       bodyRef={bodyRef}
       onScroll={(e) => saveScroll(e.currentTarget.scrollTop)}
@@ -117,7 +118,7 @@ export function OtherAccount() {
           </div>
           {acctGroupByDay(list).map((g) =>
             g.items.map((t, i) => (
-              <AcctRow key={t.id} className="toss-acct-other__row" inset="0 8px">
+              <AcctRow key={t.id} className="toss-acct-other__row" inset="0 8px" style={{ animationDelay: `${145 + Math.min(list.indexOf(t), 10) * 30}ms` }}>
                 {i === 0 && <span className="toss-acct-other__date">{mmdd(t.at)}</span>}
                 <span className="toss-acct-other__name">{t.merchant}</span>
                 <span className="toss-acct-other__time">{hm(t.at)}</span>

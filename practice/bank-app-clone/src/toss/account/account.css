@@ -82,6 +82,13 @@
 .toss-acct-bank__barchev {
   margin-top: 1px;
 }
+/* 제목이 나타나고 사라지는 때: 기준선을 넘고 185ms 뒤, 나타남 400ms · 사라짐 300ms (녹화 A 26.86–27.24 · 41.44–41.62) */
+.toss-acct-bank__bar .toss-appbar__title--fade {
+  transition: opacity 300ms ease-out 185ms;
+}
+.toss-acct-bank__bar .toss-appbar__title--fade.on {
+  transition-duration: 400ms;
+}
 .toss-acct-bank__bar .toss-appbar__right {
   right: 12.4px;
 }
@@ -122,23 +129,52 @@
     height: 0;
   }
 }
-/* 그림은 위에 붙어 있고 아래 카드의 둥근 모서리 뒤까지 32dp 더 (모서리 너머로 보임) */
-.toss-acct-banner__art {
+/* 그림은 위에 붙어 있고 아래 카드의 둥근 모서리 뒤까지 32dp 더 (모서리 너머로 보임).
+   바탕 칸(__art)은 잘라 온 그대로, 위 칸(__zoom)은 1.3배 → artEnd 로 줄어듦 (중심 205 · 150dp, 녹화 A 23.26–23.91 타일 위치로 잼).
+   줄어든 뒤 가장자리 몇 dp 는 바탕 칸이 메우고 위 칸 가장자리는 흐리게 */
+.toss-acct-banner__art,
+.toss-acct-banner__zoom {
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
-  height: calc(100% + 32px);
-  background-color: #151829;
   background-repeat: no-repeat;
   background-position: top left;
   background-size: 384px 180.8px;
 }
+.toss-acct-banner__art {
+  height: calc(100% + 32px);
+  background-color: #151829;
+  overflow: hidden;
+  animation: toss-acct-banner-art 300ms linear 100ms both;
+}
+.toss-acct-banner__zoom {
+  bottom: 0;
+  transform-origin: 205px 150px;
+  transform: scale(var(--acct-art-end, 1));
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent), linear-gradient(180deg, transparent, #000 12px);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent), linear-gradient(180deg, transparent, #000 12px);
+  mask-composite: intersect;
+  animation: toss-acct-banner-zoom 1300ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+@keyframes toss-acct-banner-art {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes toss-acct-banner-zoom {
+  from {
+    transform: scale(calc(var(--acct-art-end, 1) * 1.3));
+  }
+}
+/* 제목: 나타날 때는 오른쪽 12 · 아래 18.4dp 에서 1.045배 (A 23.85–24.24 잉크 x 32.8–192 · y 132–150) → 제자리 (x 20.8–172.8 · y 113.6) */
 .toss-acct-banner__title {
   position: absolute;
   left: 20px;
   top: 31.2px; /* 잉크 112.8 */
-  animation: toss-acct-banner-rise 330ms cubic-bezier(0.45, 0, 0.35, 1) 1590ms both;
+  transform-origin: 0 0;
+  animation: toss-acct-banner-rise 380ms cubic-bezier(0.3, 0, 0.3, 1) 1560ms both;
 }
 .toss-acct-banner__titlein {
   font-size: 19px;
@@ -147,17 +183,30 @@
   margin-top: -4.1px;
   color: #9fd0fb;
   white-space: nowrap;
-  animation: toss-acct-banner-title 400ms ease-out 870ms both;
+}
+.toss-acct-banner__line {
+  display: block;
+  animation: toss-acct-banner-title 450ms ease-out 880ms both;
+}
+.toss-acct-banner__line--2 {
+  animation-delay: 940ms;
 }
 @keyframes toss-acct-banner-rise {
   from {
-    transform: translate3d(0, 18px, 0);
+    transform: translate3d(12px, 18.4px, 0) scale(1.045);
   }
 }
 @keyframes toss-acct-banner-title {
   from {
     opacity: 0;
-    transform: translate3d(0, 5px, 0);
+    transform: translate3d(0, 4px, 0);
+  }
+}
+/* 부제 · 버튼: 14dp 밑에서 올라오며 나타남 (A 24.62–24.96) · × 는 제자리에서 나타남 */
+@keyframes toss-acct-banner-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
   }
 }
 .toss-acct-banner__sub {
@@ -168,7 +217,7 @@
   line-height: 13px;
   color: #9ca2b8;
   white-space: nowrap;
-  animation: toss-fade-in-kf 400ms ease-out 1850ms both;
+  animation: toss-acct-banner-up 320ms cubic-bezier(0, 0, 0.2, 1) 1900ms both;
 }
 .toss-acct-banner__cta {
   position: absolute;
@@ -182,7 +231,7 @@
   font-weight: 600;
   color: #ffffff;
   white-space: nowrap;
-  animation: toss-fade-in-kf 400ms ease-out 1850ms both;
+  animation: toss-acct-banner-up 320ms cubic-bezier(0, 0, 0.2, 1) 1980ms both;
 }
 .toss-acct-banner__x {
   position: absolute;
@@ -192,7 +241,7 @@
   height: 36px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
-  animation: toss-fade-in-kf 400ms ease-out 1850ms both;
+  animation: toss-fade-in-kf 260ms ease-out 1880ms both;
 }
 .toss-acct-banner__x > .toss-press__content {
   width: 100%;
@@ -201,10 +250,10 @@
   place-items: center;
 }
 .toss-acct-banner--still.toss-acct-banner--open,
-.toss-acct-banner--still.toss-acct-banner--open :is(.toss-acct-banner__title, .toss-acct-banner__titlein, .toss-acct-banner__sub, .toss-acct-banner__cta, .toss-acct-banner__x) {
+.toss-acct-banner--still.toss-acct-banner--open :is(.toss-acct-banner__art, .toss-acct-banner__zoom, .toss-acct-banner__title, .toss-acct-banner__line, .toss-acct-banner__sub, .toss-acct-banner__cta, .toss-acct-banner__x) {
   animation: none;
 }
-.toss-acct-banner--closing :is(.toss-acct-banner__title, .toss-acct-banner__titlein, .toss-acct-banner__sub, .toss-acct-banner__cta, .toss-acct-banner__x) {
+.toss-acct-banner--closing :is(.toss-acct-banner__title, .toss-acct-banner__sub, .toss-acct-banner__cta, .toss-acct-banner__x) {
   animation: toss-acct-out 150ms linear both;
 }
 @keyframes toss-acct-out {
@@ -1020,6 +1069,9 @@
   place-items: center;
 }
 /* 공용 .toss-dock 보다 나중에 오지 않을 수 있어(번들 순서) 클래스 둘로 */
+.toss-dock.toss-acct-dock--in {
+  animation: toss-acct-reveal 200ms ease-out both;
+}
 .toss-dock.toss-acct-dock {
   z-index: 4;
   bottom: -1px; /* 아래 내비 띠와 사이 기기 1px 틈으로 목록이 비치지 않게 */
@@ -1258,12 +1310,12 @@
 }
 .toss-acct-detail__icon {
   position: absolute !important;
-  left: 24px;
+  left: 24.8px;
   top: 52px; /* 화면 133.6 – 158.4 */
 }
 .toss-acct-detail__who {
   position: absolute;
-  left: 55.6px;
+  left: 57.2px;
   right: 120px;
   top: 55px; /* 잉크 137.6 */
   font-size: 14px;
@@ -1275,8 +1327,8 @@
 }
 .toss-acct-detail__amt {
   position: absolute;
-  left: 23.4px;
-  top: 81.8px; /* 원 잉크 166.4 */
+  left: 24.2px;
+  top: 82.6px; /* 원 잉크 166.4 (녹화 A 58.5 '+' 잉크 x 25.6) */
   font-size: 28px;
   line-height: 28px;
   font-weight: 700;
@@ -1299,25 +1351,28 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 16px;
-  margin-top: -0.25px;
+  height: 17px;
+  margin-top: -0.5px;
 }
+/* 이름 · 값 17 (녹화 A 58.5 · 106.5: '거래 후 잔액' 잉크 78.4dp · '받는 분 통장표시' 107.2dp → 16 은 4–6% 좁음).
+   이름은 M (잉크 질량이 같은 화면 '출금' 값 · '복사' 보다 1.2배 → R 아님), 값은 R */
 .toss-acct-detail__label {
   position: absolute;
-  left: 23.25px;
+  left: 24.8px;
   top: 0;
-  font-size: 16px;
-  line-height: 16px;
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 500;
   color: #b8b7bc;
   white-space: nowrap;
 }
 .toss-acct-detail__value {
   position: absolute;
-  right: 24.3px;
+  right: 23.5px;
   top: 0;
-  max-width: 230px;
-  font-size: 16px;
-  line-height: 16px;
+  max-width: 268px;
+  font-size: 17px;
+  line-height: 17px;
   color: #b9b8bd;
   white-space: nowrap;
   overflow: hidden;
@@ -1328,15 +1383,15 @@
 }
 .toss-acct-detail__value--link > .toss-press__content {
   text-decoration: underline;
-  text-decoration-thickness: 0.8px;
-  text-underline-offset: 2.6px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 .toss-acct-detail__memo {
   position: absolute;
-  right: 24.8px;
+  right: 24px;
   top: 0;
-  font-size: 16px;
-  line-height: 16px;
+  font-size: 17px;
+  line-height: 17px;
   color: var(--toss-blue);
   white-space: nowrap;
 }
@@ -1372,10 +1427,11 @@
 }
 .toss-acct-detail__certtext {
   position: absolute;
-  left: 59.25px;
-  top: 23.75px; /* 잉크 622.4 (입금 · 받는 분 줄 없을 때) */
-  font-size: 16px;
-  line-height: 16px;
+  left: 60.8px;
+  top: 23.5px; /* 잉크 622.4 (입금 · 받는 분 줄 없을 때) */
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 600; /* 녹화: 위 이름들보다 굵음 (잉크 질량 17 SB 와 같음) */
   color: #b8b7bc;
 }
 .toss-acct-detail__certchev {
@@ -1496,6 +1552,10 @@
   width: 24px;
   height: 24px;
 }
+/* 못 받았으면 (없는 계좌 등) 새로고침 표시 없음 */
+.toss-acct-other__refresh--off {
+  display: none;
+}
 .toss-acct-other__spin,
 .toss-acct-other__ok {
   position: absolute;
@@ -1520,9 +1580,10 @@
 .toss-acct-other__refresh--done .toss-acct-other__ok {
   opacity: 1;
   transform: none;
+  /* 녹화 B 163.62–163.70 돌던 것이 사라지고 130ms 빈 뒤 163.83–163.95 ✓ */
   transition:
-    opacity 200ms ease-out 100ms,
-    transform 200ms cubic-bezier(0.3, 1.4, 0.5, 1) 100ms;
+    opacity 150ms ease-out 230ms,
+    transform 150ms cubic-bezier(0.3, 1.4, 0.5, 1) 230ms;
 }
 .toss-acct-other__gear {
   position: absolute;
@@ -1560,6 +1621,27 @@
 .toss-acct-other__top {
   position: relative;
   height: 330px; /* 첫 거래 줄 위끝 (화면 411.6) */
+}
+/* 처음 그릴 때 위에서부터 차례로 (녹화 B 162.68–163.3). 줄은 OtherAccount 가 145 + 30·i ms 늦춤 */
+.toss-acct-other--reveal :is(.toss-acct-other__acct, .toss-acct-other__rate, .toss-acct-other__cb, .toss-acct-other__ad, .toss-acct-other__filter, .toss-acct-other__row) {
+  animation: toss-acct-reveal 500ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+.toss-acct-other--reveal .toss-acct-other__rate {
+  animation-delay: 35ms;
+}
+.toss-acct-other--reveal .toss-acct-other__cb {
+  animation-delay: 70ms;
+}
+.toss-acct-other--reveal .toss-acct-other__ad {
+  animation-delay: 95ms;
+}
+.toss-acct-other--reveal .toss-acct-other__filter {
+  animation-delay: 125ms;
+}
+@keyframes toss-acct-reveal {
+  from {
+    opacity: 0;
+  }
 }
 .toss-acct-other__acct {
   position: absolute;

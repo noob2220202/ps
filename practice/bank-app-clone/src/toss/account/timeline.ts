@@ -18,15 +18,17 @@ export const ACCT_BANK = {
   bannerH: 180.8,
 } as const;
 
-// 거래내역 (녹화 A 45.5 → 49.05초, B 75.0 → 77.1초): 진행 막대 → 450ms 에 내용 + 머리줄 카드 · 관리, 그 400ms 뒤 파란 ✓ 800ms
-export const ACCT_HISTORY = { barReady: 250, steps: [450], check: 400, checkHold: 800 } as const;
+// 거래내역 (녹화 A 45.5 → 49.7초, B 75.0 → 77.4초): 진행 막대 → 1 머리줄 카드 · 관리 250 (A 48.2, 내용보다 먼저) →
+// 2 잔액 · 이자 · 띠 · 전체 줄 · 광고 450 (A 49.05) → 3 거래 줄 + 아래 채우기/보내기(200ms 에 나타남) + 파란 ✓ 700 (A 49.70 · B 77.39 같은 프레임).
+// ✓ 는 목록과 함께 나타나 800ms (B 77.39–77.8, A ≤ 1.2초) 뒤 200ms 에 사라짐
+export const ACCT_HISTORY = { barReady: 250, steps: [250, 450, 700], check: 0, checkHold: 800 } as const;
 
 // 상세 내역 (녹화 A 56.40 → 57.75초): 350ms 에 내용
 export const ACCT_DETAIL = { barReady: 150, steps: [350] } as const;
 
 // 다른 은행 계좌 (녹화 B 161.5 빈 화면 → 161.75 뼈대 → 162.75 잔액 반짝임 → 163.0 내용 → 163.9 ✓):
-// 1 뼈대 150 · 2 내용 + 톱니 450 (잔액 반짝임 1300ms 한 번) · 새로고침 아이콘은 들어올 때부터 돌다가 1350ms 에 ✓ 로
-export const ACCT_OTHER = { barReady: 200, steps: [150, 450], spin: 1350, shimmer: 1300 } as const;
+// 1 뼈대 150 · 2 내용 + 톱니 450 (잔액 반짝임 1300ms 한 번) · 새로고침 아이콘은 들어올 때부터 돌다가 내용 940ms 뒤(1390ms) 사라지고 ✓ 로
+export const ACCT_OTHER = { barReady: 200, steps: [150, 450], spin: 1390, shimmer: 1300 } as const;
 
 // ---------- 뒤로 와서 다시 그리는 화면 ----------
 // ScreenStack 은 맨 위 화면만 붙여 두므로 뒤로 오면 화면을 새로 만듦. 녹화처럼 '쌓여 있던 화면은 받아 둔 그대로 바로' 보이게 (plan.md §1.4):

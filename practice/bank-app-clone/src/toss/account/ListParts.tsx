@@ -40,10 +40,10 @@ export function AcctFilterRow({ check, className }: { check: boolean; className?
   );
 }
 
-// 아래 고정 채우기 (옅은 파랑) · 보내기 (파랑), 위 40dp 그라데이션
-export function AcctBottomBar({ onSend }: { onSend?: () => void }) {
+// 아래 고정 채우기 (옅은 파랑) · 보내기 (파랑), 위 40dp 그라데이션. fadeIn: 처음 그릴 때 200ms 에 나타남 (녹화 A 49.37–49.74)
+export function AcctBottomBar({ onSend, fadeIn = false }: { onSend?: () => void; fadeIn?: boolean }) {
   return (
-    <TossBottomDock fade className="toss-acct-dock">
+    <TossBottomDock fade className={`toss-acct-dock${fadeIn ? " toss-acct-dock--in" : ""}`}>
       <TossButtonPair>
         <TossButton variant="weak">채우기</TossButton>
         <TossButton onPress={onSend}>보내기</TossButton>

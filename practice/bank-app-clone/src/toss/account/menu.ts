@@ -166,8 +166,8 @@ export const ACCT_RECO: AcctReco[][] = [
   ],
 ];
 
-// 통장 위 배너 (방문마다 번갈아, × 는 앱을 다시 열 때까지 숨김). art = toss-acct-banner-<art>.jpg
+// 통장 위 배너 (방문마다 번갈아, × 는 앱을 다시 열 때까지 숨김). art = toss-acct-banner-<art>.jpg · artEnd = 잘라 온 그림을 끝에 줄이는 배율
 export const ACCT_BANNERS = [
-  { id: "autotransfer", art: "banner-autotransfer", title: ["자동이체 가져오기가", "새로 나왔어요"], sub: "흩어진 자동이체를 한 번에 가져올 수 있어요.", cta: "보러가기" },
-  { id: "newdeposit", art: "banner-newdeposit", title: ["토스뱅크에", "새로운 예금이 나왔어요"], sub: "1년 보관하면 연 3.8% (세전)", cta: "자세히 보기" },
+  { id: "autotransfer", art: "banner-autotransfer", artEnd: 0.951, title: ["자동이체 가져오기가", "새로 나왔어요"], sub: "흩어진 자동이체를 한 번에 가져올 수 있어요.", cta: "보러가기" },
+  { id: "newdeposit", art: "banner-newdeposit", artEnd: 0.968, title: ["토스뱅크에", "새로운 예금이 나왔어요"], sub: "1년 보관하면 연 3.8% (세전)", cta: "자세히 보기" },
 ] as const;

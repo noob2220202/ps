@@ -92,7 +92,7 @@ export function BankScreen() {
           </TossPressable>
         ) : undefined
       }
-      progress={<TossProgressBar ready={barReady} />}
+      progress={<TossProgressBar ready={barReady || failed} />}
     />
   );
 

@@ -18,7 +18,7 @@ import { acctInterest, ACCT_HISTORY, useAcctCheck, useAcctPhases, useAcctRevisit
 import "./account.css";
 
 // /bank/:accountId/history — 거래내역 (account.md §2.5 · §3.5 · §3.6, 녹화 A 45.5–56.4초 · 102.8–112.7초).
-// 머리줄은 제목 없이 ← 와 카드 · 관리 (다 받은 뒤), 바탕은 스크롤 따라 (40 → 160dp 에서 불투명). 전체 ⌄ 줄 옆 ✓ 는 다 받은 뒤 잠깐.
+// 머리줄은 제목 없이 ← 와 카드 · 관리 (내용보다 먼저), 바탕은 스크롤 따라 (40 → 160dp 에서 불투명). 전체 ⌄ 줄 옆 ✓ 는 거래 줄과 함께 잠깐.
 // 줄을 누르면 상세 (/tx/:id), 보내기 → 송금. 아래 채우기 · 보내기는 고정, 목록은 그 밑으로 흐려지며 지나감
 export function History() {
   const { accountId = "main" } = useParams();
@@ -30,8 +30,9 @@ export function History() {
   const failed = !ready && (account.status === "error" || txs.status === "error");
   const { revisit, bodyRef, savedScroll, saveScroll } = useAcctRevisit();
   const { phase, barReady } = useAcctPhases(ready, ACCT_HISTORY, revisit);
-  const loaded = phase >= 1;
-  const check = useAcctCheck(loaded && !revisit, ACCT_HISTORY.check, ACCT_HISTORY.checkHold);
+  const loaded = phase >= 2;
+  const listed = phase >= 3;
+  const check = useAcctCheck(listed && !revisit, ACCT_HISTORY.check, ACCT_HISTORY.checkHold);
   const { onScrollTop } = check;
 
   // 머리줄 바탕은 0–200dp 에서만 바뀜 → 그 밖에서는 같은 값이라 다시 그리지 않음
@@ -55,8 +56,8 @@ export function History() {
     <TossPage
       className="toss-acct-hist"
       headerOverlay
-      header={<TossAppBar mode="scroll" scrollTop={st} right={loaded ? <AcctHistoryActions /> : undefined} progress={<TossProgressBar ready={barReady} />} />}
-      dock={loaded ? <AcctBottomBar onSend={() => goSend({ from: accountId })} /> : undefined}
+      header={<TossAppBar mode="scroll" scrollTop={st} right={phase >= 1 ? <AcctHistoryActions /> : undefined} progress={<TossProgressBar ready={barReady || failed} />} />}
+      dock={listed ? <AcctBottomBar fadeIn={!revisit} onSend={() => goSend({ from: accountId })} /> : undefined}
       onScroll={onScroll}
       bodyRef={bodyRef}
     >
@@ -87,7 +88,7 @@ export function History() {
               <span className="toss-acct-hist__adsub">선착순 판매 완료 시 종료! • AD</span>
             </AcctRow>
           </div>
-          {groups.map((g) => (
+          {listed && groups.map((g) => (
             <div key={g.day}>
               <div className="toss-acct-hist__date">{mwd(g.items[0].at)}</div>
               {g.items.map((t) => (
@@ -101,7 +102,7 @@ export function History() {
               ))}
             </div>
           ))}
-          {!list.length && <div className="toss-acct-hist__empty">거래내역이 없어요</div>}
+          {listed && !list.length && <div className="toss-acct-hist__empty">거래내역이 없어요</div>}
           <div style={{ height: TOSS_DOCK_SPACE + 12 }} />
         </>
       )}
