@@ -822,7 +822,18 @@ function findRecipient(bankCode, number) {
   throw new HttpError(404, "ACCOUNT_NOT_FOUND", "입력하신 계좌정보를 확인해 주세요");
 }
 
-app.get("/api/transfer/lookup", (req, res) => res.json(findRecipient(req.query.bank, req.query.number)));
+app.get("/api/transfer/lookup", (req, res) => {
+  // 토스 금액 화면: 못 찾은 번호는 흔한 흐름(안내창) → soft=1 이면 404 대신 { notFound: true } (브라우저 콘솔에 오류가 안 남게)
+  if (TOSS && req.query.soft) {
+    try {
+      return res.json(findRecipient(req.query.bank, req.query.number));
+    } catch (e) {
+      if (e instanceof HttpError && e.code === "ACCOUNT_NOT_FOUND") return res.json({ notFound: true });
+      throw e;
+    }
+  }
+  res.json(findRecipient(req.query.bank, req.query.number));
+});
 
 // 이체 첫 화면: 내 계좌(보내는 계좌 빼고 — 콕뱅크 '내계좌' 탭은 보내는 계좌도 잔액과 함께 보여줌) + 최근 이체한 사람
 function kakaoRecent() {
@@ -1040,7 +1051,8 @@ if (existsSync(dist)) {
   const html = readFileSync(resolve(dist, "index.html"), "utf8")
     .replace(/<title>.*<\/title>/, `<title>${{ kakao: "카카오뱅크", nh: "NH콕뱅크", hana: "하나원큐", ibk: "i-ONE Bank", kbank: "케이뱅크", toss: "토스", allone: "올원뱅크" }[APP]} 클론 연습</title>`)
     .replace("</head>", `<script>window.__BANK_APP__ = ${JSON.stringify(APP)};${INTRO ? " window.__BANK_INTRO__ = true;" : ""}</script></head>`);
-  app.use(express.static(dist, { index: false })); // "/" 도 아래에서 (index.html을 그대로 주면 앱 정보가 빠짐)
+  // 토스는 화면 주소 /assets 가 빌드 폴더 dist/assets 와 겹침 → 폴더 주소를 /assets/ 로 넘기지 않고 아래 index.html 로
+  app.use(express.static(dist, { index: false, ...(TOSS && { redirect: false }) })); // "/" 도 아래에서 (index.html을 그대로 주면 앱 정보가 빠짐)
   // /account/main 같은 주소로 바로 들어와도 index.html을 줘야 화면 쪽 라우터가 처리할 수 있다
   app.get("/{*path}", (_req, res) => res.type("html").send(html));
 }

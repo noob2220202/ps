@@ -951,7 +951,11 @@
   width: 100%;
   height: 100%;
   opacity: 0;
-  animation: 1900ms linear infinite both;
+  /* 이름 없는 animation 줄임꼴은 빌드(lightningcss)에서 none 이 됨 → 풀어 씀 */
+  animation-duration: 1900ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
 }
 /* 1.9초 한 바퀴 (B 128.45–129.61 에서 잰 차례 · 길이, 녹화는 장면 사이를 한 프레임에 바꿈):
    '+' 에서 '₩' 이 그려짐 0–.40 (₩ 를 위에 겹쳐 .05–.35 동안 나타나게) · ₩ .40–.72 · 넘김 .72–.92 · 옆으로 .92–1.72 · 돈주머니 1.72–1.90 */

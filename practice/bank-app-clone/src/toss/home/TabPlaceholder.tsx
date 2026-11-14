@@ -2,6 +2,7 @@
 // 탭바는 그 탭 그림을 채워서. 홈 ↔ 탭은 움직임 없이 (cut), 뒤로 = 홈
 import { useParams } from "react-router-dom";
 import { TossPage, TOSS_BG_DEEP } from "../ui/Page";
+import { TossRedirect } from "../ui/Redirect";
 import { TabBar } from "./TabBar";
 import "./home.css";
 
@@ -9,13 +10,14 @@ const NAME: Record<string, string> = { benefit: "혜택", shopping: "쇼핑", st
 
 export function TabPlaceholder() {
   const { tab = "" } = useParams();
+  if (!(tab in NAME)) return <TossRedirect to="/" />; // 없는 탭
   return (
     <TossPage
       bg={TOSS_BG_DEEP}
       className="toss-home"
       header={
         <div className="toss-home-head">
-          <span className="toss-home-ph__title">{NAME[tab] ?? tab}</span>
+          <span className="toss-home-ph__title">{NAME[tab]}</span>
         </div>
       }
       dock={<TabBar />}

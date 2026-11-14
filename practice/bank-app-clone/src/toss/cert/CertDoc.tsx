@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { TossPage, TOSS_BG } from "../ui/Page";
 import { TossPressable } from "../ui/Pressable";
+import { TossRedirect } from "../ui/Redirect";
 import { certPages, CERT_PAGE, useCertDoc, useCertQuery } from "./data";
 import { CertBar, CertShareIcon } from "./parts";
 import { TransferCertDoc } from "./TransferCertDoc";
@@ -11,6 +12,11 @@ import "./cert.css";
 // 384 보다 좁은 폰에서는 양옆 8 을 남기고 종이를 줄임.
 // 워터마크 · 빈 도장 · 가짜 진위확인 그대로 (TransferCertDoc). 내려받기 · 인쇄 · 공유는 없음
 export function CertDoc() {
+  // 고른 내역 없이 주소를 바로 열었음 → 증명서 첫 화면
+  return useCertQuery().ids.length ? <DocBody /> : <TossRedirect to="/cert" />;
+}
+
+function DocBody() {
   const q = useCertQuery();
   const doc = useCertDoc(q);
   const data = doc.data;

@@ -1,7 +1,7 @@
 // 토스 화면 ↔ 서버 (plan.md §2.4). 공용 엔드포인트는 src/api/endpoints.ts 의 paths · api 를 그대로 쓰고,
 // 토스만 쓰는 블록 · 새 엔드포인트(/api/toss/*)의 모양과 부르는 함수는 여기. 서버가 아직 안 준 칸이 있어도 화면이 깨지지 않게 대부분 선택 칸(?)
 import { http } from "../api/client";
-import type { Account, Bank, HomeData, Profile, Transaction, TransactionDetail } from "../api/types";
+import type { Account, Bank, HomeData, Profile, Recipient, Transaction, TransactionDetail } from "../api/types";
 
 // ---------- GET /api/home 의 toss 블록 ----------
 export interface TossHomeBlock {
@@ -199,6 +199,11 @@ export const tossApi = {
   addPoint: (body: Partial<Omit<TossPoint, "id">> & Pick<TossPoint, "name">) => http.post<TossPoint>(tossPaths.points, body),
   updatePoint: (id: string, patch: Partial<Omit<TossPoint, "id">>) => http.patch<TossPoint>(tossPaths.point(id), patch),
   deletePoint: (id: string) => http.delete(tossPaths.point(id)),
+  // 받는 계좌 찾기: 못 찾으면 404 대신 null (금액 화면의 안내창 흐름)
+  lookupAccount: (bankCode: string, number: string) =>
+    http
+      .get<Recipient | { notFound: true }>(`/api/transfer/lookup?bank=${encodeURIComponent(bankCode)}&number=${number.replace(/\D/g, "")}&soft=1`)
+      .then((r) => ("notFound" in r ? null : r)),
 };
 
 // 이체 뒤 광고 화면을 건너뛸지 (3일 동안 안보기)

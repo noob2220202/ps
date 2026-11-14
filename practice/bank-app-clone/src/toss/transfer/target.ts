@@ -5,10 +5,10 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useLocation } from "react-router-dom";
 import { ApiError, getVersion, subscribeVersion } from "../../api/client";
-import { api, paths } from "../../api/endpoints";
+import { paths } from "../../api/endpoints";
 import { useApi } from "../../api/useApi";
 import type { Bank, Profile, Recipient, TransferRecipients } from "../../api/types";
-import type { TossAccount } from "../api";
+import { tossApi, type TossAccount } from "../api";
 import { digitsOf, type SendTarget } from "./store";
 
 export interface SendParams {
@@ -25,6 +25,8 @@ export function useSendParams(): SendParams {
     return { from: q.get("from") || "main", to: q.get("to"), bank: q.get("bank"), number: digitsOf(q.get("number")), amount: Number(q.get("amount")) || 0 };
   }, [search]);
 }
+// 주소에 받는 분이 있음 (없으면 주소를 바로 연 것 → 어디로 보낼까요로)
+export const hasSendTarget = (p: SendParams) => !!p.to || (!!p.bank && !!p.number);
 // 다음 화면 주소에 붙일 받는 분 (금액 → 확인 · 메모)
 export const targetQuery = (p: SendParams) =>
   `from=${encodeURIComponent(p.from)}${p.to ? `&to=${encodeURIComponent(p.to)}` : `&bank=${encodeURIComponent(p.bank ?? "")}&number=${p.number}`}`;
@@ -44,9 +46,9 @@ function useLookup(bank: string | null, number: string, on: boolean): Lookup {
     if (h && h.at === version && h.v.status !== "loading") return;
     let dead = false;
     if (!h) looked.set(key, { at: version, v: { status: "loading" } });
-    api
+    tossApi
       .lookupAccount(bank, number)
-      .then((r) => looked.set(key, { at: version, v: { status: "found", r } }))
+      .then((r) => looked.set(key, { at: version, v: r ? { status: "found", r } : { status: "notfound" } }))
       .catch((e: unknown) => {
         const err = e instanceof ApiError ? e : null;
         looked.set(key, { at: version, v: err?.status === 404 ? { status: "notfound" } : { status: "error", message: err?.message ?? String(e) } });

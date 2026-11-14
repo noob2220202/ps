@@ -4,6 +4,7 @@ import { useTossGo } from "../nav";
 import { TossBottomDock, TossButton } from "../ui/Button";
 import { TossPage } from "../ui/Page";
 import { TossPressable } from "../ui/Pressable";
+import { TossRedirect } from "../ui/Redirect";
 import { certUrl, CERT_PAGE, CERT_T, useCertDoc, useCertQuery } from "./data";
 import { CertBar, CertTitle } from "./parts";
 import { useCertPhase, useCertRevisit } from "./steps";
@@ -17,6 +18,11 @@ const PREVIEW = 344 / CERT_PAGE.w; // 0.9363
 // 켜짐 (공용 버튼의 180ms 교차, 녹화 A 83.37–83.62). 문서.pdf 에서 돌아오면 끝 모습 그대로.
 // 확인했어요 → 증명서에 들어온 화면으로 (certExit, pop). 파일 저장하기 → 400ms 뒤 문서.pdf (push) — 파일은 만들지 않음
 export function CertDone() {
+  // 고른 내역 없이 주소를 바로 열었음 → 증명서 첫 화면
+  return useCertQuery().ids.length ? <DoneBody /> : <TossRedirect to="/cert" />;
+}
+
+function DoneBody() {
   const q = useCertQuery();
   const doc = useCertDoc(q);
   const go = useTossGo();

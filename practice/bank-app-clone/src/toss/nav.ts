@@ -121,6 +121,17 @@ export function tossLock(ms: number = TOSS_NAV.lock) {
   lockedUntil = now + ms;
   return true;
 }
+// 갤럭시 뒤로로 지킴 칸(tossBack)이 이미 빠진 뒤의 이동처럼 버리면 안 되는 이동: 잠겨 있으면 풀린 뒤에 fn. 돌려준 함수로 취소
+export function tossAfterLock(fn: () => void) {
+  let t = 0;
+  const run = () => {
+    const left = lockedUntil - performance.now();
+    if (left > 0) t = window.setTimeout(run, left + 1);
+    else fn();
+  };
+  run();
+  return () => window.clearTimeout(t);
+}
 
 export interface TossGoOptions extends Pick<NavigateOptions, "replace"> {
   state?: Record<string, unknown>; // tossAnim · tossExit 등 (깊이는 알아서 붙음)

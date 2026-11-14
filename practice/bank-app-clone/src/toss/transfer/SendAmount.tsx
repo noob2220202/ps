@@ -9,11 +9,12 @@ import { useLayerActive } from "../../platform/LayerContext";
 import { num, won } from "../format";
 import { useTossGo } from "../nav";
 import { TossAppBar, TossButton, TossDialog, TossPage, TossSpinner } from "../ui";
+import { TossRedirect } from "../ui/Redirect";
 import { AmountKeypad } from "./AmountKeypad";
 import { Caret, LoadChip, Shield } from "./common";
 import { accountLine, sendMemo, toLabel, verbAsk } from "./store";
 import { useKeyed, useRevisit } from "./keyed";
-import { targetQuery, useSendParams, useSendTarget } from "./target";
+import { hasSendTarget, targetQuery, useSendParams, useSendTarget } from "./target";
 import "./send.css";
 
 const MAX_LEN = 9;
@@ -24,6 +25,12 @@ const CHECK_AT = 750; // 내용이 나온 뒤 사기계좌 조회 끝 ('내 ' ·
 const DOTS_MS = 440; // 못 찾은 번호: 다음 → 점 → 안내창
 
 export function SendAmount() {
+  const p = useSendParams();
+  // 받는 분 없이 주소를 바로 열었음 → 어디로 보낼까요
+  return hasSendTarget(p) ? <AmountBody /> : <TossRedirect to={`/send?from=${encodeURIComponent(p.from)}`} />;
+}
+
+function AmountBody() {
   const p = useSendParams();
   const res = useSendTarget(p);
   const go = useTossGo();

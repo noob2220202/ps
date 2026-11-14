@@ -8,9 +8,10 @@ import { api } from "../../api/endpoints";
 import { num } from "../format";
 import { useTossGo } from "../nav";
 import { TossAppBar, TossButton, TossDialog, TossPage, TossPressable } from "../ui";
+import { TossRedirect } from "../ui/Redirect";
 import { RowChevron, Shield } from "./common";
 import { accountLine, isMove, toLabel, useSendMemo, verbAsk, verbCta } from "./store";
-import { targetQuery, useSendParams, useSendTarget } from "./target";
+import { hasSendTarget, targetQuery, useSendParams, useSendTarget } from "./target";
 import type { SendDoneState } from "./done";
 import "./send.css";
 
@@ -18,6 +19,14 @@ const DOTS_MOVE = 420;
 const DOTS_SEND = 1000;
 
 export function SendConfirm() {
+  const p = useSendParams();
+  // 받는 분 · 금액 없이 주소를 바로 열었음 → 어디로 보낼까요 / 금액
+  if (!hasSendTarget(p)) return <TossRedirect to={`/send?from=${encodeURIComponent(p.from)}`} />;
+  if (!(p.amount > 0)) return <TossRedirect to={`/send/amount?${targetQuery(p)}`} />;
+  return <ConfirmBody />;
+}
+
+function ConfirmBody() {
   const p = useSendParams();
   const res = useSendTarget(p);
   const go = useTossGo();

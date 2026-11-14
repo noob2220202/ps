@@ -26,6 +26,7 @@ import { Assets } from "./assets/Assets";
 import { MyAccounts } from "./assets/MyAccounts";
 import { Spend } from "./assets/Spend";
 import { UiGallery } from "./UiGallery";
+import { TossRedirect } from "./ui/Redirect";
 import "./toss.css";
 import "./ui/ui.css";
 import "./nav.css";
@@ -62,5 +63,7 @@ export const renderTossRoute = (location: Location) => (
     <Route path="/assets/accounts" element={<MyAccounts />} />
     {/* 공용 부품 견본 (녹화에 없음, 기초 단계 확인용) */}
     <Route path="/dev/ui" element={<UiGallery />} />
+    {/* 없는 주소 → 홈 */}
+    <Route path="*" element={<TossRedirect to="/" />} />
   </Routes>
 );

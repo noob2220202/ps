@@ -47,7 +47,7 @@ function DoneBody() {
     return () => window.clearTimeout(t);
   }, [revisit]);
   // 갤럭시 뒤로: 보내는 중엔 무시(지킴 칸을 다시 쌓음), 완료에선 확인과 같음
-  const leave = useDoneGuard(active, () => (phase === "sending" ? true : void finish(d.kind)));
+  const leave = useDoneGuard(active, () => finish(d.kind), () => phase === "sending");
   const ok = () => leave(() => finish(d.kind));
 
   const sending = phase === "sending";

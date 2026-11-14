@@ -13,6 +13,7 @@ import { GearIcon } from "../ui/icons";
 import { TossPage } from "../ui/Page";
 import { TossPressable } from "../ui/Pressable";
 import { TossProgressBar } from "../ui/ProgressBar";
+import { TossRedirect } from "../ui/Redirect";
 import { TossSkeleton } from "../ui/Skeleton";
 import { TossSymbol } from "../ui/TossSymbol";
 import { BankBanner } from "./BankBanner";
@@ -96,6 +97,8 @@ export function BankScreen() {
     />
   );
 
+  // 다른 은행 계좌를 이 주소로 바로 열었음 → 다른 은행 계좌 화면
+  if (a && a.bank.code !== "toss") return <TossRedirect to={`/account/${encodeURIComponent(accountId)}`} />;
   return (
     <TossPage className="toss-acct-bank" header={header} headerOverlay onScroll={onScroll} bodyRef={bodyRef} bodyClassName="toss-acct-bank__body">
       <div className="toss-acct-bank__top" />
@@ -103,7 +106,7 @@ export function BankScreen() {
       <div className={`toss-acct-sheet${banner.shown ? " toss-acct-sheet--cap" : ""}`}>
         {failed && (
           <TossPressable className="toss-acct-fail" onPress={() => (account.status === "error" ? account.retry() : txs.retry())}>
-            잠시 후 다시 시도해 주세요
+            {account.error?.status === 404 ? "계좌를 찾을 수 없어요" : "잠시 후 다시 시도해 주세요"}
           </TossPressable>
         )}
         {phase >= 1 && (

@@ -5,6 +5,7 @@ import { paths } from "../../api/endpoints";
 import { prefetch } from "../../api/useApi";
 import { useLayerActive } from "../../platform/LayerContext";
 import { currentProfileId } from "../../profile/session";
+import { tossAfterLock } from "../nav";
 
 // ---------- 탭바 ----------
 export type HomeTab = "home" | "benefit" | "shopping" | "stock" | "all";
@@ -96,15 +97,18 @@ export function useAdBackGuard(onBack: () => void) {
     const arm = window.setTimeout(() => {
       if (!leaving.current && backLevel() === 0) window.history.pushState({ ...window.history.state, tossBack: 1 }, "");
     });
+    let cancel = () => {};
     const onPop = () => {
       if (leaving.current || backLevel() > 0) return;
       leaving.current = true; // 한 번만
-      ref.current();
+      // 방금 replace 로 와서 이동 잠금 중이면 풀린 뒤에 닫음 (버리면 지킴 칸만 빠지고, 다음 뒤로가 끝난 이체 화면으로 감)
+      cancel = tossAfterLock(() => ref.current());
     };
     window.addEventListener("popstate", onPop);
     return () => {
       window.clearTimeout(arm);
       window.removeEventListener("popstate", onPop);
+      cancel();
     };
   }, [active]);
   return (fn: () => void) => {

@@ -11,6 +11,7 @@ import { GearIcon } from "../ui/icons";
 import { TossPage } from "../ui/Page";
 import { TossPressable } from "../ui/Pressable";
 import { TossProgressBar } from "../ui/ProgressBar";
+import { TossRedirect } from "../ui/Redirect";
 import { TossSkeleton } from "../ui/Skeleton";
 import { acctGroupByDay } from "./data";
 import { AcctBottomBar, AcctCheckMark, AcctFilterRow } from "./ListParts";
@@ -72,6 +73,8 @@ export function OtherAccount() {
     </div>
   );
 
+  // 토스뱅크 계좌를 이 주소로 바로 열었음 → 통장 화면
+  if (isToss) return <TossRedirect to={`/bank/${encodeURIComponent(accountId)}`} />;
   return (
     <TossPage
       className={`toss-acct-other${revisit ? "" : " toss-acct-other--reveal"}`}
