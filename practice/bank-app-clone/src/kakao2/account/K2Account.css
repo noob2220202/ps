@@ -1,0 +1,404 @@
+/* ===== kakao2 통장 (K2AccountScreen.tsx, account.md + critic.md 16 · X16 · G2) =====
+   좌표 = pt (= CSS px). 녹화는 가로 1180 px / 3.0025, 세로 2556 px / 3 (세로를 3.0025 로 나눈 account.md 값은 아래로 갈수록 ≈0.7pt 작음).
+   머리줄 아래끝 113 = 상태바 띠(--k2-sb 54) + 59. 글자 간격은 0 (chrome.css .k2acct), 녹화 글자 폭에 맞춰 일부만 + */
+
+.k2acct {
+  /* 아래 고정 띠 높이 (흐려짐 37 + 버튼 60 + 아래 34 = 131, 위끝 721): 내용 아래 여백 · 스크롤 표시 칸 · 다음 쪽 불러오기 기준 */
+  --k2acct-bar: calc(97px + var(--safe-bottom));
+  position: absolute;
+  inset: 0;
+  color: #1f1f1f;
+  /* 뿌리 바탕은 칠하지 않음: push 때 머리줄 아래로 밑 홈이 보이고 본문(.k2-push-body)만 밀려 들어옴 (nav.css) */
+}
+.k2acct button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- 머리줄 (고정, 흰색 0 – 113): < 11 × 20 · 제목 17/600 가운데 · 톱니 21 × 22. 가운데선 y 81 ---------- */
+.k2acct__nav {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: calc(var(--k2-sb) + 59px);
+  padding-top: var(--k2-sb);
+  background: #fff;
+}
+/* 스크롤하면(scrollTop > 0) 아래끝 머리카락 선 1 기기 px (112.67 – 113) #d0d0d0, 페이드 없음 */
+.k2acct__nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #d0d0d0;
+  transform: scaleY(0.3333);
+  transform-origin: bottom;
+  opacity: 0;
+}
+.k2acct__nav--line::after {
+  opacity: 1;
+}
+.k2acct__navrow {
+  position: relative;
+  height: 59px;
+}
+.k2acct__title {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  top: 16px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* 누르는 칸 44 × 44, 아이콘은 가운데: < 잉크 가운데 (41.5, 81), 톱니 (355.1, 80.9) */
+.k2acct__back,
+.k2acct__gear {
+  position: absolute;
+  top: 5px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+.k2acct__back {
+  left: 19.5px;
+}
+.k2acct__gear {
+  left: 333px;
+}
+.k2acct__gear svg {
+  transform: translateX(0.3333px); /* 잉크 344.33 – 365.67 */
+}
+
+/* ---------- 본문 (머리줄 아래 전부, push 때 이것만 밀림 + 아래 두 모서리 r55 — nav.css .k2-push-body) ---------- */
+/* 녹화는 머리줄이 뜬 첫 프레임에 본문이 이미 346pt 까지 들어옴 → 한 프레임 앞당겨 시작 (두 모서리도 그만큼 일찍 각짐, critic.md G2 477ms) */
+html[data-kakao2] .layer--k2-push.layer--push-enter .k2acct__body.k2-push-body {
+  animation-delay: -17ms;
+}
+.k2acct__body {
+  position: absolute;
+  inset: calc(var(--k2-sb) + 59px) 0 0;
+  overflow: hidden;
+  background: #fff;
+}
+.k2acct__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  /* 녹화는 아래 버튼이 뜬 첫 프레임에 내용이 이미 ≈19% (29.523초) → 2 프레임 앞당겨 시작 (뼈대 흐려짐도) */
+  animation: k2acct-in 170ms linear -34ms both;
+}
+.k2acct__scroll::-webkit-scrollbar {
+  display: none;
+}
+/* 아래 여백 = 고정 띠: 끝까지 내리면 마지막 행이 흐려짐 시작(721)에서 끝남 */
+.k2acct__content {
+  padding-bottom: var(--k2acct-bar);
+}
+@keyframes k2acct-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 요약 (본문 0 – 285, 화면 113 – 398): 녹화 기기 px(1/3pt) 에 맞춘 자리. 상자 · 글자가 CSS px 로 붙는 브라우저(크롬 DPR 흉내 등)에서도
+   같게 자리는 정수 px 로 두고 남는 1/3pt 는 transform (transform 은 기기 px 로 그려짐) */
+.k2acct__head {
+  position: relative;
+  height: 285px;
+}
+/* 계좌번호 14/400 #5b5b5b 밑줄 1pt (160 – 161) + 복사 아이콘. 숫자 잉크 148.33 – 158.33 */
+.k2acct__num {
+  position: absolute;
+  top: 30px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.3px; /* 녹화 글자 폭 (같은 번호 122.9pt) */
+  color: #5b5b5b;
+}
+.k2acct__num > span {
+  position: relative;
+  transform: translateY(0.3333px);
+}
+/* 밑줄은 상자로 (text-decoration 은 CSS px 로 붙어 1/3pt 를 못 맞춤): 글자 폭(뒤 간격 포함) 전체, 160 – 161 */
+.k2acct__num > span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 17px;
+  height: 1px;
+  background: #5b5b5b;
+  transform: translateY(-0.3333px);
+}
+.k2acct__copy {
+  flex: none;
+  align-self: flex-start;
+  margin: 5px 0 0 2.3px; /* 잉크 148 – 158.67 */
+}
+/* 잔액 32/700, '원' 잉크 170.33 */
+.k2acct__bal {
+  position: absolute;
+  top: 52px;
+  left: 24px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
+}
+
+/* 검색 상자 353 × 65 (236.33 – 301.33), r16, #f8f8f8 + 1pt #f2f2f2. 돋보기 17 × 16.7 왼쪽 41.6 · '3개월 · 전체 · 최신순' 13/400 + ∨ 오른쪽 352.4 */
+.k2acct__search {
+  position: absolute;
+  top: 123px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 65px;
+  padding: 0 19.6px 0 20px;
+  border: 1px solid #f2f2f2;
+  border-radius: 16px;
+  background: #f8f8f8;
+  transform: translateY(0.3333px);
+}
+.k2acct__magn {
+  flex: none;
+  transform: translateX(0.6667px); /* 잉크 왼끝 41.67 */
+}
+.k2acct__filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  word-spacing: 0.5px; /* 녹화 글꼴은 띄어쓰기가 조금 넓음 (같은 글자인데 ' · ' 마다 ≈1pt) */
+  color: #5b5b5b;
+}
+
+/* 홍보 줄 (327.33 – 367.33, 누를 수 없음): 카드 + 돈 아이콘 40 + 12/400 #5b5b5b · 15/700. 잉크 위끝 331 · 349.67 */
+.k2acct__promo {
+  position: absolute;
+  top: 214px;
+  left: 20px;
+  right: 20px;
+  height: 40px;
+  transform: translateY(0.3333px);
+}
+.k2acct__promo img {
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+.k2acct__promo-text {
+  position: absolute;
+  top: 3px; /* 화면 330 에 놓고 −1/3 (줄의 +1/3 포함 −2/3) */
+  left: 48px;
+  transform: translateY(-0.6667px);
+}
+.k2acct__promo small {
+  display: block;
+  font-size: 12px;
+  line-height: 15px;
+  word-spacing: 0.5px;
+  color: #5b5b5b;
+}
+.k2acct__promo strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 19px;
+  letter-spacing: 0.13px;
+}
+/* 구분선 22 – 371 × 389.67 – 390.33 (2 기기 px) #e9e9e9 */
+.k2acct__divider {
+  position: absolute;
+  top: 276px;
+  left: 22px;
+  right: 22px;
+  height: 1px;
+  background: #e9e9e9;
+  transform: translateY(0.6667px) scaleY(0.6667);
+  transform-origin: top;
+}
+
+/* ---------- 거래 목록 (K2TxList.tsx): 날짜 칸 35.67 · 행 77.33 (칸 높이 · 남는 1/3pt 는 K2TxList 가 칸마다), 첫 날짜 칸 위끝 398 ---------- */
+/* 날짜 'MM.DD' 14/600 #3c3c3c (녹화 글꼴 숫자는 Pretendard 보다 낮고 넓음 → 13.5px + 간격 .35 로 잉크 9.67 × 32.6 맞춤), 잉크 위끝 = 칸 위끝 + 22.67 */
+.k2acct .k2list__date {
+  margin: 0;
+  padding: 19px 20px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.35px;
+  color: #3c3c3c;
+  translate: 0 0.3333px; /* 칸의 1/3pt transform(K2TxList) 위에 더함 */
+}
+/* 행: 첫 줄 이름 16/400 · 금액 16/700 (한글 잉크 위끝 = 행 위끝 + 20), 둘째 줄 시각 13/400 · 거래 후 잔액 14/400 #7d7d7d
+   (숫자 기준선 = 행 위끝 + 55.33). 줄마다 기준선을 맞춤. 누른 모습 없음 */
+.k2acct .k2list__row {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+}
+.k2acct .k2list__l1,
+.k2acct .k2list__l2 {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 12px;
+}
+.k2acct .k2list__l1 {
+  top: 17px;
+  line-height: 22px;
+  transform: translateY(-0.3333px);
+}
+.k2acct .k2list__l2 {
+  top: 41px;
+  line-height: 18px;
+  transform: translateY(0.3333px);
+}
+.k2acct .k2list__merchant {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.k2acct .k2list__amount {
+  flex: none;
+  margin-right: 0.33px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
+}
+.k2acct .k2list__amount--in {
+  color: #0076ca;
+}
+.k2acct .k2list__time {
+  font-size: 13px;
+  letter-spacing: 0.17px;
+  color: #7d7d7d;
+}
+.k2acct .k2list__after {
+  margin-right: -0.24px;
+  transform: translateY(-0.3333px); /* 녹화는 같은 기준선에서 1 기기 px 위 */
+  font-size: 14px;
+  letter-spacing: 0.24px;
+  color: #7d7d7d;
+  white-space: nowrap;
+}
+/* 맨 아래 불러오기 줄 79.7: 스피너(지름 27.6, #dfdfdf) 가운데가 줄 위에서 39.4 */
+.k2acct .k2list__more {
+  display: flex;
+  justify-content: center;
+  height: 79.7px;
+  padding-top: 24.4px;
+}
+
+/* ---------- 스크롤 표시 (iOS): x 387 – 390, 칸 116 – 721 (본문 위 3 ~ 아래 띠 위끝). 길이 · 위치는 K2AccountScreen 이 매 프레임 ---------- */
+.k2acct__ind {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  z-index: 2;
+  width: 3px;
+  border-radius: 1.5px;
+  background: rgba(0, 0, 0, 0.39);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease-out;
+}
+.k2acct__ind--on {
+  opacity: 1;
+  transition: none;
+}
+
+/* ---------- 아래 고정 띠 (721 – 852): 37pt 흰색으로 흐려짐(내용이 비침) + 가져오기 #2d324d / 이체하기 #ffde00 177.85 × 60 r12 (758 – 818), 사이 7.65 ---------- */
+.k2acct__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  height: var(--k2acct-bar);
+  background: linear-gradient(rgba(255, 255, 255, 0) 1px, #fff 38.2px); /* 녹화 투명도 0 @722 · .93 @756.6 */
+  pointer-events: none;
+}
+.k2acct__btns {
+  position: absolute;
+  inset: 37px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 60px;
+  gap: 7.65px;
+  padding: 0 14.65px 0 15px;
+  pointer-events: auto;
+}
+.k2acct__btn {
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.k2acct__btn--get {
+  background: #2d324d;
+  color: #fff;
+}
+.k2acct__btn--send {
+  background: #ffde00;
+  color: #1f1f1f;
+}
+
+/* ---------- 뼈대 (K2AccountSkeleton.tsx): 막대 #f0f0f0, 밝은 띠(꼭대기 ≈ #f8f8f8, 170 폭)가 1초에 화면 x −238 → 393 (≈ 630pt/s).
+   모든 막대가 같은 화면 x 에서 밝아지게 막대마다 제 왼끝(--x)만큼 뺌. 내용이 오면 170ms 동안 흐려지며 걷힘 ---------- */
+.k2acct__skel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.k2acct__skel--out {
+  animation: k2acct-out 170ms linear -34ms both;
+}
+@keyframes k2acct-out {
+  to {
+    opacity: 0;
+  }
+}
+.k2acct__sk {
+  position: absolute;
+  background: #f0f0f0 linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.53), rgba(255, 255, 255, 0)) no-repeat;
+  background-size: 170px 100%;
+  animation: k2acct-shimmer 1000ms linear infinite;
+}
+@keyframes k2acct-shimmer {
+  from {
+    background-position: calc(-323px - var(--x)) 0;
+  }
+  to {
+    background-position: calc(308px - var(--x)) 0;
+  }
+}

@@ -1,0 +1,70 @@
+/* 기초 단계 자리 화면 (stub.tsx · 영역 폴더의 stub). 영역이 진짜 화면으로 바꾸면 안 쓰게 됨 */
+.toss-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 28px 20px 96px;
+}
+.toss-stub__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--toss-t0);
+}
+.toss-stub__sub {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--toss-t3);
+  word-break: break-all;
+}
+.toss-stub__link > .toss-press__content {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--toss-card);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--toss-t1);
+}
+.toss-stub-bell {
+  position: absolute;
+  right: 14px;
+  top: 36px;
+  width: 40px;
+  height: 40px;
+  z-index: 5;
+  color: #a8a8b0;
+}
+.toss-stub-bell > .toss-press__content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+/* 탭바 자리 780.5 → 838.33 (57.8): #171619, 위 모서리 20, 위 1px 선 */
+.toss-stub-tabbar {
+  position: relative;
+  flex: none;
+  height: 57.8px;
+  border-radius: 20px 20px 0 0;
+  background: #171619;
+  box-shadow: inset 0 0.8px 0 #272629;
+  z-index: 2;
+}
+.toss-stub-tabbar__tab {
+  position: absolute;
+  top: 0;
+  width: 64px;
+  height: 57.8px;
+}
+.toss-stub-tabbar__tab > .toss-press__content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #d8d7dd;
+  font-size: 11px;
+  font-weight: 500;
+}

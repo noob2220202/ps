@@ -1,0 +1,311 @@
+/* kakao2 홈 AI 알약 (K2AiPill.tsx). 치수 pt = 녹화 px ÷ 3.0025 (home.md §4.2, intro.md §7)
+   왼끝 15.65, 높이 44.6, 채움 #232323 + 0.67 #2a2a2a 테두리, 별 · 고리 가운데 (왼끝 + 24.15, 가운데), 글자 잉크 왼끝 58.3 · 오른끝까지 19 */
+.k2-home .k2-pill {
+  position: absolute;
+  left: 15.65px;
+  top: 22.6px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-width: 48.3px;
+  max-width: 320px;
+  height: 44.6px;
+  border: 0.67px solid #2a2a2a;
+  border-radius: 22.3px;
+  background: #232323;
+  overflow: hidden;
+}
+.k2-home .k2-pill__text {
+  min-width: 0;
+  margin: 0 17.1px 0 41.58px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.07px; /* 녹화 잉크 폭 211.5 (Pretendard 0 이면 210) */
+  color: #fff;
+}
+.k2-home .k2-pill__icon,
+.k2-home .k2-pill__ring {
+  position: absolute;
+  left: 23.48px;
+  top: 21.63px;
+  translate: -50% -50%;
+}
+.k2-home .k2-pill__icon {
+  display: flex;
+}
+.k2-home .k2-pill__icon svg {
+  display: block;
+}
+
+/* 알약 둘레 옅은 노란 빛 (R · G +2 – 4, 15pt 안): 천천히 둘레를 돎. 지우는 · 쓰는 동안은 없음 (그때는 다른 animation 이 덮어씀) */
+.k2-home .k2-pill--glow {
+  animation: k2-pill-glow 6s ease-in-out infinite backwards;
+}
+@keyframes k2-pill-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 16px rgba(255, 235, 60, 0);
+  }
+  15% {
+    box-shadow: -6px -4px 16px rgba(255, 235, 60, 0.03);
+  }
+  40% {
+    box-shadow: 6px -4px 16px rgba(255, 235, 60, 0.03);
+  }
+  65% {
+    box-shadow: 8px 4px 16px rgba(255, 235, 60, 0.03);
+  }
+  90% {
+    box-shadow: -4px 4px 16px rgba(255, 235, 60, 0.03);
+  }
+}
+
+/* ---------- 지우기 (0 – 180ms, 녹화 0.745 – 0.925초): 폭 ease-in-out, 글자는 잘리며 흐려지고 별은 작아짐 (ease-in) ---------- */
+.k2-home .k2-pill--collapse {
+  animation: k2-pill-collapse 180ms cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+.k2-home .k2-pill--collapse .k2-pill__text {
+  flex-shrink: 0;
+  overflow: visible;
+  text-overflow: clip;
+}
+@keyframes k2-pill-collapse {
+  from {
+    width: var(--k2-pill-w0);
+  }
+  to {
+    width: 48.3px;
+  }
+}
+.k2-home .k2-pill__text--out {
+  animation: k2-pill-text-out 180ms linear both;
+}
+@keyframes k2-pill-text-out {
+  12.2% {
+    opacity: 0.98;
+  }
+  21.1% {
+    opacity: 0.9;
+  }
+  30.6% {
+    opacity: 0.86;
+  }
+  40% {
+    opacity: 0.69;
+  }
+  48.9% {
+    opacity: 0.57;
+  }
+  58.3% {
+    opacity: 0.38;
+  }
+  72.2% {
+    opacity: 0.23;
+  }
+  81.7% {
+    opacity: 0.12;
+  }
+  90.6%,
+  100% {
+    opacity: 0;
+  }
+}
+.k2-home .k2-pill__icon--out {
+  animation: k2-pill-star-out 180ms linear both;
+}
+@keyframes k2-pill-star-out {
+  12.2% {
+    scale: 0.956;
+  }
+  21.1% {
+    scale: 0.875;
+  }
+  30.6% {
+    scale: 0.83;
+  }
+  40% {
+    scale: 0.67;
+  }
+  48.9% {
+    scale: 0.58;
+  }
+  58.3% {
+    scale: 0.375;
+  }
+  72.2% {
+    scale: 0.206;
+  }
+  81.7% {
+    scale: 0.125;
+  }
+  90.6%,
+  100% {
+    scale: 0;
+  }
+}
+
+/* ---------- 새 글자 (438ms –): 묶음 전체가 166ms 동안 나타남. 폭은 글자마다 바로 늘지만 오른쪽 여백이 처음엔 좁았다가
+   233ms 동안 17.1 로 벌어짐 (녹화 1.175 – 1.41초 오른끝을 프레임마다 잼: 첫 글자 77.4 · 둘째 90.7 · 셋째 105.4 …) ---------- */
+.k2-home .k2-pill__text--in {
+  animation:
+    k2-pill-text-in 166ms cubic-bezier(0.42, 0, 0.58, 1) both,
+    k2-pill-pad 233ms linear both;
+}
+@keyframes k2-pill-text-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes k2-pill-pad {
+  0% {
+    margin-right: 5.35px;
+  }
+  14.2% {
+    margin-right: 7.25px;
+  }
+  28.8% {
+    margin-right: 10.45px;
+  }
+  42.9% {
+    margin-right: 13.75px;
+  }
+  57.1% {
+    margin-right: 15.25px;
+  }
+  71.7% {
+    margin-right: 16.15px;
+  }
+  85.8% {
+    margin-right: 16.75px;
+  }
+  100% {
+    margin-right: 17.1px;
+  }
+}
+
+/* ---------- 고리 (438 – 988ms, 녹화 1.183 – 1.733초): 노랑 ↔ 청록 원뿔 그라데이션, 바깥 지름 20, 시계 방향 750°/초.
+   두께 1.7 → 5 (구멍 작은 도넛) → 14 · 10 으로 줄며 흐려져 사라짐 ---------- */
+@property --k2-ring-w {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 1.7px;
+}
+.k2-home .k2-pill__ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: conic-gradient(#e8e52a, #1392b1 50%, #e8e52a);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - var(--k2-ring-w) - 0.4px), #000 calc(100% - var(--k2-ring-w) + 0.2px));
+  mask: radial-gradient(closest-side, transparent calc(100% - var(--k2-ring-w) - 0.4px), #000 calc(100% - var(--k2-ring-w) + 0.2px));
+  animation:
+    k2-pill-ring 550ms linear both,
+    k2-pill-spin 480ms linear infinite;
+}
+@keyframes k2-pill-ring {
+  0% {
+    opacity: 0;
+    --k2-ring-w: 1.7px;
+    scale: 1;
+  }
+  21.3% {
+    opacity: 1;
+  }
+  34% {
+    --k2-ring-w: 1.7px;
+  }
+  35.8%,
+  48.5% {
+    --k2-ring-w: 2px;
+  }
+  52.2%,
+  57.6% {
+    --k2-ring-w: 2.3px;
+  }
+  60.7% {
+    --k2-ring-w: 3px;
+  }
+  66.7% {
+    --k2-ring-w: 4.3px;
+  }
+  72.2% {
+    --k2-ring-w: 4.6px;
+  }
+  75.8% {
+    --k2-ring-w: 5px;
+  }
+  78.9% {
+    opacity: 1;
+    scale: 1;
+  }
+  81.8% {
+    scale: 0.7;
+  }
+  88%,
+  94% {
+    opacity: 0.4;
+    scale: 0.5;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.4;
+    --k2-ring-w: 5px;
+  }
+}
+@keyframes k2-pill-spin {
+  from {
+    rotate: 185deg;
+  }
+  to {
+    rotate: 545deg;
+  }
+}
+
+/* ---------- 별 다시 커짐 (990ms –, 녹화 1.75 – 2.0초): 점에서 16pt, 살짝 넘쳤다가 (16.7) 제자리 ---------- */
+.k2-home .k2-pill__icon--in {
+  animation: k2-pill-star-in 410ms linear both;
+}
+@keyframes k2-pill-star-in {
+  0% {
+    scale: 0;
+  }
+  3.7% {
+    scale: 0.17;
+  }
+  7.8% {
+    scale: 0.29;
+  }
+  11.7% {
+    scale: 0.46;
+  }
+  15.9% {
+    scale: 0.58;
+  }
+  20% {
+    scale: 0.69;
+  }
+  23.9% {
+    scale: 0.77;
+  }
+  28% {
+    scale: 0.86;
+  }
+  32.2% {
+    scale: 0.92;
+  }
+  40.2% {
+    scale: 0.96;
+  }
+  44.4% {
+    scale: 1;
+  }
+  64.6% {
+    scale: 1.04;
+  }
+  100% {
+    scale: 1;
+  }
+}

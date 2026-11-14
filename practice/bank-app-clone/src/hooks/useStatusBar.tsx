@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { useLayerActive } from "../platform/LayerContext";
+import { StatusBandContext } from "../kakao2/band";
 
 // 화면마다 상태바 글자색/배경이 다름(홈=검정 배경 흰 글씨, 상세=밝은 배경 검정 글씨).
 // 각 화면이 useStatusBar(...)로 선언하면 PhoneFrame의 StatusBar가 따라 바뀐다.
@@ -23,8 +24,12 @@ export function useStatusBarStyle() {
 // 그 화면이 맨 위가 되는 순간 active가 true로 바뀌며 다시 적용된다.
 export function useStatusBar(bg: string, fg: StatusBarStyle["fg"]) {
   const { setStyle } = useContext(Ctx)!;
+  const setBand = useContext(StatusBandContext); // kakao2 K2Inset 안이면 그 층 54pt 띠 색 (src/kakao2/band.ts)
   const active = useLayerActive();
   useEffect(() => {
     if (active) setStyle({ bg, fg });
   }, [bg, fg, active, setStyle]);
+  useLayoutEffect(() => {
+    setBand?.(bg);
+  }, [bg, setBand]);
 }

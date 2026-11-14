@@ -27,9 +27,10 @@
   --frame-h: 800px;
   --safe-bottom: 0px; /* 홈 인디케이터 영역. 실제 아이폰에선 env()로 덮어씀 */
 }
-/* 콕뱅크(갤럭시): 실제 기기 384 × 853.33dp (상태바 28 + 앱 + 제스처바 15) */
+/* 콕뱅크(갤럭시): 실제 기기 384 × 853.33dp (상태바 28 + 앱 + 제스처바 15). 하나원큐 · 토스 녹화도 같은 기기 */
 html[data-app="nh"]:not([data-os="ios"]),
-html[data-app="hana"]:not([data-os="ios"]) {
+html[data-app="hana"]:not([data-os="ios"]),
+html[data-app="toss"]:not([data-os="ios"]) {
   --frame-w: 384px;
   --frame-h: 853.33px;
 }
@@ -89,6 +90,14 @@ html[data-app="kbank"]:not([data-os="ios"]) {
 [data-os="ios"] {
   --frame-w: 402px;
   --frame-h: 874px;
+  --safe-bottom: 34px;
+}
+/* kakao2 녹화 기기 (iPhone 15 계열, 아이폰 고정): 1180 x 2556px = 393 x 852pt, 상태바 54 · 아래 안전영역 34.
+   allone(NH올원뱅크)도 같은 녹화 아이폰 (흰 띠 59 / 34 는 src/allone/allone.css) */
+html[data-kakao2],
+html[data-app="allone"] {
+  --frame-w: 393px;
+  --frame-h: 852px;
   --safe-bottom: 34px;
 }
 
@@ -151,12 +160,19 @@ button {
     0 0 0 12px #6d6d72,
     0 30px 60px rgba(0, 0, 0, 0.35);
 }
+/* kakao2 · allone 녹화 기기 화면 모서리 (iPhone 15 Pro 계열 55pt) */
+html[data-kakao2] .phone--ios,
+html[data-app="allone"] .phone--ios {
+  border-radius: 55px;
+}
 
 /* 진짜 폰 화면 크기면 프레임 없이 꽉 채움. 가짜 상태바 내용은 숨기고,
    노치/다이내믹 아일랜드 높이(safe-area-inset-top)만큼 배경색 띠로 남긴다 */
 @media (max-width: 500px) {
   :root,
-  [data-os="ios"] {
+  [data-os="ios"],
+  html[data-kakao2],
+  html[data-app="allone"] {
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   body {
@@ -304,6 +320,11 @@ button {
 /* 아이폰에선 시스템 글꼴(SF Pro + 애플SD산돌고딕Neo). 다른 기기에선 Pretendard로 대체 */
 [data-os="ios"] body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, sans-serif;
+}
+/* kakao2 · allone: 화면 크기를 전부 Pretendard 로 맞췄으므로 맥에서도 Pretendard (어느 PC에서 녹화해도 같은 글자) */
+html[data-kakao2] body,
+html[data-app="allone"] body {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
 }
 
 /* iOS 26+ Liquid Glass 원형 버튼: 반투명 + 배경 흐림 + 위쪽 하이라이트 */

@@ -11,7 +11,21 @@ import "./auth.css";
 // 로그인 (폰 화면 안). 계정은 관리자가 만들어 줌 — 은행(서버)마다 따로
 export function LoginScreen({ message }: { message?: string }) {
   useStatusBar(
-    APP === "nh" ? "#18171c" : APP === "hana" ? (THEME === "dark" ? "#191a1c" : "#ffffff") : APP === "ibk" ? "#fafafa" : APP === "kbank" ? "#ffffff" : "var(--home-bg)",
+    APP === "nh"
+      ? "#18171c"
+      : APP === "hana"
+        ? THEME === "dark"
+          ? "#191a1c"
+          : "#ffffff"
+        : APP === "ibk"
+          ? "#fafafa"
+          : APP === "kbank"
+            ? "#ffffff"
+            : APP === "toss"
+              ? "#171619"
+              : APP === "allone"
+                ? "#ffffff"
+                : "var(--home-bg)",
     APP === "nh" || (THEME === "dark" && APP !== "ibk" && APP !== "kbank") ? "light" : "dark",
   );
   const [username, setUsername] = useState("");

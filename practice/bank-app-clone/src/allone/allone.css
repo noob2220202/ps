@@ -1,0 +1,551 @@
+/* ===== NH올원뱅크 (html[data-app="allone"]) — 토큰 · 기기 화면 위(흰 띠 · 상태바 · 아일랜드 · 홈 인디케이터) · 네이티브 층 · 로딩 막 · 토스트 · 로그인 / 프로필 고르기 =====
+   한 번들에 모든 앱 CSS 가 들어가므로 올원만 고르는 선택자(html[data-app="allone"] 또는 ao- 클래스)만 씀. 키프레임도 ao- 로 시작.
+   전역 --home-* 토큰은 다시 정하지 않음 (프로필 고르기 .picker--allone 안에서만). plan.md §3.1 · §3.2 */
+/* .ao-num 의 Roboto (400 · 500 · 700) — 다른 앱 CSS(ibk · kbank)에 기대지 않고 여기서 */
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/700.css";
+
+:root[data-app="allone"] {
+  /* 바탕 · 선 */
+  --ao-bg: #ffffff;
+  --ao-line: #eeeeee;
+  --ao-line-2: #dcdcdc;
+  --ao-line-3: #f5f5f5; /* 칩 · 탭 바탕 */
+  --ao-disabled: #f5f5f5;
+  --ao-skeleton: #fcfbfe;
+
+  /* 초록 */
+  --ao-green: #0c8f2d;
+  --ao-green-dark: #004511; /* 눌림: 상세 확인 */
+  --ao-green-light: #12a434; /* 눌림: 웹 잔액채우기 · T5/T1 웹 버튼 */
+  --ao-green-native: #003e0e; /* 눌림: T2 다음 · T7 확인 */
+  --ao-green-tint: #eafeee; /* 테두리 버튼 눌림 바탕 */
+  --ao-chip-hash: #00831a;
+  --ao-notice-title: #008b1e;
+  --ao-notice-date: #00821f;
+  --ao-page-dot: #0a902b;
+  --ao-spinner-face: #1ac66d;
+  --ao-spinner-ring: #16b758;
+
+  /* 그 밖의 색 */
+  --ao-blue: #0052b3; /* NH 파랑 (NH 로고 타일 · 계좌 블록) */
+  --ao-out: #e93535; /* 출금 */
+  --ao-in: #1a5dd9; /* 입금 */
+  --ao-error: #ff0000;
+  --ao-link: #555555;
+  --ao-star: #8f8f8f;
+  --ao-star-on: #ffc31a;
+
+  /* 글자 */
+  --ao-t0: #000000;
+  --ao-t1: #141414;
+  --ao-t2: #3c3c3c;
+  --ao-t3: #4e4e4e;
+  --ao-t4: #4c4c4c;
+  --ao-t5: #666666;
+  --ao-t5b: #686868;
+  --ao-t6: #808080;
+  --ao-t7: #898989;
+  --ao-t8: #9e9e9e;
+  --ao-placeholder: #bcbcbc; /* 금액 자리 글자 */
+
+  /* 막 */
+  --ao-dim-web: rgba(55, 55, 55, 0.68); /* 웹 로딩 막 (59–818 만) */
+  --ao-dim-deep: rgba(0, 0, 0, 0.22); /* 더 어둡게 한 겹 */
+  --ao-scrim: rgba(0, 0, 0, 0.3); /* 웹 시트 배경막 */
+  --ao-dim-amount: rgba(0, 0, 0, 0.765); /* 네이티브 T7 (창 전체) */
+  --ao-dim-password: rgba(0, 0, 0, 0.733); /* 네이티브 T3 (창 전체) */
+
+  /* 글꼴: Pretendard (영역 스펙의 맞춘 크기 · 자간 그대로), 숫자 일부만 Roboto (.ao-num) */
+  --ao-font: "Pretendard Variable", Pretendard, sans-serif;
+  --ao-font-num: Roboto, "Pretendard Variable", Pretendard, sans-serif;
+
+  /* 띠: 위 상태바 띠 0–59, 웹뷰 59–818, 아래 띠 818–852 (진짜 폰에선 안전 영역) */
+  --ao-top: 59px;
+  --ao-bottom: 34px;
+}
+.ao-num {
+  font-family: var(--ao-font-num);
+}
+
+/* ---------- 진짜 폰 화면 (500px 이하): 띠 = 기기 안전 영역, 가짜 상태바 · 아일랜드 · 홈 인디케이터는 global.css 가 숨김 ---------- */
+/* 화면 폭이 393 이 아니어도 393pt 좌표 그대로: 폰을 393 폭으로 두고 창 폭에 맞게 배율(zoom, ibk2 와 같은 방법) — 360 폭에서 오른쪽이 잘리거나
+   430 폭에서 웹 화면 · 네이티브 키패드 판이 어긋나지 않게. 높이는 창 높이 / 배율 (--ao-fit · --ao-phone-h 는 Overlay.tsx 가 창 크기로 정함), 띠도 배율로 나눔 */
+@media (max-width: 500px) {
+  :root[data-app="allone"] {
+    --ao-top: calc(env(safe-area-inset-top, 0px) / var(--ao-fit, 1));
+    --ao-bottom: calc(env(safe-area-inset-bottom, 0px) / var(--ao-fit, 1));
+  }
+  html[data-app="allone"]:not([data-ibk2]) .phone {
+    width: 393px;
+    height: var(--ao-phone-h, 100dvh);
+    zoom: var(--ao-fit, 1);
+  }
+}
+
+/* ---------- 흰 띠 + 웹뷰 (WebView 를 감싼 네이티브 껍데기) ---------- */
+html[data-app="allone"] .phone__viewport {
+  position: absolute;
+  inset: var(--ao-top) 0 var(--ao-bottom);
+  z-index: 0;
+  flex: none;
+}
+.ao-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  z-index: 1;
+  pointer-events: none;
+}
+.ao-band--top {
+  top: 0;
+  height: var(--ao-top);
+}
+.ao-band--bottom {
+  bottom: 0;
+  height: var(--ao-bottom);
+}
+/* 화면 묶음 (App.tsx): 로그인 cut 전에 홈을 간편비밀번호 화면 밑에 숨겨 미리 그려 둘 때 --pre (보이지도 눌리지도 않음, 배치는 미리 됨) */
+.ao-stack {
+  display: contents;
+}
+.ao-stack--pre {
+  visibility: hidden;
+  pointer-events: none;
+}
+/* 밑에 숨어 있는 화면 층 (ScreenStack allone 갈래: 화면 사이는 CUT, 밑 층은 그대로 두어 돌아오면 스크롤 · 내용 그대로) */
+html[data-app="allone"] .layer--ao-under {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---------- 상태바 (StatusBar.tsx): 화면 위에 겹친 투명한 층, 글자 · 아이콘만. 색 바뀜의 지연 · 길이는 StatusBar.tsx 가 Web Animations 로 ---------- */
+html[data-app="allone"] .phone > .statusbar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 54px;
+  padding: 0;
+  display: block;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: none;
+  z-index: 70;
+  pointer-events: none;
+}
+.ao-sb__svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+.ao-sb text {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  letter-spacing: 0;
+}
+.ao-sb__clock {
+  font-size: 16.2px;
+  font-weight: 600;
+  fill: #000;
+}
+.ao-sb--clock-light .ao-sb__clock {
+  fill: #fff;
+}
+.ao-sb__icons {
+  color: #000;
+}
+.ao-sb--icons-light .ao-sb__icons {
+  color: #fff;
+}
+.ao-sb__lte {
+  font-size: 13.25px;
+  font-weight: 620;
+}
+.ao-sb__num {
+  font-size: 11px;
+  font-weight: 700;
+}
+.ao-sb__empty {
+  fill-opacity: 0.333;
+}
+.ao-sb__cap {
+  fill-opacity: 0.31;
+}
+.ao-sb--icons-light .ao-sb__empty {
+  fill-opacity: 0.46;
+}
+.ao-sb--icons-light .ao-sb__cap {
+  fill-opacity: 0.43;
+}
+.ao-sb__low {
+  fill: #ff3b30;
+}
+
+/* ---------- 다이나믹 아일랜드 (kakao2 K2Island 를 그대로 씀 — kakao2 chrome.css 의 html[data-kakao2] 규칙과 같은 값, k2-rec 키프레임은 전역) ----------
+   녹화 중: 107.41 – 279.27 × 11.23 – 48.05, 빨간 점 지름 12.1 가운데 (125.68, 29.53), 1.5초 주기 */
+html[data-app="allone"] .dynamic-island {
+  height: 37.33px;
+  border-radius: 18.67px;
+}
+html[data-app="allone"] .dynamic-island--k2rec {
+  left: 107.41px;
+  top: 11.23px;
+  width: 171.86px;
+  height: 36.82px;
+  margin-left: 0;
+  border-radius: 18.41px;
+}
+html[data-app="allone"] .dynamic-island--k2rec .k2-rec {
+  left: 12.17px;
+  top: 12.25px;
+  width: 12.1px;
+  height: 12.1px;
+  margin-top: 0;
+  opacity: 1;
+  transition: none;
+  animation: k2-rec 1500ms linear infinite;
+}
+
+/* ---------- 홈 인디케이터 (HomeIndicator.tsx): 앱이 켜진 직후만, 검정 140 × 5 (x 126.5–266.5, y 839–844). D 기준 투명도 표 (motion.ts) ---------- */
+html[data-app="allone"] .phone__home-indicator--ao {
+  bottom: 8px;
+  width: 140px;
+  height: 5px;
+  margin-left: -70px;
+  border-radius: 2.5px;
+  background: #000;
+  opacity: 0;
+  z-index: 58;
+  pointer-events: none;
+  animation: ao-home-ind 1100ms linear both;
+}
+@keyframes ao-home-ind {
+  0% {
+    opacity: 0;
+  }
+  22.727% {
+    opacity: 0.41;
+  }
+  27.273% {
+    opacity: 0.45;
+  }
+  31.818% {
+    opacity: 0.49;
+  }
+  36.364% {
+    opacity: 0.6;
+  }
+  40.909% {
+    opacity: 0.72;
+  }
+  45.455% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.88;
+  }
+  54.545% {
+    opacity: 0.91;
+  }
+  59.091% {
+    opacity: 0.94;
+  }
+  63.636% {
+    opacity: 0.97;
+  }
+  68.182%,
+  77.273% {
+    opacity: 1;
+  }
+  81.818% {
+    opacity: 0.85;
+  }
+  86.364% {
+    opacity: 0.64;
+  }
+  90.909% {
+    opacity: 0.4;
+  }
+  95.455% {
+    opacity: 0.19;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- 네이티브 층 자리 (Overlay.tsx · native.ts): 폰 화면 전체, 자리 자체는 누름을 받지 않음 ---------- */
+.ao-native {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ao-native--panel {
+  z-index: 53;
+}
+.ao-native--sheet {
+  z-index: 55;
+}
+.ao-native--keyboard {
+  z-index: 56;
+}
+.ao-native--scene {
+  z-index: 57;
+}
+.ao-native-part {
+  display: contents;
+}
+.ao-native-part--hidden {
+  display: none;
+}
+.ao-native-part > *,
+.ao-native--scene > * {
+  pointer-events: auto;
+}
+
+/* ---------- 웹 로딩 막 + 스피너 (ui/Loading.tsx · loading.ts): 막은 웹뷰만, 스피너는 화면 가운데 (196.5, 425.8) ---------- */
+.ao-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 51;
+  pointer-events: none;
+}
+.ao-loading__web {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--ao-top);
+  bottom: var(--ao-bottom);
+  pointer-events: auto;
+  touch-action: none;
+}
+.ao-loading__web--dim {
+  background: var(--ao-dim-web);
+}
+.ao-loading__web--fade {
+  animation: ao-fade-in 120ms linear both;
+}
+.ao-loading__deep {
+  position: absolute;
+  inset: 0;
+  background: var(--ao-dim-deep);
+  animation: ao-fade-in 280ms ease-out both;
+}
+.ao-loading__spin {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 0.2px);
+  width: 61px;
+  height: 61px;
+  margin: -30.5px 0 0 -30.5px;
+  display: grid;
+  place-items: center;
+}
+@keyframes ao-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ao-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- 토스트 (ui/Toast.tsx · toast.ts): 알약 검정 .80, 흰 14.3/400, 12 × 20, 둥글기 22, 가운데. 아래 끝 = 화면 y (bottom) ---------- */
+.ao-toast-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 54;
+  pointer-events: none;
+}
+.ao-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--ao-bottom) + var(--ao-toast-y, 106px));
+  translate: -50% 0;
+  max-width: calc(100% - 48px);
+  padding: 12px 20px;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: var(--ao-font);
+  font-size: 14.3px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  animation: ao-toast-in 200ms linear both;
+}
+.ao-toast--leaving {
+  animation: ao-toast-out 200ms linear both;
+}
+@keyframes ao-toast-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ao-toast-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- 앱이 꺼진 상태 (녹화 시작 직전, 인트로를 껐을 때): 띠까지 창 전체가 검정 ---------- */
+.ao-off {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+
+/* ---------- 로그인 · 프로필 고르기 (공용 화면, 웹뷰가 이미 띠 아래라 감싸지 않음) ---------- */
+.login--allone {
+  background: #ffffff;
+  color: #222222;
+}
+.login--allone .login__form input:focus {
+  border-color: #0c8f2d;
+}
+.login--allone .login__btn {
+  background: #0c8f2d;
+  color: #ffffff;
+}
+.picker--allone {
+  --home-bg: #ffffff;
+  --home-text: #222222;
+  --home-btn: #f2f4f3;
+  --home-card: #f7f8f8;
+  --home-line: #e6e9e8;
+  padding-bottom: 28px; /* 아래 띠(34)는 프레임이 칠함 */
+}
+
+/* ---------- 기초 단계 자리 (stub.tsx · 각 영역 자리 파일). 영역이 진짜 화면으로 바꾸면 안 쓰임 ---------- */
+.ao-stub,
+.ao-stub-white {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+.ao-stub {
+  display: flex;
+  flex-direction: column;
+}
+.ao-stub__head {
+  flex: none;
+  position: relative;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--ao-line);
+}
+.ao-stub__head--home {
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0 14px 0 24px;
+}
+.ao-stub__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.ao-stub__title--left {
+  margin-right: auto;
+  font-size: 18px;
+}
+.ao-stub__back,
+.ao-stub__close {
+  position: absolute;
+  top: 0;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+}
+.ao-stub__back {
+  left: 6px;
+}
+.ao-stub__close {
+  right: 8px;
+}
+.ao-stub__icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+.ao-stub__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ao-stub__sub {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--ao-t6);
+  word-break: break-all;
+}
+.ao-stub__card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--ao-line);
+  border-radius: 14px;
+}
+.ao-stub__card small {
+  color: var(--ao-t5);
+}
+.ao-stub__bal {
+  font-size: 20px;
+  font-weight: 700;
+}
+.ao-stub__row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.ao-stub__row .ao-stub__link {
+  flex: 1;
+}
+.ao-stub__link {
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid var(--ao-green);
+  color: var(--ao-green);
+  font-size: 15px;
+  font-weight: 600;
+}
+.ao-stub__link:active {
+  background: var(--ao-green-tint);
+}
+.ao-stub__tx {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--ao-line);
+  text-align: left;
+  font-size: 15px;
+}
+.ao-stub__tx small {
+  grid-column: 1 / -1;
+  color: var(--ao-t6);
+  font-size: 12px;
+}
+/* launch/intro.ts 자리 장면: 무늬 없는 회색 → 250ms 동안 흰색으로 */
+.ao-stub-scene {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #6f7b8a, #9aa6b2 55%, #c3c9d0);
+}
+.ao-stub-scene--out {
+  animation: ao-fade-out 250ms linear(0, 0.004, 0.008, 0.039, 0.077, 0.129, 0.203, 0.285, 0.387, 0.49, 0.602, 0.713, 0.817, 0.902, 0.962, 1) both;
+}

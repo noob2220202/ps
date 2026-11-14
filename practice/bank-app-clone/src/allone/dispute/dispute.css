@@ -1,0 +1,511 @@
+/* ===== NH올원뱅크 이의제기 (녹화 C4 0.0–12.4). 클래스는 ao-dsp- 로 시작.
+   좌표: 화면 층(웹뷰) y = 화면 y − 59, 머리줄 50 아래 본문 y = 화면 y − 109. 잉크 상자는 녹화 px/3 에서 잼 ===== */
+
+.ao-dsp {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* 초기화는 특이도 0 (AoButton 의 바탕 · 이 파일의 클래스 규칙이 이김) */
+:where(.ao-dsp) button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+:where(.ao-dsp) :where(h1, h2, h3, p, ol, ul) {
+  margin: 0;
+  padding: 0;
+}
+
+/* 흰 막 51% (녹화 C4 1.607: 검정 글자 3 → 128 은 .50, 초록 #0c8f2d → 132–141, 201–207, 154–156 은 밝기로 .53 — 사이. 웹뷰 전체 — 머리줄 · 아래 버튼까지, 누름 막음) */
+.ao-dsp-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.51);
+}
+/* 첫 화면이 막 밑에 막 그려졌을 때 (막이 걷힌 뒤 한 프레임 — 빈 화면 + 스피너, C4 0.024). 스피너는 화면 가운데 196.5, 425.8 = 층 366.8 */
+.ao-dsp-spin {
+  position: absolute;
+  left: 166px;
+  top: 336.3px;
+  width: 61px;
+  height: 61px;
+  z-index: 20;
+  pointer-events: none;
+}
+.ao-dsp-hdr--blank > * {
+  visibility: hidden;
+}
+/* 그다음 내용을 받기 전 가운데 초록 화살표 (잉크 165.12–225.87 × 405.25–456.75 = 층 y − 59, allone-dispute-arrow 60.75 × 51.5) */
+.ao-dsp-wait {
+  position: absolute;
+  left: 165.12px;
+  top: 346.25px;
+  width: 60.75px;
+  height: 51.5px;
+  z-index: 20;
+  pointer-events: none;
+}
+/* 오른쪽 스크롤 막대 (x 387–390) */
+.ao-dsp-sbar {
+  position: absolute;
+  left: 387px;
+  width: 3px;
+  z-index: 10;
+  border-radius: 1.5px;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 117ms linear;
+  pointer-events: none;
+}
+.ao-dsp-sbar--on {
+  opacity: 1;
+  transition: none;
+}
+
+/* ---------- 머리줄 (화면 59–109) ---------- */
+.ao-dsp-hdr {
+  position: relative;
+  flex: none;
+  height: 50px;
+  background: #fff;
+  color: #000;
+}
+.ao-dsp-hdr__btn {
+  position: absolute;
+  top: 3px;
+  width: 44px;
+  height: 44px;
+}
+.ao-dsp-hdr__btn > svg {
+  position: absolute;
+}
+/* ← 잉크 x 26.31 y 77.33 */
+.ao-dsp .ao-dsp-hdr__back {
+  left: 15px;
+  color: #1d1d1d;
+}
+.ao-dsp-hdr__back > svg {
+  left: 11px; /* 상자 (26, 77) → 잉크 26.31–45.63 × 77.33–90.67 (C4 1.207 · 2.507) */
+  top: 15px;
+}
+/* 집 잉크 x 307.66 y 74.67 */
+.ao-dsp-hdr__home {
+  left: 296px;
+  width: 40px;
+}
+.ao-dsp-hdr__home > svg {
+  left: 11.66px;
+  top: 12.67px;
+}
+/* ≡🔍 상자 (345, 74) */
+.ao-dsp-hdr__menu {
+  left: 340px;
+  width: 38px;
+}
+.ao-dsp-hdr__menu > svg {
+  left: 5px;
+  top: 12px;
+}
+/* 제목 가운데 (잉크 132.31–260.53 × 77–91.33) */
+.ao-dsp-hdr__title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 15.84px;
+  padding: 0 70px;
+  font-size: 15.6px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: -0.2px;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* 취소 #3a3a3a (잉크 341.99–368.3 × 77.33–91.33) */
+.ao-dsp .ao-dsp-hdr__cancel {
+  position: absolute;
+  left: 330px;
+  top: 3px;
+  width: 52px;
+  height: 44px;
+  color: #3a3a3a;
+}
+.ao-dsp-hdr__cancel > span {
+  position: absolute;
+  left: 11.5px;
+  top: 13px;
+  font-size: 15.75px;
+  line-height: 20px;
+  letter-spacing: -0.27px;
+  white-space: nowrap;
+}
+
+/* ---------- 아래 버튼 줄 (흰 바탕 724–818, 버튼 730–786) ---------- */
+.ao-page__foot.ao-dsp-foot {
+  display: flex;
+  gap: 8px;
+  padding: 6px 24px 32px;
+}
+.ao-dsp-intro__footgap {
+  height: 56px;
+}
+/* 아래 버튼 줄 위로 흰 그러데이션 (C4 1.207: 신청절차 글자가 714 에서 .34 → 724 에서 .85 로 흐려짐 — 707.5 에서 0, 1pt 마다 .05 인 직선. 724 부터는 흰 버튼 줄) */
+.ao-page__foot.ao-dsp-foot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -16.5px;
+  height: 16.5px;
+  background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.825));
+  pointer-events: none;
+}
+.ao-btn.ao-dsp-next.ao-btn--disabled {
+  background: #fff;
+}
+
+/* ---------- /dispute 첫 화면 ---------- */
+.ao-dsp-intro {
+  padding: 0 24px 26px;
+}
+/* 안내 3줄 Bold 25.5 (잉크 가운데 151.83 / 189.83 / 227.67 → 줄 37.92) */
+.ao-dsp-intro__head {
+  padding-top: 23.87px;
+  font-size: 25.5px;
+  font-weight: 700;
+  line-height: 37.92px;
+  letter-spacing: -0.05px;
+}
+.ao-dsp-intro__head > span {
+  display: block;
+  position: relative;
+  top: 0.8px; /* Pretendard 한글 잉크가 녹화보다 0.8 위 */
+}
+/* 그림 잉크 109.66–259.91 × 294.17–453.17 (allone-dispute-clipboard 150.25 × 159 = 잉크 상자) */
+.ao-dsp-intro__art {
+  position: relative;
+  height: 290.37px;
+}
+.ao-dsp-intro__art > img {
+  position: absolute;
+  left: 85.66px;
+  top: 47.54px;
+  width: 150.25px;
+  height: 159px;
+}
+/* 신청 대상 Bold 19.6 (잉크 541–559, 가운데 550) */
+.ao-dsp-intro__h {
+  font-size: 19.6px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.35px;
+}
+/* 대상 2줄 16 (잉크 가운데 598.17 / 622.33) */
+.ao-dsp-intro__target {
+  margin-top: 23.09px;
+  font-size: 16px;
+  line-height: 24.16px;
+  letter-spacing: -0.5px;
+}
+.ao-dsp-intro__target > span {
+  display: block;
+  position: relative;
+  top: 1px;
+}
+/* 영업점 안내 14 #3a3a3a (잉크 가운데 657.83 · 가장 진한 칸 58, C4 1.207) */
+.ao-dsp-intro__note {
+  margin-top: 13.42px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.49px;
+  color: #3a3a3a;
+  position: relative;
+  top: -1px;
+}
+/* 신청절차 (잉크 위끝 714 — 아래 버튼 줄 724 밑으로 이어짐) */
+.ao-dsp-intro__h--steps {
+  margin-top: 42.17px;
+}
+.ao-dsp-intro__steps {
+  margin-top: 14px;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: ao-dsp-step;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.5px;
+}
+.ao-dsp-intro__steps > li {
+  counter-increment: ao-dsp-step;
+}
+.ao-dsp-intro__steps > li::before {
+  content: counter(ao-dsp-step) ". ";
+}
+
+/* ---------- /dispute/check ---------- */
+/* 진행 막대 1/5 (x 23.98–93.26, 2.67 높이): 처음 화면 124.67, 스크롤하면 머리줄 밑 108.67 에 붙음 (C4 2.507 · 4.191).
+   sticky 상자는 CSS 정수 px 로 붙어 그려지므로 상자는 정수 자리 (124–128, 붙으면 108–112 · 웹뷰 109 위는 잘림) 에 두고 초록은 그 안 0.67–3.33.
+   흰 바탕이 막대 아래 0.67 까지 덮어 밑으로 지나가는 글자 끝이 막대 줄에 비치지 않음 */
+.ao-dsp-check__bar {
+  position: sticky;
+  top: -1px;
+  z-index: 3;
+  height: 4px;
+  background: #fff;
+  margin-top: 15px;
+}
+/* 초록은 0.67–3.33 (정수 상자 안의 그러데이션 — 소수 자리 상자로 두면 막대가 2pt 로 붙어 그려짐) */
+.ao-dsp-check__bar > i {
+  position: absolute;
+  left: 23.98px;
+  top: 0;
+  width: 69.28px;
+  height: 4px;
+  background: linear-gradient(transparent 0.67px, var(--ao-green, #0c8f2d) 0.67px, var(--ao-green, #0c8f2d) 3.33px, transparent 3.33px);
+}
+.ao-dsp-check {
+  padding: 0 24px 26px;
+}
+/* 제목 Bold 21.6 (잉크 151.33–171, 가운데 161.17) */
+.ao-dsp-check__title {
+  padding-top: 19.16px; /* 막대 상자 아래끝 128 부터 */
+  font-size: 21.6px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.2px;
+}
+/* 항목 글 16 (첫 줄 잉크 가운데 222.17, 줄 24) · 버튼 위까지 11.83 · 버튼 · 칸 아래 다음 항목 줄 상자까지 32.33 */
+.ao-dsp-check__item {
+  margin-top: 35px;
+}
+.ao-dsp-check__item + .ao-dsp-check__item {
+  margin-top: 32.17px; /* 버튼 · 칸 아래끝 → 다음 2줄 항목의 버튼 위끝 92 (녹화 270 · 412 · 578 · 720 · 862, 소수가 쌓이지 않게) */
+}
+.ao-dsp-check__text {
+  position: relative;
+  top: 0.8px; /* Pretendard 한글 잉크가 녹화보다 0.8 위 */
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.47px;
+}
+/* 확인함 345 × 50, 둥글기 8: 안 누름 테 #ddd · 글 #363636 / 누름 테 · 글 초록 */
+.ao-dsp .ao-dsp-check__ok {
+  display: block;
+  width: 100%;
+  height: 50px;
+  margin-top: 11.83px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px #ddd;
+  color: #363636;
+  font-size: 15.75px;
+  line-height: 50px;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+.ao-dsp .ao-dsp-check__ok--on {
+  box-shadow: inset 0 0 0 1px var(--ao-green, #0c8f2d);
+  color: var(--ao-green, #0c8f2d);
+  font-weight: 500;
+}
+/* 5번 영업점 칸 345 × 48 (테 #eee → 누르면 초록), 글 x 41.3 · 돋보기 x 331.99 */
+.ao-dsp .ao-dsp-check__field {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 48px;
+  margin-top: 11.83px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px #eee;
+  text-align: left;
+}
+.ao-dsp .ao-dsp-check__field--on {
+  box-shadow: inset 0 0 0 1px var(--ao-green, #0c8f2d);
+}
+.ao-dsp-check__field > span {
+  position: absolute;
+  left: 17px;
+  top: 13px;
+  font-size: 18px;
+  line-height: 22px;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+}
+.ao-dsp-check__mag {
+  position: absolute;
+  left: 307.99px;
+  top: 16.33px;
+  color: #080808;
+}
+
+/* ---------- /dispute/branch 영업점검색 ---------- */
+.ao-dsp-branch {
+  position: relative;
+  min-height: 100%;
+}
+/* 칸 화면 124–172 (345 × 48, 둥글기 8, 테 #eee → 고르면 초록) */
+.ao-dsp-branch__field {
+  position: absolute;
+  left: 24px;
+  top: 15px;
+  width: 345px;
+  height: 48px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px #eee;
+  cursor: text;
+}
+.ao-dsp-branch__field--on {
+  box-shadow: inset 0 0 0 1px var(--ao-green, #0c8f2d);
+}
+/* 글 17 (잉크 x 41.66, 화면 140.33–156), 안내 #797979, 커서 2 × 24 (화면 136–160) #2a57fd */
+.ao-dsp-branch__text {
+  position: absolute;
+  left: 17.4px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  max-width: 250px;
+  height: 24px;
+  overflow: hidden;
+  font-size: 17.7px;
+  line-height: 24px;
+  letter-spacing: 0.2px;
+  white-space: pre;
+}
+.ao-dsp-branch__text--ph {
+  color: #797979;
+}
+.ao-dsp-branch__text .ao-caret {
+  flex: none;
+  margin-left: 0.7px;
+}
+.ao-dsp-branch__text .ao-dsp-branch__caret0 {
+  position: absolute;
+  left: -1px;
+  margin-left: 0;
+}
+/* 지우기 Ø 17 #7b7b7b (화면 x 300–317, y 139–157) · 돋보기 (x 331.99, y 140.33) */
+.ao-dsp .ao-dsp-branch__clear {
+  position: absolute;
+  left: 268px;
+  top: 6px;
+  width: 36px;
+  height: 36px;
+}
+.ao-dsp-branch__clear::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 9px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #7b7b7b;
+}
+.ao-dsp-branch__clear > svg {
+  position: absolute;
+  left: 13px;
+  top: 14px;
+}
+.ao-dsp .ao-dsp-branch__go {
+  position: absolute;
+  left: 300px;
+  top: 2px;
+  width: 44px;
+  height: 44px;
+  color: #090909;
+}
+.ao-dsp-branch__go > svg {
+  position: absolute;
+  left: 7.99px;
+  top: 14.33px;
+}
+/* 안내 두 줄 (잉크 201.33 / 231.33): 회색 점 4 (x 23.98) · 글 x 32.64 · 괄호 #363636 */
+.ao-dsp-branch__hints {
+  position: absolute;
+  left: 24px;
+  top: 85.33px;
+  list-style: none;
+  font-size: 16px;
+  line-height: 30px;
+  letter-spacing: -0.5px;
+}
+.ao-dsp-branch__hints > li {
+  position: relative;
+  padding-left: 7.93px;
+  white-space: nowrap;
+}
+.ao-dsp-branch__hints > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #979797;
+}
+.ao-dsp-branch__hints span {
+  color: #363636;
+}
+/* 결과 (첫 이름 잉크 227.33, 간격 111): 이름 Bold · 주소 · 전화 #3a3a3a (가장 진한 칸 58, C4 9.907) */
+.ao-dsp-branch__list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 104px;
+}
+.ao-dsp .ao-dsp-branch__row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 111px;
+  padding: 10.33px 24px 0;
+  text-align: left;
+}
+/* 이름 Bold 15.1 (잉크 가운데 234.33) · 주소 13.9 (261.17) · 전화 (285.17) */
+.ao-dsp-branch__row > strong {
+  display: block;
+  position: relative;
+  top: 0.67px; /* 잉크 227.33 (C4 9.907) */
+  font-size: 15.1px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.7px;
+}
+.ao-dsp-branch__row > span {
+  display: block;
+  margin-top: 4.84px;
+  font-size: 13.9px;
+  line-height: 22px;
+  letter-spacing: -0.45px;
+  color: #3a3a3a;
+}
+.ao-dsp-branch__row > .ao-dsp-branch__tel {
+  margin-top: 2px;
+}
+.ao-dsp-branch__none {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 130px;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  text-align: center;
+  color: #808080;
+}

@@ -1,0 +1,1711 @@
+/* ===== 토스 이체 (src/toss/transfer/*, 클래스 · 키프레임은 toss-send-) =====
+   값은 transfer.md §2 의 잰 값 (화면 dp, 0 = 상태바 위). 글자 줄은 line-height = 글자 크기로 두고,
+   Pretendard 잉크 가운데(한글 ≈ 줄 위 + 0.495em, 숫자만 ≈ + 0.47em)가 녹화 잉크 가운데에 오게 top 을 잡음.
+   .toss-page__main 은 화면 y 28 에서 시작 → main 기준 top = 화면 y − 28 */
+
+.toss-send-who,
+.toss-send-num,
+.toss-send-amt,
+.toss-send-cf,
+.toss-send-memo,
+.toss-send-done {
+  --ts-title: #f4f3f6;
+  --ts-text: #dddcdf;
+  --ts-sub: #838285;
+  font-family: var(--toss-font);
+}
+
+/* 깜빡이는 입력 막대 */
+.toss-send-caret {
+  display: inline-block;
+  width: 2px;
+  background: var(--toss-blue);
+  border-radius: 1px;
+  animation: toss-send-blink 1000ms step-end infinite;
+}
+@keyframes toss-send-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 은행 아이콘 (SendLogo): 하나 · NH 는 흰 글리프, KB 는 어두운 글리프를 위로 3.3 올리고 밑에 작은 'KB국민은행' (B 8.500), 카카오는 그림 노랑을 바탕에 맞춤 */
+.toss-send-logo--white img {
+  filter: brightness(0) invert(1);
+}
+.toss-send-logo--kb {
+  position: relative;
+}
+.toss-send-logo--kb img {
+  filter: brightness(0);
+  opacity: 0.78;
+  translate: 0 -3.3px;
+}
+.toss-send-logo--kb::after {
+  content: "KB국민은행";
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  top: 25.8px; /* 잉크 아이콘 위 + 28.7 – 32 */
+  text-align: center;
+  font-size: 11px;
+  line-height: 11px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: rgba(70, 52, 0, 0.72);
+  scale: 0.5;
+  transform-origin: 50% 0;
+}
+.toss-send-logo--kakao img {
+  filter: brightness(0.96);
+  clip-path: inset(8%); /* 그림 네모의 가장자리 선이 안 보이게 */
+}
+.toss-send-glyph {
+  display: inline-flex; /* grid 면 img 의 % 높이가 안 먹어 세로로 긴 글리프가 칸을 넘침 */
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.toss-send-glyph img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 숨은 입력칸 (실제 키보드 · 폰 키보드로도 칠 수 있게) */
+.toss-send-hidden-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+  font-size: 16px; /* 폰에서 확대 안 되게 */
+  pointer-events: none;
+}
+
+/* =================== S1 어디로 보낼까요? =================== */
+.toss-send-who__head {
+  position: relative;
+  height: 184.1px; /* 28 – 212.1 고정 */
+  background: var(--toss-bg);
+}
+.toss-send-who__h1 {
+  position: absolute;
+  left: 23.8px;
+  top: 86.4px; /* 잉크 115.7–140.8 */
+  margin: 0;
+  font-size: 28px;
+  line-height: 28px;
+  font-weight: 650;
+  color: #ffffff; /* B 8.500 잉크 꼭대기 */
+  white-space: nowrap;
+}
+.toss-send-who__tabs {
+  position: absolute;
+  inset: 0;
+  top: 140px;
+  height: 44.1px;
+}
+.toss-send-who__tabs::after {
+  /* 탭 아래 전체 폭 1px 줄 (화면 y 211.3) */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 43.3px;
+  height: 0.8px;
+  background: #272629;
+}
+.toss-send-who__tab {
+  position: absolute;
+  top: 0;
+  height: 40px;
+}
+.toss-send-who__tab > .toss-press__content {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 11.1px; /* 잉크 179.2–194.3 */
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 600;
+  color: #929194;
+  transition: color 200ms ease-out;
+}
+.toss-send-who__tab.on > .toss-press__content {
+  color: #e6e5e8;
+}
+.toss-send-who__bar {
+  position: absolute;
+  top: 41.7px; /* 화면 209.7–212.1 */
+  height: 2.4px;
+  background: #dfdee1;
+  z-index: 1;
+  transition:
+    left 200ms ease-out,
+    width 200ms ease-out;
+}
+.toss-send-who__body {
+  padding-top: 23.7px; /* 상자 235.8 */
+}
+.toss-send-who__empty {
+  margin: 180px 0 0;
+  text-align: center;
+  font-size: 15px;
+  color: #7e7d80;
+}
+.toss-send-who__box {
+  margin: 0 24px;
+  height: 56.4px;
+  border-radius: 12px;
+  background: #1f1e21;
+}
+.toss-send-who__box > .toss-press__content {
+  height: 100%;
+}
+.toss-send-who__ph {
+  position: absolute;
+  left: 16.6px;
+  top: 21px; /* 잉크 257.1–272.3 */
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 500;
+  color: #757477;
+}
+.toss-send-who__cam {
+  position: absolute;
+  right: 4px;
+  top: 4.4px;
+  width: 48px;
+  height: 48px;
+  color: #565558;
+}
+.toss-send-who__cam > .toss-press__content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.toss-send-who__list {
+  margin-top: 16px;
+  animation: toss-fade-in-kf 60ms linear both;
+}
+.toss-send-who__mine {
+  height: 49.6px; /* 화면 308.2–357.8 */
+}
+.toss-send-who__mine > .toss-press__content {
+  height: 100%;
+}
+.toss-send-who__sec {
+  position: absolute;
+  left: 24.2px;
+  top: 20.5px; /* 잉크 가운데 = 줄 위 + 28.9 */
+  margin: 0;
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 650;
+  color: #e5e4e7;
+  white-space: nowrap;
+}
+.toss-send-who__sech {
+  position: relative;
+  left: 0;
+  top: 0;
+  height: 49.8px;
+  padding: 21.3px 0 0 24.2px;
+  box-sizing: border-box;
+  color: #e6e5e8;
+}
+.toss-send-who__count {
+  position: absolute;
+  right: 39.8px; /* 잉크 오른끝 342.6 */
+  top: 22.5px;
+  font-size: 15px;
+  line-height: 15px;
+  color: #8b8a8d;
+}
+.toss-send-who__chev {
+  position: absolute;
+  left: 350.4px;
+  top: 25.6px; /* 화면 333.8 */
+  color: #8e8d90; /* 선이 가늘어 녹화 꼭대기 #89888b 보다 조금 밝게 */
+  transition: transform 200ms ease-out;
+}
+.toss-send-who__mine.open .toss-send-who__chev {
+  transform: rotate(-180deg);
+}
+.toss-send-who__exp {
+  overflow: hidden;
+  transition: height 200ms ease-out 100ms;
+}
+.toss-send-who__exprows {
+  opacity: 0;
+  transition: opacity 100ms linear;
+}
+.toss-send-who__exp.open {
+  transition-delay: 0ms;
+}
+.toss-send-who__exp.open .toss-send-who__exprows {
+  opacity: 1;
+  transition-delay: 200ms;
+}
+.toss-send-who__hint {
+  height: 20.2px;
+  margin: 0;
+  padding: 3.3px 0 0 24.8px; /* 잉크 361.5–373.0 */
+  box-sizing: border-box;
+  font-size: 13px;
+  line-height: 13px;
+  color: #626164;
+}
+.toss-send-who__row {
+  height: 68px;
+}
+.toss-send-who__row > .toss-press__content {
+  height: 100%;
+}
+.toss-send-who__row .toss-send-logo {
+  position: absolute;
+  left: 24px;
+  top: 14px;
+}
+.toss-send-who__text {
+  position: absolute;
+  left: 79px;
+  right: 60px;
+  top: 0;
+}
+.toss-send-who__title,
+.toss-send-who__sub {
+  position: absolute;
+  left: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toss-send-who__title {
+  top: 15.9px; /* 잉크 +16.2 … +31.6 (글자는 0.8 단위로 붙음 → B 8.500 이름 423.8) */
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 650;
+  color: #e8e6e9;
+}
+.toss-send-who__sub {
+  top: 38.8px; /* 잉크 +38.8 … +51.7 */
+  font-size: 15px;
+  line-height: 15px;
+  color: #8f8e91;
+}
+.toss-send-star {
+  position: absolute;
+  left: 323.6px; /* ★ 337.6–357.6 */
+  top: 20px;
+  width: 48px;
+  height: 28px;
+  color: #413f42;
+}
+.toss-send-star > .toss-press__content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.toss-send-star.on {
+  color: #ffc342;
+}
+.toss-send-star.on svg {
+  animation: toss-send-star-pop 150ms ease-out;
+}
+@keyframes toss-send-star-pop {
+  50% {
+    transform: scale(1.2);
+  }
+}
+.toss-send-who__pad {
+  height: 24px;
+}
+
+/* =================== S2 어떤 계좌로 보낼까요? =================== */
+.toss-send-num__body {
+  overflow: hidden;
+}
+.toss-send-num__in {
+  position: absolute;
+  inset: 0;
+  top: -53.6px; /* 본문(81.6)이 아니라 main(28) 기준으로 놓으려고 */
+}
+.toss-send-num__h1 {
+  position: absolute;
+  left: 23.8px;
+  top: 85.1px; /* 잉크 115.2–138.4 */
+  margin: 0;
+  font-size: 26px;
+  line-height: 26px;
+  font-weight: 650;
+  color: #fffeff;
+  white-space: nowrap;
+}
+.toss-send-field {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+}
+.toss-send-field__label {
+  position: absolute;
+  left: 0.4px;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 500;
+  color: #afaeb1; /* B 36.981 #abaaad – #b2b1b4 */
+  white-space: nowrap;
+  transition: color 150ms;
+}
+.toss-send-field--focus .toss-send-field__label {
+  color: #2c69cc; /* 파랑이지만 13px 글자는 녹화에서 #2863c3 까지만 (B 11.111) */
+}
+.toss-send-field__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.6px;
+  background: #2c2b2e;
+}
+.toss-send-field--focus .toss-send-field__line,
+.toss-send-field--active .toss-send-field__line {
+  height: 2.4px;
+  background: #4194fa;
+}
+/* 계좌번호 칸: 화면 160 – 밑줄 */
+.toss-send-num__number {
+  top: 132px;
+  height: 64px;
+}
+.toss-send-num__number .toss-send-field__label {
+  top: 4px; /* 잉크 165.5–176.9 */
+}
+.toss-send-num__value {
+  position: absolute;
+  left: 0;
+  top: 30.6px; /* 숫자 잉크 192.7–209.1 */
+  display: flex;
+  align-items: center;
+  height: 22px;
+  font-size: 22px;
+  line-height: 22px;
+  color: #e1e0e3;
+  white-space: nowrap;
+}
+.toss-send-num__value .toss-send-caret {
+  margin-left: 1px;
+  translate: 0 -1.9px; /* 막대 183.2 – 216 */
+}
+.toss-send-num__number .toss-send-field__line {
+  top: 61.7px; /* 값 있음: 221.7 */
+}
+.toss-send-num--empty .toss-send-num__number .toss-send-field__line {
+  top: 57.7px; /* 비었을 때 칸이 4dp 짧음: 217.7 */
+  height: 1.6px;
+}
+.toss-send-num__clear {
+  position: absolute;
+  left: 294px;
+  top: 22px; /* ⓧ 326.4–345.6 × 190.4–209.6 (가운데 336, 200) */
+  width: 36px;
+  height: 36px;
+}
+.toss-send-num__clear > .toss-press__content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.toss-send-num__tap {
+  position: absolute;
+  left: 0;
+  right: 40px;
+  top: 0;
+  bottom: -6px;
+  cursor: text;
+}
+/* 은행 칸 (번호가 비었을 때 기준 · 값이 있으면 아래 전부 +4) */
+.toss-send-num__shift {
+  position: absolute;
+  inset: 0;
+  transform: translateY(4px);
+  pointer-events: none; /* 화면 전체를 덮는 칸이라 — 위 번호 칸을 누를 수 있게 */
+}
+.toss-send-num__shift > * {
+  pointer-events: auto;
+}
+.toss-send-num--empty .toss-send-num__shift {
+  transform: none;
+}
+.toss-send-num__bank {
+  top: 202px; /* 화면 230 */
+  height: 70px;
+  cursor: pointer;
+}
+.toss-send-num__bankph {
+  position: absolute;
+  left: 0;
+  top: 38.3px; /* 잉크 269.6–288.8 */
+  font-size: 22px;
+  line-height: 22px;
+  color: #bdbcbf;
+  white-space: nowrap;
+}
+.toss-send-num__bank .toss-send-field__label {
+  top: 15.4px; /* 잉크 249.6–261.6 (+4) */
+}
+.toss-send-num__bankval {
+  position: absolute;
+  left: 0;
+  top: 38.7px; /* 잉크 273.6–293.6 (+4 포함 −4) */
+  font-size: 22px;
+  line-height: 22px;
+  color: #dcdbde;
+  white-space: nowrap;
+}
+.toss-send-num__bankval,
+.toss-send-num__bank .toss-send-field__label,
+.toss-send-num__bankph {
+  transition: opacity 120ms linear;
+}
+.toss-send-num__chev {
+  position: absolute;
+  left: 317.6px; /* 341.6–354.4 */
+  top: 45.2px; /* 275.2–282.4 */
+  color: #6d6c6f;
+}
+.toss-send-num__bank .toss-send-field__line {
+  top: 68.4px; /* 298.4 */
+}
+.toss-send-num__under {
+  position: absolute;
+  left: 24px;
+  right: 0;
+  top: 280px; /* 화면 308 */
+  height: 40px;
+}
+.toss-send-num__hint {
+  position: absolute;
+  left: 0.1px;
+  top: -0.4px; /* 잉크 308.0–319.7 */
+  font-size: 13px;
+  line-height: 13px;
+  color: #8a898c;
+  white-space: nowrap;
+}
+.toss-send-num__finding {
+  position: absolute;
+  left: 0;
+  top: -1.5px; /* 잉크 312.3–321.6 (+4 포함) */
+  display: flex;
+  align-items: center;
+  height: 13px;
+  font-size: 13px;
+  line-height: 13px;
+  color: #878689;
+  white-space: nowrap;
+}
+.toss-send-num__dots {
+  display: inline-flex;
+  gap: 3.6px;
+  width: 15.2px;
+  margin-right: 5.6px;
+}
+.toss-send-num__dots i {
+  width: 2.4px;
+  height: 2.4px;
+  border-radius: 50%;
+  background: #878689;
+  animation: toss-send-dot 900ms ease-in-out infinite;
+}
+.toss-send-num__dots i:nth-child(2) {
+  animation-delay: 150ms;
+}
+.toss-send-num__dots i:nth-child(3) {
+  animation-delay: 300ms;
+}
+@keyframes toss-send-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2.4px);
+  }
+}
+.toss-send-num__chips {
+  position: absolute;
+  left: 0;
+  top: 0.3px; /* 화면 312.3 (+4 포함) − 4 */
+  display: flex;
+  gap: 9.4px;
+  animation: toss-fade-in-kf 350ms ease-out both;
+}
+.toss-send-chip {
+  height: 38.9px;
+  border-radius: 6.4px;
+  background: #2b2a2d;
+}
+.toss-send-chip > .toss-press__content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6.4px;
+  padding: 0 12.8px 0 12.9px;
+  font-size: 15px;
+  line-height: 15px;
+  font-weight: 500;
+  color: #b4b5b8;
+  white-space: nowrap;
+}
+.toss-send-num__pill {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  top: 412.7px; /* 화면 440.7–478.6 */
+  height: 37.9px;
+  border-radius: 8px;
+  background: #27282d;
+}
+.toss-send-num__pill > .toss-press__content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 13px;
+  font-size: 14.5px;
+  line-height: 14.5px;
+  font-weight: 500;
+  color: #b9bdc5;
+  white-space: nowrap;
+}
+.toss-send-num__ok {
+  position: absolute;
+  left: 20px;
+  right: 19.8px;
+  bottom: 20.8px; /* 화면 761.5 – 817.5 (아래 띠 위 20.8) */
+}
+.toss-send-num__ok--kb {
+  bottom: 364px; /* 화면 418.3 (자판 494.7 위 20.4) */
+}
+
+/* 삼성 숫자 자판 (HanaKeyboard) 감싸기: 화면 494.7 – 838.33, 올라옴 180ms (B 10.81–10.99), 내려감 150ms (31.33–31.47) */
+.toss-send-kbwrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 20;
+}
+.toss-send-kbwrap .hana-kb {
+  pointer-events: auto;
+  transition: translate 150ms cubic-bezier(0.4, 0, 1, 1);
+}
+.toss-send-kbwrap .hana-kb--open {
+  transition: translate 180ms cubic-bezier(0, 0, 0.2, 1);
+}
+/* 토스 녹화의 삼성 자판 (하나 녹화와 다른 곳): 도구 동그라미 ⌀32 #3d3d3d (⚙ 만 흰색), ⌫ · 완료 · .- 키 #161616, ⌫ 는 선 모양, 엔터 자리에 파란 '완료', 키 모서리 6.4 */
+.toss-send-kbwrap .hana-kb__tool {
+  top: 6.1px;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  background: #3d3d3d;
+  color: #6c6c6c;
+}
+.toss-send-kbwrap .hana-kb__tool svg {
+  width: 19px;
+  height: 19px;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(1) {
+  left: 33.6px;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(2) {
+  left: 101.6px;
+  color: #ffffff;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(3) {
+  left: 168.4px;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(4) {
+  left: 236px;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(5) {
+  left: 303.2px;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(2) svg {
+  display: none;
+}
+.toss-send-kbwrap .hana-kb__tool:nth-child(2)::after {
+  content: "";
+  width: 19px;
+  height: 19px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M8.6 2.4h2.8l.4 2.1 1.5.8 2-.8 1.4 2.4-1.6 1.4v1.4l1.6 1.4-1.4 2.4-2-.8-1.5.8-.4 2.1H8.6l-.4-2.1-1.5-.8-2 .8-1.4-2.4 1.6-1.4V8.3L3.3 6.9l1.4-2.4 2 .8 1.5-.8Z'/%3E%3Ccircle cx='10' cy='10' r='2.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.toss-send-kbwrap .hana-kb__key {
+  border-radius: 6.4px;
+}
+.toss-send-kbwrap :is(.hana-kb__key--back, .hana-kb__key--enter, .hana-kb__key--dot) {
+  background: #161616;
+}
+.toss-send-kbwrap .hana-kb__key--back:active,
+.toss-send-kbwrap .hana-kb__key--enter:active {
+  background: #2a2a2a;
+}
+.toss-send-kbwrap :is(.hana-kb__key--back, .hana-kb__key--enter) svg {
+  display: none;
+}
+.toss-send-kbwrap .hana-kb__key--enter::after {
+  content: "완료";
+  font-family: var(--toss-font);
+  font-size: 21px; /* 잉크 313.6–350.4 (B 11.111) */
+  font-weight: 400;
+  color: #4890fd;
+}
+/* 자리 (B 11.111 에서 다시 잼): 도구줄 위 494.4 · 키 줄 549.2 / 612.4 / 675.6 / 738.8, 키 열 9.6 · 102.4 · 196.8 · 289.6 (마지막 열 85.6 폭, 오른쪽 375.2) */
+.toss-send-kbwrap .hana-kb {
+  height: 344.2px;
+}
+.toss-send-kbwrap .hana-kb__keys {
+  right: 8.8px;
+  grid-template-columns: 84.8px 84.8px 84.8px 85.6px;
+  justify-content: space-between;
+  column-gap: 0;
+}
+.toss-send-kbwrap .hana-kb__key {
+  color: #fafafa;
+}
+.toss-send-kbwrap .hana-kb__key--back::after {
+  content: "";
+  width: 30.4px;
+  height: 22.4px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30.4 22.4'%3E%3Cpath d='M10 1.2h16.4a2.8 2.8 0 0 1 2.8 2.8v14.4a2.8 2.8 0 0 1-2.8 2.8H10L1.6 11.2Z' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linejoin='round'/%3E%3Cpath d='m13.8 6.8 8.8 8.8m0-8.8-8.8 8.8' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* 은행 선택 시트 (S3): 카드 위 169.7, 제목 잉크 216.0–234.0, 격자 첫 줄 264.9 (스크롤 영역은 256 부터) */
+.toss-send-sheet .toss-sheet__title {
+  padding: 29.6px 23.2px 0; /* 잉크 x 34.8 (녹화 B 32.219) */
+  height: 70.3px;
+  box-sizing: border-box;
+  font-size: 20px;
+  line-height: 20px;
+  font-weight: 650;
+}
+.toss-send-sheet .toss-sheet__body {
+  overscroll-behavior: contain;
+}
+.toss-send-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 99px);
+  gap: 8.8px;
+  padding: 8.1px 0 24px 23.4px;
+}
+.toss-send-grid + .toss-send-grid {
+  padding-top: 0;
+}
+.toss-send-grid__sec {
+  margin: 0;
+  padding: 28.9px 0 0 24.8px; /* 마지막 은행 타일 아래 37.7 → 글자 */
+  height: 70.5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 16px;
+  color: #adacaf;
+}
+.toss-send-tile {
+  height: 85px;
+  border-radius: 10px;
+  background: #28272a;
+}
+.toss-send-tile > .toss-press__content {
+  height: 100%;
+}
+.toss-send-tile .toss-send-glyph {
+  position: absolute;
+  left: 35.5px; /* 28 폭 가운데 */
+  top: 16px;
+}
+.toss-send-tile__label {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 52.6px; /* 잉크 위 = 타일 위 + 55.6 */
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  color: #fcfbfe;
+  text-align: center;
+  word-break: break-all;
+}
+.toss-send-tile--two .toss-send-tile__label {
+  top: 45px;
+}
+
+/* =================== S4 토스뱅크 송금 (금액) =================== */
+.toss-send-amt__title {
+  animation: toss-fade-in-kf 250ms ease-out 330ms both;
+}
+.toss-send-amt__body {
+  overflow: hidden;
+}
+.toss-send-amt__in {
+  position: absolute;
+  inset: 0;
+  top: -53.6px;
+}
+.toss-send-amt__content {
+  position: absolute;
+  inset: 0;
+  animation: toss-fade-in-kf 150ms ease-out both;
+}
+.toss-send-amt__fail {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 396px;
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  color: #7e7d80;
+}
+.toss-send-amt__spin {
+  position: absolute;
+  left: 177px;
+  top: 390px; /* 가운데 (192, 433) */
+}
+.toss-send-line {
+  position: absolute;
+  margin: 0;
+  left: 24.5px;
+  right: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toss-send-line b {
+  font-weight: 650;
+  color: #fdfdff;
+}
+.toss-send-line span {
+  color: #9c9ba0;
+}
+.toss-send-amt__from {
+  top: 75.5px; /* 잉크 105.2–125.2 */
+  font-size: 22px;
+  line-height: 22px;
+}
+.toss-send-amt__bal {
+  top: 114.1px; /* 잉크 143.4–155.7 */
+  font-size: 15px;
+  line-height: 15px;
+  color: #9f9ea3;
+}
+.toss-send-amt__bal em {
+  font-style: normal;
+  color: #c3c2c6; /* B 47.20 · A 130.500 */
+}
+.toss-send-amt__to {
+  top: 169.1px; /* 잉크 199.0–218.5 */
+  font-size: 22px;
+  line-height: 22px;
+}
+.toss-send-amt__to--grey b {
+  color: #9e9ca2;
+}
+.toss-send-amt__tosub {
+  top: 206.1px; /* 잉크 234.3–247.2 */
+  display: flex;
+  align-items: center;
+  height: 15px;
+  font-size: 15px;
+  line-height: 15px;
+  color: #807e86; /* B 47.20 · 96.3 */
+}
+.toss-send-shield {
+  margin: 0 6.1px 0 1.1px;
+  flex: none;
+}
+/* 방패 안 체크: 그려짐 125ms → 머묾 → 사라짐 → 되풀이 (send-amt: 2.1초, 시작 0.2초 뒤 · send-cf: 1.04초, 0.33초 뒤) */
+.toss-send-shield__chk {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.toss-send-shield--amt .toss-send-shield__chk {
+  animation: toss-send-chk-amt 2100ms linear 200ms infinite;
+}
+.toss-send-shield--cf {
+  animation: toss-fade-in-kf 1ms linear 110ms both;
+}
+.toss-send-shield--cf .toss-send-shield__chk {
+  animation: toss-send-chk-cf 1040ms linear 330ms infinite;
+}
+@keyframes toss-send-chk-amt {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  6% {
+    stroke-dashoffset: 0;
+  }
+  36% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  36.1%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes toss-send-chk-cf {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  12% {
+    stroke-dashoffset: 0;
+  }
+  75% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  75.1%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+.toss-send-loadchip {
+  display: inline-block;
+  margin: -6px 0 0 11.6px;
+  padding: 6px 30px 6px 8.6px;
+  border-radius: 9px;
+  background: #19181d; /* 녹화에선 거의 안 보이는 칸 (B 95.55: #18171c – #19181d) */
+  font-size: 15px;
+  line-height: 15px;
+}
+.toss-send-line .toss-send-loadchip {
+  color: #59575f; /* .toss-send-line span 의 회색보다 앞서게 */
+}
+.toss-send-amt__bal .toss-send-loadchip {
+  translate: 0 -3.6px; /* 글자 잉크 141.0 (B 95.55 · A 124.95) */
+}
+.toss-send-amt__tosub .toss-send-loadchip {
+  translate: 0 -0.8px; /* 233.0 */
+}
+.toss-send-amt__amount {
+  position: absolute;
+  left: 24px;
+  top: 260px; /* 값 잉크 294.4–320.2 · 안내 288.0–316.8 */
+  height: 34px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.toss-send-amt__val {
+  display: flex;
+  font-size: 31px;
+  line-height: 31px;
+  font-weight: 650;
+  color: #fdfcff;
+  translate: 0 1px; /* 잉크 x 25.6 (B 48.212 · A 130.500) */
+}
+.toss-send-amt__val i {
+  font-style: normal;
+  display: inline-block;
+  animation: toss-send-digit 150ms ease-out both;
+}
+.toss-send-amt__won {
+  display: inline-block;
+  transition: transform 150ms ease-out;
+}
+@keyframes toss-send-digit {
+  from {
+    opacity: 0;
+    transform: translateY(-4.5px);
+  }
+}
+.toss-send-amt__ph {
+  display: flex;
+  align-items: center;
+  font-size: 30px;
+  line-height: 30px;
+  font-weight: 500;
+  color: #817f89; /* 녹화 잉크 꼭대기 #807e88 – #83818b */
+  translate: 0 -1.2px;
+}
+.toss-send-amt__ph .toss-send-caret {
+  margin-right: 1px;
+  translate: 0 0.4px;
+}
+/* 내 계좌로 옮길 때는 아래줄(방패 없음) · 금액이 조금 아래 (A 128.0 · 130.500 · B 62.1–63.2: 아래줄 잉크 237.2, 금액 297.0, 안내 문구 342.8) */
+.toss-send-amt__content--own .toss-send-amt__tosub {
+  top: 208.5px;
+}
+.toss-send-amt__content--own .toss-send-amt__amount {
+  top: 262.6px;
+}
+.toss-send-amt__content--own .toss-send-amt__err {
+  top: 314px;
+}
+.toss-send-amt__err {
+  top: 313.2px; /* 잉크 342.2–355.6 */
+  font-size: 15px;
+  line-height: 15px;
+  font-weight: 600;
+  color: var(--toss-red);
+}
+.toss-send-amt__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 264.3px; /* 화면 518 – 574 (숫자판 위) */
+  height: 56px;
+  z-index: 1;
+  overflow: hidden;
+}
+.toss-send-amt__bar .toss-btn__label {
+  translate: 0 -1.6px;
+}
+.toss-send-amt__bar .toss-btn {
+  height: 56px;
+  font-size: 17px;
+  animation: toss-send-bar-up 130ms ease-out both;
+}
+@keyframes toss-send-bar-up {
+  from {
+    transform: translateY(42px);
+  }
+}
+.toss-send-pad {
+  position: absolute;
+  left: 10.2px;
+  bottom: 0; /* 화면 574.3 – 838.3 */
+  width: 363.6px;
+  height: 264px;
+  display: grid;
+  grid-template-columns: repeat(3, 121.2px);
+  grid-auto-rows: 66px;
+  z-index: 2;
+  background: var(--toss-bg);
+}
+.toss-send-pad__key:nth-child(-n + 9) {
+  padding-bottom: 2.6px;
+}
+.toss-send-pad__key:nth-child(10),
+.toss-send-pad__key:nth-child(11) {
+  padding-bottom: 4.4px;
+}
+.toss-send-pad__key:nth-child(10) {
+  translate: 0 -0.8px; /* 00 잉크 793.0 (0 과 같은 줄) */
+}
+.toss-send-pad__key svg {
+  translate: 0 2.8px;
+}
+.toss-send-pad__key {
+  display: grid;
+  place-items: center;
+  padding: 0 0 1px;
+  border: 0;
+  background: none;
+  font-family: var(--toss-font);
+  font-size: 30px;
+  line-height: 30px;
+  font-weight: 400;
+  color: #c2c1c6;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+/* =================== S5 옮길까요 / 보낼까요 =================== */
+.toss-send-cf__body {
+  overflow: hidden;
+}
+.toss-send-cf__in {
+  position: absolute;
+  inset: 0;
+  top: -53.6px;
+}
+.toss-send-big {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-weight: 650;
+  color: #fffeff;
+}
+.toss-send-big em {
+  font-style: normal;
+  color: var(--toss-blue);
+}
+.toss-send-cf__title {
+  top: 132px; /* 잉크 위 166.4 / 200.0 / 235.6 */
+  font-size: 26px;
+  line-height: 34.4px;
+}
+.toss-send-cf__rows {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 546px; /* 화면 574.0 */
+}
+.toss-send-cf__row {
+  height: 37.6px;
+}
+.toss-send-cf__row > .toss-press__content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 24.8px 0 20.1px;
+  font-size: 15px;
+  line-height: 15px;
+}
+.toss-send-cf__label,
+.toss-send-cf__val > span {
+  translate: 0 1.2px;
+}
+.toss-send-cf__label {
+  flex: none;
+  font-weight: 500;
+  color: #807e86; /* B 63.727 · 97.514 */
+}
+.toss-send-cf__val {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-weight: 600;
+  color: #c4c3c8;
+  white-space: nowrap;
+}
+.toss-send-cf__val .toss-send-shield {
+  margin: 0 4.4px 0 0; /* 방패 ≈129–141.6, 글자 145.6 부터 (B 99.0) */
+  translate: 0 0.4px;
+}
+.toss-send-cf__val > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toss-send-rowchev {
+  flex: none;
+  margin-left: 9.2px;
+  color: #c0c1c6; /* 녹화 잉크 꼭대기 #b1b3ba – #c1c0c5 (선이 가늘어 조금 밝게) */
+  animation: toss-fade-in-kf 1ms linear 50ms both;
+}
+.toss-send-cf__ok {
+  position: absolute;
+  left: 20px;
+  right: 19.8px;
+  bottom: 59.2px; /* 화면 723.1 – 779.1 */
+}
+.toss-send-cf__cap {
+  position: absolute;
+  margin: 0;
+  left: 0;
+  right: 0;
+  bottom: 24.2px; /* 잉크 799.8–812.6 */
+  text-align: center;
+  font-size: 15px;
+  line-height: 15px;
+  color: #9d9ca1;
+}
+
+/* =================== S6 받는 분에게 표시 (메모) =================== */
+.toss-send-memo__done {
+  height: 40px;
+}
+.toss-send-memo__done > .toss-press__content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 7px;
+  margin-right: 1.8px; /* 잉크 331.7–358.6 */
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 500;
+  color: #e0dfe2; /* B 105.761 */
+}
+.toss-send-memo__body {
+  overflow: hidden;
+}
+.toss-send-memo__in {
+  position: absolute;
+  inset: 0;
+  top: -53.6px;
+}
+.toss-send-memo__h1 {
+  position: absolute;
+  left: 24.5px;
+  top: 82.1px; /* 잉크 112.0–131.7 */
+  margin: 0;
+  font-size: 22px;
+  line-height: 22px;
+  font-weight: 650;
+  color: #fdfcff;
+}
+.toss-send-memo__text {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 421.5px; /* 잉크 가운데 461.4 (키보드 없음) */
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  line-height: 24px;
+  color: #ffffff;
+  white-space: pre;
+  cursor: text;
+}
+.toss-send-memo--kb .toss-send-memo__text {
+  top: 249.7px; /* 가운데 289.6 (81.6 – 494.7 사이) */
+}
+.toss-send-memo__sel {
+  position: relative;
+  padding: 5.5px 6px;
+  margin: 0 -6px;
+  background: rgba(49, 130, 246, 0.38);
+}
+.toss-send-memo__comp {
+  text-decoration: underline;
+  text-decoration-thickness: 1.6px;
+  text-underline-offset: 4px;
+}
+.toss-send-memo__ph {
+  color: #6d6c6f;
+}
+.toss-send-memo__text .toss-send-caret {
+  margin-left: 1px;
+}
+.toss-send-memo__cap {
+  position: absolute;
+  margin: 0;
+  left: 0;
+  right: 0;
+  bottom: 21.7px; /* 잉크 804.8–818.3 */
+  text-align: center;
+  font-size: 14px;
+  line-height: 14px;
+  color: #8c8b8e; /* B 104.140 · 105.761 */
+}
+.toss-send-memo--kb .toss-send-memo__cap {
+  bottom: 364.2px; /* 잉크 461.6–475.2 (키보드 위 19.5) */
+}
+
+/* 한글 자판 (KoreanKeyboard.tsx): 화면 494.7 – 838.33 */
+.toss-send-kk {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 343.63px;
+  z-index: 20;
+  background: #090909;
+  color: #f2f2f2;
+  translate: 0 100%;
+  transition: translate 150ms cubic-bezier(0.4, 0, 1, 1);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.toss-send-kk--open {
+  translate: 0 0;
+  transition: translate 240ms cubic-bezier(0, 0, 0.2, 1);
+}
+.toss-send-kk__tools {
+  position: relative;
+  height: 43.8px;
+  background: #252525;
+}
+.toss-send-kk__tool {
+  position: absolute;
+  top: 6.1px;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #3d3d3d;
+  color: #ffffff;
+}
+.toss-send-kk__more {
+  position: absolute;
+  left: 360px;
+  top: 11px;
+  translate: -50% 0;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #f7f7f7;
+}
+.toss-send-kk__key {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: #2c2c2c;
+  color: #fbfbfb;
+  font-family: var(--toss-font);
+  font-size: 24px;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.toss-send-kk__key:active {
+  background: #3d3d3d;
+}
+.toss-send-kk__key--fn {
+  background: #161616;
+}
+.toss-send-kk__key--fn:active {
+  background: #2a2a2a;
+}
+.toss-send-kk__key--shift.on {
+  color: #3e8fff;
+}
+.toss-send-kk__key--num {
+  font-size: 21px;
+  font-weight: 400;
+}
+.toss-send-kk__key--sym {
+  font-size: 18px;
+}
+.toss-send-kk__key--done {
+  font-size: 18px;
+  font-weight: 400;
+  color: #3e8fff;
+}
+.toss-send-kk__lang {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+  line-height: 10px;
+}
+.toss-send-kk__lang i {
+  position: absolute;
+  font-style: normal;
+}
+.toss-send-kk__lang i:first-child {
+  left: 1px;
+  top: 0;
+}
+.toss-send-kk__lang i:last-child {
+  right: 0;
+  bottom: 0;
+}
+.toss-send-kk__lang b {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 1px;
+  height: 18px;
+  background: currentColor;
+  rotate: 35deg;
+}
+.toss-send-kk__pop {
+  position: absolute;
+  width: 44px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #3a3a3a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  font-size: 26px;
+  color: #ffffff;
+  pointer-events: none;
+  z-index: 1;
+}
+.toss-send-kk__bottom {
+  position: absolute;
+  left: 45.6px;
+  right: 42.4px;
+  bottom: 0;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #d6d6d6;
+}
+.toss-send-kk__bottom button {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.toss-send-kk__key--back svg {
+  width: 23.4px; /* 잉크 20.8 × 16 (B 104.140) */
+  height: 17.3px;
+}
+.toss-send-kk__key--lang {
+  color: #c4c4c4;
+}
+.toss-send-kk__key--sym {
+  font-size: 19px;
+}
+.toss-send-kk__key--done {
+  font-size: 15px; /* 잉크 337.8–362.6 */
+  color: #3e88eb;
+}
+
+/* 두 자판 같이: 맨 아래 ⌨ · ∨, 도구줄 ··· (B 11.111 · 104.140: ⌨ 잉크 47.6–65.2 × 824.4–834.8, ∨ 320.0–335.2 × 825.2–833.2,
+   ··· 지름 3.4 · 가운데 354.5 / 360.2 / 366.0 × 516.8, 모두 흰색) */
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) {
+  left: 47.6px;
+  right: 48.8px;
+  bottom: 4.6px;
+  height: 10.4px;
+  color: #ffffff;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) svg {
+  display: none;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom)::before {
+  content: "";
+  width: 17.6px;
+  height: 10.4px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17.6 10.4' fill='%23fff'%3E%3Cg%3E%3Crect width='2' height='2' rx='.4'/%3E%3Crect x='3.9' width='2' height='2' rx='.4'/%3E%3Crect x='7.8' width='2' height='2' rx='.4'/%3E%3Crect x='11.7' width='2' height='2' rx='.4'/%3E%3Crect x='15.6' width='2' height='2' rx='.4'/%3E%3C/g%3E%3Cg transform='translate(0 4.2)'%3E%3Crect width='2' height='2' rx='.4'/%3E%3Crect x='3.9' width='2' height='2' rx='.4'/%3E%3Crect x='7.8' width='2' height='2' rx='.4'/%3E%3Crect x='11.7' width='2' height='2' rx='.4'/%3E%3Crect x='15.6' width='2' height='2' rx='.4'/%3E%3C/g%3E%3Crect y='8.4' width='2' height='2' rx='.4'/%3E%3Crect x='3.9' y='8.4' width='9.8' height='2' rx='.6'/%3E%3Crect x='15.6' y='8.4' width='2' height='2' rx='.4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) button {
+  padding: 12px; /* 누르는 칸만 넓힘 (∨ 자리는 그대로) */
+  margin: -12px;
+  color: inherit;
+}
+:is(.toss-send-kbwrap .hana-kb__bottom, .toss-send-kk__bottom) button::after {
+  content: "";
+  width: 15.2px;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15.2 8' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M.8.8 7.6 7.2 14.4.8'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:is(.toss-send-kbwrap .hana-kb__more, .toss-send-kk__more) {
+  left: 351.6px;
+  top: 20.6px;
+  translate: none;
+  width: 17.25px;
+  height: 3.4px;
+  font-size: 0;
+  letter-spacing: 0;
+  color: transparent;
+  background: radial-gradient(circle, #f7f7f7 1.55px, transparent 1.75px) 0 0 / 5.75px 3.4px repeat-x;
+}
+
+/* =================== S7 보내는 중 · S8 완료 =================== */
+.toss-send-done__body {
+  overflow: hidden;
+}
+.toss-send-done__in {
+  position: absolute;
+  inset: 0;
+  top: -53.6px;
+}
+.toss-send-done__title {
+  top: 193.8px; /* 잉크 가운데 237.2 / 267.6 / 298.8, 줄 30.8 */
+  font-size: 22px;
+  line-height: 30.8px;
+}
+.toss-send-done--done .toss-send-done__title em {
+  color: inherit;
+}
+.toss-send-done__slot {
+  position: absolute;
+  left: 157.6px; /* 가운데 (191.6, 147) */
+  top: 85px;
+  width: 68px;
+  height: 68px;
+}
+.toss-send-done__chip {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  top: 306.5px; /* 화면 334.5 – 368.9 */
+  height: 34.4px;
+  border-radius: 12px;
+  background: #2a2a34;
+}
+.toss-send-done__chip > .toss-press__content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 16.9px;
+  font-size: 17px;
+  line-height: 17px;
+  color: #c3c2ca; /* B 118.211 */
+  white-space: nowrap;
+  max-width: 300px;
+}
+.toss-send-done__dock {
+  position: absolute;
+  left: 20px;
+  right: 19.8px;
+  bottom: 20.1px; /* 화면 762.2 – 818.2 */
+  display: flex;
+  gap: 7.6px;
+}
+.toss-send-done__dock > * {
+  flex: 1;
+}
+/* 공유하기 20.2–192.4 · 확인 200.0–364.2 (B 118.211, 밝기 경계) */
+.toss-send-done__dock > .toss-btn--secondary {
+  flex: 0 0 172.4px;
+  margin-left: 0;
+}
+
+/* 보내는 중 동전 (₩): 은빛 원판 → 오른쪽으로 늘어나 혜성처럼 날아감 (주황 불꽃) → 파란 고리 사이로 돌아옴. 한 바퀴 ≈1.1초 */
+.toss-send-coin {
+  position: absolute;
+  inset: 0;
+  animation: toss-send-coin-in 220ms cubic-bezier(0.2, 1.4, 0.4, 1) 200ms both;
+}
+.toss-send-coin__disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, #ffffff 0%, rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 70% 85%, rgba(232, 160, 190, 0.85) 0%, rgba(232, 160, 190, 0) 45%),
+    radial-gradient(circle at 25% 80%, rgba(150, 170, 255, 0.7) 0%, rgba(150, 170, 255, 0) 40%),
+    linear-gradient(160deg, #f4f4f8 0%, #c9cad6 55%, #a9a6c4 100%);
+  box-shadow: inset 0 -3px 6px rgba(90, 80, 140, 0.35);
+  animation: toss-send-coin-fly 1100ms cubic-bezier(0.45, 0, 0.3, 1) 420ms infinite;
+}
+.toss-send-coin__disc svg {
+  position: absolute;
+  left: 15px;
+  top: 21px;
+}
+.toss-send-coin__spark {
+  position: absolute;
+  left: 62px;
+  top: 30px;
+  width: 9px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(#ffc39a, rgba(255, 150, 100, 0));
+  opacity: 0;
+  animation: toss-send-coin-spark 1100ms ease-out 420ms infinite;
+}
+.toss-send-coin__ring {
+  position: absolute;
+  top: -6px;
+  width: 10px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(96, 110, 220, 0.75);
+  opacity: 0;
+  animation: toss-send-coin-ring 1100ms ease-out 420ms infinite;
+}
+.toss-send-coin__ring:nth-of-type(2) {
+  left: -22px;
+}
+.toss-send-coin__ring:nth-of-type(3) {
+  left: -6px;
+  animation-delay: 470ms;
+}
+@keyframes toss-send-coin-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes toss-send-coin-fly {
+  0% {
+    transform: none;
+  }
+  18% {
+    transform: translateX(6px) scale(0.95, 0.85);
+    border-radius: 46% 54% 54% 46% / 50%;
+  }
+  36% {
+    transform: translateX(20px) scale(1.15, 0.22);
+    border-radius: 50%;
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-40px) scale(1.2, 0.35);
+    opacity: 0.6;
+  }
+  70% {
+    transform: translateX(-18px) scale(0.9, 0.6);
+    opacity: 0.85;
+  }
+  88% {
+    transform: translateX(-2px) scale(1.02, 0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes toss-send-coin-spark {
+  0%,
+  10% {
+    opacity: 0;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(30px);
+  }
+  45% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-send-coin-ring {
+  0%,
+  45% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  85%,
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+/* 완료 체크: 0.2초 빈자리 → 은빛 물방울(0–100ms) → 거꾸로 버섯 모양(≈200ms) → 파랗게 + 체크(300–400ms) → 둥글게 출렁(650ms) (B 68.30–68.95 · 117.30–117.95) */
+.toss-send-check {
+  position: absolute;
+  left: 0.1px; /* 원판 158.7–224.8 · 가운데 191.7 (B 69.609 · 118.211) */
+  top: -0.2px;
+  width: 68.4px;
+  height: 68.4px;
+}
+.toss-send-check__drop {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--toss-blue);
+  animation: toss-send-drop-shape 650ms cubic-bezier(0.3, 0.7, 0.4, 1) 200ms both;
+}
+/* 은빛 → 파랑: 두 겹의 투명도로 (그라데이션끼리는 섞이지 않으므로) */
+.toss-send-check__drop::before,
+.toss-send-check__drop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.toss-send-check__drop::before {
+  background: radial-gradient(circle at 38% 28%, #ffffff, #cfcfdc 55%, #a6a4c2);
+  animation: toss-send-drop-silver 650ms linear 200ms both;
+}
+.toss-send-check__drop::after {
+  background: radial-gradient(circle at 40% 30%, #9fc2ff, #4f8ef7 60%, #3a6fe0);
+  animation: toss-send-drop-mid 650ms linear 200ms both;
+}
+.toss-send-check svg {
+  position: absolute;
+  inset: 0;
+}
+.toss-send-check path {
+  stroke-dasharray: 41 48;
+  stroke-dashoffset: 41.5;
+  animation: toss-send-check-draw 260ms ease-out 590ms both;
+}
+.toss-send-check--still .toss-send-check__drop,
+.toss-send-check--still .toss-send-check__drop::before,
+.toss-send-check--still .toss-send-check__drop::after,
+.toss-send-check--still path {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+.toss-send-check--still .toss-send-check__drop::before,
+.toss-send-check--still .toss-send-check__drop::after {
+  opacity: 0;
+}
+@keyframes toss-send-drop-shape {
+  0% {
+    opacity: 0;
+    transform: scale(0.35, 0.9);
+    border-radius: 50% 50% 46% 46% / 30% 30% 70% 70%;
+  }
+  12% {
+    opacity: 1;
+    transform: scale(0.45, 1);
+    border-radius: 50% 50% 46% 46% / 30% 30% 70% 70%;
+  }
+  30% {
+    transform: scale(0.85, 0.9);
+    border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+  }
+  48% {
+    transform: scale(0.95, 0.95);
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  }
+  66% {
+    transform: scale(1.08, 0.94);
+    border-radius: 48% 52% 50% 50% / 46% 46% 54% 54%;
+  }
+  82% {
+    transform: scale(0.97, 1.03);
+    border-radius: 50%;
+  }
+  100% {
+    transform: none;
+    border-radius: 50%;
+  }
+}
+@keyframes toss-send-drop-silver {
+  0%,
+  26% {
+    opacity: 1;
+  }
+  44%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-send-drop-mid {
+  0%,
+  26% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  62%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-send-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* 공용 큰 버튼 글자가 녹화보다 0.8–1.6dp 아래 (B 63.727 · 118.224) → 이 영역에서만 올림 */
+:is(.toss-send-num, .toss-send-cf) .toss-btn__label {
+  translate: 0 -0.8px;
+}
+.toss-send-done .toss-btn__label {
+  translate: 0 -1.6px;
+}
+
+/* 공유하기 글자 색 (잉크 꼭대기 #4492ff — B 118.211) */
+.toss-send-done .toss-btn--secondary {
+  color: #4492ff;
+}

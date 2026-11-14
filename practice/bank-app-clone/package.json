@@ -13,6 +13,9 @@
     "dev:kbank": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app kbank --port 8791\" \"vite --mode kbank --port 5177\"",
     "dev:kbank2": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app kbank2 --port 8792\" \"vite --mode kbank2 --port 5178\"",
     "dev:ibk2": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app ibk2 --port 8793\" \"vite --mode ibk2 --port 5179\"",
+    "dev:kakao2": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app kakao2 --port 8794\" \"vite --mode kakao2 --port 5180\"",
+    "dev:toss": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app toss --port 8795\" \"vite --mode toss --port 5181\"",
+    "dev:allone": "concurrently -k -n api,web -c yellow,cyan \"node --watch --disable-warning=ExperimentalWarning server/index.mjs --app allone --port 8796\" \"vite --mode allone --port 5182\"",
     "build": "tsc -b && vite build",
     "start": "node --disable-warning=ExperimentalWarning server/index.mjs",
     "start:nh": "node --disable-warning=ExperimentalWarning server/index.mjs --app nh",
@@ -21,6 +24,9 @@
     "start:kbank": "node --disable-warning=ExperimentalWarning server/index.mjs --app kbank",
     "start:kbank2": "node --disable-warning=ExperimentalWarning server/index.mjs --app kbank2",
     "start:ibk2": "node --disable-warning=ExperimentalWarning server/index.mjs --app ibk2",
+    "start:kakao2": "node --disable-warning=ExperimentalWarning server/index.mjs --app kakao2",
+    "start:toss": "node --disable-warning=ExperimentalWarning server/index.mjs --app toss",
+    "start:allone": "node --disable-warning=ExperimentalWarning server/index.mjs --app allone",
     "lint": "oxlint"
   },
   "dependencies": {

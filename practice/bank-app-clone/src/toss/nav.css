@@ -1,0 +1,114 @@
+/* ===== 토스 화면 전환 (ScreenStack 의 layer--toss-{push | load | pop | fade | reveal}, 길이 · 근거는 src/toss/nav.ts) =====
+   화면 한 장 = .toss-page (바탕) > .toss-page__band (28dp 띠) + .toss-page__main (내용). TossPage 가 아닌 층은 층 전체가 움직임 */
+
+/* 나가는 층은 누를 수 없음 */
+html[data-app="toss"] :is(.layer--push-exit, .layer--pop-exit) {
+  pointer-events: none;
+}
+
+/* ---------- push: 새 층이 +150dp 에서 400ms cubic-bezier(.05,.7,.1,1) 로 올라옴, 처음 50ms 에 나타남 ---------- */
+html[data-app="toss"] :is(.layer--toss-push, .layer--toss-load).layer--push-enter {
+  animation:
+    toss-push-in 400ms cubic-bezier(0.05, 0.7, 0.1, 1) both,
+    toss-appear 50ms linear both;
+}
+/* 옛 층: 내용은 60ms 에 흐려지며 −12dp, 띠와 바탕은 95ms 까지 그대로 있다가 사라짐 (그 뒤 새 층 위 빈자리 = 검정) */
+html[data-app="toss"] :is(.layer--toss-push, .layer--toss-load).layer--push-exit {
+  animation: toss-gone 95ms step-end both;
+}
+html[data-app="toss"] .layer--toss-push.layer--push-exit .toss-page > .toss-page__main {
+  animation: toss-old-out 60ms linear both;
+}
+html[data-app="toss"] .layer--toss-push.layer--push-exit:not(:has(.toss-page)) {
+  animation:
+    toss-old-out 60ms linear both,
+    toss-gone 95ms step-end both;
+}
+/* load: 옛 층(LOAD 빈 화면 밑에 있던 화면)의 내용은 처음부터 안 보임 — 빈 #171619 + 띠만 95ms */
+html[data-app="toss"] .layer--toss-load.layer--push-exit .toss-page > .toss-page__main {
+  opacity: 0;
+}
+
+/* ---------- pop: 닫히는 층 0 → +40dp 120ms cubic-bezier(.4,0,1,1), 흐려지지 않고 끝에 사라짐 ----------
+   드러나는 층: 바탕 · 띠만 보이다가 120ms 뒤 내용이 −5dp → 0 (120ms cubic-bezier(0,0,.2,1)). 끝 = toss-reveal (240ms) */
+html[data-app="toss"] .layer--toss-pop.layer--pop-exit {
+  animation:
+    toss-pop-out 120ms cubic-bezier(0.4, 0, 1, 1) both,
+    toss-gone 120ms step-end both;
+}
+html[data-app="toss"] .layer--toss-pop.layer--pop-enter .toss-page > .toss-page__main,
+html[data-app="toss"] .layer--toss-pop.layer--pop-enter:not(:has(.toss-page)) {
+  animation: toss-reveal 240ms linear both;
+}
+
+/* ---------- fade: 맨 위 층이 90ms 직선으로 흐려짐, 밑 층은 그대로 (끝 = toss-fade-out) ---------- */
+html[data-app="toss"] .layer--toss-fade.layer--pop-exit {
+  animation: toss-fade-out 90ms linear both;
+}
+
+/* ---------- reveal: 나가는 층(이체 완료)은 pop 처럼 내려가고, 밑의 새 층은 처음부터 바탕이 보이고 내용만 150ms 뒤 300ms ease-out 으로 ---------- */
+html[data-app="toss"] .layer--toss-reveal.layer--pop-exit {
+  animation:
+    toss-pop-out 120ms cubic-bezier(0.4, 0, 1, 1) both,
+    toss-gone 120ms step-end both;
+}
+html[data-app="toss"] .layer--toss-reveal.layer--pop-enter .toss-page > .toss-page__main,
+html[data-app="toss"] .layer--toss-reveal.layer--pop-enter:not(:has(.toss-page)) {
+  animation: toss-reveal-in 300ms ease-out 150ms both;
+}
+
+@keyframes toss-push-in {
+  from {
+    transform: translate3d(0, 150px, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes toss-appear {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes toss-old-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -12px, 0);
+  }
+}
+@keyframes toss-gone {
+  to {
+    visibility: hidden;
+  }
+}
+@keyframes toss-pop-out {
+  to {
+    transform: translate3d(0, 40px, 0);
+  }
+}
+@keyframes toss-reveal {
+  0%,
+  49.99% {
+    opacity: 0;
+    transform: translate3d(0, -5px, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, -5px, 0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes toss-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes toss-reveal-in {
+  from {
+    opacity: 0;
+  }
+}

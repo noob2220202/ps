@@ -1,0 +1,237 @@
+/* ===== 토스 (html[data-app="toss"]) — 토큰 · 기기 화면 위(상태바 · 내비 띠) · 로그인 / 프로필 고르기 =====
+   한 번들에 모든 앱 CSS 가 들어가므로 토스만 고르는 선택자(html[data-app="toss"] 또는 toss- 클래스)만 씀. 키프레임도 toss- 로 시작.
+   거꾸로 TSX className 도 toss- 로 시작 (on · out · red · blue · open 같은 꾸밈 이름만 예외) — 다른 앱의 맨 클래스(.done · .amount · .home · .row · .btn …)가 토스 화면에 걸림.
+   공용 --home-* 토큰(카카오뱅크 것)은 다시 정의하지 않음 (plan.md §3.2) */
+
+:root[data-app="toss"] {
+  /* 화면 맨 위 띠(상태바 자리) · 아래 내비 띠 높이. 화면은 0–853.33 에 그리고 이만큼 비움 (진짜 폰에선 기기 안전 영역) */
+  --toss-sb: 28px;
+  --toss-nav: 15px;
+
+  /* 바탕 */
+  --toss-bg: #171619; /* 화면 · 탭바 · 내비 띠 */
+  --toss-bg-deep: #100f12; /* 홈 · 증명서 첫 화면 */
+  --toss-band-deep: #101013; /* 통장 구역 띠 */
+  --toss-card: #19181b; /* 홈 카드 */
+  --toss-card-2: #201f22; /* 자산 카드 */
+  --toss-surface: #1f1e21; /* 토스트 · 입력 상자 · 시트 카드 · 로딩 상자 */
+  --toss-fill: #2c2c35; /* 통장 타일 · 채우기/보내기 · 복사 */
+  --toss-fill-2: #2a2a34; /* 칩 · 안내창 카드 · 분절 · 떠 있는 알약 · 메모 칩 */
+  --toss-grey-btn: #292a2f;
+  --toss-home-btn: #2a2b30;
+  --toss-home-btn-pressed: #3b3c41;
+  --toss-divider: #2a2a2f; /* 0.8dp */
+  --toss-skeleton: #232228;
+  --toss-skeleton-web: #1d1c1f;
+
+  /* 파랑 */
+  --toss-blue: #3182f6;
+  --toss-blue-pressed: #2b72de; /* 눌린 파랑 버튼 (녹화 A 증명서 CTA) */
+  --toss-blue-text: #4593fc;
+  --toss-blue-weak: #1f2942;
+  --toss-blue-weak-text: #5399f8;
+  --toss-blue-secondary: #18294a;
+  --toss-blue-secondary-text: #4690f6;
+  --toss-blue-disabled: #1e355b;
+  --toss-blue-disabled-text: #4d5e7c;
+
+  --toss-red: #f04452;
+  --toss-scrim: rgba(0, 0, 0, 0.61);
+
+  /* 글자 (다크) */
+  --toss-t0: #fafafc; /* 제목 최고 밝기 */
+  --toss-t1: #f0f0f3;
+  --toss-t2: #c3c3c6;
+  --toss-t3: #97979c;
+  --toss-t4: #86858a;
+  --toss-t5: #6e6e70;
+
+  /* 글꼴: Pretendard (토스 프로덕트 산스는 쓸 수 없음 — infra.md §7). 굵기 R 400 · M 500 · SB 600 · B 700 */
+  --toss-font: "Pretendard Variable", Pretendard, sans-serif;
+}
+
+/* 토스 화면은 글자 간격 0 (몸의 −0.2px 대신) */
+html[data-app="toss"] .phone {
+  letter-spacing: 0;
+  font-family: var(--toss-font);
+}
+
+/* ---------- 상태바: 화면 위에 겹친 투명한 층 (kakao2 chrome.css 와 같은 꼴) ----------
+   28dp 띠는 화면(TossPage)이 칠함 → push 중 새 화면 위 빈자리는 폰 바탕(검정)이 보이고, 시트 막은 띠만 어둡게 하고 글자는 그대로 */
+html[data-app="toss"] .phone > .statusbar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 28px;
+  padding: 0;
+  display: block;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: none;
+  z-index: 70;
+  pointer-events: none;
+  color: #f0f0f2;
+}
+.toss-sb__svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+.toss-sb__text {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  fill: currentColor;
+}
+/* 화면 녹화 표시의 캠코더: 1초 주기 0.5초 켜짐 (infra.md §1.2) */
+.toss-sb__rec {
+  animation: toss-sb-rec 1000ms step-end infinite;
+}
+@keyframes toss-sb-rec {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 화면들 = 따로 쌓임 맥락 (그 안 무엇도 상태바 글자 · 내비 띠를 덮지 않음) */
+html[data-app="toss"] .phone__viewport {
+  z-index: 0;
+}
+html[data-app="toss"] .layer {
+  isolation: isolate;
+}
+
+/* ---------- 아래 내비 띠 838.33–853.33 (15dp) + 손잡이 115.2 × 4.27 (y 843.66): 화면 위에 겹친 층, 모드 4가지 (band.ts) ---------- */
+html[data-app="toss"] .phone__navbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15px;
+  transform: none;
+  background: #171619;
+  box-shadow: none;
+  z-index: 60;
+  pointer-events: none;
+}
+html[data-app="toss"] .phone__navbar i {
+  height: 4px;
+  transform: translateY(4.87px); /* 손잡이 843.2–847.2 (토스 녹화, 기기 1054–1059px) */
+  background: #6b6a6d;
+}
+/* 삼성 키보드 (useTossBand("kb") 또는 HanaKeyboard 의 data-hana-kb) */
+html[data-app="toss"]:is([data-toss-band="kb"], [data-hana-kb]) .phone__navbar {
+  background: #090909;
+}
+html[data-app="toss"]:is([data-toss-band="kb"], [data-hana-kb]) .phone__navbar i {
+  background: #616161;
+}
+/* 시트 배경막 아래 */
+html[data-app="toss"][data-toss-band="dim"] .phone__navbar {
+  background: #050407;
+}
+html[data-app="toss"][data-toss-band="dim"] .phone__navbar i {
+  background: #5e5d60;
+}
+/* 소비: 목록이 띠 밑으로 비쳐 보임 */
+html[data-app="toss"][data-toss-band="scrim"] .phone__navbar {
+  background: rgba(0, 0, 0, 0.43);
+}
+html[data-app="toss"][data-toss-band="scrim"] .phone__navbar i {
+  background: #646366;
+}
+
+/* ---------- 진짜 폰 화면 (500px 이하): 가짜 상태바 · 내비 띠를 숨기고 기기 안전 영역만큼 비움 (kbank 처럼) ----------
+   화면 폭이 384 가 아니어도 384dp 좌표 그대로: 폰을 384 폭으로 두고 창 폭에 맞게 배율(zoom, allone 과 같은 방법) — 360 폭에서 오른쪽(🔔)이 잘리거나
+   412 폭에서 오른쪽 아이콘이 안쪽에 몰리지 않게. 높이는 창 높이 / 배율 (--toss-fit · --toss-phone-h 는 phoneSnap.ts useTossPhoneFit), 띠도 배율로 나눔 */
+@media (max-width: 500px) {
+  :root[data-app="toss"] {
+    --toss-sb: calc(env(safe-area-inset-top, 0px) / var(--toss-fit, 1));
+    --toss-nav: calc(env(safe-area-inset-bottom, 0px) / var(--toss-fit, 1));
+  }
+  html[data-app="toss"]:not([data-ibk2]) .phone {
+    width: 384px;
+    height: var(--toss-phone-h, 100dvh);
+    zoom: var(--toss-fit, 1);
+  }
+  html[data-app="toss"] .phone__navbar {
+    display: none;
+  }
+}
+
+/* ---------- 로그인 · 프로필 고르기 (공용 화면을 TossInset 으로 감쌈) ---------- */
+.toss-inset {
+  position: absolute;
+  inset: 0;
+  background: #171619;
+}
+.toss-inset__band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--toss-sb, 28px);
+  background: #171619;
+}
+.toss-inset__body {
+  position: absolute;
+  inset: var(--toss-sb, 28px) 0 var(--toss-nav, 15px);
+}
+.login--toss {
+  background: #171619;
+  color: #ffffff;
+}
+.login--toss .login__form input:focus {
+  border-color: #3182f6;
+}
+.login--toss .login__btn {
+  background: #3182f6;
+  color: #ffffff;
+}
+.picker--toss {
+  --home-bg: #171619;
+  --home-text: #ffffff;
+  --home-sub: #9e9ea4;
+  --home-btn: #292a2f;
+  --home-card: #19181b;
+  --home-line: #2c2c33;
+}
+/* 프로필 만들기/고치기 시트 (공용 Sheet · ProfileForm · 지우기 확인창) — 노란 흰 시트 대신 토스 어둠 · 파랑 */
+.picker--toss {
+  --yellow: var(--toss-blue);
+  --yellow-pressed: var(--toss-blue-pressed);
+}
+.picker--toss .sheet__panel,
+.picker--toss .dialog__box {
+  background: var(--toss-surface);
+  color: #ffffff;
+}
+.picker--toss .cta:not(:disabled) {
+  color: #ffffff;
+}
+.picker--toss .cta:disabled {
+  background: var(--toss-fill);
+  color: #6b6a6d;
+}
+.picker--toss .profile-form__name {
+  background: var(--toss-fill-2);
+  color: #ffffff;
+}
+.picker--toss .profile-form__avatars button.on {
+  border-color: #ffffff;
+}
+.picker--toss .profile-form__colors button.on {
+  outline-color: #ffffff;
+}
+.picker--toss .profile-form__hint {
+  color: #9e9ea4;
+}
+.picker--toss .dialog__buttons {
+  border-top-color: #2c2c33;
+}
+.picker--toss .dialog__cancel {
+  border-right-color: #2c2c33;
+  color: #9e9ea4;
+}

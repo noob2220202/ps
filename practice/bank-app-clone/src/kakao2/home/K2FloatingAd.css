@@ -1,0 +1,53 @@
+/* kakao2 홈 아래 떠 있는 광고 (K2FloatingAd.tsx, home.md §4.13). x 18 – 375, 화면 y 667 – 752 (357 × 85, 반지름 11, 녹화 px 2001 – 2255 ÷ 3),
+   #f1f1f1. 탭바 밑(z)에서 움직임. 스크롤에 따라 아래로 밀리는 만큼은 K2Home 이 transform 으로 (처음엔 화면 밖, visibility hidden).
+   아래 top · left 는 광고 상자 기준 */
+.k2-home .k2-ad {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: calc(var(--safe-bottom) + 66px);
+  z-index: 15;
+  height: 85px;
+  border-radius: 11px;
+  background: #f1f1f1;
+  visibility: hidden;
+  will-change: transform;
+}
+/* 제목 13/700 #181818 (잉크 왼끝 73.3, 가운데 701.75), 설명 10.8/400 #696969 (잉크 133.6 × 9.7, 가운데 718.9) */
+.k2-home .k2-ad__title,
+.k2-home .k2-ad__desc {
+  position: absolute;
+  left: 55px;
+  white-space: nowrap;
+}
+.k2-home .k2-ad__title {
+  top: 26.35px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  color: #181818;
+}
+.k2-home .k2-ad__desc {
+  top: 45.8px;
+  font-size: 10.8px;
+  font-weight: 400;
+  line-height: 14px;
+  color: #696969;
+}
+/* 사진 230.5 – 321.7 × 677.4 – 740.4, 반지름 5 */
+.k2-home .k2-ad__photo {
+  position: absolute;
+  right: 53.3px;
+  top: 11px;
+  width: 91.2px;
+  height: 63px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+/* i: 지름 15.5, 가운데 (365.5, 676.5) */
+.k2-home .k2-ad__info {
+  position: absolute;
+  right: 1.75px;
+  top: 2.35px;
+  display: flex;
+}

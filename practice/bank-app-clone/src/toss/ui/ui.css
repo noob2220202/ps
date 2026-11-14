@@ -1,0 +1,791 @@
+/* ===== 토스 공용 부품 (src/toss/ui/*). 값의 근거는 각 .tsx 머리 주석 · plan.md §3.3 =====
+   영역 CSS 가 클래스 하나로 덮어쓸 수 있게 부품 뿌리의 자리 · 크기 규칙은 :where() (특정도 0) 로 둠 */
+
+/* ---------- 화면 뼈대 (Page.tsx) ---------- */
+.toss-page {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--toss-t1);
+  letter-spacing: 0;
+}
+.toss-page__band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--toss-sb, 28px);
+}
+.toss-page__main {
+  position: absolute;
+  top: var(--toss-sb, 28px);
+  left: 0;
+  right: 0;
+  bottom: var(--toss-nav, 15px);
+  display: flex;
+  flex-direction: column;
+}
+.toss-page--under-nav > .toss-page__main {
+  bottom: 0;
+}
+.toss-page__head {
+  position: relative;
+  flex: none;
+  z-index: 3;
+}
+.toss-page--overlay-head > .toss-page__main > .toss-page__head {
+  position: absolute;
+  inset: 0 0 auto;
+}
+.toss-page__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.toss-page__body::-webkit-scrollbar {
+  display: none;
+}
+.toss-portal-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.toss-portal-root > * {
+  pointer-events: auto;
+}
+
+/* ---------- 머리줄 (AppBar.tsx) 28 – 81.6 ---------- */
+:where(.toss-appbar) {
+  position: relative;
+  height: 53.6px;
+  color: #ffffff;
+}
+.toss-appbar__bg {
+  position: absolute;
+  inset: 0;
+  background: var(--toss-appbar-bg);
+}
+.toss-appbar--blur {
+  background: transparent;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+.toss-appbar__back {
+  position: absolute;
+  left: 4px; /* ← 24 상자 (16, 42.4): 기기 화소에 맞춘 자리 (cert · transfer 검토, 잉크 18.9–38.0 × 45.8–63.2) */
+  top: 2.4px;
+  width: 48px;
+  height: 48px;
+  z-index: 1;
+}
+.toss-appbar__back > .toss-press__content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.toss-appbar__title {
+  position: absolute;
+  left: 72px;
+  top: 0;
+  height: 53.6px;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fcfbfe;
+  white-space: nowrap;
+}
+.toss-appbar__title--center {
+  left: 50%;
+  translate: -50% 0;
+}
+.toss-appbar__title--fade {
+  opacity: 0;
+  transition: opacity 300ms ease-out 185ms; /* 경계를 넘고 ≈185ms 뒤 시작 (녹화 A 26.675→26.86 · 41.255→41.44) */
+}
+.toss-appbar__title--fade.on {
+  opacity: 1;
+  transition-duration: 400ms;
+}
+.toss-appbar__right {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  height: 53.6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+.toss-appbar__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52px; /* 화면 y 80 */
+}
+
+/* ---------- 누름 (Pressable.tsx) ---------- */
+:where(.toss-press) {
+  position: relative;
+}
+.toss-press {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  outline: none;
+}
+.toss-press__bg {
+  position: absolute;
+  inset: var(--tp-inset, 0);
+  border-radius: var(--tp-radius, 0);
+  background: var(--tp-color, rgba(255, 255, 255, 0.08));
+  opacity: 0;
+  transition: opacity var(--tp-out, 170ms) ease-out;
+  pointer-events: none;
+}
+.toss-press--on > .toss-press__bg {
+  opacity: 1;
+  transition-duration: var(--tp-in, 0ms);
+}
+.toss-press__content {
+  position: relative;
+  transition: transform var(--tp-out, 170ms) ease-out;
+}
+.toss-press--on > .toss-press__content {
+  transform: scale(var(--tp-scale, 1));
+  transition-duration: var(--tp-in, 0ms);
+}
+.toss-press--disabled {
+  cursor: default;
+}
+.toss-press:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(49, 130, 246, 0.6);
+}
+
+/* ---------- 목록 줄 (Row.tsx) ---------- */
+.toss-row__in {
+  display: flex;
+  align-items: center;
+}
+.toss-row__icon {
+  flex: none;
+  display: flex;
+}
+.toss-row__text {
+  flex: 1;
+  min-width: 0;
+}
+.toss-row__title {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--toss-t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toss-row__sub {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--toss-t4);
+}
+.toss-row__right {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- 큰 버튼 (Button.tsx) ---------- */
+:where(.toss-btn) {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+}
+.toss-btn {
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
+  transition:
+    background-color 180ms ease-out,
+    color 180ms ease-out,
+    transform 150ms ease-out;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.toss-btn > * {
+  grid-area: 1 / 1;
+}
+.toss-btn--primary {
+  background: var(--toss-blue);
+  color: #ffffff;
+  --toss-btn-press: var(--toss-blue-pressed);
+}
+.toss-btn--weak {
+  background: var(--toss-blue-weak);
+  color: var(--toss-blue-weak-text);
+  --toss-btn-press: #19223a;
+}
+.toss-btn--grey {
+  background: var(--toss-grey-btn);
+  color: #e4e4e8;
+  --toss-btn-press: #3b3c41;
+}
+.toss-btn--secondary {
+  background: var(--toss-blue-secondary);
+  color: var(--toss-blue-secondary-text);
+  --toss-btn-press: #142240;
+}
+.toss-btn--disabled {
+  background: var(--toss-blue-disabled);
+  color: var(--toss-blue-disabled-text);
+  cursor: default;
+}
+.toss-btn--bar {
+  height: 56px;
+  border-radius: 0;
+  font-weight: 500;
+}
+/* 짧게 눌러도 ≈0.97, 오래 누르면 0.965 (80ms 에), 떼면 ≈150ms 에 돌아옴 (녹화 B 69.54 · 109.74) */
+.toss-btn--pressed {
+  transform: scale(0.965);
+  transition-duration: 80ms;
+}
+.toss-btn__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--toss-btn-press, #225eb5);
+  transform: scale(0);
+  opacity: 0;
+  transition:
+    transform 100ms ease-out,
+    opacity 150ms ease-out;
+  pointer-events: none;
+}
+.toss-btn__ripple.on {
+  transform: scale(1);
+  opacity: 1;
+  transition:
+    transform 100ms ease-out,
+    opacity 0ms;
+  animation: toss-btn-press-in 50ms linear; /* 녹화는 누른 곳 없이 버튼 전체가 ≈50ms 에 어두워짐 (B 69.525–69.574) */
+}
+@keyframes toss-btn-press-in {
+  from {
+    opacity: 0;
+  }
+}
+.toss-btn__label {
+  position: relative;
+  transition: opacity 100ms linear;
+}
+.toss-btn__dots {
+  position: relative;
+  display: flex;
+  gap: 8.6px; /* 지름 6.4 + 8.6 = 15 간격 */
+  opacity: 0;
+  transition: opacity 100ms linear;
+}
+.toss-btn__dots i {
+  width: 6.4px;
+  height: 6.4px;
+  border-radius: 50%;
+  background: #f3f3f5;
+  opacity: 0.3;
+  transform: scale(0.75);
+}
+.toss-btn--loading .toss-btn__label {
+  opacity: 0;
+}
+.toss-btn--loading .toss-btn__dots {
+  opacity: 1;
+}
+.toss-btn--loading .toss-btn__dots i {
+  animation: toss-dot 750ms ease-in-out infinite;
+}
+.toss-btn--loading .toss-btn__dots i:nth-child(2) {
+  animation-delay: 200ms;
+}
+.toss-btn--loading .toss-btn__dots i:nth-child(3) {
+  animation-delay: 400ms;
+}
+@keyframes toss-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.75);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.toss-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 20px 20.33px; /* 버튼 y 762–818 */
+  z-index: 2;
+}
+.toss-dock--fade::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--toss-dock-bg));
+  pointer-events: none;
+}
+.toss-dock--fade {
+  background: var(--toss-dock-bg);
+}
+.toss-btn-pair {
+  display: flex;
+  gap: 8px;
+}
+.toss-btn-pair > * {
+  flex: 1;
+}
+
+/* ---------- 시트 (Sheet.tsx) ---------- */
+.toss-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+}
+.toss-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--toss-scrim);
+  animation: toss-fade-in-kf 230ms linear both;
+}
+.toss-sheet__card {
+  position: absolute;
+  left: 11.2px;
+  right: 11.2px;
+  bottom: 25.33px; /* 카드 아래끝 ≈828 */
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 120px);
+  border-radius: 24px;
+  background: var(--toss-surface);
+  overflow: hidden;
+  animation: toss-sheet-in 100ms ease-out 130ms both;
+}
+.toss-sheet__grabber {
+  flex: none;
+  width: 42.4px;
+  height: 4px;
+  margin: 12px auto 0;
+  border-radius: 2px;
+  background: #363538;
+}
+.toss-sheet__title {
+  flex: none;
+  padding: 28px 28.8px 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fcfbfe;
+}
+.toss-sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.toss-sheet--closing .toss-sheet__scrim {
+  animation: toss-fade-out-kf 100ms linear both;
+}
+.toss-sheet--closing .toss-sheet__card {
+  animation: toss-sheet-out 100ms ease-in both;
+}
+@keyframes toss-sheet-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+@keyframes toss-sheet-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+}
+@keyframes toss-fade-in-kf {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes toss-fade-out-kf {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- 안내창 (Dialog.tsx) ---------- */
+.toss-dialog {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+}
+.toss-dialog__scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 81.6px; /* 웹 영역만 (머리줄 · 상태바는 그대로) */
+  bottom: 15px;
+  background: var(--toss-scrim);
+  animation: toss-fade-in-kf 160ms linear both;
+}
+.toss-dialog--full .toss-dialog__scrim {
+  top: 0;
+  bottom: 0;
+}
+.toss-dialog__card {
+  position: absolute;
+  left: 32.1px;
+  width: 319.7px;
+  top: 432.8px;
+  translate: 0 -50%;
+  padding: 20.8px 12px 12.8px 22.4px; /* 녹화 B 51.012: 카드 361.6–504.0 · 제목 잉크 387.2 · 본문 422.4 · 확인 463.3 */
+  border-radius: 24px;
+  background: var(--toss-fill-2);
+  animation: toss-dialog-in 160ms ease-out both;
+}
+.toss-dialog__title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #e6e5ee;
+  padding-right: 10px;
+}
+.toss-dialog__body {
+  margin-top: 9.6px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #a09ea8;
+  padding-right: 10px;
+}
+.toss-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 10px;
+}
+.toss-dialog__action > .toss-press__content {
+  padding: 10px 14px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.toss-dialog__action--blue {
+  color: #3280f5;
+}
+.toss-dialog__action--grey {
+  color: #9796a0;
+}
+.toss-dialog--closing .toss-dialog__scrim {
+  animation: toss-fade-out-kf 130ms linear both;
+}
+.toss-dialog--closing .toss-dialog__card {
+  animation: toss-dialog-out 130ms ease-in both;
+}
+@keyframes toss-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes toss-dialog-out {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* ---------- 토스트 (Toast.tsx): 알약 가운데 y 54.4, 높이 49.5 ---------- */
+.toss-toast-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 29.65px;
+  display: flex;
+  justify-content: center;
+  z-index: 80;
+  pointer-events: none;
+}
+.toss-toast {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 49.5px;
+  padding: 0 20px 0 19px; /* 녹화 A 16.503 알약 x 88.1–295.2 · 로고 107.1 (글자 폭은 아래 letter-spacing 으로) */
+  border-radius: 25px;
+  background: #1f1e21;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  animation:
+    toss-toast-in 800ms linear both,
+    toss-toast-appear 180ms linear both;
+}
+.toss-toast__logo {
+  width: 18px;
+  height: 16.7px;
+  object-fit: contain;
+}
+.toss-toast__logo--dot {
+  border-radius: 50%;
+  background: var(--toss-blue);
+}
+.toss-toast__text {
+  letter-spacing: 0.5px; /* Pretendard 가 녹화 글꼴보다 3.8dp 좁음 → 글자 끝 275.0 */
+}
+.toss-toast__text u {
+  color: var(--toss-blue);
+  text-decoration: underline;
+  text-decoration-thickness: 1.6px;
+  text-underline-offset: -0.8px; /* 밑줄은 글자 'ㅡ' 획에 붙음: y 59.2–60.8 (녹화 A 16.503) */
+}
+.toss-toast--out {
+  animation: toss-toast-out 200ms ease-in both;
+}
+/* 위 −14 → (150ms −10) → +5.5 넘침 (240–330ms) → 505ms +1.5 → 760ms +0.2 → 0 (home.md §3.3) */
+@keyframes toss-toast-in {
+  0% {
+    transform: translate3d(0, -14px, 0);
+    animation-timing-function: ease-in;
+  }
+  18.75% {
+    transform: translate3d(0, -10px, 0);
+    animation-timing-function: ease-out;
+  }
+  30% {
+    transform: translate3d(0, 5.5px, 0);
+  }
+  41.25% {
+    transform: translate3d(0, 5.5px, 0);
+    animation-timing-function: ease-in-out;
+  }
+  63.1% {
+    transform: translate3d(0, 1.5px, 0);
+  }
+  95% {
+    transform: translate3d(0, 0.2px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes toss-toast-appear {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  83% {
+    filter: blur(0);
+  }
+}
+@keyframes toss-toast-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -13px, 0);
+  }
+}
+
+/* ---------- LOAD 빈 화면 · 기다림 상자 (LoadingLayer.tsx) ---------- */
+.toss-load {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--toss-sb, 28px);
+  bottom: 0;
+  background: #171619;
+  z-index: 40;
+  touch-action: none;
+}
+.toss-load__spin {
+  position: absolute;
+  left: 177px; /* 가운데 (192, 433) */
+  top: calc(418px - var(--toss-sb, 28px));
+}
+.toss-wait {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 418px;
+  height: 78px;
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  background: #1f1e21;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 45;
+}
+.toss-wait__spin {
+  position: absolute;
+  left: 38px;
+  top: 29px;
+}
+.toss-wait__text {
+  position: absolute;
+  left: 86px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+/* ---------- 스피너 (Spinner.tsx) ---------- */
+.toss-spin {
+  display: block;
+}
+.toss-spin--grey {
+  animation: toss-spin-rot 1400ms linear infinite;
+}
+.toss-spin--grey circle {
+  stroke-dasharray: 1 var(--toss-spin-c);
+  stroke-dashoffset: 0;
+  animation: toss-spin-dash 1400ms ease-in-out infinite;
+  transform-origin: center;
+}
+.toss-spin--blue {
+  animation: toss-spin-rot 800ms linear infinite;
+}
+@keyframes toss-spin-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes toss-spin-dash {
+  0% {
+    stroke-dasharray: 1 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 60 200;
+    stroke-dashoffset: -12;
+  }
+  100% {
+    stroke-dasharray: 60 200;
+    stroke-dashoffset: -86;
+  }
+}
+
+/* ---------- 진행 막대 (ProgressBar.tsx) ---------- */
+.toss-progress {
+  position: relative;
+  height: 2.4px;
+  overflow: hidden;
+  background: #4c4e55;
+  animation: toss-fade-in-kf 200ms linear both;
+}
+.toss-progress__fill {
+  position: absolute;
+  inset: 0;
+  background: #3182f6;
+  opacity: 0.75;
+  transform-origin: left;
+  transform: scaleX(0.7);
+  animation: toss-progress-jump 80ms ease-out both;
+}
+.toss-progress--done {
+  animation: toss-fade-out-kf 400ms linear 300ms both;
+}
+.toss-progress--done .toss-progress__fill {
+  transform: scaleX(1);
+  transition: transform 300ms linear;
+  animation: none;
+}
+@keyframes toss-progress-jump {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- 뼈대 (Skeleton.tsx) ---------- */
+:where(.toss-skel) {
+  position: relative;
+  display: block;
+}
+.toss-skel {
+  overflow: hidden;
+  background: var(--toss-skeleton);
+}
+.toss-skel--web {
+  background: var(--toss-skeleton-web);
+}
+.toss-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.045) 50%, transparent 70%);
+  transform: translate3d(-100%, 0, 0);
+  animation: toss-shimmer 1.4s linear infinite;
+}
+@keyframes toss-shimmer {
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+.toss-fade-in {
+  animation-name: toss-fade-in-kf;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* ---------- 숫자 굴림 (Odometer.tsx) ---------- */
+.toss-odo {
+  white-space: nowrap;
+}
+.toss-odo__col {
+  position: relative;
+  display: inline-block;
+  clip-path: inset(0);
+  line-height: var(--toss-odo-lh, 1.25em);
+}
+.toss-odo__ghost {
+  visibility: hidden;
+}
+.toss-odo__strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  text-align: center;
+  animation: toss-odo-roll 460ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.toss-odo__strip > span {
+  display: block;
+  height: var(--toss-odo-lh, 1.25em);
+  line-height: var(--toss-odo-lh, 1.25em);
+}
+@keyframes toss-odo-roll {
+  to {
+    transform: translate3d(0, calc(var(--toss-odo-n) * -1 * var(--toss-odo-lh, 1.25em)), 0);
+  }
+}
+
+/* ---------- 은행 로고 (BankLogo.tsx) ---------- */
+:where(.toss-banklogo) {
+  display: inline-grid;
+}
+.toss-banklogo {
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+}
+.toss-banklogo img {
+  display: block;
+  object-fit: contain;
+}

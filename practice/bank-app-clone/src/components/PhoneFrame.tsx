@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useStatusBarStyle } from "../hooks/useStatusBar";
 import { setBattery, setClock, syncClock, useDeviceStatus, useNow } from "../platform/deviceStatus";
-import { IBK2, OS } from "../platform/platform";
+import { DEVICE_LOCK, IBK2, OS } from "../platform/platform";
 import { canRecord, recordPhone, useRecorder } from "../platform/recorder";
-import { THEME } from "../platform/theme";
-import { APP, HAS_INTRO } from "../profile/session";
-import { BLINK_MS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
+import { THEME, THEME_LOCK } from "../platform/theme";
+import { ALLONE, APP, HAS_INTRO, KAKAO2, TOSS } from "../profile/session";
+import { BLINK_MS, INTRO_OS, setIntro, useBlinkEpoch, useIntro } from "../platform/intro";
 import { useKbankSent } from "../kbank/notice";
+import { K2HomeIndicator, K2Island, K2StatusBar } from "../kakao2/StatusBar";
+import { K2LoadingDim } from "../kakao2/LoadingDim";
+import { K2LaunchIcon } from "../kakao2/Launch";
+import { TossStatusBar } from "../toss/StatusBar";
+import { AlloneStatusBar } from "../allone/StatusBar";
+import { AlloneHomeIndicator } from "../allone/HomeIndicator";
 import "./PhoneFrame.css";
 
 function useClock() {
@@ -336,14 +342,28 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
   const recording = useRecorder().status === "recording";
   return (
     <div className={`phone phone--${OS}`}>
-      {/* 녹화 중엔 진짜 아이폰처럼 다이나믹 아일랜드 왼쪽에 빨간 녹화 표시 (영상에도 찍힘) */}
-      {OS === "ios" && (
-        <div className={`dynamic-island${recording ? " dynamic-island--rec" : ""}`}>
-          <i />
-        </div>
-      )}
-      <StatusBar />
-      <div className="phone__viewport">{children}</div>
+      {/* 녹화 중엔 진짜 아이폰처럼 다이나믹 아일랜드 왼쪽에 빨간 녹화 표시 (영상에도 찍힘). kakao2 는 녹화 아이폰의 넓어진 아일랜드 + 깜빡이는 점 */}
+      {/* allone(NH올원뱅크)도 같은 녹화 아이폰 → kakao2 아일랜드를 그대로 (모양은 src/allone/allone.css) */}
+      {OS === "ios" &&
+        (KAKAO2 || ALLONE ? (
+          <K2Island recording={recording} />
+        ) : (
+          <div className={`dynamic-island${recording ? " dynamic-island--rec" : ""}`}>
+            <i />
+          </div>
+        ))}
+      {/* kakao2: 화면 위에 겹친 투명한 상태바 (src/kakao2/StatusBar.tsx). 토스도 겹친 상태바 (12시간 시계 · 녹화 중 표시, src/toss/StatusBar.tsx) */}
+      {/* allone: 겹친 상태바 + 흰 띠 위 0–59 · 아래 818–852 (웹뷰는 그 사이, src/allone/allone.css) */}
+      {KAKAO2 ? <K2StatusBar /> : TOSS ? <TossStatusBar /> : ALLONE ? <AlloneStatusBar /> : <StatusBar />}
+      {ALLONE && <div className="ao-band ao-band--top" />}
+      {ALLONE && <div className="ao-band ao-band--bottom" />}
+      <div className="phone__viewport">
+        {children}
+        {/* kakao2 로딩 막: 화면 하나가 켜고 다른 화면이 끔 (src/kakao2/dim.ts) */}
+        {KAKAO2 && <K2LoadingDim />}
+      </div>
+      {/* kakao2 녹화 인트로가 끝난 순간 앱 창 위에 잠깐 겹치는 노란 B 아이콘 (src/kakao2/Launch.tsx) */}
+      {KAKAO2 && <K2LaunchIcon />}
       {navbar && APP === "ibk" ? (
         <NavKeys />
       ) : navbar && APP === "kbank" ? (
@@ -352,9 +372,16 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
           <i />
         </div>
       ) : navbar ? (
+        // 토스: 같은 띠를 화면 위에 겹친 층으로 + 모드 4가지 (src/toss/toss.css · band.ts)
         <div className="phone__navbar">
           <i />
         </div>
+      ) : KAKAO2 ? (
+        // kakao2: 앱이 켜진 직후에만 잠깐 (src/kakao2/launch.ts)
+        <K2HomeIndicator />
+      ) : ALLONE ? (
+        // allone: 앱이 켜진 직후에만 잠깐 (src/allone/launch.ts)
+        <AlloneHomeIndicator />
       ) : (
         <div className={`phone__home-indicator phone__home-indicator--${fg}`} />
       )}
@@ -367,8 +394,8 @@ export function PhoneFrame({ children, overlay }: { children: ReactNode; overlay
 export function OsSwitch() {
   return (
     <div className="switches">
-      {/* ibk2 는 인트로 기기(갤럭시)로 고정 */}
-      {!IBK2 && (
+      {/* ibk2 · kakao2 는 인트로 기기(갤럭시 · 아이폰)로 고정 */}
+      {!DEVICE_LOCK && (
       <nav className="os-switch">
         <a href="/?os=android" className={OS === "android" ? "on" : ""}>
           Galaxy
@@ -378,6 +405,8 @@ export function OsSwitch() {
         </a>
       </nav>
       )}
+      {/* kakao2 는 녹화처럼 라이트 고정 (홈만 늘 어둡게), 토스는 다크 고정 (theme.ts THEME_LOCK) */}
+      {!THEME_LOCK && (
       <nav className="os-switch">
         <a href="/?theme=light" className={THEME === "light" ? "on" : ""}>
           라이트
@@ -386,7 +415,8 @@ export function OsSwitch() {
           다크
         </a>
       </nav>
-      {HAS_INTRO && OS === "android" && <IntroToggle />}
+      )}
+      {HAS_INTRO && OS === INTRO_OS && <IntroToggle />}
       <DeviceStatusControls />
       {/* 녹화: 누르면 앱을 처음(시작화면)부터 다시 띄우며 폰 화면만 녹화 */}
       {canRecord() && (
@@ -399,7 +429,7 @@ export function OsSwitch() {
   );
 }
 
-// 녹화 인트로 켜기/끄기 (kbank2, 갤럭시 모드만 — 영상이 갤럭시 화면): 켜면 녹화 시작 때 실제 기기 영상(홈 화면 → 금융 폴더 → K 탭)을 앞에 이어 붙여 녹화
+// 녹화 인트로 켜기/끄기 (kbank2 · ibk2 는 갤럭시, kakao2 는 아이폰 모드만 — 영상을 찍은 기기): 켜면 녹화 시작 때 실제 기기 영상(홈 화면 → 금융 폴더 → 앱 아이콘 탭)을 앞에 이어 붙여 녹화
 function IntroToggle() {
   const on = useIntro();
   return (

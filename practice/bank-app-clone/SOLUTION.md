@@ -17,6 +17,12 @@ src/
   lib/         format.ts (금액 포맷, 날짜 그룹핑) · keypad.ts (키패드 입력 계산)
   components/  PhoneFrame, TxList, Icon, Sheet(시트·키패드·알림창), BankIcon, art(로고/일러스트/스피너 SVG)
   screens/     boot / home / account / history / tx / bank(다른 은행 계좌) / transfer(이체)
+  kakao2/      kakao2(카카오뱅크 새 녹화 · 아이폰) 전용 — routes.tsx(라우트 표) · launch.ts(켜진 시각) · dim.ts(로딩 막) · nav.ts/css(전환)
+               · StatusBar · Launch(앱 창 커지기) · K2Inset · home/ account/ transfer/ txdetail/ (25장)
+  allone/      allone(NH올원뱅크 · 아이폰) 전용 — routes.tsx · nav.ts(로딩 프로필 표 LOAD) · flow.ts · loading.ts · native.ts(네이티브 층) · statusFg.ts
+               · launch.ts(켜진 시각 D) · intro.ts(녹화기 이음새) · StatusBar · Overlay · ui/(공용 부품) · launch/ home/ account/ transfer/ (26장)
+  toss/        toss(토스 · 갤럭시 · 다크) 전용 — routes.tsx · nav.ts/css(전환 · 깊이 · 뒤로) · flow.ts(영역 사이 약속) · band.ts(내비 띠) · loading.ts · toast.ts
+               · StatusBar · Inset · Overlay · ui/(공용 부품) · home/ account/ transfer/ cert/ assets/ devpanel/ (27장)
 ```
 
 **타이밍을 한 파일에 모은 이유**: 영상과 비교하며 속도를 맞출 때 컴포넌트를 돌아다니지 않고
@@ -307,7 +313,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 | GET | `/api/banks` | 추가할 수 있는 은행 목록 | 200 |
 | GET / PATCH | `/api/profile` | 이름·카드 끝 4자리 · `suspended`(카카오뱅크 계좌 지급정지, 연습용) | 200, 400(형식 오류) |
 | POST | `/api/accounts` | 다른 은행 계좌 추가 `{bankCode, number, balance}` | **201**, 400(자릿수), 409(중복) |
-| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액·계좌번호 수정 | 200, 404 |
+| GET / PATCH | `/api/accounts/:id` | 계좌 조회 / 잔액·계좌번호 수정 (allone 은 `blocked` 지급정지도) | 200, 404 |
 | DELETE | `/api/accounts/:id` | 다른 은행 계좌 삭제 (카카오뱅크 통장은 거부) | **204**, 400, 404 |
 | GET | `/api/accounts/:id/transactions` | 거래내역 (`?limit=`) | 200 |
 | POST | `/api/accounts/:id/transactions` | 입금/출금 만들기 | **201**, 400, 400(잔액 부족) |
@@ -315,10 +321,12 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 | GET / POST | `/api/payees` | 받는 분 목록 / 등록 `{bankCode, number, holder}` | 200, **201**, 400, 409(중복·내 계좌) |
 | PATCH / DELETE | `/api/payees/:id` | 이름·번호·☆ 수정 / 삭제 | 200, **204** |
 | GET | `/api/transfer/recipients?from=` | 이체 첫 화면: 내 계좌 + 최근 이체 | 200 |
-| GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 | 200, **404**(ACCOUNT_NOT_FOUND) |
-| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크), 403(`ACCOUNT_SUSPENDED` — 카카오뱅크 계좌 지급정지를 켠 프로필, 화면은 `SuspendedDialog` 팝업) |
+| GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 (토스만: `&soft=1` 이면 못 찾아도 200 `{ notFound: true }`) | 200, **404**(ACCOUNT_NOT_FOUND) |
+| POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크), 403(`ACCOUNT_SUSPENDED` — 카카오뱅크 계좌 지급정지를 켠 프로필, 화면은 `SuspendedDialog` 팝업 · `ACCOUNT_BLOCKED` — allone 출금계좌 지급정지, 화면은 '안내' 팝업) |
 | GET | `/api/transfers?from=` | 내가 보낸 이체 기록 (입금 거래에 붙인 보낸 분 기록은 뺌) | 200 |
 | POST | `/api/reset` | 초기 데이터로 | 204 |
+| GET | `/api/toss/spend?month=&tab=` · `/api/toss/assets` | 토스만: 소비(달 · 탭별 합계 · 분류 · 날짜별) · 자산(계좌 · 카드 · 포인트) — 다른 앱은 404 | 200, 400 |
+| GET / POST / PATCH / DELETE | `/api/toss/cards(/:id)` · `/api/toss/points(/:id)` | 토스만: 🔔 카드 · 포인트 | 200, **201**, **204**, 400, 404 |
 
 에러는 항상 `{ code, message, fields? }` 모양 → 패널이 `message`를 그대로 토스트로 띄움.
 
@@ -919,3 +927,515 @@ DPR3 으로 놓고 보고, 기준을 정해 고침:
 - **덮어쓰기 막기**: 예전 자르기 스크립트를 다시 돌리면 옛 그림이 같은 이름으로 덮이고 CSS 자리까지 어긋남 →
   모든 자르기 스크립트가 `scripts/keep_assets.py` 를 불러 **이미 있는 파일은 건너뜀** (`--force` / `FORCE=1` 일 때만 덮어씀).
 
+## 25. kakao2 — 카카오뱅크 새 녹화(아이폰) + 녹화 인트로 (`src/kakao2/`, `scripts/kakao-intro-erase.py`)
+
+같은 카카오뱅크를 새로 찍은 아이폰 녹화(1180 × 2556, 60fps, 기기는 라이트 모드 · 홈만 앱이 어둡게 그림)로 다시 만든 변형. 붙이는 자리는 kbank2 · ibk2 와 같지만(23장)
+그 둘은 **같은 화면 + 인트로**이고 kakao2 는 **새 화면 묶음 + 인트로**라, 원래 카카오뱅크(9101)와 다른 앱이 한 픽셀도 안 바뀌게 하는 게 가장 큰 일이었다.
+녹화를 담당별 명세(인프라 · 인트로 · 홈 · 이체 · 통장 · 거래상세 · 기기)로 나눠 재고, 명세끼리 어긋난 값은 따로 검수해 한 표로 정한 뒤 만들었다.
+
+### 서버: VARIANTS 표 하나
+```js
+const VARIANTS = { kbank2: "kbank", ibk2: "ibk", kakao2: "kakao" };
+export const INTRO = Object.hasOwn(VARIANTS, SERVER_ID);
+export const APP = INTRO ? VARIANTS[SERVER_ID] : SERVER_ID;
+```
+- 전엔 `INTRO = SERVER_ID === "kbank2" || SERVER_ID === "ibk2"` 와 `APP` 의 삼항 사슬이 따로라 변형을 더할 때 두 곳을 같이 고쳐야 했음 → 표 한 줄.
+  `in` 이 아니라 `Object.hasOwn`: `in` 은 물려받은 속성(`toString` 등)도 true.
+- 이름(SERVER_ID)이 정하는 것: 데이터 `data-kakao2/` · 쿠키 `bank_sid_kakao2` · 포트 9115(`index.mjs` 표). APP 은 `kakao` 라 API · 예시 데이터는 카카오뱅크 그대로,
+  HTML 에는 `__BANK_APP__ = "kakao"` + `__BANK_INTRO__ = true` (개발은 `.env.kakao2` 의 `VITE_APP=kakao` · `VITE_INTRO=1`). 서버에서 kakao2 만 다른 건 거래구분 하나(아래).
+
+### 화면: `KAKAO2` 상수 하나, "모든 변경은 문 안에서"
+- `session.ts`: `export const KAKAO2 = APP === "kakao" && HAS_INTRO;`. 인트로 스위치(`isIntroOn()`)로 나누지 않음 — 인트로를 꺼도 화면은 kakao2 여야 하니까.
+  `session.ts` 는 아무것도 import 하지 않아서 `platform.ts` · `theme.ts` · `deviceStatus.ts` 가 가져다 써도 순환 import(초기화 전 접근) 걱정이 없음.
+- 문은 세 가지: JS `KAKAO2` · CSS `html[data-kakao2] …` 또는 kakao2 에서만 그리는 `k2-` 클래스 · 서버 `SERVER_ID === "kakao2"`. 공용 파일(ScreenStack · PhoneFrame · recorder ·
+  ProfilePicker)도 문 안에서만 고침. 빌드 하나라 모든 앱 번들에 kakao2 CSS 가 들어가므로 새 `@keyframes` 이름(34개)이 기존 것과 안 겹치는지도 확인.
+- **확인 방법**: 바꾸기 전 커밋을 worktree 로 따로 꺼내 같은 시계 · 같은 데이터로 띄우고, 다른 앱 화면과 전환 중간(60 · 150 · 300ms 에서 멈춤) 프레임을 양쪽에서 찍어 비교.
+  기준끼리도 생기는 차이(둥근 모서리 안티에일리어싱 · 깜빡이는 녹화 알약 · 250ms API 지연 전후)는 빼고 모든 짝에서 나는 차이만 셈. 서버는 같은 요청 46개를 전후 서버에 보내 응답 비교.
+- 실제로 걸린 것: ProfilePicker 를 `DEVICE_LOCK ?? p.os ?? OS` 로 고쳤더니 **ibk2**(갤럭시 고정)도 바뀌어, 아이폰으로 저장된 프로필을 고를 때 다시 불러오기를 건너뜀.
+  `DEVICE_LOCK` 은 다른 변형도 쓰는 공용 값 → `KAKAO2 ? OS : (p.os ?? OS)`. 새 변형을 위한 분기는 새 변형 이름으로.
+
+### 기기 · 테마 잠금
+- `platform.ts`: `DEVICE_LOCK = IBK2 ? "android" : KAKAO2 ? "ios" : null` → `OS` 는 늘 ios, `<html data-kakao2="on">`. 기기 스위치 · 🔔 기기 · 프로필의 기기 설정을 안 봄.
+- `theme.ts`: `lightOnly` 에 `KAKAO2` (녹화 기기가 라이트 — 앱 보관함이 밝음). 홈만 `.k2-home` 이 테마와 상관없이 어두운 색을 직접 들고 있음.
+  프로필에 저장된 테마도 안 봄 (안 그러면 테마가 다른 프로필을 고를 때마다 `?theme=` 로 다시 불러왔음).
+- 틀 393 × 852 · 모서리 55 · 상태바 54 · 아래 안전영역 34 (`global.css html[data-kakao2]`). 글꼴은 맥에서도 Pretendard — 아이폰 글꼴 목록을 그대로 두면
+  숫자 · 영문이 리눅스에선 Inter, 맥에선 SF 로 그려져 녹화에 맞춘 크기가 기계마다 달라짐.
+
+### 라우트 표 통째로 바꾸기 (`routes.tsx`)
+`App.tsx` 의 `const render = KAKAO2 ? renderKakao2Route : ROUTES[APP];` — 콕뱅크(19장)와 같은 방법이라 카카오뱅크의 `renderRoute` 는 한 줄도 안 바뀜.
+녹화에 나온 화면은 새로(`K2Home` · `K2AccountScreen` · `K2Transfer` · `K2TxDetail`), 없는 화면(다른 은행 계좌 · 금액 · 완료)은 카카오뱅크 화면을 `K2Inset` 으로 감싸 재사용.
+주소 목록이 같아서 딥링크 · 새로고침이 안 깨짐. 녹화에 스플래시가 없어서 프로필을 고르면 `boot` 가 바로 `ready`.
+
+### 상태바 · 아일랜드 · 홈 인디케이터 (`StatusBar.tsx`, `chrome.css`, `K2Inset.tsx`)
+- 다른 앱은 상태바가 위 띠로 자리를 차지하고 `useStatusBar(bg, fg)` 로 띠를 칠함. 녹화를 보면 홈 내용이 상태바 밑까지 스크롤되고, 로딩 막은 띠까지 어둡게 하는데
+  **글자는 안 어두워짐**(흰 글자 255 그대로) → 띠는 화면이 칠하고 글자만 위에 겹쳐야 함.
+- `K2StatusBar` 는 화면 위에 겹친 투명한 층(z 70, `pointer-events: none`)이고 `useStatusBar` 의 fg 만 씀. 시각 · 위치 표시 칸(달 · 파란 위치 표시 · 화살표) · 신호 · LTE · 배터리를
+  **393 × 54 SVG 한 장**에 그림 (요소마다 따로 놓으면 반올림이 달라 0.5px 씩 튐). viewport 는 852 전체, kakao2 화면은 y 0 부터 그리고 54pt 띠를 스스로 칠함.
+- 재사용 화면은 `K2Inset` 이 맨 위 54pt 띠를 **그 화면이 `useStatusBar` 로 정한 색**(`StatusBandContext`)으로 칠하고 화면을 그 아래에 둠. 띠가 층과 같이 움직여서
+  전환 중에도 밑 화면 띠가 제 색 (전역 상태바 값을 읽으면 밑 화면 띠까지 위 화면 색이 됨). 로그인 · 프로필 고르기도 같은 틀.
+- `K2Island`: 녹화 중이거나 인트로를 켜 두면 녹화 기기처럼 넓어진 아일랜드 + 1.5초 주기 빨간 점(`BLINK_MS` 1500). `K2HomeIndicator`: 켜진 직후에만 흰색으로 나타났다 사라짐.
+
+### 켜진 시각 저장소 (`launch.ts`)
+- 스플래시가 없는 대신 앱이 켜진 직후에만 도는 것이 여럿(위치 표시 → 화살표, 홈 인디케이터, AI 알약 지우고 다시 쓰기, 배너 첫 넘김, 녹화 점 위상) →
+  기준 시각 하나 `launchAt` 을 모듈 변수 + `useSyncExternalStore` 로 (콕뱅크 `loading.ts` 와 같은 작은 전역 저장소). 받는 쪽은 그 값을 `key` 로 다시 그려 처음부터.
+- 기준 = 인트로 영상이 끝나는 순간 **H = 0.4167초**(25장 ÷ 60fps). `LAUNCH` 표 = 녹화 시각 − 0.4167 (ms): 홈 인디케이터 283 → 733 나타남 · 1485 → 1751 사라짐,
+  위치 표시 316 · 4053, 화살표 4216, 배너 첫 넘김 5391, 녹화 점 위상 1173. 명세마다 '0초' 가 달랐음(H · "앱이 다 커진 때" · 영상 끝) → 한 기준으로 옮겨 적음 (한 명세는 전부 +241ms).
+- 그냥 켤 때(프로필 고름 · 새로고침): 홈이 뜨는 때 `launchReady()`. 인트로 녹화: 영상 동안 `holdLaunch()` 로 멈춰 두고 끝나는 프레임에 `setLaunchAt(t)`.
+
+### 로딩 막 하나 (`dim.ts`) · 모달과 push (`nav.ts`, `nav.css`)
+- 홈 '이체' → 이체, 통장 거래 → 거래상세는 **누른 화면이 막을 켜고 다음 화면이 끔** → 화면 상태로는 넘겨줄 수 없어 전역 하나:
+  `showK2Dim()` 그 프레임에 바로(터치 막음) · `leaveK2Dim()` 167ms `cubic-bezier(.42,0,.58,1)` 로 스피너와 함께 흐려짐(데이터를 그린 프레임에) · `cutK2Dim()` 바로 걷음.
+  `rgba(0,0,0,.34)` 로 띠까지 852pt 를 덮고 상태바 글자 · 아일랜드는 안 덮음 (PhoneFrame 이 viewport 안에 `K2LoadingDim` 하나).
+- 이체 쪽은 흐려지기가 끝까지 안 감: 프레임마다 재 보면 4단계 흐려지다 모달이 처음 움직이는 프레임에 남은 막이 한 번에 사라짐 → 흐려지기 시작 +50ms 모달, +67ms `cutK2Dim()`.
+- 막을 끌 화면이 사라지는 경우: 거래를 눌러 막이 뜬 채 로그인이 풀려(401) 로그인 화면이 뜨면 막이 입력을 막은 채 남았음 → 로그인 안 된 동안엔 `K2LoadingDim` 이 스스로 걷음.
+- 전환 종류는 ScreenStack 이 `KAKAO2` 일 때만 `k2AnimFor(anim, path)` 로 정함 (다른 앱은 className · 타이머 · `UNDER_DIM` 그대로):
+  - **modal**(이체) · **detail**(거래상세): 아래에서 올라오는 전체 화면 500ms. 위끝을 프레임마다 재 보니 임계 감쇠 스프링(ω 18)이라 `cubic-bezier` 로는 안 맞음 →
+    CSS `linear()` 에 21개 점: `linear(0, .075, .228, .391, .537, …, .998, 1)`. 거래상세는 막이 뜬 프레임보다 24ms 앞서 시작한 꼴(`animation-delay: -24ms`).
+    밑 화면은 움직이지도 어두워지지도 않고 층도 걷지 않음(`layer--k2-under` → 닫으면 스크롤 · 불러온 목록 그대로). 가장자리 스와이프는 막음. 걷기는 `animationend`.
+  - **push**(홈 → 통장): 400ms `cubic-bezier(.2,1,.45,1)`. 머리줄은 첫 프레임부터 제자리, 본문(`.k2-push-body`)만 밂. 본문 아래 두 모서리가 55로 둥글다가
+    밀기가 끝나고 77ms 뒤(477ms, `K2_NAV.pushHold`) 각짐 — 앱 창이 커질 때 모서리가 늦게 각지는 것과 같은 모양. 밑 화면은 10% 어두워짐.
+- 빠른 두 번 누르기는 `useK2Once`(첫 누름 뒤 이 층이 덮일 때까지 잠금, 이동이 없으면 1.5초), 주소로 바로 연 통장 · 이체의 `<` · X 는 `useK2Back` 이 홈으로
+  (기록 첫 칸에서 `navigate(-1)` 하면 앱 밖으로 나갔음).
+
+### 녹화와 맞추기
+- 녹화 1180px = 393pt → **1pt = 3.0025px**. 프레임은 ffmpeg 로 60fps 그대로 PNG 로 뽑아(프레임 번호 = 시각 × 60) 위치 · 색을 재고, 움직임은 한 점(위끝 · 색)을 프레임마다 재서 곡선을 맞춤.
+- 클론은 Playwright 로 DPR 3(`deviceScaleFactor: 3`)으로 찍어 녹화와 같은 화소 크기로 → 반반 붙이기 · 겹치기 · 차이 그림. 녹화의 이름 · 번호 · 잔액이 보이는 프레임은 비교에만 쓰고 커밋 안 함.
+- 비교에서 고친 예:
+  - **홈 스크롤 막대**: 검수는 오른쪽 x 387–390 열의 프레임별 **최댓값**이 바탕과 같다(32 vs 31)며 "홈엔 막대 없음"으로 정했는데, 막대는 바탕(31)보다 **어두운**(22) 검정 .29 라
+    최댓값엔 안 잡혔음. 반반 비교에서 보여서 되살림(`k2-home__ind`) — 어두운 바탕 위 어두운 것은 최솟값으로도 볼 것.
+  - **떠 있는 광고**: 명세는 '올라왔다 내려가는 시간 애니메이션'이었는데, 프레임마다 재 보니 **광고 위끝 + 스크롤 = 1162.5** 로 늘 같음 → 목록 끝에 붙어 스크롤과 같이 움직이는 것
+    (맨 끝에선 제자리 667). 시간으로 흉내 내면 스크롤 속도가 다를 때마다 어긋남. 자리는 스크롤 프레임마다 ref 로 바로 (10장).
+  - **거래구분 이름**: 녹화의 거래상세는 보낸 이체 '일반이체' · 받은 돈 '일반입금'. 서버 `txDetailJson` 이 `SERVER_ID === "kakao2"` 일 때만 이렇게 줌 —
+    명세는 `APP === "kakao" && INTRO` 였지만 카카오 변형이 또 생겨도 안 걸리게 서버 이름으로. 🔔 패널은 보이던 거래구분을 그대로 다시 보내므로 기본값과 같은 이름은 '직접 지정'으로 안 봄.
+
+### 녹화 인트로 클립과 개인정보 (`scripts/kakao-intro-erase.py`, `recorder.ts`, `Launch.tsx`)
+- 원본은 0.458초부터 커지는 앱 창 속에 **녹화한 사람의 실제 계좌 이름 · 잔액**이 보임 → 클립은 0.000~0.400초 **25장(앱 보관함에서 B 아이콘을 눌렀다 뗌)만**,
+  스크립트도 `ffmpeg -frames:v 25` 로 25장만 읽음. 그 뒤 '앱 창이 아이콘 자리에서 화면 전체로 커지는' 0.35초는 클론이 그림(`Launch.tsx`): 녹화 프레임마다 잰
+  창 위치 · 모서리 · 밝기 표를 Web Animations(`el.animate`)로, 뒤에는 멈춘 영상 마지막 장면을 흐리게 · 어둡게, 416ms 에 모서리가 각지고 영상을 걷음.
+- 지우기: 시계 + 달 · 배터리 칸을 줄마다 칸 바깥 왼쪽 · 오른쪽 세 칸 평균을 직선으로 이어 메움 (한 칸만 쓰면 압축 잡음이 가로 줄무늬로 남음). 영상이 도는 동안엔
+  우리 상태바를 그 위에 올려(`[data-intro-play]`) 녹화한 시각 · 정해 둔 배터리가 찍힘 (kbank2 와 같은 방법). 신호 · LTE · 아일랜드는 앱과 같아서 그대로.
+- 인코딩: 2배(786 × 1704)로 줄이고 RGB → bt709 tv 범위 yuv420p 를 numpy 로 직접 계산해 넘김 (ffmpeg 에 RGB 를 주면 회색이 1~2, 노란 B 가 3~10 단계 어긋났음).
+  mp4 = H.264 High 4.2 · `-bf 0`(B 프레임이 있으면 편집 목록 때문에 브라우저 시작 시각이 밀림) · `+faststart`, webm = VP9. 다시 돌리면 mp4 는 바이트까지 같음.
+- 녹화(`recorder.ts`): 은행마다 `IntroCfg`. kbank2 는 영상 뒤 시작화면을 새로 띄우지만(`mount: "start"`), kakao2 는 `"resume"` — 녹화를 시작하기 **전에** 영상 밑에서 홈을
+  데이터 · 글꼴(`document.fonts.ready`) · 그림(`img.decode()`)까지 다 그려 둠(`resumeUnder`). 끝나기 6장 전에 `requestVideoFrameCallback` 의 장면 시각으로 H 를 계산해
+  켜짐 연출을 걸어 둠 — H 에 바로 하면 무거워서 마지막 장면이 3~4장 더 찍혔음.
+- 폰 폭 393 이 홀수라 짝수 폭 창 가운데에 두면 왼끝이 0.5px 에 걸려, 크롬 탭 캡처가 프레임 폭을 392 ↔ 394 로 바꾸며 오류를 내고 왼끝에 검은 1px 줄이 생김 →
+  kakao2 녹화 동안만 폰 여백을 정수 px 로 옮김(`snapToDevicePixels` — transform 을 주면 Element Capture 가 프레임을 안 내보냈음).
+- 저장소에 개인정보 없음: 커밋한 그림 14개(`k2-*` 12개 + 클립 2개, 클립은 25장 모두)를 열어 보고, 추가된 모든 줄과 커밋 메시지를 녹화 속 이름 · 번호 · 금액과 대조. 화면은 예시 데이터(홍길동).
+
+## 26. allone — NH올원뱅크 녹화(아이폰) + 그린 녹화 인트로 (`src/allone/`, `scripts/allone-crops/`)
+
+NH농협은행 앱 NH올원뱅크를 아이폰 녹화(1180 × 2556, 60fps, 라이트)로 새로 만든 앱. 기기는 kakao2 와 같은 아이폰이지만 세 가지가 달랐다:
+(1) 변형이 아니라 **자기 서버를 가진 새 앱인데 처음부터 인트로가 있음**, (2) 화면이 **네이티브 껍데기 안의 웹뷰**, (3) 녹화 앞부분을 **영상으로 쓸 수 없음**.
+녹화를 담당별 명세(인프라 · 시작 · 홈 · 거래내역 · 이체)로 재고, 명세끼리 어긋난 값은 `docs/allone-spec/plan.md` 한 곳에서 녹화를 다시 재서 정한 뒤
+기반 → 영역 넷(동시에, 서로 import 안 함) → 통합 순서로 만들었다. 기반이 실제로 만든 내보내기 · API 는 `docs/allone-spec/foundation.md`.
+
+### 서버: `INTRO_APPS` 와 APP / INTRO 떼기
+```js
+const VARIANTS = { kbank2: "kbank", ibk2: "ibk", kakao2: "kakao" };
+const INTRO_APPS = ["allone"];
+const VARIANT = Object.hasOwn(VARIANTS, SERVER_ID);
+export const APP = VARIANT ? VARIANTS[SERVER_ID] : SERVER_ID;
+export const INTRO = VARIANT || INTRO_APPS.includes(APP);
+```
+- 25장의 표는 `INTRO = 변형인가` 였고 APP 도 그걸로 정해졌음. allone 은 변형이 아니라 자기 앱(APP = SERVER_ID = `allone`)인데 인트로가 있음 → 두 값을 따로 계산.
+  kbank2 · ibk2 · kakao2 는 결과가 그대로. 화면 쪽은 고칠 것 없음: `HAS_INTRO` 는 원래대로 `__BANK_INTRO__`(배포) / `.env.allone` 의 `VITE_INTRO=1`(개발),
+  `KAKAO2` · `IBK2` 는 APP 도 보므로 false 그대로. `session.ts` 에 `ALLONE = APP === "allone"` 하나.
+- 이름(SERVER_ID)이 정하는 것: 데이터 `data-allone/` · 쿠키 `bank_sid_allone` · 포트 9119 · 제목 '올원뱅크 클론 연습'.
+- 올원 칸은 모두 `ALLONE` 문 안에서 덧붙임: `migrate()` 가 allone DB 에만 `accounts.blocked` · `profile.notice_on` · `profile.notice_items` · `recent_hidden` 표를 만들고,
+  응답에 `blocked`(지급정지), 홈 `ao.notice`, 거래 상세 `ao: {accountId, payee}`(☆ 상태), `POST /api/payees` 의 `favorite`, 받는 분 '최근' 숨김(`HAVING MAX(t.at) > hidden_at`),
+  allone 서버에만 있는 `DELETE /api/transfer/recent`(다른 앱은 404). 거래내역 기간 · 입출금 · 순서 · 20건씩은 화면이 거름 (목록 API 가 500건까지 줌).
+- **지급정지를 `badge` 가 아니라 따로 칸으로**: `migrate()` 가 DB 를 열 때마다 `UPDATE accounts SET badge = NULL WHERE kind = 'main'` 을 돌려서 대표계좌 badge 는 남지 않음.
+  공용 줄을 고치지 않고 allone 칸 `accounts.blocked` 를 새로 둠. 예전 '한도제한' 칸(`limited`) · 지어낸 이의제기 칸(`dispute_at`)은 `ALTER TABLE … DROP COLUMN` 으로 지움
+  (node:sqlite 가 DROP COLUMN 을 지원 — 이미 쓰던 data-allone DB 도 열 때 정리됨).
+- 예시 데이터는 `server/allone-seed.mjs` (`db.mjs` 가 이 파일을 import 하므로 이 파일은 `db.mjs` 를 부르지 않음). `SEEDS.allone = { example, empty }` 가 빠지면 첫 실행 · 새 프로필 · 되돌리기에서 서버가 죽음.
+
+### 앱 id `allone` ≠ 은행 코드 `nh`
+- NH농협은행 계좌의 은행 코드는 `nh` 인데 `nh` 는 콕뱅크의 앱 id 이기도 함. allone 서버의 `db().app` 은 `"allone"` 이라 콕뱅크 규칙(1일 송금 한도 · `dailyRemaining`)은 하나도 안 켜짐.
+  올원 코드는 늘 `bank.code === "nh"` 로 보고, **`APP === "nh"` 로 allone 을 가리지 않음**.
+- '앱 이름 = 은행 코드' 에 기대던 곳이 깨짐: `POST /api/accounts` 의 기본 은행 `bankCode = APP` → allone 이면 400 '은행을 골라 주세요' → `APP === "allone" ? "nh" : APP`.
+  🔔 `OWN_BANK.allone = { code: "nh", name: "NH농협은행", … }`. AddPayee 기본 은행 사슬은 마지막 `"nh"` 로 떨어져 우연히 맞아서 그대로 둠 (`"allone"` 을 넣으면 없는 은행 코드를 찾음).
+- 이름 충돌: 그림은 `allone-`, CSS 는 `ao-`(영역은 `ao-ln-` · `ao-home-` · `ao-acct-` · `ao-send-`), 키프레임도 `ao-`. 콕뱅크가 `nh-*` 그림 141개를 갖고 있어 `nh-` 는 안 씀.
+  `data-kakao2` 도 안 켬 (kakao2 전환 · 인트로 CSS 가 걸림) — 틀은 `html[data-app="allone"]`.
+- `AppName` 에 `"allone"` 을 넣으면 tsc 가 잡는 곳은 세 군데뿐 (`ROUTES[APP]`, overlay 표, `APP_NAME`). 나머지(시작화면 사슬 · 기기 · 테마 잠금 · 인트로 기기 · 깜빡임 주기 ·
+  배터리 기본값 · 녹화 픽셀 맞춤 · 서버 SEEDS · 제목 · 포트 · 삭제 문구 …)는 **조용히 카카오 · 콕뱅크 · 보통 아이폰 쪽으로 떨어짐** → `APP ===` · `[APP]` · `KAKAO2 ||` 를 grep 해서 하나씩 (infra.md §3 표).
+
+### 웹뷰 + 네이티브 껍데기: 흰 띠 59 / 34
+- 녹화를 재 보면 웹 로딩 막 · 웹 시트 배경막이 떠도 위 0–59 · 아래 818–852 는 흰색(255) 그대로 (막은 그 사이만 덮음) → 진짜 앱은 **네이티브 껍데기 안의 웹뷰**.
+  화면마다 54pt 띠를 스스로 칠하는 kakao2(25장)와 다른 모델.
+- 그래서 `.phone__viewport` 를 `inset: 59px 0 34px`(`--ao-top` / `--ao-bottom`)로 줄이고 PhoneFrame 이 흰 띠 둘(`.ao-band--top/--bottom`)을 그림. 모든 화면은 759pt 웹뷰 안에서
+  배치 (웹 y = 화면 y − 59). 로그인 · 프로필 고르기도 감쌀 필요가 없음 (K2Inset 안 씀). 폰(≤ 500px)에선 띠 = `env(safe-area-inset-*)`, 가짜 상태바 · 아일랜드는 다른 앱처럼 숨김.
+  화면이 393pt 좌표로 그려져 있으므로 폰에선 ibk2 처럼 `.phone` 을 393 폭 그대로 두고 `zoom` 으로 창 폭에 맞춤 (`--ao-fit` = 기기 폭 / 393, 높이 = 창 높이 / 배율).
+  기기 폭은 `visualViewport.width × scale` — 393 폭 폰이 잠깐이라도 창보다 넓으면 모바일 크롬이 레이아웃 뷰포트를 393 으로 넓혀 `innerWidth` 가 393 이 됨.
+- 홈 인디케이터는 앱 안에선 없음. 켜진 직후(D+250 → D+1100)에만 흰 시작화면 위에 검정으로 (`AO_HOME_INDICATOR` 투명도 표).
+- 검은 화면(녹화 "off" · 로그인 확인 중)을 웹뷰 안에 그리면 띠가 흰색으로 남음 → `AlloneOff` 는 네이티브 층에 창 전체 검정.
+
+### 막 두 가지: 웹 막 · 네이티브 막
+- **웹 로딩 막** `rgba(55,55,55,.68)` + 초록 all one 동전 스피너: 웹뷰(59–818)만 덮고 한 프레임에 켜지고 꺼짐. 스피너는 33ms 먼저 꺼지고, 웹뷰가 아니라 **화면** 가운데 (196.5, 425.8).
+  거래 상세 · 잔액채우기 링크는 그 위에 검정 .22 한 겹이 280 / 300ms ease-out 으로 더 깔림. 웹 시트 배경막 .30(300ms ease)도 웹뷰만.
+- 막 색은 흰 바탕 하나로는 못 정함: 명세 셋이 검정 .53 · (55,55,55,.68) · (56,56,59,.70) 으로 갈렸는데, 흰색(255 → 118)과 간편비밀번호 초록(#0C8F2D → (45,80,55))을
+  같이 맞추면 회색 .68 만 맞음 (검정 .53 이면 흰색은 맞아도 초록이 (6,67,21)). **바탕 두 가지에서 재야 막의 색과 투명도가 같이 풀린다.**
+- **네이티브 막**: 금액 입력(T7) 검정 .765 · 계좌 비밀번호(T3) .733 은 상태바 띠까지 창 전체를 덮지만 아일랜드 · 빨간 점 · 상태바 글자는 안 덮음.
+- 얼마를 보낼까요(T2)의 금액 키패드 판도 네이티브라 웹 로딩 막에 덮이지 않음 (z 53 > 51). 그래서 판은 막이 켜지는 프레임에 직접 내려 보내고(170ms) 돌아오면 다시 올림.
+
+### 네이티브 층 z 순서 (`Overlay.tsx`, `native.ts`, `ui/NativePortal.tsx`)
+```
+.phone 안:  웹뷰 0 · 흰 띠 1 · 웹 로딩 막 + 스피너 51 · 금액 키패드 판 53 (#ao-native-panel) · 토스트 54
+           · 네이티브 막 + 시트 55 (#ao-native — T7 · T3 · 스플래시 그림) · iOS 키보드 56 (#ao-native-kb) · 인트로 장면 57 (#ao-native-scene)
+           · 홈 인디케이터 58 · 아일랜드 60 · 상태바 글자 70
+```
+- `AlloneOverlay` 를 PhoneFrame `overlay` 로 넘겨 `.phone` 안 맨 끝에 그림. 자리 div 는 393 × 852 전체에 `pointer-events: none`, 직접 자식만 누름을 받음.
+  웹뷰 밖까지 덮는 것(키패드 판 · T7 · T3 · 키보드 · 스플래시)은 `AoNativePortal({ layer })` 로 이 자리에.
+- 화면 층이 밑에 깔려 숨으면 그 층이 그린 네이티브 내용도 같이 숨음 (`.ao-native-part` 를 `display: none`) — 화면마다 따로 챙길 필요 없음.
+- 녹화 다시 시작(RESTART "off") · 로그아웃이면 막 · 토스트 · 상태바 덮어쓰기를 걷고 `aoNativeReset()` → 열린 시트 · 키보드가 `onClose`. "start" 에는 안 걷음 (인트로가 장면 · 상태바 색을 이어서 다룸).
+
+### 상태바 글자색 덮어쓰기 (`statusFg.ts`, `StatusBar.tsx`)
+- 앱 안에선 늘 흰 띠 위 검정. 바꾸는 건 **막을 연 쪽**: T7 은 아이콘(신호 · LTE · 배터리)이 600ms 뒤 한 프레임에 흰색, 시계는 667ms 뒤 100ms 동안(닫으면 한 프레임에 검정).
+  T3 는 같은 네이티브 막인데 검정 그대로 → 막에 묶지 않고 `setAoStatusFg(fg, { iconsDelay, iconsMs, clockDelay, clockMs, easing })` 를 시트가 따로 부름. 인트로는 장면 동안 흰색, D+100 부터 217ms 곡선으로 검정.
+- 지연은 **부른 시각부터** 잼: `setAoStatusFg` 가 `performance.now()` 를 같이 저장하고, `AlloneStatusBar` 는 같은 커밋에 클래스를 바꾼 뒤 옛 색을 Web Animations(`startTime` = 부른 시각)로 붙잡음.
+  처음엔 CSS transition 이라 React 가 그리는 시간 · 프레임 위상만큼 밀렸음.
+- `null` + 타이밍이면 500ms 안에 오는 화면 fg 바뀜에도 같은 타이밍 (시작화면의 `useStatusBar("dark")` 가 한 프레임 뒤에 와서 글자가 검정으로 튀었음).
+- 상태바는 K2StatusBar 를 옮겨 와 맞춘 393 × 54 SVG 한 장: 시계 잉크 가운데 x 60.0(옆 표시 없음), 신호 막대 4칸(kakao2 와 같은 모양), LTE · 배터리 · 숫자는 kakao2 보다 1.0~1.33pt 오른쪽,
+  배터리 빈 칸 .333 · 기본 50. 아일랜드 · 빨간 점(1.5초 주기)은 같은 기기라 `K2Island` 를 그대로 import.
+
+### 인트로를 그린 이유 (`launch/Scene.tsx`, `launch/intro.ts`, `intro.ts`, `recorder.ts`)
+- kakao2 는 앱 보관함 25장을 쓸 수 있었지만, 올원 녹화 0–1.15초의 홈 화면엔 녹화한 사람의 배경화면 · 설치한 앱 · 알림 숫자가 그대로 보임 → **그 구간 프레임은 한 장도 안 씀**.
+  아이콘 누름 · 녹아 사라짐도 그 배경 위라 영상으로 쓸 수 있는 구간이 없음.
+- 대신 DOM/SVG 장면: 자리 · 크기만 녹화에서 잼 (1열 아이콘 64pt, 왼끝 28.7 / 119.6 / 210.5 / 301.4 · 위끝 80, 검색 알약, 독 둥글기 40). 배경은 만든 그라데이션,
+  아이콘은 '금융' 폴더(로고 없는 파스텔 칸) · 메모장 · 날씨 · 이름 없는 독 4개 · all one 아이콘(CSS 초타원 + 워드마크 마스크). 그림 파일은 `allone-wordmark.png` 하나 (다른 래스터를 읽지 않는 것이 검사 항목 — plan.md §7.1).
+- **줌이 아니라 녹아 사라짐**: 인프라 명세는 '아이콘 자리에서 흰 창이 커짐' 이었는데, 화면을 6 × 4 칸으로 나눠 칸마다 흰색 비율을 재 보니 모든 칸이 같이 올라감
+  (.04 → .2 → .5 → .85, 50ms 간격) → 화면 전체 250ms 균일 페이드, 곡선은 `linear()` 16점.
+- 시각표 (녹화 첫 프레임 t0 기준, C1 그대로): +650 아이콘 누름(한 프레임에 바탕 #0C8F2D → #034913, 글자 흰색 → #919291, 크기 그대로) · +900 = **D** 손 뗌 —
+  아이콘 100ms ease-out 복귀 + 장면 위 흰 막 250ms · D 에 `aoSetLaunchAt(D)` + RESTART "start"(그 밑에 시작화면이 흰색으로 이미 그려짐) · D+100 상태바 글자 → 검정 217ms · D+300 장면을 걷음.
+  누름 · 녹아 사라짐은 미리 걸어 둔 Web Animations(`startTime = t0`)라 그 프레임에 DOM 바뀜이 없음.
+- 녹화기 갈래(영상 `IntroCfg` 갈래는 그대로): `prepareAlloneIntro()`(글꼴 · 워드마크, 늦어도 3초) → RESTART "off" → `showAlloneIntro()`(장면이 폰을 덮음 — 첫 프레임이 검정이 아님)
+  → 녹화 시작 → 첫 프레임 뒤 한 프레임 → `keepCapturing`(가만있는 장면도 매 프레임 찍히게, 23장) · `syncBlink(618)`(빨간 점이 녹화 0.62초에 가장 어둡게) → `runAlloneIntro`.
+- 멈췄다가 0.9초 안에 다시 ● 녹화하면 지난 녹화의 "start" 가 새 장면 밑에 갔음 → 세대 번호로 밀려난 실행은 아무것도 안 켬.
+- 폰 폭 393 이 홀수라 kakao2 의 `snapToDevicePixels` 를 allone 에도 (25장). 단 DPR 3 에서 크롬이 자리를 1/64px 단위로 저장해(63.6667 → 63.65625) 0.01 검사에 걸려 되돌려졌음
+  → allone 만 허용치 1/64 + 0.001 (kakao2 는 0.01 그대로).
+
+### 켜진 시각 D (`launch.ts`) · 시작 흐름 (`launch/AlloneSplash.tsx`)
+- 홈 인디케이터 · 스플래시 · 간편비밀번호는 모두 D 기준. 인트로 녹화는 장면 동안 `aoHoldLaunch()`, D 에 `aoSetLaunchAt`. 그냥 켤 때(프로필 고름 · 새로고침 · 인트로 끈 녹화)는
+  App 이 boot "splash" 에서 `aoLaunchReady()` → D = 지금 − 250 (흰 화면 1.20초 뒤 스플래시 — 인트로가 있을 때와 같은 시각표).
+- App 은 이 값을 **`useLayoutEffect`** 로 정함. `useEffect` 면 자식(AlloneSplash)의 효과가 먼저 돌아 지난 D 를 읽어 배포판에서 250ms 늦었음 (자식 효과가 부모보다 먼저).
+- 흰 화면 → D+1450 스플래시 그림 267ms 페이드 → 2383ms → 167ms 교차 페이드 → 간편비밀번호, +117ms 보안 키패드 → 6번째 숫자 +67ms 로딩 막(그 프레임에 키패드 없앰)
+  → +2033 막 밑에서 홈 → +2233 막 걷힘. 스플래시는 네이티브 층 y 59 에 (아래 띠까지 덮음).
+- 간편비밀번호 · 계좌 비밀번호는 **보이기만**: 몇 개 눌렀는지만 화면 상태에 두고 숫자는 서버 · 저장소 · 콘솔 어디에도 안 보냄. 로그인은 원래 쿠키 세션.
+  막 동안 뒤로가기로 로그인이 멈추면 간편비밀번호를 처음부터 (점 6개 · 키패드 없는 화면에 멈췄던 문제).
+
+### 화면 이동 = CUT + 로딩 프로필 표 하나 (`nav.ts LOAD`, `loading.ts`, `flow.ts`)
+- 녹화의 화면 바뀜은 모두 한 프레임 CUT, 대부분 로딩 막 뒤. iOS push · 가장자리 스와이프가 없음 → ScreenStack 의 allone 갈래: 애니메이션 없음, `canSwipe` 끔,
+  **밑 층은 숨긴 채 그대로**(`.layer--ao-under`, active false) — 홈 · 거래내역조회로 돌아오면 스크롤 · 불러온 줄이 그대로. 대신 숨은 화면은 전역 일을 하면 안 되고(`useLayerActive`),
+  다시 맨 위가 될 때 할 일은 `useAoReturn` 에서 (T2 판 다시 올리기 등).
+- 기다림은 화면마다 따로 두지 않고 **표 하나** (손 뗀 때부터 ms, 스피너는 따로 적지 않으면 걷힘 − 33):
+
+| 프로필 | 누름 | 막 / cut / 걷힘 | 더 | 근거 |
+|---|---|---|---|---|
+| login | 6번째 PIN 숫자 | 67 / 2033 / 2233 | 스피너 2183 | C1 9.850–12.150 |
+| history | 홈 카드 거래내역 | 0 / 967 / 1000 | | C2 8.991–9.991 |
+| txIn · txOut | 거래 행 입금 · 출금 | 0 / 167 / 184 · 0 / 1083 / 1100 | 검정 .22 280ms (+17) | C2 14.274 · 16.558 |
+| sendFromList · sendFromHome | 거래내역 이체 · 홈 카드 이체 | 0 / 717 / 1050 · 0 / 284 / 417 | | C2 20.091 · C3 26.146 |
+| password | 4번째 계좌 비밀번호 숫자 +50 | 0 / 450 / 483 | | C3 32.729 |
+| topupLink | T2 잔액채우기 링크 | 0 / 367 / 1433 | .22 300ms, cut 에서 기본 막, T6 +983 | C3 1.896–3.329 |
+| topupRow · topupSubmit | T6 행 · 잔액채우기 버튼 | 0 / 284 / 384 · 0 / 534 / 567 | 막이 걷힌 프레임에 T7 막 | C3 5.179 · 12.029 |
+| cancelHome | 취소 | 0 / 383 / 650 | 스피너 517 | C3 21.596–22.246 |
+| menu · search | 홈 ≡ · 전체메뉴 검색 줄 | 스피너만 0–317 → 317 / 367 · 0 / 167 / 167 | 검색은 +33 부터 120ms 서서히 | C3 38.629 · 39.813 |
+| lookup · send · finish · menuLink · resend · acctFilter | (녹화 없음) | 384/417 · 967/1000 · 383/650 · 267/300 · 967/1000 · 567/600 | 지어낸 값 | — |
+
+- 늘 `max(api, 시간)`: 막 동안 다음 화면 데이터를 미리 받고(`prefetch`) 늦으면 cut · 걷힘 · 그 뒤 marks 가 같이 밀림. 실패하면 cut 없이 걷힘, 막 동안 브라우저 뒤로면 cut 안 함
+  (이동 잠금도 풂), 새 `aoLoad` 는 이전 것을 멈춤. 단 돈이 오가는 막(`send` · `topupSubmit`, LOAD `commit`)은 뒤로를 무시하고 끝까지 돎 → 이체 완료 · '잔액을 채웠어요' 가
+  도착한 칸에서 (뒤로 한 번에 이체가 된 채 T2 로 돌아가 같은 이체를 또 보낼 수 있었음). 이체 완료에서 브라우저 뒤로 = 확인 (`useAoDoneBack`).
+- 뒤로(popstate)는 react-router 보다 먼저 받아야 함 (`onAoPopFirst`): React 19 는 popstate 안에서 화면 바꿈을 바로 그려서, 늦게 붙인 수신은 밑 화면의 `useAoReturn` 뒤에야 불리고
+  그새 사라진 화면이 붙인 수신은 아예 안 불림. 그래서 수신 하나를 `AlloneOverlay` 의 `useLayoutEffect` 로 붙임 (자식 효과라 BrowserRouter 의 `history.listen` 보다 먼저).
+- 같은 주소의 GET 을 여러 화면이 한꺼번에 다시 받으면(무효화) 크롬 HTTP 캐시가 하나씩 차례로 보냄 (250ms × 개수) → allone 만 GET 을 `cache: "no-store"` 로. `useAoFlow()` 의 `goHistory` · `goTx` · `goSend` · `goAmount` · `goTopup` … 이 프로필 이름(`via`)만 받음.
+- 깊이: push 마다 `location.state.aoDepth` +1 (replace 는 그대로) → `goHome` = `history.go(-aoDepth)`, 주소로 바로 연 화면은 "/" 로 replace (kakao2 `useK2Back`).
+  이체 흐름은 `aoSendDepth` · `aoOrigin` 을 따로 세서 완료 '확인'(`sendFinish`)이 흐름을 시작한 화면까지 한 번에 걷음.
+- **새로 불러온 홈**: `goHomeFresh()` = cancelHome 막 밑에서 "/" 로 + `aoHomeFresh` 알림 → 홈이 막이 걷힌 뒤 뼈대(+0 · +33 알약 · +117 배너 · +350 카드 · +550 아래 칸)와
+  +583 정기점검 시트를 다시. 그냥 뒤로 온 홈은 그대로.
+- 빠른 두 번 누르기: 맨 위 아닌 층의 누름은 버리고 450ms(로딩이면 걷힘 + 100) 잠금. 잠금으로 이동이 거절되면 먼저 내려 보낸 키패드 판을 다시 올림 (`canGo()` 를 먼저 봄).
+
+### 잰 chrome · 움직임 (녹화와 맞추기)
+- 좌표: x pt = px / 3.0025, **y pt = px / 3.000** (2556 / 852). 명세 셋이 y 도 3.0025 로 나눠 화면 아래로 갈수록 최대 0.68pt 낮게 적었음 → 띠 경계(59 / 818)만 맞춰 고치고
+  나머지는 허용 오차(±1pt) 안이라 그대로 씀. 클론은 DPR 3 으로 찍어 녹화와 같은 화소로 비교 (25장).
+- 처음 표의 곡선이 틀렸던 것 — 시작 · 끝만 맞추면 가운데가 어긋남 → 한 점을 프레임마다 재서 오차(rms)로:
+  - 금액 키패드 판: 웹뷰 아래끝(818) 기준 150 / 153ms 로 적었는데 판은 **화면 아래끝(852)** 에서 들어오고 나감 → 175ms `cubic-bezier(.4,.2,.6,1)` · 170ms `(.4,0,.6,.7)` (5–40pt 어긋났던 것)
+  - iOS 키보드: 240ms `(.2,.8,.2,1)` → 290ms `(.2,.4,.2,1)` (가운데서 45pt 어긋났음), 쉬는 위끝 545
+  - 인트로 상태바: '녹아 사라짐 곡선 + 33ms' → D+100 부터 217ms 자기 곡선 (최대 .2 앞섰음)
+  - 홈 뼈대: 0 · 150 · 350 · 550 → 프레임 차이로 +33 알약 · +117 배너가 따로 나옴. 탭 바와 '내 자산 확인' 알약도 따로 움직임 (알약이 탭 바 뒤로 지나감)
+  - 카드 넘기기: 처음 250 / 450ms 는 끄는 시간까지 넣은 값 → 손을 놓은 때부터 305ms
+- 인라인 `<svg>` 는 크롬이 레이아웃 상자를 CSS px 정수로 반올림해 그려서, 소수 자리(347.38, 76.33)에 놓은 아이콘이 최대 0.5pt 어긋남 → 상자는 정수 자리에 두고 소수는 path 안에.
+- 글꼴은 Pretendard(kakao2 규칙 — `global.css` 의 `html[data-kakao2]` 줄에 `html[data-app="allone"]` 을 더함), 금액 · 키패드 · 칩 숫자만 Roboto(`.ao-num`, allone.css 가 직접 import).
+- iOS 26 한국어 두벌식 키보드는 그림 (`ui/Keyboard.tsx`, 네이티브 층 56): 웹뷰는 줄지 않고 키보드가 아래를 덮음. 입력칸은 가짜 칸 + 깜빡이는 커서,
+  컴퓨터 자판은 숨은 `<input inputMode="none">` 이 받아 QWERTY → 자모로 (조합은 `ui/hangul.ts`).
+
+### 예시 데이터는 지금 기준 (`server/allone-seed.mjs`)
+- `ago(n, "HH:MM:SS")` = 오늘 − n일 그 시각 (n ≥ 1 → 미래 거래 없음, 시각은 늘 초까지). 케이뱅크(23장)는 녹화 날 시각을 그대로 두고 그보다 이르면 하루씩 당겼는데,
+  올원은 거래내역 기본 조회가 '1개월' 이라 날짜를 박아 두면 한 달 뒤 목록이 빔 → 처음부터 상대 날짜.
+- 잔액은 '지금 잔액' 을 저장하고 거래 후 잔액은 서버가 거꾸로 계산 (7장). 시작 잔액에서 거래 40행을 차례로 더해도 한 번도 음수가 안 되게 스크립트로 확인.
+- 녹화에서 맞춘 건 **구조만**: 두 번째 NH 계좌는 최근 1개월 거래 3행(입금 → 올원이체 둘)이라 목록 스크롤 길이를 녹화와 비교할 수 있고, 잔액이 한 자리라 두 자리만 쳐도 '출금가능금액 부족'.
+  이름 · 번호 · 잔액 · 금액 · 가게는 전부 지어냄. '올원이체' 같은 거래 종류 이름은 화면이 태그 · 부호로 붙임 (`aoTxLabel`, 서버 태그는 그대로).
+- 빈 데이터(새 프로필)는 대표계좌 0원 하나 + 정기점검 켬. 두 데이터 모두 `recent_hidden` 도 비움.
+
+### 잔액채우기 = 이체 (`transfer/Topup.tsx`, `api.ts topup`)
+- 새 API 없이 `POST /api/transfers`: 내 다른 계좌(KB · 케이뱅크 …) → 받는 NH 계좌, `memoTo = memoMe = "잔액채우기"`. 서버가 이미 출금 거래 + (내 계좌면) 입금 거래 + 이체 기록을
+  `transaction()` 하나로 묶으므로(14장) 양쪽 통장에 '잔액채우기' 행이 생김. 내 계좌로 보낸 것이라 '최근' 목록에는 끼지 않음.
+- 1회 한도 500만 · 1일 잔여한도(100만 − 오늘 그 계좌에서 채운 합계, `GET /api/transfers?from=` 의 오늘 기록 중 잔액채우기)는 표시 + 화면 검사만. 서버 한도는 없음 → 검사를 지나면 늘 성공.
+- 성공하면 `invalidate()` 뒤: 얼마를 보낼까요(T2)에서 왔으면 잔액채우기를 닫고(CUT) T2 판이 다시 올라오며 판 위에 '잔액을 채웠어요', 전체메뉴 · 다른금융 카드에서 왔으면 그 화면 그대로 + 금액 0 + 토스트.
+- 순서: 링크 → topupLink 막 밑에서 잔액채우기, +983 에 출금계좌 선택 시트(T6)가 막 밑에서 올라옴 → 행 → topupRow 막이 걷힌 프레임에 금액 입력(T7) 네이티브 막 → +64ms 부터 357ms 올라옴.
+
+### 지급정지 '안내' 팝업 (`ui/Alert.tsx` AoAlert, `transfer/blocked.ts`, `transfer/BlockedAlert.tsx`)
+- 서버: allone 이고 출금계좌 `blocked` 면 `POST /api/transfers` 가 **403 `ACCOUNT_BLOCKED`** (잔액채우기도 같은 API 라 같이 막힘). 입금 · 다른 앱은 그대로.
+- 언제 뜨나 (녹화 C3 12.75 · 33.3):
+  - **계좌 비밀번호(T2) 4번째 숫자**: password 막 동안 출금계좌를 캐시 없이 다시 받아(`checkNotBlocked`) 지급정지면 CUT 없이 막이 걷히는 프레임에 팝업.
+    확인 → 팝업 한 프레임에 사라짐 → 83ms 뒤 키패드 판이 다시 들어옴.
+  - **이체 확인 `보내기`**(도중에 걸었을 때) · **잔액채우기**: 서버 403 → 막이 걷히기 33ms 전(`enter: "cut"`) 막 밑에서 팝업. 이체 확인 · 잔액채우기 화면은 그대로.
+    T2 에서 연 잔액채우기면 확인 뒤 숨어 있던 T2 판이 잔액채우기 위로 올라와 남음 (녹화 C3 19.48 — 네이티브 판이 웹 팝업이 닫힐 때 다시 보이는 것).
+- 모양: 웹뷰 안 z45(로딩 막 아래), 배경막 .30 은 웹뷰만, 카드 24–369 × 282–595 · r12, 제목 '안내' · 본문 · 빨간 코드 줄 · 전화 아이콘 + 밑줄 번호 · 초록 테두리 `확인`.
+  나타남은 크기 변화 없는 opacity (카드 300ms · 배경막 340ms, Chrome 이 애니메이션을 한 프레임 늦게 시작하는 만큼 −23ms 앞당김). 사라짐은 확인을 뗀 프레임에 한 번에.
+- 닫힌 뒤 300ms 누름 막(두 번 누름), 떠 있는 동안 브라우저 뒤로 = 확인 (같은 key 의 방문 기록 한 칸을 넣었다가 확인으로 닫으면 뺌).
+- 본문 · 오류코드(`EFAB03743`) · 고객행복센터 번호는 녹화 그대로 (본문은 녹화처럼 낱말 가운데서도 줄바꿈, `break-all`). 오류코드 뒤 긴 번호는 그 녹화의 거래 번호라 쓰지 않고
+  형식만 따라 열 때마다 만듦: 상태바와 같은 기기 시각 `yyMMddHHmmss` + `OEFABINOPT` + 숫자 10자리.
+
+### 이의제기 (`dispute/`, `home/Search.tsx`)
+- 길: 통합검색 → 결과 '이의제기 신청 및 조회' → `/dispute` 안내 → `이의제기 신청` → `/dispute/check` 신청 전 확인 6항목 → 5번 칸 → `/dispute/branch` 영업점검색.
+  `다음`(6개 다 확인하면 초록)은 누른 색만 — 그 뒤(녹화 C4 12.4~ 휴대폰 본인인증 · 신분증)는 일부러 만들지 않음. 서버 API 없음, 확인 상태는 화면 메모리(`dispute/store.ts`)만.
+- 통합검색: ↵ 는 LOAD 프로필 없이 `showAoLoading` 직접 (막 0 · 키보드 내려감 150 · 결과 167 · 막 걷힘 600). 결과 줄 = 경로 + 초록 밑줄 이름, 검색어는 경로 · 이름 어디든 (띄어쓰기 무시).
+  자동완성은 두 글자부터, 띄어쓰기 없는 낱말만 (녹화: '이의제' 목록은 이의제기 · 이의제기신청 두 줄).
+- 로딩 둘: 검색 결과 → 안내는 어두운 막 `disputeLink`(스피너 0 → 막 17 → CUT 800 → 833), 안내 화면은 흰 빈 화면 + 스피너 → 제목 없는 머리줄 + 초록 화살표(그림)
+  → 내용 +217 · 제목 +251 · 그림 +384 순서로 나옴. 이의제기 안의 이동(`disputeApply` · `branchOpen`, CUT 184 · 200)은 어두운 막 없이 **떠나는 화면의 흰 막(.51) + 스피너**
+  (`dimFade.from: 60000` 으로 공용 막을 켜지 않음 — LOAD 표에 '막 없음' 칸이 없어서).
+- 확인 6항목: `확인함` 을 누르면 그 항목이 초록이 되고 같은 프레임에 다음 항목이 나오며 맨 아래로 스크롤. 진행 막대는 sticky 108.67.
+  5번 영업점 칸 → 영업점검색(× · 한국어 키보드 · 힌트 두 줄) → ↵ 막 184/200 → 결과 줄을 누르면 키보드 닫힘 + 83ms 뒤 돌아와 칸에 들어가 있음. ← 는 안내로, 다시 들어오면 처음부터.
+- 영업점 8곳 · 주소 · 전화는 지어냄 (`02-000-…`). 안내 · 확인 항목의 긴 문장은 같은 뜻 · 비슷한 길이로 새로 씀 (줄 수를 녹화와 맞춤), 짧은 화면 이름 · 버튼 글만 녹화 그대로.
+
+### 🔔 관리 패널
+- 기본: 기기 · 테마 칸 숨김 (kakao2 처럼 `!ALLONE` 조건 추가). 정기점검 안내 칸은 home 영역 파일(`home/NoticePanel.tsx`)을 ALLONE 일 때만 그림 —
+  보이기는 서버 `profile.notice_on`, 1쪽 항목은 `profile.notice_items`(null = 화면이 오늘로 계산), '1일동안 안보기'는 보는 사람 브라우저(localStorage)라 지우기 버튼만.
+- 계좌: `OWN_BANK.allone`(은행 코드 nh · 13자리) + 다른 은행 계좌 추가(`AddBankAccount withName`, 서버도 allone 이면 카카오뱅크 계좌를 거절하지 않음). 계좌번호 자유 입력은 NH 계좌만,
+  다른 은행은 그 은행 형식 (`freeNumber`). 계좌마다 지급정지 `걸기 / 풀기`(`PATCH /api/accounts/:id { blocked }`).
+- 받는 분: ☆ 자주 토글 (`PATCH /api/payees/:id { favorite }` — 이체 '자주' 탭 · 거래내역 상세 ☆ 와 같은 값). 거래내역 상세에서 등록 안 된 상대에 ☆ 를 누르면 `POST /api/payees { favorite: true }`.
+- 홈 머리줄 🔔 가 패널을 엶. 초록 버튼은 `.dev-panel--allone` 이 변수(`--yellow`)만 바꿔 끼움.
+
+### 그림 (`scripts/allone-crops/`)
+- `shared.py`: 워드마크 = 스플래시 정지 구간 평균 → Real-ESRGAN 4배 → 흰 바탕에서 초록 · 파랑 글자를 걷어 흰색 알파 마스크(4px/pt). 앱 아이콘 · 스피너 · 인트로 아이콘이 CSS `mask-image` 로 같이 씀.
+  은행 타일 7개는 로고만 있는 칸(글자 시작 px 212 앞) → 4배 → **초타원 |x|^2.6 + |y|^2.6 = 1** 마스크 (둥근 네모 r 14.3 보다 3배 잘 맞음, 32 · 40pt NH 타일도 같은 모양).
+  그 밖의 은행은 은행 색 타일 + 하나원큐 글리프 마스크, 안쪽이 여러 색인 글리프 20개는 흰 타일에 원래 색 (마스크로 하면 흰 덩어리).
+- `launch.py`: 스플래시는 3D 그림이라 키우지 않고 평균 그대로(3px/pt) WebP. 간편비밀번호 머리글은 '픽셀 = a·흰색 + (1−a)·초록' 의 a 를 풀어 마스크로.
+- `home.py`: 31장, 상자 테두리 중앙값 = 바탕색 → 테두리와 이어진 바탕만 걷기(그림 안쪽 흰 부분은 남김). 실제 인물 광고 · 공익 광고 자리는 지어낸 그림으로 대신.
+- `dispute.py`: 이의제기 안내 그림(클립보드 · 체크 · 돋보기) · 안내 첫 프레임의 초록 화살표 · AI톡 캐릭터(알약 안쪽만, 테두리 링은 마스크로 뺌) — 여러 프레임 평균 → ESRGAN 4배 → 바탕 걷기.
+- 모든 스크립트가 `keep_assets` (24장, 이미 있는 파일은 건너뜀) + `--out` 임시 폴더에 먼저 만들어 한 장씩 열어 본 뒤 옮김. 상자는 plan.md §5 표의 것만 읽고 제외 구간 프레임은 읽지 않음.
+  스피너 · 상태바 · 아이콘 · 거래내역 · 이체 화면은 SVG · CSS (막 밑 프레임은 자르지 않음).
+
+### 다른 앱이 안 바뀌게
+- 문은 셋: JS `ALLONE`(session.ts) · CSS `html[data-app="allone"]` 또는 `ao-` 클래스 · 서버 `ALLONE`(`APP === "allone"`). 공용 파일(App · ScreenStack · PhoneFrame · recorder · DevPanel ·
+  ProfilePicker · LoginScreen · AppBrand · global.css · platform/theme/intro/deviceStatus)은 문 안에서만 고침.
+- kakao2 와 같은 기기라 같은 규칙은 선택자 · 조건을 늘림 (`html[data-kakao2], html[data-app="allone"]` — 틀 393 × 852, 모서리 55, Pretendard · `KAKAO2 || ALLONE` — 아일랜드 · 1.5초 점 · 배터리 50 · 녹화 픽셀 맞춤).
+  `DEVICE_LOCK` 같은 공용 값을 고치지 않고 새 앱 이름으로 분기 (25장 ProfilePicker 교훈 — `KAKAO2 || … || ALLONE ? OS : (p.os ?? OS)`).
+- 확인은 25장 방법: 바꾸기 전 커밋을 worktree 로 띄워 같은 시계 · 같은 데이터로 다른 앱 화면 · 응답을 비교.
+
+### 배운 것
+- 명세를 여럿이 따로 재면 같은 것이 꼭 다르게 나옴 (줌 vs 녹아 사라짐, 막 색 셋, 바탕 #fff vs #fafcfd, 웹뷰 아래끝 817.3 vs 818) → 한 문서에서 녹화를 다시 재서 정하고, 영역은 그것만 봄.
+- 무엇이 네이티브고 무엇이 웹인지가 원점을 정함: 띠 · 막 범위 · 키패드 판이 852 에서 들어오는 것 · 상태바 글자를 누가 바꾸는지가 다 여기서 나옴.
+- 시각은 '부른 때' 를 기준으로 박아 둠 (Web Animations `startTime`, CSS 애니메이션 시작 시각 고정) — 타이머 · CSS transition 은 그리는 시간만큼 밀림.
+- 밑 층을 살려 두면 돌아올 때 스크롤 · 내용이 공짜로 그대로지만, 숨은 층이 전역 일(상태바 · 막 · 타이머)을 하지 않게 막는 장치가 같이 있어야 함.
+- 개인정보: 영상 대신 그리기, 잘라도 되는 상자를 먼저 표로 정하고 스크립트도 그 구간만 읽게, 자른 그림은 다 열어 보고 옮김. 예시 데이터는 구조만 녹화와 맞추고 값은 지어냄.
+
+## 27. toss — 토스(안드로이드 갤럭시 녹화 2개) (`src/toss/`, `server/toss-*.mjs`, `scripts/toss-crops/`)
+
+토스 앱(토스 홈 · 토스뱅크 통장 · 송금 · 증명서 · 소비 · 자산)을 갤럭시 화면 녹화 두 개(A · B, 480 × 1066px = 384 × 853.33dp, 1dp = 1.25px, 가변 프레임률, 다크)로 새로 만든 앱.
+allone(26장)과 달리 인트로가 없고, 기기는 콕뱅크 · 하나원큐와 같은 갤럭시지만 **다크 고정**, 그리고 여러 은행을 모아 보는 앱이라 다른 은행 계좌 · 토스머니 · 카드 · 포인트까지 데이터가 넓다.
+녹화를 담당별 명세 여섯(인프라 · 홈 · 통장 · 송금 · 증명서 · 자산)으로 재고, 명세끼리 어긋난 값은 `docs/toss-spec/plan.md` 한 곳에서 녹화를 다시 재서 정한 뒤
+기반(`foundation.md` — 실제로 만든 부품 · API) → 영역 다섯(home · account · transfer · cert · assets, 동시에 · 서로 import 안 함 · 공용 파일은 얼림) →
+**영역마다 녹화 대조 검토**(잰 값 · 고친 것 · 남은 차이 · 공용 수정 요청) → 통합(수정 요청을 공용 부품에 반영) 순서로 만들었다.
+
+### 서버: 새 파일 둘 + 문 안의 작은 갈고리 (`server/toss-api.mjs`, `server/toss-seed.mjs`)
+- 이름(SERVER_ID)이 정하는 것: 데이터 `data-toss/` · 쿠키 `bank_sid_toss` · 포트 9117 · 제목 '토스 클론 연습'. 변형 표 · `INTRO_APPS`(26장)에는 안 넣음 → `INTRO` false.
+- `index.mjs` 는 `const TOSS = APP === "toss"` 와 `const toss = TOSS ? tossApi({ getProfile, toAccount, nowIso, bad, notFound, … }) : null` 하나. 공용 응답에 붙는 칸은 모두
+  `...(TOSS && toss.accountFields(row))` 꼴이라 다른 앱 JSON 은 바이트까지 그대로. 토스 전용 API 는 `if (toss) toss.routes(app)` 한 줄 → 다른 앱은 `/api/toss/*` 가 404.
+- 공용 API 에 붙는 칸: 홈 `toss` 블록(쓴 돈 · 포인트 기회 · 리워드 배너 · 토스유스카드 · 광고 미루기), 계좌 `openedAt` · `favorite` · `role`, 거래 `category` · `channel` · `cardId` · `cancelled` · `exclude` · `own`,
+  상세 `kindLabel` · `counterparty`(입금처 / 출금처), 받는 분 목록의 '최근' 에 **내 계좌도 남김**(녹화: 최근 보낸 계좌에 '내 …' 가 섞임, `accountId` 를 붙임), PATCH 몇 칸.
+- `migrate()` 는 토스 칸과 `cards` · `points` 표를 `APP === "toss"` 일 때만 만듦. plan 은 모든 앱 DB 에 칸을 더하라 했지만 읽는 코드가 토스뿐이라 다른 앱 DB 파일은 건드리지 않음.
+- **토스머니 = 계좌 한 줄** (`accounts.role = 'money'`, 은행 toss): 내 계좌 · 받는 쪽 · 이체 · 자산 합계에 특별한 코드가 필요 없음. 카드(선불 잔액 칸 포함) · 포인트는 작은 표.
+- **쓴 돈은 함수 하나** `spendTotal`: 출금 · 취소 아님 · 제외 아님 · 내 계좌끼리 아님 (남에게 보낸 이체는 포함). 홈 '{M}월에 쓴 돈' 과 소비 합계가 늘 같음.
+  명세 둘이 '카드 · 페이만' 과 '이체 포함' 으로 갈렸던 것을 하나로. 🔔 의 '이번 달 쓴 돈' 직접 입력은 **이번 달 · 전체 탭에만** (모든 달 · 탭에 같은 숫자가 박히지 않게).
+- 받은 돈의 상대는 새 칸 없이 기존 '보낸 분 기록'(입금 거래를 `out_tx_id` 로 가리키는 transfers 행, 23장) + 내 계좌끼리는 `in_tx_id` 로 찾음.
+- 공용 줄을 고칠 땐 다른 앱 결과부터: '카카오뱅크 통장은 이미 있어요' 검사를 plan 대로 `APP === "kakao"` 로 바꾸면 콕뱅크 · 하나 · IBK · 케이뱅크의 오류 문구가 바뀌어
+  바이트 비교에서 걸림 → `!TOSS` (토스는 카카오뱅크 계좌도 더할 수 있음).
+- 예시 데이터(`toss-seed.mjs`): 날짜는 지금 기준 `c(n)` = 오늘 − n일(이번 달 1일 밑으로는 안 내려감) · `p(day)` 지난달 · `q(day)` 두 달 전 → 어느 날 켜도 이번 달 소비 · 지난달 비교가 참.
+  지금보다 늦은 시각(아침에 켰는데 낮 시각)은 바로 앞 줄보다 1분씩 앞으로 당겨 순서를 지킴 (케이뱅크의 '미래 거래' 함정, 23장). `db.mjs` 가 이 파일을 import 하므로 BEGIN/COMMIT 도우미는 따로.
+  `SEEDS.toss = { example, empty }` — 빈 데이터는 토스뱅크 통장 · 토스머니 0원.
+- 못 찾은 번호(D1 안내창)는 흔한 흐름이라 토스는 `GET /api/transfer/lookup?…&soft=1` → 404 대신 200 `{ notFound: true }` (브라우저 콘솔에 오류가 안 남음, 다른 앱은 그대로 404).
+- 배포 서버: 화면 주소 `/assets`(자산)가 빌드 폴더 `dist/assets` 와 겹쳐 `express.static` 이 `/assets/` 로 301 을 보냈음 → 토스만 `redirect: false` (폴더 주소는 아래 index.html 로).
+
+### 문: `TOSS` 하나
+- 화면: `session.ts` `TOSS = APP === "toss"`, `platform.ts` `DEVICE_LOCK` 에 `APP === "toss" ? "android"`, `theme.ts` `darkOnly` → `THEME_LOCK` dark. PhoneFrame 스위치 줄 · 🔔 기본은 잠겨 있으면 그 칸을 숨김.
+  ProfilePicker 는 `KAKAO2 || TOSS || ALLONE ? OS : (p.os ?? OS)` — 공용 `DEVICE_LOCK` 으로 나누지 않음 (25장 ibk2 교훈).
+- 공용 파일은 갈래 하나씩: App(`ROUTES.toss` · 시작화면 사슬 · overlay `TossOverlay` · 로그인 / 프로필 고르기를 `TossInset` 으로), ScreenStack(`TOSS_ANDROID` 갈래), PhoneFrame(상태바 하나 고름),
+  AppBrand · LoginScreen · ProfilePicker(앱 아이콘 · 상태바 띠 #171619),
+  DevPanel(`APP === "toss"` 칸 셋). CSS 는 `html[data-app="toss"]` 와 `toss-` 접두 클래스 · 키프레임만.
+
+### 기기 틀: 갤럭시 상태바 · 내비 띠 (`StatusBar.tsx`, `toss.css`, `band.ts`, `ui/Page.tsx`, `Inset.tsx`)
+- 384 × 853.33 = 상태바 28 + 화면 + 내비 띠 15 (`global.css` 의 콕뱅크 · 하나 줄에 `html[data-app="toss"]` 를 더함).
+- **상태바 = 투명 겹층** (kakao2 방식, 25장): 녹화의 push 중 상태바 자리가 잠깐 검정이 되었다가 새 창과 함께 채워짐 → 띠는 화면이 칠하는 것. 시트 막 밑에서 띠는 #09080b 로 어두워지는데 시계는 밝은 그대로(B 33.5).
+  그래서 28dp 띠는 `TossPage` 가 화면마다 칠하고(층과 같이 움직임) 상태바는 글자 · 아이콘만 — 둘 다 따로 흉내 낼 필요 없이 나옴.
+  `TossStatusBar` 는 384 × 28 SVG 한 장(dp 좌표): 시계 잉크 왼끝 x 28, **토스만 12시간 `h:mm`**, 오른쪽 아이콘 묶음은 녹화 자리 그대로. 화면 녹화 표시(괄호 + 1초 주기 캠코더)는 ● 녹화 중일 때만,
+  시계 잉크 오른끝 + 7dp 라 시계 폭을 따라 움직임 (잉크 폭은 캔버스에 8배로 그려 잼 — kakao2 와 같은 방법).
+- **내비 띠 모드 넷** (녹화 둘을 4fps 로 훑어 띠 색의 흐름을 잼): `solid` #171619 · `kb` #090909(삼성 자판 밑) · `dim` #050407(시트 막 밑) · `scrim` rgba(0,0,0,.43)(소비만 — 목록이 띠 밑으로 비침).
+  `useTossBand(mode)` 가 그 층이 맨 위일 때만 `<html data-toss-band>` 를 쌓아 켬. HanaKeyboard 가 켜는 `data-hana-kb` 도 토스에선 `kb`.
+  명세 하나는 '띠 없음, 탭바가 손잡이 밑' 이었는데 화면 아래 끝이 늘 같은 줄에서 잘림 → 띠가 있음. 홈은 탭바와 띠가 같은 #171619 라 구분이 안 됐던 것.
+- 로그인 · 프로필 고르기는 `TossInset`(K2Inset 꼴: 위 28 띠 + 아래 15 비움). 폰(≤ 500px)은 가짜 상태바 · 띠를 숨기고 `--toss-sb` · `--toss-nav` = safe-area.
+
+### 화면 전환: push · pop · cut · fade · reveal · load (`nav.ts`, `nav.css`, ScreenStack 토스 갈래)
+- 명세마다 push 가 달랐음 (+33dp / 270ms, +160dp / 450ms, 380ms, '60–80ms 교차' …). 세 번의 push(A 14.134 · A 45.406 · B 9.960)를 같이 맞추니 **곡선 하나**:
+  새 층 +150dp → 0, 400ms `cubic-bezier(.05,.7,.1,1)`, 처음 50ms 에 나타남 (RMS 1.7dp). 다른 값들은 같은 움직임을 늦은 첫 프레임에서 잰 것 · 옛 화면이 흐려지는 시간을 잰 것이었음.
+- 옛 층: 내용은 60ms 직선으로 흐려지며 −12dp, 띠와 바탕은 95ms 남았다 사라짐 → 그 사이 새 층 위 빈자리가 폰 바탕(검정) = 녹화의 검은 상태바.
+- pop: 닫히는 층 0 → +40dp 120ms `(.4,0,1,1)`, 흐려지지 않음. 드러나는 층은 바탕 · 띠만 보이다가 닫힘이 끝나면 내용이 −5dp → 0, 120ms (B 54.39–54.66).
+- cut(탭 사이 · 증명서 단계 · 금액 → 확인 → 보내는 중/완료) · fade(쿠폰 광고 닫기 90ms) · reveal(완료가 pop 처럼 내려가고 밑에 처음부터 있는 쿠폰 화면의 내용이 150ms 뒤 300ms 에 나타남, replace 로 감) ·
+  load(push 인데 옛 층 내용을 처음부터 숨김 — LOAD 빈 화면 밑 화면이 번쩍이지 않게).
+- 고르기 `tossAnimFor(navType, to, from)`: `state.tossAnim` → 길 규칙(cut) → push / pop, 나가는 화면 state 에 `tossExit: "fade"` 면 fade. 걷기는 그 전환의 마지막 애니메이션 이름으로(`TOSS_ANIM_END`) —
+  안쪽 요소의 `animationend` 도 올라오므로 이름으로 가림 (타이머는 대비만).
+- `useTossGo()` (kbank `useKbankGo` 를 옮김): 맨 위가 아닌 층에서 온 이동은 버림, 이동 뒤 450ms 잠금, **손 뗀 뒤 120ms 에 이동**(녹화의 웹뷰 기다림 0.46–1.7초를 줄임, 그 사이 누름 표시가 170ms 에 사라짐),
+  그 사이 뒤로 갔으면(지금 칸이 바뀜) 안 감.
+- 깊이: `location.state` 의 `sendDepth` · `certDepth` 를 push 마다 +1 (replace 는 그대로, `carryDepth`) → 흐름 나가기는 `history.go(-depth)` (`useTossExit`, 기록이 모자라면 fallback 으로 replace).
+- 화면 안 뒤로 `useTossBackStep`: 시트 · 안내창 · 자판이 떠 있는 동안 방문 기록 한 칸(`tossBack` 깊이)을 쌓아 두고 뒤로가기로 빠지면 닫기 (kbank `sendback.ts` 꼴, 겹치면 나중 것부터).
+  닫자마자 다른 칸을 쌓거나 replace 하면 순서가 꼬여서 그 칸이 빠지는 popstate 를 기다린 뒤에 함 (`transfer/guard.ts nextPop`).
+- 완료(S8) · 광고 화면의 지킴 칸: 갤럭시 뒤로로 칸이 이미 빠졌는데 방금 replace 로 와서 이동 잠금(450ms) 중이라 나가기를 버리면, 다음 뒤로가 끝난 이체의 금액 화면으로 감 →
+  `tossAfterLock(fn)` 으로 잠금이 풀린 뒤에 나감 (`useAdBackGuard` · `useDoneGuard`). 보내는 중(S7)은 `hold()` 로 칸만 바로 다시 쌓음.
+- 주소 바로 열기(새로고침 · 링크)에 보여 줄 것이 없으면 `ui/Redirect.tsx TossRedirect` 가 맨 위 층일 때 한 번 replace: 없는 주소 · 없는 탭 → 홈, 받는 분 없는 금액 · 확인 → 어디로 보낼까요
+  (금액 없는 확인 → 금액), 고른 내역 없는 증명서 완료 · 문서 → 증명서 홈, 다른 은행 계좌를 `/bank/` 로 → `/account/` (반대도). 없는 계좌는 '계좌를 찾을 수 없어요'.
+
+### 돌아온 화면 = 새 화면 → 칸(key)마다 기억
+- 토스 갈래 ScreenStack 은 맨 위 층(과 전환 중 나가는 층)만 그림 → 뒤로 오면 화면이 새로 만들어져 웹뷰 단계 · 진행 막대 · 뼈대를 처음부터 다시 함. 녹화는 쌓여 있던 화면을 받아 둔 그대로 보여 줌.
+- 그래서 영역마다 `location.key` 로 기억하고 **POP 으로 왔을 때만** 끝 모습으로: 통장 `useAcctRevisit`(그린 칸 · 스크롤 자리) · 배너 펼침 상태, 증명서 `useCertRevisit`, 송금 `useKeyed`(번호 · 은행 · 금액 · 펼침 · 완료 단계) ·
+  `useRevisit`, 홈 `useRollValue`(마지막으로 보인 금액). 증명서는 뒤로 오면 고른 것이 비워지는데(녹화 그대로) 화면이 새로 만들어지니 공짜.
+- allone(26장)은 밑 층을 숨긴 채 살려 둬서 스크롤 · 내용이 공짜인 대신 숨은 층이 전역 일을 못 하게 막아야 했음 — 토스는 반대쪽 값을 치름.
+
+### 공용 부품 (`ui/*`)
+- `TossPage`(28 띠 + 머리줄 + 스크롤 본문 + 아래 독, 전환은 `.toss-page__main` 만 움직임) · `TossAppBar`(53.6dp, ← 는 녹화 잉크에 맞춘 path 를 왼쪽 4 · 위 2.4 에 둬서 24dp 상자가 기기 픽셀 위에,
+  `blur` 모드는 스크롤 문턱을 넘고 185ms 뒤 제목이 400ms 에 나타나고 300ms 에 사라짐) · `TossPressable`(누름 바탕 · 줄어듦, 스크롤로 바뀌면 취소) ·
+  `TossButton`(56dp · 모서리 16, 누르면 50ms 에 #2b72de + 0.965(80ms), 떼면 150ms, 점 3개 로딩 750ms, 켜짐/꺼짐 180ms 교차) · `TossSheet`(막 .61 · 띠 `dim` · 카드는 막 시작 130ms 뒤) ·
+  `TossDialog`(웹 영역만 어둡게, 160 / 130ms) · `TossToast`(최소 1.45초, 화면이 다 그려지고 +100ms, 최대 2.6초) · `TossLoadingLayer` · `TossProgressBar` · `TossSkeleton` · `TossOdometer`(바뀐 자리만 굴림) ·
+  `TossBankLogo`(은행 색 둥근 네모 + 하나원큐의 은행 글리프) · `TossSymbol`(회색은 CSS mask). `/dev/ui` 는 공용 부품 견본 (녹화에 없음).
+- 공용 뿌리 규칙은 `:where()` (특정도 0): `routes.tsx` 가 영역 화면을 먼저 import 해서 영역 CSS 가 공용 CSS 보다 먼저 번들에 들어감 → 같은 특정도면 공용이 이김. `:where()` 면 영역이 클래스 하나로 덮어씀.
+- 영역은 공용 파일을 못 고치므로 녹화와 다른 공용 값은 **자기 폴더 안에서 덮어쓰고 '수정 요청'으로 남김** → 통합에서 공용에 반영하고 덮어쓰기를 걷어 냄
+  (← 자리 · 안내창 여백과 색 · 큰 버튼 누름 · 토스트 폭과 밑줄 · 제목 나타남. 홈이 녹화대로 따로 그린 탭 · 종 · Pay · Face ID 공용 아이콘은 지움). 덮어쓰기를 같이 걷지 않으면 두 번 적용됨 — 자산 쪽 ← 보정값도 같이 옮김.
+
+### 흐름 도우미 (`flow.ts`, `toast.ts`, `loading.ts`)
+영역은 서로 import 하지 않고 주소와 이 함수들로만 오감:
+- `goBank(id, { toast })`: '토스뱅크로 이동했어요' 토스트를 push 시작 100ms 뒤에. 통장이 잔액을 그리면 `tossToastReady()` → 최소 1.45초와 '다 그린 뒤 +100ms' 중 늦은 때 나감.
+- `goSend({ from })`: 120ms 뒤 LOAD 빈 화면(#171619 + 회색 스피너, 상태바 밑) → 받는 분 목록을 미리 받음(≥ 400ms) → `/send?from=` push(`load`, `sendDepth: 1`) 와 **같은 렌더에서** LOAD 를 걷음.
+- `useSendFinish()(kind)`: 광고를 안 미뤘으면 완료(S8) 자리를 replace — 옮기기 `/ad/coupon`(reveal, 닫을 땐 fade) · 보내기 `/ad/payback`(push + '토스로 이동했어요'). 미뤘으면 `history.go(-sendDepth)` 로 흐름 전 화면(pop).
+- `useAdDismiss()({ snooze })`: '3일 동안 안보기' = `PATCH /api/profile { adSnoozeUntil: 지금 + 3일 }` → `history.go(-sendDepth)`. 광고는 S8 를 replace 해서 깊이가 그대로.
+  광고 화면은 갤럭시 뒤로를 받으려고 기록 한 칸을 쌓아 두므로, 버튼으로 닫을 땐 그 칸을 먼저 걷고(popstate 를 기다림) 나감 — 안 그러면 `go(-sendDepth)` 가 한 칸 모자람 (`home/boot.ts useAdBackGuard`).
+- `certExit()`: `history.go(-certDepth)` — 상세 · 전체 메뉴 둘 다 `certDepth: 1` 로 증명서에 들어옴.
+
+### 홈 (`home/`)
+- **시작화면 → 홈 교차**: App 은 시작화면을 걷고 나서 ScreenStack 을 그려 두 화면이 같이 있지 않음 → 시작화면이 끝난 때를 적어 두고(`markSplashDone`) 홈이 처음 그려질 때 시작화면 그림을 위에 덮었다가 300ms 에 걷음.
+  1.2초 중 0.6초에 심볼이 7.2dp 내려감 (명세는 8, 녹화 A 3.75 → 6.5 가 7.2). 첫 프레임에 심볼이 없던 것 → 앱이 뜰 때(로그인 전) 그림을 미리 받아 `decode()`.
+- **숫자 굴림을 녹화 시각에** (`boot.ts`): 처음엔 홈이 다시 보인 뒤에야 `/api/home` 을 받아 pop +540ms 에 굴렀음 (녹화 +110ms). 홈이 안 그려진 동안 데이터가 바뀌면(이체 · 관리 패널 — `subscribeVersion`)
+  그때 홈 데이터를 미리 받아 둠 → +139ms. 마지막으로 보인 금액은 프로필 + 칸 이름으로 기억하고 처음 보는 값은 안 굴림. 맨 왼쪽 자리가 +355ms, 맨 오른쪽이 +520ms 에 멈춤.
+- 머리줄 회색 토스 표시: 반쪽마다 음영이 달라 그라데이션 하나로 안 맞음 → 파란 심볼의 밝기를 SVG 색 행렬로 회색에 대응 (평균 화소 차 4.6).
+- 누름: 줄 바탕이 0.82 폭에서 120ms 에 넓어지고, 떼면 32ms 머물다 135ms 직선으로 사라짐, 이동은 +121ms. 리워드 배너 × 는 그 달을 `profile.reward_dismissed` 에 저장하고 흐려진 뒤 칸이 접힘 (🔔 '다시 보이기' 로 풀면 열린 홈에 다시 나타남).
+- 그림 12장(`scripts/toss-crops/home.py`): 멈춘 구간 여러 장 평균 → ESRGAN 4배 → 녹화와 맞춰 보정(back-projection) → 바탕 걷기. 2,000원 광고의 달력 로티는 열쇠 장면 5장을 1.9초로 돌림.
+
+### 통장 · 거래내역 · 상세 · 다른 은행 계좌 (`account/`)
+- 웹뷰처럼 단계별로 그림 (`timeline.ts`, 녹화의 1–4초 기다림을 줄임): 통장 850 이름 줄 · 뼈대 → 900 잔액 → 1050 최근 거래 뼈대 → 1150 이자 줄 → 1300 전부 → +500 배너.
+  거래내역은 녹화 순서 그대로 머리줄 카드 · 관리 250 → 잔액 450 → 거래 줄 + 아래 독 + ✓ 700 (A 48.2 / 49.05 / 49.70 — 처음엔 450ms 한 단계였음). 데이터가 늦으면 그때부터 같은 간격.
+- **배너 등장** (A 22.66–25.0 프레임마다): 펼침 650ms, 그림은 100ms 뒤 300ms 에 나타나며 1.3 → 1배(1300ms), 제목 줄은 +880 / +940ms 에 12dp 오른쪽 · 18.4dp 아래 · 1.045배에서 나타났다가
+  +1560ms 부터 380ms 에 자리로, × +1880, 부제 · 버튼은 +1900 / +1980 에 14dp 올라오며. 잘라 둔 배너 그림이 확대 도중 프레임이라 3–5% 컸음 → 다시 자르지 않고 CSS 로 0.951 / 0.968배
+  (줄인 층 가장자리는 부드럽게, 밑에 안 줄인 사본을 깔아 빈틈을 메움).
+- 상세 글자: 명세 16px 인데 녹화 잉크 폭(거래 후 잔액 · 받는 분 통장표시 · 증명서 발급하기)이 17px 과 맞음. 굵기는 같은 프레임의 '복사' 등 굵기를 아는 글자의 잉크 양에 맞춤 (압축 영상에서 추정한 값).
+- 다른 은행 계좌: 내용이 위에서 아래로 500ms 에 차례로(아래로 갈수록 dp 당 0.46ms 늦게), 새로고침 표시는 내용 940ms 뒤 사라지고 130ms 빈 뒤 ✓ (B 163.62 · 163.83).
+- 그림 85장(`toss-acct-*` — 상품 메뉴 24dp 아이콘 67 · 타일 · 거래 아이콘 · 배너 2, `scripts/toss-crops/account.py`). 자를 상자 표(manifest)는 저장소 밖 작업 폴더에만.
+
+### 송금 S1–S8 (`transfer/`)
+- **자판 둘**:
+  - S2 숫자 자판은 하나원큐의 `HanaKeyboard`(같은 삼성 기기)를 그대로 쓰고 토스 녹화와 다른 칸만 `.toss-send-kbwrap` 아래에서 덮어씀 (도구줄 위끝 494.8, 줄 549.2 / 612.4 / 675.6 / 738.8,
+    열 9.6 / 102.4 / 196.0 / 289.6–375.2, 완료 #4890fd). push 가 끝나고 ≈0.5초 뒤 180ms 에 올라옴 (올라오는 곡선은 녹화와 한 프레임 안).
+  - S6 한글 자판은 `KoreanKeyboard.tsx` + `hangul.ts` 두벌식 조합: 자모 열을 통째로 다시 묶는 방식이라 ⌫ 가 자모 하나씩 지움 (ㅎㅏㄴㄱㅡㄹ = 한글 → ⌫ → 한그), 겹모음 · 겹받침 표.
+  - PC 의 실제 자판은 숨은 input 이 받음. 터치 기기(`pointer: coarse`)는 그린 자판 대신 폰 자판.
+- 칸마다 기억(`keyed.ts`): 금액 → 확인 → 메모 → 확인으로 오가도 번호 · 은행 · 금액이 그대로. 받는 분 조회 결과도 모듈에 남김(`target.ts`).
+- 옮기다 / 보내다: 받는 계좌가 내 것이면 '얼마나 옮길까요 · 옮기기 · 옮길게요 · 옮겼어요', 아니면 보내다. 조사 으로/로 · 을/를 은 받침 규칙(ㄹ → 로, `format.ts`).
+- **보내기는 정확히 한 번**: `busy` 를 먼저 걸고 `POST /api/transfers` → 점(옮기기 0.42초 · 보내기 ≈1초 — 인증 단계는 건너뜀) → `/send/done` 으로 replace(확인 화면이 기록에 안 남음).
+  빠르게 세 번 눌러도 거래 한 건. 보내는 중(S7)은 뒤로를 받지 않고(`useDoneGuard`), 완료(S8)에서 뒤로 = 확인.
+- 금액 화면은 녹화의 중간 모습까지: 번호 · 잔액은 나왔는데 방패 자리만 비고 이름은 회색 → 조회가 끝나면 방패 + 체크, 이름 흰색 (B 45.03 · 95.55 → 96.3).
+  방패 체크 · 보내는 중 동전(≈1.1초 되풀이, 최소 1.4초) · 완료 체크(0.2초 빈자리 뒤 650ms)는 로티 대신 CSS / SVG — 시각 칸만 녹화에 맞춤.
+- 글자 색은 **획의 가장 밝은 값**으로: 명세 표가 녹화보다 채널마다 7–12 어두웠음 (평균을 잰 듯). 공용 안내창 · 버튼 색도 같은 이유로 수정 요청 → 통합에서 반영.
+- 고친 버그: 번호 칸 위에 화면 전체를 덮는 움직임용 층(`inset: 0`)이 있어서, 자판을 내리거나 금액에서 돌아오면 번호 칸을 다시 눌러도 아무 일 없었음 → `pointer-events`.
+
+### 증명서 8단계 (`cert/`)
+- 단계 = cut: `/cert/transfer` ↔ `/cert/transfer/*` 는 nav.ts 길 규칙으로 cut, 문서(`/cert/doc`)는 그 밖에 둬서 push ('증명서 단계' = 앞부분 검사 하나). 발급 중(W) → 발급 완료(D)는 replace 라
+  기록에 없음 (D 에서 뒤로 = 받는 방법). 서버 일은 없음 — 보낸 이체 목록(`GET /api/transfers?from=`)만.
+- 기다림: 증명서 홈 250ms 빈 화면, 소개 280ms 옅은 뼈대 → 600ms 내용, 계좌 250 · 내역 300ms 빈 화면, W 2.6초, D 회색 카드 600ms → 종이 → 150ms 문서. D 의 두 버튼은 110ms 꺼진 모습이다가
+  180ms 교차로 켜짐 (명세의 투명도 0.4 → 1 이 프레임과 안 맞았음, A 83.37–83.62).
+- **고리 · 반짝임**: 처음 만든 고리는 녹화보다 ≈170ms 늦었음 → 반지름 0 → ≈183 (2.0초), 1.28초마다 새 고리(2.56초 주기 둘, 첫 고리는 280ms 에 이미 r ≈ 120).
+  제목 반짝임은 명세의 2.3초가 아니라 제목을 8칸으로 나눠 밝기를 따라가 보니 **2.37초 · 200dp/s**, 처음 280ms 는 어둡다가 50ms 에 무늬로 → 474dp 반복 무늬.
+- **문서 한 장 = 367.4 × 519.6** (문서.pdf 의 종이 x 8–375.4 · y 100.8–620.4, 정확히 1:√2 — 명세의 368 × 520.4 가 아님) → 미리보기 배율 344 / 367.4 = **0.9363** (명세 0.9348).
+  4배(`--u: 4px`)로 그린 뒤 줄임 — 4–5단위 작은 글자가 브라우저 최소 글자 크기에 안 걸리고 고해상도에서도 또렷. 한 장 15줄, 넘으면 쌓음. 384 보다 좁은 폰에선 양옆 8 을 남기고 줄임.
+- **안전**: 장마다 '연습용 화면 · 실제 이체 아님' 비스듬한 워터마크(3 × 2, −30°), 진짜 도장 대신 빨간 겹 동그라미 '연습용', '연습용 문서 · 진위확인 불가' · 0000-0000,
+  발급번호는 (고른 거래, 발급 시각)으로 정해지는 가짜 번호(다시 열어도 같고 서버에 안 남음). PDF · Blob · 다운로드 · 인쇄 · 공유 코드는 없음 (grep 으로 확인) — i-ONE 확인증(22장)과 같은 이유.
+
+### 소비 · 자산 · 내 계좌 (`assets/`)
+- 소비 합계: Pretendard 숫자가 토스 글꼴보다 넓어 잉크 폭 111 vs 녹화 100.8 → 숫자 높이는 그대로 두고 가로만 `scaleX(0.906)`.
+- **스크롤 엿보기는 바뀌는 프레임에서**: 날짜 머리 잉크 위끝이 287 → 281–283 을 지날 때 주간 달력의 고른 날이 바뀜 (B 145.764 · 146.945 · 148.012 세 번 다) → 선 131.8 (본문 기준).
+  처음 선(≈304)은 명세 글을 따른 것. 날짜를 누르면 그 머리가 같은 선에 와서, 조금 스크롤해도 고른 날이 되튀지 않음.
+- 자산 탭 엿보기: 칸 자리를 엉뚱한 상자 기준으로 재서 아래로 휙 밀면 계좌 → 포인트로 건너뛰었음 → '위끝이 화면 y 302.8 위로 올라온 마지막 카드, 맨 끝이면 마지막 칸' (B 156.00–156.09).
+  스크롤 범위가 172dp 뿐이라 명세의 '고정 막대 8dp 밑' 규칙으로는 카드 칸을 고를 수 없었음.
+- **당겨서 새로고침** (`usePullRefresh.ts`, B 157.30–159.3 프레임마다): 처음 80dp 는 손가락 그대로, 그 뒤 0.45배(최대 134). 고리 가운데 187.2 + 당김/2 · 지름 15 → 37(당김 35 → 79),
+  64 넘으면 동그라미 ↔ 물방울, 머리줄은 당긴 만큼 50% 까지 흐려짐. 놓으면 400ms 감속으로 +80 → 다시 받기(최소 520ms, 응답까지) → 고리 ⌀43 · 16 위로 · 200ms 에 사라짐 →
+  카드는 500ms 감속으로 0 (넘치지 않음) + 퍼지는 옅은 빛 고리. 처음 만든 '가만있는 빛'은 녹화에 없어서 퍼지는 고리로.
+- 소비 뼈대는 최소 450ms (간격도 줄임) — 명세대로 300ms 면 뼈대 줄이 나오기도 전에 내용이 와서 뼈대가 한 번도 안 보였음.
+
+### 🔔 관리 패널 (`devpanel/`)
+- DevPanel.tsx 의 `APP === "toss"` 자리 셋: 계좌 탭 끝 `TossPanelSection`(홈 · 광고 / 카드 / 포인트), 계좌 펼친 칸 `TossAccountFields`(개설일 · ★ · 토스머니로 보이기), 거래 칸 `TossTxFields`(분류 · 결제 수단 · 카드 ·
+  취소됨 · 소비에서 제외 — 따로 저장). 공용 칸의 토스 갈래: 기기 · 테마 숨김, 토스뱅크 계좌 추가(`OWN_BANK.toss`, 12자리) + 다른 은행 계좌 추가(`AddBankAccount withName exclude={[]}`, 카카오뱅크 포함),
+  번호 자유 입력은 토스뱅크 계좌만, 카드 칸은 '이번 달 쓴 돈 (홈 · 소비)' + 캐시백 기회. 파란 버튼은 `.dev-panel--toss` 가 변수만 바꿔 끼움.
+- 결제 수단 '자동': 서버는 빈 `channel` 을 거래 종류로 채워 보냄 → 그 값과 같으면 '자동'으로 보이고 저장할 때 비워 둠 (나중에 거래 종류를 바꾸면 소비 탭도 따라가게).
+- 저장하면 `invalidate` → 홈 · 소비 · 자산이 다시 받고 바뀐 자리만 굴림.
+
+### 녹화와 맞추기
+- 녹화는 가변 프레임률이라 프레임 번호가 아니라 **시각**으로 뽑음 (`ffmpeg -ss <시각> -i 녹화 -frames:v 1`). 멈춘 화면은 여러 장(홈은 25장) 평균해 압축 잡음을 줄인 뒤 잼.
+- 클론은 Playwright `deviceScaleFactor: 1.25` 로 `.phone` 요소를 480 × 1066 으로 찍어 녹화와 같은 화소 → 반반 · 50% 겹치기 · 차이 그림, 잉크 상자(반 밝기 경계) · 색 최댓값.
+  움직임은 rAF 로 찍은 프레임과 녹화의 한 점(위끝 · 밝기)을 프레임마다 비교.
+- **반 픽셀 함정**: 폰 틀은 창 가운데라 창 폭 900 이면 왼끝이 (900 − 384) / 2 = 258 → 322.5 기기 px 에 걸려 모든 스크린샷이 ≈1px 왼쪽으로 번져 밀림. 그 그림에 맞춘 x 는 바르게 그리면 0.8dp 오른쪽.
+  증명서 검토가 찾아 **창 폭 904**(왼끝 260 = 325px)로 다시 재서 고침. kakao2 · allone 의 `snapToDevicePixels`(25장)와 같은 문제를 재는 쪽에서 만난 것.
+  통합 뒤로는 `phoneSnap.ts useTossPhoneSnap`(토스 상태바가 부름)이 `.phone` 을 translate 로 기기 화소에 맞춤 → 창 폭 · 캡쳐모드(zoom · 위 여백)와 상관없이 같은 그림.
+- 1.25배에선 글자 위끝이 0.8dp 단위로만 움직여 녹화 값이 그 사이면 ±0.7–0.8dp 에 멈춤 → 그대로 둠 (몇 곳만 주석 달고 한 단 옮김).
+- 명세보다 녹화: 낙하 7.2 (8), 반짝임 2.37초 (2.3), 문서 367.4 × 519.6, 상세 17px (16), 엿보기 선, 배너 그림 크기, 거래내역 단계 순서 — 검토마다 녹화를 다시 재서 고침.
+
+### 남은 차이 (일부러 · 못 맞춘 것)
+- **글꼴**: 토스 글꼴 대신 Pretendard 하나 (기계마다 같게). 긴 글줄은 최대 3–4dp 넓고, 숫자 · 띄어쓰기가 든 글은 1–2dp, 괄호는 1.5–1.8dp 아래로 내려감. 소비 합계만 가로를 줄임.
+- **로티**: 동전 · 완료 체크 · 방패 체크는 CSS / SVG 흉내 (시각 칸은 맞음, 혜성 · 불꽃 · 모양 바뀜은 줄임), 2,000원 달력은 장면 5장을 cut 으로 (녹화 한 바퀴 ≈2.1초 중 한 구간이 다시 배치와 겹쳐 1.9초 유지).
+- **그림 모양**: 은행 글리프는 하나원큐 것(`hana-bank-*`)이라 토스 그림과 다른 은행이 있음, 목록 둥근 네모는 진짜 초타원이 아님, 톱니는 공용 모양, 홈 '모두 보기' 누름은 손가락 자리 물결 대신 가운데 띠.
+- **줄인 기다림**: 웹뷰 기다림(통장 1.3초, LOAD ≥ 0.4초, W 2.6초, 누른 뒤 120ms), 거래내역 ✓ 800ms (녹화 B ≈ 420ms).
+- **안 만든 것**: 잠금 화면, 보안 창의 검은 구간, 다른 앱 알림, 엣지 패널 손잡이, 토스뱅크에서 돌아올 때의 새로 불러오기, 소비에서 돌아올 때 배너가 다시 나타나는 것, 창 열림 확대(220ms 흉내만),
+  S2 커서 자리 · 선택 손잡이, S3 끝 튕김, S4 스피너 → 뼈대 순서 · 붙여넣기 칩, 오래 누른 버튼의 물결, 증명서 홈의 웹뷰 +53.6dp 튐 · 소개의 두 번째 옅은 뼈대.
+- 다른 은행 계좌 금리 '연 0.1%' 는 서버가 금리를 주지 않아 화면에 고정. 1.25배의 소수 자리 선에 0.4px 정도 번짐.
+
+### 개인정보
+- 녹화에는 녹화한 사람의 실명 · 상대 이름 · 실제 계좌번호 · 잔액 · 금액 · 이체 날짜 · 가게 · 전화번호 · 발급번호가 보임 → 커밋하는 것(코드 · 주석 · CSS · 문서 · 스크립트 · 그림) 어디에도 넣지 않음.
+  녹화 파일 이름에도 찍은 날짜 · 시각이 들어 있어 문서에선 '녹화 A · B' 로만 부름.
+- 명세는 값 대신 역할 · 형식(`<NAME_A>` · `<ACCT_A>`)과 녹화 시각 · 좌표만. 프레임 · 시험 삼아 잘라 본 그림은 저장소 밖 작업 폴더에만.
+- 예시 데이터는 지어냄 (홍길동 · 김철수 · (주)예시상사 · 한빛편의점 …). 구조만 녹화와 맞춤: 내 계좌 +4개, 최근 보낸 계좌에 내 계좌가 섞임, 증명서에 여러 날짜의 보낸 이체, 거래내역이 한 화면 넘게.
+- 그림: 자를 상자를 먼저 표로 정함 (글자 · 이름 · 금액 · 상태바가 없는 아이콘 · 그림 자리만). 증명서 내역 · 미리보기 · 문서 프레임과 목록 프레임은 자르지 않고, 광고주 · 가게 로고 · 본 상품 그림은 지어낸 그림으로.
+  커밋한 그림 100장(심볼 2 · 앱 아이콘 · 홈 12 · 통장 85)은 한 장씩 열어 봄.
+- 검토마다 영역 파일 전체를 녹화 속 이름 · 번호 · 금액 · 가게로 grep (주석의 한글 조합 예시가 녹화에서 친 메모 글자였던 것 하나를 찾아 바꿈).
+
+### 다른 앱이 안 바뀌게
+- 문은 셋: JS `TOSS` / `APP === "toss"` · CSS `html[data-app="toss"]` 또는 `toss-` 클래스 · 서버 `TOSS`. 새 코드는 `src/toss/` · `server/toss-*.mjs`, 공용 파일은 문 안의 갈래만.
+- 확인은 기반 단계에서 25장 방법으로: 바꾸기 전 커밋을 worktree 로 띄워 다른 8개 서버에 같은 요청을 보내 응답을 비교하고, 배포판(각자 자기 dist)으로 홈 · push 중간(60 · 150 · 300ms) 화면을 비교.
+- 한 빌드에 모든 앱 CSS 가 들어감: 다른 앱의 접두 없는 클래스(`.done { background: #fff }` 같은 것)가 토스에도 걸릴 수 있어 토스 클래스는 모두 영역 접두(`toss-home-` · `toss-acct-` · `toss-send-` · `toss-cert-` · `toss-assets-`).
+  `@keyframes` 이름도 `toss-` 로. TSX 의 className 도 `toss-` 로 시작 (on · out · red · blue · open 같은 꾸밈 이름만 예외) — `.done` · `.home` · `.btn` 같은 맨 클래스는 실제로 토스 요소에 걸림.
+- 일부러 빌려 쓰는 것: 이체 번호 자판은 하나원큐 `.hana-kb*` CSS 를 그대로 씀 → 토스만의 조정은 `transfer/send.css` 의 `html[data-app="toss"] .hana-kb…` 에만 (하나 규칙은 안 고침).
+- 공용 프로필 시트(흰 바탕 · 노란 버튼)는 `.picker--toss` 아래에서만 토스 어둠 · 파랑, 새 프로필 안내 문구는 `TOSS ?` 갈래 (토스뱅크 통장 · 토스머니 0원).
+
+### 배운 것
+- 명세 여섯이 같은 push 를 여섯 가지로 적음 → 다른 첫 프레임 · 다른 점을 잰 것. 여러 번의 이동을 한꺼번에 맞춘 곡선 하나가 나머지를 다 설명함.
+- 상태바를 '화면이 칠하는 띠 + 위에 겹친 글자' 로 나누면 push 중 검은 상태바 · 막 밑에서 밝은 시계가 흉내 없이 나옴 (kakao2 에 이어 두 번째).
+- 재는 도구가 반 픽셀 어긋나면 모든 x 가 같은 쪽으로 틀림 — 비교하기 전에 폰 왼끝이 기기 픽셀 위에 오는지부터.
+- 색은 평균 말고 획 최댓값, 멈춘 화면은 평균 프레임, 움직임은 한 점을 프레임마다. 시작 · 끝만 맞추면 가운데(고리 170ms, 반짝임 주기)가 틀림.
+- 맨 위 층만 그리는 스택에선 '돌아온 화면 = 새 화면': 칸(key)마다 기억해 POP 일 때만 되살리고, 안 보이는 동안 바뀐 데이터는 그때 미리 받아 둬야 돌아온 순간이 녹화 시각에 맞음.
+- 영역을 동시에 만들 땐 공용 파일을 얼리고 '수정 요청'으로 받아 통합에서 한 번에 — 영역끼리 안 부딪힘. 대신 영역 안 덮어쓰기는 통합 때 같이 걷어야 두 번 걸리지 않음.
+- 영역을 다 만든 뒤 영역마다 녹화 대조 검토를 한 번 더: 만든 사람이 '±0.5dp' 라 적은 값이 다시 재면 1.4dp 였고, 명세 값(8dp · 2.3초 · 0.9348 · 16px)도 여럿 틀렸음.
+- 배포판만의 버그: 빌드의 CSS 압축이 이름 없는 `animation: 1900ms linear infinite both` 를 `animation: none` 으로 바꿔 2,000원 광고 달력이 배포판에서만 안 보였음 →
+  이름이 없을 땐 longhand(`animation-duration` …)로. 애니메이션을 끄고 찍은 화면 비교로는 못 찾고, 개발 서버와 배포판의 계산된 스타일을 견줘서 찾음.

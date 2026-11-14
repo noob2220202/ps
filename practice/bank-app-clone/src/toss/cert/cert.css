@@ -1,0 +1,746 @@
+/* ===== 토스 증명서 발급 (src/toss/cert/*, cert.md). 모든 클래스 · 키프레임은 toss-cert- 로 시작 =====
+   자리는 녹화 dp (화면 y 0 = 상태바 위). 본문(.toss-page__body)은 화면 y 81.6 에서 시작 → 본문 top = 화면 y − 81.6.
+   글자는 line-height 1 이고 top = 잉크 가운데 − 0.54em (한글, Pretendard). 값 옆 주석은 녹화의 잉크 상자 */
+
+.toss-cert-c {
+  position: relative;
+  width: 100%;
+}
+.toss-cert-c p,
+.toss-cert-c h1 {
+  margin: 0;
+}
+.toss-cert-t {
+  position: absolute;
+  line-height: 1;
+  white-space: nowrap;
+}
+.toss-cert-title {
+  position: absolute;
+  left: 24px;
+  top: 28.72px; /* 잉크 111.0–130.6 */
+  margin: 0;
+  font-size: 21.9px; /* 22 로는 녹화보다 0.5% 넓음 */
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.toss-cert-bar .toss-cert-bar__back {
+  left: 4px; /* ← 24 상자 (16, 42.4) — 기기 화소에 맞춘 자리, 잉크 18.9–38.0 × 45.8–63.2 는 그림 안 좌표로 맞춤 */
+  top: 2.4px;
+}
+/* 녹화 글꼴은 띄어쓰기 · 괄호가 좁음 (17dp 줄 글자: 띄어쓰기 −0.6, 괄호 −1.2) */
+.toss-cert-narrow {
+  word-spacing: -0.6px;
+}
+.toss-cert-paren {
+  margin: 0 -0.6px;
+}
+.toss-cert-fade {
+  animation: toss-cert-fade 150ms ease-out both;
+}
+@keyframes toss-cert-fade {
+  from {
+    opacity: 0;
+  }
+}
+.toss-cert-fail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 300px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: #8f8e91;
+}
+.toss-cert-fail > .toss-press__content {
+  padding: 12px 0;
+}
+
+/* 계좌 타일 28 × 28 (A): #100f12, 모서리 8 */
+.toss-cert-tile {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #100f12;
+}
+
+/* ---------- H 토스뱅크 증명서 발급하기 (A 62.677): 바탕 · 머리줄 #100f12, 상태바 띠 #171619 ---------- */
+.toss-cert-home .toss-appbar__right {
+  inset: 14px 25px auto auto; /* 돋보기 24 상자 (335, 42) — 폭이 다른 폰에선 오른쪽 기준 */
+  height: 24px;
+}
+.toss-cert-home__search > .toss-press__content {
+  width: 24px;
+  height: 24px;
+}
+.toss-cert-home .toss-cert-title {
+  left: 24.1px; /* 잉크 x 24.7 */
+  top: 30.8px; /* 잉크 113.0–132.9 */
+}
+.toss-cert-card {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  border-radius: 20px;
+  background: #171619;
+}
+.toss-cert-card__label {
+  left: 24.1px; /* 잉크 x 40.9 */
+  top: 27.82px; /* 잉크 190.8–206.3 */
+  font-size: 17px;
+  font-weight: 700;
+  color: #e1e0e3;
+}
+.toss-cert-card__group {
+  left: 24.3px; /* 잉크 x 40.6 */
+}
+.toss-cert-card__dot {
+  margin: 0 2px; /* 녹화 가운뎃점은 Pretendard 보다 4dp 넓게 띄움 */
+}
+.toss-cert-home__top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 61.8px; /* 숫자 가운데 250.9 / 312.65 / 374.55 (누름 칸 282.4–343.2) */
+}
+.toss-cert-home__rank {
+  position: absolute;
+  left: 31.2px; /* x 47.2–63.2 (숫자 잉크 52.7–57.1) */
+  top: 22.9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #2b2b33;
+  font-size: 12.5px; /* 숫자 잉크 9.2 높이 */
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  color: #3182f6;
+}
+.toss-cert-home__toplabel {
+  left: 66px; /* 잉크 x 82.4 */
+  top: 22.37px; /* 숫자 칸 가운데 + 0.6 ('거래내역서' 잉크 366.7–381.7, 괄호 줄은 괄호가 녹화보다 조금 큼) */
+  font-size: 17px;
+  font-weight: 500;
+  color: #e1e0e3;
+}
+.toss-cert-home__sec {
+  left: 24.1px; /* 잉크 x 24.6 */
+  top: 363.9px; /* 잉크 446.3–461.5 */
+  font-size: 17px;
+  font-weight: 600;
+  color: #8f8e91;
+}
+.toss-cert-home__item {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 55px; /* 잉크 위끝 552.0 / 607.2 / 661.6 / 716.8 / 772.0 / 826.4 */
+}
+.toss-cert-home__itemlabel {
+  left: 24px; /* 잉크 x 40.6 */
+  top: 18.26px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #bab9bc;
+}
+.toss-cert-home__rows {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- I 송금 확인증 (A 68.449) ---------- */
+.toss-cert-intro .toss-cert-title {
+  left: 24.1px; /* 잉크 x 24.7 */
+  top: 28.82px; /* 잉크 111.1–130.7 */
+}
+.toss-cert-intro__sub {
+  left: 24px; /* 잉크 x 25.0 */
+  top: 62.77px; /* 잉크 144.9–160.2 */
+  font-size: 17px;
+  font-weight: 500;
+  color: #b4b9c1;
+  word-spacing: -0.6px;
+}
+.toss-cert-intro__label {
+  left: 19.9px; /* 잉크 x 24.7, 232.5–245.6 (누름 칸 x 4 · y 217.6 안에서) */
+  top: 13.08px;
+  font-size: 15.5px;
+  font-weight: 400;
+  color: #8c8d92;
+}
+.toss-cert-intro__value {
+  left: 20.2px; /* 잉크 x 24.6, 253.6–268.7 */
+  top: 35.17px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #e1dfe7;
+}
+.toss-cert-intro__lang > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-cert-intro__lang {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 136px;
+  height: 64px;
+}
+/* 옅은 뼈대 (I0): 녹화 최고 #252429, 왼쪽이 조금 더 밝음 (공용 .toss-skel 보다 뒤에 실려도 이기게 두 클래스) */
+.toss-skel.toss-cert-skel {
+  position: absolute;
+  background: #252429;
+  border-radius: 8px;
+  animation: toss-cert-fade 200ms ease-out both;
+}
+
+/* ---------- 줄 누름 (cert.md §2.0): 양옆 4dp 안쪽, 모서리 10, 흰색 5–7% ---------- */
+.toss-cert-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+/* ---------- A 어떤 계좌의 증명서를 발급할까요? (A 71.155 / 71.773) ---------- */
+.toss-cert-acct .toss-cert-title {
+  left: 24px; /* 잉크 x 24.8, 111.0–130.6 */
+}
+.toss-cert-acct__sec {
+  left: 24.1px; /* 잉크 x 24.7 */
+  font-size: 15px;
+  font-weight: 500;
+  color: #8f8e91;
+}
+.toss-cert-acct__tile {
+  position: absolute;
+  left: 24.6px;
+}
+/* 타일 안 글리프 자리 (녹화: 토스 심볼은 타일 가운데보다 0.45 오른쪽, 하나 네모는 0.7 오른쪽 · 0.4 위) */
+.toss-cert-acct__tile > img {
+  translate: 0.6px -0.5px;
+}
+.toss-cert-acct__tile > .toss-banklogo {
+  translate: 0 -1px;
+}
+.toss-cert-acct__name {
+  left: 65.6px; /* 잉크 x 66.5 ('하나' 66.7) */
+  top: 16.13px; /* 잉크 221.5–232.8 (줄 위 204) */
+  font-size: 13px;
+  font-weight: 400;
+  color: #8e8d90;
+}
+.toss-cert-acct__num {
+  left: 66px; /* 잉크 x 66.9, 숫자 240.8–253.6 */
+  top: 34.4px;
+  font-size: 17.5px;
+  font-weight: 500;
+  color: #e3e2e5;
+}
+.toss-cert-acct__opened {
+  left: 66px; /* 잉크 x 66.6 */
+  top: 56.68px; /* 잉크 261.9–273.5 */
+  font-size: 13px;
+  font-weight: 400;
+  color: #6e6d70;
+}
+.toss-cert-acct__check {
+  position: absolute;
+  right: 28.5px; /* 잉크 339.9–355.9 */
+}
+
+/* ---------- L 어떤 내역을 발급할까요? (A 74.167 / 74.767) ---------- */
+.toss-cert-items .toss-cert-title {
+  left: 24px; /* 잉크 x 24.8, 111.0–130.5 */
+}
+.toss-cert-items__field {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 84px; /* 165.6–209.6 */
+  height: 44px;
+  border-radius: 10px;
+  background: #2b2a2d;
+}
+.toss-cert-items__field svg {
+  position: absolute;
+  left: 14.3px; /* 잉크 34.2–49.5 */
+  top: 13.6px;
+}
+.toss-cert-items__input {
+  position: absolute;
+  left: 41.6px; /* 잉크 x 62.3, 180.0–195.4 */
+  right: 12px;
+  top: -1px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  color: #e3e2e5;
+  caret-color: #3182f6;
+  letter-spacing: 0;
+  word-spacing: -0.6px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.toss-cert-items__input::-webkit-search-cancel-button,
+.toss-cert-items__input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.toss-cert-items__input::placeholder {
+  color: #828184; /* 잉크 180.0–195.4 */
+  opacity: 1;
+}
+.toss-cert-items__chip {
+  position: absolute;
+  top: 140px; /* 221.6–253.6 */
+  height: 32px;
+}
+.toss-cert-items__chip > .toss-press__content {
+  display: flex;
+  align-items: center;
+  gap: 5.4px;
+  height: 32px;
+  padding: 0 12px 2px 10.6px; /* 글자 · ⌄ 는 가운데보다 1dp 위 */
+  border-radius: 7px;
+  background: #292a2f;
+  font-size: 13px;
+  font-weight: 500;
+  color: #c2c3c8;
+  white-space: nowrap;
+}
+.toss-cert-items__chip svg {
+  translate: 0 0.8px;
+}
+.toss-cert-items__chip--1 {
+  left: 20px; /* 20–105.6 */
+}
+.toss-cert-items__chip--2 {
+  left: 112px; /* 112–184.8 */
+}
+.toss-cert-items__chip--2 > .toss-press__content {
+  gap: 6.2px;
+  padding-left: 11.3px;
+}
+.toss-cert-items__circle {
+  position: absolute;
+  left: 24.5px; /* 25.0–47.0 */
+}
+.toss-cert-items__circle--late {
+  animation: toss-cert-fade 1ms linear both;
+  animation-delay: 250ms;
+}
+.toss-cert-items__all {
+  top: 188.2px; /* 동그라미 가운데 297.8 ± 28 */
+  height: 56px;
+}
+.toss-cert-items__all .toss-cert-items__circle {
+  top: 16.4px;
+}
+.toss-cert-items__alllabel {
+  left: 60px; /* 잉크 x 60.6, 289.7–304.6 */
+  top: 18.9px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #c1c0c3;
+}
+.toss-cert-items__day {
+  left: 24.1px; /* 잉크 x 24.7, 위끝 354.5 (+112 씩) */
+  font-size: 13px;
+  font-weight: 500;
+  color: #e3e2e5;
+}
+.toss-cert-items__tx {
+  height: 72px;
+}
+.toss-cert-items__tx .toss-cert-items__circle {
+  top: 24.3px; /* 가운데 = 줄 위 + 35.3 */
+}
+.toss-cert-items__who {
+  left: 60.2px; /* 잉크 x 60.9, 393.8–409.1 */
+  top: 18.1px;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 17px;
+  font-weight: 600;
+  color: #e8e7ec;
+}
+.toss-cert-items__when {
+  left: 60.3px; /* 잉크 x 60.8, 416.0–427.3 */
+  top: 39.43px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #727176;
+}
+.toss-cert-items__amt {
+  right: 24.3px; /* 오른끝 358.5, 잉크 402.4–419.0 */
+  top: 26.2px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #eaebf0;
+}
+.toss-cert-items__empty {
+  left: 0;
+  right: 0;
+  top: 330.3px; /* 가운데 y ≈ 420 */
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: #8f8e91;
+}
+/* 아래 흐림: y ≈722 투명 → 754 불투명, 버튼 위끝(762)까지 꽉 */
+.toss-cert-items .toss-dock--fade::before {
+  height: 40px;
+  background: linear-gradient(to bottom, rgba(23, 22, 25, 0) 0, #171619 32px);
+}
+
+/* ---------- M 증명서를 어떻게 받을까요? (A 76.040) ---------- */
+.toss-cert-method .toss-cert-title {
+  left: 24px; /* 잉크 x 24.7, 111.0–131.1 */
+}
+.toss-cert-method__row {
+  height: 56px; /* 잉크 위끝 180.0 / 236.0 / 292.0 */
+}
+.toss-cert-method__label {
+  left: 24.1px; /* 잉크 x 24.6 */
+  top: 18.82px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #e7e6e9;
+}
+.toss-cert-method__chev {
+  position: absolute;
+  right: 24.9px; /* 잉크 353.6–359.1 × 183.3–193.5 */
+  top: 22.9px;
+}
+
+/* ---------- W 잠시만 기다려주세요 (A 77.44–83.37) ---------- */
+.toss-cert-wait .toss-cert-title {
+  left: 24px; /* 잉크 x 24.5, 111.0–131.0 */
+  top: 28.77px;
+  /* 제목 반짝임 (녹화 A 77.44–83.37 를 글자 8 구간 밝기로 잼): 처음 280ms 는 어두운 #6b6a6e 그대로, 그 뒤 밝은 #dcdbdf 와
+     어두운 결이 474dp 주기로 왼쪽 → 오른쪽 200dp/s (한 바퀴 2.37초). 시작 때는 글자 전체가 밝고 어두운 골이 왼쪽에서 들어옴.
+     무늬 (474 칸 안): 0 밝음 → 152 어둠 → 222 어둠 → 376 밝음 → 474 밝음. 시작 전에는 무늬를 그리지 않음 (크기 0) */
+  background: linear-gradient(
+      90deg,
+      #dcdbdf 0,
+      #d5d4d8 25px,
+      #727175 128px,
+      #6b6a6e 152px,
+      #6b6a6e 222px,
+      #706f73 240px,
+      #d0cfd3 350px,
+      #dad9dd 376px,
+      #dcdbdf 474px
+    )
+    117.9px 0 / 0 0 repeat-x;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: #6b6a6e;
+  animation:
+    toss-cert-shimmer 2.37s linear 280ms infinite,
+    toss-cert-shimmer-in 50ms linear 280ms both; /* 어두운 글자 → 무늬 (녹화 첫 프레임은 중간 밝기) */
+}
+@keyframes toss-cert-shimmer {
+  from {
+    background-position: 117.9px 0;
+    background-size: 474px 100%;
+  }
+  to {
+    background-position: 591.9px 0;
+    background-size: 474px 100%;
+  }
+}
+@keyframes toss-cert-shimmer-in {
+  from {
+    color: #6b6a6e;
+  }
+  to {
+    color: transparent;
+  }
+}
+/* 퍼지는 고리: 가운데 (192, 352), r 0 → 184 를 2.0초 (cubic-bezier(.4,.45,.5,.95)), 1.28초마다 새 고리 → 한 고리의 주기 2.56초.
+   투명도는 처음 0.4초에 0 → 1, 1.68–2.0초에 → 0 (녹화 고리 밝기). 선 1dp #d1cdd6 (scale 을 쓰면 선도 굵어지므로 크기를 바꿈).
+   녹화: 첫 고리는 화면이 뜨기 0.64초 전에 생긴 것 (280ms 에 처음 보일 때 r 122) */
+.toss-cert-wait__rings {
+  position: absolute;
+  left: 192px;
+  top: 270.4px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  animation: toss-cert-show 1ms linear 280ms both; /* 첫 고리는 280ms 에 (이미 r ≈ 100) */
+}
+@keyframes toss-cert-show {
+  from {
+    visibility: hidden;
+  }
+}
+.toss-cert-wait__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border: 1px solid #d1cdd6;
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: 0;
+  box-sizing: content-box;
+  animation:
+    toss-cert-ring-r 2.56s infinite,
+    toss-cert-ring-o 2.56s linear infinite;
+  animation-delay: -690ms; /* 처음 고리는 280ms 에 이미 r ≈ 120 */
+}
+.toss-cert-wait__ring + .toss-cert-wait__ring {
+  animation-delay: 590ms;
+}
+@keyframes toss-cert-ring-r {
+  0% {
+    width: 0;
+    height: 0;
+    animation-timing-function: cubic-bezier(0.4, 0.45, 0.5, 0.95);
+  }
+  78.125% {
+    width: 366px;
+    height: 366px;
+  }
+  100% {
+    width: 366px;
+    height: 366px;
+  }
+}
+@keyframes toss-cert-ring-o {
+  0% {
+    opacity: 0;
+  }
+  15.625% {
+    opacity: 1;
+  }
+  65.6% {
+    opacity: 1;
+  }
+  78.125%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- D 송금 확인증을 발급했어요 (A 83.816 / 89.341) ---------- */
+.toss-cert-done .toss-cert-title {
+  left: 24.1px; /* 잉크 x 24.7, 111.0–131.2 */
+}
+.toss-cert-done__card {
+  position: absolute;
+  left: calc(50% - 172px); /* 20 (384 폭) */
+  top: 78.4px; /* 160–646.4 (344 × 486.4) */
+  width: 344px;
+  height: 486.4px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #292a2f;
+  transition: background-color 120ms linear;
+}
+.toss-cert-done__card--paper {
+  background: #ffffff;
+}
+.toss-cert-done__btns {
+  display: flex;
+  gap: 7.2px; /* 20–184.4 · 191.6–364 */
+}
+.toss-cert-done__btns > .toss-btn:first-child {
+  flex: 0 0 164.4px;
+}
+.toss-cert-done__btns > .toss-btn:last-child {
+  flex: 1 1 0;
+}
+.toss-cert-done__btns > .toss-btn--grey {
+  color: #bebec8;
+}
+/* 들어온 직후 110ms: 회색 버튼은 바탕 그대로 글자만 흐림 (공용 꺼짐 모습은 파랑이라 덮어씀), 파랑 버튼은 공용 꺼짐 모습 */
+.toss-cert-done__btns--off > .toss-btn--grey {
+  background: var(--toss-grey-btn);
+  color: #606166;
+}
+
+/* ---------- V 문서.pdf (A 92.236): 머리줄 #171619, 본문 #dddee3, 종이 x 8–376 · y 100.8–620 ---------- */
+.toss-cert-docview .toss-appbar__right {
+  inset: 14.2px 24.4px auto auto; /* 공유 잉크 337.7–356.8 × 44.3–64.0 (24 그림을 1.05 배, 상자 x 334.4 = 기기 화소) */
+  height: 25.2px;
+}
+.toss-cert-docview__share > .toss-press__content {
+  width: 25.2px;
+  height: 25.2px;
+}
+.toss-cert-docview__pages {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 19.2px;
+  padding: 19.2px 0 24px; /* 왼쪽은 CertDoc 이 (384 폭에서 종이 x 8) */
+}
+.toss-cert-docview__pages > .toss-cert-doc {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* ---------- 송금확인증 종이 (TransferCertDoc.tsx): 4배(--u 4px)로 그려서 줄임. 자리 · 크기는 단위(문서.pdf dp) ---------- */
+.toss-cert-doc {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  background: #ffffff;
+}
+.toss-cert-doc__page {
+  --u: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(367.4 * var(--u));
+  height: calc(519.6 * var(--u));
+  transform-origin: 0 0;
+  background: #ffffff;
+  color: #191f28;
+  font-family: var(--toss-font);
+  letter-spacing: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.toss-cert-doc__page p {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+.toss-cert-doc__title {
+  left: calc(18.6 * var(--u)); /* 잉크 x 18.8, 22.2–32.1 */
+  top: calc(21.16 * var(--u));
+  font-size: calc(11.1 * var(--u));
+  font-weight: 700;
+}
+.toss-cert-doc__statement {
+  left: calc(18.3 * var(--u)); /* 잉크 x 18.7, 67.2–74.3 */
+  top: calc(66.54 * var(--u));
+  font-size: calc(7.8 * var(--u));
+  font-weight: 700;
+}
+.toss-cert-doc__unit {
+  right: calc(18.3 * var(--u)); /* 오른끝 348.8, 잉크 86.7–90.2 */
+  top: calc(85.8 * var(--u));
+  font-size: calc(4.25 * var(--u));
+  color: #6b7684;
+}
+.toss-cert-doc__rule {
+  position: absolute;
+  left: calc(18.4 * var(--u)); /* 18.4–349.4 */
+  width: calc(331 * var(--u));
+  height: calc(1.2 * var(--u));
+  background: #191f28;
+}
+.toss-cert-doc__rule--top {
+  top: calc(98 * var(--u));
+}
+.toss-cert-doc__rule--bottom {
+  top: calc(448 * var(--u));
+}
+.toss-cert-doc__th {
+  top: calc(107.85 * var(--u)); /* 잉크 108.9–113.6 */
+  font-size: calc(5 * var(--u));
+  font-weight: 700;
+  color: #333d4b;
+}
+.toss-cert-doc__tr {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.toss-cert-doc__page .toss-cert-doc__td {
+  top: 0;
+  font-size: calc(5 * var(--u));
+  line-height: calc(7.6 * var(--u)); /* 첫 줄 잉크 123.4–127.2, 둘째 줄 131.0–135.1 */
+  color: #6b7684;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: clip;
+}
+.toss-cert-doc__note {
+  left: calc(18.3 * var(--u)); /* 잉크 x 18.8, 159.5–163.4 */
+  font-size: calc(4.1 * var(--u));
+  color: #4e5968;
+}
+.toss-cert-doc__fl,
+.toss-cert-doc__fv {
+  font-size: calc(5 * var(--u));
+  font-variant-numeric: tabular-nums;
+}
+.toss-cert-doc__fl {
+  font-weight: 700;
+  color: #333d4b;
+}
+.toss-cert-doc__fv {
+  color: #6b7684;
+  word-spacing: calc(-0.4 * var(--u));
+}
+.toss-cert-doc__logo {
+  position: absolute;
+  left: calc(18.3 * var(--u)); /* 18.4–72.8 × 491.4–500.9 */
+  top: calc(490.4 * var(--u));
+  width: calc(55 * var(--u));
+  height: calc(10 * var(--u));
+}
+.toss-cert-doc__logo-mark {
+  position: absolute;
+  left: 0;
+  top: calc(0.2 * var(--u));
+}
+.toss-cert-doc__logo-word {
+  position: absolute;
+  left: calc(11.2 * var(--u));
+  top: 0;
+  width: calc(44 * var(--u));
+  height: calc(10 * var(--u));
+  overflow: visible;
+  font-family: var(--toss-font);
+}
+.toss-cert-doc__seal {
+  position: absolute;
+  left: calc(87.9 * var(--u)); /* 가운데 (103.2, 490.4), ⌀30.6 */
+  top: calc(475.1 * var(--u));
+  width: calc(30.6 * var(--u));
+  height: calc(30.6 * var(--u));
+  font-family: var(--toss-font);
+}
+.toss-cert-doc__pageno {
+  right: calc(25.2 * var(--u)); /* 오른끝 341.0, 잉크 493.2–497.4 */
+  top: calc(492 * var(--u));
+  font-size: calc(5.7 * var(--u));
+  color: #4e5968;
+  font-variant-numeric: tabular-nums;
+}
+/* 워터마크: 장마다 3줄 × 2칸, −30°, 표가 읽히게 옅게 */
+.toss-cert-doc__mark {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.toss-cert-doc__mark span {
+  position: absolute;
+  translate: -50% -50%;
+  rotate: -30deg;
+  font-size: calc(12 * var(--u));
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: rgba(240, 68, 82, 0.16);
+}

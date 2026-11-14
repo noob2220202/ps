@@ -1,0 +1,920 @@
+/* ===== NH올원뱅크 공용 부품 (src/allone/ui/*.tsx) — 클래스 · 키프레임 모두 ao- 로 시작 (다른 앱에 닿지 않음).
+   색 · 막 토큰은 allone.css :root[data-app="allone"] (--ao-*). 좌표는 pt = 393 × 852 틀의 CSS px, 녹화에서 잰 잉크 상자에 맞춤 (각 .tsx 머리말).
+   body 의 전역 자간(-0.2px)을 받지 않도록 부품마다 letter-spacing 을 정함 ===== */
+
+@keyframes ao-ui-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ao-ui-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- AoPage: 웹뷰 한 장 (머리줄 · 스크롤 본문 · 아래 고정 칸) ---------- */
+.ao-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ao-bg, #fff);
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+.ao-page__head {
+  position: relative;
+  z-index: 2;
+  flex: none;
+}
+.ao-page__body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.ao-page__body::-webkit-scrollbar {
+  display: none;
+}
+.ao-page__foot {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  padding: 9.33px 24px 30px;
+  background: #fff;
+}
+
+/* ---------- AoHeader: 50pt (화면 59–109). 자리 = 녹화 잉크 상자 − 59, 누르는 칸 44 × 44 (위 3) ---------- */
+.ao-hdr {
+  position: relative;
+  flex: none;
+  height: 50px;
+  background: #fff;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+.ao-hdr__btn {
+  position: absolute;
+  top: 3px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: #000;
+}
+.ao-hdr__btn > svg {
+  position: absolute;
+}
+/* nav ‹ 잉크 x 31.31 y 76.33 */
+.ao-hdr__btn--back {
+  left: 13px;
+}
+.ao-hdr__btn--back > svg {
+  left: 18.31px;
+  top: 14.33px;
+}
+/* 집 잉크 x 311.74 y 74.67 */
+.ao-hdr__btn--home {
+  left: 300px;
+  width: 40px;
+}
+.ao-hdr__btn--home > svg {
+  left: 11.74px;
+  top: 12.67px;
+}
+/* ≡🔍 상자 (345, 74) 24 × 20 — 정수 자리 (잉크 347.4–367.4 × 76.2–91.7, icons.tsx AoMenuSearchIcon) */
+.ao-hdr__btn--menu {
+  left: 340px;
+  width: 38px;
+}
+.ao-hdr__btn--menu > svg {
+  left: 5px;
+  top: 12px;
+}
+/* × 잉크 x 348.71 y 75.67 */
+.ao-hdr__btn--close {
+  left: 335.03px;
+}
+.ao-hdr__btn--close > svg {
+  left: 13.68px;
+  top: 13.67px;
+}
+/* flow ‹ 잉크 x 23.98 y 74.0 */
+.ao-hdr__btn--flowback {
+  left: 6px;
+}
+.ao-hdr__btn--flowback > svg {
+  left: 17.98px;
+  top: 12px;
+}
+/* 취소 잉크 344.38–368.36 × 78.33–90.67, #838383 */
+.ao-hdr__cancel {
+  position: absolute;
+  left: 331.71px;
+  top: 3px;
+  width: 48px;
+  height: 44px;
+  padding: 0;
+  color: #838383;
+}
+.ao-hdr__cancel > span {
+  position: absolute;
+  left: 12.34px;
+  top: 12.67px;
+  font-size: 14.5px;
+  font-weight: 400;
+  letter-spacing: -0.35px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.ao-hdr__title {
+  position: absolute;
+  margin: 0;
+  color: #000;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+/* 가운데 제목: 녹화 잉크 가운데 x ≈ 196.1 — Pretendard 는 잉크가 상자 가운데보다 0.3–0.5 왼쪽이라 상자는 그냥 가운데 */
+.ao-hdr__title--center {
+  left: 0;
+  right: 0;
+  padding: 0 70px;
+  text-align: center;
+}
+.ao-hdr__title--nav {
+  top: 15.34px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+.ao-hdr__title--left {
+  left: 23.98px;
+  right: 60px;
+  top: 15.67px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+.ao-hdr__title--modal {
+  top: 16px;
+  font-size: 17.6px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.ao-hdr__title--modal-bold {
+  top: 15.67px;
+  font-size: 17.5px;
+  font-weight: 700;
+  letter-spacing: -0.13px;
+}
+
+/* ---------- AoButton ---------- */
+.ao-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto; /* 가로 줄에 둘이면 반씩 (T6 농협 · 타행 계좌등록) */
+  min-width: 0;
+  padding: 0 12px;
+  border: none;
+  font-family: var(--ao-font);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: none;
+}
+.ao-btn--primary {
+  background: var(--ao-green);
+  color: #fff;
+}
+.ao-btn--primary.ao-btn--down.ao-btn--press-light {
+  background: var(--ao-green-light);
+}
+.ao-btn--primary.ao-btn--down.ao-btn--press-dark {
+  background: var(--ao-green-dark);
+}
+.ao-btn--primary.ao-btn--down.ao-btn--press-native {
+  background: var(--ao-green-native);
+}
+.ao-btn--outline {
+  background: #fff;
+  color: #000;
+  box-shadow: inset 0 0 0 1px var(--ao-line-2);
+}
+.ao-btn--outline.ao-btn--down {
+  background: #f5f5f5;
+}
+.ao-btn--outlineGreen {
+  background: #fff;
+  color: var(--ao-green);
+  box-shadow: inset 0 0 0 1px var(--ao-green);
+}
+.ao-btn--outlineGreen.ao-btn--down {
+  background: var(--ao-green-tint);
+}
+.ao-btn--disabled,
+.ao-btn--disabled.ao-btn--down {
+  background: var(--ao-disabled);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* ---------- AoSwitch: 색은 한 프레임, 손잡이만 미끄러짐 ---------- */
+.ao-switch {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  padding: 0;
+  border-radius: 999px;
+  background: #6d6d6d;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.ao-switch--on {
+  background: var(--ao-green);
+}
+.ao-switch:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ao-switch__knob {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+}
+.ao-switch--sm {
+  width: 28px;
+  height: 18px;
+}
+.ao-switch--sm .ao-switch__knob {
+  left: 2px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  transition: transform 150ms ease;
+}
+.ao-switch--sm.ao-switch--on .ao-switch__knob {
+  transform: translateX(10px);
+}
+.ao-switch--lg {
+  width: 52.3px;
+  height: 30.67px;
+  background: #6e6e6e;
+}
+.ao-switch--lg.ao-switch--on {
+  background: var(--ao-green);
+}
+.ao-switch--lg .ao-switch__knob {
+  left: 2.33px;
+  top: 2.33px;
+  width: 26px;
+  height: 26px;
+  box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.12);
+  transition: transform 250ms ease;
+}
+.ao-switch--lg.ao-switch--on .ao-switch__knob {
+  transform: translateX(21.64px);
+}
+
+/* ---------- AoSkeleton ---------- */
+.ao-skel {
+  flex: none;
+  background: var(--ao-skeleton, #fcfbfe);
+}
+
+/* ---------- AoSheet: 웹 시트 (화면 층 안 z 40, 웹뷰만) ---------- */
+.ao-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+.ao-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--ao-scrim, rgba(0, 0, 0, 0.3));
+  animation: ao-ui-fade-in 300ms ease both;
+}
+.ao-sheet__card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+.ao-sheet--rise.ao-sheet--open .ao-sheet__card {
+  animation: ao-sheet-rise 291ms cubic-bezier(0, 0.11, 0.17, 0.87) both;
+}
+.ao-sheet--closing .ao-sheet__card {
+  animation: ao-sheet-down 150ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+.ao-sheet--closing .ao-sheet__scrim {
+  animation: ao-ui-fade-out 150ms linear both;
+}
+/* 내려가는 150ms 동안 시트는 누름을 받지 않고, 배경막은 계속 받음 — 두 번 누름의 둘째가 밑 화면으로 새지 않게 (배경막 누름은 열린 동안만 onClose, .ao-nsheet--closing 과 같은 생각) */
+.ao-sheet--closing .ao-sheet__card {
+  pointer-events: none;
+}
+@keyframes ao-sheet-rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ao-sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+/* T6 머리줄: 제목 잉크 x 24.98 · 시트 위 +23.33, × 잉크 x 348.71 · +23.67. 첫 줄은 +61 부터 (T6 첫 로고 위 +74.33 = 63pt 줄 가운데) */
+.ao-sheet__head {
+  position: relative;
+  flex: none;
+  height: 61px;
+}
+.ao-sheet__title {
+  position: absolute;
+  left: 24.31px;
+  top: 20.66px;
+  margin: 0;
+  font-size: 20.6px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 24px;
+  white-space: nowrap;
+}
+.ao-sheet__close {
+  position: absolute;
+  left: 335.03px;
+  top: 10px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: #000;
+}
+.ao-sheet__close > svg {
+  position: absolute;
+  left: 13.68px;
+  top: 13.67px;
+}
+.ao-sheet__body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.ao-sheet__body::-webkit-scrollbar {
+  display: none;
+}
+.ao-sheet__foot {
+  flex: none;
+  padding: 0 24px 30px;
+}
+
+/* ---------- AoBankLogo: 자리 기본값은 0 특이도 — 영역 클래스(한 개짜리라도)가 position · display 를 바꿀 수 있음 ---------- */
+:where(.ao-banklogo) {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+:where(img.ao-banklogo) {
+  display: block;
+}
+
+/* ---------- AoNativeSheet: 네이티브 막 + 시트 (#ao-native, 창 전체) ---------- */
+.ao-nsheet {
+  position: absolute;
+  inset: 0;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+.ao-nsheet__dim {
+  position: absolute;
+  inset: 0;
+}
+.ao-nsheet--amount .ao-nsheet__dim {
+  background: var(--ao-dim-amount, rgba(0, 0, 0, 0.765));
+}
+.ao-nsheet--password .ao-nsheet__dim {
+  background: var(--ao-dim-password, rgba(0, 0, 0, 0.733));
+}
+.ao-nsheet__card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #fff;
+}
+.ao-nsheet--in-rise.ao-nsheet--open .ao-nsheet__card {
+  animation: ao-nsheet-rise 357ms cubic-bezier(0.19, 0.52, 0.23, 1) both;
+}
+.ao-nsheet--closing .ao-nsheet__card {
+  animation: ao-nsheet-down 145ms cubic-bezier(0.29, 0.19, 0.54, 0.75) both;
+  pointer-events: none;
+}
+/* 닫는 동안(내려가는 145ms + 막이 남는 370ms) 막은 누름을 계속 받음 — 밑의 웹 화면으로 새지 않게 (막 누름은 열린 동안만 onDimClick) */
+@keyframes ao-nsheet-rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ao-nsheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+.ao-nsheet__title {
+  position: absolute;
+  margin: 0;
+  line-height: 24px;
+  white-space: nowrap;
+}
+.ao-nsheet__close {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.ao-nsheet__close > svg {
+  position: absolute;
+}
+/* T7 금액 입력: 제목 잉크 x 24.65 · +26.67, × #656571 잉크 x 346.71 · +28 */
+.ao-nsheet--amount .ao-nsheet__title {
+  left: 23.98px;
+  top: 23.34px;
+  font-size: 19.8px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.ao-nsheet--amount .ao-nsheet__close {
+  left: 332.71px;
+  top: 14px;
+}
+.ao-nsheet--amount .ao-nsheet__close > svg {
+  left: 14px;
+  top: 14px;
+}
+/* T3 계좌 비밀번호 입력: 제목 잉크 x 24.98 · +28, × 잉크 x 346.38 · +26.67 */
+.ao-nsheet--password .ao-nsheet__title {
+  left: 24.31px;
+  top: 25px;
+  font-size: 18.8px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.ao-nsheet--password .ao-nsheet__close {
+  left: 333.04px;
+  top: 13.33px;
+  color: #000;
+}
+.ao-nsheet--password .ao-nsheet__close > svg {
+  left: 13.34px;
+  top: 13.33px;
+}
+
+/* ---------- AoKeyboard: iOS 26 키보드 (#ao-native-kb, z 56) ---------- */
+.ao-kb {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+.ao-kb--closing {
+  animation: ao-kb-out 250ms cubic-bezier(0.4, 0, 0.6, 1) both;
+  pointer-events: none;
+}
+@keyframes ao-kb-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ao-kb-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+.ao-kb__input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+/* 보조 줄 (흰 바탕, 판 위 55pt): ∧ 잉크 x 31.64 +14.67 · ∨ x 85.6 +15.33 (#a9a9a9) · ✓ x 342.71 +11.33 (검정) */
+.ao-kb__acc {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 55px;
+  background: #fff;
+}
+.ao-kb__acc-btn {
+  position: absolute;
+  top: 0;
+  height: 55px;
+  padding: 0;
+  color: #a9a9a9;
+}
+.ao-kb__acc-btn > svg {
+  position: absolute;
+  display: block;
+}
+.ao-kb__acc-btn--on {
+  color: #000;
+}
+.ao-kb__acc-up {
+  left: 18px;
+  width: 46px;
+}
+.ao-kb__acc-up > svg {
+  left: 13.64px;
+  top: 14.67px;
+}
+.ao-kb__acc-down {
+  left: 72px;
+  width: 46px;
+}
+.ao-kb__acc-down > svg {
+  left: 13.6px;
+  top: 15.33px;
+}
+.ao-kb__acc-done {
+  left: 328px;
+  width: 48px;
+  color: #000;
+}
+.ao-kb__acc-done > svg {
+  left: 14.71px;
+  top: 11.33px;
+}
+/* 유리 판: 위 모서리 27, 아래 모서리 타원 45 / 53 (C3 41.80 윤곽 맞춤) */
+.ao-kb__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(#edeef1, #f0f1f4 12px, #f0f1f4 calc(100% - 30px), #eceef0);
+  border-radius: 27px 27px 45px 45px / 27px 27px 53px 53px;
+}
+.ao-kb__key {
+  position: absolute;
+  padding: 0;
+  border-radius: 7.5px;
+  background: #fff;
+  color: #000;
+  font-size: 23.5px;
+  font-weight: 400;
+  line-height: 40.6px; /* 녹화 자모가 Pretendard 보다 1.2 위 (ㅂ 잉크 위 키 +14.0) */
+  padding-bottom: 2.4px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: default;
+}
+.ao-kb__key--down {
+  background: #c9c8cb;
+}
+.ao-kb__key--fn {
+  font-size: 17.9px;
+  line-height: 42.6px; /* "123" 잉크 위 키 +14.0 */
+  padding-bottom: 0.4px;
+}
+.ao-kb__key--fn-ko {
+  font-size: 17px;
+  letter-spacing: -0.5px;
+}
+.ao-kb__key--space {
+  font-size: 0;
+}
+.ao-kb__han {
+  position: absolute;
+  right: 5.73px;
+  top: 24.66px;
+  font-size: 13px;
+  line-height: 16px;
+  color: #cccccc;
+}
+.ao-kb__key--bare {
+  background: transparent;
+}
+.ao-kb__key--bare.ao-kb__key--down {
+  background: #c9c8cb;
+}
+.ao-kb__glyph {
+  position: absolute;
+  display: block;
+}
+/* 키 안 그림 (가운데 기준, 393 폭에서 잉크 상자와 같음) */
+.ao-kb__g-shift {
+  left: calc(50% - 9.665px);
+  top: 13.33px;
+}
+.ao-kb__g-back {
+  left: calc(50% - 10.82px);
+  top: 13.67px;
+}
+.ao-kb__g-emoji {
+  left: calc(50% - 9.5px);
+  top: 11.33px;
+}
+.ao-kb__g-return {
+  left: calc(50% - 9.665px);
+  top: 12.67px;
+}
+.ao-kb__globe,
+.ao-kb__mic {
+  position: absolute;
+  pointer-events: none;
+}
+.ao-kb__globe {
+  left: 28.98px;
+  top: 253.67px;
+}
+.ao-kb__mic {
+  right: 33.3px;
+  top: 251.67px;
+}
+.ao-kb__globe > svg,
+.ao-kb__mic > svg {
+  position: static;
+}
+/* 숫자 패드 */
+.ao-kb__key--num {
+  border-radius: 8.5px;
+}
+.ao-kb--num .ao-kb__key--icon .ao-kb__g-back {
+  left: calc(50% - 10.155px);
+  top: 14.5px;
+}
+.ao-kb__numlabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.ao-kb__numd {
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 25px;
+}
+.ao-kb__numl {
+  margin-top: 1px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  line-height: 11px;
+}
+
+/* ---------- AoCaret ---------- */
+.ao-caret {
+  display: inline-block;
+  flex: none;
+  border-radius: 1px;
+  vertical-align: middle;
+  animation: ao-caret-blink 1000ms steps(1, end) infinite;
+}
+@keyframes ao-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------- /dev/ui 견본 (Gallery.tsx) ---------- */
+.ao-gal {
+  padding: 8px 0 40px;
+}
+.ao-gal__h {
+  margin: 22px 24px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ao-t6);
+}
+.ao-gal__frame {
+  position: relative;
+  height: 50px;
+  border-top: 1px dashed #e4e4e4;
+}
+.ao-gal__frame:last-of-type {
+  border-bottom: 1px dashed #e4e4e4;
+}
+.ao-gal__icons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 6px;
+  padding: 0 16px;
+}
+.ao-gal__icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--ao-t6);
+  text-align: center;
+  word-break: keep-all;
+}
+.ao-gal__icon > div {
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+}
+.ao-gal__icon--dark > div {
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--ao-green);
+}
+.ao-gal__col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 24px;
+}
+.ao-gal__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+.ao-gal__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 54px;
+  margin: 0 24px;
+  padding: 0 20px;
+  border: 1px solid var(--ao-line);
+  border-radius: 12px;
+  font-size: 17px;
+  color: #000;
+  cursor: text;
+}
+.ao-gal__field--focus {
+  border-color: var(--ao-green);
+}
+.ao-gal__field > .ao-gal__ph {
+  color: #8a8a8a;
+}
+.ao-gal__sheet-row {
+  display: flex;
+  align-items: center;
+  height: 63px;
+  padding: 0 24px;
+  gap: 11px;
+  font-size: 16.4px;
+  font-weight: 500;
+}
+.ao-gal__sheet-row small {
+  display: block;
+  margin-top: 2px;
+  font-size: 14.3px;
+  font-weight: 400;
+  color: #808080;
+}
+.ao-gal__pair {
+  display: flex;
+  gap: 10px;
+}
+.ao-gal__nbody {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 90px;
+  font-size: 14px;
+  color: var(--ao-t6);
+}
+.ao-gal__nbody > .ao-btn {
+  position: absolute;
+  top: 416px;
+}
+
+/* ---------- AoAlert: 웹 '안내' 팝업 (C3 33.8 · 15.0 에서 잼, 카드 y 282.33–595.0 · x 24.3–369.0). 화면 층 안 (웹뷰만 덮음), 웹 로딩 막(z51) 밑.
+   잉크 (녹화 → 여기): 제목 안 306.33–321.67 → 306.0–321.33 · 본문 첫 줄 350.33–364.67 → 351.0–364.33 · 빨간 줄 가운데 422.5 / 444.5 → 422.8 / 444.5
+   · 아이콘 475.33–495.0 → 475.33–495.0 (테 속 145–147, 굵기 1.4) · 밑줄 496–497 · 버튼 527.0–575.1 → 527–575 · 확인 544.0–558.67 → 544.33–558.33 ---------- */
+.ao-alert {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+}
+/* 닫힌 뒤 300ms 의 .ao-alert--guard: 아무것도 그리지 않고 누름만 받음 */
+.ao-alert__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--ao-scrim, rgba(0, 0, 0, 0.3));
+  animation: ao-ui-fade-in 350ms cubic-bezier(0.33, 1, 0.68, 1) 62.5ms both;
+}
+.ao-alert__card {
+  position: relative;
+  width: 100%;
+  padding: 19.83px 24px 20px;
+  border-radius: 12px;
+  background: #fff;
+  animation: ao-ui-fade-in 365ms cubic-bezier(0.215, 0.61, 0.355, 1) 15.5ms both;
+}
+/* 나타나는 시각: 연 프레임부터의 지연 (그려진 프레임에서 잼, 막이 걷히는 프레임 = 0).
+   hidden (계좌 비밀번호 뒤, C3 33.229): 카드 0 · .02 · .137 · .259 · .381 · .479 · .564, 배경막 4프레임 0 뒤 .039 · .169 · .273
+   cut (잔액채우기, 막이 걷히기 33ms 전 막 밑에서 엶, C3 12.713): 카드 .094 · .231 · .353 · .460 · .554, 배경막 3프레임 0 뒤 .039 · .169 */
+.ao-alert--cut .ao-alert__scrim {
+  animation-delay: 79ms;
+}
+.ao-alert--cut .ao-alert__card {
+  animation-delay: 19ms;
+}
+.ao-alert__title {
+  margin: 0;
+  font-size: 17.4px;
+  font-weight: 700;
+  line-height: 24px;
+  color: #000;
+  text-align: left;
+}
+/* 줄은 글자 어디서나 바뀜 (녹화 웹뷰처럼 낱말 가운데에서도: 지급정지 문구는 "가 / 까운") */
+.ao-alert__body {
+  margin-top: 21.07px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22.33px;
+  color: #1f1f1f;
+  text-align: center;
+  word-break: break-all;
+}
+.ao-alert__code {
+  margin: 19.1px 0 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--ao-error, #f00);
+  text-align: center;
+}
+.ao-alert__tel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20.33px;
+  margin: 20.33px 0 0;
+  font-size: 14.5px;
+  font-weight: 400;
+  line-height: 20.33px;
+  color: #888;
+  white-space: pre;
+}
+.ao-alert__telicon {
+  flex: none;
+  margin-right: 3.65px;
+  color: #919191;
+}
+.ao-alert__telnum {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5.5px;
+}
+.ao-alert__ok {
+  display: flex;
+  margin-top: 31.67px;
+  padding-top: 2.33px; /* 확인 잉크 가운데 551.5 (버튼 가운데 + 1.17) */
+}
+.ao-alert__ok.ao-btn--outlineGreen {
+  color: var(--ao-green-light);
+  box-shadow: inset 0 0 0 1px var(--ao-green-light);
+}
+.ao-alert__ok.ao-btn--down {
+  background: #fff;
+}

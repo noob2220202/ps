@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Route, Routes, useNavigate, type Location } from "react-router-dom";
 import { OsSwitch, PhoneFrame } from "./components/PhoneFrame";
 import { FakeCursor, RecordingBar } from "./components/RecordingBar";
@@ -15,7 +15,7 @@ import { TransferScreen } from "./screens/transfer/TransferScreen";
 import { AmountScreen } from "./screens/transfer/AmountScreen";
 import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
 import { ProfilePicker } from "./profile/ProfilePicker";
-import { APP, currentProfileId } from "./profile/session";
+import { ALLONE, APP, KAKAO2, TOSS, currentProfileId } from "./profile/session";
 import { NhSplash } from "./nh/NhSplash";
 import { NhLoadingLayer } from "./nh/common";
 import { HanaLoadingLayer } from "./hana/common";
@@ -50,6 +50,19 @@ import { KbankTxDetail } from "./kbank/KbankTxDetail";
 import { KbankSend } from "./kbank/KbankSend";
 import { KbankDone } from "./kbank/KbankDone";
 import { KbankReceipt } from "./kbank/KbankReceipt";
+import { renderKakao2Route } from "./kakao2/routes";
+import { K2Inset } from "./kakao2/K2Inset";
+import { launchReady } from "./kakao2/launch";
+import { renderTossRoute } from "./toss/routes";
+import { TossInset } from "./toss/Inset";
+import { TossOverlay } from "./toss/Overlay";
+import { TossSplash } from "./toss/home/TossSplash";
+import { renderAlloneRoute } from "./allone/routes";
+import { AlloneOverlay } from "./allone/Overlay";
+import { AlloneSplash } from "./allone/launch/AlloneSplash";
+import { aoLaunchReady } from "./allone/launch";
+import { aoHistoryGoFirst } from "./allone/nav";
+import { AoNativePortal } from "./allone/ui/NativePortal";
 import { prefetch } from "./api/useApi";
 import { paths } from "./api/endpoints";
 import { RESTART_EVENT } from "./platform/recorder";
@@ -122,21 +135,39 @@ const renderKbankRoute = (location: Location) => (
     <Route path="/send/done" element={<KbankDone />} />
   </Routes>
 );
-const ROUTES = { kakao: renderRoute, nh: renderNhRoute, hana: renderHanaRoute, ibk: renderIbkRoute, kbank: renderKbankRoute };
+// 토스 (APP=toss 9117): 화면 표는 src/toss/routes.tsx · NH올원뱅크 (APP=allone 9119): src/allone/routes.tsx
+const ROUTES = {
+  kakao: renderRoute,
+  nh: renderNhRoute,
+  hana: renderHanaRoute,
+  ibk: renderIbkRoute,
+  kbank: renderKbankRoute,
+  toss: renderTossRoute,
+  allone: renderAlloneRoute,
+};
+// 카카오뱅크 kakao2 (9115): 새 녹화(아이폰) 화면 표 (src/kakao2/routes.tsx). kakao 의 renderRoute 는 그대로
+const render = KAKAO2 ? renderKakao2Route : ROUTES[APP];
 
 // 개발 중 매번 스플래시 보기 귀찮으면 주소 뒤에 ?skip
 const skipSplash = new URLSearchParams(location.search).has("skip");
+// kakao2: 새 녹화엔 시작화면(노란 스플래시 · 로딩)이 없음 → 프로필을 고르면 · 녹화를 시작하면 바로 홈
+const warmStart = skipSplash || KAKAO2;
 
 export default function App() {
   // 이번 세션에 고른 프로필이 없으면 프로필 고르기부터
-  const [boot, setBoot] = useState<Boot>(!currentProfileId() ? "pick" : skipSplash ? "ready" : "splash");
+  const [boot, setBoot] = useState<Boot>(!currentProfileId() ? "pick" : warmStart ? "ready" : "splash");
   const toSplash = useCallback(() => {
     prefetch(paths.home); // 스플래시 도는 동안 그 프로필의 홈 데이터를 미리 받아 둠
-    setBoot(skipSplash ? "ready" : "splash");
+    setBoot(warmStart ? "ready" : "splash");
   }, []);
   // onDone이 렌더마다 새 함수면 Splash의 effect가 다시 돌아서 타이머가 리셋됨 → useCallback
   const toLoading = useCallback(() => setBoot("loading"), []);
   const toReady = useCallback(() => setBoot("ready"), []);
+  // allone: 로그인 cut(+2033) 250ms 전에 홈을 간편비밀번호 화면 밑에 숨겨 미리 그려 둠 (AlloneSplash onPrepare) → cut 에는 보이기만.
+  // cut 에 처음 그리면 배치에 40ms 남짓 걸려 막 밑의 홈이 4프레임쯤 늦게 보였음. 시작 흐름을 벗어나면(꺼짐 · 프로필 고르기) 지움
+  const [aoPre, setAoPre] = useState(false);
+  const aoPrepare = useCallback(() => setAoPre(true), []);
+  if (aoPre && boot !== "splash" && boot !== "ready") setAoPre(false);
   // 로그인: 켜질 때 확인 → 안 돼 있으면 로그인 화면. 로그인하면 (다른 계정일 수 있으니) 프로필 고르기부터
   const auth = useAuth();
   const userId = auth.status === "in" ? auth.user.id : null;
@@ -152,25 +183,78 @@ export default function App() {
   const navigate = useNavigate();
   useEffect(() => {
     const onRestart = (e: Event) => {
-      if ((e as CustomEvent).detail === "off") {
+      if ((e as CustomEvent).detail === "off" && ALLONE) {
+        // allone: 앱의 첫 칸으로 돌아가 "/" 로 바꿈 — 다시 켠 앱에서 뒤로가 녹화 전 화면(이체 흐름 등)으로 가지 않게 (그 칸들은 앞으로 가기 칸이 되어 버려짐)
+        setBoot("off");
+        void aoHistoryGoFirst().then(() => navigate("/", { replace: true }));
+      } else if ((e as CustomEvent).detail === "off") {
         navigate("/", { replace: true });
         setBoot("off");
       } else {
         prefetch(paths.home);
-        setBoot(currentProfileId() ? "splash" : "pick");
+        setBoot(currentProfileId() ? (KAKAO2 ? "ready" : "splash") : "pick");
       }
     };
     window.addEventListener(RESTART_EVENT, onRestart);
     return () => window.removeEventListener(RESTART_EVENT, onRestart);
   }, [navigate]);
+  // kakao2: 홈이 뜨는 때 = 앱이 켜진 때 (상태바 위치 표시 · 홈 인디케이터 · 홈 AI 알약이 여기서부터, src/kakao2/launch.ts).
+  // 녹화 인트로는 영상을 트는 동안 잡아 두었다가(holdLaunch) 영상이 끝날 때 정함
+  const ready = auth.status === "in" && boot === "ready";
+  useEffect(() => {
+    if (KAKAO2 && ready) launchReady();
+  }, [ready]);
+  // allone: 앱이 켜진 때 D = 시작 흐름(boot "splash")이 뜬 때 − 250ms (홈 인디케이터, src/allone/launch.ts). 녹화 인트로는 인트로가 D 를 정해 둠.
+  // useLayoutEffect: 자식(AlloneSplash)의 useEffect 보다 먼저 정해 두어야 시작화면이 D 를 읽음 (useEffect 면 자식 효과가 먼저 돌아 배포판에서 250ms 늦었음)
+  const splash = auth.status === "in" && boot === "splash";
+  useLayoutEffect(() => {
+    if (ALLONE && splash) aoLaunchReady();
+  }, [splash]);
 
   return (
     <StatusBarProvider>
-      <PhoneFrame overlay={{ nh: <NhLoadingLayer />, hana: <HanaLoadingLayer />, ibk: <IbkLoadingLayer />, kbank: undefined, kakao: undefined }[APP]}>
-        {auth.status === "checking" && <PhoneOff />}
-        {auth.status === "out" && <LoginScreen message={auth.message} />}
-        {auth.status === "in" && boot === "off" && <PhoneOff />}
-        {auth.status === "in" && boot === "pick" && <ProfilePicker onEnter={toSplash} />}
+      <PhoneFrame
+        overlay={
+          {
+            nh: <NhLoadingLayer />,
+            hana: <HanaLoadingLayer />,
+            ibk: <IbkLoadingLayer />,
+            kbank: undefined,
+            kakao: undefined,
+            toss: <TossOverlay />,
+            allone: <AlloneOverlay />,
+          }[APP]
+        }
+      >
+        {auth.status === "checking" && (ALLONE ? <AlloneOff /> : <PhoneOff />)}
+        {/* kakao2 는 상태바가 화면 위에 겹치므로 카카오뱅크 로그인 · 프로필 고르기를 54pt 띠 아래에 (K2Inset). 토스도 같은 이유로 28dp 띠 아래에 (TossInset).
+            allone 은 웹뷰(.phone__viewport)가 이미 흰 띠 59 / 34 사이라 감싸지 않음 (아래 그냥 갈래) */}
+        {auth.status === "out" &&
+          (KAKAO2 ? (
+            <K2Inset>
+              <LoginScreen message={auth.message} />
+            </K2Inset>
+          ) : TOSS ? (
+            <TossInset>
+              <LoginScreen message={auth.message} />
+            </TossInset>
+          ) : (
+            <LoginScreen message={auth.message} />
+          ))}
+        {auth.status === "in" && boot === "off" && (ALLONE ? <AlloneOff /> : <PhoneOff />)}
+        {auth.status === "in" &&
+          boot === "pick" &&
+          (KAKAO2 ? (
+            <K2Inset>
+              <ProfilePicker onEnter={toSplash} />
+            </K2Inset>
+          ) : TOSS ? (
+            <TossInset>
+              <ProfilePicker onEnter={toSplash} />
+            </TossInset>
+          ) : (
+            <ProfilePicker onEnter={toSplash} />
+          ))}
         {auth.status === "in" &&
           boot === "splash" &&
           (APP === "nh" ? (
@@ -181,11 +265,25 @@ export default function App() {
             <IbkSplash onDone={toReady} />
           ) : APP === "kbank" ? (
             <KbankSplash onDone={toReady} />
+          ) : APP === "toss" ? (
+            // 토스: 시작화면 1.2초 → 홈 (잠금 화면 없음, plan.md §0.12). 진짜 시작화면은 home 영역 (src/toss/home/TossSplash.tsx)
+            <TossSplash onDone={toReady} />
+          ) : APP === "allone" ? (
+            // NH올원뱅크: 흰 시작화면 → 스플래시 → 간편비밀번호 → 로그인 로딩 → 홈 (launch 영역, src/allone/launch/AlloneSplash.tsx)
+            <AlloneSplash onDone={toReady} onPrepare={aoPrepare} />
           ) : (
             <Splash onDone={toLoading} />
           ))}
         {auth.status === "in" && boot === "loading" && <BootLoading onDone={toReady} />}
-        {auth.status === "in" && boot === "ready" && <ScreenStack render={ROUTES[APP]} />}
+        {auth.status === "in" &&
+          (boot === "ready" || (aoPre && boot === "splash")) &&
+          (ALLONE ? (
+            <div className={`ao-stack${boot === "ready" ? "" : " ao-stack--pre"}`}>
+              <ScreenStack render={render} />
+            </div>
+          ) : (
+            <ScreenStack render={render} />
+          ))}
       </PhoneFrame>
       <OsSwitch />
       <RecordingBar />
@@ -198,4 +296,13 @@ export default function App() {
 function PhoneOff() {
   useStatusBar("#000000", "light");
   return <div style={{ position: "absolute", inset: 0, background: "#000" }} />;
+}
+// allone: 웹뷰가 흰 띠 사이라 띠까지 창 전체를 검정으로 (네이티브 층). 녹화 인트로가 켜져 있으면 그 위에 장면이 덮음
+function AlloneOff() {
+  useStatusBar("#000000", "light");
+  return (
+    <AoNativePortal>
+      <div className="ao-off" />
+    </AoNativePortal>
+  );
 }
