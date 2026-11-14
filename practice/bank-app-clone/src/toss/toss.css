@@ -188,3 +188,40 @@ html[data-app="toss"][data-toss-band="scrim"] .phone__navbar i {
   --home-card: #19181b;
   --home-line: #2c2c33;
 }
+/* 프로필 만들기/고치기 시트 (공용 Sheet · ProfileForm · 지우기 확인창) — 노란 흰 시트 대신 토스 어둠 · 파랑 */
+.picker--toss {
+  --yellow: var(--toss-blue);
+  --yellow-pressed: var(--toss-blue-pressed);
+}
+.picker--toss .sheet__panel,
+.picker--toss .dialog__box {
+  background: var(--toss-surface);
+  color: #ffffff;
+}
+.picker--toss .cta:not(:disabled) {
+  color: #ffffff;
+}
+.picker--toss .cta:disabled {
+  background: var(--toss-fill);
+  color: #6b6a6d;
+}
+.picker--toss .profile-form__name {
+  background: var(--toss-fill-2);
+  color: #ffffff;
+}
+.picker--toss .profile-form__avatars button.on {
+  border-color: #ffffff;
+}
+.picker--toss .profile-form__colors button.on {
+  outline-color: #ffffff;
+}
+.picker--toss .profile-form__hint {
+  color: #9e9ea4;
+}
+.picker--toss .dialog__buttons {
+  border-top-color: #2c2c33;
+}
+.picker--toss .dialog__cancel {
+  border-right-color: #2c2c33;
+  color: #9e9ea4;
+}

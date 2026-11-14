@@ -169,7 +169,11 @@ function ProfileForm({ target, canDelete, onDone }: { target: AppProfile | "new"
           <button key={c} className={c === color ? "on" : ""} style={{ background: c }} onClick={() => setColor(c)} aria-label={c} />
         ))}
       </div>
-      {isNew && <p className="profile-form__hint">새 프로필은 카카오뱅크 통장 0원만 있는 빈 상태로 시작해요.</p>}
+      {isNew && (
+        <p className="profile-form__hint">
+          {TOSS ? "새 프로필은 토스뱅크 통장 · 토스머니 0원만 있는 빈 상태로 시작해요." : "새 프로필은 카카오뱅크 통장 0원만 있는 빈 상태로 시작해요."}
+        </p>
+      )}
       <button className="cta" disabled={!name.trim() || busy} onClick={save}>
         {isNew ? "만들기" : "저장"}
       </button>
