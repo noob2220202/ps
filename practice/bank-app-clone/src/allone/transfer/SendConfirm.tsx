@@ -17,6 +17,7 @@ import { AoButton, AoCaret, AoChevronRightIcon, AoHeader, AoKeyboard, AoPage, Ao
 import { bankLabel } from "./util";
 
 const MAX = 20;
+const TOAST_PANEL = 419; // T2 키패드 판 위 (SendAmount 와 같음)
 type Edit = null | "to" | "me";
 
 export function SendConfirm() {
@@ -89,9 +90,10 @@ export function SendConfirm() {
               return note ? aoApi.updateMemo(r.outTxId, note) : undefined;
             }),
         onError: (e) => {
-          // 지급정지: 이 화면이 맨 위면 '안내'. 막 동안 뒤로로 떠났으면(send 는 뒤로를 무시하고 끝까지 돎) 도착한 화면에 토스트
+          // 지급정지: 이 화면이 맨 위면 '안내'. 막 동안 뒤로로 떠났으면(send 는 뒤로를 무시하고 끝까지 돎) 도착한 화면에 토스트 —
+          // T2 면 키패드 판 위 (판은 막이 걷히면 다시 들어옴, 잔액채우기 성공 토스트와 같은 자리)
           if (isAoBlocked(e) && activeRef.current) setBlocked(true);
-          else aoToast(e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요");
+          else aoToast(e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요", window.location.pathname === "/send/amount" ? { bottom: TOAST_PANEL } : {});
         },
       },
     );

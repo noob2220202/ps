@@ -151,11 +151,12 @@ export function Topup() {
         setBusy(false);
         const msg = e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요";
         // 지급정지: 이 화면이 맨 위면 '안내' (막이 걷히기 33ms 전 — 녹화 12.713 의 첫 프레임이 이미 10%). 막 동안 뒤로로 떠났으면 도착한 화면에 토스트
+        // (T2 에서 왔으면 성공 토스트처럼 키패드 판 위)
         if (isAoBlocked(e)) {
           if (activeRef.current) {
             alerted = true;
             setBlocked(true);
-          } else aoToast(msg);
+          } else aoToast(msg, origin === "amount" ? { bottom: TOAST_PANEL } : {});
         } else setError(msg);
       },
     });

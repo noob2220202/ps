@@ -124,8 +124,13 @@ export const aoHistoryIdx = () => (window.history.state as { idx?: number } | nu
 export const aoHereState = (): unknown => (window.history.state as { usr?: unknown } | null)?.usr;
 // 이 문서(페이지를 연 · 새로고침한 때)의 첫 칸. 그보다 앞 칸은 새로고침 전 문서라 history.go 로 가면 페이지를 다시 엶 (읽기만 함)
 const firstIdx = aoHistoryIdx();
-// 앱의 첫 칸으로 돌아감 (녹화 다시 시작: App.tsx). 그 위 칸들은 앞으로 가기 칸이 되어 다음 이동에 버려짐
-export const aoHistoryGoFirst = () => aoHistoryGo(-Math.max(0, aoHistoryIdx() - firstIdx));
+// 앱의 첫 칸으로 돌아감 (녹화 다시 시작: App.tsx). 그 위 칸들은 앞으로 가기 칸이 되어 다음 이동에 버려짐.
+// '안내' 팝업이 떠 있으면 그 칸은 밑 화면 칸과 idx 가 같으므로 한 칸 더 (팝업은 닫히면서 따로 되돌리지 않음)
+export const aoHistoryGoFirst = () => {
+  const extra = liveAlerts.has(aoAlertHere()) ? 1 : 0;
+  liveAlerts.clear();
+  return aoHistoryGo(-(Math.max(0, aoHistoryIdx() - firstIdx) + extra));
+};
 // history.go(delta) 하고 도착(popstate)까지 기다림. 범위 밖이라 popstate 가 안 오면 300ms 뒤 끝
 export function aoHistoryGo(delta: number) {
   if (!delta) return Promise.resolve();
@@ -141,6 +146,26 @@ export function aoHistoryGo(delta: number) {
   });
 }
 
+// ---------- '안내' 팝업 칸 (ui/Alert.tsx) ----------
+// 팝업은 떠 있는 동안 지금 칸을 복사한 칸 하나를 쌓음 (주소 · key · idx 그대로 + aoAlert 표시 — 브라우저 뒤로 = 확인).
+// 확인으로 닫으면 history.back 으로 되돌리는데, 되돌린 칸은 앞으로 가기 칸으로 남음 (다음 이동에 버려짐). 그 칸에 앞으로 가기로 오면
+// 같은 화면의 빈 칸이라 아무것도 안 바뀌고, 그 위에서는 뒤로 · 취소 · 홈의 칸 셈(idx · aoDepth)이 하나씩 어긋남 → 오자마자 다시 뒤로 (aoListenPopFirst)
+let alertSeq = Date.now(); // 문서마다 다른 수부터 (새로고침 전 문서가 쌓은 칸의 표시와 헷갈리지 않게)
+const ownAlerts = new Set<number>(); // 이 문서가 쌓은 팝업 칸
+const liveAlerts = new Set<number>(); // 그중 팝업이 아직 떠 있는 칸
+export const aoAlertHere = () => num(st(window.history.state)?.aoAlert);
+export function aoPushAlert() {
+  const id = ++alertSeq;
+  window.history.pushState({ ...window.history.state, aoAlert: id }, "");
+  ownAlerts.add(id);
+  liveAlerts.add(id);
+  return id;
+}
+// 팝업이 닫힘: 아직 그 칸에 있으면 되돌림 (뒤로로 닫혔거나 · 다른 칸으로 떠났거나 · 첫 칸으로 가는 중이면 그대로)
+export function aoPopAlert(id: number) {
+  if (liveAlerts.delete(id) && aoAlertHere() === id) window.history.back();
+}
+
 // ---------- 뒤로(popstate)를 react-router 보다 먼저 받기 ----------
 // 막 · 잠금(loading.ts)과 이체 완료 지킴이(flow.ts)는 도착한 화면이 그려지기 전에 알아야 함: React 19 는 popstate 안에서 화면 바꿈을 바로 그려서
 // (그 사이 밑 화면의 useAoReturn 이 돎) react-router 뒤에 붙인 window 수신은 그 뒤에야 불리고, 그새 사라진 화면이 붙인 수신은 아예 안 불림.
@@ -152,6 +177,9 @@ export function onAoPopFirst(cb: () => void) {
 }
 export function aoListenPopFirst() {
   const fn = () => {
+    // 닫힌 팝업 칸 (앞으로 가기로 옴): 밑 화면 칸으로 바로 되돌림. 같은 화면 칸이라 아래 수신들은 할 일이 없음 (화면 스택도 key 가 같아 그대로)
+    const a = aoAlertHere();
+    if (a && ownAlerts.has(a) && !liveAlerts.has(a)) return window.history.back();
     for (const cb of [...popFirst]) if (popFirst.has(cb)) cb(); // 도중에 빠진 것은 부르지 않음 (DOM 수신과 같게)
   };
   window.addEventListener("popstate", fn);

@@ -9,11 +9,11 @@
 //  - 사라짐: 확인을 뗀 프레임에 한 번에 (C3 33.996 · 19.479). 누른 모양 없음. 배경막을 눌러도 닫히지 않음
 //  - 닫힌 뒤 300ms 동안 보이지 않는 막이 웹 누름을 받음 (확인 두 번 누름의 둘째가 밑 화면으로 새지 않게)
 //  - 브라우저 뒤로 = 확인 (화면은 그대로): 떠 있는 동안 방문 기록 한 칸을 쌓음 (주소 · 라우터 칸은 그대로라 화면 스택은 안 바뀜).
-//    확인으로 닫히면 그 칸을 되돌림
+//    확인으로 닫히면 그 칸을 되돌림. 칸을 쌓고 되돌리는 것 · 되돌린 칸에 앞으로 가기로 오면 바로 다시 뒤로 · 녹화 다시 시작의 칸 셈은 nav.ts
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useLayerActive } from "../../platform/LayerContext";
-import { onAoPopFirst } from "../nav";
+import { aoAlertHere, aoPopAlert, aoPushAlert, onAoPopFirst } from "../nav";
 import { AoButton } from "./Button";
 
 export interface AoAlertProps {
@@ -31,10 +31,6 @@ export interface AoAlertProps {
 
 const GUARD_MS = 300;
 type Phase = "closed" | "open" | "guard";
-
-// 떠 있는 동안 쌓은 방문 기록 칸의 표시 (여러 팝업이 겹쳐도 자기 칸만 알아봄)
-let seq = 0;
-const marker = () => (window.history.state as { aoAlert?: number } | null)?.aoAlert;
 
 export function AoAlert({ open, onClose, title = "안내", children, code, tel, confirmLabel = "확인", enter = "hidden", className, host }: AoAlertProps) {
   const [phase, setPhase] = useState<Phase>(open ? "open" : "closed");
@@ -58,23 +54,19 @@ export function AoAlert({ open, onClose, title = "안내", children, code, tel, 
   const shown = phase === "open" && active;
   useEffect(() => {
     if (!shown) return;
-    const id = ++seq;
-    let pushed = false;
+    let id = 0; // 쌓은 칸의 표시 (0 = 아직. 여러 팝업이 겹쳐도 자기 칸만 알아봄)
     let popped = false;
     const off = onAoPopFirst(() => {
-      if (!pushed || popped || marker() === id) return;
+      if (!id || popped || aoAlertHere() === id) return;
       popped = true;
       closeRef.current();
     });
-    const t = window.setTimeout(() => {
-      window.history.pushState({ ...window.history.state, aoAlert: id }, "");
-      pushed = true;
-    });
+    const t = window.setTimeout(() => void (id = aoPushAlert()));
     return () => {
       window.clearTimeout(t);
       off();
-      // 우리 칸에 그대로 있을 때만 되돌림 (뒤로로 닫혔거나 다른 화면으로 떠났으면 그대로)
-      if (pushed && !popped && marker() === id) window.history.back();
+      // 우리 칸에 그대로 있을 때만 되돌림 (뒤로로 닫혔거나 다른 화면 · 첫 칸으로 떠났으면 그대로)
+      if (id) aoPopAlert(id);
     };
   }, [shown]);
 

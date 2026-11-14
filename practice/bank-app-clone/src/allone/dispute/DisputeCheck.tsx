@@ -19,6 +19,9 @@ import "./dispute.css";
 
 const N = DISPUTE_CHECK_ITEMS.length;
 const TITLE_AFTER = [17] as const; // 제목은 내용보다 한 프레임 늦게 (C4 1.824 → 1.841)
+// 확인함으로 새 항목이 나타난 뒤 이만큼은 그 항목의 누름을 버림: 4번 확인함을 두 번 누르면 첫 누름에 맨 아래로 스크롤되어
+// 5번 영업점 칸이 손 밑에 오고, 둘째 누름이 영업점검색을 열었음 (AoAlert 의 닫힌 뒤 300ms 와 같은 생각). 녹화의 누름 간격은 584ms 이상이라 걸리지 않음
+const REVEAL_GUARD = 300;
 
 export function DisputeCheck() {
   const flow = useAoFlow();
@@ -51,14 +54,20 @@ export function DisputeCheck() {
     if (el && shown > 1) el.scrollTop = el.scrollHeight;
   }, [shown]);
 
-  const confirm = (i: number) => {
-    if (!active || veil || done[i] || i !== shown - 1) return;
+  // 확인함으로 새 항목이 나타난 때 (누름의 event.timeStamp — performance.now 와 같은 시계)
+  const revealedAt = useRef(-Infinity);
+
+  const confirm = (i: number, at: number) => {
+    if (!active || veil || done[i] || i !== shown - 1 || at - revealedAt.current < REVEAL_GUARD) return;
     setDone((d) => d.map((v, k) => v || k === i));
-    if (i + 1 < N) setShown(i + 2);
+    if (i + 1 < N) {
+      setShown(i + 2);
+      revealedAt.current = at;
+    }
   };
 
-  const openBranch = () => {
-    if (!flow.canGo()) return;
+  const openBranch = (at: number) => {
+    if (at - revealedAt.current < REVEAL_GUARD || !flow.canGo()) return;
     setFieldOn(true);
     run(() => flow.goBranchSearch());
   };
@@ -96,7 +105,7 @@ export function DisputeCheck() {
                   type="button"
                   className={`ao-dsp-check__field${fieldOn ? " ao-dsp-check__field--on" : ""}`}
                   aria-label="영업점 검색"
-                  onClick={openBranch}
+                  onClick={(e) => openBranch(e.timeStamp)}
                 >
                   <span>{branch?.name ?? ""}</span>
                   <DspMagnifier className="ao-dsp-check__mag" />
@@ -106,7 +115,7 @@ export function DisputeCheck() {
                   type="button"
                   className={`ao-dsp-check__ok${done[i] ? " ao-dsp-check__ok--on" : ""}`}
                   aria-pressed={done[i]}
-                  onClick={() => confirm(i)}
+                  onClick={(e) => confirm(i, e.timeStamp)}
                 >
                   {DISPUTE_CONFIRM}
                 </button>
