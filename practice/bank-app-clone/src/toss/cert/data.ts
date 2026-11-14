@@ -22,6 +22,7 @@ export const CERT_T = {
   issuing: 2600, // W: 고리 두 바퀴 뒤 D 로 replace
   doneSkeleton: 600, // D: 회색 카드 → 흰 종이
   doneDoc: 150, // D: 흰 종이 → 문서 내용
+  doneButtons: 110, // D: 두 버튼이 꺼진 모습에서 켜지기 시작 (녹화 A 83.37 → 83.50, 켜짐은 공용 180ms 교차)
   docIdle: 400, // D: 파일 저장하기 → 문서.pdf push
 } as const;
 
@@ -187,8 +188,9 @@ export function useCertDoc(q: CertQuery) {
   return { data, error, retry };
 }
 
-// A4 종이 (단위 = 문서.pdf 화면 dp). 미리보기(D)는 344 / 368 배
-export const CERT_PAGE = { w: 368, h: 520.4 } as const;
+// A4 종이 (단위 = 문서.pdf 화면 dp): 녹화 문서.pdf 의 종이 x 8–375.4 · y 100.8–620.4 (367.4 × 519.6 = 1 : √2).
+// 미리보기(D)는 344 / 367.4 = 0.9363 배 (D 카드 안 글자 · 선 자리로 맞춰 봄)
+export const CERT_PAGE = { w: 367.4, h: 519.6 } as const;
 // 한 장에 15줄 (cert.md §5.6). 줄이 없어도 한 장
 export const CERT_DOC_ROWS_PER_PAGE = 15;
 export function certPages<T>(rows: T[]): T[][] {

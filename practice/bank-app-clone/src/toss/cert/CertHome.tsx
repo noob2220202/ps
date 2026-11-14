@@ -22,7 +22,7 @@ const GROUPS: { title: string; items: string[] }[] = [
 // 본문 좌표 (화면 y − 81.6)
 const CARD1_TOP = 80.8; // 162.4
 const CARD2_TOP = 393.6; // 475.2
-const ITEM_H = 54.88;
+const ITEM_H = 55;
 const ITEM0 = 57.36; // 카드 위 → 첫 줄 위 (첫 잉크 가운데 560)
 const cardH = (n: number) => ITEM0 + n * ITEM_H + 14.08; // 마지막 잉크 가운데 → 카드 아래 41.6 (첫 카드와 같게)
 const CARD_GAP = 16;
@@ -76,7 +76,7 @@ export function CertHome() {
         <div className="toss-cert-c" style={{ height: HEIGHT }}>
           <CertTitle>토스뱅크 증명서 발급하기</CertTitle>
           <div className="toss-cert-card" style={{ top: CARD1_TOP, height: 255.2 }}>
-            <p className="toss-cert-t toss-cert-card__label">많이 찾아요</p>
+            <p className="toss-cert-t toss-cert-narrow toss-cert-card__label">많이 찾아요</p>
             {phase >= 2 &&
               TOP.map((label, i) => (
                 <TossPressable

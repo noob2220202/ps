@@ -32,10 +32,10 @@ export const CertChevronDown = ({ className, style, color = "#95969b" }: IconPro
     <path d="M.75.75 5.1 5.4 9.45.75" stroke={color} strokeWidth="1.5" {...round} />
   </svg>
 );
-// 줄 › (M): 잉크 5.5 × 10.2, 선 1.6 #515053
+// 줄 › (M): 잉크 5.5 × 10.2 (반 밝기 경계), 선 1.6 #515053
 export const CertChevronRight = ({ className, style, color = "#515053" }: IconProps) => (
-  <svg className={className} style={style} width={5.5} height={10.2} viewBox="0 0 5.5 10.2" aria-hidden>
-    <path d="M.8.8 4.7 5.1.8 9.4" stroke={color} strokeWidth="1.6" {...round} />
+  <svg className={className} style={style} width={6.3} height={10.2} viewBox="0 0 6.3 10.2" aria-hidden>
+    <path d="M.8.6 5.5 5.1.8 9.6" stroke={color} strokeWidth="1.6" {...round} />
   </svg>
 );
 // 고른 계좌 ✓ (A): 잉크 16 × 11, 선 2 #3182f6
@@ -54,7 +54,7 @@ export const CertCheckCircle = ({ on, className, style, color = "#58575a", knock
 // 공유 (V 머리줄): 열린 상자 + 위 화살표, 잉크 19 × 20 #e1e0e3
 export const CertShareIcon = ({ className, style, color = "#e1e0e3" }: IconProps) => (
   <svg className={className} style={style} width={25.2} height={25.2} viewBox="0 0 24 24" aria-hidden>
-    <path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6M12 3v12M7 8l5-5 5 5" stroke={color} strokeWidth="2" {...round} />
+    <path d="M4.5 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6M12.5 3v12M7.5 8l5-5 5 5" stroke={color} strokeWidth="2" {...round} />
   </svg>
 );
 
@@ -78,10 +78,10 @@ export function CertTitle({ children, className, style }: { children: ReactNode;
   );
 }
 
-// ← (증명서 머리줄): 잉크 x 18.9–38.0 · y 45.8–63.2 (19.1 × 17.4), 선 2 둥근 끝. 24 상자 (16.5, 42.5)
+// ← (증명서 머리줄): 잉크 x 18.9–38.0 · y 45.8–63.2 (19.1 × 17.4), 선 2 둥근 끝. 24 상자 (16, 42.4)
 export const CertBackIcon = ({ className, style, color = "#ffffff" }: IconProps) => (
   <svg className={className} style={style} width={24} height={24} viewBox="0 0 24 24" aria-hidden>
-    <path d="M20.5 12H3.4M11.1 4.3 3.4 12l7.7 7.7" stroke={color} strokeWidth="2" {...round} />
+    <path d="M21 12.3H3.9M11.6 4.6 3.9 12.3l7.7 7.7" stroke={color} strokeWidth="2" {...round} />
   </svg>
 );
 

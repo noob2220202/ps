@@ -106,7 +106,7 @@ export function CertItems() {
           {shown.length > 0 ? (
             <TossPressable className="toss-cert-row toss-cert-items__all" inset="0 4px" radius={10} color={PRESS} fadeIn={150} fadeOut={100} onPress={toggleAll}>
               <CertCheckCircle className={circle} on={allOn} color="#5a595c" />
-              <p className="toss-cert-t toss-cert-items__alllabel">모두 선택</p>
+              <p className="toss-cert-t toss-cert-narrow toss-cert-items__alllabel">모두 선택</p>
             </TossPressable>
           ) : (
             <p className="toss-cert-t toss-cert-items__empty">{text.trim() && all.length ? "검색 결과가 없어요" : "발급할 수 있는 내역이 없어요"}</p>

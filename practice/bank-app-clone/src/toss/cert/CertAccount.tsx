@@ -92,8 +92,9 @@ export function CertAccount() {
       {show && (
         <div className="toss-cert-c" style={{ height: bottom + 120 }}>
           <CertTitle>어떤 계좌의 증명서를 발급할까요?</CertTitle>
-          {secs.map((s) => (
-            <p key={s.label} className="toss-cert-t toss-cert-acct__sec" style={{ top: s.c - 8.1 }}>
+          {/* 첫 구역 이름은 글자가 기기 화소에 맞춰지며 1dp 위로 그려져서 0.8 내림 (녹화 잉크 180.1) */}
+          {secs.map((s, i) => (
+            <p key={s.label} className="toss-cert-t toss-cert-narrow toss-cert-acct__sec" style={{ top: s.c - 8.1 + (i ? 0 : 0.8) }}>
               {s.label}
             </p>
           ))}
@@ -113,11 +114,12 @@ export function CertAccount() {
               >
                 <CertTile code={isToss ? "toss" : a.bank.code} bank={a.bank} className="toss-cert-acct__tile" style={{ top: mid - 14 }} />
                 <p className="toss-cert-t toss-cert-acct__name">{isToss ? a.label : certBankShort(a)}</p>
-                <p className="toss-cert-t toss-cert-acct__num" style={opened ? undefined : { top: 34.6 }}>
+                {/* 두 줄 칸 번호: 잉크 373.0 (줄 위 336.7) */}
+                <p className="toss-cert-t toss-cert-acct__num" style={opened ? undefined : { top: 33.2 }}>
                   {a.number}
                 </p>
                 {opened && <p className="toss-cert-t toss-cert-acct__opened">개설일 {opened}</p>}
-                {sel === a.id && <CertCheck className="toss-cert-acct__check" style={{ top: mid - 5.5 }} />}
+                {sel === a.id && <CertCheck className="toss-cert-acct__check" style={{ top: mid - 5.3 }} />}
               </TossPressable>
             );
           })}

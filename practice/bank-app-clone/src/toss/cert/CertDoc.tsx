@@ -1,22 +1,36 @@
+import { useLayoutEffect, useRef, useState } from "react";
 import { TossPage, TOSS_BG } from "../ui/Page";
 import { TossPressable } from "../ui/Pressable";
-import { certPages, useCertDoc, useCertQuery } from "./data";
+import { certPages, CERT_PAGE, useCertDoc, useCertQuery } from "./data";
 import { CertBar, CertShareIcon } from "./parts";
 import { TransferCertDoc } from "./TransferCertDoc";
 import "./cert.css";
 
 // /cert/doc?account=&ids=&at= — V 문서.pdf (cert.md §2.8, 녹화 A 92.236). 머리줄 #171619 + 제목 '문서.pdf' + 공유(누름 표시만),
-// 본문 #dddee3 에 A4 종이(368 × 520.4, x 8–376 · y 100.8–620). 여러 장이면 19.2 간격으로 쌓고 스크롤.
+// 본문 #dddee3 에 A4 종이(367.4 × 519.6, x 8–375.4 · y 100.8–620.4). 여러 장이면 19.2 간격으로 쌓고 스크롤.
+// 384 보다 좁은 폰에서는 양옆 8 을 남기고 종이를 줄임.
 // 워터마크 · 빈 도장 · 가짜 진위확인 그대로 (TransferCertDoc). 내려받기 · 인쇄 · 공유는 없음
 export function CertDoc() {
   const q = useCertQuery();
   const doc = useCertDoc(q);
   const data = doc.data;
+  const body = useRef<HTMLDivElement>(null);
+  const [k, setK] = useState(1);
+  useLayoutEffect(() => {
+    const el = body.current;
+    if (!el) return;
+    const fit = () => setK(Math.min(1, (el.clientWidth - 16) / CERT_PAGE.w));
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   return (
     <TossPage
       className="toss-cert-docview"
       bg="#dddee3"
       band={TOSS_BG}
+      bodyRef={body}
       header={
         <CertBar
           bg={TOSS_BG}
@@ -30,9 +44,9 @@ export function CertDoc() {
       }
     >
       {data && (
-        <div className="toss-cert-docview__pages">
+        <div className="toss-cert-docview__pages" style={{ paddingLeft: `calc(50% - ${(CERT_PAGE.w * k) / 2 + 0.3}px)` }}>
           {certPages(data.rows).map((_, i) => (
-            <TransferCertDoc key={i} data={data} page={i} />
+            <TransferCertDoc key={i} data={data} page={i} scale={k} />
           ))}
         </div>
       )}

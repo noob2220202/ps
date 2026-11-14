@@ -1,5 +1,5 @@
-// 송금확인증 한 장 (cert.md §2.10). A4 종이(368 × 520.4 단위, 1단위 = 문서.pdf 화면 1dp)를 4배(--u 4px)로 그린 뒤 scale/4 로 줄임
-// — 4–5단위 작은 글자가 브라우저 최소 글자 크기에 걸리지 않고 고해상도에서도 또렷함. 미리보기(D) scale 0.9348, 문서.pdf(V) 1.
+// 송금확인증 한 장 (cert.md §2.10). A4 종이(367.4 × 519.6 단위, 1단위 = 문서.pdf 화면 1dp)를 4배(--u 4px)로 그린 뒤 scale/4 로 줄임
+// — 4–5단위 작은 글자가 브라우저 최소 글자 크기에 걸리지 않고 고해상도에서도 또렷함. 미리보기(D) scale 0.9363, 문서.pdf(V) 1.
 // 연습용 안전 규칙 (infra §8): '연습용 화면 · 실제 이체 아님' 비스듬한 워터마크(장마다 3 × 2), 진짜 도장 대신 '연습용' 빈 도장,
 // 진위확인 · 고객센터는 가짜 값. 파일(PDF)은 만들지 않음
 import { TossSymbol } from "../ui/TossSymbol";
@@ -8,7 +8,7 @@ import { certPages, CERT_PAGE, type CertDocData, type CertDocRow } from "./data"
 const MARK = "연습용 화면 · 실제 이체 아님";
 // 표 칸 왼쪽 (단위)
 const COLS: { key: keyof CertDocRow | "when"; label: string; x: number }[] = [
-  { key: "when", label: "거래일자", x: 19.0 },
+  { key: "when", label: "거래일자", x: 18.5 }, // 녹화 19.0 (Pretendard '거' · 숫자는 왼쪽 여백이 0.5 넓음)
   { key: "to", label: "받는사람", x: 55.0 },
   { key: "from", label: "보낸사람", x: 88.3 },
   { key: "amount", label: "금액", x: 121.3 },
@@ -16,14 +16,14 @@ const COLS: { key: keyof CertDocRow | "when"; label: string; x: number }[] = [
   { key: "toAccount", label: "받는 은행 계좌", x: 243.4 },
   { key: "memo", label: "받는통장 표시", x: 316.1 },
 ];
-// 칸 폭 (다음 칸 왼쪽 − 1.5, 마지막은 오른쪽 선 349). 녹화엔 넘치는 값이 없지만 긴 은행 이름 등이 옆 칸과 겹치지 않게 자름
-const colW = (i: number) => (COLS[i + 1]?.x ?? 350.5) - COLS[i].x - 1.5;
+// 칸 폭 (다음 칸 왼쪽 − 1.5, 마지막은 오른쪽 선 349.4). 녹화엔 넘치는 값이 없지만 긴 은행 이름 등이 옆 칸과 겹치지 않게 자름
+const colW = (i: number) => (COLS[i + 1]?.x ?? 350.9) - COLS[i].x - 1.5;
 const ROW_TOP = 121.3; // 첫 줄 위 (글자 상자, 줄 높이 7.6)
 const ROW_PITCH = 22; // 두 줄 × 7.35 + 틈 (cert.md §5.6)
-const FOOT_GAP = 158.9 - ROW_TOP; // 마지막 줄 위 → 안내 문구 위
+const FOOT_GAP = 158.5 - ROW_TOP; // 마지막 줄 위 → 안내 문구 위
 
 const u = (n: number) => `calc(${n} * var(--u))`;
-const INK = 0.6; // 글자 상자 왼쪽 → 잉크 (Pretendard 5단위 글자를 녹화와 같은 방법으로 잰 차이)
+const INK = -0.3; // 칸 왼쪽 → 글자 상자 (Pretendard 5단위 글자의 왼쪽 여백만큼 당김, 녹화 잉크에 맞춤)
 
 export function TransferCertDoc({ data, page = 0, scale = 1, className }: { data: CertDocData; page?: number; scale?: number; className?: string }) {
   const pages = certPages(data.rows);

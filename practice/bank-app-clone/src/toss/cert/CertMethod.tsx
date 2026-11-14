@@ -31,7 +31,7 @@ export function CertMethod() {
             fadeOut={120}
             onPress={i === 0 ? save : undefined}
           >
-            <p className="toss-cert-t toss-cert-method__label">{label}</p>
+            <p className="toss-cert-t toss-cert-narrow toss-cert-method__label">{label}</p>
             <CertChevronRight className="toss-cert-method__chev" />
           </TossPressable>
         ))}

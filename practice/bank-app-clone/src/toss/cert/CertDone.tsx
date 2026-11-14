@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTossFlow } from "../flow";
 import { useTossGo } from "../nav";
 import { TossBottomDock, TossButton } from "../ui/Button";
@@ -9,10 +10,11 @@ import { useCertPhase, useCertRevisit } from "./steps";
 import { TransferCertDoc } from "./TransferCertDoc";
 import "./cert.css";
 
-const PREVIEW = 344 / CERT_PAGE.w; // 0.9348
+const PREVIEW = 344 / CERT_PAGE.w; // 0.9363
 
 // /cert/transfer/done?account=&ids=&at= — D 송금 확인증을 발급했어요 (cert.md §2.7, 녹화 A 83.816 / 89.341). W 를 replace 해서 옴 (뒤로 = M).
-// 회색 카드 600ms → 흰 종이 → 150ms 뒤 문서 첫 장 (0.9348 배). 두 버튼은 들어올 때 .4 → 1 (250ms). 문서.pdf 에서 돌아오면 끝 모습 그대로.
+// 회색 카드 600ms → 흰 종이 → 150ms 뒤 문서 첫 장 (0.9363 배). 두 버튼은 처음 110ms 꺼진 모습(글자 흐림 · 파랑은 #1e355b)이다가
+// 켜짐 (공용 버튼의 180ms 교차, 녹화 A 83.37–83.62). 문서.pdf 에서 돌아오면 끝 모습 그대로.
 // 확인했어요 → 증명서에 들어온 화면으로 (certExit, pop). 파일 저장하기 → 400ms 뒤 문서.pdf (push) — 파일은 만들지 않음
 export function CertDone() {
   const q = useCertQuery();
@@ -21,17 +23,25 @@ export function CertDone() {
   const { certExit } = useTossFlow();
   const { revisit } = useCertRevisit();
   const phase = useCertPhase([CERT_T.doneSkeleton, CERT_T.doneSkeleton + CERT_T.doneDoc], !!doc.data, revisit);
+  const [live, setLive] = useState(revisit);
+  useEffect(() => {
+    if (live) return;
+    const t = window.setTimeout(() => setLive(true), CERT_T.doneButtons);
+    return () => window.clearTimeout(t);
+  }, [live]);
   return (
     <TossPage
       className="toss-cert-done"
       header={<CertBar />}
       dock={
         <TossBottomDock>
-          <div className={`toss-cert-done__btns${revisit ? "" : " toss-cert-done__btns--in"}`}>
-            <TossButton variant="grey" onPress={certExit}>
+          <div className={`toss-cert-done__btns${live ? "" : " toss-cert-done__btns--off"}`}>
+            <TossButton variant="grey" disabled={!live} onPress={certExit}>
               확인했어요
             </TossButton>
-            <TossButton onPress={() => go(certUrl("/cert/doc", { account: q.account, ids: q.ids, at: q.at ?? undefined }), { delay: CERT_T.docIdle })}>파일 저장하기</TossButton>
+            <TossButton disabled={!live} onPress={() => go(certUrl("/cert/doc", { account: q.account, ids: q.ids, at: q.at ?? undefined }), { delay: CERT_T.docIdle })}>
+              파일 저장하기
+            </TossButton>
           </div>
         </TossBottomDock>
       }
