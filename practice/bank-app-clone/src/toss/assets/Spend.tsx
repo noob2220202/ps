@@ -369,8 +369,8 @@ function WeekStrip({
                     onPress={() => onPick(c.date)}
                   >
                     <span className="toss-assets-strip__date">{c.day}</span>
-                    {d && d.income > 0 && <FitText className="toss-assets-strip__in" text={`+${calAmount(d.income)}원`} max={42} />}
-                    {d && d.expense > 0 && <FitText className="toss-assets-strip__out" text={`-${calAmount(d.expense)}원`} max={42} />}
+                    {d && d.income > 0 && <FitText className="toss-assets-strip__in" text={`+${calAmount(d.income)}원`} max={42} room={48} />}
+                    {d && d.expense > 0 && <FitText className="toss-assets-strip__out" text={`-${calAmount(d.expense)}원`} max={42} room={48} />}
                   </TossPressable>
                 );
               })}

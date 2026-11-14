@@ -10,7 +10,7 @@ import { bankByCode, bankInfo, digitsOf, formatAccountNumber } from "./banks.mjs
 // 공용 API 에 붙는 토스 칸 (홈 toss 블록, 계좌 role/favorite/openedAt, 거래 category/channel/own …, 상세 counterparty) 도 여기서 만듦.
 // 쓴 돈은 한 함수(spendTotal)만 셈 — 홈 '{M}월에 쓴 돈' 과 소비 합계가 늘 같게.
 
-// 소비 분류 색: 이체 · 카테고리 없음 · 교육 색은 녹화에서 잼, 나머지는 지어냄. '그 외'는 늘 #3e3d40
+// 소비 분류 색: 녹화에서 잰 색 셋 (#2f7ff3 이체 · #1e7055 카테고리 없음 · #804b20 갈색 — 클론은 갈색을 교육에 씀), 나머지는 지어냄. '그 외'는 늘 #3e3d40
 export const CATEGORY_COLORS = {
   이체: "#2f7ff3",
   "카테고리 없음": "#1e7055",

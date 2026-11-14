@@ -87,7 +87,8 @@ monthAmount = this month's non-cancelled debits with that card_id (a credit card
   `migrate()` (toss only) rebuilds an old `cards` table once (it still has `last_used_at`): the old example prepaid card becomes the example credit card
   `c-day` (bill = its old balance, payDay 13, pays from `hana` if present), other prepaid cards become check cards, old example card art gets the new names.
   In the same one-time step, rows that still hold the exact old example values (hana account name, the hana check card name, two example card purchases)
-  get the new example names and categories; amounts stay, so balances do not move. Edited rows are left alone (exact ids and values in `server/db.mjs`).
+  get the new example names and categories; amounts stay, so balances do not move. A purchase is renamed only when account, merchant, amount, tag, category, card and
+  time all match the old example, so edited rows and user-added rows with the same merchant are left alone (exact ids and values in `server/db.mjs`).
 
 **Points CRUD**
 - `GET /api/toss/points` → `[{id, name, balance, icon, sort}]`

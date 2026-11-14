@@ -165,7 +165,7 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Row 2 is indented to x 75.2: there is an **empty 30-dp icon slot** at x 32.7–62.4 (uniform card colour in both videos).
   - Amount `<ROW2_AMOUNT>원`, 17 dp B. Ink y 458.4–473.6.
   - Label 13 dp, dim `#717074`. Ink y 479.2–491.2.
-  - **Adult clone:** the clone keeps the slot,
+  - **Clone:** the clone keeps the slot,
     font sizes and colours and shows the first credit card's next bill: amount = `toss.cardBill.amount`, label **`{D}일 낼 카드값`**
     (D = day of `cardBill.dueDate`), button **내역** (press only). No credit card → the row is hidden. Toss's own pages call this
     '카드값' / '카드 청구서' / '카드값 내는 날' / '나갈 카드값' (card company, amount, due date); the exact home wording is not confirmed.
@@ -192,7 +192,7 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Left box x 12.6–187.3, right box x 196.0–371.1 (≈175 wide, h-gap 8.8), height 68.2, same card radius.
 - bg: card colour plus a soft bottom glow. Left is bluish (`#1d2130` at bottom), right is warm brown (`#2a2220`).
 - Titles: 2 lines, 15 dp SB `#f3f2f5`, line pitch 20.8. Ink tops at card top +16.7 / +37.5, text x = card left +19.5.
-  - Left (adult clone): **대출 조건 / 1분 만에 비교** (this copy follows the app-store text
+  - Left (clone): **대출 조건 / 1분 만에 비교** (this copy follows the app-store text
     "대출 조건을 1분 만에 비교"). Right: **토스 브랜드콘 / 구매하기**.
 - 3-D illustrations are bottom-right and clipped by the card bottom.
   - Left (clone): an invented SVG (tilted document + magnifier, `LoanArt` in `home/icons.tsx`) drawn for 54 × 56 dp, card x +116, top +16
@@ -206,7 +206,7 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Rows:
   - **계좌 개설**: blue card icon `#4b8ff6`.
   - **토스쇼핑**: coral bag `#f96167` with a grey handle.
-  - **카드 혜택 추천** (adult wording; credit cards included): mint card `#a8e5cf` with a blue star badge.
+  - **카드 혜택 추천** (clone wording): mint card `#a8e5cf` with a blue star badge.
 
 **Bottom padding.** Make the last card scroll fully above the tab bar: content end + 12 + tab bar 73.3.
 

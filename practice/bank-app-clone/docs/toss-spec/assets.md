@@ -121,7 +121,7 @@ Page `#171619`. The status bar uses the same colour. No bottom bar.
 - **분석** button: x 307.2–360.0, y 148.0–180.0 (52.8 × 32), fill `#27282d`, radius 8, label 13 M `#babdc4`.
 - **Category bar**: x 24–360 (336), y 198.4–211.2 (≈ 12.8; draw 12). Segments are separate rounded rects (radius ≈ 3) with a **2.4 dp gap**.
   Width is proportional to each category's share, sorted by share (top 3, then 그 외). Measured colours:
-  이체 `#2f7ff3`, 카테고리 없음 `#1e7055`, `#804b20` (used for 교육), 그 외 `#3e3d40`.
+  이체 `#2f7ff3`, 카테고리 없음 `#1e7055`, a third segment `#804b20`, 그 외 `#3e3d40` (the clone gives `#804b20` to 교육).
 
   The smallest segment observed is ≈ 21.6 wide, so clamp each segment to a minimum of 16.
 - **Legend**, ink y 222.4–232.8: square dots 8 × 8 (radius 2) in the segment colour, 3.2 gap, label 12 R `#8a898c`, 6.4 gap to the next dot.
@@ -137,6 +137,7 @@ Page `#171619`. The status bar uses the same colour. No bottom bar.
   - Expense, line 2, ink y 339.2–349.6: `-<OUT>원`, `#8a898c`.
   - **Font 10.5 R, shrink-to-fit inside ~42 dp** (short strings render at 10.5, long ones down to ~8.5). Days without values show nothing.
     Clone: amounts of 1,000,000 or more are written in 만 units (`+285만원`), so a salary day does not shrink to ≈ 6.9 px.
+    On phones narrower than 384 (zoom < 1) the box is 48 dp instead of 42, so six-digit totals stay ≈ 8.9 px at 360 wide (desktop keeps 42).
 - Expand chevron "⌄": ink x 184.0–200.8, y 375.2–381.6 (16.8 × 6.4), stroke ≈ 2, `#8c8d92`.
 - No divider or shadow under the sticky strip. Rows simply clip at its bottom edge (sticky y 264.0).
 
@@ -364,7 +365,7 @@ None in this area.
 |---|---|
 | `total` | Σ\|amount\| over **counted** debits in month M. Counted = `amount < 0` AND not cancelled AND not an own-account transfer AND not a card-bill payment AND not manually excluded. **Transfers to other people count** (이체 is the biggest category in the video). Shown as `-N원` |
 | `vsLastMonth` | `total(M, day 1..today) − total(M−1, day 1..same day)`. Text: `지난달보다 {X}만원 더 쓰는 중` (red) when > 0. X = round(\|diff\| / 10 000); if < 10 000 show `{diff}원`. Invented for the other cases: `덜 쓰는 중` in blue `#3182f6`, and `지난달과 비슷해요` in grey when \|diff\| < 1 000 |
-| `categories` | counted spend grouped by `category`, sorted desc, top 3 + `그 외`. Colours: §2.1.3 for 이체 / 카테고리 없음 / 교육; invented for others (식비 `#d9822b`, 편의점·마트 `#c9a227`, 쇼핑 `#8a5cf5`, 교통 `#27a5a0`, 문화 `#d6458f`, 주거·통신 `#e2574c`, 술·유흥 `#7aa83a`). `그 외` is always `#3e3d40` |
+| `categories` | counted spend grouped by `category`, sorted desc, top 3 + `그 외`. Colours: §2.1.3 for 이체 / 카테고리 없음; the third measured colour `#804b20` is given to 교육; invented for others (식비 `#d9822b`, 편의점·마트 `#c9a227`, 쇼핑 `#8a5cf5`, 교통 `#27a5a0`, 문화 `#d6458f`, 주거·통신 `#e2574c`, 술·유흥 `#7aa83a`). `그 외` is always `#3e3d40` |
 | `days[]` | for each date of M: `income` = Σ amount > 0 excluding own transfers; `expense` = Σ counted \|amount\|. The strip shows the week of the selected day |
 | `groups[]` | days with ≥ 1 tx, newest first. Label `D일 요일` (일/월/화/수/목/금/토 + 요일). `overspent` = day expense > 2 × the month's average daily expense **and** ≥ 30 000원 (invented threshold) |
 | `cashback` | `profile.cashback_count` (existing column). Row shown in **today's** group when > 0 |

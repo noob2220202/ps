@@ -221,7 +221,7 @@ No new transaction **tags** are added. 페이·기타 comes from `channel`, and 
 - **counted(tx)**: `amount < 0` and `!cancelled` and `!exclude` and `!own(tx)`. Transfers to other people count.
 - **tossSpendTotal(month)**: `profile.card_spend ?? Σ|amount| of counted debits in month`. Used by `/api/home` (`monthlyCardSpend` and `toss.spend.total`) and by `/api/toss/spend`.
 - **vsLastMonth**: total(M, day 1..today) − total(M−1, day 1..same day). The copy rules are in assets.md §4.1.
-- **categories**: counted spend by `category ?? (tag #이체 ? '이체' : '카테고리 없음')`, top 3 plus 그 외. Colours: 이체 #2f7ff3, 카테고리 없음 #1e7055, 교육 #804b20 (measured); invented: 식비 #d9822b, 카페·간식 #b0703a, 편의점·마트 #c9a227, 쇼핑 #8a5cf5, 교통 #27a5a0, 문화·여가 #d6458f, 주거·통신 #e2574c, 술·유흥 #7aa83a; 그 외 #3e3d40. 교육 stays selectable but the example seed has none.
+- **categories**: counted spend by `category ?? (tag #이체 ? '이체' : '카테고리 없음')`, top 3 plus 그 외. Colours: 이체 #2f7ff3, 카테고리 없음 #1e7055, 교육 #804b20 (the third measured colour); invented: 식비 #d9822b, 카페·간식 #b0703a, 편의점·마트 #c9a227, 쇼핑 #8a5cf5, 교통 #27a5a0, 문화·여가 #d6458f, 주거·통신 #e2574c, 술·유흥 #7aa83a; 그 외 #3e3d40. 교육 stays selectable but the example seed has none.
 - **overspent(day)**: day expense > 2 × the month's average daily expense **and** ≥ 30,000원.
 - **총 자산** = Σ balances of all accounts (토스머니 included) + Σ points. Cards are not assets.
 - **card monthAmount** = Σ|amount| of this month's non-cancelled debits with that `card_id`.

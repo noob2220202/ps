@@ -1,7 +1,7 @@
 // 데스크톱에서 가운데 맞춘 폰((창 폭 − 384) / 2)이 기기 화소 사이에 걸리면 글자가 통째로 1화소 밀려 그려짐
 // (배율 1.25 에서 창 폭이 8 의 배수가 아니면 글자 −0.8dp · 그림 −0.3–0.5dp) → .phone 을 translate 로 기기 화소에 맞춤.
 // 창 크기 · 배율(devicePixelRatio) · 캡쳐모드(zoom · 위 여백)가 바뀌면 다시. 토스 상태바(TossStatusBar)가 부름 — 다른 앱은 안 씀
-// (아래 useTossPhoneFit · tossScaleOf 도 토스 전용)
+// (아래 useTossPhoneFit · tossPhoneFit · tossScaleOf 도 토스 전용)
 import { useLayoutEffect, type RefObject } from "react";
 
 export function useTossPhoneSnap(ref: RefObject<HTMLElement | null>) {
@@ -62,6 +62,12 @@ export function useTossPhoneFit() {
       root.removeProperty("--toss-phone-h");
     };
   }, []);
+}
+
+// 지금 진짜 폰 화면 배율 (500px 이하에서만 zoom 이 걸림, toss.css). 데스크톱은 캡쳐모드 zoom 이 있어도 1 — 녹화 크기 그대로 둘 곳에서 씀
+export function tossPhoneFit() {
+  if (!window.matchMedia("(max-width: 500px)").matches) return 1;
+  return Number(document.documentElement.style.getPropertyValue("--toss-fit")) || 1;
 }
 
 // 화면 안 요소의 실제 그려진 배율 (폰 zoom 이 걸리면 1 이 아님): 손가락 좌표(clientX) · getBoundingClientRect 차이를 요소 안 px 로 바꿀 때 나눔
