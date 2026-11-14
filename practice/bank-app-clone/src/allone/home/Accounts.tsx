@@ -27,10 +27,11 @@ export interface AccountsProps {
   onHistory: (id: string) => void;
   onSend: (id: string) => void;
   onTopup: (fromId: string) => void;
+  onBlock: (id: string) => void;
   onRetry: () => void;
 }
 
-export function Accounts({ accounts, filled, open, onCopy, onHistory, onSend, onTopup, onRetry }: AccountsProps) {
+export function Accounts({ accounts, filled, open, onCopy, onHistory, onSend, onTopup, onBlock, onRetry }: AccountsProps) {
   const [tab, setTab] = useState<Tab>("nh");
   const list = (accounts ?? []).filter((a) => (tab === "nh" ? isAoNh(a) : !isAoNh(a)));
   const count = Math.max(1, list.length);
@@ -122,6 +123,7 @@ export function Accounts({ accounts, filled, open, onCopy, onHistory, onSend, on
                   onHistory={() => onHistory(a.id)}
                   onSend={() => onSend(a.id)}
                   onTopup={() => onTopup(a.id)}
+                  onBlock={() => onBlock(a.id)}
                 />
               );
             })}
@@ -177,15 +179,21 @@ interface CardProps {
   onHistory: () => void;
   onSend: () => void;
   onTopup: () => void;
+  onBlock: () => void;
 }
 
-function Card({ a, style, hidden, onCopy, onHide, onHistory, onSend, onTopup }: CardProps) {
+function Card({ a, style, hidden, onCopy, onHide, onHistory, onSend, onTopup, onBlock }: CardProps) {
   const nh = isAoNh(a);
   return (
     <article className="ao-home-card" style={style}>
       <Head a={a} name={a.label} />
       <NumberLine a={a} onCopy={onCopy} />
-      {nh && a.limited && <span className="ao-home-card__tag">한도제한</span>}
+      {/* 지급정지 (invented, 녹화에 없음) */}
+      {nh && a.blocked && (
+        <button type="button" className="ao-home-card__tag--blocked" onClick={onBlock}>
+          지급정지
+        </button>
+      )}
       <div className="ao-home-abs ao-home-card__bal">
         <span className={`ao-home-card__amt${hidden ? " ao-home-card__amt--hidden" : ""}`}>
           {hidden ? (
@@ -210,7 +218,7 @@ function Card({ a, style, hidden, onCopy, onHide, onHistory, onSend, onTopup }: 
             <button type="button" className="ao-home-card__btn" onClick={onHistory}>
               거래내역
             </button>
-            <button type="button" className="ao-home-card__btn" onClick={onSend}>
+            <button type="button" className="ao-home-card__btn" onClick={a.blocked ? onBlock : onSend}>
               이체
             </button>
           </>

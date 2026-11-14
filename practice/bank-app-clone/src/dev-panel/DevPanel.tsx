@@ -542,28 +542,29 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
             </>
           )}
           {APP === "toss" && <TossAccountFields account={account} run={run} />}
-          {ALLONE && <AoLimitedToggle account={account} run={run} />}
+          {ALLONE && <AoBlockToggle account={account} run={run} />}
         </div>
       )}
     </div>
   );
 }
 
-// NH올원뱅크 '한도제한' 표시 (홈 카드 · 얼마를 보낼까요 계좌 줄의 빨간 글자, 표시만 — 서버 한도 없음). PATCH /api/accounts/:id { limited }
-function AoLimitedToggle({ account, run }: { account: Account; run: Run }) {
-  const limited = !!(account as AoAccount).limited;
+// NH올원뱅크 계좌별 지급정지 (연습용, 녹화에 없음). 켜면 서버도 이 계좌에서 보내는 걸 막음(입금은 그대로). 풀면(끄기) 이의제기 신청 기록도 같이 지워짐.
+// 사용자가 이의제기를 신청했으면 그 사실만 보여 줌 — 관리자가 직접 "끄기" 를 눌러야 실제로 풀림 (신청 = 자동 해제 아님)
+function AoBlockToggle({ account, run }: { account: Account; run: Run }) {
+  const a = account as AoAccount;
+  const blocked = !!a.blocked;
   return (
     <div className="field">
-      <span className="field__label">한도제한 표시</span>
+      <span className="field__label">지급정지 (이 계좌에서 보내기만 막음, 녹화에 없음){a.disputed ? " · 이의제기 접수됨" : ""}</span>
       <Segmented
-        value={limited ? "on" : "off"}
+        value={blocked ? "on" : "off"}
         options={[
-          ["on", "보이기"],
-          ["off", "숨기기"],
+          ["on", "걸기"],
+          ["off", "풀기"],
         ]}
         onChange={(v) => {
-          if ((v === "on") !== limited)
-            run(() => aoApi.setLimited(account.id, v === "on"), v === "on" ? "한도제한을 표시해요" : "한도제한 표시를 껐어요");
+          if ((v === "on") !== blocked) run(() => aoApi.setBlocked(account.id, v === "on"), v === "on" ? "지급정지를 걸었어요" : "지급정지를 풀었어요");
         }}
       />
     </div>

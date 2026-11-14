@@ -548,3 +548,64 @@
 .ao-acct-auto__chev {
   color: #000;
 }
+
+/* ---------- 지급정지 안내 + 이의제기 (invented, 녹화에 없음) ---------- */
+.ao-block__body {
+  padding: 36px 24px 40px;
+  text-align: center;
+}
+.ao-block__icon {
+  display: block;
+  margin: 8px auto 20px;
+}
+.ao-block__title {
+  margin: 0 0 16px;
+  font-size: 19px;
+  font-weight: 700;
+}
+.ao-block__desc {
+  margin: 0;
+  font-size: 14.5px;
+  color: #666;
+}
+.ao-block__list {
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #3c3c3c;
+}
+.ao-block__list > li {
+  position: relative;
+  padding-left: 14px;
+  margin-top: 8px;
+}
+.ao-block__list > li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+}
+.ao-block__status {
+  margin: 0;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  font-size: 14.5px;
+  color: #3c3c3c;
+}
+.ao-block__agree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+.ao-block__hint {
+  margin: 0 0 20px;
+  font-size: 12.5px;
+  color: #8d8d8d;
+  text-align: left;
+}

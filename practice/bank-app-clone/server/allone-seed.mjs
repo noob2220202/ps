@@ -37,14 +37,14 @@ const agoFrom = (now) => (n, hms) => {
 };
 
 // ---------- 예시 데이터 표 ----------
-// [id, kind, bank, name, number, balance, limited, sort] — NH 카드 묶음 = bank 'nh' (main, kpay), 다른금융 = 나머지
+// [id, kind, bank, name, number, balance, sort] — NH 카드 묶음 = bank 'nh' (main, kpay), 다른금융 = 나머지
 const MAIN_NAME = "NH페이모아통장(비대면실명확인)";
 const MAIN_NUMBER = "302-1234-5678-91";
 const ACCOUNTS = [
-  ["main", "main", "nh", MAIN_NAME, MAIN_NUMBER, 4_638, 1, 0],
-  ["kpay", "external", "nh", "NH X 카카오페이통장(비대면실명확인)", "302-8765-4321-01", 7, 1, 1],
-  ["kb", "external", "kb", "KB나라사랑우대통장", "123456-78-901234", 245_000, 0, 2],
-  ["kbank", "external", "kbank", "MY 입출금통장", "100-123-456789", 58_300, 0, 3],
+  ["main", "main", "nh", MAIN_NAME, MAIN_NUMBER, 4_638, 0],
+  ["kpay", "external", "nh", "NH X 카카오페이통장(비대면실명확인)", "302-8765-4321-01", 7, 1],
+  ["kb", "external", "kb", "KB나라사랑우대통장", "123456-78-901234", 245_000, 2],
+  ["kbank", "external", "kbank", "MY 입출금통장", "100-123-456789", 58_300, 3],
 ];
 
 // [holder, bank, number, favorite] — 최근(새것부터) = 김민지 · 최유나 · 박하늘 · 윤하람, 자주 = ☆ 김민지 · 최유나
@@ -111,7 +111,7 @@ function base(d, userName, accounts) {
   wipe(d);
   // 정기점검 안내: 보이기(notice_on 1), 문구는 화면 기본값(notice_items NULL)
   d.prepare("INSERT INTO profile (id, user_name, card_last4, notice_on, notice_items) VALUES (1, ?, '0000', 1, NULL)").run(userName);
-  const acc = d.prepare("INSERT INTO accounts (id, kind, bank_code, name, number, balance, limited, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+  const acc = d.prepare("INSERT INTO accounts (id, kind, bank_code, name, number, balance, sort) VALUES (?, ?, ?, ?, ?, ?, ?)");
   for (const row of accounts) acc.run(...row);
 }
 
@@ -149,7 +149,7 @@ export function seedAlloneExample(d, userName = "홍길동", now = new Date()) {
   });
 }
 
-// 빈 상태: NH페이모아통장 0원 하나만 (한도제한 표시), 받는 분 · 거래 없음, 정기점검 안내 켜짐 — 새 프로필은 이걸로 시작
+// 빈 상태: NH페이모아통장 0원 하나만, 받는 분 · 거래 없음, 정기점검 안내 켜짐 — 새 프로필은 이걸로 시작
 export function seedAlloneEmpty(d, userName) {
-  inTransaction(d, () => base(d, userName, [["main", "main", "nh", MAIN_NAME, MAIN_NUMBER, 0, 1, 0]]));
+  inTransaction(d, () => base(d, userName, [["main", "main", "nh", MAIN_NAME, MAIN_NUMBER, 0, 0]]));
 }

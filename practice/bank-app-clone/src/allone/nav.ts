@@ -33,7 +33,8 @@ export type AoLoadProfile =
   | "search"
   | "menuLink"
   | "resend"
-  | "acctFilter";
+  | "acctFilter"
+  | "blockNotice";
 
 export interface AoLoadSpec {
   dimOn: number;
@@ -73,6 +74,8 @@ export const LOAD: Record<AoLoadProfile, AoLoadSpec> = {
   resend: { dimOn: 0, cut: 967, off: 1000 }, // 거래내역 상세 다시보내기 (invented, replace)
   // 거래내역조회 조회 조건 적용 (invented, account.md §5.2 의 600ms): 줄은 567 에 막 밑에서 바뀌고 스피너 567 · 막 600 에 걷힘. 화면이 바뀌지 않음
   acctFilter: { dimOn: 0, cut: 567, off: 600 },
+  // 지급정지 안내 (invented, 녹화에 없음 — menuLink 와 같은 느낌의 짧은 링크 막)
+  blockNotice: { dimOn: 0, cut: 267, off: 300 },
 };
 
 // ---------- location.state ----------

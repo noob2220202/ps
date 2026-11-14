@@ -33,7 +33,7 @@
   --ao-out: #e93535; /* 출금 */
   --ao-in: #1a5dd9; /* 입금 */
   --ao-error: #ff0000;
-  --ao-limited: #e94143; /* 한도제한 글자 (홈 카드 C2 7.000 글자 가운데 (233, 64, 66)) */
+  --ao-blocked: #d93025; /* 지급정지 글자 (invented, 녹화에 없음) */
   --ao-link: #555555;
   --ao-star: #8f8f8f;
   --ao-star-on: #ffc31a;

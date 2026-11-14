@@ -9,7 +9,7 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import { prefetch, useApi } from "../../api/useApi";
 import { aoApi, aoPaths, type AoHome, type AoTransferRecord } from "../api";
 import { aoBankName } from "../bank";
-import { aoViaOf } from "../flow";
+import { aoViaOf, useAoFlow } from "../flow";
 import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLine, aoDailyRemaining, aoNum, aoTopupError } from "../format";
 import { AO_AMOUNT_SHEET } from "../motion";
 import { aoHereKey, LOAD, useAoBack } from "../nav";
@@ -27,6 +27,7 @@ const manText = (n: number) => aoAmountReading(n).replace(/원$/, "");
 export function Topup() {
   const [params] = useSearchParams();
   const location = useLocation();
+  const flow = useAoFlow();
   const back = useAoBack();
   const home = useApi<AoHome>(aoPaths.home);
   const toId = params.get("to") ?? "main";
@@ -96,11 +97,13 @@ export function Topup() {
   };
 
   const daily = from ? aoDailyRemaining(transfers.data) : 0;
+  const onBlockNotice = () => void (from && flow.goBlockNotice(from.id));
   const submitting = useRef(false);
   const submit = () => {
     // T7 가 닫히는 동안(내려감 + 막 370ms)의 누름은 네이티브 막이 받음 (ui.css .ao-nsheet--closing) — 여기로 오지 않음
     if (!from || !to || busy || submitting.current) return;
-    const err = aoTopupError(amount, from.balance, daily);
+    // 지급정지 (invented) — 다른 오류보다 먼저 봄
+    const err = from.blocked ? "입출금이 제한된 계좌예요" : aoTopupError(amount, from.balance, daily);
     setError(err);
     if (err) {
       // 오류 줄은 금액 칸 아래(아래 버튼 띠에 가려 있음) → 끝까지 내려 보이게
@@ -141,7 +144,7 @@ export function Topup() {
       bodyRef={bodyRef}
       header={<AoHeader variant="modal" title="잔액채우기" onClose={() => back()} />}
       footer={
-        <AoButton className="ao-send-topup__submit" disabled={!sel || !armed} disabledColor="#808080" radius={15} height={56} size={18.5} onPress={submit}>
+        <AoButton className="ao-send-topup__submit" disabled={!sel || !armed || !!from?.blocked} disabledColor="#808080" radius={15} height={56} size={18.5} onPress={submit}>
           잔액채우기
         </AoButton>
       }
@@ -164,6 +167,8 @@ export function Topup() {
           <button type="button" className={`ao-send-topup__from${t7Up ? " ao-send-topup__from--focus" : ""}`} onClick={openT6}>
             <AoBankLogo code={from.bank.code} bank={logoBank(from.bank)} style={{ position: "absolute", left: 20, top: 32.67 }} />
             <span className="ao-send-topup__pname">{from.label}</span>
+            {/* 지급정지 (invented, 녹화에 없음) */}
+            {from.blocked && <span className="ao-send-topup__tag">지급정지</span>}
             <span className="ao-send-topup__psub">{aoBankLine(from)}</span>
             <AoChevronDownIcon w={12} h={6.67} stroke={1.5} className="ao-send-topup__pchev" />
             <span className="ao-send-topup__avl">출금가능금액</span>
@@ -198,7 +203,16 @@ export function Topup() {
             </>
           )}
         </button>
-        {error && <p className="ao-send-topup__error">{error}</p>}
+        {error && (
+          <p className="ao-send-topup__error">
+            {error}
+            {from?.blocked && (
+              <button type="button" className="ao-send-topup__errlink" onClick={onBlockNotice}>
+                자세히 보기
+              </button>
+            )}
+          </p>
+        )}
         {/* 값 숫자는 Roboto 700 (C3 9.2: 숫자 간격 7.33 = Roboto, Pretendard 700 은 8.3 이라 3pt 넓음) */}
         <p className="ao-send-topup__limit ao-send-topup__limit--1">
           1회 한도 {sel ? <><b className="ao-num">{manText(AO_LIMITS.perTransfer)}</b> 원</> : <><b className="ao-num">0</b>원</>}

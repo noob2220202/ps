@@ -1,5 +1,5 @@
 // NH올원뱅크 화면 ↔ 서버 (plan.md §2.4). 공용 엔드포인트는 src/api/endpoints.ts 의 paths · api 를 그대로 쓰고,
-// allone 서버만 더 주는 칸(limited · ao 블록)과 새 엔드포인트(DELETE /api/transfer/recent)의 모양 · 부르는 함수는 여기.
+// allone 서버만 더 주는 칸(blocked/disputed · ao 블록)과 새 엔드포인트(DELETE /api/transfer/recent)의 모양 · 부르는 함수는 여기.
 // 서버가 아직 안 준 칸이 있어도 화면이 깨지지 않게 더해진 칸은 모두 선택(?)으로 — 화면은 ?? 로 기본값
 // 같은 데이터를 화면끼리(그리고 로딩 막 동안의 prefetch 와) 나눠 쓰도록 주소는 늘 aoPaths 로
 import { http } from "../api/client";
@@ -20,9 +20,10 @@ import type {
 } from "../api/types";
 
 // ---------- 계좌 ----------
-// limited: 한도제한 표시 (홈 카드 · T2 계좌 줄, 🔔 계좌 탭에서 켜고 끔 — 표시만, 서버 한도 없음)
+// blocked: 지급정지 — 이 계좌에서는 서버도 실제로 보내기를 막음(입금은 됨). disputed: 이의제기를 신청해 둠(검토 중, 신청만으론 안 풀림)
 export interface AoAccount extends Account {
-  limited?: boolean;
+  blocked?: boolean;
+  disputed?: boolean;
 }
 export const isAoNh = (a: { bank?: { code: string } | null }) => a.bank?.code === "nh"; // NH농협은행 계좌 (앱 id "nh" 콕뱅크와 다름)
 
@@ -73,6 +74,7 @@ export const aoPaths = {
   transfers: (from?: string) => paths.transfers(from),
   recent: (bankCode: string, number: string) =>
     `/api/transfer/recent?bank=${encodeURIComponent(bankCode)}&number=${encodeURIComponent(number.replace(/\D/g, ""))}`,
+  dispute: (accountId: string) => `/api/accounts/${accountId}/dispute`,
 };
 
 // ---------- 바꾸는 요청 (성공하면 api/client 가 모든 화면 데이터를 다시 받게 함) ----------
@@ -81,7 +83,9 @@ export const aoApi = {
   updateName: (userName: string) => api.updateProfile({ userName }),
   // 정기점검 안내: 보이기 · 1쪽 항목 (null = 기본 문구)
   updateNotice: (patch: { noticeOn?: boolean; noticeItems?: AoNoticeItem[] | null }) => http.patch<AoProfile>(paths.profile, patch),
-  setLimited: (accountId: string, limited: boolean) => http.patch<AoAccount>(paths.account(accountId), { limited }),
+  setBlocked: (accountId: string, blocked: boolean) => http.patch<AoAccount>(paths.account(accountId), { blocked }),
+  // 이의제기 신청: 신청만으론 지급정지가 풀리지 않음 (🔔 패널에서 관리자가 직접 풀어야 함)
+  dispute: (accountId: string) => http.post<AoAccount>(aoPaths.dispute(accountId), {}),
   updateMemo: (txId: string, memo: string) => api.updateMemo(txId, memo),
   setFavorite: (payeeId: string, favorite: boolean) => api.updatePayee(payeeId, { favorite }),
   // ☆ 를 누른 받는 분이 아직 등록 안 됐으면 등록하면서 ☆

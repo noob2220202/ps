@@ -7,6 +7,7 @@ import { Menu } from "./home/Menu";
 import { Search } from "./home/Search";
 import { History } from "./account/History";
 import { TxDetail } from "./account/TxDetail";
+import { BlockNotice } from "./account/BlockNotice";
 import { SendWho } from "./transfer/SendWho";
 import { SendAmount } from "./transfer/SendAmount";
 import { SendConfirm } from "./transfer/SendConfirm";
@@ -24,6 +25,8 @@ export const renderAlloneRoute = (location: Location) => (
     <Route path="/search" element={<Search />} />
     <Route path="/history/:accountId" element={<History />} />
     <Route path="/tx/:txId" element={<TxDetail />} />
+    {/* 지급정지 안내 + 이의제기 (invented, 녹화에 없음) */}
+    <Route path="/account/:accountId/notice" element={<BlockNotice />} />
     <Route path="/send" element={<SendWho />} />
     <Route path="/send/amount" element={<SendAmount />} />
     <Route path="/send/confirm" element={<SendConfirm />} />
