@@ -295,7 +295,7 @@ Other boot wiring: TossSplash is at home/TossSplash.tsx (`{onDone}`), called by 
 - **Sheet timing:** the card appears 130 ms after the scrim starts, so it lands as the 230 ms scrim finishes.
 - **Toast:** with `waitReady` the toast has a 2.6 s maximum hold, so a page that never calls `tossToastReady()` does not leave it hanging.
 - **Status bar:**
-  - The recorder indicator is placed 7 dp after the clock's ink right edge (measured gap in the recording), so it moves with clock width. At "5:51" it lands at x 60.
+  - The recorder indicator is placed 7 dp after the clock's ink right edge (measured gap in the recording), so it moves with clock width. At a 4-character clock (h:mm) it lands at x 60.
   - Default battery stays 62 %, because deviceStatus is shared with other apps.
 - **DevPanel for toss:**
   - Free-text number input is used only for toss-bank accounts; other banks use the bank's own number format.

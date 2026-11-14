@@ -1,7 +1,7 @@
 # toss — 이체 flow spec (어디로 보낼까요 → 계좌번호 → 은행 선택 → 금액 → 확인 → 메모 → 보내는 중 → 완료)
 
 Area owner: transfer. Sources: two Galaxy dark-mode recordings, 480×1066 px, VFR. All times are real `pts_time` (s).
-- **A** = `591c4ee0-…_175407_Toss.mp4` (132.37 s). **B** = `68897750-…_175809_Toss.mp4` (174.59 s).
+- **A** = first Toss screen recording (132.37 s). **B** = second (174.59 s).
 
 **Geometry** (same as infra.md §1): 384 × 853.33 dp, **1.25 px/dp** (`dp = px/1.25`). Status bar 0–28, app viewport 28–838.33, nav band 838.33–853.33.
 All dp below are screen coordinates (0 = top of status bar). Text boxes are **ink** boxes measured at the half-intensity crossing (±0.3 dp). "row top/bottom" values are layout boxes inferred from ink + pressed highlights.

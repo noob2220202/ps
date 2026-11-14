@@ -161,7 +161,7 @@ Page `#171619`. The status bar uses the same colour. No bottom bar.
     - **income from others**: `+N원` blue `#3182f6`
     - **cancelled**: grey `#6f6e71` with a **strike-through**. The title gets a suffix: ` | ` (`#d7d6d9`) + `취소` (17 R `#767578`).
 - **Subtitle rules seen**:
-  - card spend → the card product name, e.g. `Young Hana+ 체크카드`, `프렌즈 체크카드_MC_비교통_라이언`
+  - card spend → the card product name, e.g. `Young Hana+ 체크카드`, `프렌즈 체크카드`
   - transfer from/to another person → `내 토스뱅크 통장` / `내 카카오뱅크 계좌` / `내 하나은행 계좌` (the account it touched)
   - own transfer → `<from bank> → <to bank>`, e.g. `토스뱅크 → 하나은행`. When the source label is a person's name it is `<NAME_A> → 하나은행`
   - pay → `<card name> · <merchant detail>` (wraps)
@@ -484,7 +484,7 @@ Generate timestamps **relative to now** (infra.md §2.1) so the current month al
 | cashback count | `<N>` | 1 digit + "건" | cashback row |
 | counterparties (people) | `<NAME_B>` … `<NAME_F>` | 3-syllable Korean names | 소비 row titles |
 | the recorder's name (as account label) | `<NAME_A>` | 3 syllables | own-transfer subtitle "<NAME_A> → 하나은행" |
-| merchants | `<MERCHANT_1>` … `<MERCHANT_6>` | a convenience-store operator, a gift service, a ride service, an app store, a pay merchant with product detail, a mart | 소비 rows |
+| merchants | `<MERCHANT_1>` … `<MERCHANT_6>` | ≤ 12 chars; one pay row has a two-line product detail | 소비 rows |
 | tx amounts | `<AMOUNT>` | 1–6 digits | 소비 rows |
 | dates / weekdays of the recording | `<TODAY>`, `<D>` | "D일 요일" | strip, date headers |
 | account balances | `<BAL_TOSS>`, `<BAL_HANA>`, `<BAL_KAKAO>`, `<BAL_NH>`, `<BAL_MONEY>` | 1–6 digits | 자산, 내 계좌 |
@@ -495,7 +495,7 @@ Generate timestamps **relative to now** (infra.md §2.1) so the current month al
 | other-bank account number | (account.md) | | S4 |
 
 Not personal, OK to reuse as UI text:
-- product names: 토스뱅크 통장, 토스머니, 토스포인트, 영하나플러스 통장, 입출금통장, 자립예탁금, Young Hana+ 체크카드, 프렌즈 체크카드_MC_비교통_라이언
+- product names: 토스뱅크 통장, 토스머니, 토스포인트, 영하나플러스 통장, 입출금통장, 자립예탁금, Young Hana+ 체크카드, 프렌즈 체크카드
 - category labels: 이체, 카테고리 없음, 교육, 그 외
 - UI labels: 평소보다 많이 씀, 캐시백 가능한 내역, and every button label
 

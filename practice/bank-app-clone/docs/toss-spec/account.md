@@ -98,7 +98,7 @@ All y below are for **no banner, scrollTop 0**. With the banner, everything from
 | Divider | x 20–364 | ≈903 | `divider` |
 | "더 보기 1/2" | centred (ink 155.2–228.8) | 920.8–935.2 | "더 보기" 14 R #a8a7ac + 6 dp gap + "1/2" 13 R #88878c |
 | Section band | full width | ≈960–976 | `bgDeep` |
-| Native ad row | logo 20–56.8 (36.8 dp rounded square, radius ≈10, white bg); text x 68 | logo 996.8–1034.4; title ink 999.2–1012.8; sub 1020.8–1032.8 | title 17 SB #d2d1d6 (Latin "THE BLUE SALE" in video — use invented ad); sub "… • AD" 13 R #a3a2a7 |
+| Native ad row | logo 20–56.8 (36.8 dp rounded square, radius ≈10, white bg); text x 68 | logo 996.8–1034.4; title ink 999.2–1012.8; sub 1020.8–1032.8 | title 17 SB #d2d1d6 (third-party ad title — use invented ad); sub "… • AD" 13 R #a3a2a7 |
 | Divider | x 20–364 | 1052.8 | `divider` |
 | Promo card | image tile 24–119.2 (≈96 dp square, radius ≈20, `fill`), text x 135.2 | tile 1073.6–1168.8; title 1078.4–1095.2; body 1111.2–1123.2; link 1131.2–1143.2 | title "새로운 예금이 나왔어요" 17 B text1; body "1년 보관하면 연 3.8% 받아요. (세전)" 13 R #a3a2a7; link "더보기 ›" 13 M blueText |
 
@@ -350,7 +350,7 @@ Existing endpoints in `server/index.mjs` that already fit:
 | Balances (Toss, other bank), interest, benefit amount ("최소 … 보기") | S1, S2, S4 | `<AMOUNT>` | integer 원 with thousands commas |
 | Transaction amounts & balance-after | all lists, 상세 | `<AMOUNT>` | signed, commas |
 | Transaction dates & times | lists (`M.D`, `M월 D일`, `MM.DD`, `HH:mm`), 상세 일시 | `<DATE>`, `<TIME>` | as listed |
-| Merchants (recorder's spending: online shop, AI subscription, auction pay, card company, gift shop, a store) | 거래내역, S4 | `<MERCHANT_1..n>` | ≤ 12 chars, some with `_PG` suffix style |
+| Merchants | 거래내역, S4 | `<MERCHANT_1..n>` | ≤ 12 chars, some with `_PG` suffix style |
 | Counts tied to the user (내 자산 N개, 캐시백 기회 N번) | S1, S4 | `<N>` | 1-digit |
 | Status-bar clock/battery/icons | all | device chrome (infra) | — |
 | OS notifications (messenger preview, bank push with name+balance) | B 4.0–4.6, ~75.5–78, ~128–131 | **never reproduce** | — |

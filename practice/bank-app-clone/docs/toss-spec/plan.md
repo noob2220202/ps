@@ -6,7 +6,7 @@ This file is the single source of truth where the six area specs disagree. Read 
 
 **Privacy.** This file contains no value from the recordings. Seed values below are invented (홍길동-style). Placeholders such as `<NAME_A>` and `<ACCT_A>` only describe roles and formats. Frames and crops stay in `…/scratchpad/toss/frames/<area>/`. Never commit a frame. A crop is committed only after someone has looked at it.
 
-**Units.** dp = screen coordinates of the 384 × 853.33 frame (0 = top of the status bar). Video px / 1.25 = dp. Times are real pts in seconds (A = 175407 video, B = 175809 video).
+**Units.** dp = screen coordinates of the 384 × 853.33 frame (0 = top of the status bar). Video px / 1.25 = dp. Times are real pts in seconds (A = first video, B = second video).
 
 ---
 

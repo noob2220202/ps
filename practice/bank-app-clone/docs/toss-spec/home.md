@@ -1,8 +1,8 @@
 # Toss clone: launch, system bars, HOME, home→토스뱅크 transition, post-transfer ad pages
 
 Area owner: home. Sources are two Galaxy recordings (dark mode). Each is 480×1066 px with variable frame rate. All times below are real pts in seconds (ffprobe `pts_time`), not frame index.
-- **A** = `591c4ee0-…_175407_Toss.mp4` (132.4 s)
-- **B** = `68897750-…_175809_Toss.mp4` (174.6 s)
+- **A** = first Toss screen recording (132.4 s)
+- **B** = second Toss screen recording (174.6 s)
 
 **Geometry.** The recordings are 480×1066.67 px. The device is 1080×2400 at 2.8125 px/dp, so the recordings scale at **1.25 px/dp**. The phone is **384 × 853.33 dp**, the same Galaxy class as nh/hana (`--frame-w:384px; --frame-h:853.33px`). Every dp value below is `px / 1.25`, measured from the top-left of the screen. Edges are taken at the half-intensity crossing, so they have sub-pixel accuracy (±0.3 dp).
 
@@ -180,9 +180,9 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 | 3 | 오늘의 딜 | 최대 1만원 꽝 없는 쿠폰 뽑기 | teal `#21ead4` bold glyph mark (two vertical "ㅂ/H"-like shapes) on transparent, 36 dp |
 
 **Card 4: ad**
-- Title **빚 최대 탕감결과 30초 확인**: 17 dp B white. Ink x 33.6, top = card top +20.7, ink h 16.
-- Subtitle **상담 없이 결과 즉시 확인 가능 · AD**: 13 dp M `#adacaf`. Ink top +44.
-- Third line `광고 책임 변호사 <AD_LAWYER_NAME>`: ~9 dp R `#77767a`. Ink top ≈+71, h 8.8.
+- Title `<AD_TITLE>`: 17 dp B white. Ink x 33.6, top = card top +20.7, ink h 16.
+- Subtitle `<AD_SUB> · AD`: 13 dp M `#adacaf`. Ink top +44.
+- Third line `<AD_LINE3>` (advertiser disclosure): ~9 dp R `#77767a`. Ink top ≈+71, h 8.8.
 - Thumbnail: 36 dp white squircle with an advertiser logo, vertically centred, x 319.2–356.0. **Invent** both the advertiser and the line.
 
 **Two half cards** (B cached frame):

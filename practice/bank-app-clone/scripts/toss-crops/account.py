@@ -223,8 +223,8 @@ def save(arr, name):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--a", required=True, help="녹화 A (Screen_Recording_…175407)")
-    ap.add_argument("--b", required=True, help="녹화 B (Screen_Recording_…175809)")
+    ap.add_argument("--a", required=True, help="녹화 A (토스 화면 녹화 첫째 파일)")
+    ap.add_argument("--b", required=True, help="녹화 B (둘째 파일)")
     ap.add_argument("--model", required=True, help="RealESRGAN_x4plus_anime_6B.pth")
     ap.add_argument("--manifest", required=True, help="manifest.json · manifest_top.json 이 있는 폴더")
     ap.add_argument("--out", help="저장 폴더 (기본 src/assets/local)")
