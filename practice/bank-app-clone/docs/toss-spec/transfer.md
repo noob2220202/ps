@@ -25,6 +25,7 @@ Scratch evidence: `scratchpad/toss/frames/transfer/` (frames, `s_*.png` sheets).
 3. **Recent list includes my own accounts** ("내 영하나플러스 통장" etc.), so the server `recent` filter must be gated for toss (infra §2.2). "내 계좌 +N개" = my accounts except the sending one.
 4. **Bank list icons are squircles** (40 dp, radius ≈14), not the repo's circular `bank-<code>.png`. The 은행 선택 grid and suggestion chips use **glyph-only** logos. They match the existing `hana-bank-<code>.png` style, and all 61 codes are present.
 5. **Keyboards.** The number keyboard is exactly `src/hana/HanaKeyboard.tsx` (same device and geometry, top at 494.7 dp). The **Korean keyboard** for the memo is new (§2.8.1), with the same outer frame.
+   Toss imports `src/hana/hana-send.css` and reuses the `.hana-kb*` rules as they are (those rules are not gated). A toss-only adjustment goes in `src/toss/transfer/send.css` under `html[data-app="toss"] .hana-kb…`; never edit the hana rules for toss.
    The amount keypad is Toss's own in-page keypad (no keyboard).
 6. **Not cloneable / do not copy:** the **black frames B 112.13–113.92** (FLAG_SECURE auth prompt after 보내기), and the WebView glitch frames B 31.84–31.95 (a grey card flashes at the top before the sheet).
    Also the 2.2 s blank-spinner network waits (A 112.66–114.83, A 121.7–124.9, B 93.4–95.4): keep a short spinner/skeleton only.

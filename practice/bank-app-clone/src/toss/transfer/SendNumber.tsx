@@ -8,7 +8,7 @@ import { paths } from "../../api/endpoints";
 import { useApi } from "../../api/useApi";
 import type { Bank, TransferRecipients } from "../../api/types";
 import { HanaKeyboard, type KbKey } from "../../hana/HanaKeyboard";
-import "../../hana/hana-send.css";
+import "../../hana/hana-send.css"; // .hana-kb* 를 그대로 씀 — 토스만 바꿀 것은 send.css 에 html[data-app="toss"] .hana-kb… 로 (hana 규칙은 고치지 않음)
 import { useLayerActive } from "../../platform/LayerContext";
 import { TOSS_BANK_TILES, TOSS_SEC_TILES, type TossBankTile } from "../bank";
 import { useTossBack, useTossBackStep, useTossGo } from "../nav";

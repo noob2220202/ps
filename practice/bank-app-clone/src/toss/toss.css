@@ -1,5 +1,6 @@
 /* ===== 토스 (html[data-app="toss"]) — 토큰 · 기기 화면 위(상태바 · 내비 띠) · 로그인 / 프로필 고르기 =====
    한 번들에 모든 앱 CSS 가 들어가므로 토스만 고르는 선택자(html[data-app="toss"] 또는 toss- 클래스)만 씀. 키프레임도 toss- 로 시작.
+   거꾸로 TSX className 도 toss- 로 시작 (on · out · red · blue · open 같은 꾸밈 이름만 예외) — 다른 앱의 맨 클래스(.done · .amount · .home · .row · .btn …)가 토스 화면에 걸림.
    공용 --home-* 토큰(카카오뱅크 것)은 다시 정의하지 않음 (plan.md §3.2) */
 
 :root[data-app="toss"] {
