@@ -1,11 +1,26 @@
+// /tab/benefit · /tab/shopping · /tab/stock — 녹화에 없는 탭 (plan.md §1.6): 홈 머리줄 모양에 탭 이름(22 B), 가운데 회색 안내 한 줄,
+// 탭바는 그 탭 그림을 채워서. 홈 ↔ 탭은 움직임 없이 (cut), 뒤로 = 홈
 import { useParams } from "react-router-dom";
-import { TOSS_BG_DEEP } from "../ui/Page";
-import { TossStub } from "../stub";
+import { TossPage, TOSS_BG_DEEP } from "../ui/Page";
 import { TabBar } from "./TabBar";
+import "./home.css";
 
-// 기초 단계 자리 — A1 home 영역이 진짜 화면으로 바꿈. /tab/benefit · /tab/shopping · /tab/stock (plan.md §1.6)
 const NAME: Record<string, string> = { benefit: "혜택", shopping: "쇼핑", stock: "증권" };
+
 export function TabPlaceholder() {
   const { tab = "" } = useParams();
-  return <TossStub title={NAME[tab] ?? tab} area="home" header={false} bg={TOSS_BG_DEEP} dock={<TabBar />} sub="연습용 클론에서는 아직 없는 화면이에요" />;
+  return (
+    <TossPage
+      bg={TOSS_BG_DEEP}
+      className="toss-home"
+      header={
+        <div className="toss-home-head">
+          <span className="toss-home-ph__title">{NAME[tab] ?? tab}</span>
+        </div>
+      }
+      dock={<TabBar />}
+    >
+      <p className="toss-home-ph__msg">연습용 클론에서는 아직 없는 화면이에요</p>
+    </TossPage>
+  );
 }

@@ -1,0 +1,1099 @@
+/* ===== 토스 홈 영역 (src/toss/home): 시작화면 · 홈 · 탭바 · 탭 자리 · 전체 메뉴 · 이체 뒤 광고 2장 =====
+   자리 · 색은 녹화에서 잰 값 (home.md §2, 녹화 A 10.698 · B 136.113 · B 74.942 · B 129.251). 단위 px = dp.
+   글자는 Pretendard 잉크 가운데를 녹화 잉크 가운데에 맞춤 (line-height = 글자 크기, top = 잉크 가운데 − 잉크 가운데 오프셋) */
+
+/* ---------- 시작화면 (A 0.55–7.29) ---------- */
+.toss-home-splash {
+  position: absolute;
+  inset: 0;
+  background: #171619;
+  overflow: hidden;
+}
+/* 창이 열리는 확대 (A 0.40–0.62 끝자락만 녹화됨) */
+.toss-home-splash--open {
+  animation: toss-home-open 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes toss-home-open {
+  from {
+    transform: scale(0.92);
+    border-radius: 28px;
+    opacity: 0.6;
+  }
+}
+.toss-home-splash__logo {
+  position: absolute;
+  left: calc(50% - 65.2px); /* 384 × 853.33 에서 x 126.8, y 363.2 */
+  top: calc(50% - 63.47px);
+  width: 132.5px;
+  height: 124.75px;
+}
+/* 시스템 → 앱 시작화면 넘김: 한 프레임에 7.2dp 아래로 (A 5.622 → 5.642) */
+.toss-home-splash__logo--drop {
+  top: calc(50% - 56.27px); /* y 370.4 — A 6.5: +6.4 … +7.2 아래 (home.md 는 8) */
+}
+.toss-home-splash__dot {
+  position: absolute;
+  left: calc(50% - 52px);
+  top: calc(50% - 52px);
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: #3182f6;
+}
+/* 홈 위에 덮었다 걷는 시작화면 (교차 300ms — A 10.118 → 10.40: 홈 불투명도 .42 / .55 / .83 / .97 at +47 / +195 / +229 / +280ms, 심볼은 더 빨리 흐려짐) */
+.toss-home-xfade {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #171619;
+  pointer-events: none;
+  animation: toss-home-xfade 300ms linear both;
+}
+.toss-home-xfade > .toss-home-splash__logo {
+  animation: toss-home-xfade-logo 160ms ease-out both;
+}
+@keyframes toss-home-xfade {
+  0% {
+    opacity: 1;
+  }
+  15.7% {
+    opacity: 0.58;
+  }
+  65% {
+    opacity: 0.45;
+  }
+  76.3% {
+    opacity: 0.17;
+  }
+  93.3% {
+    opacity: 0.03;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-home-xfade-logo {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- 홈 화면 뼈대 ---------- */
+:is(.toss-home, .toss-home-adp) :is(p, h2) {
+  margin: 0;
+}
+.toss-home {
+  --toss-home-tab-bg: #171619;
+  color: #fafafc;
+}
+.toss-home__body {
+  padding-bottom: 70.33px; /* 마지막 카드 아래 12 + 탭바 58.33 (780–838.33) */
+}
+.toss-home__col {
+  position: relative;
+  padding-top: 2.3px; /* 배너가 없으면 카드 1 위끝 86.3 */
+}
+
+/* 머리줄 28–84 (스크롤해도 고정, 4dp 넘게 내리면 아래 머리카락 줄 — 녹화에 없음, home.md §5) */
+.toss-home-head {
+  position: relative;
+  height: 56px;
+  background: #100f12;
+}
+.toss-home-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.8px;
+  background: #252427;
+  opacity: 0;
+  transition: opacity 150ms linear;
+}
+.toss-home-head--line::after {
+  opacity: 1;
+}
+/* 회색 토스 표시 + '토스뱅크' + › 가 한 누름 칸 (화면 x 18–128, y 38–74) */
+.toss-home-head__title {
+  position: absolute;
+  left: 18px;
+  top: 10px;
+  width: 110px;
+  height: 36px;
+}
+.toss-home-head__title > .toss-press__content,
+.toss-home-pay > .toss-press__content,
+.toss-home-bellbtn > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-head__logo {
+  position: absolute;
+  left: 7.9px; /* 화면 25.9 */
+  top: 9px; /* 화면 47.0 */
+}
+.toss-home-head__name {
+  position: absolute;
+  left: 33.5px; /* 잉크 x 52.0 */
+  top: 10.4px; /* 잉크 y 48.8–64.0 */
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 600;
+  color: #aaabb4;
+  white-space: nowrap;
+}
+.toss-home-head__chev {
+  position: absolute;
+  left: 96px; /* 화면 114, 50 */
+  top: 12px;
+  color: #83888d;
+}
+/* Pay (화면 x 276–322, y 36–76): 괄호 x 281.6–316.8 · y 43.2–65.6, 글자 잉크 x 288.8–308.0 · y 48.0–61.6 */
+.toss-home-pay {
+  position: absolute;
+  left: 276px;
+  top: 8px;
+  width: 46px;
+  height: 40px;
+  color: #b0b3bc;
+}
+.toss-home-pay__br {
+  position: absolute;
+  left: 4.8px; /* 화면 280.8, 44.0 — 평균 프레임의 세로 팔 가운데 283.0 / 315.6 */
+  top: 8px;
+}
+.toss-home-pay__t {
+  position: absolute;
+  left: 9.6px; /* 잉크 x 286.4–312.0, P 위 48.4 · 아래 59.6 (A 10.698 평균) */
+  top: 10.8px;
+  font-size: 15.6px;
+  line-height: 15.6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* 종 (화면 x 332–368, y 36–72) */
+.toss-home-bellbtn {
+  position: absolute;
+  left: 332px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+  color: #b0b1ba;
+}
+.toss-home-bell {
+  position: absolute;
+  left: 2px;
+  top: 0;
+}
+
+/* ---------- 리워드 배너 (닫을 수 있음): 칸 80.87 = 위 7.37 + 배너 65.42 + 아래 8.08 ---------- */
+.toss-home-bslot {
+  position: relative;
+  height: 80.87px;
+}
+.toss-home-bslot--closing {
+  animation: toss-home-bslot-close 300ms cubic-bezier(0.4, 0, 0.2, 1) 120ms both;
+}
+.toss-home-bslot--closing > * {
+  animation: toss-home-fade-out 120ms linear both;
+}
+@keyframes toss-home-bslot-close {
+  to {
+    height: 0;
+  }
+}
+@keyframes toss-home-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.toss-home-banner {
+  position: absolute;
+  left: 15.94px;
+  right: 16.06px; /* 384 폭에서 352 */
+  top: 7.37px;
+  height: 65.42px;
+  border-radius: 18.8px;
+  background: #171619;
+  overflow: hidden;
+}
+.toss-home-banner > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-banner__icon {
+  position: absolute;
+  left: 24.06px; /* 화면 40, 115.2 */
+  top: 21.53px;
+  color: #148bf9; /* 평균 프레임 가장 밝은 화소 (20, 139, 249) */
+}
+.toss-home-banner__l1 {
+  position: absolute;
+  left: 60.11px; /* 잉크 x 76.8, y 108.8–120.0 */
+  top: 14.36px;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 400;
+  color: #89888b;
+  white-space: nowrap;
+}
+.toss-home-banner__l2 {
+  position: absolute;
+  left: 59.86px; /* 잉크 x 76.8, y 128.0– */
+  top: 33.83px;
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 600;
+  color: #e1e0e3;
+  white-space: nowrap;
+}
+/* 확인하기: x 278.4–344.0, y 110.4–143.2 */
+.toss-home-banner__btn {
+  position: absolute;
+  right: 23.94px; /* 384 폭에서 x 278.4 */
+  top: 16.73px;
+  width: 65.6px;
+  height: 32.8px;
+  border-radius: 8px;
+  background: #317fed; /* A 10.698 평균 (49, 127, 237) */
+  overflow: hidden;
+}
+.toss-home-banner__btn > .toss-press__content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+/* 닫기 동그라미 ⌀24.2, 가운데 (360.6, 95.9) — 배너 오른쪽 위 모서리에 걸침 */
+.toss-home-banner__x {
+  position: absolute;
+  right: 11.3px; /* 384 폭에서 x 348.5 */
+  top: -2.5px;
+  width: 24.2px;
+  height: 24.2px;
+  border-radius: 50%;
+  background: #2b2a2d;
+  color: #88878a;
+  z-index: 1;
+}
+.toss-home-banner__x > .toss-press__content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- 카드 (x 12–371.5, 반지름 22.8, #19181b, 사이 9.3) ---------- */
+.toss-home-card {
+  position: relative;
+  margin: 0 12.5px 9.3px 12px;
+  border-radius: 22.8px;
+  background: #19181b;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* 줄 (누르면 카드 폭 전체 #2a2b30, 손 떼면 170ms 에 사라짐 · 처음 120ms 는 가로로 .82 → 1 로 퍼짐 — A 13.247–13.646) */
+.toss-home-row {
+  position: relative;
+  height: 52.8px;
+}
+.toss-home-row > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-row.toss-press--on > .toss-press__bg,
+.toss-home-li.toss-press--on > .toss-press__bg,
+.toss-home-c3row.toss-press--on > .toss-press__bg {
+  animation: toss-home-press-in 120ms cubic-bezier(0.5, 0, 1, 1) both; /* 폭 .82 → .877 (+65ms) → 1 (+116ms), A 13.247–13.363 */
+}
+@keyframes toss-home-press-in {
+  from {
+    transform: scaleX(0.82);
+  }
+}
+/* 손을 떼면: 32ms 그대로 있다가 135ms 직선으로 사라짐 (A 13.479 → 13.646, 중간 밝기 +84ms) */
+.toss-home-row:not(.toss-press--on) > .toss-press__bg,
+.toss-home-li:not(.toss-press--on) > .toss-press__bg,
+.toss-home-c3row:not(.toss-press--on) > .toss-press__bg,
+.toss-home-ad:not(.toss-press--on) > .toss-press__bg {
+  transition: opacity 135ms linear 32ms;
+}
+/* 30dp 아이콘 (x 32.7–62.4) */
+.toss-home-row__ic {
+  position: absolute;
+  left: 20.7px;
+  top: 11.55px;
+}
+.toss-home-acc-ic {
+  position: absolute;
+  left: 20.7px;
+  top: 11.55px;
+  width: 29.7px;
+  height: 29.7px;
+  border-radius: 9.9px;
+  background: #22375c;
+  display: grid;
+  place-items: center;
+}
+/* 파란 심볼: 잉크 x 38.8–56.4, y = 줄 가운데 −7.6 … +10.0 (A 10.698 평균) */
+.toss-home-acc-ic > img {
+  transform: translate(-0.2px, 1px);
+}
+.toss-home-row__amt {
+  --toss-odo-lh: 17px; /* 숫자 굴림 칸 = 줄 높이 (굴리는 동안 줄이 밀리지 않게) */
+  position: absolute;
+  left: 62.45px; /* 잉크 x 75.2 */
+  top: 9.725px; /* 잉크 = 가운데 −16.0 … −1.6 */
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 700;
+  color: #e4e3e6;
+  white-space: nowrap;
+}
+.toss-home-row__lbl {
+  position: absolute;
+  left: 62.7px;
+  top: 31.625px; /* 잉크 = 가운데 +5.6 … +17.6 */
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 500;
+  color: #b9b9c0;
+  white-space: nowrap;
+}
+.toss-home-dot {
+  margin: 0 1.2px;
+}
+.toss-home-row__lbl--dim {
+  color: #8f8e92;
+}
+/* 작은 버튼 x 299.1–351.2 (52.1 × 31.7), 줄 가운데 */
+.toss-home-sbtn {
+  position: absolute;
+  right: 20.3px; /* 카드 359.5 폭에서 x 299.1 */
+  top: 10.55px;
+  width: 52.1px;
+  height: 31.7px;
+  border-radius: 6px;
+  background: #2a2b30;
+  overflow: hidden;
+  transition: background-color 135ms linear 32ms;
+}
+.toss-home-sbtn > .toss-press__content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 600;
+  color: #bbbcc3;
+}
+/* 줄을 누르는 동안 그 줄의 작은 버튼은 #3b3c41 */
+.toss-home-row--on .toss-home-sbtn,
+.toss-home-sbtn.toss-press--on {
+  background: #3b3c41;
+  transition-duration: 0ms;
+}
+/* 시작할 때 '포인트' 줄이 펼쳐짐 (A 10.31–10.40) */
+.toss-home-row--insert {
+  animation: toss-home-insert 90ms ease-out both;
+  overflow: hidden;
+}
+@keyframes toss-home-insert {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+/* 카드 1: 계좌 (위 8 · 줄 52.8 × 3 · 8 · 선 0.8 · 아래 줄 39.04) */
+.toss-home-acc {
+  padding-top: 8px;
+}
+.toss-home-acc__div {
+  height: 0.8px;
+  margin-top: 8px; /* y 341.6 (한 화소 줄에 맞음) */
+  background: #262528;
+}
+.toss-home-acc__foot {
+  height: 39.04px;
+}
+.toss-home-acc__foot > .toss-press__content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 12.425px; /* 잉크 y 356.0–367.2 */
+  text-align: center;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 500;
+  word-spacing: 0.5px; /* 녹화 글자 폭 150.4 */
+  color: #b8b9bd;
+  white-space: nowrap;
+}
+/* 낱말 사이를 녹화에 맞춤 (잉크: 계좌 116.8 · 가운뎃점 143.2 · 카드 150.4 · 가운뎃점 177.6 · 포인트 184.8 · 모두 220.8 · 보기 246.4) */
+.toss-home-foot__d1 {
+  margin: 0 -0.8px 0 0.8px;
+}
+.toss-home-foot__d2 {
+  margin-left: 1.6px;
+}
+.toss-home-foot__w {
+  margin-left: -1.6px;
+}
+/* 누르는 동안 (B 150.937–151.44): 카드 안쪽 x 32.5–352 에 가운데가 밝은 띠 (#2a292c → 가장자리 #1e1d20), 글자는 .97 로 작아지며 어두워짐.
+   손을 떼면 글자는 바로 돌아오고 띠는 60ms 뒤 사라짐 */
+.toss-home-acc__foot.toss-press--on > .toss-press__content {
+  color: #9d9ea2;
+}
+.toss-home-acc__foot:not(.toss-press--on) > .toss-press__content {
+  transition: none;
+}
+.toss-home-acc__foot:not(.toss-press--on) > .toss-press__bg {
+  transition: opacity 20ms linear 60ms;
+}
+
+/* 카드 2: 소비 (위 4.6 · 줄 52.8 × 2 · 아래 8) */
+.toss-home-spend {
+  padding: 4.6px 0 8px;
+}
+.toss-home-row__amt--left {
+  left: 20.05px; /* 잉크 x 32.8 */
+  color: #f8f7fa;
+}
+.toss-home-row__lbl--left {
+  left: 20.3px;
+  top: 29.625px; /* 잉크 = 가운데 +4.0 … +15.2 */
+  color: #8e8e92;
+}
+.toss-home-row__lbl--youth {
+  top: 30.425px;
+  color: #6d6c6f;
+}
+.toss-home-row__amt--youth {
+  color: #ffffff;
+}
+
+/* 카드 3: 최근 본 상품 · 방문한 서비스 · 오늘의 딜 (위 8.43 · 줄 54 · 54 · 선 · 54 · 아래 8.5) */
+.toss-home-c3 {
+  padding: 8.43px 0 8.5px;
+}
+.toss-home-c3row {
+  position: relative;
+  height: 54px;
+}
+.toss-home-c3row > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-c3row__t {
+  position: absolute;
+  left: 20.3px; /* 잉크 x 32.8 */
+  top: 10.25px; /* 잉크 = 가운데 −16.8 … −3.2 */
+  font-size: 15px;
+  line-height: 15px;
+  font-weight: 700;
+  letter-spacing: -0.25px;
+  color: #fafafc;
+  white-space: nowrap;
+}
+.toss-home-c3row__s {
+  position: absolute;
+  left: 20.3px;
+  top: 31.4px; /* 잉크 = 가운데 +5.2 … +16.4 */
+  max-width: 252px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: -0.1px; /* '최대 1만원 꽝 없는 쿠폰 뽑기' 녹화 폭 141.6 */
+  color: #8e8e92;
+  white-space: nowrap;
+}
+.toss-home-thumb {
+  position: absolute;
+  right: 44.3px; /* x 291.2–327.2 */
+  top: 9px;
+}
+.toss-home-deal {
+  position: absolute;
+  right: 42.05px; /* 잉크 상자 (그림 둘레 번짐 포함) x 288.2 */
+  top: 5.35px;
+  width: 41.25px;
+  height: 44.75px;
+}
+.toss-home-chev {
+  position: absolute;
+  right: 23.5px; /* 잉크 x 340.8–346.4 */
+  top: 19.8px;
+  color: #b2b6bf;
+}
+.toss-home-c3__div {
+  height: 1.2px;
+  margin: 5px 16.5px 7px 15.8px; /* x 27.8–355.4, y 639.2–640.4 (평균 프레임 가운데 639.8), 셋째 줄 가운데 674.8 */
+  background: #2b2a2d;
+}
+
+/* 카드 4: 광고 (지어낸 문구 · 광고주, plan.md Q7) */
+.toss-home-ad {
+  height: 96.2px;
+}
+.toss-home-ad > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-ad__t {
+  position: absolute;
+  left: 21.05px; /* 잉크 x 33.6, y 740.0–756.0 (카드 위 +20.7) */
+  top: 20.825px;
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.toss-home-ad__s {
+  position: absolute;
+  left: 20.3px;
+  top: 43.5px; /* 잉크 +43.9 … +55.9 */
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 500;
+  color: #adacaf;
+  white-space: nowrap;
+}
+.toss-home-ad__thumb {
+  position: absolute;
+  right: 15.5px; /* x 319.2–356.0, 세로 가운데 */
+  top: 29.7px;
+}
+
+/* 반쪽 카드 두 장 (x 12–187.5 · 195.6–371.4, 높이 68.32, 바탕 #171619 + 그림 둘레 빛) */
+.toss-home-halves {
+  display: flex;
+  gap: 8.1px;
+  margin: 0 12.6px 9.3px 12px;
+}
+.toss-home-half {
+  position: relative;
+  flex: 1;
+  height: 68.32px;
+  border-radius: 22.8px;
+  background: #171619;
+  overflow: hidden;
+  isolation: isolate;
+}
+.toss-home-half > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-half__t {
+  position: absolute;
+  left: 20.6px; /* 잉크 x 32.8 / 216.0 */
+  top: 14.8px; /* 줄 간격 20.4: 잉크 가운데 +24.1 · +44.5 */
+  font-size: 15px;
+  line-height: 20.4px;
+  font-weight: 600;
+  letter-spacing: -0.2px; /* 녹화 폭: 토스머니 충전 78.4 · 토스 브랜드콘 79.2 */
+  color: #f3f2f5;
+  white-space: pre;
+  z-index: 1;
+}
+.toss-home-half:last-child .toss-home-half__t {
+  left: 19.8px; /* 잉크 x 216.0 */
+}
+.toss-home-half__art {
+  position: absolute;
+  pointer-events: none;
+}
+.toss-home-half__art--store {
+  left: 21px; /* 잉크 상자 x 33.0, y 536.55 (카드 518.32) */
+  top: 18.23px;
+  width: 140px;
+  height: 50.25px;
+}
+.toss-home-half__art--coffee {
+  left: 84.1px; /* x 279.7 (카드 195.6) */
+  top: 18.48px;
+  width: 77px;
+  height: 50.5px;
+}
+
+/* 목록 카드 (줄 간격 49.4, 첫 줄 가운데 +29.5) */
+.toss-home-list {
+  padding: 5.1px 0 4.7px;
+}
+.toss-home-li {
+  position: relative;
+  height: 49.4px;
+}
+.toss-home-li > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-li__ic {
+  position: absolute;
+}
+.toss-home-li__ic--account {
+  left: 20.15px; /* 잉크 x 32.15 */
+  top: 15.87px;
+  width: 25.25px;
+  height: 20.25px;
+}
+.toss-home-li__ic--shopping {
+  left: 20.4px;
+  top: 13.62px;
+  width: 24.5px;
+  height: 23.75px;
+}
+.toss-home-li__ic--checkcard {
+  left: 20.4px;
+  top: 10.82px;
+  width: 25px;
+  height: 26.5px;
+}
+.toss-home-li__svg {
+  position: absolute;
+  left: 21.6px; /* 24dp 상자 x 33.6–57.6 */
+  top: 12.7px;
+}
+.toss-home-li__t {
+  position: absolute;
+  left: 58.4px; /* 잉크 x 70.4 */
+  top: 18.075px; /* 잉크 가운데 = 줄 가운데 */
+  font-size: 15px;
+  line-height: 15px;
+  font-weight: 600;
+  letter-spacing: -0.15px; /* '체크카드 혜택 추천' 녹화 폭 107.2 */
+  color: #f3f2f5;
+  white-space: nowrap;
+}
+.toss-home-li .toss-home-chev {
+  top: 19.1px; /* 잉크 가운데 = 줄 가운데 −0.3 */
+}
+.toss-home-edit {
+  height: 40px;
+  margin: -1px 0 0;
+}
+.toss-home-edit > .toss-press__content {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  line-height: 13px;
+  font-weight: 500;
+  color: #97979c;
+}
+
+/* 불러오는 중 · 오류 */
+.toss-home-skel {
+  display: inline-block;
+  width: 74px;
+  height: 14px;
+  margin-top: 1px;
+  border-radius: 5px;
+  background: #232228;
+}
+.toss-home-err {
+  height: 120px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  font-size: 15px;
+  color: #97979c;
+}
+.toss-home-err__btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #2a2b30;
+  color: #e4e3e6;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ---------- 탭바 (y 780 → 화면 끝, 띠 838.33–853.33 은 내비 띠가 같은 색으로 이어 그림) ---------- */
+.toss-home-tabbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px; /* 내비 띠(838.33–) 밑까지 조금 더 — 1.25배 화면에서 경계 줄에 본문이 비치지 않게 */
+  height: 60.33px;
+  z-index: 5;
+  background: #171619;
+  border: 0.8px solid #2b2a2d;
+  border-bottom: 0;
+  border-radius: 20.8px 20.8px 0 0;
+}
+.toss-home-tab {
+  position: absolute;
+  top: -0.8px;
+  width: 70.4px;
+  height: 58.33px;
+  color: #d8d7dd;
+}
+.toss-home-tab > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-tab--on {
+  color: #dcdce4;
+}
+.toss-home-tab__ic {
+  position: absolute;
+  top: 7.6px; /* 화면 787.6 */
+}
+.toss-home-tab__l {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 37.275px; /* 잉크 y 817.6–827.2 */
+  text-align: center;
+  font-size: 11px;
+  line-height: 11px;
+  font-weight: 500;
+  color: #cdccd0;
+}
+
+/* ---------- 혜택 · 쇼핑 · 증권 자리 (plan.md §1.6) ---------- */
+.toss-home-ph__title {
+  position: absolute;
+  left: 24px;
+  top: 15.5px;
+  font-size: 22px;
+  line-height: 22px;
+  font-weight: 700;
+  color: #fafafc;
+}
+.toss-home-ph__msg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 300px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+  color: #97979c;
+}
+
+/* ---------- 전체 메뉴 (지어낸 화면, assets.md §5.4) ---------- */
+.toss-home-all__icons {
+  position: absolute;
+  right: 12px;
+  top: 6px;
+  display: flex;
+  gap: 4px;
+  color: #b0b1ba;
+}
+.toss-home-all__ib {
+  width: 44px;
+  height: 44px;
+}
+.toss-home-all__ib > .toss-press__content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.toss-home-all__sec {
+  padding: 22px 24px 6px;
+  font-size: 15px;
+  line-height: 15px;
+  font-weight: 600;
+  color: #8a898c;
+}
+.toss-home-all__row {
+  position: relative;
+  height: 56px;
+}
+.toss-home-all__row > .toss-press__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 24px;
+  gap: 14px;
+}
+.toss-home-all__ic {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+.toss-home-all__label {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 500;
+  color: #ececf0;
+}
+.toss-home-all__row .toss-home-chev {
+  position: static;
+}
+.toss-home-all__gap {
+  height: 8px;
+  margin-top: 14px;
+  background: #100f12;
+}
+
+/* ---------- 이체 뒤 광고 화면 (바탕 #171619, ← 는 내용이 나타나기 전부터 보임) ---------- */
+.toss-home-adp__back {
+  position: absolute;
+  left: 4.4px;
+  top: 30.8px; /* AppBar ← 자리 (잉크 x 18.4–38.4, y 45.6–64.0) */
+  width: 48px;
+  height: 48px;
+  z-index: 3;
+  color: #ffffff;
+}
+.toss-home-adp__back > .toss-press__content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+/* 쿠폰 (B 74.942): 아래쪽에 왼쪽 맞춤 */
+.toss-home-cpn__img {
+  position: absolute;
+  left: 27.7px; /* x 27.7–81, y 515.7–543.2 */
+  top: 487.7px;
+  width: 53.25px;
+  height: 27.5px;
+}
+.toss-home-cpn__t {
+  position: absolute;
+  left: 23.55px; /* 잉크 x 24.8 */
+  top: 547.05px; /* 잉크 582.4–601.6 · 615.2–635.2 (간격 33.2) */
+  font-size: 22px;
+  line-height: 33.4px;
+  font-weight: 700;
+  letter-spacing: -0.25px;
+  color: #f5f5f7;
+  white-space: pre;
+}
+.toss-home-cpn__s {
+  position: absolute;
+  left: 24.3px;
+  top: 630.8px; /* 잉크 x 24.8, y 659.2–674.4 */
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 400;
+  letter-spacing: -0.2px; /* 녹화 글자 폭 204.8 */
+  color: #b6b5b9;
+  white-space: nowrap;
+}
+.toss-home-cpn__btn {
+  position: absolute;
+  left: 20.2px; /* 가장자리 (반 밝기) x 20.5–363.5, y 716.4–772.4 (B 74.942) */
+  width: calc(100% - 40.9px); /* 384 폭에서 x 20.2–363.3 */
+  top: 688.1px; /* (그려지는 화소에 맞춰 716.0–772.0) */
+  height: 55.8px;
+  border-radius: 14px;
+}
+.toss-home-cpn__btn.toss-btn {
+  font-size: 17.6px; /* 잉크 x 160.0–223.2 (공용 .toss-btn 17px 보다 앞서게) */
+}
+.toss-home-cpn__btn .toss-btn__label {
+  top: -0.8px; /* 잉크 y 735.2–751.2 */
+}
+.toss-home-pb__btn .toss-btn__label {
+  top: -0.8px; /* 잉크 y 704.0–719.2 */
+}
+.toss-home-cpn__skip {
+  position: absolute;
+  left: 50%;
+  top: 761.15px; /* 글자 잉크 y 797.6–812.8 */
+  translate: -50% 0;
+  padding: 8px 10px;
+  color: #898b91;
+  transition: color 170ms ease-out;
+}
+.toss-home-cpn__skip > .toss-press__content {
+  font-size: 16.4px; /* 잉크 x 141.6–242.4 */
+  line-height: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.toss-home-cpn__skip.toss-press--on {
+  color: #a0a1a6;
+  transition-duration: 0ms;
+}
+/* '30일 동안' (B 129.251): 가운데 맞춤 */
+.toss-home-pb {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-pb--in {
+  animation: toss-home-pb-in 200ms ease-out both;
+}
+@keyframes toss-home-pb-in {
+  from {
+    opacity: 0;
+  }
+}
+.toss-home-cal {
+  position: absolute;
+  left: calc(50% - 54.4px); /* 384 폭에서 137.6 (녹화도 가운데에서 조금 오른쪽) */ /* 다섯 장면을 합친 잉크 상자 x 137.6, y 187.05 (131.75 × 141) */
+  top: 159.05px;
+  width: 131.75px;
+  height: 141px;
+}
+.toss-home-cal > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: 1900ms linear infinite both;
+}
+/* 1.9초 한 바퀴 (B 128.45–129.61 에서 잰 차례 · 길이, 녹화는 장면 사이를 한 프레임에 바꿈):
+   '+' 에서 '₩' 이 그려짐 0–.40 (₩ 를 위에 겹쳐 .05–.35 동안 나타나게) · ₩ .40–.72 · 넘김 .72–.92 · 옆으로 .92–1.72 · 돈주머니 1.72–1.90 */
+.toss-home-cal > img:nth-child(1) {
+  animation-name: toss-home-cal-1;
+}
+.toss-home-cal > img:nth-child(2) {
+  animation-name: toss-home-cal-2;
+}
+.toss-home-cal > img:nth-child(3) {
+  animation-name: toss-home-cal-3;
+}
+.toss-home-cal > img:nth-child(4) {
+  animation-name: toss-home-cal-4;
+}
+.toss-home-cal > img:nth-child(5) {
+  animation-name: toss-home-cal-5;
+}
+@keyframes toss-home-cal-1 {
+  0%,
+  18.4% {
+    opacity: 1;
+  }
+  19.3%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-home-cal-2 {
+  0%,
+  2.6% {
+    opacity: 0;
+  }
+  18.4%,
+  37.9% {
+    opacity: 1;
+  }
+  38.8%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-home-cal-3 {
+  0%,
+  37.9% {
+    opacity: 0;
+  }
+  38.8%,
+  48.4% {
+    opacity: 1;
+  }
+  49.3%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-home-cal-4 {
+  0%,
+  48.4% {
+    opacity: 0;
+  }
+  49.3%,
+  90.5% {
+    opacity: 1;
+  }
+  91.4%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes toss-home-cal-5 {
+  0%,
+  90.5% {
+    opacity: 0;
+  }
+  91.4%,
+  100% {
+    opacity: 1;
+  }
+}
+.toss-home-pb__t {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 355.725px; /* 잉크 388.8–412.8 · 424.0–449.6 (간격 34.4) */
+  text-align: center;
+  font-size: 26px;
+  line-height: 34.4px;
+  font-weight: 700;
+  letter-spacing: -0.15px; /* 둘째 줄 녹화 폭 237.6 */
+  color: #ffffff;
+  white-space: pre;
+}
+.toss-home-pb__s {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 438.45px; /* 잉크 y 466.4–480.0 */
+  text-align: center;
+  font-size: 15px;
+  line-height: 15px;
+  font-weight: 400;
+  color: #a6a5aa;
+}
+.toss-home-pb__btn {
+  position: absolute;
+  left: calc(50% - 57.5px); /* 384 폭에서 134.5 */
+  top: 656.1px; /* x 134.5–248.8, y 684.1–740.0 */
+  width: 114.3px;
+  height: 55.9px;
+  border-radius: 15px;
+}
+.toss-home-pb__close {
+  position: absolute;
+  left: calc(50% - 32px); /* 384 폭에서 160 */
+  top: 728px;
+  width: 66px;
+  height: 38px;
+  color: #abaaaf;
+}
+.toss-home-pb__close > .toss-press__content {
+  position: absolute;
+  inset: 0;
+}
+.toss-home-pb__x {
+  position: absolute;
+  left: 9.6px; /* × 잉크 x 169.6–180.8, y 770.4–780.8 */
+  top: 14.4px;
+}
+.toss-home-pb__cl {
+  position: absolute;
+  left: 29.15px; /* '닫기' 잉크 x 190.4–216.8, y 767.2–782.4 */
+  top: 10.8px;
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.toss-home-pb__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52px; /* 화면 y 80 */
+  z-index: 2;
+}
