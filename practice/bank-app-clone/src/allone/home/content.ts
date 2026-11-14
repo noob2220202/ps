@@ -153,19 +153,42 @@ export const MENU_QUICK = [
   { label: "이벤트", art: "allone-home-menu-event" },
 ] as const;
 
-// 통합검색: 메뉴 줄 전체 (같은 이름은 한 번)
-export const SEARCH_CATALOG: AoMenuItem[] = (() => {
+// ---------- 통합검색 (C3 39.979–45.54) ----------
+// 결과 줄 = 경로 (기타 > 고객센터 > … >) + 초록 밑줄 메뉴 이름. 검색어는 경로와 이름 어디에 있어도 맞음 (띄어쓰기 무시, C3 43.679 '이의제기' → 2건)
+// link: history · send · topup = 전체메뉴와 같은 이동, dispute = 이의제기 신청 및 조회. 없으면 누름만
+export type AoSearchLink = AoMenuLink | "dispute";
+export interface AoSearchItem {
+  label: string;
+  path: string[];
+  link?: AoSearchLink;
+}
+export const SEARCH_CATALOG: AoSearchItem[] = (() => {
   const seen = new Set<string>();
-  const out: AoMenuItem[] = [];
+  const out: AoSearchItem[] = [];
   for (const s of MENU_SECTIONS)
     for (const it of s.items)
       if (!seen.has(it.label)) {
         seen.add(it.label);
-        out.push(it);
+        out.push({ label: it.label, path: [s.title], link: it.link });
       }
+  // 녹화의 두 줄 (피해구제 신청 및 조회는 만들지 않은 화면 — 누름만)
+  const fraud = ["기타", "고객센터", "보이스피싱 피해구제/이의제기"];
+  out.push({ label: "이의제기 신청 및 조회", path: fraud, link: "dispute" }, { label: "피해구제 신청 및 조회", path: fraud });
   return out;
 })();
 export const SEARCH_POPULAR = ["제로페이모바일상품권", "카드", "자동이체", "포인트", "만보기", "환전", "통장사본", "디깅퀴즈", "대출"];
+// 자동완성 낱말 (치는 중 칸 아래 목록). 녹화의 '이의…' 다섯 개가 이 순서 (C3 42.413), 그 뒤는 메뉴 이름 · 인기 검색어
+export const SEARCH_SUGGEST: string[] = (() => {
+  const words = ["이의제기", "이의제기신청", "이의신청", "이의", "이음", "피해구제", "피해구제신청", "보이스피싱", "지급정지"];
+  const out: string[] = [];
+  const add = (w: string) => !out.includes(w) && out.push(w);
+  words.forEach(add);
+  // 메뉴 이름은 띄어쓰기 없는 낱말만 (녹화: '이의제' · '이의제기' 목록은 이의제기 · 이의제기신청 두 줄뿐 — '이의제기 신청 및 조회' 같은 메뉴 경로 이름은 목록에 없음)
+  SEARCH_CATALOG.forEach((it) => !/\s/.test(it.label) && add(it.label));
+  SEARCH_POPULAR.forEach(add);
+  return out;
+})();
+export const SEARCH_AITALK = "AI톡, 올리에게 물어보세요.";
 
 // ---------- 정기점검 안내 시트 (launch.md §2.10, plan Q10) ----------
 // 1쪽: 녹화의 공지 모양 그대로 — 제목의 달과 날짜는 오늘로 계산 (🔔 관리 패널에서 바꾸면 서버 noticeItems)

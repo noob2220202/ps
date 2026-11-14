@@ -1172,3 +1172,130 @@
 .ao-home-notice__btn--close {
   right: 24.8px;
 }
+
+/* ===== 통합검색 결과 · 자동완성 낱말 · AI톡 (C3 41.5–45.54, Search.tsx). 좌표는 화면 층(.ao-home-search) 안 y = 화면 y − 59 ===== */
+/* 결과: 칸 아래부터 스크롤. 메뉴 N건 Regular 14.5 (잉크 가운데 283.67), 줄마다 경로 16.5 (가운데 337) + 초록 밑줄 이름 (가운데 361, 밑줄 368.67–370), 줄 간격 68 */
+.ao-home-search-res {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 140px;
+  bottom: 0;
+  padding: 0 24px 120px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ao-home-search-res::-webkit-scrollbar {
+  display: none;
+}
+.ao-home-search-res__count {
+  margin: 74.67px 0 0;
+  font-size: 14.1px;
+  line-height: 20px;
+  letter-spacing: -0.1px;
+}
+.ao-home-search-res__count em {
+  font-style: normal;
+  color: var(--ao-green, #0c8f2d);
+}
+/* 검은 막(찾기 · 이의제기 링크)이 떠 있는 동안만 보이는 줄 (화면 304–305, #efefef — 막 밑에서 118 → 114) */
+.ao-home-search-res__line {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 105.3px;
+  height: 0.67px;
+  background: #efefef;
+}
+.ao-home-search-res__row {
+  padding-top: 30.87px;
+}
+.ao-home-search-res__row + .ao-home-search-res__row {
+  padding-top: 20.33px;
+}
+.ao-home-search-res__path {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 24px;
+  letter-spacing: -0.27px;
+  white-space: nowrap;
+}
+.ao-home-search .ao-home-search-res__link {
+  display: block;
+  font-size: 16.5px;
+  line-height: 24px;
+  letter-spacing: -0.14px;
+  white-space: nowrap;
+  color: var(--ao-green, #0c8f2d);
+  text-decoration: underline;
+  text-decoration-thickness: 1.33px;
+  text-underline-offset: 1.67px; /* 밑줄 화면 369–370 (C3 43.996) */
+}
+/* AI톡 알약 (화면 x 93.33–369.03 · y 736–788, #1d5eda 테 #1246aa) + 캐릭터 (잉크 316.9–362.9 × 744.42–783.42, allone-dispute-aitok 46 × 39) */
+.ao-home-search .ao-home-search-ai {
+  position: absolute;
+  left: 93.33px;
+  top: 677px;
+  width: 275.7px;
+  height: 52px;
+  border: 1px solid #1246aa;
+  border-radius: 26px;
+  background: #1d5eda;
+  color: #fff;
+}
+.ao-home-search-ai > span {
+  position: absolute;
+  left: 23.7px;
+  top: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+.ao-home-search-ai > img {
+  position: absolute;
+  left: 222.57px;
+  top: 7.42px;
+  width: 46px;
+  height: 39px;
+}
+/* 칸에 친 글은 녹화가 Pretendard Regular 보다 굵음 (잉크 픽셀 +21%, C3 42.95 · 44.0) → Medium. 안내 글은 그대로 */
+.ao-home-search .ao-home-search__text:not(.ao-home-search__text--ph) {
+  font-weight: 500;
+}
+/* 자동완성 낱말: 흰 판 (칸 아래 191 → 줄 42, 위 10.5 · 아래 9.5, 다섯 줄 반 426 에서 잘림) + 그 아래 검정 .30 */
+.ao-home-search-sug {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 132px;
+  bottom: 0;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.3);
+}
+.ao-home-search-sug__list {
+  max-height: 235px;
+  padding: 10.5px 0 9.5px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: #fff;
+}
+.ao-home-search-sug__list::-webkit-scrollbar {
+  display: none;
+}
+.ao-home-search .ao-home-search-sug__row {
+  display: block;
+  width: 100%;
+  height: 42px;
+  padding-left: 25.33px;
+  font-size: 15.9px;
+  line-height: 42px;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+  color: #000;
+}
+.ao-home-search-sug__row em {
+  font-style: normal;
+  color: var(--ao-green, #0c8f2d);
+}

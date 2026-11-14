@@ -76,12 +76,15 @@ export const LOAD: Record<AoLoadProfile, AoLoadSpec> = {
   resend: { dimOn: 0, cut: 967, off: 1000 }, // 거래내역 상세 다시보내기 (invented, replace)
   // 거래내역조회 조회 조건 적용 (invented, account.md §5.2 의 600ms): 줄은 567 에 막 밑에서 바뀌고 스피너 567 · 막 600 에 걷힘. 화면이 바뀌지 않음
   acctFilter: { dimOn: 0, cut: 567, off: 600 },
-  // 이의제기 (dispute 영역이 녹화에 맞춰 고침 — 지금 값은 자리표시): 통합검색 결과 → 이의제기 신청 및 조회 (C3 43.0 누름 → 45.5 녹화 끝까지 막, C4 0.0 에 화면)
-  disputeLink: { dimOn: 0, cut: 2500, off: 2533 },
-  // 이의제기 신청 → 신청 전 확인해 주세요 (C4 1.5–2.0)
-  disputeApply: { dimOn: 0, cut: 450, off: 483 },
-  // 영업점 칸 → 영업점검색 (C4 6.0–6.5)
-  branchOpen: { dimOn: 0, cut: 267, off: 300 },
+  // 통합검색 결과 '이의제기 신청 및 조회' → /dispute: 손 뗀 프레임에 스피너, 17 에 막 (C3 44.779 · 44.796). 녹화 C3 는 막이 켜진 채 끝남 (+746 까지 보임).
+  // cut 800 (보인 것보다 한 박자 길게 고름) — 막 · 스피너는 33 뒤 걷힘 (새 화면이 라우터 전환으로 1–2프레임 늦게 그려지므로, 다른 프로필처럼).
+  // 그 뒤 첫 화면이 빈 화면 + 스피너 한 프레임 (C4 0.024) → 머리줄 + 초록 화살표 그림으로 217ms 더 기다림 (C4 0.041 → 0.257, dispute/DisputeIntro)
+  disputeLink: { dimOn: 0, spinnerOnlyUntil: 17, cut: 800, off: 833, spinnerOff: 833 },
+  // 이의제기 쪽 웹 화면 이동 (이의제기 신청 → 신청 전 확인 C4 1.607–1.824, 영업점 칸 → 영업점검색 C4 6.174–6.391): 검은 막 없이 스피너만
+  // (흰 막 51% 는 떠나는 화면이 그림 — dispute/store.ts useDisputeVeil). 스피너 200 에 꺼지고 새 화면은 217 에 보이게 cut 184 (라우터 전환 한 프레임).
+  // dimFade.from 을 이동이 끝난 한참 뒤로 두어 공용 막은 켜지지 않음 (스피너만 — 그 사이 누름은 막 층이 받음)
+  disputeApply: { dimOn: 0, cut: 184, off: 200, spinnerOff: 200, dimFade: { from: 60000, ms: 0, deep: false } },
+  branchOpen: { dimOn: 0, cut: 184, off: 200, spinnerOff: 200, dimFade: { from: 60000, ms: 0, deep: false } },
 };
 
 // ---------- location.state ----------
