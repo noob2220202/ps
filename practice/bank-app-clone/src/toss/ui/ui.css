@@ -372,7 +372,7 @@
   position: absolute;
   left: 11.2px;
   right: 11.2px;
-  bottom: 25.33px; /* 카드 아래끝 ≈828 */
+  bottom: calc(var(--toss-nav, 15px) + 10.33px); /* 카드 아래끝 ≈828 = 내비 띠 위 10.33 (진짜 폰: 기기 아래 안전 영역 위) */
   display: flex;
   flex-direction: column;
   max-height: calc(100% - 120px);
@@ -441,8 +441,10 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 81.6px; /* 웹 영역만 (머리줄 · 상태바는 그대로) */
-  bottom: 15px;
+  /* 웹 영역만 (머리줄 · 상태바 · 내비 띠는 그대로): 데스크톱 81.6 – 838.33. 진짜 폰은 띠가 기기 안전 영역이라 그만큼만 —
+     고정 값이면 머리줄 아래 28dp · 화면 아래 15dp 가 안 어두워지던 것 */
+  top: calc(var(--toss-sb, 28px) + 53.6px);
+  bottom: var(--toss-nav, 15px);
   background: var(--toss-scrim);
   animation: toss-fade-in-kf 160ms linear both;
 }
@@ -517,7 +519,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 29.65px;
+  top: calc(var(--toss-sb, 28px) + 1.65px); /* 데스크톱 29.65 — 진짜 폰은 기기 상태바(안전 영역) 아래에 */
   display: flex;
   justify-content: center;
   z-index: 80;

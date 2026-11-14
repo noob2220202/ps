@@ -161,6 +161,11 @@ html[data-app="toss"][data-toss-band="scrim"] .phone__navbar i {
   html[data-app="toss"] .phone__navbar {
     display: none;
   }
+  /* 16px 입력칸: 배율이 1 보다 작으면(384 보다 좁은 폰, 아이폰 미니 · SE 375 등) 그려지는 글자가 16 밑으로 내려가
+     iOS 사파리가 초점 때 화면을 확대하고 그대로 둠 → 배율로 나눠 그려지는 크기를 16 으로 (배율 1 이상 · 데스크톱은 그대로) */
+  html[data-app="toss"] :is(.toss-send-hidden-input, .toss-cert-items__input, .login__form input, .profile-form__name) {
+    font-size: max(16px, calc(16px / var(--toss-fit, 1)));
+  }
 }
 
 /* ---------- 로그인 · 프로필 고르기 (공용 화면을 TossInset 으로 감쌈) ---------- */

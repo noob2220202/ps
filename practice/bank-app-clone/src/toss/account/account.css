@@ -1503,7 +1503,9 @@
   position: absolute;
   left: 20px;
   right: 20px;
-  top: 415.4px; /* 가운데 461.4 */
+  /* 가운데 461.4 = 머리줄 아래 ~ 화면 아래 사이 가운데 (+1.5, S6 와 같은 식). 폰 키보드가 올라오면 이 칸 높이가 줄어 그 가운데로
+     — 키 작은 폰에서 입력칸이 키보드 밑에 숨던 것 (데스크톱 · 큰 폰은 그대로 415.4) */
+  top: min(415.4px, calc(50% + 10.24px));
   height: 36px;
   padding: 0;
   border: 0;
@@ -1524,7 +1526,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 775.8px;
+  top: min(775.8px, calc(100% - 34.52px)); /* 화면 803.8. 키 작은 폰 · 폰 키보드가 올라오면 아래 20.5 에 붙음 — 안내 · 저장 실패 글이 화면 밖에 있던 것 */
   margin: 0;
   text-align: center;
   font-size: 14px;

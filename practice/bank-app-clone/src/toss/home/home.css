@@ -859,18 +859,19 @@
   display: grid;
   place-items: center;
 }
-/* 쿠폰 (B 74.942): 아래쪽에 왼쪽 맞춤 */
+/* 쿠폰 (B 74.942): 아래쪽에 왼쪽 맞춤. 본문 높이(데스크톱 810.33)보다 키 작은 폰에서는 다섯 칸이 같이 올라감 (min(녹화 자리, 100% − 아래까지))
+   — 375×667 등에서 쿠폰 받기 · 3일 동안 안보기가 화면 밖으로 나가던 것. 데스크톱 · 큰 폰은 그대로 */
 .toss-home-cpn__img {
   position: absolute;
   left: 27.7px; /* x 27.7–81, y 515.7–543.2 */
-  top: 487.7px;
+  top: min(487.7px, calc(100% - 322.62px));
   width: 53.25px;
   height: 27.5px;
 }
 .toss-home-cpn__t {
   position: absolute;
   left: 23.55px; /* 잉크 x 24.8 */
-  top: 547.05px; /* 잉크 582.4–601.6 · 615.2–635.2 (간격 33.2) */
+  top: min(547.05px, calc(100% - 263.27px)); /* 잉크 582.4–601.6 · 615.2–635.2 (간격 33.2) */
   font-size: 22px;
   line-height: 33.4px;
   font-weight: 700;
@@ -881,7 +882,7 @@
 .toss-home-cpn__s {
   position: absolute;
   left: 24.3px;
-  top: 630.8px; /* 잉크 x 24.8, y 659.2–674.4 */
+  top: min(630.8px, calc(100% - 179.52px)); /* 잉크 x 24.8, y 659.2–674.4 */
   font-size: 17px;
   line-height: 17px;
   font-weight: 400;
@@ -893,7 +894,7 @@
   position: absolute;
   left: 20.2px; /* 가장자리 (반 밝기) x 20.5–363.5, y 716.4–772.4 (B 74.942) */
   width: calc(100% - 40.9px); /* 384 폭에서 x 20.2–363.3 */
-  top: 688.1px; /* (그려지는 화소에 맞춰 716.0–772.0) */
+  top: min(688.1px, calc(100% - 122.22px)); /* 688.1 (그려지는 화소에 맞춰 716.0–772.0) */
   height: 55.8px;
   border-radius: 14px;
 }
@@ -909,7 +910,7 @@
 .toss-home-cpn__skip {
   position: absolute;
   left: 50%;
-  top: 761.15px; /* 글자 잉크 y 797.6–812.8 */
+  top: min(761.15px, calc(100% - 49.17px)); /* 761.15 · 글자 잉크 y 797.6–812.8 */
   translate: -50% 0;
   padding: 8px 10px;
   color: #898b91;
@@ -1063,7 +1064,7 @@
 .toss-home-pb__btn {
   position: absolute;
   left: calc(50% - 57.5px); /* 384 폭에서 134.5 */
-  top: 656.1px; /* x 134.5–248.8, y 684.1–740.0 */
+  top: min(656.1px, calc(100% - 154.22px)); /* 656.1 · x 134.5–248.8, y 684.1–740.0 (키 작은 폰에서는 닫기와 같이 올라감 — 쿠폰과 같은 까닭) */
   width: 114.3px;
   height: 55.9px;
   border-radius: 15px;
@@ -1071,7 +1072,7 @@
 .toss-home-pb__close {
   position: absolute;
   left: calc(50% - 32px); /* 384 폭에서 160 */
-  top: 728px;
+  top: min(728px, calc(100% - 82.32px));
   width: 66px;
   height: 38px;
   color: #abaaaf;
