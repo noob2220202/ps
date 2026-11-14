@@ -5,7 +5,7 @@ import { paths } from "../../api/endpoints";
 import { prefetch } from "../../api/useApi";
 import { useLayerActive } from "../../platform/LayerContext";
 import { currentProfileId } from "../../profile/session";
-import { tossAfterLock } from "../nav";
+import { tossAfterLock, tossLocked } from "../nav";
 
 // ---------- 탭바 ----------
 export type HomeTab = "home" | "benefit" | "shopping" | "stock" | "all";
@@ -111,8 +111,10 @@ export function useAdBackGuard(onBack: () => void) {
       cancel();
     };
   }, [active]);
+  // 이동 잠금 중(방금 replace · push 로 열림)에 누른 것은 버림: 완료 '확인' 을 빨리 두 번 누르면 둘째가 막 나타난 쿠폰의
+  // '3일 동안 안보기' 에 떨어져 미루기만 저장되고 닫기는 잠금에 막혀 광고에 갇히던 것 (← 를 일찍 눌러도 같음)
   return (fn: () => void) => {
-    if (leaving.current) return;
+    if (leaving.current || tossLocked()) return;
     leaving.current = true;
     const lv = backLevel();
     if (!lv) return fn();

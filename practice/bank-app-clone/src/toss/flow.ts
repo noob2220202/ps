@@ -95,8 +95,9 @@ export function useAdDismiss() {
   const exit = useTossExit();
   return useCallback(
     ({ snooze = false }: { snooze?: boolean } = {}) => {
-      if (snooze) tossApi.updateProfile({ adSnoozeUntil: new Date(Date.now() + TOSS_FLOW.adSnoozeDays * 86_400_000).toISOString() }).catch(() => {});
-      exit(tossDepth(location.state, "sendDepth"));
+      // 닫기를 받았을 때만 미루기 저장 (잠금에 막힌 닫기가 미루기만 남기지 않게)
+      if (exit(tossDepth(location.state, "sendDepth")) && snooze)
+        tossApi.updateProfile({ adSnoozeUntil: new Date(Date.now() + TOSS_FLOW.adSnoozeDays * 86_400_000).toISOString() }).catch(() => {});
     },
     [location.state, exit],
   );

@@ -48,7 +48,9 @@ function HomeFields({ profile, adSnoozeUntil, run }: { profile: TossProfile; adS
   const snoozed = tossAdSnoozed(adSnoozeUntil);
   return (
     <div className="add-bank">
-      <PanelField label="송금·결제 후 받는 포인트 (홈)">
+      {/* label 로 감싸지 않음 (PanelSeg 와 같은 까닭): 안내 글 · 'N번' 을 누르면 첫 버튼 '−' 가 눌려 횟수가 줄던 것 */}
+      <div className="field">
+        <span className="field__label">송금·결제 후 받는 포인트 (홈)</span>
         <div className="chips-row">
           <PanelCount value={chances} onChange={setChances} unit="번" />
           <button
@@ -60,7 +62,7 @@ function HomeFields({ profile, adSnoozeUntil, run }: { profile: TossProfile; adS
             저장
           </button>
         </div>
-      </PanelField>
+      </div>
       <PanelField label={`리워드 배너 '이번 달 최대 적립금' ${hidden ? "(지금: 숨김)" : ""}`}>
         <PanelMoney value={reward} onChange={setReward} quick={[1000, 10000, 50000]} />
       </PanelField>

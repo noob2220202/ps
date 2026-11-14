@@ -121,6 +121,8 @@ export function tossLock(ms: number = TOSS_NAV.lock) {
   lockedUntil = now + ms;
   return true;
 }
+// 잠겨 있는지만 봄 (잠그지 않음)
+export const tossLocked = () => performance.now() < lockedUntil;
 // 갤럭시 뒤로로 지킴 칸(tossBack)이 이미 빠진 뒤의 이동처럼 버리면 안 되는 이동: 잠겨 있으면 풀린 뒤에 fn. 돌려준 함수로 취소
 export function tossAfterLock(fn: () => void) {
   let t = 0;
@@ -184,13 +186,15 @@ export function useTossBack(fallback = "/") {
 }
 
 // 흐름 나가기: depth 칸을 한 번에 뒤로 (이체 완료 → 처음 화면, 증명서 확인 → 상세). 방문 기록이 모자라면 fallback 으로 바꿈
+// 돌려준 값: 이동을 받았으면 true (잠금 중이면 false)
 export function useTossExit() {
   const navigate = useNavigate();
   return useCallback(
     (depth: number, fallback = "/") => {
-      if (!tossLock()) return;
+      if (!tossLock()) return false;
       if (depth > 0 && historyIdx() >= depth) window.history.go(-depth);
       else navigate(fallback, { replace: true });
+      return true;
     },
     [navigate],
   );
