@@ -76,16 +76,18 @@ Rules:
 
 **`GET /api/toss/assets`** (also used by 내 계좌):
 `{total (accounts + points; cards are not assets), accounts: {count, total, items: [{id, bankCode, name, number, balance, isMain, role, favorite}]} in sort order, cards: {count, items: [{id, name, bankCode, accountId, art, kind, bill? · payDay? (credit only), sort, monthAmount}]} sorted by monthAmount desc, points: {count, items: [{id, name, balance, icon, sort}]}}`
-monthAmount = this month's non-cancelled debits with that card_id.
+monthAmount = this month's non-cancelled debits with that card_id (a credit card with none shows its next bill).
 
 **Cards CRUD**
 - `GET /api/toss/cards` → `[{id, name, bankCode, accountId, art, kind, bill? · payDay? (credit only), sort}]`
 - `POST /api/toss/cards {name, bankCode, accountId?, art?, kind = "check" | "credit", bill? (0~10억), payDay? (1~31, required for credit), sort?}` → 201 card, id "card-xxxxxxxx". A check card stores bill / payDay as NULL
 - `PATCH /api/toss/cards/:id` takes any subset and returns the card.
 - `DELETE /api/toss/cards/:id` → 204 and clears transactions.card_id.
-- Adult account (later change): kinds are check | credit (the first version had check | prepaid with balance · last_used_at — 원본 녹화의 연령 전용 상품은 성인용으로 바꿈).
-  `migrate()` (toss only) rebuilds an old `cards` table once (it still has `last_used_at`): the example prepaid card `c-youth` becomes the example credit card
-  `c-day` (bill = its old balance, payDay 14, pays from `hana` if present), other prepaid cards become check cards, art `hana-young` → `hana-travlog`, `toss-youth` → NULL.
+- Adult account (later change): kinds are check | credit (the first version had check | prepaid with balance · last_used_at).
+  `migrate()` (toss only) rebuilds an old `cards` table once (it still has `last_used_at`): the old example prepaid card becomes the example credit card
+  `c-day` (bill = its old balance, payDay 13, pays from `hana` if present), other prepaid cards become check cards, old example card art gets the new names.
+  In the same one-time step, rows that still hold the exact old example values (hana account name, the hana check card name, two example card purchases)
+  get the new example names and categories; amounts stay, so balances do not move. Edited rows are left alone (exact ids and values in `server/db.mjs`).
 
 **Points CRUD**
 - `GET /api/toss/points` → `[{id, name, balance, icon, sort}]`

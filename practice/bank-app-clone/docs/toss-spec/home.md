@@ -165,10 +165,10 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Row 2 is indented to x 75.2: there is an **empty 30-dp icon slot** at x 32.7–62.4 (uniform card colour in both videos).
   - Amount `<ROW2_AMOUNT>원`, 17 dp B. Ink y 458.4–473.6.
   - Label 13 dp, dim `#717074`. Ink y 479.2–491.2.
-  - **Adult clone:** the recorded row was an age-specific product row (원본 녹화의 연령 전용 상품은 성인용으로 바꿈). The clone keeps the slot,
+  - **Adult clone:** the clone keeps the slot,
     font sizes and colours and shows the first credit card's next bill: amount = `toss.cardBill.amount`, label **`{D}일 낼 카드값`**
     (D = day of `cardBill.dueDate`), button **내역** (press only). No credit card → the row is hidden. Toss's own pages call this
-    '카드값' / '카드 청구서' (card company, amount, due date); the exact home wording is not confirmed.
+    '카드값' / '카드 청구서' / '카드값 내는 날' / '나갈 카드값' (card company, amount, due date); the exact home wording is not confirmed.
 
 **Card 3.** Rows centred y 553.6 / 607.6, inset divider at y 639.8 (x 27.8–355.4), row centred 674.8. Bottom padding ≈35.5.
 - Title: 15 dp **B** `#fafafc`, ink x 32.8, ink top = centre −16.8.
@@ -192,10 +192,11 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Left box x 12.6–187.3, right box x 196.0–371.1 (≈175 wide, h-gap 8.8), height 68.2, same card radius.
 - bg: card colour plus a soft bottom glow. Left is bluish (`#1d2130` at bottom), right is warm brown (`#2a2220`).
 - Titles: 2 lines, 15 dp SB `#f3f2f5`, line pitch 20.8. Ink tops at card top +16.7 / +37.5, text x = card left +19.5.
-  - Left (adult clone): **대출 조건 / 1분 만에 비교** (the recorded left card was an age-specific item; this copy follows the app-store text
+  - Left (adult clone): **대출 조건 / 1분 만에 비교** (this copy follows the app-store text
     "대출 조건을 1분 만에 비교"). Right: **토스 브랜드콘 / 구매하기**.
 - 3-D illustrations are bottom-right and clipped by the card bottom.
-  - Left (clone): the product-menu 신용대출 icon (`toss-acct-m-loan-credit`) at 54 dp, card x +108, top +20 (clipped 5.7 dp by the card bottom).
+  - Left (clone): an invented SVG (tilted document + magnifier, `LoanArt` in `home/icons.tsx`) drawn for 54 × 56 dp, card x +116, top +16
+    (clipped ≈ 3.7 dp by the card bottom), muted colours so it sits next to the 3-D 브랜드콘 art.
   - Right: x 311–356 dp, an iced-coffee cup with a barcode coupon.
   - Crop or redraw them (§5).
 
@@ -407,7 +408,7 @@ interface TossHome {
 - Profile 홍길동, given name 길동, reward max 50,000원.
 - 토스뱅크 통장 balance 4,286,400원 (an adult salary account), number in Toss Bank format `1000-XXXX-XXXX` (12 digits, invented).
 - 토스머니 12,800원. 포인트 3번.
-- Credit card 토스뱅크 하나카드 Day, 결제일 14일: next bill 428,600원 (351,700원 once the 14th has passed).
+- Credit card 토스뱅크 하나카드 Day, 결제일 13일: next bill 428,600원 (351,700원 once the 13th has passed).
 - 최근 본 상품: "바삭 감자칩 오리지널 3봉" + an invented snack thumbnail.
 - 방문한 서비스: "토스쇼핑" with the coral bag icon.
 

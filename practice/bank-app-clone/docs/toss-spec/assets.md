@@ -120,11 +120,8 @@ Page `#171619`. The status bar uses the same colour. No bottom bar.
 - Line 2, ink y 171.2–184.0, 13 R `#808084`: `지난달보다 ` + **`<SPEND_DIFF>만원`** in red `#f04452` + ` 더 쓰는 중`.
 - **분석** button: x 307.2–360.0, y 148.0–180.0 (52.8 × 32), fill `#27282d`, radius 8, label 13 M `#babdc4`.
 - **Category bar**: x 24–360 (336), y 198.4–211.2 (≈ 12.8; draw 12). Segments are separate rounded rects (radius ≈ 3) with a **2.4 dp gap**.
-  Width is proportional to each category's share. Observed order and colours:
-  1. 이체 `#2f7ff3`
-  2. 카테고리 없음 `#1e7055`
-  3. 교육 `#804b20`
-  4. 그 외 `#3e3d40`
+  Width is proportional to each category's share, sorted by share (top 3, then 그 외). Measured colours:
+  이체 `#2f7ff3`, 카테고리 없음 `#1e7055`, `#804b20` (used for 교육), 그 외 `#3e3d40`.
 
   The smallest segment observed is ≈ 21.6 wide, so clamp each segment to a minimum of 16.
 - **Legend**, ink y 222.4–232.8: square dots 8 × 8 (radius 2) in the segment colour, 3.2 gap, label 12 R `#8a898c`, 6.4 gap to the next dot.
@@ -139,6 +136,7 @@ Page `#171619`. The status bar uses the same colour. No bottom bar.
   - Income, line 1, ink y 326.4–336.0: `+<IN>원`, blue (`#3182f6`; samples #2a5599–#415e99).
   - Expense, line 2, ink y 339.2–349.6: `-<OUT>원`, `#8a898c`.
   - **Font 10.5 R, shrink-to-fit inside ~42 dp** (short strings render at 10.5, long ones down to ~8.5). Days without values show nothing.
+    Clone: amounts of 1,000,000 or more are written in 만 units (`+285만원`), so a salary day does not shrink to ≈ 6.9 px.
 - Expand chevron "⌄": ink x 184.0–200.8, y 375.2–381.6 (16.8 × 6.4), stroke ≈ 2, `#8c8d92`.
 - No divider or shadow under the sticky strip. Rows simply clip at its bottom edge (sticky y 264.0).
 
@@ -366,7 +364,7 @@ None in this area.
 |---|---|
 | `total` | Σ\|amount\| over **counted** debits in month M. Counted = `amount < 0` AND not cancelled AND not an own-account transfer AND not a card-bill payment AND not manually excluded. **Transfers to other people count** (이체 is the biggest category in the video). Shown as `-N원` |
 | `vsLastMonth` | `total(M, day 1..today) − total(M−1, day 1..same day)`. Text: `지난달보다 {X}만원 더 쓰는 중` (red) when > 0. X = round(\|diff\| / 10 000); if < 10 000 show `{diff}원`. Invented for the other cases: `덜 쓰는 중` in blue `#3182f6`, and `지난달과 비슷해요` in grey when \|diff\| < 1 000 |
-| `categories` | counted spend grouped by `category`, sorted desc, top 3 + `그 외`. Colours: §2.1.3 for 이체 / 카테고리 없음 / 교육; invented for others (식비 `#d9822b`, 편의점·마트 `#c9a227`, 쇼핑 `#8a5cf5`, 교통 `#27a5a0`, 문화 `#d6458f`, 주거·통신 `#e2574c`). `그 외` is always `#3e3d40` |
+| `categories` | counted spend grouped by `category`, sorted desc, top 3 + `그 외`. Colours: §2.1.3 for 이체 / 카테고리 없음 / 교육; invented for others (식비 `#d9822b`, 편의점·마트 `#c9a227`, 쇼핑 `#8a5cf5`, 교통 `#27a5a0`, 문화 `#d6458f`, 주거·통신 `#e2574c`, 술·유흥 `#7aa83a`). `그 외` is always `#3e3d40` |
 | `days[]` | for each date of M: `income` = Σ amount > 0 excluding own transfers; `expense` = Σ counted \|amount\|. The strip shows the week of the selected day |
 | `groups[]` | days with ≥ 1 tx, newest first. Label `D일 요일` (일/월/화/수/목/금/토 + 요일). `overspent` = day expense > 2 × the month's average daily expense **and** ≥ 30 000원 (invented threshold) |
 | `cashback` | `profile.cashback_count` (existing column). Row shown in **today's** group when > 0 |
@@ -383,6 +381,7 @@ None in this area.
   This matches the recording, where 총 자산 − 입출금 total = the points.
 - `accounts` = the same ordered list as 내 계좌. The 자산 card shows the first 3. `count` drives "계좌 n개 전체보기".
 - `cards[]` = `{ id, name, bankCode, art, monthAmount }`. `monthAmount` = Σ\|amount\| of this month's non-cancelled debits with `card_id = id`.
+  A credit card with no such debits shows its next bill instead (its purchases are not stored as transactions), so the card behind the home bill row ranks with that amount.
   Sorted by `monthAmount` desc; the card shows the first 2. `count` drives "카드 n개 전체보기".
 - `points[]` = `{ id, name, balance, icon }` in sort order; the card shows the first 1.
 
@@ -414,7 +413,7 @@ New (all gated to `APP === "toss"`; columns via `migrate()`, nullable, harmless 
 
 ### 4.3 Seed (invented, `seedTossExample`)
 Generate timestamps **relative to now** (infra.md §2.1) so the current month always has data. Include today and ≥ 6 earlier days, plus ≥ 8 transactions in the previous month.
-The clone seed is an **adult** account (원본 녹화의 연령 전용 상품은 성인용으로 바꿈; the built seed is in plan.md §2.3):
+The clone seed is an **adult** account (the built seed is in plan.md §2.3):
 - Accounts, all fictional numbers:
   - main 토스뱅크 통장 (salary account)
   - hana 주거래하나 통장 (card bill · fixed bills)
@@ -425,10 +424,10 @@ The clone seed is an **adult** account (원본 녹화의 연령 전용 상품은
   - `토스뱅크 체크카드` (toss), linked to main
   - `트래블로그 체크카드` (hana), linked to the hana account
   - `프렌즈 체크카드` (kakao), linked to the kakao account
-  - `토스뱅크 하나카드 Day` (credit, pays from hana, 결제일 14일) → `카드 4개`
+  - `토스뱅크 하나카드 Day` (credit, pays from hana, 결제일 13일) → `카드 4개`
 - Points: `토스포인트` and `하나머니` (any count ≥ 1).
 - Transactions:
-  - card spend at **invented** shops (e.g. `한빛편의점` 편의점, `소나무분식` 식비, `바다주유소` 교통, `튼튼헬스` 문화·여가)
+  - card spend at **invented** shops (e.g. `한빛편의점` 편의점, `소나무분식` 식비, `바다주유소` 교통, `튼튼헬스` 문화·여가, `달빛포차` 술·유흥)
   - salary in (`(주)예시상사`, 25th), fixed bills (`예시텔레콤`, `푸른마을관리비` → 주거·통신), the credit-card bill `하나카드` (excluded)
   - one cancelled card tx
   - transfers to invented people (이체 → counted)
@@ -499,7 +498,7 @@ The clone seed is an **adult** account (원본 녹화의 연령 전용 상품은
 
 Not personal, OK to reuse as UI text:
 - product names (clone seed): 토스뱅크 통장, 토스머니, 토스포인트, 주거래하나 통장, 입출금통장, 자립예탁금, 트래블로그 체크카드, 프렌즈 체크카드, 토스뱅크 하나카드 Day
-- category labels: 이체, 카테고리 없음, 교육, 그 외
+- category labels: 이체, 카테고리 없음, 그 외
 - UI labels: 평소보다 많이 씀, 캐시백 가능한 내역, and every button label
 
 ---

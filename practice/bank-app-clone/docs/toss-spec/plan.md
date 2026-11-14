@@ -6,9 +6,9 @@ This file is the single source of truth where the six area specs disagree. Read 
 
 **Privacy.** This file contains no value from the recordings. Seed values below are invented (홍길동-style). Placeholders such as `<NAME_A>` and `<ACCT_A>` only describe roles and formats. Frames and crops stay in `…/scratchpad/toss/frames/<area>/`. Never commit a frame. A crop is committed only after someone has looked at it.
 
-**Adult account.** The clone shows an **adult** Toss account (원본 녹화의 연령 전용 상품은 성인용으로 바꿈): the seed is a salary account with
+**Adult account.** The clone shows an **adult** Toss account (product names and copy are adult products checked on the web): the seed is a salary account with
 fixed bills and a credit card, home card 2 row 2 shows the credit card's next bill '{D}일 낼 카드값', and cards are check | credit. The recorded
-layout, positions, font sizes and colours are kept; only age-specific content was swapped (sources and the full mapping: SOLUTION 27장 '성인 계정').
+layout, positions, font sizes and colours are kept; only the content follows the adult account (sources and the full mapping: SOLUTION 27장 '성인 계정').
 
 **Units.** dp = screen coordinates of the 384 × 853.33 frame (0 = top of the status bar). Video px / 1.25 = dp. Times are real pts in seconds (A = first video, B = second video).
 
@@ -221,7 +221,7 @@ No new transaction **tags** are added. 페이·기타 comes from `channel`, and 
 - **counted(tx)**: `amount < 0` and `!cancelled` and `!exclude` and `!own(tx)`. Transfers to other people count.
 - **tossSpendTotal(month)**: `profile.card_spend ?? Σ|amount| of counted debits in month`. Used by `/api/home` (`monthlyCardSpend` and `toss.spend.total`) and by `/api/toss/spend`.
 - **vsLastMonth**: total(M, day 1..today) − total(M−1, day 1..same day). The copy rules are in assets.md §4.1.
-- **categories**: counted spend by `category ?? (tag #이체 ? '이체' : '카테고리 없음')`, top 3 plus 그 외. Colours: 이체 #2f7ff3, 카테고리 없음 #1e7055, 교육 #804b20 (measured); invented: 식비 #d9822b, 카페·간식 #b0703a, 편의점·마트 #c9a227, 쇼핑 #8a5cf5, 교통 #27a5a0, 문화·여가 #d6458f, 주거·통신 #e2574c; 그 외 #3e3d40. 교육 stays selectable but the example seed has none.
+- **categories**: counted spend by `category ?? (tag #이체 ? '이체' : '카테고리 없음')`, top 3 plus 그 외. Colours: 이체 #2f7ff3, 카테고리 없음 #1e7055, 교육 #804b20 (measured); invented: 식비 #d9822b, 카페·간식 #b0703a, 편의점·마트 #c9a227, 쇼핑 #8a5cf5, 교통 #27a5a0, 문화·여가 #d6458f, 주거·통신 #e2574c, 술·유흥 #7aa83a; 그 외 #3e3d40. 교육 stays selectable but the example seed has none.
 - **overspent(day)**: day expense > 2 × the month's average daily expense **and** ≥ 30,000원.
 - **총 자산** = Σ balances of all accounts (토스머니 included) + Σ points. Cards are not assets.
 - **card monthAmount** = Σ|amount| of this month's non-cancelled debits with that `card_id`.
@@ -263,7 +263,7 @@ The order (`sort`) is the 내 계좌 order: main, hana, kakao, nh, money.
 | c-toss | 토스뱅크 체크카드 | toss | main | toss-check | check | — |
 | c-hana | 트래블로그 체크카드 | hana | hana | hana-travlog | check | — |
 | c-kakao | 프렌즈 체크카드 | kakao | kakao | kakao-friends | check | — |
-| c-day | 토스뱅크 하나카드 Day | hana | hana | hana-day | credit | 428,600 if today ≤ 14 else 351,700 / 14 |
+| c-day | 토스뱅크 하나카드 Day | hana | hana | hana-day | credit | 428,600 if today ≤ 13 else 351,700 / 13 |
 
 Credit-card purchases are not stored (a transaction must belong to an account, and the card's purchases would land in the pay-from account's history and balance).
 The bill shows on home and as the monthly '하나카드' auto-debit below.
@@ -317,7 +317,7 @@ This gives 최근 보낸 계좌 with own accounts mixed in, ≥ 4 sent transfers
 main  c(0,08:05)  한빛편의점      -4,800   #체크카드 card 편의점·마트 c-toss
 main  c(1,12:30)  소나무분식      -9,000   #체크카드 card 식비       c-toss
 main  c(2,15:10)  하늘카페        -5,500   #체크카드 card 카페·간식  c-toss
-main  c(2,21:40)  달빛포차       -46,000   #체크카드 card 식비       c-toss
+main  c(2,21:40)  달빛포차       -46,000   #체크카드 card 술·유흥    c-toss
 main  c(3,18:20)  바다주유소     -52,000   #체크카드 card 교통       c-toss
 main  c(3,21:02)  카드 캐시백        +50   #체크카드 card 캐시백     c-toss
 main  c(5,19:40)  샘플쇼핑_PG    -32,900   #체크카드 pay  쇼핑       c-toss   (pay: two-line subtitle)
@@ -341,7 +341,7 @@ hana  c(4,16:00)  튼튼헬스       -99,000   #체크카드 card 문화·여가
 hana  c(5,12:40)  하늘카페        -4,800   #체크카드 card 카페·간식  c-hana
 hana  m/p/q(3,10:00)  예시텔레콤    -55,000   #자동이체 account 주거·통신      (each month; this month only after the 3rd)
 hana  m/p/q(10,09:30) 푸른마을관리비 -186,000 / -172,000 / -168,000  #자동이체 account 주거·통신
-hana  m/p/q(14,07:00) 하나카드  -428,600 / -386,900 / -412,300  #자동이체 account (none)  exclude=1 (Day card bill)
+hana  m/p/q(13,07:00) 하나카드  -428,600 / -386,900 / -412,300  #자동이체 account (none)  exclude=1 (Day card bill)
 hana  p(9,13:30)  소나무분식      -7,500   #체크카드 card 식비       c-hana
 hana  p(16,20:10) 예시마트       -22,000   #체크카드 card 편의점·마트 c-hana
 kakao c(2,22:15)  앱마켓_PG       -1,100   #체크카드 pay  카테고리 없음 c-kakao
