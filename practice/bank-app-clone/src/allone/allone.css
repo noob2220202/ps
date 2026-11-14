@@ -33,7 +33,6 @@
   --ao-out: #e93535; /* 출금 */
   --ao-in: #1a5dd9; /* 입금 */
   --ao-error: #ff0000;
-  --ao-blocked: #d93025; /* 지급정지 글자 (invented, 녹화에 없음) */
   --ao-link: #555555;
   --ao-star: #8f8f8f;
   --ao-star-on: #ffc31a;

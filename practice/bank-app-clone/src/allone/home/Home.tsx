@@ -167,7 +167,6 @@ export function Home() {
             onHistory={(id) => void flow.goHistory(id)}
             onSend={(id) => void flow.goSend({ from: id, origin: "home" })}
             onTopup={(id) => void flow.goTopup({ to: mainNh, from: id, origin: "card" })}
-            onBlock={(id) => void flow.goBlockNotice(id)}
             onRetry={home.retry}
           />
           {/* 아래 칸은 처음부터 숨겨 그려 둠 (H4 에서 한 프레임에 보이기만 — 무거운 그림 준비가 +583 정기점검 시트를 늦추지 않게) */}

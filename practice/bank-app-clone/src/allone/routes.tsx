@@ -7,12 +7,14 @@ import { Menu } from "./home/Menu";
 import { Search } from "./home/Search";
 import { History } from "./account/History";
 import { TxDetail } from "./account/TxDetail";
-import { BlockNotice } from "./account/BlockNotice";
 import { SendWho } from "./transfer/SendWho";
 import { SendAmount } from "./transfer/SendAmount";
 import { SendConfirm } from "./transfer/SendConfirm";
 import { SendDone } from "./transfer/SendDone";
 import { Topup } from "./transfer/Topup";
+import { DisputeIntro } from "./dispute/DisputeIntro";
+import { DisputeCheck } from "./dispute/DisputeCheck";
+import { BranchSearch } from "./dispute/BranchSearch";
 import { AoGallery } from "./ui/Gallery";
 
 // NH올원뱅크 (APP=allone 으로 띄운 서버, 9119). 화면 표는 plan.md §1.2 — 화면 사이는 모두 CUT (ScreenStack allone 갈래),
@@ -25,13 +27,15 @@ export const renderAlloneRoute = (location: Location) => (
     <Route path="/search" element={<Search />} />
     <Route path="/history/:accountId" element={<History />} />
     <Route path="/tx/:txId" element={<TxDetail />} />
-    {/* 지급정지 안내 + 이의제기 (invented, 녹화에 없음) */}
-    <Route path="/account/:accountId/notice" element={<BlockNotice />} />
     <Route path="/send" element={<SendWho />} />
     <Route path="/send/amount" element={<SendAmount />} />
     <Route path="/send/confirm" element={<SendConfirm />} />
     <Route path="/send/done" element={<SendDone />} />
     <Route path="/topup" element={<Topup />} />
+    {/* 이의제기 신청 및 조회 (통합검색 '이의제기' → 결과, 녹화 C3 42.4– · C4 0–12.4). 본인인증부터는 만들지 않음 — 확인 화면 '다음'은 더 진행하지 않음 */}
+    <Route path="/dispute" element={<DisputeIntro />} />
+    <Route path="/dispute/check" element={<DisputeCheck />} />
+    <Route path="/dispute/branch" element={<BranchSearch />} />
     {/* 공용 부품 견본 (녹화에 없음, 기초 단계 확인용) */}
     <Route path="/dev/ui" element={<AoGallery />} />
   </Routes>

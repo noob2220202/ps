@@ -10,7 +10,8 @@
 //                                                      "resend" = 다시보내기 (replace). 막이 있으면 홈 · 은행 목록을 막 동안 받아 둠
 //  f.goTopup({ to, from, origin })                     잔액채우기 /topup?to=&from=&origin= (origin amount → topupLink, menu · card → menuLink)
 //  f.goMenu() · f.goSearch()                           전체메뉴 (menu) · 통합검색 (search)
-//  f.goBlockNotice(accountId)                          지급정지 안내 + 이의제기 /account/:id/notice (invented, 녹화에 없음)
+//  f.goDispute(via?) · f.goDisputeCheck() · f.goBranchSearch()
+//                                                      이의제기 신청 및 조회 /dispute (disputeLink) · 신청 전 확인 /dispute/check (disputeApply) · 영업점검색 /dispute/branch (branchOpen)
 //  f.goHome()                                          홈으로 (새로 불러오지 않음, 홈은 밑에 그대로)
 //  f.goHomeFresh()                                     취소: cancelHome 막 밑에서 홈으로 + aoHomeFresh 알림 (홈이 뼈대 · 정기점검 시트를 다시)
 //  f.sendFinish()                                      이체 완료 확인: finish 막 밑에서 이체 흐름 전 화면으로 (홈이면 새로 불러온 홈)
@@ -252,12 +253,10 @@ export function useAoFlow() {
 
   const goMenu = useCallback(() => go("/menu", { via: "menu" }), [go]);
   const goSearch = useCallback(() => go("/search", { via: "search" }), [go]);
+  const goDispute = useCallback((via: AoLoadProfile = "disputeLink") => go("/dispute", { via }), [go]);
+  const goDisputeCheck = useCallback(() => go("/dispute/check", { via: "disputeApply" }), [go]);
+  const goBranchSearch = useCallback(() => go("/dispute/branch", { via: "branchOpen" }), [go]);
 
-  // 지급정지 안내 (invented): 홈 카드 · T2 출금계좌 줄 · 잔액채우기 출금계좌 줄의 "지급정지" 글자를 누르면
-  const goBlockNotice = useCallback(
-    (accountId: string) => go(`/account/${encodeURIComponent(accountId)}/notice`, { via: "blockNotice", prefetch: [aoPaths.account(accountId)] }),
-    [go],
-  );
 
   const goHome = useCallback(() => {
     if (!active || !aoLock()) return Promise.resolve(false);
@@ -282,7 +281,7 @@ export function useAoFlow() {
 
   const canGo = useCallback(() => active && !aoLocked(), [active]);
 
-  return { go, canGo, goHistory, goTx, goSend, goAmount, goTopup, goMenu, goSearch, goBlockNotice, goHome, goHomeFresh, sendFinish };
+  return { go, canGo, goHistory, goTx, goSend, goAmount, goTopup, goMenu, goSearch, goDispute, goDisputeCheck, goBranchSearch, goHome, goHomeFresh, sendFinish };
 }
 
 // 화면이 자기 location.state 에서 읽는 값

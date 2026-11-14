@@ -465,17 +465,6 @@
   position: absolute;
   white-space: nowrap;
 }
-/* 지급정지 (invented, 녹화에 없음) */
-.ao-send-acct__tag--blocked {
-  position: absolute;
-  left: 43.4px;
-  top: 18.23px;
-  width: 54px;
-  font-size: 11px;
-  color: var(--ao-blocked);
-  font-weight: 500;
-  white-space: nowrap;
-}
 .ao-send-acct__bank {
   left: 89.9px;
   top: 15.2px;
@@ -813,14 +802,6 @@
   font-size: 12.2px;
   color: #7d7d7d;
 }
-/* 지급정지 (invented, 녹화에 없음): 이름 오른쪽, ▾ 와 안 겹치게 */
-.ao-send-topup__tag {
-  right: 90px;
-  top: 36.5px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ao-blocked);
-}
 .ao-send-topup__pchev {
   position: absolute;
   left: 311px;
@@ -908,17 +889,6 @@
 }
 .ao-send-topup--sel .ao-send-topup__error {
   top: 632.8px;
-}
-/* 지급정지 안내로 (invented) */
-.ao-send-topup__errlink {
-  margin-left: 8px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  text-decoration: underline;
-  color: inherit;
-  cursor: pointer;
 }
 /* 잔액채우기 버튼 732–788 (56; C3 8.5 · 11.9 · 12.05 위끝 2196 px), r 15, 18.5/600 (잉크 752.67–769.33 = 가운데 + 1).
    꺼짐: 바탕 #E0E0E0 · 글자 #808080 (C3 2.3 · 5.5 웹 막 밑 110 / 80, 5.6 T7 막 밑 51 / 26 — #F5F5F5 · 흰 글자면 116 / 119) */

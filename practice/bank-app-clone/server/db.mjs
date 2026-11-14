@@ -20,7 +20,7 @@ import { seedAlloneEmpty, seedAlloneExample } from "./allone-seed.mjs";
 // 토스뱅크 통장(main) + 다른 은행 계좌 + 토스머니(accounts.role = 'money') · 카드 · 포인트. 토스 전용 칸·표·API는 APP === "toss" 일 때만
 // (server/toss-seed.mjs 예시 데이터, server/toss-api.mjs 소비 · 자산 · 카드 · 포인트)
 // APP=allone 이면 NH올원뱅크 (NH농협은행 앱 — 콕뱅크 nh 와 다른 앱. 아이폰 · 라이트 고정 + 처음부터 녹화 인트로, server/data-allone/).
-// NH 계좌는 은행 코드 'nh' 로 저장 (앱 이름 allone 은 은행 코드가 아님). 올원 전용 칸·표(accounts.blocked/dispute_at, profile.notice_*, recent_hidden)는
+// NH 계좌는 은행 코드 'nh' 로 저장 (앱 이름 allone 은 은행 코드가 아님). 올원 전용 칸·표(accounts.blocked, profile.notice_*, recent_hidden)는
 // APP === "allone" 일 때만 (server/allone-seed.mjs 예시 데이터)
 export const APPS = ["kakao", "nh", "hana", "ibk", "kbank", "toss", "allone"];
 const appArg = process.argv.indexOf("--app");
@@ -216,9 +216,9 @@ function migrate(d) {
   // NH올원뱅크 전용 칸·표 (다른 앱 DB 파일은 건드리지 않음). 한도제한은 badge 가 아니라 따로 — 위 UPDATE 가 main 의 badge 를 열 때마다 지움
   if (APP === "allone") {
     const add = (table, column, type) => columns(table).includes(column) || d.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
-    add("accounts", "blocked", "INTEGER NOT NULL DEFAULT 0"); // 1 = 지급정지 — 이 계좌에서는 보낼 수 없음(서버도 막음). 입금은 그대로 됨. 🔔 패널에서 걸고 풂
+    add("accounts", "blocked", "INTEGER NOT NULL DEFAULT 0"); // 1 = 지급정지 — 이 계좌에서 보내면 403 ACCOUNT_BLOCKED (화면은 '안내' 팝업). 입금은 그대로. 🔔 패널에서 걸고 풂
     if (columns("accounts").includes("limited")) d.exec("ALTER TABLE accounts DROP COLUMN limited"); // '한도제한' 표시 제거 (쓰지 않음)
-    add("accounts", "dispute_at", "TEXT"); // 이의제기 신청 시각(ISO) — 신청하면 찍히고, 관리자가 지급정지를 풀면(해제) 다시 NULL
+    if (columns("accounts").includes("dispute_at")) d.exec("ALTER TABLE accounts DROP COLUMN dispute_at"); // 예전 이의제기 접수 칸 (쓰지 않음)
     add("profile", "notice_on", "INTEGER NOT NULL DEFAULT 1"); // 정기점검 안내 시트 보이기
     add("profile", "notice_items", "TEXT"); // 시트 첫 장 항목 JSON [{title, when}] (NULL = 화면이 계산한 기본값)
     // 누구에게 보낼까요 '최근' 삭제하기: 이 시각까지 보낸 이체는 최근 목록에서 숨김 (그 뒤에 새로 보내면 다시 나옴)

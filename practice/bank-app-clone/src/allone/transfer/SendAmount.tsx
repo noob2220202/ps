@@ -105,10 +105,9 @@ export function SendAmount() {
   // ---- 금액 검사 (§2.3: 0 < 금액 ≤ 잔액, ≤ 500만) ----
   const n = Number(amount || 0);
   const balance = from?.balance ?? 0;
-  const blocked = !!from?.blocked; // 지급정지 (invented) — 다른 오류보다 먼저 봄
-  const short = !blocked && n > 0 && !!from && n > balance;
-  const overLimit = !blocked && n > AO_LIMITS.perTransfer && !short;
-  const canNext = !blocked && !!from && aoCanSend(n, balance);
+  const short = n > 0 && !!from && n > balance;
+  const overLimit = n > AO_LIMITS.perTransfer && !short;
+  const canNext = !!from && aoCanSend(n, balance);
 
   const onKey = (k: PadKey) => setAmount((v) => padApply(v, k));
   const onChip = (man: number) => setAmount((v) => addMan(v, man));
@@ -133,11 +132,6 @@ export function SendAmount() {
     panelOut();
     markTopupLink();
     unlessMoved(flow.goTopup({ to: fromId, origin: "amount" }));
-  };
-  const onBlockNotice = () => {
-    if (!flow.canGo()) return;
-    panelOut();
-    unlessMoved(flow.goBlockNotice(fromId));
   };
   const onNext = () => {
     if (!canNext) return;
@@ -197,14 +191,7 @@ export function SendAmount() {
               <span className="ao-num ao-send-amt__digits">{aoNum(n)}</span>
               <span className="ao-send-amt__won">원</span>
             </p>
-            {blocked ? (
-              <p className="ao-send-amt__err">
-                <span className="ao-send-amt__errtext">입출금이 제한된 계좌예요</span>
-                <button type="button" className="ao-send-amt__link" onClick={onBlockNotice}>
-                  자세히 보기
-                </button>
-              </p>
-            ) : short ? (
+            {short ? (
               <p className="ao-send-amt__err">
                 <span className="ao-send-amt__errtext">출금가능금액 부족</span>
                 <button type="button" className="ao-send-amt__link" onClick={onTopup}>
@@ -222,12 +209,10 @@ export function SendAmount() {
         )}
       </div>
 
-      {/* 출금계좌 줄: 지급정지 · NH농협은행(끝 4자리) · 잔액 ▾ */}
+      {/* 출금계좌 줄: NH농협은행(끝 4자리) · 잔액 ▾ (녹화의 '한도제한' 글자는 빼기로 함) */}
       {from && (
         <button type="button" className={`ao-send-acct ao-send-acct--${lay}`} onClick={onAcct}>
-          {/* 지급정지 (invented, 녹화에 없음) */}
-          {from.blocked && <span className="ao-send-acct__tag--blocked">지급정지</span>}
-          <span className={`ao-send-acct__bank${from.blocked ? "" : " ao-send-acct__bank--solo"}`}>{aoBankLast4(from)}</span>
+          <span className="ao-send-acct__bank ao-send-acct__bank--solo">{aoBankLast4(from)}</span>
           <span className="ao-send-acct__bal">{aoWon(from.balance)}</span>
           <AoChevronDownIcon w={13} h={7.67} stroke={1.3} className="ao-send-acct__chev" />
         </button>

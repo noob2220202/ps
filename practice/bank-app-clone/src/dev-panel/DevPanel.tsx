@@ -549,14 +549,12 @@ function AccountEditor({ account, bank, run }: { account: Account; bank?: Bank; 
   );
 }
 
-// NH올원뱅크 계좌별 지급정지 (연습용, 녹화에 없음). 켜면 서버도 이 계좌에서 보내는 걸 막음(입금은 그대로). 풀면(끄기) 이의제기 신청 기록도 같이 지워짐.
-// 사용자가 이의제기를 신청했으면 그 사실만 보여 줌 — 관리자가 직접 "끄기" 를 눌러야 실제로 풀림 (신청 = 자동 해제 아님)
+// NH올원뱅크 계좌별 지급정지 (연습용). 걸면 이 계좌에서 보낼 때(이체 비밀번호 뒤 · 잔액채우기) 서버가 막고 '안내' 팝업 (녹화 C3 33.3 · 12.75). 입금은 그대로
 function AoBlockToggle({ account, run }: { account: Account; run: Run }) {
-  const a = account as AoAccount;
-  const blocked = !!a.blocked;
+  const blocked = !!(account as AoAccount).blocked;
   return (
     <div className="field">
-      <span className="field__label">지급정지 (이 계좌에서 보내기만 막음, 녹화에 없음){a.disputed ? " · 이의제기 접수됨" : ""}</span>
+      <span className="field__label">지급정지 (걸면 이 계좌에서 보낼 때 '안내' 팝업 · 연습용)</span>
       <Segmented
         value={blocked ? "on" : "off"}
         options={[

@@ -430,25 +430,6 @@
   border-radius: 50%;
   background: #414141;
 }
-/* 지급정지 (invented, 녹화에 없음) — 누르면 지급정지 안내로 */
-.ao-home-card__tag--blocked {
-  position: absolute;
-  left: 59.3px;
-  top: 73px;
-  width: 58px;
-  height: 23.33px;
-  border: none;
-  padding: 0;
-  border-radius: 4px;
-  background: #fffefb;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 25.3px;
-  letter-spacing: -0.3px;
-  text-align: center;
-  color: var(--ao-blocked);
-  cursor: pointer;
-}
 .ao-home-card__bal {
   left: 59.4px;
   top: 99.67px; /* 숫자 잉크 가운데 409.67 */

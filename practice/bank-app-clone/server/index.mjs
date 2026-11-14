@@ -108,7 +108,7 @@ function toAccount(row, profile = getProfile()) {
     bank: bankInfo(bank),
     ...(row.kind === "main" && { safebox: row.safebox }),
     ...(TOSS && toss.accountFields(row)), // openedAt · favorite · role
-    ...(ALLONE && { blocked: !!row.blocked, disputed: !!row.dispute_at }), // 올원 지급정지 — 서버도 실제로 보내기를 막음
+    ...(ALLONE && { blocked: !!row.blocked }), // 올원 지급정지 — 이 계좌에서 보내면 403 (POST /api/transfers)
   };
 }
 
@@ -528,7 +528,7 @@ app.patch("/api/accounts/:id", (req, res) => {
   if (!money(safebox)) throw bad("입력값을 확인해 주세요", { safebox: "0원 이상 10억원 이하" });
   if (safebox !== undefined && row.kind !== "main") throw bad("세이프박스는 카카오뱅크 통장에만 있어요");
   const tossSave = TOSS && toss.accountPatch(req.body ?? {}); // favorite · openedAt · sort · role (잘못된 값이면 여기서 400)
-  const blocked = ALLONE ? req.body?.blocked : undefined; // 올원 지급정지 (🔔 패널) — 풀면(false) 이의제기 신청 기록도 같이 지움
+  const blocked = ALLONE ? req.body?.blocked : undefined; // 올원 지급정지 (🔔 패널)
   if (blocked !== undefined && typeof blocked !== "boolean") throw bad("입력값을 확인해 주세요", { blocked: "켜기/끄기" });
   let formatted = row.number;
   if (number !== undefined) {
@@ -547,22 +547,9 @@ app.patch("/api/accounts/:id", (req, res) => {
     row.id,
   );
   if (tossSave) tossSave(row.id);
-  if (blocked !== undefined)
-    db()
-      .prepare(`UPDATE accounts SET blocked = ?${blocked ? "" : ", dispute_at = NULL"} WHERE id = ?`)
-      .run(blocked ? 1 : 0, row.id);
+  if (blocked !== undefined) db().prepare("UPDATE accounts SET blocked = ? WHERE id = ?").run(blocked ? 1 : 0, row.id);
   res.json(toAccount(findAccount(row.id)));
 });
-
-// 올원 이의제기 신청: 지급정지 중인 계좌에서만, 한 번만 찍힘 (이미 신청했으면 그대로 돌려줌 — 두 번 눌러도 다시 접수되지 않음).
-// 신청만으로 지급정지가 풀리지는 않음 — 관리자가 🔔 패널에서 직접 풀어야 함 (실제로 검토해서 처리한다는 걸 보여주려고)
-if (ALLONE)
-  app.post("/api/accounts/:id/dispute", (req, res) => {
-    const row = findAccount(req.params.id);
-    if (!row.blocked) throw bad("지금은 지급정지 상태가 아니에요");
-    if (!row.dispute_at) db().prepare("UPDATE accounts SET dispute_at = ? WHERE id = ?").run(nowIso(), row.id);
-    res.json(toAccount(findAccount(row.id)));
-  });
 
 // 다른 은행 계좌 삭제 (거래내역도 ON DELETE CASCADE로 같이 지워짐)
 app.delete("/api/accounts/:id", (req, res) => {
@@ -968,8 +955,8 @@ app.post("/api/transfers", (req, res) => {
   if (to.accountId === from.id) throw bad("같은 계좌로는 보낼 수 없어요");
   // 카카오뱅크 계좌 지급정지 (🔔 패널, 연습용): 보내지 않고 403 → 화면은 '고객센터로 문의해주세요.' 팝업
   if (db().app === "kakao" && getProfile().suspended) throw new HttpError(403, "ACCOUNT_SUSPENDED", "고객센터로 문의해주세요.");
-  // 올원 계좌별 지급정지: 이 계좌에서는 보낼 수 없음(잔액채우기의 출금계좌로도 안 됨). 입금은 막지 않음 — to 쪽은 보지 않음
-  if (ALLONE && from.blocked) throw new HttpError(403, "ACCOUNT_BLOCKED", "입출금이 제한된 계좌예요");
+  // 올원 계좌별 지급정지 (🔔 패널): 이 계좌에서는 보낼 수 없음(잔액채우기의 출금계좌로도). 입금은 막지 않음 — 화면은 '안내' 팝업
+  if (ALLONE && from.blocked) throw new HttpError(403, "ACCOUNT_BLOCKED", "지급정지된 계좌라 출금할 수 없어요");
   if (from.balance < amount)
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `출금 가능 금액(${from.balance.toLocaleString("ko-KR")}원)을 넘었어요`);
 

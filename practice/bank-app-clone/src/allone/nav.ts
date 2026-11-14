@@ -34,7 +34,9 @@ export type AoLoadProfile =
   | "menuLink"
   | "resend"
   | "acctFilter"
-  | "blockNotice";
+  | "disputeLink"
+  | "disputeApply"
+  | "branchOpen";
 
 export interface AoLoadSpec {
   dimOn: number;
@@ -74,8 +76,12 @@ export const LOAD: Record<AoLoadProfile, AoLoadSpec> = {
   resend: { dimOn: 0, cut: 967, off: 1000 }, // 거래내역 상세 다시보내기 (invented, replace)
   // 거래내역조회 조회 조건 적용 (invented, account.md §5.2 의 600ms): 줄은 567 에 막 밑에서 바뀌고 스피너 567 · 막 600 에 걷힘. 화면이 바뀌지 않음
   acctFilter: { dimOn: 0, cut: 567, off: 600 },
-  // 지급정지 안내 (invented, 녹화에 없음 — menuLink 와 같은 느낌의 짧은 링크 막)
-  blockNotice: { dimOn: 0, cut: 267, off: 300 },
+  // 이의제기 (dispute 영역이 녹화에 맞춰 고침 — 지금 값은 자리표시): 통합검색 결과 → 이의제기 신청 및 조회 (C3 43.0 누름 → 45.5 녹화 끝까지 막, C4 0.0 에 화면)
+  disputeLink: { dimOn: 0, cut: 2500, off: 2533 },
+  // 이의제기 신청 → 신청 전 확인해 주세요 (C4 1.5–2.0)
+  disputeApply: { dimOn: 0, cut: 450, off: 483 },
+  // 영업점 칸 → 영업점검색 (C4 6.0–6.5)
+  branchOpen: { dimOn: 0, cut: 267, off: 300 },
 };
 
 // ---------- location.state ----------
