@@ -52,9 +52,9 @@ Balances do not change on cancel.
 - Example seed with from=main: mine = hana, kakao, nh, money ("+4개"). recent has 12 rows, including hana, kakao and money as own accounts.
 
 **`GET /api/home`.** `monthlyCardSpend` = shared spend total (same as 소비 total) plus:
-`toss: {spend: {month, total}, pointChances, reward: {month, max: number | null, dismissed: boolean}, youthCard: {id, name, balance, lastUsedAt} | null, adSnoozeUntil: string | null}`
+`toss: {spend: {month, total}, pointChances, reward: {month, max: number | null, dismissed: boolean}, cardBill: {id, name, amount, dueDate} | null, adSnoozeUntil: string | null}`
 - `reward.dismissed` = profile.rewardDismissed === the current month.
-- `youthCard` = the first card with kind prepaid.
+- `cardBill` = the first card with kind credit (sort order): `amount` = its `bill`, `dueDate` = next 결제일 ('YYYY-MM-DD': this month if today ≤ payDay, else next month; a missing day → that month's last day). Home card 2 row 2 '{D}일 낼 카드값'.
 - The kakao banners and the other existing fields are still present.
 
 **`GET /api/toss/spend?month=YYYY-MM&tab=all|card|account|pay`.** Both parameters are optional (current month, all). A malformed month or tab returns 400; a future month is clamped to the current one. Returns:
@@ -75,14 +75,17 @@ Rules:
 - **Row taps:** the client navigates to /tx/:txId only when channel === "account".
 
 **`GET /api/toss/assets`** (also used by 내 계좌):
-`{total (accounts + points; cards are not assets), accounts: {count, total, items: [{id, bankCode, name, number, balance, isMain, role, favorite}]} in sort order, cards: {count, items: [{id, name, bankCode, accountId, art, kind, balance? (prepaid only), lastUsedAt, sort, monthAmount}]} sorted by monthAmount desc, points: {count, items: [{id, name, balance, icon, sort}]}}`
+`{total (accounts + points; cards are not assets), accounts: {count, total, items: [{id, bankCode, name, number, balance, isMain, role, favorite}]} in sort order, cards: {count, items: [{id, name, bankCode, accountId, art, kind, bill? · payDay? (credit only), sort, monthAmount}]} sorted by monthAmount desc, points: {count, items: [{id, name, balance, icon, sort}]}}`
 monthAmount = this month's non-cancelled debits with that card_id.
 
 **Cards CRUD**
-- `GET /api/toss/cards` → `[{id, name, bankCode, accountId, art, kind, balance? (prepaid only), lastUsedAt, sort}]`
-- `POST /api/toss/cards {name, bankCode, accountId?, art?, kind = "check" | "prepaid", balance?, lastUsedAt? (YYYY-MM-DD[THH:mm[:ss]]), sort?}` → 201 card, id "card-xxxxxxxx"
+- `GET /api/toss/cards` → `[{id, name, bankCode, accountId, art, kind, bill? · payDay? (credit only), sort}]`
+- `POST /api/toss/cards {name, bankCode, accountId?, art?, kind = "check" | "credit", bill? (0~10억), payDay? (1~31, required for credit), sort?}` → 201 card, id "card-xxxxxxxx". A check card stores bill / payDay as NULL
 - `PATCH /api/toss/cards/:id` takes any subset and returns the card.
 - `DELETE /api/toss/cards/:id` → 204 and clears transactions.card_id.
+- Adult account (later change): kinds are check | credit (the first version had check | prepaid with balance · last_used_at — 원본 녹화의 연령 전용 상품은 성인용으로 바꿈).
+  `migrate()` (toss only) rebuilds an old `cards` table once (it still has `last_used_at`): the example prepaid card `c-youth` becomes the example credit card
+  `c-day` (bill = its old balance, payDay 14, pays from `hana` if present), other prepaid cards become check cards, art `hana-young` → `hana-travlog`, `toss-youth` → NULL.
 
 **Points CRUD**
 - `GET /api/toss/points` → `[{id, name, balance, icon, sort}]`
@@ -94,7 +97,7 @@ monthAmount = this month's non-cancelled debits with that card_id.
 
 **Seed ids:**
 - accounts: main, hana, kakao, nh, money
-- cards: c-toss, c-hana, c-kakao, c-youth
+- cards: c-toss, c-hana, c-kakao, c-day (credit)
 - points: pt-toss, pt-hana
 
 **Empty seed:** main and money at 0, opened today; 토스포인트 0; rewardMax null; cashbackCount 0; no cards, transactions or payees.
@@ -111,8 +114,8 @@ monthAmount = this month's non-cancelled debits with that card_id.
 - **Additive extras beyond the plan's shapes:**
   - spend: `today`, `tab`, and on items `accountId`, `channel`, `time`
   - assets: `accounts.total`, and `number` / `favorite` on accounts
-  - cards: `accountId`, `lastUsedAt`, `sort`
-  - youthCard: `id`
+  - cards: `accountId`, `sort`
+  - cardBill: `id`, `name`
   - counterparty: `accountId`, `digits`
   - factory: `spend` / `assets` exposed for tests
 - **Choices where the plan was silent:**
@@ -321,7 +324,7 @@ Other boot wiring: TossSplash is at home/TossSplash.tsx (`{onDone}`), called by 
 The server contract is as the server agent reported it, and the client types in src/toss/api.ts now match it exactly. Server shapes are unchanged.
 
 **src/toss/api.ts**
-- `TossHomeBlock` = {spend: {month, total}, pointChances, reward: {month, max: number | null, dismissed: boolean}, youthCard: {id, name, balance, lastUsedAt} | null, adSnoozeUntil: string | null}.
+- `TossHomeBlock` = {spend: {month, total}, pointChances, reward: {month, max: number | null, dismissed: boolean}, cardBill: {id, name, amount, dueDate} | null, adSnoozeUntil: string | null}.
 - `TossSpend` = {month, label, today, hasPrev, hasNext, tab: TossSpendTab, total, vsLastMonth: {diff}, categories: TossSpendCategory[], days: TossSpendDay[], cashback: {count} | null, groups: TossSpendGroup[]}.
 - `TossSpendCategory` = {key, label, color, amount}. `TossSpendDay` = {date, dow, income, expense}.
 - `TossSpendItem` = {id, txId, accountId, channel: TossChannel, time, title, suffix?: "취소", subtitle, amount, tone: TossSpendTone, icon}.
@@ -329,10 +332,10 @@ The server contract is as the server agent reported it, and the client types in 
 - `TossCounterparty` = {direction, own, accountId?, accountName?, bank, number, digits, holder}. `TossTxDetail` adds `own?`.
 - `TossAssets` = {total, accounts: {count, total, items: TossAssetAccount[]}, cards: {count, items}, points: {count, items}}.
   - `TossAssetAccount` = {id, bankCode, name, number: string | null, balance, isMain, role, favorite}.
-  - `TossAssetCard` = {id, name, bankCode, accountId, art, kind, balance? (prepaid only), lastUsedAt, sort, monthAmount}.
+  - `TossAssetCard` = {id, name, bankCode, accountId, art, kind: TossCardKind ("check" | "credit"), bill? · payDay? (credit only), sort, monthAmount}.
   - `TossAssetPoint` = {id, name, balance, icon, sort}.
-- `TossCard.balance` is optional (prepaid only).
-- `TossCardInput` (POST/PATCH body, balance / accountId / art / lastUsedAt nullable).
+- `TossCard.bill` / `TossCard.payDay` are optional (credit only).
+- `TossCardInput` (POST/PATCH body, bill / accountId / art / payDay nullable).
   - `tossApi.addCard(TossCardInput & {name, bankCode})`
   - `tossApi.updateCard(id, TossCardInput)`
   - `tossApi.addPoint({name, balance?, icon?, sort?})`

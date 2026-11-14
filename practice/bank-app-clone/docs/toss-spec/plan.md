@@ -6,6 +6,10 @@ This file is the single source of truth where the six area specs disagree. Read 
 
 **Privacy.** This file contains no value from the recordings. Seed values below are invented (홍길동-style). Placeholders such as `<NAME_A>` and `<ACCT_A>` only describe roles and formats. Frames and crops stay in `…/scratchpad/toss/frames/<area>/`. Never commit a frame. A crop is committed only after someone has looked at it.
 
+**Adult account.** The clone shows an **adult** Toss account (원본 녹화의 연령 전용 상품은 성인용으로 바꿈): the seed is a salary account with
+fixed bills and a credit card, home card 2 row 2 shows the credit card's next bill '{D}일 낼 카드값', and cards are check | credit. The recorded
+layout, positions, font sizes and colours are kept; only age-specific content was swapped (sources and the full mapping: SOLUTION 27장 '성인 계정').
+
 **Units.** dp = screen coordinates of the 384 × 853.33 frame (0 = top of the status bar). Video px / 1.25 = dp. Times are real pts in seconds (A = first video, B = second video).
 
 ---
@@ -40,7 +44,7 @@ This file is the single source of truth where the six area specs disagree. Read 
 7. **Unbuilt controls use the repo convention** (SOLUTION 22: "기능 없는 다른 버튼들도 안내창 없이 무반응"): press feedback, then no-op. There is **no "준비 중이에요" toast**. Exceptions are listed in §1.6.
    - The tabs **혜택 / 쇼핑 / 증권** open one shared **placeholder tab screen** with the tab bar.
    - 전체 opens the invented 전체 메뉴.
-8. **토스머니 is a real `accounts` row** (`role = 'money'`, bank toss). This keeps it in 내 계좌 / recipients as the recording shows, and transfers to it need no special code. **Points** get a small table. **Cards** get a table with an optional prepaid balance (토스유스카드).
+8. **토스머니 is a real `accounts` row** (`role = 'money'`, bank toss). This keeps it in 내 계좌 / recipients as the recording shows, and transfers to it need no special code. **Points** get a small table. **Cards** get a table; credit cards also store the next bill and the payment day (home '{D}일 낼 카드값').
 9. **The spend total is one server function**, `tossSpendTotal(month)`, and it feeds both home "{M}월에 쓴 돈" and 소비. It uses assets.md's counted rule, which **includes transfers to other people**; home.md's card-only rule is replaced. The 🔔 `card_spend` override applies to both.
 10. **Incoming counterparties need no new columns.** Other people use the repo's existing sender record (a `transfers` row whose `out_tx_id` points at the deposit; `SENT()` already excludes it). Own-account transfers get a toss-gated `in_tx_id` lookup.
 11. **Post-transfer ad pages are shown.**
@@ -207,7 +211,7 @@ All server changes are **gated** (`APP === "toss"` or `db().app === "toss"`). Co
 | profile | `reward_max INTEGER` (NULL hides the banner) | home banner "<given>님의 {M}월 최대 적립금 N원" |
 | profile | `reward_dismissed TEXT` ('YYYY-MM') | banner × |
 | profile | `ad_snooze_until TEXT` (ISO) | post-transfer ad pages |
-| new `cards` (toss only, created in `migrate()` when `APP === "toss"`) | `id TEXT PK, name TEXT, bank_code TEXT, account_id TEXT NULL, art TEXT, kind TEXT ('check'\|'prepaid'), balance INTEGER NULL, last_used_at TEXT NULL, sort INTEGER` | 자산 카드, home 토스유스카드 row, 소비 subtitles |
+| new `cards` (toss only, created in `migrate()` when `APP === "toss"`) | `id TEXT PK, name TEXT, bank_code TEXT, account_id TEXT NULL, art TEXT, kind TEXT ('check'\|'credit'), bill INTEGER NULL, pay_day INTEGER NULL, sort INTEGER` | 자산 카드, home '{D}일 낼 카드값' row (first credit card), 소비 subtitles |
 | new `points` (toss only) | `id TEXT PK, name TEXT, balance INTEGER, icon TEXT, sort INTEGER` | 자산 포인트 |
 
 No new transaction **tags** are added. 페이·기타 comes from `channel`, and the cashback medal comes from `category = '캐시백'`. `TAGS`, `TxTag` and the DevPanel tag chips stay as they are.
@@ -217,18 +221,19 @@ No new transaction **tags** are added. 페이·기타 comes from `channel`, and 
 - **counted(tx)**: `amount < 0` and `!cancelled` and `!exclude` and `!own(tx)`. Transfers to other people count.
 - **tossSpendTotal(month)**: `profile.card_spend ?? Σ|amount| of counted debits in month`. Used by `/api/home` (`monthlyCardSpend` and `toss.spend.total`) and by `/api/toss/spend`.
 - **vsLastMonth**: total(M, day 1..today) − total(M−1, day 1..same day). The copy rules are in assets.md §4.1.
-- **categories**: counted spend by `category ?? (tag #이체 ? '이체' : '카테고리 없음')`, top 3 plus 그 외. Colours: 이체 #2f7ff3, 카테고리 없음 #1e7055, 교육 #804b20 (measured); invented: 식비 #d9822b, 카페·간식 #b0703a, 편의점·마트 #c9a227, 쇼핑 #8a5cf5, 교통 #27a5a0, 문화·여가 #d6458f; 그 외 #3e3d40.
+- **categories**: counted spend by `category ?? (tag #이체 ? '이체' : '카테고리 없음')`, top 3 plus 그 외. Colours: 이체 #2f7ff3, 카테고리 없음 #1e7055, 교육 #804b20 (measured); invented: 식비 #d9822b, 카페·간식 #b0703a, 편의점·마트 #c9a227, 쇼핑 #8a5cf5, 교통 #27a5a0, 문화·여가 #d6458f, 주거·통신 #e2574c; 그 외 #3e3d40. 교육 stays selectable but the example seed has none.
 - **overspent(day)**: day expense > 2 × the month's average daily expense **and** ≥ 30,000원.
 - **총 자산** = Σ balances of all accounts (토스머니 included) + Σ points. Cards are not assets.
 - **card monthAmount** = Σ|amount| of this month's non-cancelled debits with that `card_id`.
 - **interest accrued** (통장 "어제까지 쌓인 이자", computed client-side) = `floor(balance × 0.01 × (dayOfMonth − 1) / 365)`, which is 0원 on the 1st. The rate matches the product menu's "토스뱅크 통장 연 1%".
 - **내 자산 N개** (통장 header) = number of accounts with `bank_code = 'toss'` (통장 + 토스머니). Its sheet is a no-op.
-- **youth card "N개월 전"** = whole months since `last_used_at`; 0 → "이번 달".
+- **next card bill** (home card 2 row 2) = the first credit card's `bill`, due on its `pay_day` this month if today ≤ that day, else next month → "{D}일 낼 카드값".
 - **given name** (banner) = `userName.length === 3 ? userName.slice(1) : userName`, computed client-side with no column.
 
 ### 2.3 Seed `seedTossExample(d, userName = "홍길동")` (all invented; `server/toss-seed.mjs`)
 **Dates are relative to now.** Use the server's `nowIso()` clock.
 - `c(n, "HH:MM")` = today − n days, clamped to the 1st of the current month 00:00+.
+- `m(day, …)` = that day of this month, only if it is before today (monthly bills that have not come yet are left out).
 - `p(day, …)` = that day of the previous month; `q(day, …)` = that day two months back.
 
 Any timestamp that would land after now (for example `c(0, "09:12")` when seeding at 08:00) is pulled back to now − (k + 1) minutes, where k is its rank among today's rows. This keeps the order stable and nothing in the future.
@@ -241,22 +246,27 @@ This keeps "{M}월에 쓴 돈", 소비 and 지난달 comparisons populated on an
 
 | id | kind | bank | name | number (format) | balance | opened_at | role |
 |---|---|---|---|---|---|---|---|
-| main | main | toss | 토스뱅크 통장 | 1000-1234-5678 (4-4-4) | 1,250,000 | 2024-03-15 | |
-| money | external | toss | 토스머니 | 1000-9999-0001 (internal, never displayed) | 3,200 | | money |
-| hana | external | hana | 영하나플러스 통장 | 123-456789-01234 (3-6-5) | 84,500 | 2023-08-02 | |
-| kakao | external | kakao | 입출금통장 | 3333-01-2345678 (4-2-7) | 15,300 | | |
-| nh | external | nh | 자립예탁금 | 301-0123-4567-01 (3-4-4-2; S1 sub shows raw digits) | 52,000 | | |
+| main | main | toss | 토스뱅크 통장 | 1000-1234-5678 (4-4-4) | 4,286,400 (salary account) | 2024-03-15 | |
+| money | external | toss | 토스머니 | 1000-9999-0001 (internal, never displayed) | 12,800 | | money |
+| hana | external | hana | 주거래하나 통장 | 123-456789-01234 (3-6-5) | 1,126,400 (card bill · fixed bills) | 2023-08-02 | |
+| kakao | external | kakao | 입출금통장 | 3333-01-2345678 (4-2-7) | 152,300 | | |
+| nh | external | nh | 자립예탁금 | 301-0123-4567-01 (3-4-4-2; S1 sub shows raw digits) | 520,000 | | |
+
+Balances are chosen so that the back-computed `balanceAfter` never drops below 0원 over the three months (two salaries come in).
 
 The order (`sort`) is the 내 계좌 order: main, hana, kakao, nh, money.
 
 **Cards:**
 
-| id | name | bank | linked | kind | balance / last used |
-|---|---|---|---|---|---|
-| c-toss | 토스뱅크 체크카드 | toss | main | check | — |
-| c-hana | Young Hana+ 체크카드 | hana | hana | check | — |
-| c-kakao | 프렌즈 체크카드 | kakao | kakao | check | — |
-| c-youth | 토스유스카드 | toss | — | prepaid | 15,000 / q(10, 14:00) |
+| id | name | bank | linked (credit: pays from) | art | kind | bill / pay day |
+|---|---|---|---|---|---|---|
+| c-toss | 토스뱅크 체크카드 | toss | main | toss-check | check | — |
+| c-hana | 트래블로그 체크카드 | hana | hana | hana-travlog | check | — |
+| c-kakao | 프렌즈 체크카드 | kakao | kakao | kakao-friends | check | — |
+| c-day | 토스뱅크 하나카드 Day | hana | hana | hana-day | credit | 428,600 if today ≤ 14 else 351,700 / 14 |
+
+Credit-card purchases are not stored (a transaction must belong to an account, and the card's purchases would land in the pay-from account's history and balance).
+The bill shows on home and as the monthly '하나카드' auto-debit below.
 
 **Points:** 토스포인트 1,280 · 하나머니 350.
 
@@ -280,17 +290,18 @@ The order (`sort`) is the 내 계좌 order: main, hana, kakao, nh, money.
 
 **Transfers sent from main.** Each row creates the out transaction, plus the deposit on the own account where the destination is mine. `memo_to` is NULL (defaults to the user name).
 1. c(0, 09:12) → 최지우 15,000
-2. c(1, 18:40) → **내 hana** 50,000
+2. c(1, 18:40) → **내 hana** 500,000
 3. c(2, 12:05) → 김철수 32,000
 4. c(3, 20:31) → 이영희 8,500
-5. c(5, 13:10) → **내 kakao** 20,000
+5. c(5, 13:10) → **내 kakao** 100,000
 6. c(6, 19:22) → 박민수 120,000
 7. p(25, 11:00) → 정하늘 45,000
 8. p(18, 08:30) → 오세라 12,000
 9. p(9, 21:15) → **내 money** 10,000
-10. p(4, 10:45) → (주)예시상사 77,000
+10. p(4, 10:45) → 서지호 77,000
 11. q(20, 16:20) → 윤다온 5,000
 12. q(11, 09:05) → 강예린 9,900
+13. p(26, 08:50) → **내 hana** 700,000 (the day after payday)
 
 This gives 최근 보낸 계좌 with own accounts mixed in, ≥ 4 sent transfers on ≥ 3 dates for the cert, and one to an own other-bank account.
 
@@ -298,7 +309,7 @@ This gives 최근 보낸 계좌 with own accounts mixed in, ≥ 4 sent transfers
 
 **Incoming from other people** (deposit plus the existing sender record):
 - c(4, 10:20) main +30,000 from 이영희 (kakao)
-- p(15, 09:00) main +150,000 from (주)예시상사 (shinhan)
+- p(25, 09:00) and q(25, 09:00) main +2,850,000 salary from (주)예시상사 (shinhan)
 - c(2, 15:40) hana +20,000 from 김철수 (kb)
 
 **Card, pay, interest, cashback and bill rows** (`account · when · merchant · amount · tag · channel · category · card · flags`):
@@ -306,39 +317,42 @@ This gives 최근 보낸 계좌 with own accounts mixed in, ≥ 4 sent transfers
 main  c(0,08:05)  한빛편의점      -4,800   #체크카드 card 편의점·마트 c-toss
 main  c(1,12:30)  소나무분식      -9,000   #체크카드 card 식비       c-toss
 main  c(2,15:10)  하늘카페        -5,500   #체크카드 card 카페·간식  c-toss
-main  c(3,16:45)  새싹문구       -12,000   #체크카드 card 교육       c-toss
+main  c(2,21:40)  달빛포차       -46,000   #체크카드 card 식비       c-toss
+main  c(3,18:20)  바다주유소     -52,000   #체크카드 card 교통       c-toss
 main  c(3,21:02)  카드 캐시백        +50   #체크카드 card 캐시백     c-toss
 main  c(5,19:40)  샘플쇼핑_PG    -32,900   #체크카드 pay  쇼핑       c-toss   (pay: two-line subtitle)
 main  c(6,13:15)  예시마트       -68,000   #체크카드 card 편의점·마트 c-toss   (overspent day with transfer 6)
 main  c(6,18:05)  별빛서점       -23,000   #체크카드 card 문화·여가  c-toss
 main  c(7,23:40)  구름택시       -14,300   #체크카드 card 교통       c-toss
-main  p(1,00:10)  통장 이자         +412   #예금이자 account 이자
+main  p(1,00:10)  통장 이자       +3,268   #예금이자 account 이자
 main  p(3,12:00)  소나무분식      -8,000   #체크카드 card 식비       c-toss
 main  p(7,08:40)  한빛편의점      -3,200   #체크카드 card 편의점·마트 c-toss
 main  p(12,19:30) 하늘카페        -6,100   #체크카드 card 카페·간식  c-toss
+main  p(16,18:10) 바다주유소     -61,000   #체크카드 card 교통       c-toss
 main  p(20,14:20) 예시마트       -41,000   #체크카드 card 편의점·마트 c-toss
 main  p(27,21:00) 카드 캐시백        +30   #체크카드 card 캐시백     c-toss
-main  q(1,00:10)  통장 이자         +388   #예금이자 account 이자
+main  q(1,00:10)  통장 이자       +2,941   #예금이자 account 이자
 main  q(6,13:00)  별빛서점       -15,000   #체크카드 card 문화·여가  c-toss
 main  q(14,18:45) 소나무분식      -9,500   #체크카드 card 식비       c-toss
 main  q(23,11:30) 구름택시       -11,800   #체크카드 card 교통       c-toss
 hana  c(1,08:20)  한빛편의점      -2,300   #체크카드 card 편의점·마트 c-hana
 hana  c(3,17:10)  샘플쇼핑_PG    -19,800   #체크카드 card 쇼핑       c-hana   cancelled=1
-hana  c(4,16:00)  바른학원      -150,000   #체크카드 card 교육       c-hana
-hana  c(5,07:00)  하나카드       -54,000   #자동이체 account (none)            exclude=1 (card bill)
+hana  c(4,16:00)  튼튼헬스       -99,000   #체크카드 card 문화·여가  c-hana
 hana  c(5,12:40)  하늘카페        -4,800   #체크카드 card 카페·간식  c-hana
-hana  p(5,07:00)  하나카드       -61,000   #자동이체 account (none)            exclude=1
+hana  m/p/q(3,10:00)  예시텔레콤    -55,000   #자동이체 account 주거·통신      (each month; this month only after the 3rd)
+hana  m/p/q(10,09:30) 푸른마을관리비 -186,000 / -172,000 / -168,000  #자동이체 account 주거·통신
+hana  m/p/q(14,07:00) 하나카드  -428,600 / -386,900 / -412,300  #자동이체 account (none)  exclude=1 (Day card bill)
 hana  p(9,13:30)  소나무분식      -7,500   #체크카드 card 식비       c-hana
 hana  p(16,20:10) 예시마트       -22,000   #체크카드 card 편의점·마트 c-hana
 kakao c(2,22:15)  앱마켓_PG       -1,100   #체크카드 pay  카테고리 없음 c-kakao
 kakao c(4,12:10)  소나무분식      -7,000   #체크카드 card 식비       c-kakao
-kakao p(11,19:00) 별빛서점        -9,000   #체크카드 card 문화·여가  c-kakao
+kakao p(11,19:00) 샘플OTT_PG     -13,900   #체크카드 pay  문화·여가  c-kakao
 kakao p(22,15:30) 한빛편의점      -2,700   #체크카드 card 편의점·마트 c-kakao
-nh    p(2,10:00)  자립예탁금 이자    +95   #예금이자 account 이자
+nh    p(2,10:00)  자립예탁금 이자    +43   #예금이자 account 이자
 nh    q(9,14:00)  오세라          +20,000  #이체    account 이체           (sender record: 오세라, nh)
 money c(3,11:11)  토스페이 결제    -2,400   #체크카드 pay  쇼핑
 ```
-In total there are about 60 transactions over 3 months. Main gets ≥ 20 rows, which fill 거래내역 past one screen. Balances are the stored values above; `balanceAfter` is derived by the server as today.
+In total there are about 65 transactions over 3 months (63–66 depending on the day). Main gets ≥ 20 rows, which fill 거래내역 past one screen. Balances are the stored values above; `balanceAfter` is derived by the server as today.
 
 **Empty seed** `seedTossEmpty(d, userName)`:
 - Main 토스뱅크 통장 with balance 0 and 토스머니 0.
@@ -361,7 +375,7 @@ This exercises "출금할 수 있는 돈이 0원이에요", the empty lists and 
 
 | endpoint | toss change |
 |---|---|
-| `GET /api/home` | `monthlyCardSpend = tossSpendTotal(month)` plus `toss: { spend:{month,total}, pointChances, reward:{month,max,dismissed}, youthCard:{name,balance,lastUsedAt}\|null, adSnoozeUntil }`. The kakao banners and other fields stay as they are; toss ignores them |
+| `GET /api/home` | `monthlyCardSpend = tossSpendTotal(month)` plus `toss: { spend:{month,total}, pointChances, reward:{month,max,dismissed}, cardBill:{id,name,amount,dueDate}\|null, adSnoozeUntil }`. The kakao banners and other fields stay as they are; toss ignores them |
 | `toAccount` | adds `openedAt`, `favorite`, `role` |
 | `listTransactions` rows | add `category`, `channel` (derived when NULL), `cardId`, `cancelled`, `exclude`, `own` |
 | `GET /api/transactions/:id` | adds `kindLabel` ('입금' / '출금') and `counterparty: {direction, own, accountName?, bank, number, holder}`. Sources, in order: `out_tx_id` (sent), `in_tx_id` → `from_account_id` (own incoming), the sender record (others incoming). `memoTo` stays as it is |
@@ -402,7 +416,7 @@ Mount points in `DevPanel.tsx` are foundation-owned and gated `APP === "toss"`. 
 | 계좌 → 개설일 (toss) | cert A |
 | 카드 → 이번 달 쓴 돈 (`card_spend`, or auto) and 캐시백 N | home "{M}월에 쓴 돈" **and** the 소비 total; 소비 cashback row and S4-detail "캐시백 기회 N번" |
 | 토스 → 포인트 기회 N번, 리워드 최대 적립금 (or hide), 리워드 배너 다시 보이기, 이체 뒤 광고 다시 보이기 (clear snooze) | home cards, banner, ad pages |
-| 토스 → 카드 목록 (name, bank, linked account, kind, prepaid balance, last used) | 자산 카드, home 토스유스카드 row |
+| 토스 → 카드 목록 (name, bank, linked / pay-from account, kind check · credit, credit: next bill and pay day, art) | 자산 카드, home '{D}일 낼 카드값' row |
 | 토스 → 포인트 목록 (name, balance) | 자산 포인트, 총 자산 |
 | 거래 → existing fields + toss fields: 분류 (category select), 결제 수단 (card / account / pay), 카드, 취소됨, 소비에서 제외, 상대 정보 (existing) | 거래내역 icons, 상세, 소비 (tone, total, bar, strip) |
 | 받는 분 → existing CRUD and ☆ | S1 최근 보낸 계좌 holder names, lookup |
@@ -591,8 +605,8 @@ All boxes are video px (x0, y0, x1, y1) on the 480 × 1066 frame at the given pt
 ### 5.2 Home (A1)
 | asset | source | box | method | privacy |
 |---|---|---|---|---|
-| half-card illustrations (convenience store, iced coffee + barcode) | B 136.113 | 140,662,226,734 · 380,662,452,734 | ESRGAN ×4, key out card + glow | OK |
-| list icons 계좌 개설 / 토스쇼핑 / 체크카드 혜택 추천 | B 136.113 | 38,766,74,800 · 38,826,74,860 · 38,888,74,924 | crop ×4, or SVG | OK |
+| half-card illustration (iced coffee + barcode; the left card uses the adult copy and the product-menu 신용대출 icon) | B 136.113 | 380,662,452,734 | ESRGAN ×4, key out card + glow | OK |
+| list icons 계좌 개설 / 토스쇼핑 / 카드 혜택 추천 | B 136.113 | 38,766,74,800 · 38,826,74,860 · 38,888,74,924 | crop ×4, or SVG | OK |
 | 오늘의 딜 teal mark | A 10.698 | 360,817,412,869 | crop ×4, or SVG | OK |
 | calendar lottie key frames (+, ₩, flip) | B 128.650 / 129.251 / 127.990 | 176,232,338,406 | crop ×4; 1.9 s cross-fade loop | OK (the heads-up pill is outside the box) |
 | coupon "5000" image | B 74.942 | 28,638,104,684 | crop ×4 | OK |
@@ -636,8 +650,8 @@ All boxes are video px (x0, y0, x1, y1) on the 480 × 1066 frame at the given pt
 | asset | how | privacy |
 |---|---|---|
 | bank squircles (toss, hana, kakao, nh) | `BankLogo` (§5.1); refs `frames/assets/crops/logo_*.png` | OK |
-| card plates: 프렌즈 체크카드 (yellow), Young Hana+ 체크카드 (mint) | CSS (29.6 × 43.2, radius 2.4). The mint plate may use `crops/card_plate_mint.png` (asset_top px 38,660–77,717), ESRGAN ×4 | OK (product art, no number or name) |
-| card plates for the invented cards (토스뱅크 체크카드, 토스유스카드) | CSS (invented colours) | OK |
+| card plates: 프렌즈 체크카드 (yellow) | CSS (29.6 × 43.2, radius 2.4) | OK (product art, no number or name) |
+| card plates for the other cards (토스뱅크 체크카드, 트래블로그 체크카드 / 하나 default = 하나 green, 토스뱅크 하나카드 Day = grey leather + stitch) | CSS (invented colours) | OK |
 | 소비 category icons (이체 ₩, cashback, store, invented categories), refresh blob, ◂ ▸, ⋯, plus | SVG (36 dp squircles) | OK |
 | **never crop**: merchant brand logos in 소비 | category icons instead | NOT OK |
 

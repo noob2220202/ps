@@ -78,7 +78,7 @@ The tools are in `…/scratchpad/toss/tools/assets/`.
 | A8 | Drag back down: indicator 포인트 → 카드 → 계좌, tabs un-stick | 157.05–157.57 (un-stick 157.27–157.30) | |
 | A9 | **Pull-to-refresh**: overscroll, blob indicator, header dims | pull 157.30–157.72, hold/refresh 157.72–158.22, finish 158.24–158.62, glow fades by ~159.3 | §2.2.6 |
 | A10 | Row pressed (other-bank account, 2nd row) | 160.604–161.267 | |
-| A11 | Push → other-bank account detail (영하나플러스 통장) | 161.267 → … 164.77 | **account.md S4** |
+| A11 | Push → other-bank account detail (하나은행 계좌; clone example 주거래하나 통장) | 161.267 → … 164.77 | **account.md S4** |
 | A12 | Pop back to 자산 | 164.77–165.04 | account.md P3 |
 | A13 | "계좌 n개 전체보기" pressed | 165.868–166.10 (fill fades back to 166.15) | |
 | E0 | Push → blank page (back arrow only; status bar black) | 166.49 → ~166.85; blank to 168.0 | |
@@ -161,7 +161,7 @@ Page `#171619`. The status bar uses the same colour. No bottom bar.
     - **income from others**: `+N원` blue `#3182f6`
     - **cancelled**: grey `#6f6e71` with a **strike-through**. The title gets a suffix: ` | ` (`#d7d6d9`) + `취소` (17 R `#767578`).
 - **Subtitle rules seen**:
-  - card spend → the card product name, e.g. `Young Hana+ 체크카드`, `프렌즈 체크카드`
+  - card spend → the card product name, e.g. `트래블로그 체크카드` (clone example), `프렌즈 체크카드`
   - transfer from/to another person → `내 토스뱅크 통장` / `내 카카오뱅크 계좌` / `내 하나은행 계좌` (the account it touched)
   - own transfer → `<from bank> → <to bank>`, e.g. `토스뱅크 → 하나은행`. When the source label is a person's name it is `<NAME_A> → 하나은행`
   - pay → `<card name> · <merchant detail>` (wraps)
@@ -224,7 +224,7 @@ The button is 40 tall, fill `#2b2a2d`, radius 10, label 15 SB `#f8f7f9` centred.
   - Line 2: the product name, 13 R `#b3b2b6`, ink top = row top + 35.2.
   - The main account adds ` · ` (`#575659`) + **`주계좌`** 13 M blue `#3182f6`.
   - **송금** button: x 300.8–353.6, 52.8 × 32, centred; fill `#303135`, radius 8, label 13 SB `#c5c6c9`.
-  - Example labels: `토스뱅크 통장 · 주계좌`, `영하나플러스 통장` (하나), `입출금통장` (카카오뱅크).
+  - Example labels (clone seed): `토스뱅크 통장 · 주계좌`, `주거래하나 통장` (하나), `입출금통장` (카카오뱅크).
 - **Card row** (58.4): a vertical **card-plate thumbnail** 29.6 × 43.2 (radius ≈ 2.4) at x 31.2, centred.
   - Line 1: `<CARD_AMT>원` 17 B.
   - Line 2: the card product name, 13 R `#b3b2b6`.
@@ -279,9 +279,9 @@ Reached from **계좌 n개 전체보기**. Page `#171619`.
   - Line 1: `<BAL>원` 17 B `#e4e3e8`, ink x 65.6.
   - Line 2: label 13 R **`#7c7c86`** (dimmer than on 자산). `· 주계좌` as on 자산.
   - 송금 button: x 308–360 (52 × 32), fill `#292a2f`, radius 8, label 13 SB `#b6bbc6`.
-- Row order in the video, all in one 입출금 section (<n> rows):
+- Row order in the video, all in one 입출금 section (<n> rows; names = clone seed):
   1. 토스뱅크 통장 · 주계좌
-  2. 영하나플러스 통장 (하나)
+  2. 주거래하나 통장 (하나)
   3. 입출금통장 (카카오뱅크)
   4. 자립예탁금 (NH)
   5. 토스머니 (Toss logo)
@@ -366,7 +366,7 @@ None in this area.
 |---|---|
 | `total` | Σ\|amount\| over **counted** debits in month M. Counted = `amount < 0` AND not cancelled AND not an own-account transfer AND not a card-bill payment AND not manually excluded. **Transfers to other people count** (이체 is the biggest category in the video). Shown as `-N원` |
 | `vsLastMonth` | `total(M, day 1..today) − total(M−1, day 1..same day)`. Text: `지난달보다 {X}만원 더 쓰는 중` (red) when > 0. X = round(\|diff\| / 10 000); if < 10 000 show `{diff}원`. Invented for the other cases: `덜 쓰는 중` in blue `#3182f6`, and `지난달과 비슷해요` in grey when \|diff\| < 1 000 |
-| `categories` | counted spend grouped by `category`, sorted desc, top 3 + `그 외`. Colours: §2.1.3 for 이체 / 카테고리 없음 / 교육; invented for others (식비 `#d9822b`, 편의점·마트 `#c9a227`, 쇼핑 `#8a5cf5`, 교통 `#27a5a0`, 문화 `#d6458f`). `그 외` is always `#3e3d40` |
+| `categories` | counted spend grouped by `category`, sorted desc, top 3 + `그 외`. Colours: §2.1.3 for 이체 / 카테고리 없음 / 교육; invented for others (식비 `#d9822b`, 편의점·마트 `#c9a227`, 쇼핑 `#8a5cf5`, 교통 `#27a5a0`, 문화 `#d6458f`, 주거·통신 `#e2574c`). `그 외` is always `#3e3d40` |
 | `days[]` | for each date of M: `income` = Σ amount > 0 excluding own transfers; `expense` = Σ counted \|amount\|. The strip shows the week of the selected day |
 | `groups[]` | days with ≥ 1 tx, newest first. Label `D일 요일` (일/월/화/수/목/금/토 + 요일). `overspent` = day expense > 2 × the month's average daily expense **and** ≥ 30 000원 (invented threshold) |
 | `cashback` | `profile.cashback_count` (existing column). Row shown in **today's** group when > 0 |
@@ -414,19 +414,22 @@ New (all gated to `APP === "toss"`; columns via `migrate()`, nullable, harmless 
 
 ### 4.3 Seed (invented, `seedTossExample`)
 Generate timestamps **relative to now** (infra.md §2.1) so the current month always has data. Include today and ≥ 6 earlier days, plus ≥ 8 transactions in the previous month.
+The clone seed is an **adult** account (원본 녹화의 연령 전용 상품은 성인용으로 바꿈; the built seed is in plan.md §2.3):
 - Accounts, all fictional numbers:
-  - main 토스뱅크 통장
-  - hana 영하나플러스 통장
+  - main 토스뱅크 통장 (salary account)
+  - hana 주거래하나 통장 (card bill · fixed bills)
   - kakao 입출금통장
   - nh 자립예탁금
   - 토스머니 (profile)
 - Cards (product names are fine):
-  - `Young Hana+ 체크카드` (hana), linked to the hana account
+  - `토스뱅크 체크카드` (toss), linked to main
+  - `트래블로그 체크카드` (hana), linked to the hana account
   - `프렌즈 체크카드` (kakao), linked to the kakao account
-  - two more, e.g. `토스뱅크 체크카드` and `토스유스카드`, to give `카드 4개` (any count works)
+  - `토스뱅크 하나카드 Day` (credit, pays from hana, 결제일 14일) → `카드 4개`
 - Points: `토스포인트` and `하나머니` (any count ≥ 1).
 - Transactions:
-  - card spend at **invented** shops (e.g. `한빛편의점` 편의점, `소나무분식` 식비, `새싹문구` 교육)
+  - card spend at **invented** shops (e.g. `한빛편의점` 편의점, `소나무분식` 식비, `바다주유소` 교통, `튼튼헬스` 문화·여가)
+  - salary in (`(주)예시상사`, 25th), fixed bills (`예시텔레콤`, `푸른마을관리비` → 주거·통신), the credit-card bill `하나카드` (excluded)
   - one cancelled card tx
   - transfers to invented people (이체 → counted)
   - own transfers in both directions (excluded)
@@ -495,7 +498,7 @@ Generate timestamps **relative to now** (infra.md §2.1) so the current month al
 | other-bank account number | (account.md) | | S4 |
 
 Not personal, OK to reuse as UI text:
-- product names: 토스뱅크 통장, 토스머니, 토스포인트, 영하나플러스 통장, 입출금통장, 자립예탁금, Young Hana+ 체크카드, 프렌즈 체크카드
+- product names (clone seed): 토스뱅크 통장, 토스머니, 토스포인트, 주거래하나 통장, 입출금통장, 자립예탁금, 트래블로그 체크카드, 프렌즈 체크카드, 토스뱅크 하나카드 Day
 - category labels: 이체, 카테고리 없음, 교육, 그 외
 - UI labels: 평소보다 많이 씀, 캐시백 가능한 내역, and every button label
 
@@ -510,7 +513,7 @@ Not personal, OK to reuse as UI text:
 | KakaoBank "B" on olive | SVG: yellow `#f7e64f` rounded "B" (the repo `bank-kakao.png` glyph recoloured also works) | `crops/logo_kakao_page.png` (edit_avg px 29,371–69,411) | OK: public brand mark |
 | NH wordmark on navy | SVG text "NH", 800 weight, `#0493df` | `crops/logo_nh_page.png` (edit_avg px 29,442–69,482) | OK: public brand mark |
 | Card plate: 프렌즈 체크카드 (yellow, black "B" tile) | CSS: 29.6 × 43.2 rect, radius 2.4, `#f9df02`, black rounded square with a yellow "B" at the centre-left | `crops/card_plate_yellow.png` (asset_top px 38,587–77,645) | OK: public product art, no card number |
-| Card plate: Young Hana+ 체크카드 (mint, small marketing text) | CSS: gradient `#c9fcf3` → `#9cf8de`, two grey 1-dp text lines and a tiny pink wordmark; or use the crop as is | `crops/card_plate_mint.png` (asset_top px 38,660–77,717) | OK: product art only (marketing copy, no number or name) |
+| Card plates: 트래블로그 체크카드 (and the 하나 default) · 토스뱅크 하나카드 Day | Invented CSS (the recorded 하나 card art is not used): 하나 green gradient `#00a38e` → `#008485` → `#00524e` + two white word lines + gold chip; Day = grey leather `#6e6862` → `#3b3834` + dashed stitch inset 2.2 | — | OK: invented |
 | 소비 category icons (이체 ₩, cashback ₩ + arrows, 편의점 store) | Draw in SVG, 36 squircle | reference only: `spend_top.png` px 28,573–78,625 / 28,656–78,708 / 28,930–78,982 | Icons are OK |
 | Merchant brand logos in 소비 rows | **Do not crop.** Which merchants appear is the recorder's data. Use category icons for the invented merchants | — | **NOT OK** |
 | Refresh blob, chevrons, triangles, search, ⋯, plus | SVG/CSS | — | n/a |

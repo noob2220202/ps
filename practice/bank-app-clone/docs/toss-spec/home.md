@@ -67,7 +67,7 @@ Frames used are in `scratchpad/toss/frames/home/`.
 | `--toss-page` | `#100f12` (16,15,18) | Home page bg; status-bar area on home |
 | `--toss-surface` | `#171619` (23,22,25) | Splash, lock, pushed pages (통장 / ad / coupon), tab bar, reward banner |
 | `--toss-card` | `#19181b` (25,24,27) | Home cards |
-| `--toss-btn` | `#2a2b30` (42,43,48) | Small grey buttons (송금 / 받기 / 내역 / 충전). Also the **pressed-row** bg |
+| `--toss-btn` | `#2a2b30` (42,43,48) | Small grey buttons (송금 / 받기 / 내역). Also the **pressed-row** bg |
 | `--toss-btn-on-pressed` | `#3b3c41` (59,60,65) | Small button while its row is pressed (≈ white α 0.075 over the row) |
 | `--toss-divider-full` | `#252427`, 1 px@480 (≈0.8 dp) | Card-1 full-width divider |
 | `--toss-divider-inset` | `#2b2a2d`, ~1.2 dp | Card-3 inset divider (x 27.8–355.4) |
@@ -78,7 +78,7 @@ Frames used are in `scratchpad/toss/frames/home/`.
 | `--toss-text-2` | measured `#babac0` → suggest `#c4c5cb` | Account names (토스뱅크 통장, 토스머니), footer (`#b3b4b9`→`#c0c1c7`), small-button text (`#bbbcc3`) |
 | `--toss-text-3` | measured `#8b8b8f`..`#8d8e92` → suggest `#97979c` | 13 dp subtitles (포인트 desc, 11월에 쓴 돈, 최근 본 상품 subtitle, banner line 1) |
 | `--toss-text-ad-sub` | measured `#a3a2a5` → `#adacaf` | Ad subtitle "… · AD" |
-| `--toss-text-4` | measured `#69686b` → `#717074` | 토스유스카드 · N개월 전 (the dimmest) |
+| `--toss-text-4` | measured `#69686b` → `#717074` | Card 2 row 2 label (clone: `{D}일 낼 카드값`, the dimmest) |
 | `--toss-header-fg` | `#a8a8b0` | Header title "토스뱅크", Pay, bell (grey, not white) |
 | `--toss-chevron` | `#b2b6bf` | Row chevrons |
 | `--toss-tab-fg` | icons `#d8d7dd`, selected filled icon `#dcdce4`, labels `#d5d4d9` (peak) | Tab bar |
@@ -163,9 +163,12 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
   - Label `{M}월에 쓴 돈`, 13 dp M, `#97979c`. Ink y 424.8–437.6.
   - Button **내역**.
 - Row 2 is indented to x 75.2: there is an **empty 30-dp icon slot** at x 32.7–62.4 (uniform card colour in both videos).
-  - Amount `<YOUTH_CARD_BAL>원`, 17 dp B. Ink y 458.4–473.6.
-  - Label `토스유스카드 · <N>개월 전`, 13 dp, dim `#717074`. Ink y 479.2–491.2.
-  - Button **충전**.
+  - Amount `<ROW2_AMOUNT>원`, 17 dp B. Ink y 458.4–473.6.
+  - Label 13 dp, dim `#717074`. Ink y 479.2–491.2.
+  - **Adult clone:** the recorded row was an age-specific product row (원본 녹화의 연령 전용 상품은 성인용으로 바꿈). The clone keeps the slot,
+    font sizes and colours and shows the first credit card's next bill: amount = `toss.cardBill.amount`, label **`{D}일 낼 카드값`**
+    (D = day of `cardBill.dueDate`), button **내역** (press only). No credit card → the row is hidden. Toss's own pages call this
+    '카드값' / '카드 청구서' (card company, amount, due date); the exact home wording is not confirmed.
 
 **Card 3.** Rows centred y 553.6 / 607.6, inset divider at y 639.8 (x 27.8–355.4), row centred 674.8. Bottom padding ≈35.5.
 - Title: 15 dp **B** `#fafafc`, ink x 32.8, ink top = centre −16.8.
@@ -189,9 +192,10 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Left box x 12.6–187.3, right box x 196.0–371.1 (≈175 wide, h-gap 8.8), height 68.2, same card radius.
 - bg: card colour plus a soft bottom glow. Left is bluish (`#1d2130` at bottom), right is warm brown (`#2a2220`).
 - Titles: 2 lines, 15 dp SB `#f3f2f5`, line pitch 20.8. Ink tops at card top +16.7 / +37.5, text x = card left +19.5.
-  - Left: **편의점에서 / 토스머니 충전**. Right: **토스 브랜드콘 / 구매하기**.
+  - Left (adult clone): **대출 조건 / 1분 만에 비교** (the recorded left card was an age-specific item; this copy follows the app-store text
+    "대출 조건을 1분 만에 비교"). Right: **토스 브랜드콘 / 구매하기**.
 - 3-D illustrations are bottom-right and clipped by the card bottom.
-  - Left: x 120–172 dp, a blue/lilac convenience-store box with awning.
+  - Left (clone): the product-menu 신용대출 icon (`toss-acct-m-loan-credit`) at 54 dp, card x +108, top +20 (clipped 5.7 dp by the card bottom).
   - Right: x 311–356 dp, an iced-coffee cup with a barcode coupon.
   - Crop or redraw them (§5).
 
@@ -201,7 +205,7 @@ Without the banner (cached first paint, B 136.05), card 1 starts at **86.3** dp.
 - Rows:
   - **계좌 개설**: blue card icon `#4b8ff6`.
   - **토스쇼핑**: coral bag `#f96167` with a grey handle.
-  - **체크카드 혜택 추천**: mint card `#a8e5cf` with a blue star badge.
+  - **카드 혜택 추천** (adult wording; credit cards included): mint card `#a8e5cf` with a blue star badge.
 
 **Bottom padding.** Make the last card scroll fully above the tab bar: content end + 12 + tab bar 73.3.
 
@@ -378,32 +382,32 @@ interface TossHome {
   };
   points: { chances: number };                           // "N번"
   spend: { month: number; total: number };               // "{M}월에 쓴 돈"
-  youthCard: { name: "토스유스카드"; balance: number; lastUsedAt: string } | null; // "N개월 전" computed client-side; null → hide row
+  cardBill: { id: string; name: string; amount: number; dueDate: string | null } | null; // first credit card's next bill → "{D}일 낼 카드값"; null → hide row
   recent: { product?: { title: string; thumb: string }; service?: { title: string; icon: string } }; // hide row if absent
   deal: { title: "오늘의 딜"; desc: string };            // static
   ad: { title: string; desc: string; disclosure?: string; thumb: string }; // static, invented
   quick: { id: string; title: string[]; image: string }[];  // 2 half cards, static
-  links: { id: string; label: string; icon: string }[];     // 계좌 개설 / 토스쇼핑 / 체크카드 혜택 추천 (+ invented)
+  links: { id: string; label: string; icon: string }[];     // 계좌 개설 / 토스쇼핑 / 카드 혜택 추천 (+ invented)
 }
 ```
 
 - Money values are integers in 원. Format with `toLocaleString("ko-KR") + "원"`.
 - `spend.total`: same idea as kakao's `monthlyCardSpend`. Use the sum of withdrawals this calendar month that are card/pay tagged, with a 🔔 override in `profile.card_spend`. The 소비 builder must use the same number.
 - `{M}` = current month (server `nowIso()`).
-- "N개월 전" = whole months between `lastUsedAt` and now.
+- `cardBill.dueDate` = the card's 결제일 (`payDay`) this month if today ≤ that day, else next month (a day the month lacks → its last day).
 
 **Reused endpoints:**
 - `GET /api/accounts/:id` and `/transactions` (통장)
 - `POST /api/transfers` (transfer flow)
-- `PATCH /api/profile`: extend it with `givenName`, `rewardDismissed`, `adSnoozeUntil`, `cardSpend`, `pointChances`, `youthCardBalance`.
+- `PATCH /api/profile`: extend it with `givenName`, `rewardDismissed`, `adSnoozeUntil`, `cardSpend`, `pointChances`. The card bill is a card field (🔔 → 카드: `bill` · `payDay`).
 
 **Ad-page snooze ("3일 동안 안보기").** Store `adSnoozeUntil` (ISO) on the profile, server-side so it is per profile. While `now < adSnoozeUntil`, transfer completion → 확인 goes straight back.
 
 **Seed (invented, all fictional).**
 - Profile 홍길동, given name 길동, reward max 50,000원.
-- 토스뱅크 통장 balance 1,250,000원, number in Toss Bank format `1000-XXXX-XXXX` (12 digits, invented).
-- 토스머니 3,200원. 포인트 3번.
-- 토스유스카드 15,000원, last used 2 months ago.
+- 토스뱅크 통장 balance 4,286,400원 (an adult salary account), number in Toss Bank format `1000-XXXX-XXXX` (12 digits, invented).
+- 토스머니 12,800원. 포인트 3번.
+- Credit card 토스뱅크 하나카드 Day, 결제일 14일: next bill 428,600원 (351,700원 once the 14th has passed).
 - 최근 본 상품: "바삭 감자칩 오리지널 3봉" + an invented snack thumbnail.
 - 방문한 서비스: "토스쇼핑" with the coral bag icon.
 
@@ -423,7 +427,7 @@ interface TossHome {
   - Header "토스뱅크 ›" → same as the 토스뱅크 통장 row (toast + 통장).
   - Pay → toast-style snackbar "준비 중이에요" (`#1f1e21` pill, 2 s).
   - 송금 on row 1 → transfer "어디로 보낼까요?" via the same push + toast "토스뱅크로 이동했어요".
-  - 송금 / 받기 / 충전 on rows 2–3 and 토스머니 / 포인트 / 유스카드 rows, card-3 rows, half cards, list rows, ad card, 혜택 / 쇼핑 / 증권 tabs → press feedback + "준비 중이에요".
+  - 송금 / 받기 / 내역 on rows 2–3 and 토스머니 / 포인트 / 카드값 rows, card-3 rows, half cards, list rows, ad card, 혜택 / 쇼핑 / 증권 tabs → press feedback + "준비 중이에요".
   - 내역 → 소비 (same as the row).
   - 전체 tab → 전체 메뉴 (other spec). Tab switch: instant, no transition.
 - **Banner ×:** collapse the slot (reverse of §3.6: banner fades 120 ms, slot 80.9→0 in ~300 ms) and set `rewardDismissed` for the month. Banner **확인하기** → "준비 중이에요".
@@ -444,7 +448,7 @@ interface TossHome {
 | 토스머니 balance | `<BAL_TOSSMONEY>` | 1 digit 원 | Card 1 row 2 |
 | Point chances | `<POINT_CHANCES>` | 1 digit "N번" | Card 1 row 3 |
 | This-month spending | `<SPEND_MONTH>` | 6-digit "NNN,NNN원" (two values: before/after 소비 visit) | Card 2 row 1 |
-| Youth-card balance + last use | `<YOUTH_CARD_BAL>`, `<N>개월 전` | 5-digit "NN,NNN원"; 1-digit months | Card 2 row 2 |
+| Card 2 row 2 amount + label | `<ROW2_AMOUNT>`, `<ROW2_LABEL>` | 5-digit "NN,NNN원" | Card 2 row 2 (clone: invented 카드값 row) |
 | Recently viewed product + photo | `<RECENT_PRODUCT>` | Brand + product name, truncated | Card 3 row 1 (**don't crop the thumbnail**) |
 | Visited service | `<VISITED_SERVICE>` | One word | Card 3 row 2 |
 | Ad-disclosure lawyer name (third party) | `<AD_LAWYER_NAME>` | 3 Hangul syllables | Ad card line 3 (B 137.8–138) |
@@ -453,7 +457,7 @@ interface TossHome {
 | Other-app heads-up notifications | n/a | Deposit amount, a name, a balance, a timestamp | B 76.2–79.1 (do not clone) |
 | Installed apps (launcher) | n/a | n/a | A 0–0.4 (do not clone) |
 
-UI labels, product names (토스뱅크 통장, 토스머니, 토스유스카드), ad copy and brand marks above are fine to reproduce.
+UI labels, product names (토스뱅크 통장, 토스머니), ad copy and brand marks above are fine to reproduce.
 
 ---
 
@@ -470,8 +474,8 @@ Crops are verified in `scratchpad/toss/frames/home/crops/`; boxes are in px@480 
 | Pay icon / bell | A 10.698 | 348,50,400,86 / 416,44,458,86 | **SVG** | OK |
 | 방문한 서비스 ticket icon | A 10.698 | 360,733,412,785 | **SVG** preferred | OK (generic icon) |
 | 오늘의 딜 teal mark | A 10.698 | 360,817,412,869 | Crop or SVG | OK (public service mark) |
-| Half-card illustrations | B 136.113 | left 140,662,226,734; right 380,662,452,734 | Bottom-right of the half cards (bg = card + glow; key out) | OK: generic 3-D art |
-| List icons 계좌 개설 / 토스쇼핑 / 체크카드 혜택 추천 | B 136.113 | 38,766,74,800 / 38,826,74,860 / 38,888,74,924 | Or SVG | OK |
+| Half-card illustration (right, 브랜드콘) | B 136.113 | 380,662,452,734 | Bottom-right of the half card (bg = card + glow; key out). The left card's recorded art is not used (adult copy + product-menu icon) | OK: generic 3-D art |
+| List icons 계좌 개설 / 토스쇼핑 / 카드 혜택 추천 | B 136.113 | 38,766,74,800 / 38,826,74,860 / 38,888,74,924 | Or SVG | OK |
 | Calendar Lottie frames ("+", "₩", flip) | B 128.650 / 129.251 / 127.990 | 176,232,338,406 (final layout) | Ad page loop | OK: generic illustration; the heads-up pill is outside the box |
 | Coupon "5000" image | B 74.942 | 28,638,104,684 | Coupon page | OK: generic ad art |
 | Recent-product photo | A 10.698 | 362,666,410,716 | **Do not crop**: personal browsing data. Invent. | NOT OK |

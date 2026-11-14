@@ -22,7 +22,7 @@ Scratch evidence: `scratchpad/toss/frames/transfer/` (frames, `s_*.png` sheets).
    **POP**: old page slides down 40 dp in ≈120 ms (ease-in, no fade) and is cut; revealed page settles from −6 dp in ≈150 ms.
    **REPLACE** (금액→확인, 확인→보내는 중→완료): instant. **SHEET / DIALOG**: scrim plus a short fade+slide.
    **The whole page moves, including its header** (they are web pages). The status bar never moves.
-3. **Recent list includes my own accounts** ("내 영하나플러스 통장" etc.), so the server `recent` filter must be gated for toss (infra §2.2). "내 계좌 +N개" = my accounts except the sending one.
+3. **Recent list includes my own accounts** ("내 <하나 계좌 이름>" etc.; clone: "내 주거래하나 통장"), so the server `recent` filter must be gated for toss (infra §2.2). "내 계좌 +N개" = my accounts except the sending one.
 4. **Bank list icons are squircles** (40 dp, radius ≈14), not the repo's circular `bank-<code>.png`. The 은행 선택 grid and suggestion chips use **glyph-only** logos. They match the existing `hana-bank-<code>.png` style, and all 61 codes are present.
 5. **Keyboards.** The number keyboard is exactly `src/hana/HanaKeyboard.tsx` (same device and geometry, top at 494.7 dp). The **Korean keyboard** for the memo is new (§2.8.1), with the same outer frame.
    Toss imports `src/hana/hana-send.css` and reuses the `.hana-kb*` rules as they are (those rules are not gated). A toss-only adjustment goes in `src/toss/transfer/send.css` under `html[data-app="toss"] .hana-kb…`; never edit the hana rules for toss.
@@ -45,7 +45,7 @@ Scratch evidence: `scratchpad/toss/frames/transfer/` (frames, `s_*.png` sheets).
 | S1 | 내 계좌 row pressed → expand | A | press 117.62; height 117.64–117.85; rows fade 117.93–118.03 | |
 | S1 | expanded (hint + 4 own rows) | A | 118.03–118.87 | |
 | S1 | collapse | A | rows fade 118.87–118.97; height 119.03–119.24 | |
-| S1 | recent row "내 영하나플러스 통장" tapped → PUSH out | A | 121.55–121.70 | to S4 (own) |
+| S1 | recent row "내 <하나 계좌 이름>" (own 하나 account) tapped → PUSH out | A | 121.55–121.70 | to S4 (own) |
 | S1 | entered by POP-style reveal from 통장 (recording starts mid-flow) | B | 7.182–7.433 | |
 | S1 | idle; tap 계좌번호 입력 box | B | 7.43–9.94 | → S2 (PUSH) |
 | S1 | PUSH in again after 통장 보내기 | B | 84.00–84.32 | |
@@ -73,7 +73,7 @@ Scratch evidence: `scratchpad/toss/frames/transfer/` (frames, `s_*.png` sheets).
 | D1 | dialog **계좌번호를 찾을 수 없어요** | B | in 49.72–49.88; 확인 51.28; out 51.27–51.40 | |
 | S4→S2 | ← back (POP) | B | 54.40–54.66 | |
 | S2 | tap in field (caret moved) → keyboard up; ⌫ inside the number; 확인 | B | 55.9–56.2; 57.25; 58.96 | |
-| S4 | own account by number: "내 영하나플러스 통장으로 / 얼마나 옮길까요?" | B | push 59.07–59.4; content 60.96; balance 61.21; "내 " prefix 62.0 | |
+| S4 | own account by number: "내 <하나 계좌 이름>으로 / 얼마나 옮길까요?" (clone: 내 주거래하나 통장으로) | B | push 59.07–59.4; content 60.96; balance 61.21; "내 " prefix 62.0 | |
 | S4 | "원" → digit + 다음 → (tap 다음) | B | 62.76; 62.86; ≈63.5 | |
 | S5 | **…으로 N원을 옮길까요?** (REPLACE) | B | 63.660; chevrons 63.711 | |
 | S5 | 옮기기 pressed → dots | B | 66.15; dots 66.27–66.69 | |
@@ -169,7 +169,7 @@ Top → bottom (dp):
 6. **Expanded block** (A 118.06), inserted between 내 계좌 and 최근 보낸 계좌:
    - hint "별표를 눌러 즐겨찾기 해보세요." ink x 24.8–179.6, y 361.5–373.0, **12.8 R [13]** `#58575a`.
    - N own-account rows (68 dp each) from y 378. First icon at 392.
-     Rows here: 토스머니 (Toss mark on dark-navy squircle, sub "토스머니"), 자립예탁금 (sub "NH농협 <ACCT_NH_RAW>", **no hyphens**), 입출금통장 (sub "카카오뱅크 <ACCT_KAKAO>"), 영하나플러스 통장 (sub "하나 <ACCT_HANA>").
+     Rows here: 토스머니 (Toss mark on dark-navy squircle, sub "토스머니"), 자립예탁금 (sub "NH농협 <ACCT_NH_RAW>", **no hyphens**), 입출금통장 (sub "카카오뱅크 <ACCT_KAKAO>"), the 하나 account (sub "하나 <ACCT_HANA>"; clone name 주거래하나 통장).
 7. **"최근 보낸 계좌"** header: ink x 24.8–116.8, y 379.1–394.4 (collapsed; +292.8 when expanded with 4 rows), **16.4 SB [17]** `#dedde0`. Header box ≈ 357.8–407.6.
 8. **Recipient rows**, 68 dp pitch from y 407.6 (row 1 = 407.6–475.6):
    - icon **squircle 40×40**, x 24–64, top = row top + 14, radius ≈14 (fit 14.0–14.4).
@@ -444,8 +444,8 @@ Galaxy back (history) = POP. **B 7.18**: the recording starts with the 통장 pa
 |---|---|---|
 | recorder's name | S5 받는 분에게 표시 default, S6 initial text | `<NAME_SELF>` → seed "홍길동" |
 | recorder's 토스뱅크 통장 number | 통장 (not in my screens' text) | `<ACCT_TOSS>`: 12 digits, 4-4-4 |
-| recorder's 하나 영하나플러스 통장 | S1 rows, S2 pill (raw), S4/S5 | `<ACCT_HANA>`: 14 digits, 3-6-5 (raw in the pill) |
-| recorder's NH 자립예탁금 | S1 expanded | `<ACCT_NH_RAW>`: 13 digits, shown unhyphenated |
+| recorder's 하나 account (name and number) | S1 rows, S2 pill (raw), S4/S5 | `<ACCT_HANA>`: 14 digits, 3-6-5 (raw in the pill) |
+| recorder's NH account | S1 expanded | `<ACCT_NH_RAW>`: 13 digits, shown unhyphenated |
 | recorder's 카카오뱅크 입출금통장 | S1 rows | `<ACCT_KAKAO>`: 13 digits, 4-2-7 |
 | typed (wrong) number | S2, S4 sub | `<ACCT_TYPED>`: 15 digits |
 | counterparties (≈12 people/companies) | S1 recent, S4/S5/S7/S8 titles | `<NAME_P1…>` → invented names |
@@ -456,7 +456,7 @@ Galaxy back (history) = POP. **B 7.18**: the recording starts with the 통장 pa
 | memo typed | S6, S5 row | `<MEMO>` (2 Hangul syllables) |
 | other apps' heads-up notifications | B 76.2–79.1, 127.55–131.0 | not Toss UI (home.md); do not clone |
 
-Suggested seed for this flow (invented): main 토스뱅크 통장 `1000-0000-1234`. Own externals: 하나 "영하나플러스 통장", NH "자립예탁금", 카카오뱅크 "입출금통장".
+Suggested seed for this flow (invented): main 토스뱅크 통장 `1000-0000-1234`. Own externals: 하나 "주거래하나 통장", NH "자립예탁금", 카카오뱅크 "입출금통장" (clone seed is an adult account).
 Payees (≥8) in 하나, NH (one with a 352- prefix for 지역농협), 우리, KB국민, 카카오뱅크, IBK, with invented names (e.g. 김철수, 이영희, (주)예시상사).
 Transfers with descending dates so `recent` mixes 2–3 own accounts among payees. Main balance > 0 in "example" and 0 in "empty" (shows the red error path).
 

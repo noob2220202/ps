@@ -124,7 +124,7 @@ kbank2 5178/8792/9111 · ibk2 5179/8793/9113 · kakao2 5180/8794/9115 → **toss
   in toAccount, PATCH number and `myAccountByNumber`. A NULL bank_code would render the 토스뱅크 통장 as 카카오뱅크.
 - Suggested example shape (all invented):
   - main `토스뱅크 통장` (toss, 12-digit 4-4-4, e.g. `1000-0000-1234`).
-  - Several `external` accounts for 자산 / 내 계좌: e.g. hana `영하나플러스 통장` (14 digits, 3-6-5; reuse a hana-style
+  - Several `external` accounts for 자산 / 내 계좌: e.g. hana `주거래하나 통장` (14 digits, 3-6-5; reuse a hana-style
     fake like `123-910000-12345`), nh `자립예탁금`, kakao `입출금통장`, using the product names seen in the UI.
   - Payees with invented names in several banks.
   - Transfers (including some to own accounts, see §2.2 `recent`).
@@ -132,7 +132,7 @@ kbank2 5178/8792/9111 · ibk2 5179/8793/9113 · kakao2 5180/8794/9115 → **toss
 - [ ] **Dates:** "N월에 쓴 돈" and the 소비 month calendar read the **current month**. Either generate seed timestamps
   relative to now (`daysAgo(n, "HH:MM:SS")`) or copy kbank's "fixed date + shift back" (`kbankShift/shiftIso`).
   Relative is recommended so the 소비 screen is never empty.
-- [ ] (if screens need them) toss-only profile data: 토스머니 balance, point count, prepaid-card balance.
+- [ ] (if screens need them) toss-only profile data: 토스머니 balance, point count, card data (built: a `cards` table; credit cards store the next bill and pay day).
   Add nullable/defaulted columns in `migrate()` (harmless for other apps) rather than faking them as accounts.
   `accounts.kind` is CHECK('main','external') and every account shows up in DevPanel and recipients.
 
@@ -149,7 +149,7 @@ kbank2 5178/8792/9111 · ibk2 5179/8793/9113 · kakao2 5180/8794/9115 → **toss
     Otherwise the label falls back to `${userName}의 ${bank.name} 계좌`. Better: DevPanel sends a name for toss (§2.11).
 - [ ] `GET /api/transfer/recipients`:
   - `recent` (the non-kakao branch) does `.filter((r) => !myAccountByNumber(r.bank_code, r.number))`. **Toss lists own accounts
-    inside 최근 보낸 계좌** (e.g. "내 영하나플러스 통장"), so gate: `APP === "toss" || !myAccountByNumber(…)`. The client labels them "내 …"
+    inside 최근 보낸 계좌** (e.g. "내 주거래하나 통장"), so gate: `APP === "toss" || !myAccountByNumber(…)`. The client labels them "내 …"
     by matching `mine`.
   - `mine` excludes `from` (except nh). Let the 이체 spec confirm whether toss's 내 계좌 list includes the sending account.
     Gate a change like nh does: `APP === "nh" ? "" : from`.
@@ -230,7 +230,7 @@ Toss aggregates many banks, so it is neither "own bank only" (nh/hana/ibk/kbank)
   - Add `OWN_BANK.toss = { code: "toss", name: "토스뱅크", placeholder: "토스뱅크 통장", numberLabel: "토스뱅크 계좌번호 (12자리)" }` and extend both
     `ownBank()` and the `AddPayee` default-bank chain (`APP === "hana"||"ibk"||"kbank"` …) with `"toss"`.
   - For toss render **both** "토스뱅크 계좌 추가" and "다른 은행 계좌 추가". The latter is `AddBankAccount`; give it an optional
-    "계좌 이름" input for toss (e.g. 영하나플러스 통장) and `exclude={[]}` (it currently excludes kakao).
+    "계좌 이름" input for toss (e.g. 주거래하나 통장) and `exclude={[]}` (it currently excludes kakao).
 - [ ] `AccountEditor`: `own = APP !== "kakao"` turns on the name field (good for toss) **and** a free-text number field sliced to `ownHint.max`.
   Add `toss: { name: "토스뱅크 통장", number: "숫자 12자리", max: 14 }`. For **non-toss accounts in toss** use the kakao branch
   (`formatAccountNumber(bank.pattern, …, bank.alt)`). Otherwise a 14-digit 하나 number plus hyphens gets truncated at 14 chars.
@@ -443,7 +443,7 @@ Follow the i-ONE Bank precedent (README IBK section, SOLUTION 22 "이체확인�
    Should the toss status bar copy the recording's fixed right cluster (alarm, mute, charging) or keep generic icons?
 2. 12-hour clock for toss only (matches the device) vs the 24-hour clock used by all other apps.
 3. Edge-panel handle on the left edge: replicate (fidelity) or skip?
-4. Data model for 토스머니 / 포인트 / 토스유스카드-style rows on home: new profile columns (recommended) vs not modelled.
+4. Data model for 토스머니 / 포인트 / card rows on home (built: home card 2 row 2 = credit-card bill): new profile columns (recommended) vs not modelled.
 5. 소비 "페이·기타" category: new tag (`#페이`, toss-only) vs mapping rule.
 6. Seed dates: relative to now (recommended) vs fixed recording-day + shift.
 7. On real phones (≤ 500 px): hide the fake nav band and handle (recommended, kbank-like) or keep it (NH-like)?

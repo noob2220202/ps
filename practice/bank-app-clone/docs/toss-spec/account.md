@@ -1,6 +1,6 @@
 # Toss clone — area spec: 토스뱅크 통장 · 거래내역 · 상세 내역 · 다른 은행 계좌 상세
 
-Scope: the Toss Bank account ("토스뱅크 통장") screen incl. its long lower product menu, the 거래내역 list, the 상세 내역 detail, and the other-bank account detail (e.g. 영하나플러스 통장). Dark theme, Galaxy frame, fixed.
+Scope: the Toss Bank account ("토스뱅크 통장") screen incl. its long lower product menu, the 거래내역 list, the 상세 내역 detail, and the other-bank account detail (e.g. a 하나은행 account; clone example 주거래하나 통장). Dark theme, Galaxy frame, fixed.
 
 ## 0. Conventions used in this spec
 
@@ -56,7 +56,7 @@ Scope: the Toss Bank account ("토스뱅크 통장") screen incl. its long lower
 | S3 | 상세 내역 — incoming own-account transfer (credit) | 57.75–60.9, 101.3–102.7 | — |
 | S3' | 상세 내역 — outgoing transfer to another person (debit) | 105.76–108.7 | — |
 | P3 | Pop (상세 → 거래내역, 거래내역 → 통장) | 102.7, 108.8 | 79.01–79.24 |
-| S4 | Other-bank account detail (영하나플러스 통장) incl. refresh state | — | 161.5 blank, 161.75 skeleton, 162.75 balance shimmer, 163.0 loaded, ✓ 163.9; back 164.9 |
+| S4 | Other-bank account detail (하나은행 account) incl. refresh state | — | 161.5 blank, 161.75 skeleton, 162.75 balance shimmer, 163.0 loaded, ✓ 163.9; back 164.9 |
 
 Out of my area but adjacent: 증명서 발급 (A 60.9–101.3, entered from S3 "증명서 발급하기"), transfer flow (entered from 보내기, A 112.7 / B 6.9, 84.4), ad pages after transfer (B 71–75, 126–129.8), 자산 (B 150–175).
 
@@ -147,7 +147,7 @@ Section/rows in order (no-banner screen-dp of the header ink top in brackets; ad
 9. **신용카드** [3702.4] (제휴카드 | 최대 기준): 토스뱅크 하나카드 Day 생활비 10% 할인
 10. **체크카드** [3809.6]: 토스뱅크 체크카드 · 아이 체크카드 만들기 · K-패스 체크카드 · 모임카드 · 개인사업자 체크카드
 11. **서비스** [4109.6]: 쉬운 근로계약서 · 전세지킴보증 · 자동이체 · 자동이체 가져오기 · 세금·공과금 · 지금 이자 받기 · 외화 정기적으로 모으기 · 이자 달러로 모으기 · 외화 평균환율 계산기 · 개인사업자 소득공제 노란우산 (grey) · 내 사업소득 순위 알아보기 · 주택구입비용 계산기 · 1억 모으는 시간 계산기 · 미라클 모닝 도전하기 · 모임 정산 · 함께 쓰는 캘린더 · 아이와 용돈 미션 · 내 투자계좌 잔돈 찾기
-12. **유용한 정보** [5030.4], right "더보기" pill (x 310.4–364, h 32, radius ≈10, `fill`, 13 M #c3c3c6). Two article rows: thumbnail 56 × 56 (x 19.2–76, radius ≈12, light illustrations) + title 17 R #e1e0e5 at x 86.4, row pitch 80.8 dp: "청년문화예술패스, 이달 말 신청 마감돼요", "퇴직금 계산, 기준부터 알아봐요".
+12. **유용한 정보** [5030.4], right "더보기" pill (x 310.4–364, h 32, radius ≈10, `fill`, 13 M #c3c3c6). Two article rows: thumbnail 56 × 56 (x 19.2–76, radius ≈12, light illustrations) + title 17 R #e1e0e5 at x 86.4, row pitch 80.8 dp: "<ARTICLE_1>" (clone: invented title "문화비 소득공제, 연말정산 전에 챙겨요"), "퇴직금 계산, 기준부터 알아봐요".
 13. **간편히 보기** row [text block 5260.0–5296.8]: "T" icon (blue serif T, ~20 dp) at x 26.4–45.6; caption "큰 글씨로 보고싶다면" 13 R #8b8a90 + title "간편홈 보기" 17 B white at x 60.
 14. **의견** row [5335.2–5372.0] (pitch 75.2): mailbox icon (blue box + white lid, ~22 dp) at x 25.6–47.2; caption "의견을 알려주세요" + title "바뀐 토스뱅크 화면, 어떠셨나요?" 17 B white.
 15. Bottom padding: at max scroll the last row sits at screen y ≈627–666, i.e. ≈187 dp of empty `bg` below it (page padding-bottom ≈150 dp + system inset).
@@ -205,7 +205,7 @@ Opaque header with title **"상세 내역"** left-aligned at x 72.0–132.0 (17 
 Value formats: 적요 = name shown in the list; 거래 유형 = "입금" / "출금"; 일시 = `YYYY년 M월 D일 HH:mm`; 거래 후 잔액 = `N원`; 받는 분 통장표시 = text printed on the receiver's passbook (sender's name by default).
 Own accounts are prefixed with "내 " ("내 토스뱅크 …", "내 하나은행 …"); other people's accounts show "`<BANK>` `<ACCT>`" only. Account numbers are shown dashed per bank pattern (Toss 4-4-4, Hana 3-6-5 — already in server/banks.mjs).
 
-### 2.7 S4 — other-bank account detail (영하나플러스 통장 at B 163–164.9)
+### 2.7 S4 — other-bank account detail (하나은행 account at B 163–164.9)
 
 Same skeleton as 거래내역 with these differences (screen-dp):
 - Header: title = account product name, 17 SB white, x 72.0–190.4; right: refresh indicator at x 288–308.8 (spinner while refreshing → blue ✓ when done) and a **dim filled gear** x 336–357.6 (#58585a).
@@ -311,7 +311,7 @@ WebView scrollbar: 3–4 dp wide at x 379–384, #6f6e73, ~60 dp tall thumb prop
 ## 4. Data & server
 
 Existing endpoints in `server/index.mjs` that already fit:
-- `GET /api/accounts/:id` → account (name, number, balance, bank). Need `name` ("토스뱅크 통장" / "영하나플러스 통장"; column exists via migrate).
+- `GET /api/accounts/:id` → account (name, number, balance, bank). Need `name` ("토스뱅크 통장" / "주거래하나 통장"; column exists via migrate).
 - `GET /api/accounts/:id/transactions` → rows already carry `date` (MM.DD), `time` (HH:mm), `merchant`, `amount`, `tag`, `balanceAfter`. Client derives: 통장 mini list = first 3; date label `M.D` (strip zero padding) on first row per date; 거래내역 date header `M월 D일` (add `YYYY년 ` when not current year — invented); other-bank list `MM.DD`.
 - `GET /api/transactions/:id` (`txDetailJson`) → for toss add: `kindLabel` ("입금"/"출금"), `counterparty` {name, bankName, number, own: bool} for **both** directions (outgoing: from `transfers.out_tx_id`; incoming from own account: via `transfers.in_tx_id` + `from_account_id`; incoming from other people: needs new nullable columns e.g. `transactions.cp_bank`, `cp_number`, `cp_holder` seeded), `passbookText` (= `transfers.memo_to` or profile user name) for outgoing transfers, `transactedAt` → format `YYYY년 M월 D일 HH:mm` on the client.
 - `PATCH /api/transactions/:id` (memo) → 메모 남기기.
@@ -355,7 +355,7 @@ Existing endpoints in `server/index.mjs` that already fit:
 | Status-bar clock/battery/icons | all | device chrome (infra) | — |
 | OS notifications (messenger preview, bank push with name+balance) | B 4.0–4.6, ~75.5–78, ~128–131 | **never reproduce** | — |
 
-Seed suggestion (invented, 홍길동-style): `<NAME_A>` = 홍길동; counterparties 김철수, 이영희, 박민수; Toss acct `1000-1234-5678`; Hana own acct `123-456789-01234` (product "영하나플러스 통장", 연 0.1%); balances in the low tens of thousands; ~18 Toss transactions over 3 months mixing: own-account transfers in/out, person transfers, 카드 캐시백 (+tens of 원), 통장 이자 (+hundreds of 원), card merchants (예시마트, 샘플커피, 테스트쇼핑_PG). The product menu, rates, banner/ad copy and labels above are public UI content and can be used as-is (replace brand ads with invented ads).
+Seed suggestion (invented, 홍길동-style): `<NAME_A>` = 홍길동; counterparties 김철수, 이영희, 박민수; Toss acct `1000-1234-5678`; Hana own acct `123-456789-01234` (product "주거래하나 통장", 연 0.1%); adult-level balances (the built seed: plan.md §2.3); ~18 Toss transactions over 3 months mixing: own-account transfers in/out, person transfers, 카드 캐시백 (+tens of 원), 통장 이자 (+hundreds of 원), card merchants (예시마트, 샘플커피, 테스트쇼핑_PG). The product menu, rates, banner/ad copy and labels above are public UI content and can be used as-is (replace brand ads with invented ads).
 
 ## 7. Scratch artefacts (for builders/verification)
 
