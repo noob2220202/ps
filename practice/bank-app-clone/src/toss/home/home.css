@@ -847,7 +847,8 @@
 .toss-home-adp__back {
   position: absolute;
   left: 4px;
-  top: 30.4px; /* AppBar ← 자리 (잉크 x 18.9–38.0, y 45.8–63.2 · 녹화 B 74.942 · 129.251) */
+  top: calc(var(--toss-sb, 28px) + 2.4px); /* 30.4 · AppBar ← 자리 (잉크 x 18.9–38.0, y 45.8–63.2 · 녹화 B 74.942 · 129.251).
+     화면 뿌리(띠 포함)에 붙으므로 띠 높이를 더함 — 진짜 폰에서 띠가 0 이면 2,000원 광고 진행 막대(본문 52)에 ← 가 걸리던 것 */
   width: 48px;
   height: 48px;
   z-index: 3;
@@ -942,7 +943,7 @@
 .toss-home-cal {
   position: absolute;
   left: calc(50% - 54.4px); /* 384 폭에서 137.6 (녹화도 가운데에서 조금 오른쪽) */ /* 다섯 장면을 합친 잉크 상자 x 137.6, y 187.05 (131.75 × 141) */
-  top: 159.05px;
+  top: min(159.05px, calc(100% - 472.62px)); /* 키 작은 폰: 제목 · 설명과 같이 올라감 (아래 .toss-home-pb__s) */
   width: 131.75px;
   height: 141px;
 }
@@ -1041,7 +1042,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 355.725px; /* 잉크 388.8–412.8 · 424.0–449.6 (간격 34.4) */
+  top: min(355.725px, calc(100% - 275.945px)); /* 잉크 388.8–412.8 · 424.0–449.6 (간격 34.4) */
   text-align: center;
   font-size: 26px;
   line-height: 34.4px;
@@ -1054,7 +1055,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 438.45px; /* 잉크 y 466.4–480.0 */
+  top: min(438.45px, calc(100% - 193.22px)); /* 잉크 y 466.4–480.0. 키 작은 폰에서 확인하기(100% − 154.22)가 올라와도
+     설명 아래끝과 버튼 사이 24 를 두고 달력 · 제목 · 설명이 한 덩어리로 같이 올라감 (본문 631.67 보다 낮을 때만 — 데스크톱 · 큰 폰은 그대로) */
   text-align: center;
   font-size: 15px;
   line-height: 15px;
