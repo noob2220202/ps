@@ -3,7 +3,7 @@
 //   nav · close · flow · modal · modal-bold   머리줄 (C2 11.341 · 18.324 · C3 29.2 · 8.5 · 40.546)
 //   kb · num                                  키보드 (C3 41.80) · 숫자 패드
 //   t6 · t7 · t3                              웹 시트 (C3 4.5) · 금액 입력 네이티브 시트 (C3 6.5) · 계좌 비밀번호 (C3 32.5)
-//   alert                                     지급정지 '안내' 팝업 (C3 15.0 — 문구는 새로 씀)
+//   alert                                     지급정지 '안내' 팝업 (C3 15.0)
 // 내용 글자는 모두 지어낸 것 (녹화의 이름 · 번호 · 금액 없음)
 import { useEffect, useState, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";

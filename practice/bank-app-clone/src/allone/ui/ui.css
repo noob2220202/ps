@@ -866,7 +866,7 @@
   color: #000;
   text-align: left;
 }
-/* 줄은 낱말 단위로만 바뀜 (녹화 웹뷰는 낱말 가운데서도 끊었지만 읽기 어색해서 — 문구 쪽에서 <br /> 로 끊음) */
+/* 줄은 글자 어디서나 바뀜 (녹화 웹뷰처럼 낱말 가운데에서도: 지급정지 문구는 "가 / 까운") */
 .ao-alert__body {
   margin-top: 21.07px;
   font-size: 15px;
@@ -874,7 +874,7 @@
   line-height: 22.33px;
   color: #1f1f1f;
   text-align: center;
-  word-break: keep-all;
+  word-break: break-all;
 }
 .ao-alert__code {
   margin: 19.1px 0 0;
