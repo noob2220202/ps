@@ -83,12 +83,6 @@
   margin-top: 1px;
 }
 /* 제목이 나타나고 사라지는 때: 기준선을 넘고 185ms 뒤, 나타남 400ms · 사라짐 300ms (녹화 A 26.86–27.24 · 41.44–41.62) */
-.toss-acct-bank__bar .toss-appbar__title--fade {
-  transition: opacity 300ms ease-out 185ms;
-}
-.toss-acct-bank__bar .toss-appbar__title--fade.on {
-  transition-duration: 400ms;
-}
 .toss-acct-bank__bar .toss-appbar__right {
   right: 12.4px;
 }

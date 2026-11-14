@@ -61,7 +61,7 @@ export function AllMenu() {
         },
         { label: "거래내역", icon: <Tile bg="#26262c" fg="#c3c3c8"><G d="M8 6.5h11M8 12h11M8 17.5h11M4.5 6.5h.1M4.5 12h.1M4.5 17.5h.1" /></Tile>, run: () => go("/bank/main/history") },
         { label: "송금", icon: <Tile bg="#1f2b45" fg="#5d9cf8"><G d="M20.5 3.5 10 14M20.5 3.5 14 20.5l-4-6.5-6.5-4Z" /></Tile>, run: () => goSend({ from: "main", toastFromHome: true }) },
-        { label: "증명서 발급", icon: <Tile bg="#2c2a22" fg="#e2b84a"><G d="M6 3.5h8.5L18.5 7.5V20.5H6ZM14 3.5V8h4.5M9 12h6M9 15.5h6" /></Tile>, run: () => go("/cert") },
+        { label: "증명서 발급", icon: <Tile bg="#2c2a22" fg="#e2b84a"><G d="M6 3.5h8.5L18.5 7.5V20.5H6ZM14 3.5V8h4.5M9 12h6M9 15.5h6" /></Tile>, run: () => go("/cert", { state: { certDepth: 1 } }) },
       ],
     ],
     [

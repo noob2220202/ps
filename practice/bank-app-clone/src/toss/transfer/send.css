@@ -1696,28 +1696,6 @@
   }
 }
 
-/* 안내창 D1 (공용 TossDialog 를 이 영역에서만 녹화 B 51.012 에 맞춤: 카드 361.6–504.0, 제목 잉크 387.2, 본문 423.0, 확인 463.8) */
-:is(.toss-send-amt, .toss-send-cf) .toss-dialog__card {
-  padding-top: 21.6px;
-  padding-bottom: 12.8px;
-}
-:is(.toss-send-amt, .toss-send-cf) .toss-dialog__body {
-  margin-top: 8.8px;
-}
-:is(.toss-send-amt, .toss-send-cf) .toss-dialog__actions {
-  margin-top: 10px;
-}
-/* 글자 색 (B 51.012 잉크 꼭대기): 제목 #e6e5ee · 본문 #a09ea8 · 확인 #3280f5 */
-:is(.toss-send-amt, .toss-send-cf) .toss-dialog__title {
-  color: #e6e5ee;
-}
-:is(.toss-send-amt, .toss-send-cf) .toss-dialog__body {
-  color: #a09ea8;
-}
-:is(.toss-send-amt, .toss-send-cf) .toss-dialog__action--blue {
-  color: #3280f5;
-}
-
 /* 공용 큰 버튼 글자가 녹화보다 0.8–1.6dp 아래 (B 63.727 · 118.224) → 이 영역에서만 올림 */
 :is(.toss-send-num, .toss-send-cf) .toss-btn__label {
   translate: 0 -0.8px;
@@ -1726,15 +1704,7 @@
   translate: 0 -1.6px;
 }
 
-/* 큰 버튼 누름: 녹화에선 짧게 눌러도 0.96 까지 줄었다가(≈70ms) 떼면 돌아옴 (B 69.54–69.73 · 109.74–109.94). 공용은 0.995 */
-:is(.toss-send-num, .toss-send-cf, .toss-send-done) .toss-btn--pressed {
-  transform: scale(0.96);
-  transition-duration: 80ms;
-}
-/* 큰 버튼 글자 색 (잉크 꼭대기: 파랑 버튼 #ffffff, 공유하기 #4492ff — B 63.727 · 118.211). 공용은 #f3feff · #4690f6 */
-:is(.toss-send-num, .toss-send-amt, .toss-send-cf, .toss-send-done) .toss-btn--primary:not(.toss-btn--disabled) {
-  color: #ffffff;
-}
+/* 공유하기 글자 색 (잉크 꼭대기 #4492ff — B 118.211) */
 .toss-send-done .toss-btn--secondary {
   color: #4492ff;
 }

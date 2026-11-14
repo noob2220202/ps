@@ -74,8 +74,8 @@
 }
 .toss-appbar__back {
   position: absolute;
-  left: 4.4px;
-  top: 2.8px;
+  left: 4px; /* ← 24 상자 (16, 42.4): 기기 화소에 맞춘 자리 (cert · transfer 검토, 잉크 18.9–38.0 × 45.8–63.2) */
+  top: 2.4px;
   width: 48px;
   height: 48px;
   z-index: 1;
@@ -104,10 +104,11 @@
 }
 .toss-appbar__title--fade {
   opacity: 0;
-  transition: opacity 250ms ease-out 80ms;
+  transition: opacity 300ms ease-out 185ms; /* 경계를 넘고 ≈185ms 뒤 시작 (녹화 A 26.675→26.86 · 41.255→41.44) */
 }
 .toss-appbar__title--fade.on {
   opacity: 1;
+  transition-duration: 400ms;
 }
 .toss-appbar__right {
   position: absolute;
@@ -224,7 +225,7 @@
 }
 .toss-btn--primary {
   background: var(--toss-blue);
-  color: #f3feff;
+  color: #ffffff;
   --toss-btn-press: var(--toss-blue-pressed);
 }
 .toss-btn--weak {
@@ -252,9 +253,10 @@
   border-radius: 0;
   font-weight: 500;
 }
+/* 짧게 눌러도 0.96 까지 ≈70ms 에 줄었다가 떼면 ≈150ms 에 돌아옴 (녹화 B 69.54–69.73 · 109.74–109.94) */
 .toss-btn--pressed {
-  transform: scale(0.995);
-  transition-duration: 100ms;
+  transform: scale(0.96);
+  transition-duration: 80ms;
 }
 .toss-btn__ripple {
   position: absolute;
@@ -448,7 +450,7 @@
   width: 319.7px;
   top: 432.8px;
   translate: 0 -50%;
-  padding: 24px 12px 12px 22.4px;
+  padding: 21.6px 12px 12.8px 22.4px; /* 녹화 B 51.012: 카드 361.6–504.0 · 제목 잉크 387.2 · 본문 423.0 · 확인 463.8 */
   border-radius: 24px;
   background: var(--toss-fill-2);
   animation: toss-dialog-in 160ms ease-out both;
@@ -457,22 +459,22 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 1.35;
-  color: #e2e1e7;
+  color: #e6e5ee;
   padding-right: 10px;
 }
 .toss-dialog__body {
-  margin-top: 8px;
+  margin-top: 8.8px;
   font-size: 15px;
   font-weight: 500;
   line-height: 1.45;
-  color: #9796a0;
+  color: #a09ea8;
   padding-right: 10px;
 }
 .toss-dialog__actions {
   display: flex;
   justify-content: flex-end;
   gap: 4px;
-  margin-top: 18px;
+  margin-top: 10px;
 }
 .toss-dialog__action > .toss-press__content {
   padding: 10px 14px;
@@ -480,7 +482,7 @@
   font-weight: 700;
 }
 .toss-dialog__action--blue {
-  color: #317ceb;
+  color: #3280f5;
 }
 .toss-dialog__action--grey {
   color: #9796a0;
@@ -520,7 +522,7 @@
   align-items: center;
   gap: 4px;
   height: 49.5px;
-  padding: 0 20px 0 19px;
+  padding: 0 21px 0 20px; /* Pretendard 가 ≈1.6dp 좁아 녹화 A 16.503 알약 (x 88.1–295.2) 에 맞춰 넓힘 */
   border-radius: 25px;
   background: #1f1e21;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
@@ -545,7 +547,7 @@
   color: var(--toss-blue);
   text-decoration: underline;
   text-decoration-thickness: 1.6px;
-  text-underline-offset: 3px;
+  text-underline-offset: 1.2px; /* 밑줄 y 59.2–60.8 (녹화 A 16.503) */
 }
 .toss-toast--out {
   animation: toss-toast-out 200ms ease-in both;

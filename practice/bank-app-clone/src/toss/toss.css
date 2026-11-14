@@ -25,7 +25,7 @@
 
   /* 파랑 */
   --toss-blue: #3182f6;
-  --toss-blue-pressed: #225eb5;
+  --toss-blue-pressed: #2b72de; /* 눌린 파랑 버튼 (녹화 A 증명서 CTA) */
   --toss-blue-text: #4593fc;
   --toss-blue-weak: #1f2942;
   --toss-blue-weak-text: #5399f8;

@@ -147,12 +147,12 @@
   color: #e1e0e3;
 }
 .toss-assets-spend__bar .toss-appbar__back {
-  left: 4.8px;
+  left: 4.2px; /* 공용 ← 그림이 0.6dp 오른쪽으로 바뀐 만큼 당김 */
   top: 3.6px; /* ← 잉크 x 18.4–38.4 · y 46.4–64.8 */
 }
 .toss-assets-assets__bar .toss-appbar__back,
 .toss-assets-my .toss-appbar__back {
-  left: 4.8px; /* ← 잉크 x 18.4–38.4 */
+  left: 4.2px; /* ← 잉크 x 18.4–38.4 (공용 ← 그림이 0.6dp 오른쪽으로 바뀐 만큼 당김) */
 }
 .toss-assets-spend__tools {
   position: absolute;
