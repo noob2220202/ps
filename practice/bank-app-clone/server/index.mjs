@@ -78,6 +78,9 @@ const TOSS = APP === "toss";
 // NH올원뱅크 (allone): 공용 API 에 작은 칸만 덧붙임 (홈 ao.notice, 거래 상세 ao, 받는 분 ☆, 최근 삭제하기).
 // 다른 앱 응답은 그대로. NH 계좌는 bank_code 'nh' — 여기서 APP === "nh"(콕뱅크)를 보면 안 됨
 const ALLONE = APP === "allone";
+// 관리 패널 거래 한 건 금액 상한: 다른 앱은 1천만원, 올원은 잔액 상한(10억)과 같게 (큰 입금 · 출금도 한 줄로)
+const TX_MAX = ALLONE ? 1_000_000_000 : 10_000_000;
+const TX_MAX_MSG = ALLONE ? "한 번에 10억원까지" : "한 번에 1천만원까지";
 
 const getProfile = () => {
   const p = db().prepare("SELECT * FROM profile WHERE id = 1").get();
@@ -572,7 +575,7 @@ app.post("/api/accounts/:id/transactions", (req, res) => {
   if (typeof merchant !== "string" || !merchant.trim()) fields.merchant = "거래처를 입력해 주세요";
   else if (merchant.length > 20) fields.merchant = "20자 이하";
   if (!Number.isInteger(amount) || amount === 0) fields.amount = "0이 아닌 금액을 입력해 주세요";
-  else if (Math.abs(amount) > 10_000_000) fields.amount = "한 번에 1천만원까지";
+  else if (Math.abs(amount) > TX_MAX) fields.amount = TX_MAX_MSG;
   if (!TAGS.includes(tag)) fields.tag = "알 수 없는 거래 종류";
   if (at !== undefined && !isLocalIso(at)) fields.at = "날짜 형식 오류";
   const tossSets = [];
@@ -674,7 +677,7 @@ app.patch("/api/transactions/:id", (req, res) => {
   let balanceDelta = 0;
   if ("amount" in body) {
     if (!Number.isInteger(body.amount) || body.amount === 0) fields.amount = "0이 아닌 금액을 입력해 주세요";
-    else if (Math.abs(body.amount) > 10_000_000) fields.amount = "한 번에 1천만원까지";
+    else if (Math.abs(body.amount) > TX_MAX) fields.amount = TX_MAX_MSG;
     else {
       balanceDelta = body.amount - t.amount;
       sets.push("amount = ?");
