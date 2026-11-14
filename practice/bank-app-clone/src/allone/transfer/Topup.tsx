@@ -3,6 +3,10 @@
 //  - T6 줄 → topupRow 막 → 시트가 한 프레임에 사라지고 계좌 표시 → 막이 걷히는 프레임에 T7 금액 입력 (금액이 0 일 때)
 //  - 잔액채우기 = POST /api/transfers (출금계좌 → 입금계좌, 통장 표시 "잔액채우기"), topupSubmit 막 (567)
 //    성공: T2 에서 왔으면 이 화면을 닫고(CUT) T2 판이 다시 들어옴 + "잔액을 채웠어요" (판 위), 메뉴 · 카드에서 왔으면 그대로 + 금액 0 + 토스트
+//    출금계좌가 지급정지(403 ACCOUNT_BLOCKED)면 빨간 글 대신 '안내' 팝업 (cut, C3 12.713) → 확인 → 이 화면 그대로 (금액 그대로).
+//    T2 에서 왔으면 밑의 T2 키패드 판이 이 화면 위로 올라와 남음 (C3 19.479–19.663, blocked.ts). 다른 오류는 빨간 글
+//  - 잔액채우기 버튼 색: 막 동안 누른 색 → 원래 색 (transfer.css --held), 지급정지 '안내'가 뜨면 막이 걷히는 프레임에 원래 색 → 50ms 에 더 어두운 초록 (--alert),
+//    확인을 누르면 한 프레임에 원래 색 (C3 12.146–13.06 · 19.479)
 // 1회 한도 500만 · 1일 잔여한도 100만 − 오늘 그 계좌에서 채운 합계 (표시 + 화면 검사, 서버 한도 없음)
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
@@ -14,7 +18,10 @@ import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLine, aoDailyRemaini
 import { AO_AMOUNT_SHEET } from "../motion";
 import { aoHereKey, LOAD, useAoBack } from "../nav";
 import { AoBankLogo, AoButton, AoChevronDownIcon, AoHeader, AoPage, AoSheet, aoLoad, aoToast } from "../ui";
+import { useLayerActive } from "../../platform/LayerContext";
 import { AmountSheet } from "./AmountSheet";
+import { isAoBlocked, showPanelOverTopup } from "./blocked";
+import { BlockedAlert } from "./BlockedAlert";
 import { SendRow } from "./parts";
 import { logoBank, sinceTopupLink } from "./util";
 
@@ -47,7 +54,15 @@ export function Topup() {
   const [t7Delay, setT7Delay] = useState<number>(AO_AMOUNT_SHEET.riseDelay);
   const [t7Up, setT7Up] = useState(false); // T7 막이 남아 있는 동안 (출금계좌 묶음에 테, C3 11.5)
   const [error, setError] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false); // 지급정지 '안내'
+  const [held, setHeld] = useState<"dim" | "alert" | null>(null); // 잔액채우기 버튼 색 (누른 뒤 막 동안 · 안내 동안)
   const [busy, setBusy] = useState(false);
+  const active = useLayerActive();
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+  useEffect(() => () => void (activeRef.current = false), []); // 뒤로로 떠나 사라진 뒤 막이 끝나도 (도착한 화면에 토스트)
   // 잔액채우기 버튼: 출금계좌를 고른 뒤에도 금액 입력(T7)이 한 번 닫힐 때까지는 회색 (C3 5.45–5.6 회색 → 7.85 초록).
   // 주소에 출금계좌가 있으면(다른금융 카드) 처음부터 켜짐
   const [armed, setArmed] = useState(() => !!params.get("from"));
@@ -110,9 +125,12 @@ export function Topup() {
     }
     submitting.current = true;
     setBusy(true);
+    setHeld("dim");
     const amt = amount;
     // 막 동안 브라우저 뒤로를 눌렀으면(topupSubmit 은 뒤로를 무시하고 끝까지 돎) 이미 이 화면을 떠났으므로 cut 의 뒤로는 하지 않음. 토스트는 도착한 화면에
     const here = aoHereKey();
+    let failed = false;
+    let alerted = false; // 지급정지 '안내'를 막 밑에서 열었음
     void aoLoad("topupSubmit", {
       // 채우기만 기다림 (POST 가 성공하면 무효화로 열린 화면들이 홈 데이터를 다시 받음 — 같은 주소를 또 받으면 브라우저 연결 수(6)에 막혀 cut 이 250ms 늦었음).
       // T2 계좌 줄 잔액은 그 다시 받기로 막 밑에서 바뀜
@@ -124,12 +142,21 @@ export function Topup() {
       onHidden: () => {
         submitting.current = false;
         setBusy(false);
-        aoToast("잔액을 채웠어요", origin === "amount" ? { bottom: TOAST_PANEL } : {});
+        setHeld(alerted ? "alert" : null);
+        if (!failed) aoToast("잔액을 채웠어요", origin === "amount" ? { bottom: TOAST_PANEL } : {}); // 실패해도 막은 걷히며 여기로 옴
       },
       onError: (e) => {
+        failed = true;
         submitting.current = false;
         setBusy(false);
-        setError(e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요");
+        const msg = e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요";
+        // 지급정지: 이 화면이 맨 위면 '안내' (막이 걷히기 33ms 전 — 녹화 12.713 의 첫 프레임이 이미 10%). 막 동안 뒤로로 떠났으면 도착한 화면에 토스트
+        if (isAoBlocked(e)) {
+          if (activeRef.current) {
+            alerted = true;
+            setBlocked(true);
+          } else aoToast(msg);
+        } else setError(msg);
       },
     });
   };
@@ -141,7 +168,7 @@ export function Topup() {
       bodyRef={bodyRef}
       header={<AoHeader variant="modal" title="잔액채우기" onClose={() => back()} />}
       footer={
-        <AoButton className="ao-send-topup__submit" disabled={!sel || !armed} disabledColor="#808080" radius={15} height={56} size={18.5} onPress={submit}>
+        <AoButton className={`ao-send-topup__submit${held ? ` ao-send-topup__submit--${held === "dim" ? "held" : "alert"}` : ""}`} disabled={!sel || !armed} disabledColor="#808080" radius={15} height={56} size={18.5} onPress={submit}>
           잔액채우기
         </AoButton>
       }
@@ -243,6 +270,16 @@ export function Topup() {
           />
         ))}
       </AoSheet>
+
+      <BlockedAlert
+        open={blocked}
+        enter="cut"
+        onClose={() => {
+          setBlocked(false);
+          setHeld(null);
+          if (origin === "amount") showPanelOverTopup();
+        }}
+      />
 
       <AmountSheet
         open={t7}

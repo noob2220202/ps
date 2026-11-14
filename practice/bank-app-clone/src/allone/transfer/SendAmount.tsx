@@ -3,7 +3,9 @@
 // 판이 열리고 닫힐 때 화면은 한 프레임에 다시 배치되고 판만 미끄러짐 (화면 아래끝에서 들어옴 175ms, 나감 170ms — motion.ts AO_PANEL, transfer.css).
 // 다음 → 판 나감 → +133ms 계좌 비밀번호(T3) → 4번째 숫자 +50ms → password 막(483) → 이체 확인.
 // 출금가능금액 부족 | 잔액채우기 → 판 나감 + topupLink 막 → 잔액채우기(T5). 돌아오면 판이 다시 들어옴
+// 출금계좌가 지급정지면 password 막 뒤 이체 확인 대신 '안내' 팝업 (C3 33.229) → 확인 → 5프레임 뒤 판이 다시 들어옴 (C3 33.996 → 34.079)
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 import { useApi } from "../../api/useApi";
 import type { Bank } from "../../api/types";
@@ -13,10 +15,12 @@ import { useAoFlow } from "../flow";
 import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLast4, aoBankLine, aoCanSend, aoDigits, aoNum, aoWon } from "../format";
 import { AO_PANEL } from "../motion";
 import { aoLoadingProfile, onAoLoadingHidden } from "../loading";
-import { aoNativeHost, onAoNativeReset } from "../native";
+import { aoNativeHost, onAoNativeReset, useAoNativeHost } from "../native";
 import { useAoBack, useAoReturn } from "../nav";
 import { useLayerActive } from "../../platform/LayerContext";
 import { AoButton, AoChevronDownIcon, AoHeader, AoNativePortal, AoPage, AoSheet, aoToast } from "../ui";
+import { BLOCKED_PANEL_DELAY, checkNotBlocked, isAoBlocked, onPanelOverTopup } from "./blocked";
+import { BlockedAlert } from "./BlockedAlert";
 import { PasswordSheet } from "./Password";
 import { AmountPad, SendRow } from "./parts";
 import { addMan, bankLabel, copyText, markTopupLink, padApply, type PadKey } from "./util";
@@ -58,6 +62,8 @@ export function SendAmount() {
   const [open, setOpen] = useState(true); // 화면 배치 (판 열림 / 닫힘) — 판이 움직이기 시작하는 프레임에 바뀜
   const [pw, setPw] = useState(false);
   const [acctSheet, setAcctSheet] = useState(false);
+  const [alert, setAlert] = useState(false); // 지급정지 '안내'
+  const [over, setOver] = useState(false); // 잔액채우기 화면 위에 남은 판 (blocked.ts showPanelOverTopup)
   const timers = useRef<number[]>([]);
   const later = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms));
   useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
@@ -85,6 +91,7 @@ export function SendAmount() {
   useAoReturn(() => {
     setPw(false);
     setAcctSheet(false);
+    setOver(false);
     heldPanel.current?.();
     heldPanel.current = null;
     const p = aoLoadingProfile();
@@ -100,7 +107,17 @@ export function SendAmount() {
     panelIn();
   });
   // 녹화 다시 시작 · 로그아웃: 판은 화면과 같이 사라짐 — 남은 그림자 판만 치움
-  useEffect(() => onAoNativeReset(() => document.querySelectorAll(".ao-send-ghost").forEach((g) => g.remove())), []);
+  useEffect(
+    () =>
+      onAoNativeReset(() => {
+        document.querySelectorAll(".ao-send-ghost").forEach((g) => g.remove());
+        setOver(false);
+      }),
+    [],
+  );
+  // 위의 잔액채우기에서 '안내'를 닫으면 이 화면의 판이 잔액채우기 위로 올라와 남음 (녹화 C3 19.479–19.663). 돌아오면(useAoReturn) 걷고 늘 하던 대로 다시 들어옴
+  useEffect(() => onPanelOverTopup(() => !activeRef.current && setOver(true)), []);
+  const panelHost = useAoNativeHost("panel");
 
   // ---- 금액 검사 (§2.3: 0 < 금액 ≤ 잔액, ≤ 500만) ----
   const n = Number(amount || 0);
@@ -145,7 +162,22 @@ export function SendAmount() {
   const onPwDone = () => {
     setPw(false);
     const q = new URLSearchParams({ from: fromId, bank: bankCode, number, holder, amount: String(n) });
-    unlessMoved(flow.go(`/send/confirm?${q}`, { via: "password", prefetch: [aoPaths.home, aoPaths.banks] }));
+    // 막 동안 출금계좌를 새로 받아 지급정지인지 봄 → 지급정지면 이동 없이 막이 걷히는 프레임에 '안내' (판은 확인 뒤에)
+    let blocked = false;
+    void flow
+      .go(`/send/confirm?${q}`, {
+        via: "password",
+        prefetch: [aoPaths.home, aoPaths.banks],
+        task: () => checkNotBlocked(fromId),
+        onError: (e) => void (blocked = isAoBlocked(e)),
+        onHidden: () => blocked && setAlert(true),
+      })
+      .then((ok) => !ok && !blocked && panelIn());
+  };
+  const onAlertClose = () => {
+    setAlert(false);
+    // 팝업이 사라지는 프레임(rAF)부터 세어 5프레임째에 판이 들어오기 시작 (누른 시점이 프레임 어디든 같게)
+    requestAnimationFrame(() => later(BLOCKED_PANEL_DELAY, () => activeRef.current && panelIn()));
   };
   const onAcct = () => {
     // 판이 다 들어와 있을 때만 (시트를 고르거나 닫은 뒤 판이 다시 들어오기 전의 누름이 시트를 또 열어 판과 엇갈리지 않게)
@@ -166,6 +198,33 @@ export function SendAmount() {
     copyText(number);
     aoToast("계좌번호를 복사했어요", panel === "in" ? { bottom: TOAST_PANEL } : {});
   };
+
+  // 판 안 (칩 · 키패드 · 다음). live = false 면 누름이 아무 일도 하지 않음 (잔액채우기 위에 남은 판)
+  const noop = () => {};
+  const panelKeys = (live: boolean) => (
+    <>
+      {CHIPS.map(([label, man], i) => (
+        <button key={label} type="button" className="ao-send-chip" style={{ left: CHIP_X[i][0], width: CHIP_X[i][1] - CHIP_X[i][0] }} onClick={live ? () => onChip(man) : noop}>
+          <span className="ao-num">{label}</span>
+        </button>
+      ))}
+      <button type="button" className="ao-send-chip" style={{ left: CHIP_X[4][0], width: CHIP_X[4][1] - CHIP_X[4][0] }} onClick={live ? onAll : noop}>
+        <span>전액</span>
+      </button>
+      <AmountPad
+        className="ao-send-panel__pad"
+        cols={[80.9, 196.7, 312.8]} // 잉크 가운데 (C3 29.2: "1" 79.8 · "00" 80.8 · "2" 196.8 · "0" 196.65) — Roboto 글리프가 왼쪽으로 치우쳐 칸 가운데를 조금 옮김
+        rows={[89.3, 149.3, 209.7, 269.7]}
+        cellH={60}
+        size={24}
+        back={{ left: 298.12, top: 262.2 }}
+        onKey={live ? onKey : noop}
+      />
+      <AoButton className="ao-send-panel__next" disabled={!canNext} pressed="native" height={56} radius={8.5} size={18.8} onPress={live ? onNext : noop}>
+        다음
+      </AoButton>
+    </>
+  );
 
   const accounts = home.data?.accounts ?? [];
   const sheetAccounts = accounts.filter((a) => a.bank.code === "nh" || a.id === fromId);
@@ -222,31 +281,19 @@ export function SendAmount() {
       {panel !== "off" && (
         <AoNativePortal layer="panel">
           <div className="ao-send-panelclip" ref={panelRef}>
-            <div className={`ao-send-panel ao-send-panel--${panel}`}>
-              {CHIPS.map(([label, man], i) => (
-                <button key={label} type="button" className="ao-send-chip" style={{ left: CHIP_X[i][0], width: CHIP_X[i][1] - CHIP_X[i][0] }} onClick={() => onChip(man)}>
-                  <span className="ao-num">{label}</span>
-                </button>
-              ))}
-              <button type="button" className="ao-send-chip" style={{ left: CHIP_X[4][0], width: CHIP_X[4][1] - CHIP_X[4][0] }} onClick={onAll}>
-                <span>전액</span>
-              </button>
-              <AmountPad
-                className="ao-send-panel__pad"
-                cols={[80.9, 196.7, 312.8]} // 잉크 가운데 (C3 29.2: "1" 79.8 · "00" 80.8 · "2" 196.8 · "0" 196.65) — Roboto 글리프가 왼쪽으로 치우쳐 칸 가운데를 조금 옮김
-                rows={[89.3, 149.3, 209.7, 269.7]}
-                cellH={60}
-                size={24}
-                back={{ left: 298.12, top: 262.2 }}
-                onKey={onKey}
-              />
-              <AoButton className="ao-send-panel__next" disabled={!canNext} pressed="native" height={56} radius={8.5} size={18.8} onPress={onNext}>
-                다음
-              </AoButton>
-            </div>
+            <div className={`ao-send-panel ao-send-panel--${panel}`}>{panelKeys(true)}</div>
           </div>
         </AoNativePortal>
       )}
+      {/* 잔액채우기 화면 위에 남은 판 (이 층은 숨어 있으므로 AoNativePortal 대신 판 자리에 바로). 누름은 받기만 하고 아무 일 없음 */}
+      {over &&
+        panelHost &&
+        createPortal(
+          <div className="ao-send-panelclip">
+            <div className="ao-send-panel ao-send-panel--in">{panelKeys(false)}</div>
+          </div>,
+          panelHost,
+        )}
 
       {/* 출금계좌 선택 (invented, T6 모양) */}
       <AoSheet open={acctSheet} title="출금계좌 선택" onClose={closeAcct} className="ao-send-acctsheet">
@@ -265,6 +312,7 @@ export function SendAmount() {
         ))}
       </AoSheet>
 
+      <BlockedAlert open={alert} onClose={onAlertClose} />
       <PasswordSheet open={pw} account={from ? `${aoBankName(from.bank)} ${aoAccountNumber(from)}` : ""} onClose={onPwClose} onDone={onPwDone} />
     </AoPage>
   );

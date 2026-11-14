@@ -898,6 +898,22 @@
 .ao-btn--disabled.ao-send-topup__submit {
   background: #e0e0e0;
 }
+/* 누른 뒤 막 동안 (--held): 손을 뗀 뒤에도 누른 색(#12a434)이 잠깐 남았다가 원래 색으로 서서히
+   (C3 12.146 막 밑 (45, 88, 58) → 12.429 (45, 80, 55) — 막 밑 값을 되돌리면 G 164 → 143, 녹화 압축 탓에 R · B 가 +2~4 뜸) */
+.ao-btn--primary.ao-send-topup__submit--held:not(.ao-btn--down) {
+  transition: background-color 250ms ease-out 50ms;
+}
+/* 지급정지 '안내' 동안 (--alert): 막이 걷히는 프레임엔 원래 색, 50ms 에 더 어두운 초록 (C3 12.713 (12, 143, 45) · 12.729 (8, 138, 42) · 12.746 (9, 134, 39)
+   → 배경막 밑 (2, 90, 26) = 바탕 (3, 129, 37)). 확인으로 닫히면 클래스가 빠지며 한 프레임에 원래 색 (19.479 (12, 143, 47)) */
+.ao-btn--primary.ao-send-topup__submit--alert:not(.ao-btn--down) {
+  background: #038125;
+  animation: ao-send-topup-alert 50ms linear both;
+}
+@keyframes ao-send-topup-alert {
+  from {
+    background-color: var(--ao-green);
+  }
+}
 
 /* ---------- T6 출금계좌 선택 (C3 4.5): 위 453, 첫 타일 527.33, 줄 63, 버튼 732–788 ---------- */
 .ao-send-t6__btns {

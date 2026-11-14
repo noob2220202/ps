@@ -9,6 +9,7 @@ export { AoKeyboard, AoCaret, AO_KB_TOP, AO_KB_NUM_TOP, AO_KB_ACCESSORY, type Ao
 export { compose as aoComposeHangul, isJamo as aoIsJamo, isConsonant as aoIsConsonant, isVowel as aoIsVowel } from "./hangul";
 export { AoSwitch, type AoSwitchProps } from "./Switch";
 export { AoSkeleton, type AoSkeletonProps } from "./Skeleton";
+export { AoAlert, type AoAlertProps } from "./Alert";
 export * from "./icons";
 
 // 다른 기초 담당이 만든 부품 (같이 모아 둠)

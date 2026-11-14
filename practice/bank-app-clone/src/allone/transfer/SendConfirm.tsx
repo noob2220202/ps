@@ -1,6 +1,7 @@
 // 이체 확인 (invented, transfer.md §5.1): 계좌 비밀번호 뒤 password 막(483)으로 들어옴. 녹화에는 이 뒤가 없어서 지어낸 화면.
 // 제목 두 줄 (T5 모양) + 상자 (받는 계좌 · 출금 계좌 · 받는 분 통장 표시 › · 내 통장 표시 › · 수수료 면제) + 메모 칸 + 보내기.
 // 통장 표시 줄은 입력 시트 (최대 20자, 한국어 키보드). 보내기 → send 막 (max(api, 1000)) 동안 POST /api/transfers → 이체 완료 (replace)
+// 그사이 출금계좌가 지급정지됐으면(403 ACCOUNT_BLOCKED) 이동 없이 '안내' 팝업 (막이 걷히기 33ms 전, 잔액채우기와 같게) → 확인 → 이체 확인 그대로
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useApi } from "../../api/useApi";
@@ -9,6 +10,9 @@ import { aoApi, aoPaths, type AoHome, type AoTransferResult } from "../api";
 import { useAoFlow } from "../flow";
 import { aoBankLast4, aoDigits, aoNum } from "../format";
 import { useAoBack } from "../nav";
+import { useLayerActive } from "../../platform/LayerContext";
+import { isAoBlocked } from "./blocked";
+import { BlockedAlert } from "./BlockedAlert";
 import { AoButton, AoCaret, AoChevronRightIcon, AoHeader, AoKeyboard, AoPage, AoSheet, aoToast } from "../ui";
 import { bankLabel } from "./util";
 
@@ -37,7 +41,14 @@ export function SendConfirm() {
   const [edit, setEdit] = useState<Edit>(null);
   const [draft, setDraft] = useState("");
   const [memoFocus, setMemoFocus] = useState(false);
+  const [blocked, setBlocked] = useState(false); // 지급정지 '안내'
   const bodyRef = useRef<HTMLDivElement>(null);
+  const active = useLayerActive();
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+  useEffect(() => () => void (activeRef.current = false), []); // 뒤로로 떠나 사라진 뒤 막이 끝나도 (도착한 화면에 토스트)
 
   // 메모 칸에 들어가면 키보드(위 490) 위로 보이게 올림
   useEffect(() => {
@@ -77,7 +88,11 @@ export function SendConfirm() {
               result = r;
               return note ? aoApi.updateMemo(r.outTxId, note) : undefined;
             }),
-        onError: (e) => aoToast(e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요"),
+        onError: (e) => {
+          // 지급정지: 이 화면이 맨 위면 '안내'. 막 동안 뒤로로 떠났으면(send 는 뒤로를 무시하고 끝까지 돎) 도착한 화면에 토스트
+          if (isAoBlocked(e) && activeRef.current) setBlocked(true);
+          else aoToast(e instanceof Error && e.message ? e.message : "잠시 후 다시 시도해 주세요");
+        },
       },
     );
   };
@@ -143,6 +158,8 @@ export function SendConfirm() {
           )}
         </div>
       </div>
+
+      <BlockedAlert open={blocked} enter="cut" onClose={() => setBlocked(false)} />
 
       <AoKeyboard open={memoFocus} value={memo} maxLength={MAX} onChange={setMemo} onDone={() => setMemoFocus(false)} />
 
