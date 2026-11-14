@@ -201,7 +201,7 @@
 }
 .toss-send-who__sec {
   position: absolute;
-  left: 25px;
+  left: 24.2px;
   top: 20.5px; /* 잉크 가운데 = 줄 위 + 28.9 */
   margin: 0;
   font-size: 17px;
@@ -215,7 +215,7 @@
   left: 0;
   top: 0;
   height: 49.8px;
-  padding: 21.3px 0 0 25px;
+  padding: 21.3px 0 0 24.2px;
   box-sizing: border-box;
   color: #e6e5e8;
 }
@@ -288,14 +288,14 @@
   text-overflow: ellipsis;
 }
 .toss-send-who__title {
-  top: 16.3px; /* 잉크 +16.2 … +31.6 */
+  top: 15.9px; /* 잉크 +16.2 … +31.6 (글자는 0.8 단위로 붙음 → B 8.500 이름 423.8) */
   font-size: 17px;
   line-height: 17px;
   font-weight: 650;
   color: #e8e6e9;
 }
 .toss-send-who__sub {
-  top: 39.2px; /* 잉크 +38.8 … +51.7 */
+  top: 38.8px; /* 잉크 +38.8 … +51.7 */
   font-size: 15px;
   line-height: 15px;
   color: #8f8e91;
@@ -339,7 +339,7 @@
 }
 .toss-send-num__h1 {
   position: absolute;
-  left: 24.6px;
+  left: 23.8px;
   top: 85.1px; /* 잉크 115.2–138.4 */
   margin: 0;
   font-size: 26px;
@@ -355,7 +355,7 @@
 }
 .toss-send-field__label {
   position: absolute;
-  left: 1px;
+  left: 0.4px;
   font-size: 13px;
   line-height: 13px;
   font-weight: 500;
@@ -449,7 +449,7 @@
 }
 .toss-send-num__bankph {
   position: absolute;
-  left: 0.8px;
+  left: 0;
   top: 38.3px; /* 잉크 269.6–288.8 */
   font-size: 22px;
   line-height: 22px;
@@ -461,7 +461,7 @@
 }
 .toss-send-num__bankval {
   position: absolute;
-  left: 0.8px;
+  left: 0;
   top: 38.7px; /* 잉크 273.6–293.6 (+4 포함 −4) */
   font-size: 22px;
   line-height: 22px;
@@ -491,7 +491,7 @@
 }
 .toss-send-num__hint {
   position: absolute;
-  left: 0.7px;
+  left: 0.1px;
   top: -0.4px; /* 잉크 308.0–319.7 */
   font-size: 13px;
   line-height: 13px;
@@ -1063,7 +1063,7 @@
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 0 24.8px 0 20.9px;
+  padding: 0 24.8px 0 20.1px;
   font-size: 15px;
   line-height: 15px;
 }
@@ -1453,14 +1453,15 @@
   right: 19.8px;
   bottom: 20.1px; /* 화면 762.2 – 818.2 */
   display: flex;
-  gap: 9.3px;
+  gap: 7.6px;
 }
 .toss-send-done__dock > * {
   flex: 1;
 }
+/* 공유하기 20.2–192.4 · 확인 200.0–364.2 (B 118.211, 밝기 경계) */
 .toss-send-done__dock > .toss-btn--secondary {
-  flex: 0 0 169.6px;
-  margin-left: 1.6px;
+  flex: 0 0 172.4px;
+  margin-left: 0;
 }
 
 /* 보내는 중 동전 (₩): 은빛 원판 → 오른쪽으로 늘어나 혜성처럼 날아감 (주황 불꽃) → 파란 고리 사이로 돌아옴. 한 바퀴 ≈1.1초 */
@@ -1587,7 +1588,7 @@
 /* 완료 체크: 0.2초 빈자리 → 은빛 물방울(0–100ms) → 거꾸로 버섯 모양(≈200ms) → 파랗게 + 체크(300–400ms) → 둥글게 출렁(650ms) (B 68.30–68.95 · 117.30–117.95) */
 .toss-send-check {
   position: absolute;
-  left: 1.4px;
+  left: 0.1px; /* 원판 158.7–224.8 · 가운데 191.7 (B 69.609 · 118.211) */
   top: -0.2px;
   width: 68.4px;
   height: 68.4px;

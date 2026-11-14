@@ -16,10 +16,10 @@ const Svg = ({ size = 24, color = "currentColor", className, style, children, vb
 );
 const line = (stroke = 2) => ({ stroke: "currentColor", strokeWidth: stroke, strokeLinecap: "round" as const, strokeLinejoin: "round" as const });
 
-// ← (머리줄): 잉크 20 × 18.4 (24 상자 안 2.3–21.7 × 2.8–21.2)
+// ← (광고 화면 · 메모 고치기): 머리줄 AppBar ← 와 같은 그림 (화살촉이 조금 작고 0.6dp 오른쪽 · 아래)
 export const BackIcon = (p: TossIconProps) => (
   <Svg {...p}>
-    <path d="M20.7 12H3.3M11.2 3.8 3 12l8.2 8.2" {...line(p.stroke ?? 2)} />
+    <path d="M21 12.3H3.9M11.6 4.6 3.9 12.3l7.7 7.7" {...line(p.stroke ?? 2)} />
   </Svg>
 );
 export const ChevronRightIcon = (p: TossIconProps) => (

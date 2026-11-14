@@ -5,9 +5,10 @@
 //  화면 녹화 표시(모서리 괄호 + 1초 주기로 깜빡이는 캠코더, x 60–71.2): ● 녹화 중일 때만. 시계 폭이 바뀌면 그만큼 옮김
 //  오른쪽 (잉크 x): 배터리 보호 241.6–249.6 · 알람 255.2–266.4 · 무음 271.2–282.4 · 와이파이 ↑↓ 286.4–303.2 · 신호 4칸 306.4–316.0
 //                  · "NN%" 오른끝 346.4 · 충전 중 배터리 348.8–356.8. 다른 앱 알림 아이콘 · 엣지 패널 손잡이는 그리지 않음
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useDeviceStatus, useNow } from "../platform/deviceStatus";
 import { useRecorder } from "../platform/recorder";
+import { useTossPhoneSnap } from "./phoneSnap";
 
 const FONT = { weight: 400, size: 14 } as const;
 const CLOCK_X = 28; // 시계 잉크 왼끝
@@ -72,8 +73,10 @@ export function TossStatusBar() {
   const clockX = clock ? CLOCK_X - clock.l : CLOCK_X - 0.6;
   const recX = clock ? CLOCK_X + (clock.r - clock.l) + REC_GAP : REC_X;
   const pctX = pctInk ? PCT_RIGHT - pctInk.r : PCT_RIGHT - 25;
+  const root = useRef<HTMLDivElement>(null);
+  useTossPhoneSnap(root); // 폰 테두리를 기기 화소에 맞춤
   return (
-    <div className="statusbar toss-sb" aria-hidden>
+    <div ref={root} className="statusbar toss-sb" aria-hidden>
       <svg className="toss-sb__svg" width="384" height="28" viewBox="0 0 384 28">
         <text className="toss-sb__text" x={clockX.toFixed(2)} y={BASE_Y}>
           {time}

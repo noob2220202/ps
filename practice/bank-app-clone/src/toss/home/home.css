@@ -846,8 +846,8 @@
 /* ---------- 이체 뒤 광고 화면 (바탕 #171619, ← 는 내용이 나타나기 전부터 보임) ---------- */
 .toss-home-adp__back {
   position: absolute;
-  left: 4.4px;
-  top: 30.8px; /* AppBar ← 자리 (잉크 x 18.4–38.4, y 45.6–64.0) */
+  left: 4px;
+  top: 30.4px; /* AppBar ← 자리 (잉크 x 18.9–38.0, y 45.8–63.2 · 녹화 B 74.942 · 129.251) */
   width: 48px;
   height: 48px;
   z-index: 3;

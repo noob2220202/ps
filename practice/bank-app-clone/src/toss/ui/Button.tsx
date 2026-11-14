@@ -1,7 +1,7 @@
 // 큰 버튼 (CTA). plan.md §3.3: transfer §2.0 · cert §2.0 · account §2.5
 //  56dp, 모서리 16, x 20–364 (BottomDock 안), 글자 17 SB
 //  primary #3182f6 / weak #1f2942 + #5399f8 / grey #292a2f / secondary #18294a + #4690f6 / disabled #1e355b + #4d5e7c (180ms 교차)
-//  누름: 누른 곳에서 #225eb5 물결이 100ms 에 버튼 전체로 + scale .995, 떼면 150ms 에 사라짐
+//  누름: 버튼 전체가 50ms 에 #2b72de + scale .965 (80ms), 떼면 150ms 에 돌아옴
 //  loading: 글자가 100ms 에 사라지고 점 3개 (⌀6.4, 간격 15, 750ms 주기, 200ms 차이, 투명도 .3→1 · 크기 .75→1)
 //  BarCTA: 화면 폭 꽉 찬 막대 (금액 화면 '다음', 0–384 · 56, 모서리 0, 글자 17 M)
 import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";

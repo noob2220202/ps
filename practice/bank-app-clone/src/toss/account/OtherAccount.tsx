@@ -68,7 +68,7 @@ export function OtherAccount() {
         </span>
       </span>
       <TossPressable className={`toss-acct-other__gear${phase >= 2 ? " toss-acct-other__gear--on" : ""}`} radius={20} ariaLabel="설정">
-        <GearIcon filled size={28} color="#545456" />
+        <GearIcon filled size={26} color="#545456" />
       </TossPressable>
     </div>
   );

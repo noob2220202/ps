@@ -118,6 +118,8 @@ html[data-app="toss"] .phone__navbar {
   pointer-events: none;
 }
 html[data-app="toss"] .phone__navbar i {
+  height: 4px;
+  transform: translateY(4.87px); /* 손잡이 843.2–847.2 (토스 녹화, 기기 1054–1059px) */
   background: #6b6a6d;
 }
 /* 삼성 키보드 (useTossBand("kb") 또는 HanaKeyboard 의 data-hana-kb) */

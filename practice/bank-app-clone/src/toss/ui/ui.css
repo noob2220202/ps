@@ -253,9 +253,9 @@
   border-radius: 0;
   font-weight: 500;
 }
-/* 짧게 눌러도 0.96 까지 ≈70ms 에 줄었다가 떼면 ≈150ms 에 돌아옴 (녹화 B 69.54–69.73 · 109.74–109.94) */
+/* 짧게 눌러도 ≈0.97, 오래 누르면 0.965 (80ms 에), 떼면 ≈150ms 에 돌아옴 (녹화 B 69.54 · 109.74) */
 .toss-btn--pressed {
-  transform: scale(0.96);
+  transform: scale(0.965);
   transition-duration: 80ms;
 }
 .toss-btn__ripple {
@@ -275,6 +275,12 @@
   transition:
     transform 100ms ease-out,
     opacity 0ms;
+  animation: toss-btn-press-in 50ms linear; /* 녹화는 누른 곳 없이 버튼 전체가 ≈50ms 에 어두워짐 (B 69.525–69.574) */
+}
+@keyframes toss-btn-press-in {
+  from {
+    opacity: 0;
+  }
 }
 .toss-btn__label {
   position: relative;
@@ -450,7 +456,7 @@
   width: 319.7px;
   top: 432.8px;
   translate: 0 -50%;
-  padding: 21.6px 12px 12.8px 22.4px; /* 녹화 B 51.012: 카드 361.6–504.0 · 제목 잉크 387.2 · 본문 423.0 · 확인 463.8 */
+  padding: 20.8px 12px 12.8px 22.4px; /* 녹화 B 51.012: 카드 361.6–504.0 · 제목 잉크 387.2 · 본문 422.4 · 확인 463.3 */
   border-radius: 24px;
   background: var(--toss-fill-2);
   animation: toss-dialog-in 160ms ease-out both;
@@ -463,7 +469,7 @@
   padding-right: 10px;
 }
 .toss-dialog__body {
-  margin-top: 8.8px;
+  margin-top: 9.6px;
   font-size: 15px;
   font-weight: 500;
   line-height: 1.45;
@@ -522,7 +528,7 @@
   align-items: center;
   gap: 4px;
   height: 49.5px;
-  padding: 0 21px 0 20px; /* Pretendard 가 ≈1.6dp 좁아 녹화 A 16.503 알약 (x 88.1–295.2) 에 맞춰 넓힘 */
+  padding: 0 20px 0 19px; /* 녹화 A 16.503 알약 x 88.1–295.2 · 로고 107.1 (글자 폭은 아래 letter-spacing 으로) */
   border-radius: 25px;
   background: #1f1e21;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
@@ -543,11 +549,14 @@
   border-radius: 50%;
   background: var(--toss-blue);
 }
+.toss-toast__text {
+  letter-spacing: 0.5px; /* Pretendard 가 녹화 글꼴보다 3.8dp 좁음 → 글자 끝 275.0 */
+}
 .toss-toast__text u {
   color: var(--toss-blue);
   text-decoration: underline;
   text-decoration-thickness: 1.6px;
-  text-underline-offset: 1.2px; /* 밑줄 y 59.2–60.8 (녹화 A 16.503) */
+  text-underline-offset: -0.8px; /* 밑줄은 글자 'ㅡ' 획에 붙음: y 59.2–60.8 (녹화 A 16.503) */
 }
 .toss-toast--out {
   animation: toss-toast-out 200ms ease-in both;

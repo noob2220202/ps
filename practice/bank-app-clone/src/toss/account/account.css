@@ -96,6 +96,7 @@
   height: 100%;
   display: grid;
   place-items: center;
+  translate: 0 -1.2px; /* 잉크 y 43.3–66.0 (A 25.968) */
 }
 .toss-acct-bank__end {
   height: 162.1px; /* 맨 아래까지 스크롤하면 마지막 줄 아래 빈칸 (최대 스크롤 4714 · 배너 있으면 4895) */
@@ -1104,6 +1105,7 @@
 }
 .toss-acct-hact__btn--manage svg {
   margin: -2.6px 0;
+  translate: 0 -1.2px; /* 잉크 y 45.6–64.0 (A 51.047) */
 }
 .toss-acct-hact__btn--manage span {
   margin-left: 5.2px;
@@ -1229,7 +1231,7 @@
 /* 날짜 칸 31.2 (잉크 위 14.0) · 거래 줄 58.4 */
 .toss-acct-hist__date {
   height: 31.2px;
-  padding: 13.25px 0 0 24.8px;
+  padding: 13.25px 0 0 24px; /* 잉크 24.7 */
   box-sizing: border-box;
   font-size: 13px;
   line-height: 13px;
@@ -1250,7 +1252,7 @@
 }
 .toss-acct-hist__name {
   position: absolute;
-  left: 76.8px;
+  left: 76px; /* 잉크 76.5–76.9 (A 51.047) */
   right: 150px;
   top: 11.1px; /* 잉크 468.0 */
   font-size: 17px;
@@ -1263,7 +1265,7 @@
 }
 .toss-acct-hist__time {
   position: absolute;
-  left: 76.8px;
+  left: 76px;
   top: 33.85px; /* 잉크 492.0 */
   font-size: 13px;
   line-height: 13px;
@@ -1352,7 +1354,7 @@
    이름은 M (잉크 질량이 같은 화면 '출금' 값 · '복사' 보다 1.2배 → R 아님), 값은 R */
 .toss-acct-detail__label {
   position: absolute;
-  left: 24.8px;
+  left: 24px; /* 잉크 24.7–25.0 (A 58.5) */
   top: 0;
   font-size: 17px;
   line-height: 17px;
@@ -1362,7 +1364,7 @@
 }
 .toss-acct-detail__value {
   position: absolute;
-  right: 23.5px;
+  right: 24.3px;
   top: 0;
   max-width: 268px;
   font-size: 17px;
@@ -1466,8 +1468,8 @@
 }
 .toss-acct-memo__back {
   position: absolute;
-  left: 4.4px;
-  top: 2.8px;
+  left: 4px;
+  top: 2.4px; /* 머리줄 ← 와 같은 자리 */
   width: 48px;
   height: 48px;
   color: #ffffff;
@@ -1582,7 +1584,7 @@
 .toss-acct-other__gear {
   position: absolute;
   left: 43.1px; /* 잉크 x 336.4 */
-  top: 6.8px;
+  top: 5.2px; /* 잉크 y 43.2–65.5 (B 164.5) */
   width: 40px;
   height: 40px;
   opacity: 0;
