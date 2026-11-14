@@ -111,6 +111,13 @@ function MemoEditor({ txId, initial }: { txId: string | null; initial: string })
     setSeq([]);
     setSelected(false);
   };
+  // 글자를 누르면 숨은 입력칸에 바로 초점: 누른 mousedown 이 초점을 body 로 빼앗아 가고, kb 가 이미 true 면 위 effect 가 다시 안 돎
+  // (폰에서 키보드가 내려가고 다시 눌러도 안 올라오던 것). 누른 그 click 안에서 불러야 iOS 도 키보드를 올림
+  const openKb = () => {
+    setKb(true);
+    input.current?.focus({ preventScroll: true });
+    if (selected) input.current?.select();
+  };
 
   // 자판이 쌓아 둔 방문 기록 칸을 먼저 빼고 뒤로
   const leave = async () => {
@@ -155,7 +162,7 @@ function MemoEditor({ txId, initial }: { txId: string | null; initial: string })
     >
       <div className="toss-send-memo__in">
         <h1 className="toss-send-memo__h1">{txId ? "메모 남기기" : "토스뱅크 송금"}</h1>
-        <div className="toss-send-memo__text" onClick={() => setKb(true)}>
+        <div className="toss-send-memo__text" onClick={openKb}>
           {selected ? (
             <span className="toss-send-memo__sel">{text}</span>
           ) : (

@@ -5,6 +5,7 @@
 //  끝: 고리가 ⌀43 으로 커지며 16 위로 · 흐려짐(200ms) · 카드는 500ms 감속으로 0 (넘치지 않음) · 고리 자리에서 옅은 빛 고리가 화면 끝까지 퍼짐
 //  · 머리줄은 200ms 뒤 230ms 에 걸쳐 돌아옴
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { tossScaleOf } from "../phoneSnap";
 
 const PTR = { threshold: 64, hold: 80, max: 134, minMs: 520, maxMs: 3000, finish: 850 } as const;
 const EASE_HOLD = "transform 400ms cubic-bezier(0.1, 0.65, 0.4, 1)"; // 놓은 뒤 +80 으로 (B 157.72–158.11)
@@ -56,17 +57,18 @@ export function usePullRefresh({ bodyRef, enabled, onRefresh }: { bodyRef: RefOb
         b.classList.toggle("toss-assets-ptr--armed", pull >= PTR.threshold);
       }
     };
-    let drag: { y0: number; pull: number; touch: boolean } | null = null;
+    // k: 폰 zoom (진짜 폰 화면) — 손가락 거리(창 px)를 화면 안 px 로 나눠야 카드가 손가락을 1:1 로 따라오고 64 · 80 도 dp 그대로
+    let drag: { y0: number; pull: number; touch: boolean; k: number } | null = null;
     const timers: number[] = [];
     let alive = true;
 
     const start = (y: number, touch: boolean) => {
       if (phaseRef.current !== "idle" || body.scrollTop > 0) return;
-      drag = { y0: y, pull: 0, touch };
+      drag = { y0: y, pull: 0, touch, k: tossScaleOf(body) };
     };
     const move = (y: number) => {
       if (!drag) return false;
-      const dy = y - drag.y0;
+      const dy = (y - drag.y0) / drag.k;
       if (dy <= 0 && !drag.pull) {
         drag = null; // 위로 밀면 보통 스크롤
         return false;

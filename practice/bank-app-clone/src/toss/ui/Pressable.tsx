@@ -35,6 +35,8 @@ function swallowGhostClick(own: HTMLElement | null) {
     window.clearTimeout(timer);
   };
   const onClick = (e: MouseEvent) => {
+    // 누름 없이 온 click (자판 Enter · Space, 보조 기기 · 코드의 click(): detail 0) 은 이 터치가 만든 것이 아님 → 그대로 두고 계속 기다림
+    if (e.detail === 0) return;
     off();
     if (own?.isConnected && e.target instanceof Node && own.contains(e.target)) return;
     e.preventDefault();

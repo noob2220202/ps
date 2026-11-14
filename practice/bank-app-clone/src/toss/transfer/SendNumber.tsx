@@ -78,9 +78,12 @@ export function SendNumber() {
     if (k === "back") return setNumber(digits.slice(0, -1));
     setNumber(digits + k);
   };
+  // 칸을 누르면 숨은 입력칸에 바로 초점: 누른 mousedown 이 초점을 body 로 빼앗아 가고, 이미 focus 면 위 effect 가 다시 안 돎
+  // (폰에서 키보드가 내려가고 다시 눌러도 안 올라오던 것). 누른 그 click 안에서 불러야 iOS 도 키보드를 올림
   const openField = () => {
     setFocus(true);
     setKb(true);
+    input.current?.focus({ preventScroll: true });
   };
   // 자판이 쌓아 둔 방문 기록 칸이 빠진 뒤에 (시트 · 뒤로가 그 칸을 잘못 잡지 않게)
   const afterKb = (fn: () => void) => {
