@@ -134,7 +134,7 @@ export interface TossAssetCard {
   bill?: number; // 신용카드만: 다음 카드값
   payDay?: number | null; // 신용카드만: 결제일 1~31
   sort: number;
-  monthAmount: number; // 이번 달 취소 안 된 출금 합계
+  monthAmount: number; // 이번 달 취소 안 된 출금 합계 (신용카드는 내역이 없으면 다음 카드값)
 }
 export interface TossAssetPoint {
   id: string;

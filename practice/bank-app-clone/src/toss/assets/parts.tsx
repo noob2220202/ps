@@ -161,6 +161,18 @@ const CAT: Record<string, { fill: string; glyph: ReactNode }> = {
       </>
     ),
   },
+  // 술집 · 포차 (맥주잔)
+  "술·유흥": {
+    fill: "#7aa83a",
+    glyph: (
+      <>
+        <path d="M11.5 12.2h10.6v11.6a1.8 1.8 0 0 1-1.8 1.8h-7a1.8 1.8 0 0 1-1.8-1.8Z" fill="#fff" />
+        <path d="M22.1 14.6h1.6a2.4 2.4 0 0 1 2.4 2.4v1.8a2.4 2.4 0 0 1-2.4 2.4h-1.6" fill="none" stroke="#fff" strokeWidth="1.9" />
+        <path d="M14.4 15.8v6.6M17.8 15.8v6.6" stroke="#7aa83a" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M10.8 12.6a2.3 2.3 0 0 1 2-3.4 2.9 2.9 0 0 1 4.3-.9 2.6 2.6 0 0 1 4.6 1.6 1.9 1.9 0 0 1 .9 2.7Z" fill="#fff" />
+      </>
+    ),
+  },
   교육: {
     fill: "#804b20",
     glyph: (

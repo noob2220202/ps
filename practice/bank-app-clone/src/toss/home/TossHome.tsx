@@ -4,7 +4,7 @@
 // 줄을 누르면 카드 폭 전체 #2a2b30 (작은 버튼은 #3b3c41), 손 떼면 170ms 에 사라지고 120ms 뒤 이동 (useTossGo).
 // 다른 화면에서 돌아오면 바뀐 금액만 숫자 굴림 (boot.ts useRollValue). 시작화면에서 넘어오면 300ms 교차 + 포인트 줄 펼침.
 // 데이터: GET /api/home (accounts · toss 블록). 녹화에 있던 개인 기록(본 상품 · 방문 서비스 · 광고 문구)은 지어낸 예시로 바꿈.
-// 성인 계정: 원본 녹화의 연령 전용 상품 줄은 성인용(신용카드 카드값 · 대출 비교)으로 바꿈 — 자리 · 글자 크기는 녹화 그대로
+// 성인 계정 예시: 소비 카드 둘째 줄 = 신용카드 카드값, 반쪽 카드 왼쪽 = 대출 비교 (SOLUTION 27장 '성인 계정') — 자리 · 글자 크기는 녹화 그대로
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { paths } from "../../api/endpoints";
@@ -30,6 +30,7 @@ import {
   GREY_MARK_FILTER,
   GreyMarkFilter,
   HeadChevron,
+  LoanArt,
   PayBrackets,
   PlusSquircle,
   PointIcon,
@@ -339,23 +340,21 @@ function AdCard() {
   );
 }
 
-// 반쪽 카드 둘 (브랜드콘 3D 그림은 녹화에서 잘라 4배 — scripts/toss-crops/home.py. 대출 비교는 상품 메뉴의 신용대출 그림을 빌려 씀)
+// 반쪽 카드 둘 (브랜드콘 3D 그림은 녹화에서 잘라 4배 — scripts/toss-crops/home.py. 대출 비교 그림은 지어낸 SVG — icons.tsx LoanArt)
 function HalfCards() {
-  const cards: [string, string, string][] = [
-    ["loan", "대출 조건\n1분 만에 비교", "toss-acct-m-loan-credit"],
-    ["coffee", "토스 브랜드콘\n구매하기", "toss-home-half-coffee"],
+  const coffee = localAsset("toss-home-half-coffee");
+  const cards: [string, string, ReactNode][] = [
+    ["loan", "대출 조건\n1분 만에 비교", <LoanArt key="art" />],
+    ["coffee", "토스 브랜드콘\n구매하기", coffee && <img key="art" className="toss-home-half__art toss-home-half__art--coffee" src={coffee} alt="" draggable={false} />],
   ];
   return (
     <div className="toss-home-halves">
-      {cards.map(([k, title, slot]) => {
-        const src = localAsset(slot);
-        return (
-          <TossPressable key={k} className="toss-home-half" color={ROW_PRESS} scale={0.98} onPress={noop}>
-            {src && <img className={`toss-home-half__art toss-home-half__art--${k}`} src={src} alt="" draggable={false} />}
-            <span className="toss-home-half__t">{title}</span>
-          </TossPressable>
-        );
-      })}
+      {cards.map(([k, title, art]) => (
+        <TossPressable key={k} className="toss-home-half" color={ROW_PRESS} scale={0.98} onPress={noop}>
+          {art}
+          <span className="toss-home-half__t">{title}</span>
+        </TossPressable>
+      ))}
     </div>
   );
 }

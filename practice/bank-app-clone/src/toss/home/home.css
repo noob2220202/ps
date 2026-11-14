@@ -612,12 +612,12 @@
   position: absolute;
   pointer-events: none;
 }
-/* 대출 비교: 상품 메뉴 신용대출 그림(32dp, 4px/dp)을 54dp 로 — 오른쪽 아래, 카드 밑으로 5.7dp 잘림 (브랜드콘 그림과 같은 느낌, 지어낸 자리) */
+/* 대출 비교: 지어낸 SVG (서류 + 돋보기, icons.tsx LoanArt) 54 × 56 — 오른쪽 아래, 카드 밑으로 ≈ 3.7dp 잘림 (브랜드콘 그림과 같은 느낌, 지어낸 자리) */
 .toss-home-half__art--loan {
-  left: 108px;
-  top: 20px;
+  left: 116px;
+  top: 16px;
   width: 54px;
-  height: 54px;
+  height: 56px;
 }
 .toss-home-half__art--coffee {
   left: 84.1px; /* x 279.7 (카드 195.6) */

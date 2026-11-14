@@ -14,7 +14,7 @@
     toss-home-li-account / li-shopping / li-checkcard  목록 카드 24dp 아이콘 (계좌 개설 · 토스쇼핑 · 카드 혜택 추천), B 136.07–137.45
     toss-home-deal            오늘의 딜 청록 표시 36dp, A 10.45–13.10
     toss-home-half-coffee     반쪽 카드(토스 브랜드콘) 3D 그림 (바탕 = 카드 #171619 + 아래 빛 — 줄마다 그림 밖 바탕을 재서 걷음), B 136.07–137.45
-                              (왼쪽 반쪽 카드는 성인 계정 문구 '대출 조건 1분 만에 비교' + 상품 메뉴 그림 toss-acct-m-loan-credit — 자르지 않음)
+                              (왼쪽 반쪽 카드는 성인 계정 문구 '대출 조건 1분 만에 비교' + 지어낸 SVG 그림 icons.tsx LoanArt — 자르지 않음)
     toss-home-coupon          쿠폰 광고 '5000' 쿠폰 그림, B 72.6–77.2
     toss-home-cal-plus / cal-won / cal-flip / cal-edge / cal-bag
                               '30일 동안' 광고 달력 로티 열쇠 장면 5개 (같은 캔버스 — 겹쳐 놓고 차례로 바꿈), B 126.79–129.29

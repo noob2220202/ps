@@ -206,8 +206,9 @@ function migrate(d) {
       );`;
     // 예전 cards 표 (체크 · 선불 + 선불 잔액 · 마지막 사용일) → 체크 · 신용 + 카드값 · 결제일. CHECK 는 ALTER 로 못 바꿔서
     // 새 표에 옮겨 담음 (한 번만 — 예전 표에만 last_used_at 칸이 있음). 예시 데이터의 선불카드 c-youth 는 예시 신용카드 c-day 로
-    // (카드값 = 예전 잔액, 결제일 14일, 결제 계좌 = 하나 계좌가 있으면), 그 밖의 선불카드는 체크카드로. 그림 이름도 새 이름으로.
-    // 계좌 이름 · 다른 카드 이름 · 거래는 사용자 데이터라 그대로 (예시 전체를 새로 받으려면 🔔 → 되돌리기 '예시 데이터로')
+    // (카드값 = 예전 잔액, 결제일 13일, 결제 계좌 = 하나 계좌가 있으면), 그 밖의 선불카드는 체크카드로. 그림 이름도 새 이름으로.
+    // 같은 때 예전 예시 데이터 그대로인 줄만 새 예시 이름으로 (id · 이름 · 분류 · 카드가 예전 값과 꼭 같을 때만 — 사용자가 바꾼 줄은 그대로).
+    // 금액은 안 바꿈 → 잔액 · 거래 후 잔액 · 합계는 그대로. 나머지 사용자 데이터도 그대로 (예시 전체를 새로 받으려면 🔔 → 기본 → '예시 데이터로')
     if (columns("cards").includes("last_used_at")) {
       const seeded = "id = 'c-youth' AND kind = 'prepaid'";
       const payFrom = d.prepare("SELECT 1 FROM accounts WHERE id = 'hana'").get() ? "'hana'" : "NULL";
@@ -216,13 +217,19 @@ function migrate(d) {
           d.exec(`
             ${cardsTable("cards_new")}
             INSERT INTO cards_new (id, name, bank_code, account_id, art, kind, bill, pay_day, sort)
-              SELECT 'c-day', '토스뱅크 하나카드 Day', 'hana', ${payFrom}, 'hana-day', 'credit', COALESCE(balance, 0), 14, sort FROM cards WHERE ${seeded};
+              SELECT 'c-day', '토스뱅크 하나카드 Day', 'hana', ${payFrom}, 'hana-day', 'credit', COALESCE(balance, 0), 13, sort FROM cards WHERE ${seeded};
             INSERT INTO cards_new (id, name, bank_code, account_id, art, kind, bill, pay_day, sort)
               SELECT id, name, bank_code, account_id, CASE art WHEN 'hana-young' THEN 'hana-travlog' WHEN 'toss-youth' THEN NULL ELSE art END, 'check', NULL, NULL, sort
                 FROM cards WHERE NOT (${seeded});
             UPDATE transactions SET card_id = 'c-day' WHERE card_id = 'c-youth' AND NOT EXISTS (SELECT 1 FROM cards_new WHERE id = 'c-youth');
             DROP TABLE cards;
             ALTER TABLE cards_new RENAME TO cards;
+            UPDATE accounts SET name = '주거래하나 통장' WHERE id = 'hana' AND name = '영하나플러스 통장';
+            UPDATE cards SET name = '트래블로그 체크카드' WHERE id = 'c-hana' AND name = 'Young Hana+ 체크카드';
+            UPDATE transactions SET merchant = '튼튼헬스', category = '문화·여가'
+              WHERE merchant = '바른학원' AND category = '교육' AND card_id = 'c-hana' AND account_id = 'hana';
+            UPDATE transactions SET merchant = '바다주유소', category = '교통'
+              WHERE merchant = '새싹문구' AND category = '교육' AND card_id = 'c-toss' AND account_id = 'main';
           `),
         d,
       );

@@ -10,7 +10,7 @@ import { bankByCode, bankInfo, digitsOf, formatAccountNumber } from "./banks.mjs
 // 공용 API 에 붙는 토스 칸 (홈 toss 블록, 계좌 role/favorite/openedAt, 거래 category/channel/own …, 상세 counterparty) 도 여기서 만듦.
 // 쓴 돈은 한 함수(spendTotal)만 셈 — 홈 '{M}월에 쓴 돈' 과 소비 합계가 늘 같게.
 
-// 소비 분류 색: 이체 · 카테고리 없음 · 교육은 녹화에서 잼, 나머지는 지어냄. '그 외'는 늘 #3e3d40
+// 소비 분류 색: 이체 · 카테고리 없음 · 교육 색은 녹화에서 잼, 나머지는 지어냄. '그 외'는 늘 #3e3d40
 export const CATEGORY_COLORS = {
   이체: "#2f7ff3",
   "카테고리 없음": "#1e7055",
@@ -22,6 +22,7 @@ export const CATEGORY_COLORS = {
   교통: "#27a5a0",
   "문화·여가": "#d6458f",
   "주거·통신": "#e2574c",
+  "술·유흥": "#7aa83a",
 };
 const OTHER_COLOR = "#3e3d40";
 const UNKNOWN_COLOR = "#5b5a5e"; // 🔔 에서 새로 만든 분류
@@ -382,7 +383,8 @@ export function tossApi(h) {
         const acc = h.toAccount(a, profile);
         return { id: a.id, bankCode: acc.bank.code, name: acc.label, number: acc.number ?? null, balance: a.balance, isMain: a.kind === "main", role: a.role ?? null, favorite: !!a.favorite };
       });
-    // 카드별 이번 달 쓴 돈 = 취소 안 된 출금 합계
+    // 카드별 이번 달 쓴 돈 = 취소 안 된 출금 합계. 신용카드는 사용 내역을 거래로 넣지 않으므로(SOLUTION 27장) 내역이 없으면
+    // 다음 카드값을 보임 → 홈 '{D}일 낼 카드값' 줄의 카드가 자산 카드 칸에도 같은 금액 · 그림으로 나옴
     const spent = new Map(
       db()
         .prepare("SELECT card_id, -SUM(amount) AS s FROM transactions WHERE card_id IS NOT NULL AND amount < 0 AND cancelled = 0 AND at LIKE ? GROUP BY card_id")
@@ -392,7 +394,7 @@ export function tossApi(h) {
     const cards = db()
       .prepare("SELECT * FROM cards ORDER BY sort, rowid")
       .all()
-      .map((c) => toCard(c, spent.get(c.id) ?? 0))
+      .map((c) => toCard(c, spent.get(c.id) ?? (c.kind === "credit" ? (c.bill ?? 0) : 0)))
       .sort((a, b) => b.monthAmount - a.monthAmount); // 많이 쓴 순 (같으면 sort 순 — 안정 정렬)
     const points = db().prepare("SELECT * FROM points ORDER BY sort, rowid").all().map(toPoint);
     const accountTotal = accounts.reduce((s, a) => s + a.balance, 0);

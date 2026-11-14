@@ -314,6 +314,8 @@ function SpendSummary({ s }: { s: TossSpend }) {
 }
 
 // ---------- 주간 달력 (붙음): 일요일부터 7칸 51.2, 고른 날 ⌀40 #100f12, 날마다 +받은 돈 / -쓴 돈 ----------
+// 100만원부터는 만 단위 ('+285만원') — 7자리 금액을 칸(42)에 맞추면 글자가 ≈ 6.9px 까지 줄어 읽기 어려움 (급여 같은 큰 금액)
+const calAmount = (n: number) => (n >= 1_000_000 ? `${num(Math.floor(n / 10_000))}만` : num(n));
 function WeekStrip({
   s,
   selected,
@@ -367,8 +369,8 @@ function WeekStrip({
                     onPress={() => onPick(c.date)}
                   >
                     <span className="toss-assets-strip__date">{c.day}</span>
-                    {d && d.income > 0 && <FitText className="toss-assets-strip__in" text={`+${num(d.income)}원`} max={42} />}
-                    {d && d.expense > 0 && <FitText className="toss-assets-strip__out" text={`-${num(d.expense)}원`} max={42} />}
+                    {d && d.income > 0 && <FitText className="toss-assets-strip__in" text={`+${calAmount(d.income)}원`} max={42} />}
+                    {d && d.expense > 0 && <FitText className="toss-assets-strip__out" text={`-${calAmount(d.expense)}원`} max={42} />}
                   </TossPressable>
                 );
               })}

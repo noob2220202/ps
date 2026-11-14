@@ -127,6 +127,47 @@ export const AdThumb = () => (
   </svg>
 );
 
+// 반쪽 카드 왼쪽 '대출 조건 1분 만에 비교' 그림 (지어냄): 기운 서류 + 돋보기, 54 × 56 dp 에 맞춰 그림 (오른쪽 아래, 카드 밑으로 조금 잘림).
+// 브랜드콘 3D 그림 옆이라 밝기를 낮춘 회청색 종이 · 파란 돋보기. 같은 id 가 두 번 그려져도(전환 중 두 층) 내용이 같아 상관없음
+export const LoanArt = () => (
+  <svg className="toss-home-half__art toss-home-half__art--loan" width={54} height={56} viewBox="0 0 54 56" aria-hidden focusable="false">
+    <defs>
+      <linearGradient id="toss-home-loan-paper" x1="0" y1="0" x2="0.8" y2="1">
+        <stop offset="0" stopColor="#e4e9f2" />
+        <stop offset="1" stopColor="#8d98ae" />
+      </linearGradient>
+      <linearGradient id="toss-home-loan-side" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#5f6a82" />
+        <stop offset="1" stopColor="#323a4d" />
+      </linearGradient>
+      <linearGradient id="toss-home-loan-rim" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#67a6fb" />
+        <stop offset="1" stopColor="#1b4fb4" />
+      </linearGradient>
+      <linearGradient id="toss-home-loan-handle" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#2f6ddc" />
+        <stop offset="1" stopColor="#0e2f78" />
+      </linearGradient>
+      <radialGradient id="toss-home-loan-glass" cx="0.35" cy="0.3" r="0.85">
+        <stop offset="0" stopColor="#cfe2ff" stopOpacity="0.7" />
+        <stop offset="1" stopColor="#5d8fdc" stopOpacity="0.35" />
+      </radialGradient>
+    </defs>
+    <g transform="rotate(-12 20 30)">
+      <rect x="7.6" y="9.6" width="26" height="36" rx="4.2" fill="url(#toss-home-loan-side)" />
+      <rect x="5.6" y="7.6" width="26" height="36" rx="4.2" fill="url(#toss-home-loan-paper)" />
+      <rect x="10" y="13" width="10" height="3.2" rx="1.6" fill="#3182f6" />
+      <rect x="10" y="19.6" width="17" height="2.3" rx="1.15" fill="#97a3ba" />
+      <rect x="10" y="24.6" width="14" height="2.3" rx="1.15" fill="#97a3ba" />
+      <rect x="10" y="29.6" width="16" height="2.3" rx="1.15" fill="#97a3ba" />
+    </g>
+    <path d="M40.2 42.6 47.8 50.2" stroke="url(#toss-home-loan-handle)" strokeWidth="6.4" strokeLinecap="round" />
+    <circle cx="31.6" cy="34" r="11" fill="url(#toss-home-loan-glass)" />
+    <circle cx="31.6" cy="34" r="11" fill="none" stroke="url(#toss-home-loan-rim)" strokeWidth="4.2" />
+    <path d="M25.8 30.6a6.8 6.8 0 0 1 4.8-3.7" fill="none" stroke="#fff" strokeOpacity="0.75" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
 // 목록 카드 지어낸 줄 (내 신용점수 보기 · 자산 추가하기) 24dp 아이콘
 export const GaugeIcon = () => (
   <svg className="toss-home-li__svg" width={24} height={24} viewBox="0 0 24 24" aria-hidden>
