@@ -1,7 +1,9 @@
 // ===== 토스 (toss) 초기 데이터 — 이름 · 계좌번호 · 잔액 · 금액 · 가게 전부 지어낸 값 =====
 // 녹화 속 값(이름, 상대방, 계좌번호, 잔액, 금액, 가게)은 하나도 쓰지 않음.
+// 성인 계정 예시: 급여 통장 · 고정비(통신 · 관리비) · 신용카드 카드값 (원본 녹화의 연령 전용 상품은 성인용으로 바꿈)
 // 날짜는 '지금' 기준 상대값 — 어느 날 켜도 이번 달 '{M}월에 쓴 돈' · 소비 · 지난달 비교 · 거래내역이 비지 않음.
 //   c(n, "HH:MM") = 오늘 − n일 (이번 달 1일보다 앞이면 1일로)
+//   m(day, …)     = 이번 달 그 날 — 오늘보다 앞일 때만 (매달 같은 날 나가는 돈. 아직 안 온 날이면 그 거래는 없음)
 //   p(day, …)     = 지난달 그 날,  q(day, …) = 두 달 전 그 날 (그 달에 없는 날이면 마지막 날)
 // 지금보다 늦은 시각(예: 08:00 에 켰는데 c(0, "09:12"))은 지금 바로 앞으로 당김 — 순서는 그대로, 1분 간격
 // (케이뱅크에서 '미래' 예시 거래 사이에 지금 한 이체가 끼어 잔액이 어긋났던 문제를 피함)
@@ -39,7 +41,9 @@ function relativeClock(now) {
     return new Date(y, mm, Math.min(day, daysIn(mm)), h, mi, 0);
   };
   return {
+    today,
     c: (n, hhmm) => at(m, Math.max(1, today - n), hhmm),
+    m: (day, hhmm) => (day < today ? at(m, day, hhmm) : null),
     p: (day, hhmm) => at(m - 1, day, hhmm),
     q: (day, hhmm) => at(m - 2, day, hhmm),
   };
@@ -62,20 +66,26 @@ function noFuture(events, now) {
 
 // ---------- 예시 데이터 표 ----------
 // [id, kind, bank, name, number, balance, opened_at, role] — sort 는 이 순서 (내 계좌 순서: 통장, 하나, 카카오, 농협, 토스머니)
+// 잔액은 거래 후 잔액(거꾸로 계산)이 석 달 내내 0원 밑으로 안 내려가게 맞춤 (급여가 두 번 들어와서 통장은 넉넉히)
 const ACCOUNTS = [
-  ["main", "main", "toss", "토스뱅크 통장", "1000-1234-5678", 1_250_000, "2024-03-15", null],
-  ["hana", "external", "hana", "영하나플러스 통장", "123-456789-01234", 84_500, "2023-08-02", null],
-  ["kakao", "external", "kakao", "입출금통장", "3333-01-2345678", 15_300, null, null],
-  ["nh", "external", "nh", "자립예탁금", "301-0123-4567-01", 52_000, null, null],
-  ["money", "external", "toss", "토스머니", "1000-9999-0001", 3_200, null, "money"], // 번호는 안에서만 씀 (화면에 안 나옴)
+  ["main", "main", "toss", "토스뱅크 통장", "1000-1234-5678", 4_286_400, "2024-03-15", null],
+  ["hana", "external", "hana", "주거래하나 통장", "123-456789-01234", 1_126_400, "2023-08-02", null], // 카드값 · 고정비가 나가는 계좌
+  ["kakao", "external", "kakao", "입출금통장", "3333-01-2345678", 152_300, null, null],
+  ["nh", "external", "nh", "자립예탁금", "301-0123-4567-01", 520_000, null, null],
+  ["money", "external", "toss", "토스머니", "1000-9999-0001", 12_800, null, "money"], // 번호는 안에서만 씀 (화면에 안 나옴)
 ];
 
-// [id, name, bank, linked account, art, kind, balance, last used]
-const CARDS = (q) => [
+// 신용카드 (토스뱅크 하나카드 Day): 매달 14일에 하나 통장에서 '하나카드' 자동이체로 카드값이 나감 (소비에서 제외 — 아래 BILLS)
+const PAY_DAY = 14;
+const BILLS = { q: 412_300, p: 386_900, m: 428_600, next: 351_700 }; // 두 달 전 · 지난달 · 이번 달 14일 · 다음 달 14일 카드값
+
+// [id, name, bank, linked account (신용카드는 결제 계좌), art, kind, 카드값, 결제일]
+// 홈 소비 카드 둘째 줄 = 첫 신용카드의 다음 카드값 (오늘이 결제일 전이면 이번 달 것, 지났으면 다음 달 것)
+const CARDS = (today) => [
   ["c-toss", "토스뱅크 체크카드", "toss", "main", "toss-check", "check", null, null],
-  ["c-hana", "Young Hana+ 체크카드", "hana", "hana", "hana-young", "check", null, null],
+  ["c-hana", "트래블로그 체크카드", "hana", "hana", "hana-travlog", "check", null, null],
   ["c-kakao", "프렌즈 체크카드", "kakao", "kakao", "kakao-friends", "check", null, null],
-  ["c-youth", "토스유스카드", "toss", null, "toss-youth", "prepaid", 15_000, q(10, "14:00")],
+  ["c-day", "토스뱅크 하나카드 Day", "hana", "hana", "hana-day", "credit", today > PAY_DAY ? BILLS.next : BILLS.m, PAY_DAY],
 ];
 
 const POINTS = [
@@ -83,7 +93,7 @@ const POINTS = [
   ["pt-hana", "하나머니", 350, "hana-money"],
 ];
 
-// 받는 분 (☆ 는 모두 꺼짐 — 녹화의 ★ 도 전부 꺼져 있음)
+// 받는 분 (☆ 는 모두 꺼짐 — 녹화의 ★ 도 전부 꺼져 있음). (주)예시상사 = 급여 주는 회사
 const PAYEES = {
   김철수: ["kb", "123456-01-234567"],
   이영희: ["kakao", "3333-02-3456789"],
@@ -97,7 +107,7 @@ const PAYEES = {
   서지호: ["kb", "654321-02-765432"],
 };
 
-function exampleEvents({ c, p, q }) {
+function exampleEvents({ c, m, p, q }) {
   const send = (when, to, amount) => ({ type: "send", when, to, amount }); // 통장(main)에서 보냄. to = 받는 분 이름 또는 "own:<계좌 id>"
   const income = (when, account, from, amount) => ({ type: "income", when, account, from, amount }); // 다른 사람이 보낸 돈
   // 카드 · 페이 · 이자 · 캐시백 · 카드값 [계좌, 시각, 가게, 금액, tag, channel, category, card, 플래그]
@@ -115,62 +125,74 @@ function exampleEvents({ c, p, q }) {
     exclude: flags.exclude ? 1 : 0,
   });
   const CARD = "#체크카드";
+  const AUTO = "#자동이체";
+  // 매달 같은 날 하나 통장에서 나가는 돈: 통신 3일 · 관리비 10일 (주거·통신) · Day 카드값 14일 (소비에서 제외)
+  const bills = (when, phone, rent, card) => [
+    tx("hana", when(3, "10:00"), "예시텔레콤", -phone, AUTO, "account", "주거·통신"),
+    tx("hana", when(10, "09:30"), "푸른마을관리비", -rent, AUTO, "account", "주거·통신"),
+    tx("hana", when(PAY_DAY, "07:00"), "하나카드", -card, AUTO, "account", null, null, { exclude: true }), // 카드값
+  ];
   return [
     // 통장에서 보낸 이체 (내 계좌로 보낸 것은 받은 계좌에 입금도)
     send(c(0, "09:12"), "최지우", 15_000),
-    send(c(1, "18:40"), "own:hana", 50_000),
+    send(c(1, "18:40"), "own:hana", 500_000),
     send(c(2, "12:05"), "김철수", 32_000),
     send(c(3, "20:31"), "이영희", 8_500),
-    send(c(5, "13:10"), "own:kakao", 20_000),
+    send(c(5, "13:10"), "own:kakao", 100_000),
     send(c(6, "19:22"), "박민수", 120_000),
+    send(p(26, "08:50"), "own:hana", 700_000), // 급여 다음 날 카드값 · 고정비 계좌로
     send(p(25, "11:00"), "정하늘", 45_000),
     send(p(18, "08:30"), "오세라", 12_000),
     send(p(9, "21:15"), "own:money", 10_000),
-    send(p(4, "10:45"), "(주)예시상사", 77_000),
+    send(p(4, "10:45"), "서지호", 77_000),
     send(q(20, "16:20"), "윤다온", 5_000),
     send(q(11, "09:05"), "강예린", 9_900),
     // 내 하나 → 통장 (상세 '입금처 / 출금처' 둘 다 내 계좌)
     { type: "own", when: c(8, "17:30"), from: "hana", to: "main", amount: 100_000 },
-    // 다른 사람이 보낸 돈 (+ 보낸 분 기록)
+    // 다른 사람이 보낸 돈 (+ 보낸 분 기록) · 급여 (매달 25일)
     income(c(4, "10:20"), "main", "이영희", 30_000),
-    income(p(15, "09:00"), "main", "(주)예시상사", 150_000),
+    income(p(25, "09:00"), "main", "(주)예시상사", 2_850_000),
+    income(q(25, "09:00"), "main", "(주)예시상사", 2_850_000),
     income(c(2, "15:40"), "hana", "김철수", 20_000),
     income(q(9, "14:00"), "nh", "오세라", 20_000),
-    // 카드 · 페이 · 이자 · 캐시백 · 카드값
+    // 카드 · 페이 · 이자 · 캐시백 · 고정비 · 카드값
     tx("main", c(0, "08:05"), "한빛편의점", -4_800, CARD, "card", "편의점·마트", "c-toss"),
     tx("main", c(1, "12:30"), "소나무분식", -9_000, CARD, "card", "식비", "c-toss"),
     tx("main", c(2, "15:10"), "하늘카페", -5_500, CARD, "card", "카페·간식", "c-toss"),
-    tx("main", c(3, "16:45"), "새싹문구", -12_000, CARD, "card", "교육", "c-toss"),
+    tx("main", c(2, "21:40"), "달빛포차", -46_000, CARD, "card", "식비", "c-toss"),
+    tx("main", c(3, "18:20"), "바다주유소", -52_000, CARD, "card", "교통", "c-toss"),
     tx("main", c(3, "21:02"), "카드 캐시백", 50, CARD, "card", "캐시백", "c-toss"),
     tx("main", c(5, "19:40"), "샘플쇼핑_PG", -32_900, CARD, "pay", "쇼핑", "c-toss"),
     tx("main", c(6, "13:15"), "예시마트", -68_000, CARD, "card", "편의점·마트", "c-toss"), // 이체 6 과 같은 날 → '평소보다 많이 씀'
     tx("main", c(6, "18:05"), "별빛서점", -23_000, CARD, "card", "문화·여가", "c-toss"),
     tx("main", c(7, "23:40"), "구름택시", -14_300, CARD, "card", "교통", "c-toss"),
-    tx("main", p(1, "00:10"), "통장 이자", 412, "#예금이자", "account", "이자"),
+    tx("main", p(1, "00:10"), "통장 이자", 3_268, "#예금이자", "account", "이자"),
     tx("main", p(3, "12:00"), "소나무분식", -8_000, CARD, "card", "식비", "c-toss"),
     tx("main", p(7, "08:40"), "한빛편의점", -3_200, CARD, "card", "편의점·마트", "c-toss"),
     tx("main", p(12, "19:30"), "하늘카페", -6_100, CARD, "card", "카페·간식", "c-toss"),
+    tx("main", p(16, "18:10"), "바다주유소", -61_000, CARD, "card", "교통", "c-toss"),
     tx("main", p(20, "14:20"), "예시마트", -41_000, CARD, "card", "편의점·마트", "c-toss"),
     tx("main", p(27, "21:00"), "카드 캐시백", 30, CARD, "card", "캐시백", "c-toss"),
-    tx("main", q(1, "00:10"), "통장 이자", 388, "#예금이자", "account", "이자"),
+    tx("main", q(1, "00:10"), "통장 이자", 2_941, "#예금이자", "account", "이자"),
     tx("main", q(6, "13:00"), "별빛서점", -15_000, CARD, "card", "문화·여가", "c-toss"),
     tx("main", q(14, "18:45"), "소나무분식", -9_500, CARD, "card", "식비", "c-toss"),
     tx("main", q(23, "11:30"), "구름택시", -11_800, CARD, "card", "교통", "c-toss"),
     tx("hana", c(1, "08:20"), "한빛편의점", -2_300, CARD, "card", "편의점·마트", "c-hana"),
     tx("hana", c(3, "17:10"), "샘플쇼핑_PG", -19_800, CARD, "card", "쇼핑", "c-hana", { cancelled: true }),
-    tx("hana", c(4, "16:00"), "바른학원", -150_000, CARD, "card", "교육", "c-hana"),
-    tx("hana", c(5, "07:00"), "하나카드", -54_000, "#자동이체", "account", null, null, { exclude: true }), // 카드값
+    tx("hana", c(4, "16:00"), "튼튼헬스", -99_000, CARD, "card", "문화·여가", "c-hana"),
     tx("hana", c(5, "12:40"), "하늘카페", -4_800, CARD, "card", "카페·간식", "c-hana"),
-    tx("hana", p(5, "07:00"), "하나카드", -61_000, "#자동이체", "account", null, null, { exclude: true }),
+    ...bills(m, 55_000, 186_000, BILLS.m), // 이번 달: 오늘보다 앞선 날만
+    ...bills(p, 55_000, 172_000, BILLS.p),
+    ...bills(q, 55_000, 168_000, BILLS.q),
     tx("hana", p(9, "13:30"), "소나무분식", -7_500, CARD, "card", "식비", "c-hana"),
     tx("hana", p(16, "20:10"), "예시마트", -22_000, CARD, "card", "편의점·마트", "c-hana"),
     tx("kakao", c(2, "22:15"), "앱마켓_PG", -1_100, CARD, "pay", "카테고리 없음", "c-kakao"),
     tx("kakao", c(4, "12:10"), "소나무분식", -7_000, CARD, "card", "식비", "c-kakao"),
-    tx("kakao", p(11, "19:00"), "별빛서점", -9_000, CARD, "card", "문화·여가", "c-kakao"),
+    tx("kakao", p(11, "19:00"), "샘플OTT_PG", -13_900, CARD, "pay", "문화·여가", "c-kakao"),
     tx("kakao", p(22, "15:30"), "한빛편의점", -2_700, CARD, "card", "편의점·마트", "c-kakao"),
-    tx("nh", p(2, "10:00"), "자립예탁금 이자", 95, "#예금이자", "account", "이자"),
+    tx("nh", p(2, "10:00"), "자립예탁금 이자", 43, "#예금이자", "account", "이자"),
     tx("money", c(3, "11:11"), "토스페이 결제", -2_400, CARD, "pay", "쇼핑"),
-  ];
+  ].filter((e) => e.when); // m(…) 이 아직 안 온 날이면 null
 }
 
 function insertBase(d, userName, { accounts, rewardMax, cashbackCount }) {
@@ -184,7 +206,7 @@ function insertBase(d, userName, { accounts, rewardMax, cashbackCount }) {
   accounts.forEach(([id, kind, bank, name, number, balance, openedAt, role], i) => acc.run(id, kind, bank, number, balance, name, i + 1, openedAt, role));
 }
 
-// 예시 데이터: 홍길동 · 계좌 5개(토스머니 포함) · 카드 4장 · 포인트 2개 · 받는 분 10명 · 거래 약 60건 (3달)
+// 예시 데이터: 홍길동 · 계좌 5개(토스머니 포함) · 카드 4장(체크 3 · 신용 1) · 포인트 2개 · 받는 분 10명 · 거래 약 70건 (3달)
 export function seedTossExample(d, userName = "홍길동", now = new Date()) {
   const clock = relativeClock(now);
   const events = exampleEvents(clock);
@@ -193,12 +215,8 @@ export function seedTossExample(d, userName = "홍길동", now = new Date()) {
   inTransaction(d, () => {
     wipe(d);
     insertBase(d, userName, { accounts: ACCOUNTS, rewardMax: 50_000, cashbackCount: 2 });
-    const card = d.prepare(
-      "INSERT INTO cards (id, name, bank_code, account_id, art, kind, balance, last_used_at, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    );
-    CARDS(clock.q).forEach(([id, name, bank, account, art, kind, balance, lastUsed], i) =>
-      card.run(id, name, bank, account, art, kind, balance, lastUsed && isoOf(lastUsed), i + 1),
-    );
+    const card = d.prepare("INSERT INTO cards (id, name, bank_code, account_id, art, kind, bill, pay_day, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    CARDS(clock.today).forEach(([id, name, bank, account, art, kind, bill, payDay], i) => card.run(id, name, bank, account, art, kind, bill, payDay, i + 1));
     const point = d.prepare("INSERT INTO points (id, name, balance, icon, sort) VALUES (?, ?, ?, ?, ?)");
     POINTS.forEach(([id, name, balance, icon], i) => point.run(id, name, balance, icon, i + 1));
     const payee = d.prepare("INSERT INTO payees (bank_code, number, holder, favorite) VALUES (?, ?, ?, 0)");

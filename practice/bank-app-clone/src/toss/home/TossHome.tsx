@@ -1,9 +1,10 @@
 // '/' — 토스 홈 (home.md §2.3–§2.5 · §3, 녹화 A 10.40–13.65 · B 136.05–152.03). 바탕 #100f12, 머리줄(28–84) 고정, 탭바(780–) 고정.
-// 위에서부터: 리워드 배너(× 로 닫힘) · 계좌 카드(토스뱅크 통장 · 토스머니 · 포인트 + 모두 보기) · 소비 카드({M}월에 쓴 돈 · 토스유스카드) ·
+// 위에서부터: 리워드 배너(× 로 닫힘) · 계좌 카드(토스뱅크 통장 · 토스머니 · 포인트 + 모두 보기) · 소비 카드({M}월에 쓴 돈 · {D}일 낼 카드값) ·
 // 최근 본 상품 카드 · 광고 카드 · 반쪽 카드 둘 · 목록 카드 · (녹화 밖, 지어냄) 목록 카드 + 화면 편집하기.
 // 줄을 누르면 카드 폭 전체 #2a2b30 (작은 버튼은 #3b3c41), 손 떼면 170ms 에 사라지고 120ms 뒤 이동 (useTossGo).
 // 다른 화면에서 돌아오면 바뀐 금액만 숫자 굴림 (boot.ts useRollValue). 시작화면에서 넘어오면 300ms 교차 + 포인트 줄 펼침.
-// 데이터: GET /api/home (accounts · toss 블록). 녹화에 있던 개인 기록(본 상품 · 방문 서비스 · 광고 문구)은 지어낸 예시로 바꿈
+// 데이터: GET /api/home (accounts · toss 블록). 녹화에 있던 개인 기록(본 상품 · 방문 서비스 · 광고 문구)은 지어낸 예시로 바꿈.
+// 성인 계정: 원본 녹화의 연령 전용 상품 줄은 성인용(신용카드 카드값 · 대출 비교)으로 바꿈 — 자리 · 글자 크기는 녹화 그대로
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { paths } from "../../api/endpoints";
@@ -51,18 +52,11 @@ const noop = () => {};
 // 이름 세 글자면 성을 뺀 이름 (plan.md §2.2)
 const givenName = (n: string) => (n.length === 3 ? n.slice(1) : n);
 const monthOf = (ym: string | undefined) => Number((ym ?? "").split("-")[1]) || new Date().getMonth() + 1;
-// 가운뎃점: 토스 글꼴의 '·' 는 양옆이 조금 더 넓음 (녹화 '송금·결제' · '토스유스카드·N개월 전')
+// 가운뎃점: 토스 글꼴의 '·' 는 양옆이 조금 더 넓음 (녹화 '송금·결제')
 const dotted = (text: string) =>
   text.split("·").flatMap((part, i) => (i ? [<span key={i} className="toss-home-dot">·</span>, part] : [part]));
-// 유스카드 'N개월 전' (0 → 이번 달)
-function monthsAgo(iso: string | null | undefined) {
-  if (!iso) return null;
-  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
-  const now = new Date();
-  let n = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m);
-  if (now.getDate() < d) n -= 1;
-  return n <= 0 ? "이번 달" : `${n}개월 전`;
-}
+// 신용카드 다음 결제일 → '{D}일 낼 카드값' (결제일을 모르면 '낼 카드값')
+const billLabel = (dueDate: string | null) => (dueDate ? `${Number(dueDate.slice(8, 10))}일 낼 카드값` : "낼 카드값");
 
 export function TossHome() {
   const q = useApi<TossHomeData>(paths.home);
@@ -148,14 +142,7 @@ export function TossHome() {
                   onPress={() => go("/spend")}
                   onBtn={() => go("/spend")}
                 />
-                {t?.youthCard && (
-                  <AccountRow
-                    amount={<Amount id="youth" value={t.youthCard.balance} />}
-                    label={dotted([t.youthCard.name, monthsAgo(t.youthCard.lastUsedAt)].filter(Boolean).join("·"))}
-                    variant="youth"
-                    btn="충전"
-                  />
-                )}
+                {t?.cardBill && <AccountRow amount={<Amount id="bill" value={t.cardBill.amount} />} label={billLabel(t.cardBill.dueDate)} variant="bill" btn="내역" />}
               </div>
               <RecentCard />
               <AdCard />
@@ -285,7 +272,7 @@ function AccountRow({
   label: ReactNode;
   btn: string;
   dim?: boolean;
-  variant?: "spend" | "youth";
+  variant?: "spend" | "bill";
   insert?: boolean;
   onPress?: () => void;
   onBtn?: () => void;
@@ -300,9 +287,9 @@ function AccountRow({
       onPress={onPress}
     >
       {icon}
-      <span className={`toss-home-row__amt${left ? " toss-home-row__amt--left" : variant === "youth" ? " toss-home-row__amt--youth" : ""}`}>{amount}</span>
+      <span className={`toss-home-row__amt${left ? " toss-home-row__amt--left" : variant === "bill" ? " toss-home-row__amt--bill" : ""}`}>{amount}</span>
       <span
-        className={`toss-home-row__lbl${dim ? " toss-home-row__lbl--dim" : ""}${left ? " toss-home-row__lbl--left" : variant === "youth" ? " toss-home-row__lbl--youth" : ""}`}
+        className={`toss-home-row__lbl${dim ? " toss-home-row__lbl--dim" : ""}${left ? " toss-home-row__lbl--left" : variant === "bill" ? " toss-home-row__lbl--bill" : ""}`}
       >
         {label}
       </span>
@@ -352,10 +339,10 @@ function AdCard() {
   );
 }
 
-// 반쪽 카드 둘 (3D 그림은 녹화에서 잘라 4배 — scripts/toss-crops/home.py)
+// 반쪽 카드 둘 (브랜드콘 3D 그림은 녹화에서 잘라 4배 — scripts/toss-crops/home.py. 대출 비교는 상품 메뉴의 신용대출 그림을 빌려 씀)
 function HalfCards() {
   const cards: [string, string, string][] = [
-    ["store", "편의점에서\n토스머니 충전", "toss-home-half-store"],
+    ["loan", "대출 조건\n1분 만에 비교", "toss-acct-m-loan-credit"],
     ["coffee", "토스 브랜드콘\n구매하기", "toss-home-half-coffee"],
   ];
   return (
@@ -373,12 +360,12 @@ function HalfCards() {
   );
 }
 
-// 목록 카드 (계좌 개설 · 토스쇼핑 · 체크카드 혜택 추천)
+// 목록 카드 (계좌 개설 · 토스쇼핑 · 카드 혜택 추천)
 function LinksCard() {
   const rows: [string, string][] = [
     ["account", "계좌 개설"],
     ["shopping", "토스쇼핑"],
-    ["checkcard", "체크카드 혜택 추천"],
+    ["checkcard", "카드 혜택 추천"],
   ];
   return (
     <div className="toss-home-card toss-home-list">

@@ -183,7 +183,7 @@ function migrate(d) {
     add("accounts", "role", "TEXT"); // 'money' = 토스머니 (홈 둘째 줄 · 자산 · 내 계좌). 그 밖엔 NULL
     add("accounts", "favorite", "INTEGER NOT NULL DEFAULT 0"); // 송금 '어디로 보낼까요?' 내 계좌 줄의 ★
     add("accounts", "opened_at", "TEXT"); // 'YYYY-MM-DD' 개설일 (증명서 '개설일 YY.MM.DD')
-    add("transactions", "category", "TEXT"); // 소비 분류 (식비 · 교육 · 캐시백 · 이자 …). NULL 이면 #이체 → 이체, 그 밖엔 카테고리 없음
+    add("transactions", "category", "TEXT"); // 소비 분류 (식비 · 주거·통신 · 캐시백 · 이자 …). NULL 이면 #이체 → 이체, 그 밖엔 카테고리 없음
     add("transactions", "channel", "TEXT"); // 'card' | 'account' | 'pay' (소비 탭). NULL 이면 tag 로 계산 (#체크카드 → card, 그 밖엔 account)
     add("transactions", "card_id", "TEXT"); // 결제한 카드 (cards.id)
     add("transactions", "cancelled", "INTEGER NOT NULL DEFAULT 0"); // 취소된 결제 (소비에서 취소선, 합계에서 뺌)
@@ -192,18 +192,43 @@ function migrate(d) {
     add("profile", "reward_max", "INTEGER"); // 홈 배너 '{M}월 최대 적립금 N원' (NULL = 배너 숨김)
     add("profile", "reward_dismissed", "TEXT"); // 'YYYY-MM' 그 달에 배너 × 를 누름
     add("profile", "ad_snooze_until", "TEXT"); // 이체 뒤 광고 '3일 동안 안보기' 끝나는 때 (ISO)
-    d.exec(`
-      CREATE TABLE IF NOT EXISTS cards (
-        id           TEXT PRIMARY KEY,
-        name         TEXT NOT NULL,              -- 카드 상품 이름 (토스뱅크 체크카드 …)
-        bank_code    TEXT NOT NULL,
-        account_id   TEXT REFERENCES accounts(id) ON DELETE SET NULL, -- 연결 계좌 (선불 카드는 없음)
-        art          TEXT,                       -- 카드 그림 이름 (화면 쪽 CSS/에셋 키)
-        kind         TEXT NOT NULL DEFAULT 'check' CHECK (kind IN ('check', 'prepaid')),
-        balance      INTEGER,                    -- 선불 카드 잔액 (토스유스카드)
-        last_used_at TEXT,                       -- 마지막 사용 시각 (홈 'N개월 전')
-        sort         INTEGER NOT NULL DEFAULT 0
+    const cardsTable = (name) => `
+      CREATE TABLE ${name} (
+        id         TEXT PRIMARY KEY,
+        name       TEXT NOT NULL,              -- 카드 상품 이름 (토스뱅크 체크카드 …)
+        bank_code  TEXT NOT NULL,
+        account_id TEXT REFERENCES accounts(id) ON DELETE SET NULL, -- 연결 계좌 (신용카드는 카드값이 나가는 결제 계좌)
+        art        TEXT,                       -- 카드 그림 이름 (화면 쪽 CSS/에셋 키)
+        kind       TEXT NOT NULL DEFAULT 'check' CHECK (kind IN ('check', 'credit')),
+        bill       INTEGER,                    -- 신용카드 다음 카드값 (홈 소비 카드 '{D}일 낼 카드값' 줄)
+        pay_day    INTEGER,                    -- 신용카드 결제일 1~31 (그 달에 없는 날이면 마지막 날)
+        sort       INTEGER NOT NULL DEFAULT 0
+      );`;
+    // 예전 cards 표 (체크 · 선불 + 선불 잔액 · 마지막 사용일) → 체크 · 신용 + 카드값 · 결제일. CHECK 는 ALTER 로 못 바꿔서
+    // 새 표에 옮겨 담음 (한 번만 — 예전 표에만 last_used_at 칸이 있음). 예시 데이터의 선불카드 c-youth 는 예시 신용카드 c-day 로
+    // (카드값 = 예전 잔액, 결제일 14일, 결제 계좌 = 하나 계좌가 있으면), 그 밖의 선불카드는 체크카드로. 그림 이름도 새 이름으로.
+    // 계좌 이름 · 다른 카드 이름 · 거래는 사용자 데이터라 그대로 (예시 전체를 새로 받으려면 🔔 → 되돌리기 '예시 데이터로')
+    if (columns("cards").includes("last_used_at")) {
+      const seeded = "id = 'c-youth' AND kind = 'prepaid'";
+      const payFrom = d.prepare("SELECT 1 FROM accounts WHERE id = 'hana'").get() ? "'hana'" : "NULL";
+      transaction(
+        () =>
+          d.exec(`
+            ${cardsTable("cards_new")}
+            INSERT INTO cards_new (id, name, bank_code, account_id, art, kind, bill, pay_day, sort)
+              SELECT 'c-day', '토스뱅크 하나카드 Day', 'hana', ${payFrom}, 'hana-day', 'credit', COALESCE(balance, 0), 14, sort FROM cards WHERE ${seeded};
+            INSERT INTO cards_new (id, name, bank_code, account_id, art, kind, bill, pay_day, sort)
+              SELECT id, name, bank_code, account_id, CASE art WHEN 'hana-young' THEN 'hana-travlog' WHEN 'toss-youth' THEN NULL ELSE art END, 'check', NULL, NULL, sort
+                FROM cards WHERE NOT (${seeded});
+            UPDATE transactions SET card_id = 'c-day' WHERE card_id = 'c-youth' AND NOT EXISTS (SELECT 1 FROM cards_new WHERE id = 'c-youth');
+            DROP TABLE cards;
+            ALTER TABLE cards_new RENAME TO cards;
+          `),
+        d,
       );
+    }
+    d.exec(`
+      ${cardsTable("IF NOT EXISTS cards")}
       CREATE TABLE IF NOT EXISTS points (
         id      TEXT PRIMARY KEY,
         name    TEXT NOT NULL,                   -- 토스포인트 · 하나머니 …

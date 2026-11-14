@@ -2,14 +2,14 @@ import { useState, type ReactNode } from "react";
 import { paths } from "../../api/endpoints";
 import { useApi } from "../../api/useApi";
 import type { Bank, HomeData } from "../../api/types";
-import { tossAdSnoozed, tossApi, tossPaths, type TossCard, type TossHomeData, type TossPoint, type TossProfile } from "../api";
+import { tossAdSnoozed, tossApi, tossPaths, type TossCard, type TossCardKind, type TossHomeData, type TossPoint, type TossProfile } from "../api";
 import { PanelCount, PanelField, PanelMoney, PanelSeg } from "./fields";
 import type { TossRun } from "./types";
 import "./panel.css";
 
 // 🔔 관리 → 계좌 탭 맨 아래 "토스" 칸 (plan.md §2.5):
 //  홈 카드 · 배너 · 광고: 포인트 기회 N번 · 리워드 최대 적립금(또는 숨김) · 리워드 배너 다시 보이기 · 이체 뒤 광고 다시 보이기
-//  카드 목록 (이름 · 은행 · 연결 계좌 · 종류 · 선불 잔액 · 마지막 사용일 · 그림) → 자산 카드 · 홈 토스유스카드 줄
+//  카드 목록 (이름 · 은행 · 연결/결제 계좌 · 종류 · 신용카드 카드값 · 결제일 · 그림) → 자산 카드 · 홈 '{D}일 낼 카드값' 줄
 //  포인트 목록 (이름 · 잔액 · 아이콘) → 자산 포인트 · 총 자산
 // 저장하면 api client 가 모든 화면 데이터를 다시 받게 함 (홈 · 소비 · 자산 숫자는 바뀐 자리만 굴러감)
 export function TossPanelSection({ run, home }: { run: TossRun; home: HomeData }) {
@@ -24,7 +24,7 @@ export function TossPanelSection({ run, home }: { run: TossRun; home: HomeData }
       <HomeFields key={`${profile.pointChances}-${profile.rewardMax}`} profile={profile} adSnoozeUntil={block?.adSnoozeUntil ?? profile.adSnoozeUntil ?? null} run={run} />
 
       <h3 className="tab__h">카드 {cards.data ? `${cards.data.length}장` : ""}</h3>
-      <p className="tab__hint">자산 '카드' 칸 (이번 달 쓴 돈 많은 순) · 선불카드 첫 장은 홈 '토스유스카드' 줄</p>
+      <p className="tab__hint">자산 '카드' 칸 (이번 달 쓴 돈 많은 순) · 신용카드 첫 장의 카드값 · 결제일은 홈 '{"{D}"}일 낼 카드값' 줄</p>
       {cards.data?.map((c) => (
         <CardEditor key={JSON.stringify(c)} card={c} banks={banks.data ?? []} accounts={home.accounts} run={run} />
       ))}
@@ -103,10 +103,11 @@ function HomeFields({ profile, adSnoozeUntil, run }: { profile: TossProfile; adS
 const ARTS: [string, string][] = [
   ["", "은행 기본"],
   ["toss-check", "토스 체크"],
-  ["toss-youth", "토스 유스"],
+  ["hana-travlog", "하나 초록"],
+  ["hana-day", "회색 가죽"],
   ["kakao-friends", "노랑 B"],
-  ["hana-young", "민트"],
 ];
+const PAY_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 type AccountLite = { id: string; label: string };
 
 function CardForm({
@@ -127,10 +128,11 @@ function CardForm({
   const [name, setName] = useState(init.name ?? "");
   const [bankCode, setBankCode] = useState(init.bankCode ?? "toss");
   const [accountId, setAccountId] = useState(init.accountId ?? "");
-  const [kind, setKind] = useState<"check" | "prepaid">(init.kind ?? "check");
-  const [balance, setBalance] = useState(init.balance ?? 0);
-  const [lastUsed, setLastUsed] = useState(init.lastUsedAt?.slice(0, 10) ?? "");
+  const [kind, setKind] = useState<TossCardKind>(init.kind ?? "check");
+  const [bill, setBill] = useState(init.bill ?? 0);
+  const [payDay, setPayDay] = useState(init.payDay ?? 14);
   const [art, setArt] = useState(init.art ?? "");
+  const credit = kind === "credit";
   return (
     <>
       <PanelField label="카드 이름">
@@ -146,7 +148,7 @@ function CardForm({
             ))}
           </select>
         </PanelField>
-        <PanelField label="연결 계좌">
+        <PanelField label={credit ? "결제 계좌" : "연결 계좌"}>
           <select value={accountId} onChange={(e) => setAccountId(e.target.value)}>
             <option value="">없음</option>
             {accounts.map((a) => (
@@ -162,19 +164,27 @@ function CardForm({
         value={kind}
         options={[
           ["check", "체크카드"],
-          ["prepaid", "선불카드 (잔액)"],
+          ["credit", "신용카드 (카드값)"],
         ]}
         onChange={setKind}
       />
-      {kind === "prepaid" && (
-        <PanelField label="선불 잔액 (홈 토스유스카드 줄)">
-          <PanelMoney value={balance} onChange={setBalance} />
+      {credit && (
+        <PanelField label="다음 카드값 (홈 '{D}일 낼 카드값' 줄)">
+          <PanelMoney value={bill} onChange={setBill} quick={[10000, 100000, 500000]} />
         </PanelField>
       )}
       <div className="row">
-        <PanelField label="마지막 사용일 (홈 'N개월 전')">
-          <input type="date" value={lastUsed} onChange={(e) => setLastUsed(e.target.value)} />
-        </PanelField>
+        {credit && (
+          <PanelField label="결제일 (매달)">
+            <select value={payDay} onChange={(e) => setPayDay(Number(e.target.value))}>
+              {PAY_DAYS.map((d) => (
+                <option key={d} value={d}>
+                  {d}일
+                </option>
+              ))}
+            </select>
+          </PanelField>
+        )}
         <PanelField label="카드 그림">
           <select value={art} onChange={(e) => setArt(e.target.value)}>
             {ARTS.map(([v, t]) => (
@@ -196,8 +206,8 @@ function CardForm({
               bankCode,
               accountId: accountId || null,
               kind,
-              balance: kind === "prepaid" ? balance : null,
-              lastUsedAt: lastUsed || null,
+              bill: credit ? bill : null,
+              payDay: credit ? payDay : null,
               art: art || null,
             })
           }
@@ -218,7 +228,8 @@ function CardEditor({ card, banks, accounts, run }: { card: TossCard; banks: Ban
         <span className="acct-edit__name">
           <strong>{card.name}</strong>
           <small>
-            {banks.find((b) => b.code === card.bankCode)?.name ?? card.bankCode} · {card.kind === "prepaid" ? `선불 ${(card.balance ?? 0).toLocaleString("ko-KR")}원` : "체크"}
+            {banks.find((b) => b.code === card.bankCode)?.name ?? card.bankCode} ·{" "}
+            {card.kind === "credit" ? `신용 · ${card.payDay ?? "?"}일 ${(card.bill ?? 0).toLocaleString("ko-KR")}원` : "체크"}
           </small>
         </span>
         <span className="toss-assets-panel__chev">{open ? "▾" : "▸"}</span>

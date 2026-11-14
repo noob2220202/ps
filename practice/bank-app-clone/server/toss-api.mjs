@@ -21,6 +21,7 @@ export const CATEGORY_COLORS = {
   쇼핑: "#8a5cf5",
   교통: "#27a5a0",
   "문화·여가": "#d6458f",
+  "주거·통신": "#e2574c",
 };
 const OTHER_COLOR = "#3e3d40";
 const UNKNOWN_COLOR = "#5b5a5e"; // 🔔 에서 새로 만든 분류
@@ -38,8 +39,6 @@ const shiftMonth = (ym, by) => {
 const isMonth = (v) => typeof v === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(v);
 const isDate = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
 const isMoney = (v) => Number.isInteger(v) && v >= 0 && v <= MAX_MONEY;
-// 'YYYY-MM-DD' · 'YYYY-MM-DDTHH:mm' · 'YYYY-MM-DDTHH:mm:ss' → 'YYYY-MM-DDTHH:mm:ss' (거래 시각과 같은 모양으로 저장)
-const toLocalIso = (v) => (v.length === 10 ? `${v}T00:00:00` : v.slice(0, 19).padEnd(19, ":00"));
 
 // 결제 수단: 직접 지정이 없으면 tag 로 (#체크카드 → 카드, 이체 · 자동이체 · 이자 → 입·출금)
 export const channelOf = (t) => t.channel ?? (t.tag === "#체크카드" ? "card" : "account");
@@ -96,15 +95,25 @@ export function tossApi(h) {
 
   const accountFields = (row) => ({ openedAt: row.opened_at ?? null, favorite: !!row.favorite, role: row.role ?? null });
 
-  // GET /api/home 의 toss 블록
+  // 신용카드 다음 결제일 'YYYY-MM-DD': 오늘이 이번 달 결제일 이전(당일 포함)이면 이번 달, 지났으면 다음 달 (그 달에 없는 날이면 마지막 날)
+  function nextPayDate(payDay) {
+    if (!Number.isInteger(payDay)) return null;
+    const today = h.nowIso().slice(0, 10);
+    const ym = today.slice(0, 7);
+    const dayIn = (m) => Math.min(payDay, daysInMonth(m));
+    const due = Number(today.slice(8, 10)) <= dayIn(ym) ? ym : shiftMonth(ym, 1);
+    return `${due}-${pad(dayIn(due))}`;
+  }
+
+  // GET /api/home 의 toss 블록. cardBill = 첫 신용카드의 다음 카드값 (홈 소비 카드 둘째 줄 '{D}일 낼 카드값', 없으면 줄 숨김)
   function homeBlock(month, total) {
     const p = rawProfile();
-    const youth = db().prepare("SELECT * FROM cards WHERE kind = 'prepaid' ORDER BY sort, rowid LIMIT 1").get();
+    const credit = db().prepare("SELECT * FROM cards WHERE kind = 'credit' ORDER BY sort, rowid LIMIT 1").get();
     return {
       spend: { month, total },
       pointChances: p.point_chances,
       reward: { month, max: p.reward_max ?? null, dismissed: p.reward_dismissed === month },
-      youthCard: youth ? { id: youth.id, name: youth.name, balance: youth.balance ?? 0, lastUsedAt: youth.last_used_at ?? null } : null,
+      cardBill: credit ? { id: credit.id, name: credit.name, amount: credit.bill ?? 0, dueDate: nextPayDate(credit.pay_day) } : null,
       adSnoozeUntil: p.ad_snooze_until ?? null,
     };
   }
@@ -148,7 +157,7 @@ export function tossApi(h) {
     return { kindLabel: t.amount < 0 ? "출금" : "입금", counterparty };
   }
 
-  // 받는 분 '최근 보낸 계좌': 내 계좌도 남김 (녹화 '내 영하나플러스 통장'), 보내는 계좌 자신만 뺌
+  // 받는 분 '최근 보낸 계좌': 내 계좌도 남김 (녹화처럼 '내 주거래하나 통장' 같은 줄), 보내는 계좌 자신만 뺌
   const keepRecent = (r, from) => myOwn(r)?.id !== from;
   const myOwn = (r) => h.myAccountByNumber(r.bank_code, r.number);
   const recentFields = (r) => {
@@ -358,8 +367,7 @@ export function tossApi(h) {
     accountId: c.account_id ?? null,
     art: c.art ?? null,
     kind: c.kind,
-    ...(c.kind === "prepaid" && { balance: c.balance ?? 0 }),
-    lastUsedAt: c.last_used_at ?? null,
+    ...(c.kind === "credit" && { bill: c.bill ?? 0, payDay: c.pay_day ?? null }),
     sort: c.sort,
     ...(monthAmount !== undefined && { monthAmount }),
   });
@@ -419,21 +427,13 @@ export function tossApi(h) {
     if (next.accountId != null && next.accountId !== "" && !(typeof next.accountId === "string" && db().prepare("SELECT 1 FROM accounts WHERE id = ?").get(next.accountId)))
       fields.accountId = "없는 계좌예요";
     if (next.art != null && !(typeof next.art === "string" && next.art.length <= 40)) fields.art = "40자 이하";
-    if (!["check", "prepaid"].includes(next.kind)) fields.kind = "check 또는 prepaid";
-    if (next.balance != null && !isMoney(next.balance)) fields.balance = "0원 이상 10억원 이하";
-    if (next.lastUsedAt != null && !(h.isLocalIso(next.lastUsedAt) || isDate(next.lastUsedAt))) fields.lastUsedAt = "날짜 형식 오류";
+    if (!["check", "credit"].includes(next.kind)) fields.kind = "check 또는 credit";
+    const credit = next.kind === "credit"; // 카드값 · 결제일은 신용카드만 (체크카드면 비움)
+    if (credit && next.bill != null && !isMoney(next.bill)) fields.bill = "0원 이상 10억원 이하";
+    if (credit && !(Number.isInteger(next.payDay) && next.payDay >= 1 && next.payDay <= 31)) fields.payDay = "결제일 1~31일";
     if (!(Number.isInteger(next.sort) && next.sort >= 0 && next.sort <= 9999)) fields.sort = "0~9999";
     if (Object.keys(fields).length) throw h.bad("입력값을 확인해 주세요", fields);
-    return [
-      next.name.trim(),
-      next.bankCode,
-      next.accountId || null,
-      next.art ?? null,
-      next.kind,
-      next.balance ?? null,
-      next.lastUsedAt ? toLocalIso(next.lastUsedAt) : null,
-      next.sort,
-    ];
+    return [next.name.trim(), next.bankCode, next.accountId || null, next.art ?? null, next.kind, credit ? (next.bill ?? 0) : null, credit ? next.payDay : null, next.sort];
   }
   function checkPoint(next) {
     const fields = {};
@@ -446,7 +446,7 @@ export function tossApi(h) {
     return [next.name.trim(), next.balance, next.icon ?? null, next.sort];
   }
   const pick = (body, keys) => Object.fromEntries(keys.filter((k) => body[k] !== undefined).map((k) => [k, body[k]]));
-  const CARD_KEYS = ["name", "bankCode", "accountId", "art", "kind", "balance", "lastUsedAt", "sort"];
+  const CARD_KEYS = ["name", "bankCode", "accountId", "art", "kind", "bill", "payDay", "sort"];
   const POINT_KEYS = ["name", "balance", "icon", "sort"];
 
   function routes(app) {
@@ -466,14 +466,14 @@ export function tossApi(h) {
       const next = { kind: "check", sort: nextSort("cards"), ...pick(req.body ?? {}, CARD_KEYS) };
       const vals = checkCard(next);
       const id = `card-${randomUUID().slice(0, 8)}`;
-      db().prepare("INSERT INTO cards (id, name, bank_code, account_id, art, kind, balance, last_used_at, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(id, ...vals);
+      db().prepare("INSERT INTO cards (id, name, bank_code, account_id, art, kind, bill, pay_day, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(id, ...vals);
       res.status(201).json(toCard(findCard(id)));
     });
     app.patch("/api/toss/cards/:id", (req, res) => {
       const c = findCard(req.params.id);
-      const cur = { name: c.name, bankCode: c.bank_code, accountId: c.account_id, art: c.art, kind: c.kind, balance: c.balance, lastUsedAt: c.last_used_at, sort: c.sort };
+      const cur = { name: c.name, bankCode: c.bank_code, accountId: c.account_id, art: c.art, kind: c.kind, bill: c.bill, payDay: c.pay_day, sort: c.sort };
       const vals = checkCard({ ...cur, ...pick(req.body ?? {}, CARD_KEYS) });
-      db().prepare("UPDATE cards SET name = ?, bank_code = ?, account_id = ?, art = ?, kind = ?, balance = ?, last_used_at = ?, sort = ? WHERE id = ?").run(...vals, c.id);
+      db().prepare("UPDATE cards SET name = ?, bank_code = ?, account_id = ?, art = ?, kind = ?, bill = ?, pay_day = ?, sort = ? WHERE id = ?").run(...vals, c.id);
       res.json(toCard(findCard(c.id)));
     });
     app.delete("/api/toss/cards/:id", (req, res) => {

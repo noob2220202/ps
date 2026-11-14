@@ -9,7 +9,8 @@ export interface TossHomeBlock {
   pointChances: number; // 송금·결제 후 받는 포인트 N번
   // max null = 배너 숨김, dismissed = 이번 달에 × 를 눌렀는지 (profile.rewardDismissed === month). 날짜 값은 profile.rewardDismissed
   reward: { month: string; max: number | null; dismissed: boolean };
-  youthCard: { id: string; name: string; balance: number; lastUsedAt: string | null } | null; // 첫 선불 카드 (토스유스카드)
+  // 첫 신용카드의 다음 카드값 (홈 소비 카드 둘째 줄 '{D}일 낼 카드값'). dueDate = 다음 결제일 "YYYY-MM-DD". 신용카드가 없으면 null (줄 숨김)
+  cardBill: { id: string; name: string; amount: number; dueDate: string | null } | null;
   adSnoozeUntil: string | null; // 이체 뒤 광고 화면 '3일 동안 안보기' 끝나는 때 (Date.parse 되는 글자)
 }
 export interface TossHomeData extends HomeData {
@@ -122,15 +123,16 @@ export interface TossAssetAccount {
   role: TossAccountRole;
   favorite: boolean;
 }
+export type TossCardKind = "check" | "credit";
 export interface TossAssetCard {
   id: string;
   name: string;
   bankCode: string;
-  accountId: string | null;
+  accountId: string | null; // 연결 계좌 (신용카드는 결제 계좌)
   art: string | null;
-  kind: "check" | "prepaid";
-  balance?: number; // 선불 카드만
-  lastUsedAt: string | null;
+  kind: TossCardKind;
+  bill?: number; // 신용카드만: 다음 카드값
+  payDay?: number | null; // 신용카드만: 결제일 1~31
   sort: number;
   monthAmount: number; // 이번 달 취소 안 된 출금 합계
 }
@@ -153,11 +155,11 @@ export interface TossCard {
   id: string;
   name: string;
   bankCode: string;
-  accountId: string | null;
+  accountId: string | null; // 연결 계좌 (신용카드는 결제 계좌)
   art: string | null;
-  kind: "check" | "prepaid";
-  balance?: number; // 선불 카드만 (보낼 땐 null 로 지움)
-  lastUsedAt: string | null; // "YYYY-MM-DDTHH:MM:SS" (보낼 땐 YYYY-MM-DD[THH:mm[:ss]])
+  kind: TossCardKind;
+  bill?: number; // 신용카드만: 다음 카드값 (체크카드로 바꾸면 서버가 지움)
+  payDay?: number | null; // 신용카드만: 결제일 1~31 (신용카드면 꼭 보냄)
   sort: number;
 }
 export interface TossPoint {
@@ -169,11 +171,11 @@ export interface TossPoint {
 }
 
 // POST/PATCH /api/toss/cards 에 보내는 칸 (빠진 칸은 그대로 · kind 기본 "check")
-export type TossCardInput = Partial<Omit<TossCard, "id" | "balance" | "accountId" | "art" | "lastUsedAt">> & {
-  balance?: number | null;
+export type TossCardInput = Partial<Omit<TossCard, "id" | "bill" | "accountId" | "art" | "payDay">> & {
+  bill?: number | null;
   accountId?: string | null;
   art?: string | null;
-  lastUsedAt?: string | null;
+  payDay?: number | null;
 };
 
 export const tossPaths = {

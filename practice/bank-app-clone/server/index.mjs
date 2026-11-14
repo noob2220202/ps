@@ -433,7 +433,7 @@ app.get("/api/home", (_req, res) => {
       { id: "s4", label: "50만원 넣고 금리쿠폰 받기", icon: "shortcut-coupon" },
     ],
     nativeAd: { source: "쿠팡 앱에서 구매하기", title: "로켓배송 오늘주문내일도착", sponsor: "Appier 광고입니다" },
-    // 토스 홈: 쓴 돈 · 포인트 기회 · 리워드 배너 · 토스유스카드 · 이체 뒤 광고 안 보기 (위 카카오 배너 등은 토스 화면이 안 씀)
+    // 토스 홈: 쓴 돈 · 포인트 기회 · 리워드 배너 · 신용카드 카드값 · 이체 뒤 광고 안 보기 (위 카카오 배너 등은 토스 화면이 안 씀)
     ...(TOSS && { toss: toss.homeBlock(month, spend) }),
     // 올원 홈: 정기점검 안내 시트 (보이기 · 첫 장 항목). '1일동안 안보기'는 보는 사람 브라우저(localStorage)에만
     ...(ALLONE && { ao: { notice: { on: profile.noticeOn, items: profile.noticeItems } } }),
@@ -885,7 +885,7 @@ app.get("/api/transfer/recipients", (req, res) => {
         GROUP BY t.bank_code, t.number${ALLONE ? AO_RECENT_VISIBLE : ""} ORDER BY last_at DESC LIMIT 20`,
     )
     .all()
-    // 내 계좌로 보낸 것은 뺌. 토스는 '최근 보낸 계좌'에 내 계좌도 섞여 나옴 ('내 영하나플러스 통장') — 보내는 계좌 자신만 뺌
+    // 내 계좌로 보낸 것은 뺌. 토스는 '최근 보낸 계좌'에 내 계좌도 섞여 나옴 ('내 주거래하나 통장') — 보내는 계좌 자신만 뺌
     .filter((r) => (TOSS ? toss.keepRecent(r, from) : !myAccountByNumber(r.bank_code, r.number)))
     .map((r) => ({
       bank: bankInfo(bankByCode(r.bank_code)),

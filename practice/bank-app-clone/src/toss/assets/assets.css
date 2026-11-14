@@ -67,8 +67,9 @@
   left: 8.6px;
   top: 15.4px;
 }
-.toss-assets-plate--mint {
-  background: linear-gradient(170deg, #dcfff6 0%, #c6fcec 45%, #9ff2d8 100%);
+/* 하나 초록 (트래블로그 체크카드 · 하나 기본 — 지어낸 판): 초록 그라데이션 + 위 흰 글자 줄 둘 + 금색 칩 */
+.toss-assets-plate--hana {
+  background: linear-gradient(150deg, #00a38e 0%, #008485 55%, #00524e 100%);
 }
 .toss-assets-plate__word {
   position: absolute;
@@ -77,38 +78,40 @@
   width: 11.5px;
   height: 1.6px;
   border-radius: 0.8px;
-  background: #ec8db5;
+  background: rgba(255, 255, 255, 0.85);
 }
 .toss-assets-plate__word--2 {
   top: 6.6px;
-  left: 7.6px;
-  width: 9.5px;
+  width: 7px;
+  background: rgba(255, 255, 255, 0.55);
 }
-.toss-assets-plate--mint::after {
-  content: "";
+.toss-assets-plate__chip {
   position: absolute;
-  right: 2.4px;
-  top: 3px;
-  bottom: 12px;
-  width: 0.8px;
-  background: repeating-linear-gradient(to bottom, #8fc9b8 0 1.2px, transparent 1.2px 2.4px);
+  left: 3.4px;
+  top: 15.6px;
+  width: 6.4px;
+  height: 5px;
+  border-radius: 1px;
+  background: linear-gradient(135deg, #f1d68e, #c9a250);
 }
-.toss-assets-plate__line {
+/* 회색 가죽 (토스뱅크 하나카드 Day — 지어낸 판): 회갈색 + 안쪽 점선 바느질 + 아래 흐린 글자 줄 */
+.toss-assets-plate--day {
+  background: linear-gradient(160deg, #6e6862 0%, #4d4843 55%, #3b3834 100%);
+  box-shadow: inset 0 0 0 0.6px rgba(255, 255, 255, 0.1);
+}
+.toss-assets-plate__stitch {
   position: absolute;
-  right: 3.4px;
-  top: 24.4px;
-  width: 17px;
-  height: 1.4px;
-  border-radius: 0.7px;
-  background: #4b8576;
+  inset: 2.2px;
+  border: 0.6px dashed rgba(255, 255, 255, 0.32);
+  border-radius: 1.4px;
 }
-.toss-assets-plate__line--2 {
-  top: 28.2px;
-  width: 13px;
-}
-.toss-assets-plate__line--3 {
-  top: 32px;
-  width: 9px;
+.toss-assets-plate__word--day {
+  left: auto;
+  right: 4px;
+  top: auto;
+  bottom: 5.4px;
+  width: 8px;
+  background: rgba(255, 255, 255, 0.4);
 }
 .toss-assets-plate--toss {
   background: linear-gradient(160deg, #46526d 0%, #262d3e 100%);
@@ -118,18 +121,6 @@
   position: absolute;
   left: 4px;
   top: 4.4px;
-}
-.toss-assets-plate--youth {
-  background: linear-gradient(160deg, #4b9bff 0%, #2366e8 100%);
-}
-.toss-assets-plate__ring {
-  position: absolute;
-  left: 9.8px;
-  top: 25px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2.4px solid rgba(255, 255, 255, 0.45);
 }
 .toss-assets-plate--other {
   display: grid;

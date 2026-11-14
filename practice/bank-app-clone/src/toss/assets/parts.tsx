@@ -63,7 +63,8 @@ export function AssetsLogo({ code, size = 30.4, surface = "page", className, sty
 }
 
 // ---------- 카드 그림 (세로 29.6 × 43.2, 모서리 2.4) ----------
-// 프렌즈 체크카드 = 노랑 + 검은 B, Young Hana+ = 민트 그라데이션 + 작은 글자 줄, 토스뱅크 체크카드 · 토스유스카드 = 지어낸 색
+// 프렌즈 체크카드 = 노랑 + 검은 B. 나머지는 지어낸 판: 토스뱅크 체크카드 = 회남색 + 심볼, 트래블로그(하나 기본) = 하나 초록 + 흰 글자 줄,
+// 토스뱅크 하나카드 Day = 회색 가죽 + 점선 바느질
 export function AssetsCardPlate({ art, bankCode, className }: { art: string | null; bankCode: string; className?: string }) {
   const kind = art ?? `bank-${bankCode}`;
   const cls = `toss-assets-plate${className ? ` ${className}` : ""}`;
@@ -75,20 +76,19 @@ export function AssetsCardPlate({ art, bankCode, className }: { art: string | nu
         </span>
       </span>
     );
-  if (kind === "hana-young" || kind === "bank-hana")
+  if (kind === "hana-travlog" || kind === "bank-hana")
     return (
-      <span className={`${cls} toss-assets-plate--mint`} aria-hidden>
+      <span className={`${cls} toss-assets-plate--hana`} aria-hidden>
         <i className="toss-assets-plate__word" />
         <i className="toss-assets-plate__word toss-assets-plate__word--2" />
-        <i className="toss-assets-plate__line" />
-        <i className="toss-assets-plate__line toss-assets-plate__line--2" />
-        <i className="toss-assets-plate__line toss-assets-plate__line--3" />
+        <i className="toss-assets-plate__chip" />
       </span>
     );
-  if (kind === "toss-youth")
+  if (kind === "hana-day")
     return (
-      <span className={`${cls} toss-assets-plate--youth`} aria-hidden>
-        <i className="toss-assets-plate__ring" />
+      <span className={`${cls} toss-assets-plate--day`} aria-hidden>
+        <i className="toss-assets-plate__stitch" />
+        <i className="toss-assets-plate__word toss-assets-plate__word--day" />
       </span>
     );
   if (kind === "toss-check" || kind === "bank-toss")
@@ -150,6 +150,16 @@ const CAT: Record<string, { fill: string; glyph: ReactNode }> = {
   "문화·여가": {
     fill: "#d6458f",
     glyph: <path d="M10 13h16v3a2 2 0 0 0 0 4v3H10v-3a2 2 0 0 0 0-4Z" fill="#fff" />,
+  },
+  // 통신 · 관리비 (집)
+  "주거·통신": {
+    fill: "#e2574c",
+    glyph: (
+      <>
+        <path d="M18 9.6 9.4 17h2.4v8.4h12.4V17h2.4Z" fill="#fff" />
+        <rect x="16" y="20" width="4" height="5.4" rx="0.6" fill="#e2574c" />
+      </>
+    ),
   },
   교육: {
     fill: "#804b20",
