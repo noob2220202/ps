@@ -10,7 +10,7 @@ const NAME: Record<string, string> = { benefit: "혜택", shopping: "쇼핑", st
 
 export function TabPlaceholder() {
   const { tab = "" } = useParams();
-  if (!(tab in NAME)) return <TossRedirect to="/" />; // 없는 탭
+  if (!Object.hasOwn(NAME, tab)) return <TossRedirect to="/" />; // 없는 탭 (toString 같은 이름도)
   return (
     <TossPage
       bg={TOSS_BG_DEEP}
