@@ -321,7 +321,7 @@ transfers    (id, from_account_id → accounts CASCADE, bank_code, number, holde
 | GET / POST | `/api/payees` | 받는 분 목록 / 등록 `{bankCode, number, holder}` | 200, **201**, 400, 409(중복·내 계좌) |
 | PATCH / DELETE | `/api/payees/:id` | 이름·번호·☆ 수정 / 삭제 | 200, **204** |
 | GET | `/api/transfer/recipients?from=` | 이체 첫 화면: 내 계좌 + 최근 이체 | 200 |
-| GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 | 200, **404**(ACCOUNT_NOT_FOUND) |
+| GET | `/api/transfer/lookup?bank=&number=` | 예금주 조회 (토스만: `&soft=1` 이면 못 찾아도 200 `{ notFound: true }`) | 200, **404**(ACCOUNT_NOT_FOUND) |
 | POST | `/api/transfers` | 이체 `{fromAccountId, bankCode, number, amount, memoTo?, memoMe?, checkDuplicate?}` | **201**, 400(잔액 부족·한도 초과), 409(`DUPLICATE_TODAY` — `checkDuplicate: true` 이고 오늘 같은 이체가 있으면 이체 안 함, 케이뱅크), 403(`ACCOUNT_SUSPENDED` — 카카오뱅크 계좌 지급정지를 켠 프로필, 화면은 `SuspendedDialog` 팝업 · `ACCOUNT_BLOCKED` — allone 출금계좌 지급정지, 화면은 '안내' 팝업) |
 | GET | `/api/transfers?from=` | 내가 보낸 이체 기록 (입금 거래에 붙인 보낸 분 기록은 뺌) | 200 |
 | POST | `/api/reset` | 초기 데이터로 | 204 |
@@ -1264,6 +1264,8 @@ allone(26장)과 달리 인트로가 없고, 기기는 콕뱅크 · 하나원큐
 - 예시 데이터(`toss-seed.mjs`): 날짜는 지금 기준 `c(n)` = 오늘 − n일(이번 달 1일 밑으로는 안 내려감) · `p(day)` 지난달 · `q(day)` 두 달 전 → 어느 날 켜도 이번 달 소비 · 지난달 비교가 참.
   지금보다 늦은 시각(아침에 켰는데 낮 시각)은 바로 앞 줄보다 1분씩 앞으로 당겨 순서를 지킴 (케이뱅크의 '미래 거래' 함정, 23장). `db.mjs` 가 이 파일을 import 하므로 BEGIN/COMMIT 도우미는 따로.
   `SEEDS.toss = { example, empty }` — 빈 데이터는 토스뱅크 통장 · 토스머니 0원.
+- 못 찾은 번호(D1 안내창)는 흔한 흐름이라 토스는 `GET /api/transfer/lookup?…&soft=1` → 404 대신 200 `{ notFound: true }` (브라우저 콘솔에 오류가 안 남음, 다른 앱은 그대로 404).
+- 배포 서버: 화면 주소 `/assets`(자산)가 빌드 폴더 `dist/assets` 와 겹쳐 `express.static` 이 `/assets/` 로 301 을 보냈음 → 토스만 `redirect: false` (폴더 주소는 아래 index.html 로).
 
 ### 문: `TOSS` 하나
 - 화면: `session.ts` `TOSS = APP === "toss"`, `platform.ts` `DEVICE_LOCK` 에 `APP === "toss" ? "android"`, `theme.ts` `darkOnly` → `THEME_LOCK` dark. PhoneFrame 스위치 줄 · 🔔 기본은 잠겨 있으면 그 칸을 숨김.
@@ -1297,6 +1299,10 @@ allone(26장)과 달리 인트로가 없고, 기기는 콕뱅크 · 하나원큐
 - 깊이: `location.state` 의 `sendDepth` · `certDepth` 를 push 마다 +1 (replace 는 그대로, `carryDepth`) → 흐름 나가기는 `history.go(-depth)` (`useTossExit`, 기록이 모자라면 fallback 으로 replace).
 - 화면 안 뒤로 `useTossBackStep`: 시트 · 안내창 · 자판이 떠 있는 동안 방문 기록 한 칸(`tossBack` 깊이)을 쌓아 두고 뒤로가기로 빠지면 닫기 (kbank `sendback.ts` 꼴, 겹치면 나중 것부터).
   닫자마자 다른 칸을 쌓거나 replace 하면 순서가 꼬여서 그 칸이 빠지는 popstate 를 기다린 뒤에 함 (`transfer/guard.ts nextPop`).
+- 완료(S8) · 광고 화면의 지킴 칸: 갤럭시 뒤로로 칸이 이미 빠졌는데 방금 replace 로 와서 이동 잠금(450ms) 중이라 나가기를 버리면, 다음 뒤로가 끝난 이체의 금액 화면으로 감 →
+  `tossAfterLock(fn)` 으로 잠금이 풀린 뒤에 나감 (`useAdBackGuard` · `useDoneGuard`). 보내는 중(S7)은 `hold()` 로 칸만 바로 다시 쌓음.
+- 주소 바로 열기(새로고침 · 링크)에 보여 줄 것이 없으면 `ui/Redirect.tsx TossRedirect` 가 맨 위 층일 때 한 번 replace: 없는 주소 · 없는 탭 → 홈, 받는 분 없는 금액 · 확인 → 어디로 보낼까요
+  (금액 없는 확인 → 금액), 고른 내역 없는 증명서 완료 · 문서 → 증명서 홈, 다른 은행 계좌를 `/bank/` 로 → `/account/` (반대도). 없는 계좌는 '계좌를 찾을 수 없어요'.
 
 ### 돌아온 화면 = 새 화면 → 칸(key)마다 기억
 - 토스 갈래 ScreenStack 은 맨 위 층(과 전환 중 나가는 층)만 그림 → 뒤로 오면 화면이 새로 만들어져 웹뷰 단계 · 진행 막대 · 뼈대를 처음부터 다시 함. 녹화는 쌓여 있던 화면을 받아 둔 그대로 보여 줌.
@@ -1393,6 +1399,7 @@ allone(26장)과 달리 인트로가 없고, 기기는 콕뱅크 · 하나원큐
   움직임은 rAF 로 찍은 프레임과 녹화의 한 점(위끝 · 밝기)을 프레임마다 비교.
 - **반 픽셀 함정**: 폰 틀은 창 가운데라 창 폭 900 이면 왼끝이 (900 − 384) / 2 = 258 → 322.5 기기 px 에 걸려 모든 스크린샷이 ≈1px 왼쪽으로 번져 밀림. 그 그림에 맞춘 x 는 바르게 그리면 0.8dp 오른쪽.
   증명서 검토가 찾아 **창 폭 904**(왼끝 260 = 325px)로 다시 재서 고침. kakao2 · allone 의 `snapToDevicePixels`(25장)와 같은 문제를 재는 쪽에서 만난 것.
+  통합 뒤로는 `phoneSnap.ts useTossPhoneSnap`(토스 상태바가 부름)이 `.phone` 을 translate 로 기기 화소에 맞춤 → 창 폭 · 캡쳐모드(zoom · 위 여백)와 상관없이 같은 그림.
 - 1.25배에선 글자 위끝이 0.8dp 단위로만 움직여 녹화 값이 그 사이면 ±0.7–0.8dp 에 멈춤 → 그대로 둠 (몇 곳만 주석 달고 한 단 옮김).
 - 명세보다 녹화: 낙하 7.2 (8), 반짝임 2.37초 (2.3), 문서 367.4 × 519.6, 상세 17px (16), 엿보기 선, 배너 그림 크기, 거래내역 단계 순서 — 검토마다 녹화를 다시 재서 고침.
 
@@ -1418,7 +1425,9 @@ allone(26장)과 달리 인트로가 없고, 기기는 콕뱅크 · 하나원큐
 - 문은 셋: JS `TOSS` / `APP === "toss"` · CSS `html[data-app="toss"]` 또는 `toss-` 클래스 · 서버 `TOSS`. 새 코드는 `src/toss/` · `server/toss-*.mjs`, 공용 파일은 문 안의 갈래만.
 - 확인은 기반 단계에서 25장 방법으로: 바꾸기 전 커밋을 worktree 로 띄워 다른 8개 서버에 같은 요청을 보내 응답을 비교하고, 배포판(각자 자기 dist)으로 홈 · push 중간(60 · 150 · 300ms) 화면을 비교.
 - 한 빌드에 모든 앱 CSS 가 들어감: 다른 앱의 접두 없는 클래스(`.done { background: #fff }` 같은 것)가 토스에도 걸릴 수 있어 토스 클래스는 모두 영역 접두(`toss-home-` · `toss-acct-` · `toss-send-` · `toss-cert-` · `toss-assets-`).
-  `@keyframes` 이름도 `toss-` 로.
+  `@keyframes` 이름도 `toss-` 로. TSX 의 className 도 `toss-` 로 시작 (on · out · red · blue · open 같은 꾸밈 이름만 예외) — `.done` · `.home` · `.btn` 같은 맨 클래스는 실제로 토스 요소에 걸림.
+- 일부러 빌려 쓰는 것: 이체 번호 자판은 하나원큐 `.hana-kb*` CSS 를 그대로 씀 → 토스만의 조정은 `transfer/send.css` 의 `html[data-app="toss"] .hana-kb…` 에만 (하나 규칙은 안 고침).
+- 공용 프로필 시트(흰 바탕 · 노란 버튼)는 `.picker--toss` 아래에서만 토스 어둠 · 파랑, 새 프로필 안내 문구는 `TOSS ?` 갈래 (토스뱅크 통장 · 토스머니 0원).
 
 ### 배운 것
 - 명세 여섯이 같은 push 를 여섯 가지로 적음 → 다른 첫 프레임 · 다른 점을 잰 것. 여러 번의 이동을 한꺼번에 맞춘 곡선 하나가 나머지를 다 설명함.
@@ -1428,3 +1437,5 @@ allone(26장)과 달리 인트로가 없고, 기기는 콕뱅크 · 하나원큐
 - 맨 위 층만 그리는 스택에선 '돌아온 화면 = 새 화면': 칸(key)마다 기억해 POP 일 때만 되살리고, 안 보이는 동안 바뀐 데이터는 그때 미리 받아 둬야 돌아온 순간이 녹화 시각에 맞음.
 - 영역을 동시에 만들 땐 공용 파일을 얼리고 '수정 요청'으로 받아 통합에서 한 번에 — 영역끼리 안 부딪힘. 대신 영역 안 덮어쓰기는 통합 때 같이 걷어야 두 번 걸리지 않음.
 - 영역을 다 만든 뒤 영역마다 녹화 대조 검토를 한 번 더: 만든 사람이 '±0.5dp' 라 적은 값이 다시 재면 1.4dp 였고, 명세 값(8dp · 2.3초 · 0.9348 · 16px)도 여럿 틀렸음.
+- 배포판만의 버그: 빌드의 CSS 압축이 이름 없는 `animation: 1900ms linear infinite both` 를 `animation: none` 으로 바꿔 2,000원 광고 달력이 배포판에서만 안 보였음 →
+  이름이 없을 땐 longhand(`animation-duration` …)로. 애니메이션을 끄고 찍은 화면 비교로는 못 찾고, 개발 서버와 배포판의 계산된 스타일을 견줘서 찾음.
