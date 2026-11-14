@@ -4,7 +4,7 @@ Area: **누구에게 보낼까요** → **얼마를 보낼까요** → **계좌 
 (error link → loading → page → 출금계좌 선택 sheet → 금액 입력 sheet → 잔액채우기 button) and **취소** back to home.
 Sources: C2 = `…_1_4.mp4` (20–27.8 s), C3 = `…_2.mp4` (0–12.7 s and 19.5–36 s). Real pts only (ffprobe `frame=pts_time`). C2 starts at pts 0.0243 and C3 at 0.0293. Every time below is the pts of the **first frame that shows the change**.
 
-**Excluded, not specified:** C3 **12.71–19.48** (withdrawal-block notice) and C3 **33.23–34.00** (the same notice again, after the password).
+**Excluded, not specified:** C3 **12.71–19.48** (excluded range) and C3 **33.23–34.00** (excluded range, after the password).
 In the clone, 잔액채우기 and transfers simply **succeed** (§5).
 
 **Privacy:** no recorded value appears below. That covers names, account numbers, last-4 digits, balances, typed amounts and times. Only formats and roles (§6), UI labels, product names, geometry, colours and timings.
@@ -21,8 +21,8 @@ Evidence: `/tmp/claude-0/-home-user-ps/23b26e0f-9264-5b65-bab4-ff964ff6821e/scra
 
 1. **Web vs native pieces.**
    - **Web** (inside the viewport 59–818; covered by the web loading dim): 누구에게 page, 얼마를 보낼까요 page body, 잔액채우기 page, 출금계좌 선택 sheet.
-   - **Native accessory panel**: the 얼마를 보낼까요 keypad panel (chips + keypad + 다음, y 435–818). It is **not** dimmed by the web loading dim (C3 1.896: panel luma stays 255 while the page goes 117).
-     It behaves like an iOS keyboard. The page **re-lays out in one frame** when it opens or closes, and the panel slides 150 ms.
+   - **Native accessory panel**: the 얼마를 보낼까요 keypad panel (chips + keypad + 다음, y 435 to the screen bottom 852). It is **not** dimmed by the web loading dim (C3 1.896: panel luma stays 255 while the page goes 117).
+     It behaves like an iOS keyboard. The page **re-lays out in one frame** when it opens or closes, and the panel slides from / to the screen bottom (in 175 ms, out 170 ms, §3.6–3.7).
    - **Native full-window sheets** with their own dim: **금액 입력** (luma 60) and **계좌 비밀번호 입력** (luma 68). Render them in the infra native layer.
 2. **Cuts, not pushes.** Every page change is a one-frame cut, normally behind the web loading dim and spinner (`infra.md` §1.8).
    Exception: **tapping a 최근 row → 얼마를 보낼까요 is an instant cut with no loading** (C2 22.774, C3 28.963).
@@ -64,7 +64,7 @@ Evidence: `/tmp/claude-0/-home-user-ps/23b26e0f-9264-5b65-bab4-ff964ff6821e/scra
 | T5f | amount filled, limits shown | web page | C3 11.696 – 12.029 |
 | T5p | 잔액채우기 button pressed (lighter) | web | C3 12.029 – 12.129 |
 | L6 | loading after 잔액채우기 | web dim | C3 12.146 – 12.70 → **[EXCLUDED 12.71–19.48]** → clone: success (§5.3) |
-| G1 | real-app glitch after the notice: T2's keypad panel slides up **over** T5 | native | C3 19.529–19.663. Do not copy (§3.9) |
+| G1 | real-app glitch right after the excluded range: T2's keypad panel slides up **over** T5 | native | C3 19.529–19.663. Do not copy (§3.9) |
 | X1 | 잔액채우기 × → T5 removed (cut) → T2 panel re-slides | web + native | cut C3 20.446, panel 20.496–20.646 |
 | X2 | **취소** → home | web dim + panel out | C3 21.596 → home cut 21.979 → dim off 22.246; C3 35.229 → 35.629 → 35.896 |
 
@@ -113,7 +113,7 @@ Top → bottom (ink boxes):
 | tabs | 4 equal cells over x 24–369 (86.25 each): centres 67.1 / 153.4 / 239.6 / 325.9. Text ink y 477.67–493.0 | "최근" "자주" "내계좌" "연락처", **16.4 px / 500**; active #000, inactive **#9E9E9E** |
 | tab lines | base line 1 pt **#F5F5F5** at y 507–508, x 24–369. Active underline **2 pt #000 (#030303)** at y 506–508 spanning the whole cell (24–110.6 for 최근) | |
 | 삭제하기 | right-aligned ink x 319.1–369.0, y 535.33–548.33; underline 1 pt at y 549–550 | **15.0 px / 500, #000** |
-| rows | first logo top **570.0**, **pitch 63.33** (570 / 633.33 / 696 / 759.33). The 5th would start at 822.7, below the web area, so the list scrolls | |
+| rows | first logo top **570.0**, **pitch 63** (☆ and tile edges are 189 px apart in C3 27.500 and C2 21.200; the first fit read 63.33). The 5th would start below the web area, so the list scrolls | |
 | ↳ logo | **x 24–60, 36 × 36 squircle** (§7) | |
 | ↳ name | x 71 (ink 70.7), ink y +0.67…+15.3 from the logo top | `<NAME_R>` **16.3 px / 500, #000** |
 | ↳ sub | x 71, ink y +22.3…+35.0 | `<BANK> <ACCT digits>` **14.3 px / 400, #808080**, raw digits, one space |
@@ -218,11 +218,11 @@ iOS-style momentum and scroll indicator (C3 8.75).
 |---|---|---|---|
 | 3.1 | 거래내역조회 `이체` | web dim on C2 20.091 (17 ms after release) → T1 painted under the dim 20.808 → dim off **21.141**. Logos and stars appear **1 frame later** (image load) | loading 1050 ms (or max(api, 1050)), cut. `from` = the list's account |
 | 3.2 | home card `이체` | dim C3 26.146 → cut ≈26.43 → off **26.563** | loading **417 ms**, `from` = that card's account |
-| 3.3 | **tap a 최근 row** | **instant cut** to T2a (C2 22.774 / C3 28.963), no dim. Layout is "open" at once. **The panel starts sliding 33–50 ms after the cut** | §3.6 slide-in |
+| 3.3 | **tap a 최근 row** | **instant cut** to T2a (C2 22.774 / C3 28.963), no dim. Layout is "open" at once. **The panel starts sliding ≈ 5 ms after the cut** | §3.6 slide-in |
 | 3.4 | key press on T2 | amount updates in the same frame, no key highlight. Error or caption and 다음 state update in the same frame | |
 | 3.5 | chips | not recorded | §5.5 |
-| 3.6 | **panel slide-in** | translateY(383 → 0): C3 28.988 → 29.146 = **≈150 ms**, fit **cubic-bezier(.31,.18,.55,.89)** (rms .003). Same on C2 22.808–22.958 and C3 34.129–34.279 | `transform` 150 ms that curve |
-| 3.7 | **panel slide-out** | C3 1.892 → 2.046 = **≈153 ms**, fit **cubic-bezier(.39,.03,.70,.92)** (rms .003). Same at 21.596 and 30.996. The layout jumps to "closed" in the first frame | |
+| 3.6 | **panel slide-in** | re-measured frame by frame (chip text and the digit rows agree): the panel (435–852) comes in from the **screen bottom (852)**, not 818, and its content shows in the 818–852 band while it moves. Panel top from the C3 28.963 cut: hidden, 836, 804.7, 759.7, 706.3, 646.3, 588.3, 532.7, 489.7, 459, 441, 435. Fit **175 ms cubic-bezier(.4,.2,.6,1)** starting **5 ms** after the cut (rms 1.0–1.4 pt); the first 818-based 150 ms (.31,.18,.55,.89) fit is 5–40 pt off | `transform: translateY(100%) → 0`, 175 ms that curve, delay 5 (`AO_PANEL`) |
+| 3.7 | **panel slide-out** | to the screen bottom. Panel top from the C3 1.896 dim frame: 442.7, 459.3, 491, 536, 587.3, 647, 709, 762, 804.3. Fit **170 ms cubic-bezier(.4,0,.6,.7)** (rms 1.5–2.2 pt; it starts one frame before the dim). Same at 21.596 and 30.996. The layout jumps to "closed" in the first frame | `translateY(0 → 100%)`, 170 ms that curve (`AO_PANEL`) |
 | 3.8 | 다음 | press: fill **#003E0E** (C3 30.896, 5 frames) → **30.996** layout closed + panel out → **31.129** T3 sheet + native dim in **one frame** (no slide) | as recorded |
 | 3.9 | T3 digits | one dot per digit at once. The 4th triggers sheet + dim off after **50 ms** → web loading dim **483 ms** | clone → confirm page (§5.1). Never send or store the PIN (infra §9) |
 | 3.10 | **잔액채우기 link** | **1.896**: web dim (117) + panel out (§3.7) + layout closed. The dim then **deepens 117 → 91 over ≈300 ms** (1.896–2.196, ease-out). **2.263**: T5 cut under the dim (dim back to 117). **2.879–3.196**: T6 rises under the dim, while the scrim fades in behind it (dim reads 117 → 90). **3.329**: dim + spinner off in one frame (scrim stays, 176) | timings as recorded: cut +367 ms, sheet start +983 ms, dim off +1433 ms |
@@ -236,7 +236,7 @@ iOS-style momentum and scroll indicator (C3 8.75).
 | 3.18 | **취소** (T2) | **21.596**: web dim + panel out + layout closed → home cut under the dim **+383 / +400 ms** → dim off **+650 / +667 ms** (21.596/22.246; 35.229/35.896) | reset the stack to home (the home spec owns the 정기점검 sheet rerun) |
 | 3.19 | spinner | green all-one spinner centred ≈ (196.5, 425) during every web dim; phase rules in `launch.md` | shared `AlloneLoading` |
 
-Do **not** copy G1 (C3 19.53–19.66: the T2 panel sliding up over T5 after the notice closes). It is a real-app glitch tied to the excluded notice.
+Do **not** copy G1 (C3 19.53–19.66: the T2 panel sliding up over T5 right after the excluded range). It is a real-app glitch tied to the excluded range.
 
 ---
 
@@ -258,7 +258,7 @@ Do **not** copy G1 (C3 19.53–19.66: the T2 panel sliding up over T5 after the 
 | T5 limits | 1회 한도 **5,000,000** (constant). 1일 잔여한도 = **1,000,000 − today's top-ups from that source** | constants in the client. Today's sum from **existing** `GET /api/transfers?from=<source>` (filter `at` = today). Display-only by default |
 | T5 잔액채우기 | move money source → target | **existing** `POST /api/transfers {fromAccountId: source, bankCode: "nh", number: target.number, amount, memoTo:"잔액채우기", memoMe:"잔액채우기"}`. `findRecipient` resolves my own account and the existing code writes the out tx, the in tx and the transfer row atomically |
 
-`POST /api/transfers` already returns **400 INSUFFICIENT_BALANCE** when needed. The client pre-checks, so the user never sees it. There is **no withdrawal block** and none is to be added.
+`POST /api/transfers` already returns **400 INSUFFICIENT_BALANCE** when needed. The client pre-checks, so the user never sees it. 잔액채우기 and transfers always succeed (no server-side block).
 `API_DELAY_MS` (250 ms) sits inside the recorded loading holds. Hold each loading for **max(api, recorded)**.
 
 ### 4.2 Server changes for this area (all allone-gated, additive)

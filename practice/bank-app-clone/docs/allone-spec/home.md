@@ -9,8 +9,8 @@ px = pt × 3.0025. Frames and tools live in `scratchpad/allone/frames/home/`:
 The 정기점검 sheet, the loading dim/spinner levels, the bands and the status bar belong to `launch.md` and `infra.md`. This file only
 names them where the home uses them.
 
-**EXCLUDED and not specced:** the withdrawal-block notice. It appears in C3 ≈ 12–19 s and again in C3 33.4–34.4 after the
-password sheet, which is the transfer area. Also excluded: everything after C3 42.40 (autocomplete results for 이의제기, through 45.5 s) and all of C4.
+**EXCLUDED and not specced:** the excluded ranges C3 ≈ 12–19 s and C3 33.4–34.4 (after the password sheet, which is the transfer area),
+everything from C3 42.40 on, and the 4th clip.
 In the clone, a home → 이체 / 잔액채우기 flow always succeeds.
 
 ---
@@ -22,7 +22,7 @@ In the clone, a home → 이체 / 잔액채우기 flow always succeeds.
 2. **The header is fixed (web area 59–108) and never changes on scroll.** It has no shadow and no divider.
    The black "오늘 운세🍀" bubble hangs below it (100–138) and stays put while the content scrolls under it.
 3. **The tab bar is an opaque white web element (743–818).** It **hides as soon as the page leaves scrollTop 0** and
-   **comes back only at the two ends**. At the top it returns fully. At the bottom it comes back only to +14 pt.
+   **comes back only at the two ends**. At the top it returns fully. At the bottom it comes back only to +14.33 pt.
    It does **not** reappear on a scroll-up in mid-page. The floating "내 자산 확인 ⌄" pill rides with it, but **only at the top**.
 4. **The account cards are an infinite carousel.** Each card is 353 × 222 at x 20 with a 10 pt gap, so both neighbours peek 10 pt.
    The "‹ i | n ›" pager follows the carousel. A card that has not been seen before shows a loading body ("상품명을 조회 중이에요" /
@@ -47,7 +47,7 @@ In the clone, a home → 이체 / 잔액채우기 flow always succeeds.
 | H3 | card filled; the sections below it not rendered yet | C1 12.500–12.683 |
 | H4 | full home, top state (scrollTop 0, tab bar + pill shown) | C1 12.70→ (sheet over it 12.733–13.833, launch.md S7); clean C1 13.833–14.517; C2 4.60–8.99; C3 24.08–26.13; C3 36.35–38.02 sheet, 38.02–38.61 clean |
 | H5 | scrolled, tab bar + pill hidden | C1 14.533–15.607 (stops at 14.77 and 15.43); C2 0.000–2.55; C2 3.10–3.94 |
-| H6 | bottom of page, tab bar back at +14 pt, no pill | C2 2.358 (scroll end) → bar enters 2.558–2.84 → rest until 2.858 |
+| H6 | bottom of page, tab bar back at +14.33 pt, no pill | C2 2.358 (scroll end) → bar moves 2.395–2.82 → rest until 2.858 |
 | H7 | back at the top: tab bar + pill slide in | C2 3.858 (top) → 3.94–4.60 |
 | H8 | card swipe 1 → 2 (paging) | C2 4.441–4.791 |
 | H9 | card 2 loading body | C2 4.541–4.841 (filled at 4.858) |
@@ -121,7 +121,7 @@ White-card style (quick menu, 금융일정, 내 소비, 내 자산, 그룹 grid)
 Under the card the shadow reads #ecebee → white over 12 pt. Above it, faint #f9fefd over 4 pt.
 
 ### 2.2 Header (fixed, 59–108)
-- **Name**: "<NAME_A>" Bold 20 (Hangul ink 75.3–91.6) + "님" Regular 20, both #000, starting at x 20.
+- **Name**: "<NAME_A>" Bold + "님" Regular, both #000, starting at x 20 (Hangul ink 75.3–91.6). The ink fits **Pretendard 18.5** (the 전체메뉴 header name fits 18.8), not 20.
   The underline is under the **name only**: x 20.0–65.6 (it ends where the name ends), y 93.9–95.3, 1.3 pt thick, #000.
   The whole name block is ink x 20–78.9.
 - **오늘 운세 bubble**: black #020202, x 20.0–105.2, body y ≈106–137.9 (h 32), radius 8.
@@ -133,11 +133,11 @@ Under the card the shadow reads #ecebee → white over 12 pt. Above it, faint #f
 - **Icons** (SVG, stroke ≈ 2, #000; 24 pt boxes centred at y 84; centres x 289 / 324.7 / 361.2):
   - wallet: rounded rect with a flap and a clasp dot; ink 278.1–300.1 × 75.9–92.9
   - bell: with top knob and bottom clapper; ink 315.7–333.7 × 73.9–94.6
-  - menu-search: 3 lines + magnifier at the lower right; ink 351.0–371.4 × 75.9–91.9
+  - menu-search: 3 lines + magnifier at the lower right; ink 351.0–371.4 × 75.9–91.9. Same shape as the 거래내역조회 and PIN instances (4 pt to the right): the bottom line is 1.9 longer than the middle one (`AoMenuSearchIcon`)
 - Header bg #fff. It has no shadow when scrolled (C2 0.0: content is cut at 108 with no line).
 
-### 2.3 Promo banner (134.9–227.1)
-- Box x 20–373 (353 × 92.2), radius ≈ 20, bg **#fffae2**, no border or shadow.
+### 2.3 Promo banner (133–227)
+- Box x 20–373 (353 × 94, y 133–227 measured in y px / 3; the first reading 134.9–227.1 used px / 3.0025), radius ≈ 20, bg **#fffae2**, no border or shadow.
 - Line 1 "두근두근, 나도 포인트 부자?": Regular 13.5 / 0, #333 (ink x 40.3–188.2, Hangul y 160.5–173.9).
 - Line 2 "1분만 투자해도 쌓여가는 포인트": Bold 16.5 / −0.6, #000 (ink x 42.3–235.5, y 184.8–199.5). Left padding 20.
 - Art: a 3D heart with a smiley face and a stack of P coins, on a soft dotted halo, at x 283–360 × 150–216. **Crop** it (§7).
@@ -159,7 +159,8 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
   The index and total are 1-based, for example "1 | 2" and "2 | 2".
 - **Carousel**: cards are 353 × 222 at x 20 when at rest, with a 10 pt gap, so the previous and next cards show 0–10 and 383–393.
   It loops: with 2 cards, card 2 is visible on both sides of card 1 and the other way round.
-  Swipe: snap paging. Measured 4.441 → 4.791 (0.35 s; the finger flick then a decelerating settle ≈ 250 ms ease-out).
+  Swipe: snap paging. Measured 4.441 → 4.791. From the finger release (4.507) the settle is **305 ms cubic-bezier(.3,.43,.3,1)** (rms 1.1 pt on the card-2 tile);
+  the rubber-band back (C3 25.192–25.433) is the same 305 ms curve (rms .24 pt). The first reading (≈ 250 / 450 ms) included the drag time.
   Pager arrows: invented, page ±1 with a 300 ms ease-out.
 - **Card**: y 293.0–515.0, bg #fff, radius ≈ 16. Mint-tinted shadow: #cee4e2 right under the card, fading to the glow
   colour over ≈ 30 pt. The gap between cards reads #d6ecea, and the line above the card #ebf6f4.
@@ -168,13 +169,14 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
     Draw it as SVG/CSS (public brand mark). Infra uses a 36 pt NH tile in lists, but this one is 32.
   - Product name: x 79.9, ink y 321.7–336.7, **SemiBold 15 / −0.3**, #000. Single line with an ellipsis, max right ≈ 297 (max-width 217).
     Example: card 2 reads "NH X 카카오페이통장(비대면실명확…".
-  - Number line: "NH농협은행 <ACCT_A>" Regular ≈ 14.5, #333 (ink y 343.4–355.7). Then "복사" in the same style with a 1 pt underline
-    (#323232, y 356.4–357.4), 4 pt after the number. The line ends at x ≈ 296.
+  - Number line: "NH농협은행 <ACCT_A>" Regular 14, **#666** (bank name ls −0.4, digits ls −0.2; ink y 343.4–355.7). Then "복사" **#333** with a 1 pt underline
+    (#323232, y 356.67–357.67), 4 pt after the number. The line ends at x ≈ 296.
   - ⋮ menu: 3 dots Ø 2.7, #414141, x 348.7–351.4, y 322.4–337.1 (6 pt pitch).
-  - 한도제한 tag: box x 79.9–127.9, y 368.0–388.0 (48 × 20), radius 4, bg ≈ #fffaf8 (barely visible).
-    Text "한도제한" Medium 11 / −0.3, **#e94848**, ink x 85.3–121.9.
-  - Balance: "<AMOUNT_A>원" at x 80.6, ink y 400.7–421.3 (digit height 20.6), **Bold 28**, #000.
-  - 숨김 pill: x 159.9–205.2 (≈45 × 26, radius 13), white, border 1 pt #eeeeee. Text "숨김" Regular 12.5 / −0.6, #000.
+  - 한도제한 tag: box **48.6 × 23.3 at x 79.3, y 366** (y px / 3), radius 4, bg ≈ #fffaf8 (barely visible).
+    Text "한도제한" Medium 11 / −0.3, **#e94143** (glyph core (233, 64, 66); `--ao-limited`), ink x 85.3–121.9.
+  - Balance: "<AMOUNT_A>원" at x 80.6, #000. The digits are **tabular figures**: ink 15.7 tall at y 401.3–417.0, pitch 13.9 → **Pretendard 700 22,
+    `tabular-nums`, ls −0.5**; "원" is **SemiBold 20** (not Bold 28).
+  - 숨김 pill: **42 × 26 at y 397–423** (radius 13), white, border 1 pt #eeeeee. Text "숨김" Regular 12.5 / −0.6, #000.
     It sits 4 pt after the balance.
   - Buttons 한도해제 / 거래내역 / 이체: y 451.6–493.6 (h 42), x 39.0–138.6 / 146.9–246.1 / 254.5–354.0 (99.5 wide, gap 8.3).
     Radius 10, white, border 1 pt **#dcdcdc**. Text Regular 15.5 / −0.6, #000, centred (ink y 465.6–478.9).
@@ -276,18 +278,18 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
   2. **#4589fe** "보험"
   3. **#059d8c**, label starts with "ㅎ…". Not seen in full; invent "헬스케어" with the lines "자산처럼 챙기는 / 건강 관리 시작하기".
 - Contents (white):
-  - title Medium ≈ 17 at x +13.3, ink y 2050.3–2064.6
+  - title fits Pretendard **16** at x +13.3, ink y 2050.3–2064.6
   - chevron "›" ≈ 5 × 9 at right −23
   - centred image tile: white squircle 64 × 64 (radius ≈ 22) at y 2099.9–2163.9, holding a car photo / a medicine bottle + dumbbell (crop the tiles)
-  - 2 lines Bold ≈ 17.5, line pitch 26, ink y 2187.8–2202.5 and 2213.8–2228.5: "내 자동차 지금 / 시세는 얼마?", "내 가입보험 / 한눈에 확인하려면?"
+  - 2 lines Bold, fit **15.8**, line pitch 26, ink y 2187.8–2202.5 and 2213.8–2228.5: "내 자동차 지금 / 시세는 얼마?", "내 가입보험 / 한눈에 확인하려면?"
 - Tap → no-op.
 
 ### 2.13 NH금융그룹 (2296–2774)
 - 2 × 3 grid. Columns x 20–191 and 202.5–373 (≈ 171 wide, gap 11.5). Rows h 142, pitch ≈ 151 (gap 9).
 - White card (§2.1 style), radius ≈ 16.
 - Inside, padding 21 left and 19 top:
-  - title Medium 17 / −0.3, #000 (ink h 14.3)
-  - 2-line description Regular 15 / −0.4, #2f2f2f (line pitch ≈ 19.5)
+  - title Medium / −0.3, #000 (ink h 14.3), fits **16**
+  - 2-line description Regular / −0.4, #2f2f2f (line pitch ≈ 19.5), fits **14**
   - 34 × 34 icon at the bottom right (right 21, bottom ≈ 16)
 - Cards, in order:
   - NH투자증권: 다양한 투자상품과 / 리서치 (blue + red candlesticks)
@@ -307,7 +309,8 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
 - x 128.0–265.5 (137.5 × 40), y **685.3–725.3** at rest, radius 20. That is 18 pt above the tab bar top.
 - `linear-gradient(90deg, #0f8a4f 0%, #127e73 30%, #186ea3 60%, #1b5fd6 100%)`.
   Sampled every 10 pt: #0f8a4f, #14875d, #128266, #127e73, #14797e, #16768a, #157195, #186ea3, #176baf, #1867bc, #1a62c8, #1b5fd6.
-- Text "내 자산 확인": Bold 16, white, ink x 148.6–220.6. Then a white "⌄" chevron, ≈ 14 × 8, stroke 2, at x ≈ 236–250. The group is centred.
+- Text "내 자산 확인": Bold 16, white, ink x 148.6–220.6. Then a white **animated double chevron** (two "⌄", ≈ 14 × 8, stroke 2, at x ≈ 236–250)
+  on a 3000 ms loop with 7.6 pt of travel. The group is centred.
 - No shadow.
 - Visible **only at the top state** (H4/H7). It moves with the tab bar (§2.16).
 - Tap is not seen. Invented: smooth-scroll so that the "내 자산" title sits 20 pt under the header. Leaving the top then hides the bar and the pill.
@@ -324,14 +327,17 @@ It is cut sharply at **y 550** by the white ad block. Suggested CSS: on the sect
   - **포인트쌓기**: outline circle with a bold "P"
   - **생활혜택**: outline gift box with a bow
 - The only selected state is the filled icon. Label colour does not change.
-- **Hide and show rule (measured):**
-  - Hide starts on the first scroll frame away from top (C1 14.533). translateY 0 → ≈ **+135 pt**, so both the bar and the pill go fully below 818.
-    Duration **≈ 440 ms**, ease-in-out (pill Δ: 1, 6, 20 … 92, 101, 108, 114, 119, 123, 127, ≥130 at 14.53 → 14.97).
+- **Hide and show rule (re-measured frame by frame; bar = home-icon row, pill = its top edge; `AO_TABBAR`):**
+  The bar and the pill move **separately**: the pill drops faster and passes behind the bar (the bar is drawn above it).
+  - **Hide** from the scroll event (C1 14.517–15.0): bar **490 ms cubic-bezier(.4,0,.2,1) to +75** (its own height, so it ends under the
+    818 band; starts one frame early, rms .5 pt); pill **620 ms cubic-bezier(.2,.05,.1,1) to +135** (rms .9 pt).
   - It stays hidden while scrolling and while resting in mid-page (C1 14.77–15.17 rest, C2 3.16 rest, C2 3.0–3.86 scroll-up).
-  - **Show at the top**: scrollTop reaches 0 at C2 3.858 → motion starts 3.94 → settles 4.60 (**≈ 650 ms**, strong ease-out,
-    ≈ `cubic-bezier(.2,.9,.3,1)`). The pill comes back with it.
-  - **Show at the bottom**: scroll end at C2 2.358 → bar enters 2.558–2.84 (≈ 300 ms ease-out). It rests at **translateY +14**: icons at 771.7, labels at 800–811.
-    **The pill does not appear.** Implement it as a "bottom-reached" state with its own offset, after a 200 ms debounce.
+  - **Show at the top**: scrollTop reaches 0 at C2 3.858 → motion from 3.903: bar **952 ms cubic-bezier(.22,-.12,.03,1)** (rms .1 pt),
+    pill **731 ms cubic-bezier(.16,.29,.07,1)** (rms .4 pt). About 38–45 ms after reaching the top = 8 ms CSS delay + one commit frame.
+  - **Show at the bottom**: scroll end at C2 2.358 → motion from ≈ 2.395, no debounce: the bar follows the start of the top curve and stops at
+    **+14.33** = **424 ms `linear(0, 0, 0, .041, .125, .244, .368, .479, .575, .656, .726, .787, .841, .888, .93, .967, 1)`** (rms .2 pt).
+    **The pill does not appear.** Implement it as a "bottom-reached" state with its own offset.
+  The first reading (one 440 ms ease-in-out to +135, 650 ms return, 200 ms debounce + 300 ms to +14) only read the visible part of each motion.
 - Taps: **홈** scrolls to the top (invented). **금융상품 / 내 자산 / 포인트쌓기 / 생활혜택** are no-ops, following the precedent `const soon = () => {}`
   (ibk/hana/toss). Do not build placeholder pages.
 
@@ -341,10 +347,14 @@ Each fresh mount of the home (after login, or after a dim-loaded return) runs th
 - **+0 ms (H1)**:
   - the header renders, then the tabs row ("NH농협 · 다른금융" + pager, ink ≈ 162–183) directly under the header (banner slot collapsed)
   - a skeleton card at y ≈ 198.8–440.3 (h ≈ 241.5) with three bars in #fcfbfe: x 39–354, y 259.8–328.7 (r 8), 337.7–361.7 and 391.7–415.7
-  - the mint glow, the pill and the tab bar are all present
-- **+150 ms (H2)**: the banner is inserted at 134.9 and everything below jumps down in one frame (no animation).
+  - the mint glow and the tab bar are present; an empty white card shell shows at +566 below the account section top (H1–H3)
+- **+33 ms**: the 내 자산 확인 pill appears (C1 12.183).
+- **+117 ms (H2)**: the banner is inserted at 133 and everything below jumps down in one frame (no animation) (C1 12.267). Its art (an animated
+  Lottie in the app) appears only at **+850 ms** after login; on later fresh entries it is there at once.
 - **+350 ms (H3)**: the card fills (the skeleton bars become the real card in one frame).
 - **+550 ms (H4)**: the ad + 오늘의 혜택 + all lower sections appear in one frame. After +583 ms the 정기점검 sheet comes up (launch.md).
+  Frame diffs (C1): dim off 12.150, pill 12.183, banner 12.267, card 12.500, lower 12.700, notice 12.733 (`AO_SKELETON_STEPS` [0, 33, 117, 350, 550]).
+  On a **fresh re-entry** (취소 → home, C3 22.68–22.95) the 정기점검 sheet **rises over ≈ 270 ms** instead of popping in (after login, C1, it pops).
 - Drive it from `/api/home` + fixed minimum delays so it looks the same every time.
 
 ### 2.18 전체메뉴 (C3 38.946–39.85, full screen in the web area, no tab bar)
@@ -370,12 +380,12 @@ Each fresh mount of the home (after login, or after a dim-loaded return) runs th
 - **Left rail** (x 0–124, bg #fff, no divider):
   - rows 50 pt from y 266
   - selected row: bg **#0c8f2d**, text white Bold 15.5
-  - other rows: Regular 15.5 / −0.9, **#4f4f4f**, x 24.6, ink tops 334.7, 384.7, 434.6 … (pitch 50)
+  - other rows: Regular, **#4f4f4f**, x 24.6, ink tops 334.7, 384.7, 434.6 … (pitch 50). The rail text fits **14.6 / ls −0.2** (not 15.5 / −0.9)
   - visible: 최근 · 조회 · 이체/출금 · 가입상품관리 · 금융상품 · 외환 · 퇴직연금 · 공과금/채권 · 내 자산 · 금융편의 · 올원사장님+
   - continues off-screen (invented): 이벤트/혜택 · 고객센터 · 설정
 - **Right list** (x 125–393, scrolls; the rail is a scroll-spy):
   - Section header: green bar 2.3 × 10.3 (#0c8f2d) at x 135.9, then the title at x 144.5, **Bold 15.5**, #000 (ink h 14).
-  - Items: x 147.2, **Regular 16.5 / −0.8**, #000, pitch **52**. The first item's ink top is 55 below the header's ink top.
+  - Items: x 147.2, Regular, #000, pitch **52**, fit **15.6 / ls −0.15** (not 16.5 / −0.8). The first item's ink top is 55 below the header's ink top.
   - Next section header: ink top ≈ 70 below the last item's ink top.
   - **Pin icon** (only in 최근 이용메뉴): an outline push-pin tilted 45°, 16.7 × 16.7, stroke 1.5, #171717, at x 353.0–369.7, vertically centred on the item.
   - Measured: 최근 header ink 283.8–297.8; items at 339.1, 391.0, 443.0; 조회 header at 513.6; items at 571.2, 623.1, 674.8, 727.1, 779.0.
@@ -409,8 +419,9 @@ Each fresh mount of the home (after login, or after a dim-loaded return) runs th
 ### 2.19 통합검색 (C3 39.979 →, full screen, no tab bar)
 - **Title bar**: "통합검색" Bold 17.5, centred (ink x 166.5–225.8, y 76.6–92.3). "×" 16.7 pt, stroke 1.5, #000, at x 348.7–365.4. No back arrow.
 - **Field**: x 24–369, y 136.9–190.8 (345 × 54), radius 12, border 1 pt **#eeeeee**, which becomes **#0c8f2d** when focused.
-  - placeholder "검색어를 입력해 주세요": Regular 17, #8a8a8a, at x ≈ 46
-  - typed text: Regular 17, #000, at x 46.3; caret blue (iOS tint), ≈ 2 × 28 pt
+  - placeholder "검색어를 입력해 주세요": Regular, #8a8a8a, at x ≈ 46. The field text fits **18.6** (not 17). The placeholder **stays visible while the
+    field is focused**, with the caret before it (C3 41.10–41.60); it goes when the first character is typed
+  - typed text: Regular 18.6, #000, at x 46.3; caret blue (iOS tint), ≈ 2 × 28 pt
   - right side: a Ø 18 clear button (#616161 circle with a white ×) at x 293.1–311.1, shown only when there is text
   - a 20 pt magnifier (stroke 2, #000) at x 328.1–348.0, y 153.9–173.9. It renders one frame after the page (40.046).
 - **자동완성 row**:
@@ -419,7 +430,7 @@ Each fresh mount of the home (after login, or after a dim-loaded return) runs th
   - colour changes in one frame (40.563); the knob slides ≈ 250 ms (40.563–40.81)
 - **인기 검색어**:
   - heading Bold 17.5 / −0.1, #000, at x 25 (ink 273.4–289.1)
-  - list items: number "n." at x 37.3, text at x 53.3, Regular 16.5 / 0, #111, row pitch **58**, first ink top 320.1
+  - list items: number "n." **right-aligned** (its ink ends at x 48.63), text at x 53.3, Regular 16.5 / 0, #111, row pitch **58**, first ink top 320.1
   - 1. 제로페이모바일상품권 · 2. 카드 · 3. 자동이체 · 4. 포인트 · 5. 만보기 · 6. 환전 · 7. 통장사본 · 8. 디깅퀴즈 · 9. 대출
 - **Results** (invented; the recording's results are EXCLUDED):
   - When the query is non-empty and 자동완성 is on, show a list under the field (replacing 인기 검색어).
@@ -447,11 +458,11 @@ Each fresh mount of the home (after login, or after a dim-loaded return) runs th
 
 | trigger | effect, with measured timing |
 |---|---|
-| scroll down from top | bar + pill hide, 440 ms ease-in-out, starting on the first scroll frame (§2.16) |
-| reach top | bar + pill show after ≈ 80 ms, 650 ms ease-out |
-| reach bottom | bar shows to +14 after ≈ 200 ms, 300 ms ease-out, no pill |
-| swipe card | snap page, loops; ≈ 350 ms total; pager updates when the snap starts (4.508); a card not seen before shows the loading body for ≈ 0.4 s |
-| drag card < half | rubber-band back: 13 pt drag, back in ≈ 0.45 s (C3 24.96–25.51) |
+| scroll down from top | from the scroll event: bar 490 ms to +75, pill 620 ms to +135 (separate curves, §2.16) |
+| reach top | after 8 ms (+ one frame): bar 952 ms, pill 731 ms (§2.16) |
+| reach bottom | bar only, no debounce: 424 ms `linear()` to +14.33, no pill (§2.16) |
+| swipe card | snap page, loops; 305 ms `cubic-bezier(.3,.43,.3,1)` from the release; pager updates when the snap starts (4.508); a card not seen before shows the loading body for ≈ 0.4 s |
+| drag card < half | rubber-band back: 13 pt drag, then the same 305 ms curve from the release (C3 25.192–25.433) |
 | pager ‹ › | invented: page ±1, 300 ms |
 | tap **거래내역** | no pressed state. In the same frame (C2 9.008) the web dim (luma ≈ 114) + spinner appear. Cut to 거래내역조회 at ≈ 9.96 (≈ 0.95 s; the account spec owns the target) |
 | tap **이체** | dim + spinner at C3 26.146 → cut ≈ 26.56 (0.41 s) → transfer "누구에게 보낼까요?" with this card as the 출금 account |
@@ -504,7 +515,7 @@ The home needs:
 - 통합검색 results, the empty state, the ✓ / × behaviour.
 - Tab taps (no-op; 홈 scrolls to top).
 - 큰글 (visual only).
-- **Do not** add the clone's "계좌 지급정지" popup (README, kakao) to allone. That kind of notice is EXCLUDED.
+- **Do not** port the kakao clone's practice popup (README, 🔔 계좌 section) to allone. Nothing from the excluded ranges is built.
 
 ---
 

@@ -12,8 +12,8 @@ and this file for every cross-cutting decision. Area specs: `specs/infra.md`, `s
 placeholders describe only a role and a format. Frames stay under `…/scratchpad/allone/frames/<area>/`. Never commit a frame. A crop is committed only after
 someone has opened and looked at it. The home-screen wallpaper (album artwork), the other installed apps and the notification badges are never reused.
 
-**Excluded, never specced or built:** the withdrawal-block notice and its code (C3 ≈ 12.7–19.5 s and its second appearance ≈ 33.2–34.0 s),
-everything about 이의제기 (C3 ≥ 42.4 s search results and all of C4), and the iOS paste-permission dialog (C1 ≈ 2.28–3.37 s). They are skipped.
+**Excluded, never specced or built:** the excluded ranges C3 ≈ 12.7–19.5 s and ≈ 33.2–34.0 s, C3 ≥ 42.4 s and the 4th clip (C4),
+and the excluded system alert (C1 ≈ 2.28–3.37 s). They are skipped.
 In the clone, 잔액채우기 and transfers simply succeed.
 
 **Units.** pt = CSS px of the 393 × 852 frame (0 = top of the status bar). Clips are 1180 × 2556 px.
@@ -39,13 +39,13 @@ In the clone, 잔액채우기 and transfers simply succeed.
 5. **Recording intro is drawn, not a video.** A DOM/SVG iPhone home scene (generated gradient wallpaper, neutral placeholder icons, the all one icon),
    a one-frame press, then a **250 ms uniform dissolve to white** (not a zoom; verified this pass), then the boot chain. Nothing from C1 0–1.15 s is shipped.
 6. **Boot chain:** white launch → splash (cropped image, fade 267 ms, hold 2.383 s) → **PIN screen (visual only; any 6 digits; nothing stored, logged or sent)** →
-   login loading 2.233 s → home (skeleton) → 정기점검 sheet at +583 ms. Timings are the recording's, with the paste dialog removed.
+   login loading 2.233 s → home (skeleton) → 정기점검 sheet at +583 ms. Timings are the recording's, with the excluded system alert removed.
 7. **PIN and account password are fake.** Component state only, cleared on unmount. Auth stays the existing cookie session.
 8. **Main account** = `NH페이모아통장(비대면실명확인)` (home card 1, small 4-digit balance). Second NH account `NH X 카카오페이통장(비대면실명확인)` has a 1-digit
    balance, so the recorded "출금가능금액 부족 → 잔액채우기" path is reachable by typing two digits. KB and 케이뱅크 accounts are the 잔액채우기 sources.
 9. **한도제한 is an allone-gated `accounts.limited` column**, not `badge` (`migrate()` clears the main account's badge on every DB open, `db.mjs:172`). Display only.
 10. **잔액채우기 = `POST /api/transfers`** from a registered own account to the NH account, `memoTo = memoMe = "잔액채우기"`. 1회 한도 5,000,000 and
-    1일 잔여한도 1,000,000 − today's top-ups from that source are display constants with client checks. No server limit, no withdrawal block.
+    1일 잔여한도 1,000,000 − today's top-ups from that source are display constants with client checks. No server limit; top-ups always succeed.
 11. **Server stays almost untouched.** Gated additive changes only (§2.4): `limited`, notice fields on the profile, a tiny `ao` block on the tx detail,
     `favorite` on `POST /api/payees`, and a `recent_hidden` table for 삭제하기. Filters and paging on 거래내역 are client-side (the list endpoint returns ≤ 500 rows).
 12. **Unbuilt controls are silent no-ops** (repo convention, SOLUTION 22). No "준비 중" toasts. Tabs 금융상품 / 내 자산 / 포인트쌓기 / 생활혜택 are no-ops,
@@ -69,7 +69,7 @@ In the clone, 잔액채우기 and transfers simply succeed.
 | 0.000 | drawn iPhone home scene covers the whole phone; status glyphs white; red dot starts enlarged and settles by 0.55 (optional) | launch | launch §2.1, §2.3 |
 | 0.650 | press: all one icon palette swap in one frame (#0C8F2D → #034913, wordmark white → #919291), no scale | launch | C1 0.650 |
 | 0.900 = **D** | release (icon un-darkens 100 ms ease-out) and the scene dissolves to white over **250 ms** `linear(0,.004,.008,.039,.077,.129,.203,.285,.387,.49,.602,.713,.817,.902,.962,1)`. `RESTART_EVENT "start"` is dispatched at D so `AlloneSplash` is already mounted (white) underneath. `aoSetLaunchAt(D)` | launch + foundation glue | C1 0.900–1.150 |
-| D+33 → D+283 | status glyphs white → black, same curve | foundation `statusFg` | launch §2.2 |
+| D+100 → D+317 | status glyphs white → black, 217 ms `linear(0,.015,.06,.14,.23,.34,.455,.57,.69,.8,.88,.95,.985,1)` (`AO_INTRO.statusDelay/statusMs/statusEase`; re-measured on the C1 clock, LTE and battery fill) | foundation `statusFg` | launch §2.2 |
 | D+250 → D+1100 | home indicator 140 × 5 at y 839–844, opacity table §3.4 | foundation | C1 1.15–2.00 |
 | D+1450 = 2.350 | splash artwork fades in 267 ms `linear(0,.188,.308,.422,.529,.624,.694,.756,.809,.855,.893,.92,.942,.964,.975,.983,1)` | launch | C1 3.400 (−1.050 for the removed dialog) |
 | 5.000 → 5.167 | splash → PIN crossfade 167 ms `linear(0,.026,.108,.236,.395,.541,.692,.82,.911,.96,1)` | launch | C1 6.050 |
@@ -77,7 +77,7 @@ In the clone, 잔액채우기 and transfers simply succeed.
 | user | 6 digits → +67 ms keypad off + web dim + spinner (same frame) | launch | C1 9.850 → 9.917 |
 | +2.033 | home mounts under the dim (skeleton state H1); `/api/home` was prefetched during the dim | launch → home | C1 11.950 |
 | +2.183 / +2.233 | spinner off / dim off | foundation loading | C1 12.100 / 12.150 |
-| dim off +0 / +150 / +350 / +550 | skeleton steps H1 → H2 (banner) → H3 (card) → H4 (lower sections) | home | C1 12.15–12.70 |
+| dim off +0 / +33 / +117 / +350 / +550 | skeleton steps H1 → pill → H2 (banner) → H3 (card) → H4 (lower sections) (`AO_SKELETON_STEPS`) | home | C1 frame diffs: dim off 12.150, pill 12.183, banner 12.267, card 12.500, lower 12.700 |
 | dim off +583 | 정기점검 sheet pops in, scrim fades in 300 ms `ease` | home | C1 12.733 |
 
 - **Intro off** (normal launch, profile pick, refresh, ● 녹화 with intro off): `D = mount − 250 ms`, so the white launch holds 1.20 s, then the same splash → PIN → loading.
@@ -111,7 +111,7 @@ Paths only need to be unique inside this server (one app per server).
 | 계좌 선택, 조회 조건 (invented) | web sheet, rise 291 ms | account | account block ▾ / filter row | × or apply → slide down 150 ms |
 | 출금계좌 선택 (T6) | web sheet, rise 291 ms `cubic-bezier(0,.11,.17,.87)` | transfer | auto on T5 entry without `from`, or the 출금계좌 field | row tap → removed in one frame under the dim; × → slide down 150 ms |
 | T2 출금계좌 sheet, 은행 선택 sheet, 통장 표시 input sheet (invented) | web sheet | transfer | T2 account row ▾, T1 은행 field, confirm rows | slide down 150 ms |
-| T2 keypad panel | **native** accessory panel y 435–818, not dimmed by the web dim | transfer | T2 mount (+33–50 ms after the cut) | slides out 153 ms on ‹, 취소, 다음, 잔액채우기 link |
+| T2 keypad panel | **native** accessory panel y 435–852 (covers the bottom band), not dimmed by the web dim | transfer | T2 mount: slides in from the screen bottom 175 ms, +5 ms after the cut | slides out to the screen bottom 170 ms on ‹, 취소, 다음, 잔액채우기 link (`AO_PANEL`) |
 | 계좌 비밀번호 입력 (T3) | **native** sheet, appears in one frame with dim .733, status glyphs stay black | transfer | T2 다음 | 4th digit → +50 ms gone; × → gone in one frame, panel slides in |
 | 금액 입력 (T7) | **native** sheet, dim .765, rise 357 ms, status glyphs turn white | transfer | auto after a 출금계좌 is chosen; 금액 field tap | × / 확인 → slide down ≈ 145 ms, dim lingers 370 ms |
 | iOS keyboard | native, slide 290 ms (foundation re-measure) | foundation (`AoKeyboard`) | focus in a text field | ✓ / tap outside / navigation |
@@ -144,6 +144,7 @@ Each hold is `max(api, hold)`: data is prefetched during the dim (`prefetch()` f
 | `search` | 전체메뉴 search row | spinner 0, dim from +33 fading in over 120 ms to the deepened level | 167 | 167 | — | C3 39.813–39.979 |
 | `menuLink` (invented) | menu or search result link, 다른금융 잔액채우기 | 0 | 267 | 300 | — | — |
 | `resend` (invented) | 거래내역 상세 다시보내기 | 0 | 967 | 1000 | navigate with replace | — |
+| `acctFilter` (invented) | 거래내역조회 조회 조건 apply | 0 | 567 | 600 | no navigation: rows change at the cut, spinner off 567 (account §5.2) | — |
 
 The spinner is centred on the **screen** at (196.5, 425.8), not on the web view, and restarts at the coin face on every onset (phase-locked).
 
@@ -345,7 +346,7 @@ After each save the panel invalidates `/api/home`, the affected account paths an
 | bands + inset viewport | `PhoneFrame.tsx` + `src/allone/allone.css` | `.ao-band--top` 0–59 and `.ao-band--bottom` 818–852, white, z 1. `.phone__viewport { position:absolute; inset: var(--ao-top) 0 var(--ao-bottom) }` with `--ao-top: 59px; --ao-bottom: 34px` (safe-area insets at ≤ 500 px) |
 | island + red dot | import `K2Island` as is | 107.2–279.4 × 11.0–48.3, dot Ø 12 at (125.7, 29.6), pulse 1500 ms (`BLINK_MS` gate). Optional: start-of-recording dot scale 1.31 → 1 over 550 ms (`ao-rec-start`) |
 | status bar | `src/allone/StatusBar.tsx` (copy-adapt of `K2StatusBar`) | one 393 × 54 SVG at z 70. Clock "H:MM" Pretendard 600 16.2, **ink centred at x 60.0**, no indicator. Dual-SIM signal (4 columns × 3 wide at x 292.09 / 297.09 / 302.08 / 307.08; bars bottom 30.64, tops 26.64 / 25.98 / 24.31 / 22.65; dots 3 × 3.67 at y 31.97–35.64). LTE ink 316.07–334.39 × 24.98–34.30. Battery body 340.72–364.36 × 22.65–35.64, fill level/100, empty part fill-opacity .333, cap 365.36–366.69, number knocked out centred 352.54. Default battery 50 (`deviceStatus.ts`) |
-| status fg override | `src/allone/statusFg.ts` | `setAoStatusFg(fg \| null, {iconsDelay, clockDelay, clockMs, easing})`. Default fg dark. Intro: light, then dark with the dissolve curve at D+33. T7: icons flip after 600 ms in one frame, clock after 667 ms over 100 ms; back to dark in one frame on close. T3: stays dark |
+| status fg override | `src/allone/statusFg.ts` | `setAoStatusFg(fg \| null, {iconsDelay, iconsMs, clockDelay, clockMs, easing})`; delays are measured from the call (Web Animations with `startTime` = call time, so no timer or render lag). Default fg dark. Intro: light, then dark from D+100 over 217 ms (`AO_INTRO.statusEase`). T7: icons flip after 600 ms in one frame, clock after 667 ms over 100 ms; back to dark in one frame on close. T3: stays dark |
 | home indicator | `src/allone/HomeIndicator.tsx` + `launch.ts` | 140 × 5, x 126.5–266.5, y 839–844, #000, r 2.5, only after launch (§3.4 table), keyed to `aoLaunchAt` |
 | overlay (native layer) | `src/allone/Overlay.tsx` (`AlloneOverlay`, passed as PhoneFrame `overlay`) | z order inside `.phone`: viewport 0 · bands 1 · **web loading dim 51** (absolute 59–818) · native panel host 53 · toast 54 · native dims + sheets 55 · keyboard 56 · intro scene 57 · home indicator 58 · island 60 · status glyphs 70. Hosts `#ao-native` (`AoNativePortal`), the loading layer, the toast layer and the intro scene slot. Cuts dims, sheets, keyboard and toasts on restart and logout (toss Overlay pattern) |
 | app icon + wordmark | `src/allone/ui/AppIcon.tsx`, `Wordmark.tsx` | green #0C8F2D continuous-corner squircle (radius 22.5 %), white "all NH one" wordmark from the `allone-wordmark.png` alpha mask via CSS `mask-image`; `pressed` palette #034913 / #919291. Used by AppBrand (Login, Picker, Admin), the intro scene and the spinner |
@@ -357,7 +358,7 @@ After each save the panel invalidates `/api/home`, the affected account paths an
 - **Green:** `--ao-green #0c8f2d`; pressed `--ao-green-dark #004511` (detail 확인), `--ao-green-light #12a434` (web 잔액채우기 and T5/T1 web CTAs),
   `--ao-green-native #003e0e` (T2 다음, T7 확인); outlined pressed bg `--ao-green-tint #eafeee`; chip hash `#00831a`; notice title green `#008b1e`, dates `#00821f`;
   page dot `#0a902b`; spinner face `#1ac66d`, ring `#16b758`.
-- **Other colours:** NH blue `#0052b3`; 출금 red `#e93535`; 입금 blue `#1a5dd9`; error `#ff0000`; 한도제한 `#e94848`; link `#555555`; star outline `#8f8f8f`,
+- **Other colours:** NH blue `#0052b3`; 출금 red `#e93535`; 입금 blue `#1a5dd9`; error `#ff0000`; 한도제한 `#e94143` (glyph core (233,64,66) on the home card); link `#555555`; star outline `#8f8f8f`,
   filled `#ffc31a`.
 - **Text:** `#000`, `#141414`, `#3c3c3c`, `#4e4e4e`, `#4c4c4c`, `#666666`/`#686868`, `#808080`, `#898989`, `#9e9e9e`, `#bcbcbc` (amount placeholder).
 - **Dims:** web loading `rgba(55,55,55,.68)`; deepen layer `rgba(0,0,0,.22)`; web sheet scrim `rgba(0,0,0,.30)`; native T7 `rgba(0,0,0,.765)`; native T3 `rgba(0,0,0,.733)`.
@@ -370,7 +371,7 @@ After each save the panel invalidates `/api/home`, the affected account paths an
 |---|---|---|
 | `Page.tsx` | `AoPage` {header, footer, bodyRef, onScroll, bg}: white page in the web view, fixed header slot (50 pt, web y 0–50), scroll body, fixed footer slot | home §2.1, account §2.1, transfer §2.5 |
 | `Header.tsx` | `AoHeader` variants: `nav` (‹ 9×16 stroke 1.4, centred title 16/700, home + menu-search icons; 거래내역조회), `close` (left title 16/600 at x 24, ×; 상세), `flow` (‹ 11.7×20.7 stroke 2, 취소 14.5/400 #838383; T1/T2/confirm), `modal` (centred title + ×; 잔액채우기 17.6/500, 통합검색 700 17.5). Home and 전체메뉴 headers are area-owned | account §2.1–2.2, transfer §2.1, §2.5, home §2.19 |
-| `icons.tsx` | back chevrons (stroke prop), ×, ▾ (two sizes), ›, home, menu-search, globe, gear, bell, wallet, magnifier, ☆/★, ↻, ⌫ (pentagon and tag variants), keypad ←, check-circle, push-pin, NH symbol (ring + V), tab icons (outline and filled 홈) | all specs |
+| `icons.tsx` | back chevrons (stroke prop), ×, ▾ (two sizes), ›, home, menu-search, globe, gear, bell, wallet, magnifier, ☆/★, ↻, ⌫ (pentagon and tag variants), keypad ←, check-circle, push-pin, NH symbol (ring + diagonal wings + notched inverted triangle, C3 32.4), tab icons (outline and filled 홈) | all specs |
 | `Button.tsx` | `AoButton` {variant: primary \| outline \| outlineGreen, disabled, pressed: dark \| light \| native, radius, height, size}. Disabled = #f5f5f5 fill (label colour per spec) | account §2.2, transfer §2.0 |
 | `Sheet.tsx` | `AoSheet` (web, in-page): top radius 24, white, scrim .30 fading 300 ms `ease`; `enter: "rise" \| "pop"` (rise 291 ms `cubic-bezier(0,.11,.17,.87)`); `exit: "slide" \| "cut"` (150 ms); title + × slots | launch §2.10, transfer §2.6, §3.11 |
 | `NativeSheet.tsx` | `AoNativeSheet` (portal to `#ao-native`): full-window dim `level: "amount" \| "password"`, `enter: "rise" \| "instant"` (357 ms `cubic-bezier(.19,.52,.23,1)`), exit slide ≈ 145 ms `cubic-bezier(.29,.19,.54,.75)` then dim lingers 370 ms (or instant), radius 24 / 20, `statusFg` option | transfer §2.4, §2.7, §3.13–3.14 |
@@ -378,7 +379,7 @@ After each save the panel invalidates `/api/home`, the affected account paths an
 | `Spinner.tsx` | `AoSpinner` {size = 61}: SVG glass coin (radial #1ac66d, ring #16b758, rim highlight, white wordmark mask 63 % of Ø) + CSS `rotateY` loop 1467 ms, `steps()` at 30 fps (keyframes launch §2.8) | launch §2.8 |
 | `Loading.tsx` + `loading.ts` | the single owner of the web dim + spinner: `aoLoad(profile)` drives §1.4 (show, deepen, cut callback, spinner-first hide), `useAoLoadingVisible()`, `onAoLoadingHidden(cb)`, `cutAoLoading()` | launch §2.8, account §3, transfer §3 |
 | `Keyboard.tsx` + `hangul.ts` (copy of `toss/transfer/hangul.ts`) | `AoKeyboard` {open, kind: "ko" \| "num", value, onChange, maxLength, onDone}: iOS 26 Korean 두벌식 (home §2.19 geometry, accessory bar ∧ ∨ ✓) and number pad (transfer §5.4), slide 290 ms `cubic-bezier(.2,.4,.2,1)` (`AO_KEYBOARD`; re-measured frame by frame, the first fit was 240 ms `cubic-bezier(.2,.8,.2,1)`), panel top 545 at rest, covers the bottom band, the web view does not resize; physical keys through a hidden `<input>` | home §2.19, transfer §5.4 |
-| `BankLogo.tsx` | `AoBankLogo` {code, size = 36, radius?}: crop tile `allone-bank-<code>.png` for jb, shinhan, kakao, hana, kb, kbank, nh; others colour tile (BANKS colour) + `hana-bank-<code>` glyph as a white mask, else the short name. NH at 32 (home card) and 40 (account block) as SVG #0052b3 + white "NH": the measured 32 / 40 tiles are the same superellipse as the 36 one, so callers **omit `radius`** (it only exists to force a plain rounded rect) | infra §8, transfer §7, home §2.4, account §2.1 |
+| `BankLogo.tsx` | `AoBankLogo` {code, size = 36, radius?}: crop tile `allone-bank-<code>.png` for jb, shinhan, kakao, hana, kb, kbank, nh; others colour tile (BANKS colour) + `hana-bank-<code>` glyph as a white mask, else the short name. NH at 32 (home card) and 40 (account block) as SVG #0052b3 + white "NH": the measured 32 / 40 tiles are the same superellipse as the 36 one, so callers **omit `radius`** (it only exists to force a plain rounded rect). Position comes from a zero-specificity class, so a caller's `className` may position it |  infra §8, transfer §7, home §2.4, account §2.1 |
 | `Toast.tsx` + `toast.ts` | `aoToast(text, {bottom})`: pill rgba(0,0,0,.80), white Pretendard 400 14.3, padding 12 × 20, r 22, centred, fade 200 ms, hold 2000 ms | transfer §5.3 (one style for every toast) |
 | `Switch.tsx` | `AoSwitch` {size: "sm" 28×18 (잔액 숨기기) \| "lg" 52×30.6 (자동완성)}, off #6d6d6d / on #0c8f2d, knob slide 150 / 250 ms | account §2.1, home §2.19 |
 | `Skeleton.tsx` | bars `#fcfbfe` radius 8 (home only uses it; foundation owns the primitive) | home §2.17 |
@@ -394,7 +395,7 @@ notice snooze, hidden balances, recent menus, 자동완성, 잔액 숨기기, �
 | constant | value | evidence |
 |---|---|---|
 | press (intro) | palette swap in one frame; release un-darken 100 ms ease-out | C1 0.650, 0.917 |
-| dissolve | 250 ms, `linear()` §1.1; status glyphs +33 ms same curve | C1 0.900–1.183 |
+| dissolve | 250 ms, `linear()` §1.1; status glyphs D+100, 217 ms, own `linear()` (§1.1) | C1 0.900–1.317 |
 | home indicator opacity (from D) | +250 .41 · +300 .45 · +350 .49 · +400 .60 · +450 .72 · +500 .85 · +550 .88 · +600 .91 · +650 .94 · +700 .97 · +750–850 1 · +900 .85 · +950 .64 · +1000 .40 · +1050 .19 · +1100 0 | C1 1.15–2.00 |
 | white launch hold | 1.20 s after the dissolve (splash fade at D + 1450) | C1 (dialog removed) |
 | splash fade / hold | 267 ms `linear()` §1.1 / 2383 ms | C1 3.400–6.050 |
@@ -405,15 +406,15 @@ notice snooze, hidden balances, recent menus, 자동완성, 잔액 숨기기, �
 | deepen | +.22 black, 280 ms (detail) / 300 ms (topup link) ease-out | C2 14.29, C3 1.896 |
 | web sheet | scrim 300 ms `ease`; rise 291 ms `cubic-bezier(0,.11,.17,.87)`; slide down 150 ms (invented) | C3 2.879–3.196 |
 | notice sheet | pop (no slide) with the scrim's first frame, +583 ms after dim off; close in one frame | C1 12.733, 13.833 |
-| T2 panel in / out | 150 ms `cubic-bezier(.31,.18,.55,.89)` starting 33–50 ms after the cut / 153 ms `cubic-bezier(.39,.03,.70,.92)` | C3 28.988–29.146, 1.892–2.046 |
+| T2 panel in / out | from / to the **screen bottom (852)**, panel 435–852: in 175 ms `cubic-bezier(.4,.2,.6,1)` starting 5 ms after the cut (rms 1–1.4 pt per frame) / out 170 ms `cubic-bezier(.4,0,.6,.7)` (rms 1.5–2.2 pt). The first table (818-based 150 / 153 ms) was 5–40 pt off | C3 28.963–29.146, 1.879–2.046 |
 | T7 | rise 357 ms `cubic-bezier(.19,.52,.23,1)` from +64 after dim; close ≈ 145 ms `cubic-bezier(.29,.19,.54,.75)`; dim lingers 370 ms; digit roll −30 pt → 0, opacity .1 → .3, 250 ms linear, then solid | C3 5.643–8.246, 10.746–11.03 |
 | T3 | appears and leaves in one frame; 4th digit +50 ms | C3 31.129, 32.729 |
 | keyboard | in 290 ms `cubic-bezier(.2,.4,.2,1)` (rms 2 pt per frame), out 250 ms (invented); panel top 545 at rest | C3 41.146–41.513, rest C3 41.80 |
-| tab bar | hide on the first frame off the top, 440 ms ease-in-out to +135; show at the top after 80 ms, 650 ms `cubic-bezier(.2,.9,.3,1)`; at the bottom after a 200 ms debounce, 300 ms ease-out to **+14** | C1 14.533, C2 3.94–4.60, 2.558–2.858 |
-| card carousel | snap ≈ 250 ms ease-out (350 total with the flick); unseen-card loading body 420 ms; rubber-band 450 ms | C2 4.441–4.858, C3 24.96–25.51 |
+| tab bar | bar and pill move separately (the pill passes behind the bar). Hide from the scroll event: bar 490 ms `cubic-bezier(.4,0,.2,1)` to +75 (one frame early), pill 620 ms `cubic-bezier(.2,.05,.1,1)` to +135. Top return after 8 ms: bar 952 ms `cubic-bezier(.22,-.12,.03,1)`, pill 731 ms `cubic-bezier(.16,.29,.07,1)`. Bottom: bar only, no debounce, 424 ms `linear(0,0,0,.041,.125,.244,.368,.479,.575,.656,.726,.787,.841,.888,.93,.967,1)` to **+14.33** (`AO_TABBAR`) | C1 14.517–15.0, C2 3.858–4.808, 2.358–2.841 |
+| card carousel | from finger release: snap and rubber-band both 305 ms `cubic-bezier(.3,.43,.3,1)` (the first 250 / 450 ms included the drag); unseen-card loading body 420 ms | C2 4.507–4.783, C3 25.192–25.433 |
 | ticker | period 2500; old text off in one frame; icon fade 150; first char +217; then one non-space char per 67 ms | C2 5.374–6.124 |
 | ad carousel | 4000 ms (invented interval), slide 180 ms ease-out | C2 0.72–0.86 |
-| skeleton | +0 / +150 / +350 / +550 after dim off | C1 12.15–12.70 |
+| skeleton | +0 / +33 (pill) / +117 (banner) / +350 (card) / +550 (lower) after dim off | C1 12.150–12.700 |
 | switches | 자동완성 colour in one frame, knob 250 ms; 큰글 knob 200 ms (invented) | C3 40.563–40.81 |
 | toast | fade 200, hold 2000 | invented |
 
@@ -605,7 +606,7 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
 | Q12 | Band model (launch Q6) | adopted: 59 / 34 white bands (§0.2) |
 | Q13 | Login loading minimum (launch Q7) | always 2.233 s |
 | Q14 | PIN after 로그아웃 (launch Q8, home Q4) | 로그아웃 is a no-op; PIN only on cold start |
-| Q15 | Tab bar +14 at the bottom (home Q2) | reproduce |
+| Q15 | Tab bar +14.33 at the bottom (home Q2) | reproduce |
 | Q16 | 대법원 ad (home Q3) | replace with an invented NH promo of the same geometry (no third-party or government ad in the clone) |
 | Q17 | 다른금융 content (home Q5) | other-bank accounts in the card layout with 잔액채우기 / 거래내역; empty card "다른 금융기관 계좌를 연결해 보세요" + 계좌등록 (no-op) |
 | Q18 | 32 pt first-paint jump on 거래내역조회 (account Q1) | not reproduced (WebView artefact, like the C1 6.183 / 6.200 glitch frames) |
@@ -625,7 +626,8 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
 ## 7. Acceptance checks (the reviewer compares against the clips)
 
 **Method.**
-- Playwright, viewport 393 × 852, `deviceScaleFactor: 3` → 1179 × 2556 screenshots (ignore the clip's 1180th column). Clock and battery frozen to a look-alike
+- Playwright, `deviceScaleFactor: 3`, a viewport wider than 500 px (e.g. 593 × 900) with the screenshot clipped to `.phone` → 1179 × 2556 (ignore the clip's 1180th column).
+  A literal 393 × 852 viewport triggers the ≤ 500 px mobile rule (bands become safe-area insets, i.e. 0) and is only for the mobile-layout check. Clock and battery frozen to a look-alike
   (battery 50). Use the example seed.
 - Compare against the listed frames side by side and as a 50 % overlay or difference. **Mask every region that holds personal data in the reference**
   (names, numbers, balances, amounts, dates, the status-bar clock digits, the home-screen scene content).
@@ -633,7 +635,7 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
   durations ±1 frame (16.7 ms) for measured motion, ±1 frame for loading holds (with the 250 ms API delay inside the hold).
 - Motion is checked with rAF-timed captures against §1.4 / §3.4.
 - **Privacy:** grep the diff and every new text file for non-UI strings; open every committed PNG/WebP; confirm none comes from §5.6; confirm no excluded
-  screen, copy or error code exists anywhere (`grep -r "이의제기\|통신사기피해" src server` must stay empty for allone files).
+  screen, copy or error code exists anywhere (grep the excluded-topic keywords from the task brief, kept outside the repo, across src server scripts docs).
 
 ### 7.1 Foundation
 1. tsc, build and lint clean; `dev:allone` boots; `server/data-allone/` appears; example and empty seeds load; reset works; new profile works.
@@ -652,10 +654,10 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
 - Scene geometry vs C1 0.600 (positions only; content masked): icons 64 at x 28.7 / 119.6 / 210.5 / 301.4, top 80.0; labels ink 150.5–160.9; search pill
   167.9–225.1 × 682.1–711.4; dock 12.0–380.3 × 730.0–838.6 r 40; dock icons top 752.7, lefts 34.6 + 86.9·i.
 - Press at +650 (one frame, palette #034913 / #919291, no scale). Dissolve +900 → +1150 against the alpha list (±.03 per frame, uniform over the screen).
-  Status glyphs +33 ms behind. Home indicator table ±.05.
+  Status glyphs D+100 → D+317 (217 ms `AO_INTRO.statusEase`, ±.03). Home indicator table ±.05.
 - Splash vs the C1 3.75–6.00 average below y 59: mean abs diff < 4 levels; fade curve at clone 2.350–2.617 (±.03); hold to 5.000.
 - Crossfade 5.000–5.167; keypad pops at 5.283 with the links row jumping 769.4 → 460.9.
-- PIN page vs C1 7.333 (mask dots and digits): bands, title mask, prompt, slots (25.6 × 1.33 at y 261.8, pitch 30), 자동로그인, links, keypad grid (columns 131,
+- PIN page vs C1 7.333 (mask dots and digits): bands, title mask, prompt, slots (25.6 × 1.33 at y 261.8, pitch 30), 자동로그인, links (condensed 2.6 % with a 1.33 × 14 separator while the keypad is not shown), keypad grid (columns 130.5 with a 0.75 inset, digit centres 65.9 / 196.5 / 326.9,
   rows 543.8 / 621.7 / 699.4 / 777.5), ↻ / ⌫ ink boxes. Keypad permutation fixed between presses; ↻ reshuffles; no pressed state; dot replaces bar in one frame.
 - 6th digit → +67 ms dim + spinner, keypad gone in the same frame; home under the dim at +2.033; spinner off +2.183; dim off +2.233.
 - **Safety:** nothing about the PIN reaches the network, storage or console (Playwright request log + storage dump after entering 6 digits).
@@ -664,11 +666,12 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
 - Top state vs **C2 7.000** (mask name, number, balance): header 59–108 (큰글 pill, icons), bubble, banner 134.9–227.1, tabs + pager, card 293–515
   (anatomy home §2.4), ad block, 오늘의 혜택, ticker, tab bar 743–818, pill 685.3–725.3.
 - Full page vs `frames/home/long_full.png`: section y map (home §2.1) ±1, content height 2929, max scrollTop 2170 ±2.
-- Tab bar: hide starts on the first scroll frame (C1 14.533), 440 ms to +135; top return 650 ms (C2 3.94–4.60); bottom rest +14 (C2 2.558–2.858), no pill there;
+- Tab bar (§3.4 `AO_TABBAR`, bar and pill tracked separately): hide from the scroll event (C1 14.517), bar 490 ms to +75, pill 620 ms to +135; top return from C2 3.903,
+  bar 952 ms, pill 731 ms; bottom rest +14.33 after 424 ms (C2 2.395–2.841), no pill there;
   no return on a mid-page scroll-up.
-- Carousel: swipe 1 → 2 (C2 4.441–4.791), pager updates at the snap start, unseen card shows "상품명을 조회 중이에요 / 조회 중입니다" ≈ 420 ms; loops both ways.
+- Carousel: swipe 1 → 2 (C2 4.441–4.791; from release 4.507 the snap is 305 ms `cubic-bezier(.3,.43,.3,1)`), pager updates at the snap start, unseen card shows "상품명을 조회 중이에요 / 조회 중입니다" ≈ 420 ms; loops both ways.
 - Ticker: C2 5.374 swap, icon fade 150 ms, first char +217 ms, 67 ms per non-space char (9 steps for the first item).
-- Skeleton after login: C1 12.150 / 12.300 / 12.500 / 12.700 states; notice at C1 12.733: sheet top 490.6, r 24, title 25 pt with green "정기점검",
+- Skeleton after login: C1 12.150 / 12.183 (pill) / 12.267 (banner) / 12.500 / 12.700 states; notice at C1 12.733: sheet top 490.6, r 24, title 25 pt with green "정기점검",
   items, bell, page indicator, buttons; 닫기 removes sheet and scrim in one frame.
 - Fresh re-entry after 취소 (C3 21.596 → 22.246 → sheet ≈ 22.6–22.9) vs plain pop (no skeleton, no sheet).
 - 전체메뉴 vs **C3 39.750** (mask name and 최근 rows): header, search row, AI톡 tile at +0.32 s, quick icons, rail 124 wide with green selected row (50-pt rows),
@@ -689,8 +692,8 @@ detail cards, T1 rows' text, T2/T3/T5/T6/T7 text; 최근 이용메뉴 rows; the 
 
 ### 7.5 Transfer (A4)
 - T1 vs **C3 27.500** and **C2 21.200** (mask names and numbers): title, two fields 54 tall r 12, helper, 다음 disabled, tabs (active underline 2 pt),
-  삭제하기, rows from 570 at pitch 63.33 with 36-pt tiles and ☆.
-- T1 최근 row → T2 instant (C3 28.963), panel slides 150 ms (C3 28.988–29.146, curve ±1 pt per frame).
+  삭제하기, rows from 570 at pitch 63 (☆ and tile edges 189 px apart in both frames) with 36-pt tiles and ☆.
+- T1 최근 row → T2 instant (C3 28.963), panel slides in from the screen bottom 175 ms (C3 28.979–29.146, curve ±1.5 pt per frame).
 - T2 vs **C3 29.2** (placeholder), **C2 26.0** (error line "출금가능금액 부족 | 잔액채우기", reproduced on kpay by typing two digits), **C3 30.7** (caption,
   다음 enabled), **C3 31.05** (panel out, closed layout). Digits Roboto 500 36, "원" 33. Validation rule §2.5.
 - T3 vs **C3 32.5** (mask the account line): one-frame appear with dim 68, sheet top 368 r 20, dots Ø 20.3 pitch 22, 4-column grid with 2 dummy NH keys,

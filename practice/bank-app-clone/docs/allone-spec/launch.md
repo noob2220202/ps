@@ -9,9 +9,9 @@ Fonts: sizes are **Pretendard fits** (rendered Pretendard at 3.0025 px/pt and ma
 itself is a hybrid web view whose face is not Pretendard (likely the iOS system Hangul face), so use these fitted values, not the
 app's px values.
 
-Skipped / excluded in this area: C1 ≈ 2.283–3.367 iOS paste-permission dialog (skip — the clone goes straight from the white
-launch screen to the splash). C3 ≈ 12–19 s and ≈ 33.0–34.6 s show the excluded withdrawal-block notice — skipped. C3 42–45 s and
-all of C4 — excluded.
+Skipped / excluded in this area: C1 ≈ 2.283–3.367 excluded system alert (skip — the clone goes straight from the white
+launch screen to the splash). C3 ≈ 12–19 s and ≈ 33.0–34.6 s are excluded ranges — skipped. C3 ≥ 42.4 s and
+the 4th clip — excluded.
 
 ---
 
@@ -38,7 +38,7 @@ Values are drawn live: clock = current time, battery = configured level (never t
 | S0p | all-one icon **pressed** | C1 0.650 – 0.900 (press frame 0.650, 1 frame, no scale) | release begins 0.917 |
 | T0 | app open = **dissolve to white** (no zoom) | C1 0.900 – 1.150 (first change 0.917, fully white 1.150) | status glyphs white → black 0.933 – 1.183 |
 | S1 | white launch screen | C1 1.150 – 2.283 | pure white + status bar + home indicator (1.15–2.0) |
-| — | paste dialog | C1 2.283 – 3.367 | **skip** |
+| — | excluded system alert | C1 2.283 – 3.367 | **skip** |
 | S2 | splash | fade-in C1 3.400 – 3.667, static to 6.050 | full-screen native view, no animation after fade-in |
 | T1 | splash → PIN crossfade | C1 6.050 – 6.217 | 6.183 one-frame spinner flash + 6.200 one-frame dark frame = glitches, skip |
 | S3 | PIN page, no keypad yet | C1 6.217 – 6.317 | links row at bottom |
@@ -93,7 +93,9 @@ wanted the start rectangle is the icon box above (radius 14.4), but it would not
   `0, .004, .008, .039, .077, .129, .203, .285, .387, .490, .602, .713, .817, .902, .962, 1`
   → CSS: `animation: 250ms linear(0, .004, .008, .039, .077, .129, .203, .285, .387, .49, .602, .713, .817, .902, .962, 1)`
   (implement as the home overlay's opacity 1 → 0 over the already-white app).
-- Status glyphs: white → black, same curve **delayed 33 ms** (black glyph alpha .03 @0.95, .23 @1.00, .56 @1.10, .88 @1.15, 1 @1.183).
+- Status glyphs: white → black from **D+100 over 217 ms**, `linear(0, .015, .06, .14, .23, .34, .455, .57, .69, .8, .88, .95, .985, 1)` (re-measured per frame on the core pixels of
+  the clock, LTE and battery fill, which agree: 0 @1.000, .055 @1.033, .224 @1.067, .448 @1.100, .69 @1.133, .88 @1.167, .98 @1.200, 1 @1.217).
+  The first reading ("dissolve curve delayed 33 ms") led the clip by up to .2. `AO_INTRO.statusDelay / statusMs / statusEase`.
   Simplest: the home overlay carries its own white status-bar copy; the app's black status bar sits underneath and is revealed.
 - Island stays above the overlay, unaffected.
 
@@ -156,9 +158,9 @@ white #FFFFFF. Top band 0–59 white with black status glyphs.
 | 6 slots | each bar **25.6 × 1.33**, y **261.8–263.1**, lefts 108.9 + 30.0·i (i = 0…5), span 108.9–284.4 | white |
 | dots | filled circle **Ø 16.3**, centre x = 121.7 + 30.0·i, y 245.1–261.8 (dot bottom = bar top) | the dot **replaces** its bar, instantly (1 frame, no scale/fade) |
 | 자동로그인 | check-circle Ø 16.5 at x 152.2–168.5, y 298.4–315.1 (outline ≈ 1.3, check inside ≈ 7 × 5); text ink x 173.9–239.8, y 299.8–314.1; gap 5.4; group centred | Pretendard 400, 16.5, ls −0.9 |
-| links row | "로그인 방식 변경하기" ink x 33.3–162.2 (centre 97.8 = ¼ width); separator x 196.2–197.8, y 463.6–473.6 (≈ 1.5 × 10); "간편비밀번호 재등록" ink x 231.5–357.7 (centre 294.6 = ¾). ink y **460.9–475.3** with keypad (28.3 above it); **769.4–783.7** without keypad (33.6 above 817.3) | Pretendard 400, 16.5, ls −0.5. Pinned to the bottom of the visible web area. |
+| links row | "로그인 방식 변경하기" ink x 33.3–162.2 (centre 97.8 = ¼ width); separator x 196.2–197.8, y 463.6–473.6 (≈ 1.5 × 10); "간편비밀번호 재등록" ink x 231.5–357.7 (centre 294.6 = ¾). ink y **460.9–475.3** with keypad (28.3 above it); **769.4–783.7** without keypad (33.6 above 817.3). **Without the keypad** (C1 6.233–6.300, and under the login dim at 10.600) the row is condensed 2.6 % horizontally: ink 35.0–159.9 / 233.8–356.4, separator 1.33 × 14 at y 770.0–784.0 (with the keypad it is 1.3 × 10 at 464–474) | Pretendard 400, 16.5, ls −0.5. Pinned to the bottom of the visible web area. |
 | keypad | white #FFFFFF, **503.6 → 852** (348.4 tall, covers the bottom band); no divider, no key borders | native secure keypad |
-| keypad grid | 3 equal columns of 131 (centres 65.5 / 196.5 / 327.5); 4 rows, centres **543.8 / 621.7 / 699.4 / 777.5** (pitch 77.9); 35.5 pt empty below row 4 | |
+| keypad grid | 3 equal columns of 130.5 with a 0.75 inset (digit centres **65.9 / 196.5 / 326.9**); 4 rows, centres **543.8 / 621.7 / 699.4 / 777.5** (pitch 77.9); 35.5 pt empty below row 4 | |
 | digits | 10 digits fill rows 1–3 (all 9 cells) + row 4 centre; ink height 16.3 | **Pretendard 500, 22.5 pt, #000** |
 | ↻ (re-shuffle) | row 4 left, ink x 54.6–77.3, y 764.0–790.7 (22.6 × 26.7) | SVG: two opposing arcs with chevron heads (upper-left head pointing left, lower-right pointing right), stroke ≈ 1.5 black |
 | ⌫ | row 4 right, ink x 311.1–343.0, y 766.7–788.0 (32 × 21.3) | SVG: left-pointing pentagon outline + ✕ inside, stroke ≈ 1.6 black |
@@ -261,7 +263,7 @@ Behaviour:
 |---|---|---|
 | 0.000 | drawn iOS home, island dot enlarged → shrinks by 0.55 | C1 0.000 |
 | 0.650 | scripted press: all-one icon pressed palette (1 frame) | C1 0.650 |
-| 0.900 – 1.150 | release + dissolve to white (§2.2); status glyphs → black (+33 ms) | C1 0.900 |
+| 0.900 – 1.150 | release + dissolve to white (§2.2); status glyphs → black (D+100 → D+317) | C1 0.900 |
 | 1.150 – 2.000 | white launch screen; home indicator curve (§2.4) | C1 |
 | 2.350 – 2.617 | splash fade-in (§2.5) | C1 3.400 − 1.050 (dialog removed) |
 | 5.000 – 5.167 | crossfade to PIN | C1 6.050 − 1.050 |

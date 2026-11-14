@@ -56,9 +56,10 @@ Z order inside .phone:
 - `goHistory(accountId, via="history")`: prefetch account + transactions.
 - `goTx(txId,"in"|"out")`: txIn/txOut, prefetch transaction.
 - `goSend({from="main",origin="home",via?})`: via default sendFromHome, sendFromList for history, menuLink for menu. Sets aoSendDepth 1 and aoOrigin; prefetch recipients(from) and home.
-- `goAmount({from,to:{bankCode,number,holder?},replace?=false,via?})`:
-  - no via = instant CUT.
-  - "lookup" calls aoApi.lookup and uses the holder from the response; 404 → false, no cut, onError, lock released.
+- `goAmount({from,to:{bankCode,number,holder?},replace?=false,via?,onError?})`:
+  - no via = instant CUT. With a via, home and banks are prefetched during the dim.
+  - "lookup" calls aoApi.lookup and uses the holder from the response; 404 → false, no cut, `onError(e)`, lock released.
+- `canGo(): boolean` — the layer is on top and navigation is not locked (check before starting a native animation that precedes a go).
   - "resend" with replace: outside a flow it starts one with aoSendDepth 1, origin history.
 - `goTopup({to="main",from?,origin:"amount"|"menu"|"card"})`: topupLink for amount, otherwise menuLink; prefetch home and transfers(from).
 - `goMenu()` (menu), `goSearch()` (search), `goHome()` (pop by aoDepth, no refresh).
@@ -92,6 +93,7 @@ Visuals: dim `rgba(55,55,55,.68)` over 59–818 (white → 119). Deepen `rgba(0,
 == statusFg.ts ==
 - `type AoFg="light"|"dark"`. `setAoStatusFg(fg:AoFg|null, {iconsDelay?,iconsMs?,clockDelay?,clockMs?,easing?})`.
 - `null` with timing also applies that timing to a screen-fg change within 500 ms.
+- Delays and durations count from the call (`state.at`): AlloneStatusBar switches the classes in the same commit and holds the old colour with Web Animations whose `startTime` is the call time, so callers get exact D+100 / +600 / +667 timing (no timer or render lag).
 - `resetAoStatusFg()`, `aoStatusFg()`, `useAoStatusFg()`. Screens call `useStatusBar("#ffffff","dark")`.
 - T7 timing: `"light",{iconsDelay:600,clockDelay:667,clockMs:100}`; close with `null`. T3: do not call.
 
@@ -102,8 +104,8 @@ Visuals: dim `rgba(55,55,55,.68)` over 59–818 (white → 119). Deepen `rgba(0,
 
 == intro.ts (recorder glue; do not call from areas) ==
 - `prepareAlloneIntro():Promise<void>` waits for fonts and the wordmark (max 3 s). `showAlloneIntro()` = aoHoldLaunch + showAlloneScene.
-- `runAlloneIntro(onStart):Promise<void>`: starts the app even if the intro never calls onStart, and calls aoSetLaunchAt if still held. `AO_INTRO_BLINK_ON_MS=618`.
-- The launch area must, in `playAlloneIntro`, call `aoSetLaunchAt(D)` and `setAoStatusFg(null,{dissolve timing})` at D, then `onStart()`. The scene must use no raster except allone-wordmark.
+- `runAlloneIntro(onStart):Promise<void>`: starts the app even if the intro never calls onStart, and calls aoSetLaunchAt if still held — unless a newer `showAlloneIntro()` superseded this run (generation counter), so a stopped-and-restarted recording never gets the old RESTART "start". `AO_INTRO_BLINK_ON_MS=618`.
+- The launch area must, in `playAlloneIntro`, call `aoSetLaunchAt(D)` and `setAoStatusFg("dark",{AO_INTRO.statusDelay − lag, statusMs, statusEase})` at D, then `onStart()`. A superseded run may simply return. The scene must use no raster except allone-wordmark.
 
 == toast.ts ==
 - `aoToast(text,{bottom?})`: `bottom` = screen y of the toast's bottom edge, default `AO_TOAST_BOTTOM`=712; the T2 panel uses 419.
@@ -140,11 +142,11 @@ Visuals: dim `rgba(55,55,55,.68)` over 59–818 (white → 119). Deepen `rgba(0,
 Also `useAoPrefs(getter)`, `AO_RECENT_MENUS_DEFAULT=["history","send","topup"]`. Never store PIN or password.
 
 == motion.ts ==
-- `AO_DISSOLVE_EASE`, `AO_INTRO{idle 650,press 250,release 100,dissolve 250,statusDelay 33,whiteHold 1200,splashAt 1450,pressColor,pressMark}`, `AO_HOME_INDICATOR`, `AO_HOME_INDICATOR_MS=1100`, `AO_LAUNCH_NO_INTRO_LEAD=250`.
+- `AO_DISSOLVE_EASE`, `AO_INTRO{idle 650,press 250,release 100,dissolve 250,statusDelay 100,statusMs 217,statusEase,whiteHold 1200,splashAt 1450,pressColor,pressMark}`, `AO_HOME_INDICATOR`, `AO_HOME_INDICATOR_MS=1100`, `AO_LAUNCH_NO_INTRO_LEAD=250`.
 - `AO_SPLASH{fade 267,fadeEase,hold 2383,toPin 167,toPinEase,keypadAfter 117,pinToLoading 67}`, `AO_SPINNER{loop 1467,fps 30,size 61,cx 196.5,cy 425.8}`.
 - `AO_DIM{web,deepen,deepenDetail 280,deepenTopup 300,spinnerLead 33,scrim,nativeAmount,nativePassword}`, `AO_SHEET{scrim 300,rise 291,riseEase,down 150,downEase}`, `AO_NOTICE{afterDim 583,autoAdvance 4000,slide 300}`.
-- `AO_PANEL{in 150,inDelay 40,inEase,out 153,outEase}`, `AO_AMOUNT_SHEET{riseDelay 64,rise 357,riseEase,close 145,closeEase,dimLinger 370,statusIconsDelay 600,statusClockDelay 667,statusClockMs 100,digitRoll 250}`, `AO_PASSWORD_SHEET{afterLastDigit 50}`.
-- `AO_KEYBOARD{slide 290,ease "cubic-bezier(.2, .4, .2, 1)",out 250,outEase,top 545}`, `AO_TABBAR{…}`, `AO_CAROUSEL`, `AO_TICKER`, `AO_ADS`, `AO_SKELETON_STEPS=[0,150,350,550]`, `AO_SWITCH`, `AO_TOAST{fade 200,hold 2000}`, `AO_NAV_LOCK=450`.
+- `AO_PANEL{top 435,from 852,in 175,inDelay 5,inEase "cubic-bezier(.4, .2, .6, 1)",out 170,outEase "cubic-bezier(.4, 0, .6, .7)"}` (from / to the screen bottom), `AO_AMOUNT_SHEET{riseDelay 64,rise 357,riseEase,close 145,closeEase,dimLinger 370,statusIconsDelay 600,statusClockDelay 667,statusClockMs 100,digitRoll 250}`, `AO_PASSWORD_SHEET{afterLastDigit 50}`.
+- `AO_KEYBOARD{slide 290,ease "cubic-bezier(.2, .4, .2, 1)",out 250,outEase,top 545}`, `AO_TABBAR{bar{hideBy 75,hide 490,hideDelay −17,hideEase,showTop 952,showTopEase,bottom 424,bottomEase,bottomRest 14.33},pill{hideBy 135,hide 620,hideEase,showTop 731,showTopEase},showTopDelay 8}`, `AO_CAROUSEL{snap 305,rubber 305,ease,easePoints,unseenBody 420}`, `AO_TICKER`, `AO_ADS`, `AO_SKELETON_STEPS=[0,33,117,350,550]` (H1, pill, banner, card, lower), `AO_SWITCH`, `AO_TOAST{fade 200,hold 2000}`, `AO_NAV_LOCK=450`.
 
 == panel.ts ==
 `type AoPanelRun=(fn:()=>Promise<unknown>, success:string)=>Promise<boolean>`.
@@ -188,7 +190,7 @@ Also `useAoPrefs(getter)`, `AO_RECENT_MENUS_DEFAULT=["history","send","topup"]`.
 allone.css tokens on `:root[data-app="allone"]`:
 - Surfaces and lines: --ao-bg #fff, --ao-line #eee, --ao-line-2 #dcdcdc, --ao-line-3 #f5f5f5, --ao-disabled #f5f5f5, --ao-skeleton #fcfbfe
 - Green: --ao-green #0c8f2d, --ao-green-dark #004511, --ao-green-light #12a434, --ao-green-native #003e0e, --ao-green-tint #eafeee, --ao-chip-hash #00831a, --ao-notice-title #008b1e, --ao-notice-date #00821f, --ao-page-dot #0a902b, --ao-spinner-face #1ac66d, --ao-spinner-ring #16b758
-- Other colours: --ao-blue #0052b3, --ao-out #e93535, --ao-in #1a5dd9, --ao-error #f00, --ao-limited #e94848, --ao-link #555, --ao-star #8f8f8f, --ao-star-on #ffc31a
+- Other colours: --ao-blue #0052b3, --ao-out #e93535, --ao-in #1a5dd9, --ao-error #f00, --ao-limited #e94143, --ao-link #555, --ao-star #8f8f8f, --ao-star-on #ffc31a
 - Text: --ao-t0 #000, --ao-t1 #141414, --ao-t2 #3c3c3c, --ao-t3 #4e4e4e, --ao-t4 #4c4c4c, --ao-t5 #666, --ao-t5b #686868, --ao-t6 #808080, --ao-t7 #898989, --ao-t8 #9e9e9e, --ao-placeholder #bcbcbc
 - Dims: --ao-dim-web, --ao-dim-deep, --ao-scrim, --ao-dim-amount, --ao-dim-password
 - Fonts and bands: --ao-font (Pretendard), --ao-font-num (Roboto), --ao-top, --ao-bottom
@@ -272,7 +274,7 @@ COMPONENTS (src/allone/ui):
 - Spinner.tsx: `AoSpinner({size=61})`. Glass coin: face #1ac66d, ring #16b758, rim highlight, white wordmark at 63.3 % of Ø, thickness 0.16·size, edge-on ribbon 0.25·size, perspective 4·size.
   - Keyframes `ao-spinner-turn` + `ao-spinner-band`: 44 poses, `1467ms steps(1,end) infinite` (30 fps). Injected once via React 19 `<style href="ao-spinner" precedence="ao">`.
   - Starts at the face on mount, so pass a new key per onset (Loading.tsx already does). Box is exactly size×size; centre it at the screen point (196.5, 425.8).
-- BankLogo.tsx: `AoBankLogo({code, size=36, radius?, bank?: {name?, short?, color?}, className?, style?})`; exports `AO_NH_BLUE="#0052B3"`.
+- BankLogo.tsx: `AoBankLogo({code, size=36, radius?, bank?: {name?, short?, color?}, className?, style?})`; exports `AO_NH_BLUE="#0052B3"`. Position/display come from the zero-specificity class `.ao-banklogo` (ui.css `:where()`), so a caller's className may set `position: absolute` etc.; size is inline.
   - Crop img for the 7 banks.
   - nh with size≠36 or radius given: SVG #0052B3 superellipse + white "NH" polygons scaled from the 36 grid (cap height 0.25·size, width 0.6·size). With radius: plain rounded rect, rx scaled.
   - Other banks: superellipse tile in the BANKS colour + white-mask hana-bank-<code> glyph at 58 %. Light tiles, and 20 glyphs whose detail is in colour (woori, ibk, kdb, bnp, kj, …), show the original-colour glyph on a white tile with a 0.08 hairline. No glyph → short name (Pretendard 800, sizes as BankIcon). Unknown code → #8E8E93 tile + code text.
@@ -285,7 +287,7 @@ import from "src/allone/ui" (index.ts). Coordinates: pt = CSS px of 393×852; we
 AoPage {header?, footer?, footerClassName?, footerStyle?, bodyRef?: Ref<HTMLDivElement>, onScroll?, bg?, className?, bodyClassName?, style?, children?} — .ao-page absolute inset 0 in the ScreenStack layer, flex column: .ao-page__head (no fixed height) / .ao-page__body (scroll, hidden scrollbar) / .ao-page__foot (white, default padding 9.33px 24px 30px = T5 footer 722 → button 731.33–788). Calls useStatusBar("#ffffff","dark").
 
 AoHeader (50pt, screen 59–109, white, no divider) — union + className?:
- {variant:"nav", title, onBack?, onHome?, onMenu?}  ‹ ink x31.31 y76.33 · title centred 16/700 ls −0.4 · home x311.74 y74.67 · menu-search x347.38 y76.33
+ {variant:"nav", title, onBack?, onHome?, onMenu?}  ‹ ink x31.31 y76.33 · title centred 16/700 ls −0.4 · home x311.74 y74.67 · menu-search box (345, 74) 24×20 (ink 347.4 / 76.2)
  {variant:"close", title, onClose?}  title left x24.31 16/600 ls −0.4 · × x348.71 y75.67
  {variant:"flow", title?, onBack?, onCancel?, cancelLabel?="취소"}  ‹ 11.66×20 x23.98 y74 · 취소 14.5/400 #838383 ink 344.38–368.36
  {variant:"modal", title, weight?: 500|700 (500 = 잔액채우기 17.6/500, 700 = 통합검색 17.5/700), onClose?}  × x348.71
@@ -302,7 +304,7 @@ AoKeyboard {open, kind?: "ko"|"num" (default ko), value, onChange(value), maxLen
 AoSwitch {checked, onChange?(checked), size?: "sm"|"lg" (sm 28×18 knob 14 slide 150ms; lg 52.3×30.67 knob 26 inset 2.33 slide 250ms), disabled?, "aria-label"?, className?} off #6d6d6d (lg #6e6e6e), on #0c8f2d, colour in one frame.
 AoSkeleton {width?="100%", height?=24, radius?=8, className?, style?} #fcfbfe.
 
-icons.tsx (all accept AoIconProps {color? (default currentColor), stroke?, className?, style?}; default SVG box = measured ink box): AoBackIcon {variant?: "nav" 8.32×15.34 s1.4 | "flow" 11.66×20 s1.6}; AoCloseIcon {size?=16.65, stroke?=1.6, cap?: "round"|"square"}; AoChevronDownIcon {size?: "md" 12×6.66 s1.6 | "sm" 9.33×5.34 s1.7, w?, h?}; AoChevronRightIcon {w?=5.33, h?=9.34, stroke 1.3}; AoHomeIcon 18.65×18.66 s1.5; AoMenuSearchIcon 19.98×15.34 s1.4; AoGlobeIcon {size?=20.3} s1.55; AoGearIcon 19.98×20; AoBellIcon 17.65×20.67; AoWalletIcon 21.65×16.34; AoMagnifierIcon {size?=16.32 s1.3; 19.98/1.45 for 통합검색}; AoStarIcon {size?=14 s1.3; T1 size 20 stroke 1.5 color #8f8f8f; filled?, fill?="#ffc31a"}; AoReshuffleIcon {variant?: "account" 19.65×20 s1.7 | "pin" 22.65×26.66 s1.5}; AoBackspaceIcon {variant?: "tag" 22.98×16 s1.5 | "pentagon" 31.98×21.34 s1.6}; AoKeypadBackIcon 17.32×13.33 s1.5; AoCheckCircleIcon {size?=16.32, checked?}; AoPinIcon {size?=16.7, color #171717}; AoNhSymbol {color?="#d4d4d8", size?=18.66 (box 18.66×21), className?, style?}; AoTabIcon {name: AoTabIconName ("home"|"products"|"assets"|"points"|"benefits"), filled? (default home)} 24×24 s1.55.
+icons.tsx (all accept AoIconProps {color? (default currentColor), stroke?, className?, style?}; default SVG box = measured ink box): AoBackIcon {variant?: "nav" 8.32×15.34 s1.4 | "flow" 11.66×20 s1.6}; AoCloseIcon {size?=16.65, stroke?=1.6, cap?: "round"|"square"}; AoChevronDownIcon {size?: "md" 12×6.66 s1.6 | "sm" 9.33×5.34 s1.7, w?, h?}; AoChevronRightIcon {w?=5.33, h?=9.34, stroke 1.3}; AoHomeIcon 18.65×18.66 s1.5; AoMenuSearchIcon box 24×20 placed at an integer position (345, 74 on 거래내역조회), s1.52 / ring 1.46; AoGlobeIcon {size?=20.3} s1.55; AoGearIcon 19.98×20; AoBellIcon 17.65×20.67; AoWalletIcon 21.65×16.34; AoMagnifierIcon {size?=16.32 s1.3; 19.98/1.45 for 통합검색}; AoStarIcon {size?=14 s1.3; T1 size 20 stroke 1.5 color #8f8f8f; filled?, fill?="#ffc31a"} (inner radius .5, ink fills size × .983·size); AoReshuffleIcon {variant?: "account" 19.65×20 s1.7 | "pin" box 24×28 at (54, 764) s1.05/1.1}; AoBackspaceIcon {variant?: "tag" 22.98×16 s1.5 | "pentagon" box 34×24 at (310, 766) s1.3 miter}; AoKeypadBackIcon 17.32×13.33 s1.5; AoCheckCircleIcon {size?=16.1, stroke?=1.08, checked?}; AoPinIcon {size?=16.7, color #171717}; AoNhSymbol {color?="#d4d4d8", size?=18.67 (box 18.67×21.67: ring + diagonal wings + notched inverted triangle, gaps cut by a mask), className?, style?}; AoTabIcon {name: AoTabIconName ("home"|"products"|"assets"|"points"|"benefits"), filled? (default home)} 24×24 s1.55.
 
 Re-exports from others: AlloneAppIcon, AoSquircle, AO_ICON_GREEN, AO_ICON_PRESSED_BG, AO_ICON_PRESSED_MARK, AoWordmark, AO_WORDMARK_RATIO, AoSpinner, AoBankLogo, AO_NH_BLUE, AoBankLogoProps, AoLoadingLayer, AoToastLayer, AoNativePortal; plus aoLoad, showAoLoading, cutAoLoading, useAoLoadingVisible, onAoLoadingHidden, isAoLoadingUp (../loading), aoToast, cutAoToast, AO_TOAST_BOTTOM (../toast), setAoStatusFg (../statusFg).
 
@@ -344,7 +346,8 @@ All files are under src/allone/. Areas import these directly.
   - `goHistory(accountId, via="history")`
   - `goTx(txId, "in"|"out")`
   - `goSend({from="main", origin="home", via?})`: via defaults to sendFromHome; sendFromList for origin history; menuLink for origin menu. Sets `aoSendDepth 1` and `aoOrigin`.
-  - `goAmount({from, to:{bankCode, number, holder?}, replace?, via?})`: no via = instant cut. `"lookup"` does `aoApi.lookup` itself, takes the holder from the response, and on 404 returns false with no cut. `"resend"` + replace starts a flow with origin history.
+  - `goAmount({from, to:{bankCode, number, holder?}, replace?, via?, onError?})`: no via = instant cut. `"lookup"` does `aoApi.lookup` itself, takes the holder from the response, and on 404 returns false with no cut and calls `onError`. `"resend"` + replace starts a flow with origin history. With a via, home and banks are prefetched.
+  - `canGo()`: true when a go would be accepted (top layer, not locked).
   - `goTopup({to="main", from?, origin: "amount"|"menu"|"card"})`: topupLink for amount, otherwise menuLink.
   - `goMenu()`, `goSearch()`, `goHome()`, `goHomeFresh()`, `sendFinish()`.
 - URLs: `/history/:id`, `/tx/:id`, `/send?from=`, `/send/amount?from=&bank=&number=&holder=`, `/topup?to=&from=&origin=`, `/menu`, `/search`.
@@ -441,7 +444,7 @@ Also `useAoPrefs(getter)` and `AO_RECENT_MENUS_DEFAULT = ["history", "send", "to
 11. **The optional `ao-rec-start` dot animation (R31) was not implemented.** K2RecDot's inline animation-delay would also apply to a second animation.
 12. **`THEME_CHOICE` returns "light" for allone,** so profiles are saved with the light theme. The plan calls this optional.
 13. **Name chosen for the gallery:** `/dev/ui` imports `{ AoGallery }` from `ui/Gallery`, because the plan names no export.
-14. **routes.tsx imports `./ui/ui.css`,** following the toss routes.tsx precedent.
+14. **routes.tsx imports `./allone.css` and `./ui/ui.css` before the screen modules,** so area CSS comes later in the bundle and a single-class area rule wins over ui.css at equal specificity.
 
 ### server
 
@@ -457,7 +460,7 @@ Also `useAoPrefs(getter)` and `AO_RECENT_MENUS_DEFAULT = ["history", "send", "to
 
 ### ui
 
-1) Keyboard slide: plan §3.4/motion.ts says 240ms cubic-bezier(.2,.8,.2,1); frame-by-frame measurement of C3 41.146–41.513 fits 290ms cubic-bezier(.2,.4,.2,1) (rms 2pt; the plan curve is ~45pt off mid-slide), so Keyboard.tsx uses its own measured constant. Rest top is 545.0 (plan §7.1.9 says ≈541; at 41.40 the panel is still settling at 547.3). Close animation (250ms) is invented. 2) Header/sheet title fonts: kept the spec's Pretendard sizes and only fitted letter-spacing to the measured ink widths (nav/close −0.4, 취소 −0.35, 통합검색 −0.13, others 0); titles are centred in the full 393 box (ink centre lands at 196.1–196.3 as recorded). 3) Close × strokes measured per instance: header/T6 1.6 round, T7 1.9 square #656571 (spec said 1.6), T3 1.45. 4) Number pad geometry (panel top 600, 46-pt keys) and the 123/#+= symbol layers are invented (not in the recording); the accessory bar is shown for both kinds. 5) Jamo glyphs get per-vowel vertical offsets because the recorded font places vowels differently from Pretendard. 6) The glass translucency smudge of the keyboard (blurred page content) is not reproduced. 7) AoButton has extra props beyond the plan (active, weight, letterSpacing, width, disabledColor); AoSheet/AoNativeSheet add onClosed/closeButton/onDimClick/host; AoKeyboard adds onEnter/accessory/onPrev/onNext/dismissOnOutside; AoCaret is an extra export. 8) AoReshuffleIcon pin variant and AoNhSymbol are approximate SVG redraws (positions/sizes match the ink boxes, shapes simplified). 9) hangul.ts has one added first comment line; otherwise identical to src/toss/transfer/hangul.ts.
+1) Keyboard slide: plan §3.4/motion.ts says 240ms cubic-bezier(.2,.8,.2,1); frame-by-frame measurement of C3 41.146–41.513 fits 290ms cubic-bezier(.2,.4,.2,1) (rms 2pt; the plan curve is ~45pt off mid-slide), so Keyboard.tsx uses its own measured constant. Rest top is 545.0 (plan §7.1.9 says ≈541; at 41.40 the panel is still settling at 547.3). Close animation (250ms) is invented. 2) Header/sheet title fonts: kept the spec's Pretendard sizes and only fitted letter-spacing to the measured ink widths (nav/close −0.4, 취소 −0.35, 통합검색 −0.13, others 0); titles are centred in the full 393 box (ink centre lands at 196.1–196.3 as recorded). 3) Close × strokes measured per instance: header/T6 1.6 round, T7 1.9 square #656571 (spec said 1.6), T3 1.45. 4) Number pad geometry (panel top 600, 46-pt keys) and the 123/#+= symbol layers are invented (not in the recording); the accessory bar is shown for both kinds. 5) Jamo glyphs get per-vowel vertical offsets because the recorded font places vowels differently from Pretendard. 6) The glass translucency smudge of the keyboard (blurred page content) is not reproduced. 7) AoButton has extra props beyond the plan (active, weight, letterSpacing, width, disabledColor); AoSheet/AoNativeSheet add onClosed/closeButton/onDimClick/host; AoKeyboard adds onEnter/accessory/onPrev/onNext/dismissOnOutside; AoCaret is an extra export. 8) AoReshuffleIcon pin variant and AoNhSymbol were approximate SVG redraws; the integration step replaced them with the launch / transfer measurements. 9) hangul.ts has one added first comment line; otherwise identical to src/toss/transfer/hangul.ts.
 
 ### verify
 
@@ -473,4 +476,45 @@ Also `useAoPrefs(getter)` and `AO_RECENT_MENUS_DEFAULT = ["history", "send", "to
   - All of this was inside the scratch worktree, which is now removed.
 - I compared push frames by pausing CSS animations and seeking them to an exact time. JS-timer pushes (kakao, nh, hana) cannot be captured that way. Two baseline runs differ from each other by about as much as baseline and current do, so I treated push-frame differences as noise. Home screens and the settled screens after the push are pixel-identical.
 - I ran ● 녹화 headless by faking `getDisplayMedia` and `CropTarget` in an init script. A real screen-capture recording cannot run headless.
-- I left the shared `snapToDevicePixels` unchanged. At DPR 3 Chromium stores layout positions in 1/64 px steps, so 63.6667 becomes 63.65625 and the function's 0.01 check undoes the snap. At DPR 1 and 2 it works. This is older shared kakao2 code; changing it would change kakao2.
+- `snapToDevicePixels`: at DPR 3 Chromium stores layout positions in 1/64 px steps (63.6667 → 63.65625), so the 0.01 check undid the snap. The integration step added a tolerance parameter; only allone passes 1/64 + 0.001 (the snapped .phone then sits within 0.03 device px of an integer, checked at viewport widths 594 / 596). kakao2 keeps the default 0.01, so its behaviour is unchanged.
+
+## Integration step: change requests applied (plan §4.3)
+
+Each item was checked against the clips before it went in (frame-by-frame tracking at the cited pts).
+- **motion.ts:** `AO_PANEL` (screen-bottom slide, in 175 / out 170), `AO_TABBAR` (bar and pill separately), `AO_CAROUSEL` (305 ms from release),
+  `AO_SKELETON_STEPS` (+33 pill, +117 banner), `AO_INTRO.statusDelay/statusMs/statusEase` (D+100, 217 ms). Areas now read these instead of local copies.
+- **nav.ts:** `LOAD.acctFilter {dimOn 0, cut 567, off 600}` (invented, account §5.2) used by 거래내역조회 조회 조건; `aoLocked()`.
+- **flow.ts:** `goAmount({..., onError})`, banks prefetched with any via, `canGo()`.
+- **statusFg.ts / StatusBar.tsx:** timing counted from the call (Web Animations with `startTime`); the CSS colour transitions are gone.
+- **intro.ts:** generation counter, superseded runs never start the app.
+- **ui.css:** `.ao-nsheet--closing` keeps the dim catching taps (only the card ignores them) until the sheet is closed; `.ao-banklogo` base class.
+- **allone.css:** Roboto 400/500/700 imported here (`.ao-num` no longer depends on ibk/kbank CSS); `--ao-limited #e94143`; status-bar transitions removed.
+- **icons.tsx:** `AoMenuSearchIcon` (measured; same on 거래내역조회, home and PIN; integer box), `AoNhSymbol` (T3 dummy-key shape),
+  `AoStarIcon` (fills the measured box), PIN variants of `AoReshuffleIcon` / `AoBackspaceIcon` and `AoCheckCircleIcon` (launch measurements).
+- **Observation:** Chromium paints an inline `<svg>` at its layout box rounded to whole CSS px, so an icon box at a fractional left/top (347.38, 76.33)
+  lands up to 0.5 pt off. Icons placed by their ink box keep that error; boxes placed at integer positions with the fraction inside the
+  path data (menu-search, PIN icons) render where measured.
+
+## Integration audit fixes (four auditors: flows · fidelity · regression · privacy)
+
+- **ui.css `AoSheet`:** while a web sheet slides down (150 ms) only the card ignores taps; the scrim keeps catching them (`.ao-sheet--closing .ao-sheet__card`), like `.ao-nsheet--closing`.
+  Before, the 2nd tap of a double tap fell through to the page (a 최근 row, a 거래 row, T2's 출금계좌 row). T2 `onAcct` also ignores taps until the panel is back in.
+- **nav.ts:** `LOAD[p].commit` on `send` and `topupSubmit`: browser back during that dim is ignored (dim, task and cut run on; the result shows on the entry the user landed on).
+  `onAoPopFirst(cb)` / `aoListenPopFirst()`: one popstate listener attached by `AlloneOverlay`'s `useLayoutEffect`, which runs before BrowserRouter's `history.listen`.
+  React 19 renders a popstate's route change synchronously between listeners, so a listener added later runs after the lower screen's `useAoReturn`, or not at all if its screen unmounted.
+  `aoHereState()` (history.state.usr), `aoHistoryGoFirst()` (back to this document's first entry).
+- **loading.ts:** the pop listener goes through `onAoPopFirst`; a load cancelled by back also calls `aoUnlock()` (the lock no longer leaks for up to 1.2 s). `aoLoadingProfile()`.
+- **flow.ts:** `go()` with `replace` whose entry was left during a commit dim pushes onto the landing entry, carrying that entry's depth and send depth. `useAoDoneBack()` (SendDone):
+  a back that leaves 이체 완료 runs `finish` from the landing entry, so the sent amount on T2 cannot be sent again. T2 keeps its panel out while a `send` / `finish` dim runs.
+- **ScreenStack (allone branch):** entries popped by back are kept; a forward POP to one of them restores it on top of the still-mounted lower layers instead of resetting to one layer.
+- **App.tsx (allone only):** RESTART "off" goes back to the first entry, then replaces it with "/", so stale entries become forward entries.
+  `AlloneSplash onPrepare` mounts the stack hidden (`.ao-stack--pre`) 250 ms before the login cut. The first layout takes about 40–70 ms in production, so the cut now only shows it (DOM +2035, first frame ≈ +2048).
+  The hidden long task (≈ +1780, under the dim) does not stop the spinner: its keyframes are transform and opacity only, and a production trace shows the compositor
+  still drawing it during a 66 ms main-thread task (draws every 33 ms as before; one pose held one extra 16.7 ms frame at the task's start).
+  A main-thread rAF probe still sees a gap of more than 34 ms there; making home's first layout cheaper is the only way to remove it (not done).
+- **client.ts (allone only):** GETs use `cache: "no-store"`. Chrome's HTTP cache sent same-URL GETs one at a time, and the topupSubmit hold grew to about 1.1 s. Topup's task is the POST alone.
+- **Mobile ≤ 500 px:** `.phone` stays 393 wide with `zoom: var(--ao-fit)` (`visualViewport.width × scale / 393`, set by Overlay), and its height is the window height divided by the fit.
+  Bands are the safe-area insets divided by the fit. `AoSheet` height is capped at the web view − 40. On tall phones the splash fills the white above the art.
+- **server (allone only):** T1 최근 shows the payee's current name when a payee row matches the bank and number (the transfer-time name otherwise).
+- **T1 row pitch:** 63 pt. The ☆ and tile edges in C3 27.500 and C2 21.200 are 189 px apart.
+

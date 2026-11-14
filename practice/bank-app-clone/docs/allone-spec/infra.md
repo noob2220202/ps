@@ -7,7 +7,7 @@ Screens themselves belong to other specs. This file covers the plumbing checklis
 
 Privacy: no value from the recordings appears below. That excludes names, account numbers, balances, amounts, transaction dates, clock times, phone numbers, codes, and
 the identity of the wallpaper or of other installed apps. Only formats, UI labels, product/brand names, geometry, colours and timings are given.
-Excluded content is not specified: C1 ≈ 2.28–3.33 s (iOS paste-permission alert), C3 ≈ 12–19 s (withdrawal-block notice), C3 ≥ 42 s and all of C4.
+Excluded content is not specified: the excluded system alert (C1 ≈ 2.28–3.33 s), the excluded ranges C3 ≈ 12–19 s and C3 ≥ 42 s, and the 4th clip.
 Scratch evidence: `/tmp/claude-0/-home-user-ps/23b26e0f-9264-5b65-bab4-ff964ff6821e/scratchpad/allone/frames/infra/` (frames, crops, tiles).
 Measuring scripts: `.../scratchpad/allone/tools/infra/` (`sb_measure.py`, `dimscan.py` (streaming), `motion.py`, `c1_launch_scan.py`, `splash_scan.py`,
 plus a scratch copy of `src/` used for the type-check in §3).
@@ -98,7 +98,7 @@ Clock format is the existing 24-hour-style `H:MM` without AM/PM, the same as `us
 | web sheet scrim (정기점검 sheet, 출금계좌 선택 sheet) | C1 12.75–13.05 fade-in, C3 3.33, C3 22.63–22.96, C3 36.38–36.65 | **59–818 only** | white → 165–178, ≈ **black .30–.35**, fades in ≈ 300 ms | the sheet body is white at the bottom, so whether it reaches into the bottom band cannot be told. Treat it as web |
 | **native sheet dim (금액 입력 keypad sheet)** | C3 5.579 on (one frame), slides up to 5.83, closes 7.75–7.88, dim off 8.246 (one frame) | **whole window 0–852 incl. status band** | luma **60** (band 60–61, bottom 57) ≈ black .765 | status glyphs stay above the dim (§1.5) |
 | **native sheet dim (계좌 비밀번호 입력, 4-col secure keypad)** | C3 31.13–32.73 | whole window | luma **68** ≈ black .733 | after 다음 on 얼마를 보낼까요 |
-| iOS system alert dim | C1 2.28–3.33 | whole window | — | **EXCLUDED** (paste-permission alert). Do not build it |
+| iOS system alert dim | C1 2.28–3.33 | whole window | — | **EXCLUDED** (excluded system alert). Do not build it |
 | iOS keyboard (search) | C3 41.1–41.5 slides up | covers the bottom band | panel ≈ #f0f1f4–#f2f3f6, white keys, top edge ≈ 545 pt (centre; corners rounded, 551 at x 10 pt). Accessory bar `^ ∨ ✓` on white above it (≈ 505–545 pt) | iOS 26-style rounded panel, Korean 두벌식 |
 
 Consequences for the implementation:
@@ -209,7 +209,7 @@ ibk2 5179/8793/9113 · kakao2 5180/8794/9115 · toss 5181/8795/9117 → **allone
   `/api/accounts/:id/transactions` (balanceAfter is computed), transactions PATCH (`memo` max 20 for non-ibk, which **matches "메모 입력 (최대 20자)"**), payees CRUD,
   `/api/transfer/lookup`, `POST /api/transfers`, `/api/transfers`, `/api/reset`.
   잔액채우기 = `POST /api/transfers { fromAccountId: <KB external id>, bankCode: "nh", number: <my NH> }`. The existing code already creates the out tx on KB, the in tx on NH, and the transfer row.
-  Per the brief, top-ups and transfers simply succeed. **No withdrawal block exists or is to be added.**
+  Per the brief, top-ups and transfers simply succeed (no server-side block).
   `API_DELAY_MS` 250 ms covers the spinner frames.
 
 ### 2.3 `server/auth.mjs`
@@ -516,8 +516,8 @@ All kakao2 CSS is gated on `html[data-kakao2]`. allone must not set that attribu
 
 - **PIN screen (간편비밀번호 6자리) and 계좌 비밀번호 pad:** practice visuals only. Accept any input, never send it to the server, never store it (not even in localStorage), and do not log it.
   The flow continues after the 6th or 4th digit.
-- **Excluded flows are not built:** the withdrawal-block notice and its code, anything about 이의제기 (search results, 신청/조회, branch search, phone verification, ID checks, mobile ID),
-  and the iOS paste-permission alert. In the clone, 잔액채우기 and transfers simply succeed.
+- **Excluded flows are not built:** nothing from the excluded ranges (C3 12.7–19.5 s and 33.2–34.0 s, C3 ≥ 42.4 s, the 4th clip) and not the excluded
+  system alert (C1 2.28–3.37 s). In the clone, 잔액채우기 and transfers simply succeed.
 - **Seeds:** invented 홍길동-style data only. Product names from the UI are fine. No value from the recordings.
 - **Assets:** never crop anything that shows the recorder's name, numbers, balances or home-screen content.
   The all one icon may be cropped from C1 0.2 s **only with a squircle mask** that removes the wallpaper corners; an App Store original is preferred.
