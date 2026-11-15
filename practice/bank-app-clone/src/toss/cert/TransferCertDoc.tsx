@@ -92,7 +92,6 @@ export function TransferCertDoc({ data, page = 0, scale = 1, className }: { data
           {[0, 1, 2].map((r) =>
             [0, 1].map((c) => (
               <span key={`${r}${c}`} style={{ left: u(92 + 184 * c), top: u(86.7 + 173.5 * r) }}>
-                {MARK}
               </span>
             )),
           )}
