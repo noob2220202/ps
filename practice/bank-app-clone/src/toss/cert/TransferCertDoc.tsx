@@ -1,5 +1,6 @@
 // 송금확인증 한 장 (cert.md §2.10). A4 종이(367.4 × 519.6 단위, 1단위 = 문서.pdf 화면 1dp)를 4배(--u 4px)로 그린 뒤 scale/4 로 줄임
 // — 4–5단위 작은 글자가 브라우저 최소 글자 크기에 걸리지 않고 고해상도에서도 또렷함. 미리보기(D) scale 0.9363, 문서.pdf(V) 1.
+import { localAsset } from "../../assets/Asset";
 import { TossSymbol } from "../ui/TossSymbol";
 import { certPages, CERT_PAGE, type CertDocData, type CertDocRow } from "./data";
 
@@ -115,15 +116,7 @@ function CertDocLogo() {
   );
 }
 
-// 빈 도장 (진짜 은행 도장은 그리지 않음): 빨간 겹 동그라미 ⌀30.6 + '연습용'
+// 빈 도장 (진짜 은행 도장은 그리지 않음): '연습용, 테스트문서' 스탬프 이미지
 function CertSeal() {
-  return (
-    <svg className="toss-cert-doc__seal" viewBox="0 0 30.6 30.6" aria-label="연습용 도장">
-      <circle cx="15.3" cy="15.3" r="14.6" fill="none" stroke="#e5484d" strokeWidth="1.2" />
-      <circle cx="15.3" cy="15.3" r="12.4" fill="none" stroke="#e5484d" strokeWidth="0.5" />
-      <text x="15.3" y="17.5" textAnchor="middle" fontSize="6.2" fontWeight="700" fill="#e5484d">
-        연습용
-      </text>
-    </svg>
-  );
+  return <img className="toss-cert-doc__seal" src={localAsset("toss-cert-seal")} alt="연습용 도장" draggable={false} />;
 }

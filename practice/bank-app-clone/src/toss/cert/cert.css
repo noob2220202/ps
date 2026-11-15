@@ -718,7 +718,8 @@
   top: calc(475.1 * var(--u));
   width: calc(30.6 * var(--u));
   height: calc(30.6 * var(--u));
-  font-family: var(--toss-font);
+  object-fit: contain;
+  mix-blend-mode: multiply;
 }
 .toss-cert-doc__pageno {
   right: calc(25.2 * var(--u)); /* 오른끝 341.0, 잉크 493.2–497.4 */
