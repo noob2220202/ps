@@ -1,11 +1,8 @@
 // 송금확인증 한 장 (cert.md §2.10). A4 종이(367.4 × 519.6 단위, 1단위 = 문서.pdf 화면 1dp)를 4배(--u 4px)로 그린 뒤 scale/4 로 줄임
 // — 4–5단위 작은 글자가 브라우저 최소 글자 크기에 걸리지 않고 고해상도에서도 또렷함. 미리보기(D) scale 0.9363, 문서.pdf(V) 1.
-// 연습용 안전 규칙 (infra §8): '연습용 화면 · 실제 이체 아님' 비스듬한 워터마크(장마다 3 × 2), 진짜 도장 대신 '연습용' 빈 도장,
-// 진위확인 · 고객센터는 가짜 값. 파일(PDF)은 만들지 않음
 import { TossSymbol } from "../ui/TossSymbol";
 import { certPages, CERT_PAGE, type CertDocData, type CertDocRow } from "./data";
 
-const MARK = "연습용 화면 · 실제 이체 아님";
 // 표 칸 왼쪽 (단위)
 const COLS: { key: keyof CertDocRow | "when"; label: string; x: number }[] = [
   { key: "when", label: "거래일자", x: 18.5 }, // 녹화 19.0 (Pretendard '거' · 숫자는 왼쪽 여백이 0.5 넓음)
@@ -72,7 +69,7 @@ export function TransferCertDoc({ data, page = 0, scale = 1, className }: { data
           문서 진위확인
         </p>
         <p className="toss-cert-doc__fv" style={{ left: u(233.6 + INK), top: u(457.2) }}>
-          연습용 문서 · 진위확인 불가
+          https://tossbank.com/customer/verify-document
         </p>
         <p className="toss-cert-doc__fl" style={{ left: u(18.5 + INK), top: u(467.8) }}>
           발급번호
@@ -84,7 +81,7 @@ export function TransferCertDoc({ data, page = 0, scale = 1, className }: { data
           고객센터
         </p>
         <p className="toss-cert-doc__fv" style={{ left: u(233.8 + INK), top: u(467.8) }}>
-          0000-0000
+          1661-7654
         </p>
         <CertDocLogo />
         <CertSeal />
