@@ -1,0 +1,1305 @@
+/* ===== NH올원뱅크 홈 (home.md §2). 클래스 · 키프레임은 ao-home- 로 시작.
+   좌표: pt = 393 × 852 틀의 CSS px. "쪽 y" = 맨 위(스크롤 0)일 때의 화면 y (C2 7.000 · 이어 붙인 긴 화면 long_full, y px / 3).
+   웹뷰는 59–818 이라 화면 층(.layer) 안의 y = 화면 y − 59. 글줄은 줄 상자의 가운데 = 녹화 한글 잉크의 가운데 (Pretendard 는 한글 잉크가 줄 가운데에 옴) ===== */
+
+.ao-home {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+:where(.ao-home) button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ao-home-art {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+.ao-home-abs {
+  position: absolute;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ---------- 스크롤 (웹뷰 전체, 머리줄 밑으로 지나감) ---------- */
+.ao-home__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.ao-home__scroll::-webkit-scrollbar {
+  display: none;
+}
+.ao-home__content {
+  position: relative;
+  padding-top: 74px; /* 머리줄 49 + 배너 위 25 (쪽 59 → 133) */
+}
+
+/* ---------- 머리줄 (쪽 59–108 고정, 그림자 · 줄 없음) ---------- */
+.ao-home-hdr {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 5;
+  height: 49px;
+  background: #fff;
+}
+/* 이름: Bold + "님" Regular, 잉크 x 20 · y 75.67–91.67 (가운데 83.67 → 층 24.67, 한글 잉크 높이 16 → Pretendard 18.5). 밑줄은 이름에만 94.0–95.33 */
+.ao-home-hdr__name {
+  position: absolute;
+  left: 19.6px;
+  top: 10px;
+  height: 28px;
+  font-size: 18.5px;
+  line-height: 28px;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+}
+.ao-home-hdr__name b {
+  position: relative;
+  font-weight: 700;
+}
+.ao-home-hdr__name b::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 21.9px; /* 쪽 94.0 (b 의 글 상자 위 = 줄 위 + 2.98) */
+  height: 1.33px;
+  background: #000;
+}
+.ao-home-hdr__name span {
+  font-weight: 400;
+}
+/* 큰글: 알약 x 210.16–264.78 · y 72–96 (회색 #eee, 흰 손잡이 Ø 20), 글 "큰글" Medium 13.5 #343434 잉크 x 237.1 */
+.ao-home-big {
+  position: absolute;
+  left: 210.16px;
+  top: 13px;
+  width: 54.62px;
+  height: 24px;
+  border-radius: 12px;
+  background: #eee;
+}
+.ao-home-big__knob {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.08);
+  transition: transform 200ms ease;
+}
+.ao-home-big__label {
+  position: absolute;
+  left: 26.4px;
+  top: 2.33px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.5px;
+  color: #343434;
+  transition: transform 200ms ease;
+}
+.ao-home-big--on .ao-home-big__knob {
+  transform: translateX(30.62px);
+}
+.ao-home-big--on .ao-home-big__label {
+  transform: translateX(-21px);
+}
+/* 아이콘 (44 × 44 누름 칸): 지갑 잉크 x 278.1 y 76.33 · 종 315.74 / 74.0 · 메뉴+돋보기 상자 349 / 74 (잉크 351.4 / 76.2) */
+.ao-home-hdr__icon {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+}
+.ao-home-hdr__icon > svg {
+  position: absolute;
+}
+.ao-home-hdr__icon--wallet {
+  left: 267px;
+  top: 3px;
+}
+.ao-home-hdr__icon--wallet > svg {
+  left: 11.1px;
+  top: 14.33px;
+}
+.ao-home-hdr__icon--bell {
+  left: 302.5px;
+  top: 3px;
+}
+.ao-home-hdr__icon--bell > svg {
+  left: 13.24px;
+  top: 12px;
+}
+.ao-home-hdr__icon--menu {
+  left: 339px;
+  top: 3px;
+}
+.ao-home-hdr__icon--menu > svg {
+  left: 10px; /* 상자 (349, 74) 24 × 20 정수 자리 = 거래내역조회 머리줄 + 4 (icons.tsx AoMenuSearchIcon) */
+  top: 12px;
+}
+/* 오늘 운세 말풍선 (쪽 100–138, 머리줄 밑에 걸려 내용이 지나가도 그대로): 검정 #020202 x 20–105.2, 몸통 106–138 둥글기 8,
+   위 꼭지 끝 y 100 · 가운데 x 63 (폭 8 × 높이 6). 글 Medium 14 / −0.9 흰색 잉크 x 32 · y 115.67–127 + 흰 밑줄 127.67–128.67, 🍀 x 80.27 */
+.ao-home-bubble {
+  position: absolute;
+  left: 20px;
+  top: 47px;
+  width: 85.2px;
+  height: 32px;
+  border-radius: 8px;
+  background: #020202;
+  color: #fff;
+}
+.ao-home-bubble::before {
+  content: "";
+  position: absolute;
+  left: 38px;
+  top: -6px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 6.2px solid #020202;
+}
+.ao-home-bubble__text {
+  position: absolute;
+  left: 11.6px;
+  top: 6.8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.9px;
+  white-space: nowrap;
+}
+.ao-home-bubble__text::after {
+  content: "";
+  position: absolute;
+  left: 0.4px;
+  right: 0.9px;
+  top: 15.21px; /* 쪽 127.67–128.67 (C1 14.200) */
+  height: 1px;
+  background: #fff;
+}
+.ao-home-bubble .ao-home-art {
+  left: 60.27px;
+  top: 8.33px;
+}
+
+/* ---------- 배너 (쪽 133–227, x 20–373, #fffae2 둥글기 20) ---------- */
+.ao-home-banner {
+  position: relative;
+  height: 94px;
+  margin: 0 20px;
+  border-radius: 20px;
+  background: #fffae2;
+}
+.ao-home-banner__sub {
+  left: 20px;
+  top: 23.67px; /* 잉크 가운데 166.83 */
+  font-size: 13.5px;
+  line-height: 18px;
+  letter-spacing: 0;
+  color: #333;
+}
+.ao-home-banner__title {
+  left: 21.6px;
+  top: 48.33px; /* 잉크 가운데 192.33 */
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: -0.67px; /* 잉크 x 42.3–235.1 */
+}
+
+/* ---------- 계좌 칸 (쪽 227–550): NH농협 · 다른금융 탭, 쪽 표시, 카드 넘기기, 민트빛 ---------- */
+.ao-home-acct {
+  position: relative;
+  height: 323px;
+  overflow: hidden; /* 아래 광고 칸(550)에서 민트빛이 딱 끊김 */
+}
+.ao-home-acct--open {
+  overflow: visible; /* 뼈대 단계: 아래 칸이 아직 없어 민트빛이 그대로 보임 */
+}
+/* 민트빛: 카드 뒤 오른쪽으로 치우친 흐린 덩어리 (C2 7.000 · C1 12.150 에서 G+B−2R 로 잰 세기에 맞춤). 550 에서 아래 흰 칸이 자름 */
+.ao-home-acct__glow {
+  position: absolute;
+  left: 140px;
+  width: 238px;
+  border-radius: 80px;
+  background: #e3fcf6;
+  filter: blur(34px);
+  pointer-events: none;
+}
+.ao-home-acct__shell {
+  top: 566px;
+  height: 176px;
+}
+.ao-home-tabs {
+  position: absolute;
+  left: 20px;
+  top: 30.1px;
+  display: flex;
+  align-items: flex-start;
+  height: 26px;
+}
+.ao-home-tab {
+  position: relative;
+  height: 26px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: -0.3px;
+  color: #323134;
+  white-space: nowrap;
+}
+.ao-home-tab + .ao-home-tab {
+  margin-left: 19.2px; /* 다른금융 잉크 x 96.25 (초록 점은 그 사이 75.94–81.93) */
+}
+.ao-home-tab--on {
+  font-weight: 700;
+  color: #000;
+}
+.ao-home-tab--on::after {
+  content: "";
+  position: absolute;
+  right: -6.4px;
+  top: -0.6px; /* 쪽 256.67 */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0d8f2e;
+}
+/* 쪽 표시 알약: x 308.08–373.02 · y 259–279, rgba(0,0,0,.45). ‹ 315.4 · 번호 가운데 331.6 · | 340.05 · 전체 349.4 · › 360.37 */
+.ao-home-pager {
+  position: absolute;
+  left: 308.08px;
+  top: 32px;
+  width: 64.94px;
+  height: 20px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+.ao-home-pager__btn {
+  position: absolute;
+  top: 0;
+  width: 20px;
+  height: 20px;
+}
+.ao-home-pager__btn > svg {
+  position: absolute;
+  top: 5.33px;
+}
+.ao-home-pager__btn--prev {
+  left: 0;
+}
+.ao-home-pager__btn--prev > svg {
+  left: 7.32px;
+}
+.ao-home-pager__btn--next {
+  right: 0;
+}
+.ao-home-pager__btn--next > svg {
+  left: 7.29px;
+}
+.ao-home-pager__num {
+  position: absolute;
+  top: 0;
+  width: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-align: center;
+}
+.ao-home-pager__num--i {
+  left: 17.48px;
+}
+.ao-home-pager__num--n {
+  left: 35.24px;
+  opacity: 0.7;
+}
+.ao-home-pager__bar {
+  position: absolute;
+  left: 31.97px;
+  top: 6.67px;
+  width: 1px;
+  height: 6.67px;
+  background: rgba(255, 255, 255, 0.8);
+}
+/* 카드 줄: 카드 353 × 222 (x 20), 간격 10 — 이웃 카드가 양쪽에 10 씩 보임 */
+.ao-home-cards {
+  position: absolute;
+  left: 0;
+  top: 66px;
+  width: 393px;
+  height: 260px;
+  touch-action: pan-y;
+}
+.ao-home-cards__set {
+  display: contents;
+}
+.ao-home-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 353px;
+  height: 222px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0, 80, 70, 0.12), 0 1px 3px rgba(0, 60, 50, 0.04);
+  will-change: transform;
+}
+.ao-home-card--skel {
+  height: 241.5px;
+}
+.ao-home-card__tile {
+  position: absolute;
+  left: 19px;
+  top: 29.67px;
+}
+.ao-home-card__name {
+  left: 58.9px;
+  top: 25.5px;
+  max-width: 220px; /* 말줄임 "…" 잉크 끝 296 (C2 7.000 카드 2) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+}
+.ao-home-card__num {
+  left: 59.2px;
+  top: 47.8px;
+  display: flex;
+  font-size: 14px; /* 녹화 글꼴이 Pretendard 보다 좁아 14 + 자간으로 폭을 맞춤 (은행 이름 잉크 80.3–144.3, 한글 높이 12.3) */
+  line-height: 18px;
+  letter-spacing: -0.2px;
+  color: #666; /* 은행 · 번호는 회색, 복사만 진하게 (C1 14.200) */
+}
+.ao-home-card__bank {
+  letter-spacing: -0.4px;
+}
+.ao-home-card__copy {
+  position: relative;
+  margin-left: 4.6px;
+  color: #333;
+}
+.ao-home-card__copy::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16.37px; /* 쪽 356.67–357.67 (C1 14.200) */
+  height: 1px;
+  background: #323232;
+}
+.ao-home-card__more {
+  position: absolute;
+  left: 318px;
+  top: 22px;
+  width: 24px;
+  height: 30px;
+}
+.ao-home-card__more i {
+  position: absolute;
+  left: 10.71px;
+  width: 2.67px;
+  height: 2.67px;
+  border-radius: 50%;
+  background: #414141;
+}
+.ao-home-card__bal {
+  left: 59.4px;
+  top: 99.67px; /* 숫자 잉크 가운데 409.67 */
+  display: flex;
+  align-items: center;
+  height: 34px;
+}
+/* 잔액: 녹화 숫자는 고정폭 숫자(1 이 가운데, 숫자 간격 13.9)에 잉크 높이 15.7 (쪽 401.3–417) → Pretendard Bold 22 tabular-nums */
+.ao-home-card__amt {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 34px;
+  letter-spacing: -0.5px;
+}
+/* "원" 은 SemiBold 20 (녹화 "원" 잉크 15.3 × 17.3, 쪽 401–418.3 — 숫자보다 획이 가늚) */
+.ao-home-card__won {
+  font-size: 20px;
+  font-weight: 600;
+}
+.ao-home-card__amt--hidden {
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  color: #808080;
+}
+.ao-home-card__hide {
+  width: 42px;
+  height: 26px;
+  margin-left: 4.4px;
+  border: 1px solid #eee;
+  border-radius: 13px;
+  background: #fff;
+  font-size: 12.5px;
+  line-height: 24px;
+  letter-spacing: -0.6px;
+  text-align: center;
+}
+.ao-home-card__btns {
+  position: absolute;
+  left: 18.97px;
+  top: 159px;
+  display: flex;
+  gap: 8.3px;
+  width: 315.07px;
+}
+.ao-home-card__btn {
+  flex: 1 1 0;
+  height: 42px;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15.5px;
+  line-height: 40px;
+  letter-spacing: -0.6px;
+  text-align: center;
+}
+.ao-home-card__btn:active {
+  background: #f5f5f5;
+}
+/* ATM출금: 눌러도 아무 일 없고 누름 색도 안 바뀜 */
+.ao-home-card__btn--inert:active {
+  background: #fff;
+}
+.ao-home-card__wait {
+  left: 59.6px;
+  top: 96.7px; /* 잉크 가운데 405.2 */
+  font-size: 23px;
+  line-height: 31px;
+  letter-spacing: -0.3px;
+  color: #808080;
+}
+.ao-home-card__empty {
+  left: 0;
+  right: 0;
+  top: 84px;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  text-align: center;
+  color: #808080;
+}
+.ao-home-card__btns--one {
+  left: 106.5px;
+  width: 140px;
+}
+.ao-home-skel {
+  position: absolute;
+  left: 19px;
+  width: 315px;
+  border-radius: 8px;
+  background: var(--ao-skeleton, #fcfbfe);
+}
+
+/* ---------- 아래 칸들 (쪽 550 → 2989, 흰 바탕이 민트빛을 덮음) ---------- */
+.ao-home-lower {
+  position: relative;
+  height: 2439px;
+  background: #fff;
+}
+/* H1–H3: 아래 칸은 자리까지 잡아 두고 그리지만 않음 (H4 에서 한 프레임에 보이기만 — 그때 배치 계산이 없게) */
+.ao-home-lowerwrap[hidden] {
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
+}
+.ao-home-h {
+  position: absolute;
+  left: 20.3px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+.ao-home-h > svg {
+  position: absolute;
+  top: 6.8px;
+}
+.ao-home-wcard {
+  position: absolute;
+  left: 20px;
+  width: 353px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+}
+.ao-home-line {
+  position: absolute;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+/* 카드 아래 광고 (쪽 550–640, 지어낸 NH 광고 — 가운데 모은 245pt 묶음 x 72.6–317.7) */
+.ao-home-ad__brand {
+  left: 72.6px;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 10.67px;
+  font-size: 6.6px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  color: #0b7a34;
+}
+.ao-home-ad__pic {
+  position: absolute;
+  left: 72.6px;
+  top: 22.33px;
+}
+.ao-home-ad__title {
+  left: 164.2px;
+  top: 26.5px; /* 잉크 가운데 585.5 */
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: -0.2px;
+}
+.ao-home-ad__sub {
+  left: 164.6px;
+  top: 46.33px; /* 잉크 가운데 604.33 */
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: -0.1px;
+  color: #505050;
+}
+.ao-home-ad__info {
+  position: absolute;
+  left: 354px;
+  top: 5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #c0c0c0;
+}
+.ao-home-ad__info::before,
+.ao-home-ad__info::after {
+  content: "";
+  position: absolute;
+  left: 6.75px;
+  width: 1.5px;
+  border-radius: 1px;
+  background: #fff;
+}
+.ao-home-ad__info::before {
+  top: 3.3px;
+  height: 1.6px;
+}
+.ao-home-ad__info::after {
+  top: 6px;
+  height: 5.6px;
+}
+
+/* 오늘의 혜택 글줄 (쪽 725.7–761.7): 그림 x 44–77, 글 Medium 18 x 92.3 */
+.ao-home-ticker {
+  position: absolute;
+  left: 0;
+  top: 175.7px;
+  width: 393px;
+  height: 37px;
+}
+.ao-home-ticker__icon {
+  position: absolute;
+  inset: 0;
+  animation: ao-home-fade 150ms linear 34ms both;
+}
+.ao-home-ticker__icon--still {
+  animation: none;
+}
+.ao-home-ticker__text {
+  position: absolute;
+  left: 92.3px;
+  top: 6.4px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0;
+  white-space: pre;
+}
+.ao-home-ticker__text > span {
+  animation: ao-home-fade 25ms linear both;
+}
+@keyframes ao-home-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 바로가기 (쪽 813–989): 4 × 2, 칸 가운데 x 72.2 / 155 / 239 / 321.5, 글 Regular 13 / −0.5 #303030 */
+.ao-home-quick {
+  top: 263px;
+  height: 176px;
+}
+.ao-home-quick__btn {
+  position: absolute;
+  width: 83px;
+  height: 82px;
+}
+.ao-home-quick__label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-size: 13px;
+  line-height: 17px;
+  letter-spacing: -0.5px;
+  text-align: center;
+  color: #303030;
+  white-space: nowrap;
+}
+
+/* 내 모임 (카드 쪽 1064.9–1176.9, #f4e8fd) */
+.ao-home-moim {
+  top: 514.9px;
+  height: 112px;
+  background: #f4e8fd;
+  box-shadow: 0 5px 10px rgba(120, 90, 160, 0.06);
+  overflow: hidden;
+}
+.ao-home-moim__sub {
+  left: 20px;
+  top: 17.77px;
+  font-size: 14.5px;
+  line-height: 20px;
+  letter-spacing: -0.7px;
+  color: #353535;
+}
+
+/* 광고 넘기기 (쪽 1215–1320, 카드 없음) */
+.ao-home-ads {
+  position: absolute;
+  left: 0;
+  top: 660px;
+  width: 393px;
+  height: 112px;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.ao-home-ads__slide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 393px;
+  height: 112px;
+  will-change: transform;
+}
+.ao-home-ads__sub {
+  left: 40px;
+  top: 23.67px; /* 잉크 가운데 1243.67 */
+  font-size: 14.5px;
+  line-height: 20px;
+  letter-spacing: -0.5px;
+  color: #2e2e2e;
+}
+.ao-home-ads__pager {
+  left: 264.11px;
+  top: 86px;
+  width: 65.3px;
+  height: 19.3px;
+}
+.ao-home-ads__pause {
+  position: absolute;
+  left: 333.1px;
+  top: 85.65px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+}
+.ao-home-ads__pause::before,
+.ao-home-ads__pause::after {
+  content: "";
+  position: absolute;
+  top: 6.3px;
+  width: 2px;
+  height: 7.4px;
+  border-radius: 0.5px;
+  background: #fff;
+}
+.ao-home-ads__pause::before {
+  left: 7.2px;
+}
+.ao-home-ads__pause::after {
+  left: 10.8px;
+}
+.ao-home-ads__pause--play::before {
+  left: 7.6px;
+  top: 5.6px;
+  width: 0;
+  height: 0;
+  border-radius: 0;
+  border-top: 4.4px solid transparent;
+  border-bottom: 4.4px solid transparent;
+  border-left: 6.6px solid #fff;
+  background: none;
+}
+.ao-home-ads__pause--play::after {
+  display: none;
+}
+
+/* 금융일정 · 내 소비 · 내 자산 */
+.ao-home-sched {
+  top: 861px;
+  height: 98px;
+}
+.ao-home-spend {
+  top: 1035.3px;
+  height: 92.3px;
+}
+.ao-home-asset {
+  top: 1203.7px;
+  height: 196.8px;
+}
+.ao-home-chips {
+  position: absolute;
+  left: 20px;
+  display: flex;
+  gap: 4.3px;
+}
+.ao-home-chip {
+  height: 26px;
+  padding: 0 8.7px;
+  border: 1px solid #dadada;
+  border-radius: 13px;
+  background: #fff;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+.ao-home-chip b {
+  font-weight: 600;
+  color: var(--ao-chip-hash, #00831a);
+}
+
+/* 생활자산 (카드 쪽 2026.67–2256.67, 가로 스크롤) */
+.ao-home-life {
+  position: absolute;
+  left: 0;
+  top: 1476.67px;
+  display: flex;
+  gap: 9.6px;
+  width: 393px;
+  height: 236px;
+  padding: 0 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 20px;
+  scrollbar-width: none;
+}
+.ao-home-life::-webkit-scrollbar {
+  display: none;
+}
+.ao-home-life::after {
+  content: "";
+  flex: 0 0 10.4px; /* 오른쪽 끝 여백 (padding-right 은 가로 스크롤에서 무시되는 브라우저가 있음) */
+}
+.ao-home-life__card {
+  position: relative;
+  flex: 0 0 167.2px;
+  height: 230px;
+  border-radius: 16px;
+  color: #fff;
+  scroll-snap-align: start;
+  text-align: left;
+}
+.ao-home-life__title {
+  left: 13.3px;
+  top: 21.33px; /* 잉크 가운데 2059 */
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.3px;
+}
+.ao-home-life__card > svg.ao-home-life__chev {
+  position: absolute;
+  left: 138.53px;
+  top: 27px;
+}
+.ao-home-life__line {
+  left: 13.3px;
+  font-size: 15.8px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.3px;
+}
+
+/* NH금융그룹 (2 × 3, 칸 171 × 142) */
+.ao-home-group {
+  height: 142px;
+  width: 171px;
+  text-align: left;
+}
+.ao-home-group__title {
+  left: 20.2px;
+  top: 15.4px; /* 잉크 가운데 +26.4 */
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.3px;
+}
+.ao-home-group__line {
+  left: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.4px;
+  color: #2f2f2f;
+}
+
+/* 홈 화면 설정 (잉크 x 164.2–228.8 · y 2829.33–2841.67, 밑줄 2842.67–2843.67) */
+.ao-home-settings {
+  position: absolute;
+  left: 146.5px;
+  top: 2270.8px;
+  width: 100px;
+  height: 30px;
+  font-size: 14.5px;
+  line-height: 30px;
+  letter-spacing: -0.4px;
+  color: #343336;
+  text-align: center;
+}
+.ao-home-settings span {
+  position: relative;
+}
+.ao-home-settings span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 15.2px;
+  height: 1px;
+  background: #373b3d;
+}
+
+/* ---------- 아래 탭 바 (쪽 743–818 흰색, 위 둥글기 16) + 내 자산 확인 알약 ----------
+   녹화에서 프레임마다 잰 움직임 (탭 바는 홈 아이콘 줄, 알약은 위끝을 따로 추적 — 둘은 곡선이 다름. 탭 바가 알약 위에 그려짐):
+   - 숨김 (스크롤 이벤트부터, C1 14.517–15.000): 탭 바는 490ms cubic-bezier(.4,0,.2,1) 로 +75 (제 높이만큼, rms 0.3pt),
+     알약은 620ms cubic-bezier(.2,.05,.1,1) 로 +135 (rms 0.7pt) — 알약이 더 빨리 내려가 탭 바 뒤로 들어감
+   - 맨 위로 돌아옴 (맨 위 닿음 C2 3.858 → 3.896 부터): 탭 바 952ms cubic-bezier(.22,-.12,.03,1) (rms 0.13pt),
+     알약 731ms cubic-bezier(.16,.29,.07,1) (rms 0.4pt). 지연 20ms + 그리는 한 프레임 ≈ 녹화의 38ms
+   - 맨 끝 (끝 닿음 C2 2.358 → 2.388 부터): 탭 바가 위로 돌아올 때와 같은 곡선으로 올라오다 +14.33 에서 멈춤 (C2 2.817) →
+     424ms, 그 곡선 앞부분을 linear() 로 (rms 0.4pt). 알약은 안 나옴
+   - 가운데에서 위로 올려도 안 나옴 */
+.ao-home-bar,
+.ao-home-pill {
+  will-change: transform;
+}
+.ao-home-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -34px; /* 웹뷰 아래끝에 붙임 (화면 743 → 아래 흰 띠 818–852 까지 이어짐) — 진짜 폰에서 웹뷰 높이가 달라도 아래에 */
+  z-index: 6;
+  height: 109px;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  transition:
+    transform 490ms cubic-bezier(0.4, 0, 0.2, 1) -17ms,
+    box-shadow 0s linear 473ms; /* 다 내려간 뒤 그림자를 지움 (818 위로 그림자가 비치지 않게) */
+}
+.ao-home-pill {
+  transition: transform 620ms cubic-bezier(0.2, 0.05, 0.1, 1);
+}
+.ao-home-bar--mid {
+  transform: translateY(75px);
+  box-shadow: none;
+}
+.ao-home-pill--mid,
+.ao-home-pill--bottom {
+  transform: translateY(135px);
+}
+.ao-home-bar--top {
+  transform: none;
+  transition: transform 952ms cubic-bezier(0.22, -0.12, 0.03, 1) 8ms;
+}
+.ao-home-pill--top {
+  transform: none;
+  transition: transform 731ms cubic-bezier(0.16, 0.29, 0.07, 1) 8ms;
+}
+.ao-home-bar--bottom {
+  transform: translateY(14.33px);
+  transition: transform 424ms linear(0, 0, 0, 0.041, 0.125, 0.244, 0.368, 0.479, 0.575, 0.656, 0.726, 0.787, 0.841, 0.888, 0.93, 0.967, 1);
+}
+.ao-home-bar--still,
+.ao-home-pill--still {
+  transition: none;
+}
+.ao-home-bar__tab {
+  position: absolute;
+  top: 0;
+  width: 72.2px;
+  height: 60px;
+}
+.ao-home-bar__tab > svg {
+  position: absolute;
+  top: 14px; /* 쪽 757.0 */
+}
+.ao-home-bar__label {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: 40.2px; /* 잉크 가운데 790.7 */
+  font-size: 12.5px;
+  line-height: 16px;
+  letter-spacing: -0.7px;
+  text-align: center;
+}
+.ao-home-pill {
+  position: absolute;
+  left: 128px;
+  bottom: 92.7px; /* 화면 685.3–725.3 (탭 바 위 18) */
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 137.5px;
+  height: 40px;
+  padding-left: 1px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #0f8a4f 0%, #127e73 30%, #186ea3 60%, #1b5fd6 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+/* 글 "내 자산 확인" 잉크 x 148.54–220.48, 아래 화살표 잉크 x 234.8 · y 702.33 (13.33 × 7.67) — 두 개가 1.5초마다 7.6pt 아래로 흘러내림 (C2 4.70–6.20) */
+.ao-home-pill__text {
+  position: absolute;
+  left: 19.6px;
+  top: 9px;
+  letter-spacing: -0.42px; /* 잉크 x 148.54–220.48 (C2 7.000) */
+  line-height: 24px;
+  white-space: nowrap;
+}
+.ao-home-pill > svg {
+  position: absolute;
+  left: 106.8px;
+  top: 17.03px;
+  overflow: visible;
+}
+.ao-home-pill path {
+  animation: ao-home-chev 3000ms linear infinite;
+}
+.ao-home-pill path + path {
+  animation-delay: -1500ms;
+}
+@keyframes ao-home-chev {
+  0% {
+    transform: translateY(-7.6px);
+    opacity: 0;
+  }
+  50% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(7.6px);
+    opacity: 0;
+  }
+}
+
+/* ---------- 정기점검 안내 시트 (시트 위끝 491 기준, C1 13.300) ---------- */
+.ao-home-notice__box {
+  position: relative;
+  height: 327px;
+  font-family: var(--ao-font);
+  -webkit-user-select: none;
+  user-select: none;
+}
+:where(.ao-home-notice__box) button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ao-home-notice__pages {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 393px;
+  height: 245px;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.ao-home-notice__page {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 393px;
+  height: 245px;
+  will-change: transform;
+}
+/* 제목 Bold 25 #000, "정기점검" #008B1E — 잉크 x 33.64 · y 532.0–554.33 (가운데 543.17 → 시트 +52.17) */
+.ao-home-notice__title {
+  position: absolute;
+  left: 32.6px;
+  top: 37.17px;
+  margin: 0;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: 0.14px; /* 잉크 x 33.64–289.43 (C1 13.300) */
+  white-space: nowrap;
+}
+.ao-home-notice__title em {
+  font-style: normal;
+  color: var(--ao-notice-title, #008b1e);
+}
+/* 항목 제목 SemiBold 17.5 / −0.7 (잉크 x 30.97, 가운데 608.0 · 674.0), 일시 SemiBold 15.5 / 0.1 #00821F (632.67 · 698.33) */
+.ao-home-notice__item {
+  position: absolute;
+  left: 30px;
+  margin: 0;
+  font-size: 17.5px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.7px;
+  white-space: nowrap;
+}
+.ao-home-notice__when {
+  position: absolute;
+  left: 30.3px;
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.06px; /* 잉크 폭 30.97–204.16 (C1 13.300) */
+  color: var(--ao-notice-date, #00821f);
+  white-space: nowrap;
+}
+/* 쪽 표시 (가운데 y 757.8 → +266.8): 초록 알약 #0A902B 20.6 × 10.3, 회색 점 #878B94 Ø 10.3, ❚❚ #727272 x 242.8–249.5 */
+.ao-home-notice__mark {
+  position: absolute;
+  top: 261.65px;
+  width: 10.3px;
+  height: 10.3px;
+  border-radius: 5.15px;
+  background: #878b94;
+}
+.ao-home-notice__mark--on {
+  width: 20.6px;
+  background: var(--ao-page-dot, #0a902b);
+}
+.ao-home-notice__pause {
+  position: absolute;
+  left: 236px;
+  top: 254.8px;
+  width: 20px;
+  height: 24px;
+}
+.ao-home-notice__pause::before,
+.ao-home-notice__pause::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  width: 2.4px;
+  height: 10px;
+  background: #727272;
+}
+.ao-home-notice__pause::before {
+  left: 6.8px;
+}
+.ao-home-notice__pause::after {
+  left: 11.1px;
+}
+.ao-home-notice__pause--play::before {
+  left: 7.3px;
+  top: 7px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid #727272;
+  background: none;
+}
+.ao-home-notice__pause--play::after {
+  display: none;
+}
+/* 1일동안 안보기 (잉크 x 25.98) · 닫기 (잉크 오른쪽 367.69): Regular 14.5 / −0.6 #353535, 가운데 793 → +302 */
+.ao-home-notice__btn {
+  position: absolute;
+  top: 287px;
+  height: 30px;
+  font-size: 14.5px;
+  line-height: 30px;
+  letter-spacing: -0.6px;
+  color: #353535;
+  white-space: nowrap;
+}
+.ao-home-notice__btn--snooze {
+  left: 25px;
+}
+.ao-home-notice__btn--close {
+  right: 24.8px;
+}
+
+/* ===== 통합검색 결과 · 자동완성 낱말 · AI톡 (C3 41.5–45.54, Search.tsx). 좌표는 화면 층(.ao-home-search) 안 y = 화면 y − 59 ===== */
+/* 결과: 칸 아래부터 스크롤. 메뉴 N건 Regular 14.5 (잉크 가운데 283.67), 줄마다 경로 16.5 (가운데 337) + 초록 밑줄 이름 (가운데 361, 밑줄 368.67–370), 줄 간격 68 */
+.ao-home-search-res {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 140px;
+  bottom: 0;
+  padding: 0 24px 120px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ao-home-search-res::-webkit-scrollbar {
+  display: none;
+}
+.ao-home-search-res__count {
+  margin: 74.67px 0 0;
+  font-size: 14.1px;
+  line-height: 20px;
+  letter-spacing: -0.1px;
+}
+.ao-home-search-res__count em {
+  font-style: normal;
+  color: var(--ao-green, #0c8f2d);
+}
+/* 검은 막(찾기 · 이의제기 링크)이 떠 있는 동안만 보이는 줄 (화면 304–305, #efefef — 막 밑에서 118 → 114) */
+.ao-home-search-res__line {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 105.3px;
+  height: 0.67px;
+  background: #efefef;
+}
+.ao-home-search-res__row {
+  padding-top: 30.87px;
+}
+.ao-home-search-res__row + .ao-home-search-res__row {
+  padding-top: 20.33px;
+}
+.ao-home-search-res__path {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 24px;
+  letter-spacing: -0.27px;
+  white-space: nowrap;
+}
+.ao-home-search .ao-home-search-res__link {
+  display: block;
+  font-size: 16.5px;
+  line-height: 24px;
+  letter-spacing: -0.14px;
+  white-space: nowrap;
+  color: var(--ao-green, #0c8f2d);
+  text-decoration: underline;
+  text-decoration-thickness: 1.33px;
+  text-underline-offset: 1.67px; /* 밑줄 화면 369–370 (C3 43.996) */
+}
+/* AI톡 알약 (화면 x 93.33–369.03 · y 736–788, #1d5eda 테 #1246aa) + 캐릭터 (잉크 316.9–362.9 × 744.42–783.42, allone-dispute-aitok 46 × 39) */
+.ao-home-search .ao-home-search-ai {
+  position: absolute;
+  left: 93.33px;
+  top: 677px;
+  width: 275.7px;
+  height: 52px;
+  border: 1px solid #1246aa;
+  border-radius: 26px;
+  background: #1d5eda;
+  color: #fff;
+}
+.ao-home-search-ai > span {
+  position: absolute;
+  left: 23.7px;
+  top: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+.ao-home-search-ai > img {
+  position: absolute;
+  left: 222.57px;
+  top: 7.42px;
+  width: 46px;
+  height: 39px;
+}
+/* 칸에 친 글은 녹화가 Pretendard Regular 보다 굵음 (잉크 픽셀 +21%, C3 42.95 · 44.0) → Medium. 안내 글은 그대로 */
+.ao-home-search .ao-home-search__text:not(.ao-home-search__text--ph) {
+  font-weight: 500;
+}
+/* 자동완성 낱말: 흰 판 (칸 아래 191 → 줄 42, 위 10.5 · 아래 9.5, 다섯 줄 반 426 에서 잘림) + 그 아래 검정 .30 */
+.ao-home-search-sug {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 132px;
+  bottom: 0;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.3);
+}
+.ao-home-search-sug__list {
+  max-height: 235px;
+  padding: 10.5px 0 9.5px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: #fff;
+}
+.ao-home-search-sug__list::-webkit-scrollbar {
+  display: none;
+}
+.ao-home-search .ao-home-search-sug__row {
+  display: block;
+  width: 100%;
+  height: 42px;
+  padding-left: 25.33px;
+  font-size: 15.9px;
+  line-height: 42px;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+  color: #000;
+}
+.ao-home-search-sug__row em {
+  font-style: normal;
+  color: var(--ao-green, #0c8f2d);
+}

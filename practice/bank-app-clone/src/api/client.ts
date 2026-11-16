@@ -1,4 +1,4 @@
-import { currentProfileId } from "../profile/session";
+import { ALLONE, currentProfileId } from "../profile/session";
 import type { ApiErrorBody } from "./types";
 
 // 서버가 2xx가 아닌 응답을 주면 이 에러를 던진다. status/code/fields로 화면이 에러를 구분해서 보여줄 수 있다.
@@ -26,6 +26,9 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   const profile = currentProfileId();
   const res = await fetch(BASE + path, {
     method,
+    // 올원뱅크: 같은 주소의 GET 을 여러 화면이 한꺼번에 다시 받을 때(잔액채우기 뒤 무효화 등) 브라우저 HTTP 캐시가 하나씩 차례로 보내서
+    // (응답 지연 250ms × 개수) 로딩 막이 길어졌음 → 캐시를 거치지 않고 한꺼번에. 다른 앱은 그대로
+    ...(ALLONE && method === "GET" && { cache: "no-store" as const }),
     headers: {
       ...(body !== undefined && { "Content-Type": "application/json" }),
       ...(profile && { "X-Profile": profile }),

@@ -1,0 +1,401 @@
+/* ===== kakao2 기기 화면 위 (html[data-kakao2], src/kakao2/StatusBar.tsx · LoadingDim.tsx · K2Inset.tsx) ===== */
+
+/* 화면 맨 위 54pt 띠 높이. kakao2 화면은 y 0 부터 그리고 이만큼 띠를 직접 칠함 (진짜 폰에선 기기 안전 영역) */
+html[data-kakao2] {
+  --k2-sb: 54px;
+}
+@media (max-width: 500px) {
+  html[data-kakao2] {
+    --k2-sb: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* 상태바 = 화면 위에 겹친 투명한 층 (device.md §8): 홈 내용이 글자 밑으로 지나가고, 모달은 올라오며 띠를 덮고, 로딩 막 · 시트 배경은
+   띠를 어둡게 하지만 글자는 그대로. 화면들(.phone__viewport, 852pt 전체)은 따로 쌓임 맥락(z 0)이라 그 안 무엇도 글자 · 아일랜드를 덮지 않음 */
+html[data-kakao2] .phone > .statusbar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 54px;
+  padding: 0;
+  display: block;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: none;
+  z-index: 70;
+  pointer-events: none;
+}
+html[data-kakao2] .phone__viewport {
+  z-index: 0;
+}
+
+/* ---------- 상태바 글자 · 아이콘 (393 × 54 SVG) ----------
+   검은 글자 #000 / 흰 글자 #fff. 옅은 부분은 같은 색의 투명도 (device.md §4): 꺼진 신호 .227 / .17, 배터리 빈 칸 .333 / .46, 꼭지 .31 / .43.
+   오른쪽 아이콘 · 화살표는 한 프레임에 바뀌고 시계만 --k2-clock-ms 동안 (기본 550ms ease-in-out) */
+html[data-kakao2] .k2sb {
+  color: #000;
+  letter-spacing: 0;
+}
+html[data-kakao2] .k2sb--light {
+  color: #fff;
+}
+.k2sb__svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+.k2sb text {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  letter-spacing: 0;
+}
+.k2sb__clock {
+  font-size: 16.2px;
+  font-weight: 600;
+  fill: #000;
+  transition: fill var(--k2-clock-ms, 550ms) ease-in-out;
+}
+.k2sb--light .k2sb__clock {
+  fill: #fff;
+}
+.k2sb__lte {
+  font-size: 13.25px;
+  font-weight: 620;
+}
+.k2sb__num {
+  font-size: 11px;
+  font-weight: 700;
+}
+.k2sb__off {
+  fill-opacity: 0.227;
+}
+.k2sb__empty {
+  fill-opacity: 0.333;
+}
+.k2sb__cap {
+  fill-opacity: 0.31;
+}
+.k2sb--light .k2sb__off {
+  fill-opacity: 0.17;
+}
+.k2sb--light .k2sb__empty {
+  fill-opacity: 0.46;
+}
+.k2sb--light .k2sb__cap {
+  fill-opacity: 0.43;
+}
+.k2sb__low {
+  fill: #ff3b30;
+}
+
+/* 앱이 켜진 때(launch.ts)부터 4316ms: 파란 위치 표시가 316ms 에 흐릿하게 반 크기로 나타나 525ms 에 또렷 → 4053ms 부터 작아지다
+   4216ms 에 사라지고, 그 자리에 화살표가 0.75 → 1 배로 커짐 (critic.md §2.1 · C7, 녹화 0.733 · 4.47 – 4.733초). 지연은 style 로 */
+.k2sb__bubble,
+.k2sb__arrow-in {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.k2sb__bubble {
+  animation: k2sb-bubble 4316ms linear both;
+}
+.k2sb__arrow-in {
+  animation: k2sb-arrow 4316ms linear both;
+}
+@keyframes k2sb-bubble {
+  0%,
+  7.32% {
+    opacity: 0;
+    transform: scale(0.5);
+    filter: blur(3px);
+  }
+  10.61% {
+    transform: scale(1);
+    filter: blur(0);
+  }
+  12.16% {
+    opacity: 1;
+  }
+  93.91% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  96.52% {
+    transform: scale(0.92);
+  }
+  96.92% {
+    opacity: 1;
+    transform: scale(0.875);
+  }
+  97.31% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  97.68%,
+  100% {
+    opacity: 0;
+    transform: scale(0.75);
+    filter: blur(0);
+  }
+}
+@keyframes k2sb-arrow {
+  0%,
+  97.67% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  97.68% {
+    opacity: 1;
+    transform: scale(0.75);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- 녹화 인트로 (recorder.ts · Launch.tsx) ----------
+   영상(z 999)이 도는 동안: 영상 속 시계 + 달 · 배터리는 지워 둠(scripts/kakao-intro-erase.py) → 상태바를 영상 위로 올려 시계 · 달 · 배터리만
+   앱 보관함 색으로 (흰색, 배터리 빈 칸 · 꼭지 흰색 .48 → 바탕 #868386 위 193). 신호 · LTE · 아일랜드는 영상에 그대로 있으니 우리 것은 숨김 */
+html[data-kakao2][data-intro-play] .phone > .statusbar {
+  z-index: 1000;
+}
+html[data-kakao2][data-intro-play] .k2sb {
+  color: #fff;
+}
+html[data-kakao2][data-intro-play] .k2sb__clock {
+  fill: #fff;
+  transition: none;
+}
+html[data-kakao2][data-intro-play]:not([data-k2-launch]) :is(.k2sb__signal, .k2sb__lte, .dynamic-island) {
+  visibility: hidden;
+}
+/* 영상이 끝나기 0.1초 전부터(Launch.tsx arm) 우리 신호 · LTE · 아일랜드를 영상 위에 — 영상 속 것과 같은 자리 · 모양이라 겹쳐도 안 보이고,
+   영상이 사라지는 H 프레임에 그대로 이어짐 (H 에 바꾸면 그 변경이 녹화에 늦게 찍힘) */
+html[data-kakao2][data-intro-play][data-k2-launch] .dynamic-island {
+  z-index: 1001;
+}
+html[data-kakao2][data-intro-play] :is(.k2sb__empty, .k2sb__cap) {
+  fill-opacity: 0.48;
+}
+/* 달: 녹화가 막 시작돼 iOS 가 상태바를 다시 그리며 흐렸다가(σ 1.17pt) 0.267초에 또렷해짐 (영상 속 LTE 와 같이). 영상을 트는 순간부터.
+   흐림 값을 움직이면 크롬이 2~3 단계로만 다시 그려서(0.17초에 이미 또렷) 흐린 달 위로 또렷한 달이 0 → 1 로 나타난 뒤 흐린 달(번진 가장자리)을
+   걷음 (둘이 함께 반투명인 순간이 없어 달 가운데가 옅어지지 않게) */
+html[data-kakao2] .k2sb__moon-soft {
+  display: none;
+}
+html[data-kakao2][data-intro-play] .k2sb__moon-soft {
+  display: inline;
+  filter: blur(1.17px);
+}
+html[data-kakao2][data-intro-play] .k2sb__moon-sharp {
+  opacity: 0;
+}
+html[data-kakao2][data-intro-play="play"] .k2sb__moon-sharp {
+  animation: k2sb-moon-sharp 267ms linear forwards;
+}
+html[data-kakao2][data-intro-play="play"] .k2sb__moon-soft {
+  animation: k2sb-moon-soft 267ms linear forwards;
+}
+@keyframes k2sb-moon-sharp {
+  85%,
+  to {
+    opacity: 1;
+  }
+}
+@keyframes k2sb-moon-soft {
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* 앱이 열리는 동안 달은 녹화 0.4 → 0.567초에 사라짐 (Launch.tsx, 상태바는 하나 그대로 — critic.md X20 간단한 판) */
+
+/* ---------- 다이나믹 아일랜드 ----------
+   보통: 126 × 37.33 가운데 (x 133.5). 화면 녹화 중(.dynamic-island--k2rec): 107.41 – 279.27 × 11.23 – 48.05 (녹화 31초 반값 경계),
+   빨간 점 지름 12.1 가운데 (125.68, 29.53)
+   점: 1.5초 주기로 밝아졌다(0.45초) 어두워짐(1.05초) — 녹화 43주기를 75ms 칸으로 접어 잰 색 (device.md §2). 0% = R 227 을 올라가며 지날 때 */
+html[data-kakao2] .dynamic-island {
+  height: 37.33px;
+  border-radius: 18.67px;
+}
+html[data-kakao2] .dynamic-island--k2rec {
+  left: 107.41px;
+  top: 11.23px;
+  width: 171.86px;
+  height: 36.82px;
+  margin-left: 0;
+  border-radius: 18.41px;
+}
+html[data-kakao2] .dynamic-island--k2rec .k2-rec {
+  left: 12.17px;
+  top: 12.25px;
+  width: 12.1px;
+  height: 12.1px;
+  margin-top: 0;
+  opacity: 1;
+  transition: none;
+  animation: k2-rec 1500ms linear infinite;
+}
+@keyframes k2-rec {
+  0% {
+    background: #e23d2e;
+  }
+  2.5% {
+    background: #eb3f2f;
+  }
+  7.5% {
+    background: #f84131;
+  }
+  12.5% {
+    background: #fd4231;
+  }
+  17.5% {
+    background: #fd4232;
+  }
+  22.5% {
+    background: #fb4231;
+  }
+  27.5% {
+    background: #f74031;
+  }
+  32.5% {
+    background: #f34030;
+  }
+  37.5% {
+    background: #ed3f2f;
+  }
+  42.5% {
+    background: #e83e2f;
+  }
+  47.5% {
+    background: #e33d2e;
+  }
+  52.5% {
+    background: #de3b2e;
+  }
+  57.5% {
+    background: #d83a2c;
+  }
+  62.5% {
+    background: #d4392c;
+  }
+  67.5% {
+    background: #d0382c;
+  }
+  72.5% {
+    background: #cc372b;
+  }
+  77.5% {
+    background: #ca372b;
+  }
+  82.5% {
+    background: #c8372b;
+  }
+  87.5% {
+    background: #c9372b;
+  }
+  92.5% {
+    background: #ce382b;
+  }
+  97.5% {
+    background: #da3a2d;
+  }
+  100% {
+    background: #e23d2e;
+  }
+}
+
+/* ---------- 홈 인디케이터: 앱이 켜진 직후만 (흰색 140 × 5, 아래 8). 켜진 때부터 283ms 에 나타나기 시작(ease-out, 프레임마다 잰 값)
+   → 733ms 다 보임 → 1485 – 1751ms 직선으로 사라짐 (device.md §6, critic.md C8) ---------- */
+html[data-kakao2] .phone__home-indicator--k2 {
+  border-radius: 2.5px;
+  background: #fff;
+  opacity: 0;
+  animation: k2-home-ind 1751ms linear both;
+}
+@keyframes k2-home-ind {
+  0%,
+  16.16% {
+    opacity: 0;
+  }
+  17.13% {
+    opacity: 0.29;
+  }
+  19.02% {
+    opacity: 0.44;
+  }
+  21.87% {
+    opacity: 0.57;
+  }
+  24.73% {
+    opacity: 0.7;
+  }
+  28.04% {
+    opacity: 0.79;
+  }
+  31.87% {
+    opacity: 0.85;
+  }
+  35.69% {
+    opacity: 0.91;
+  }
+  39.01% {
+    opacity: 0.97;
+  }
+  41.86%,
+  84.81% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- 로딩 막 (LoadingDim.tsx): 폰 화면 전체 검정 .34, 가운데 스피너. 화면들 위 · 상태바 글자와 아일랜드 아래 ---------- */
+.k2-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.34);
+  touch-action: none;
+}
+/* 데이터가 그려지면 스피너와 같이 167ms 동안 흐려짐 (critic.md C5) */
+.k2-dim--leaving {
+  animation: k2-dim-leave 167ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+}
+@keyframes k2-dim-leave {
+  to {
+    opacity: 0;
+  }
+}
+/* 화면 가운데 (196.5, 426) — 올라오는 모달과 같이 움직이지 않음 */
+.k2-dim__spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}
+
+/* ---------- K2Inset: 그대로 쓰는 카카오뱅크 화면 = 54pt 띠(그 화면의 useStatusBar 바탕색) + 그 아래 화면 ---------- */
+.k2-inset {
+  position: absolute;
+  inset: 0;
+}
+.k2-inset__band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--k2-sb, 54px);
+  transition: background-color 200ms;
+}
+.k2-inset__body {
+  position: absolute;
+  inset: var(--k2-sb, 54px) 0 0;
+}
+
+/* 글자 간격 (critic.md G7): 홈 · 이체(+ 은행 시트) · 통장 화면은 0 으로 맞춰 잰 크기 → 그 화면 뿌리에서 0.
+   거래상세(.k2txd)는 몸의 −0.2px 그대로 */
+html[data-kakao2] :is(.k2-home, .k2t, .k2bank, .k2acct) {
+  letter-spacing: 0;
+}

@@ -4,6 +4,8 @@ import { existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
+import { seedTossEmpty, seedTossExample } from "./toss-seed.mjs";
+import { seedAlloneEmpty, seedAlloneExample } from "./allone-seed.mjs";
 
 // SQLite 데이터베이스. Node 22에 내장된 node:sqlite 를 써서 따로 설치할 게 없다.
 // 넷플릭스 프로필처럼 프로필마다 DB 파일이 따로 있다 → 계좌·거래·받는 분이 서로 섞이지 않음
@@ -14,13 +16,25 @@ import { fileURLToPath } from "node:url";
 // (.gitignore 처리 — 내 데이터는 내 서버에만)
 // APP=kbank 면 케이뱅크, APP=kbank2 는 같은 케이뱅크 화면에 '녹화 인트로'(녹화 시작 때 실제 기기 홈 화면 → 금융 폴더 → K 아이콘을
 // 누르는 영상을 먼저 틀고 시작화면으로 이어 붙임)를 켠 두 번째 서버 — 데이터·계정·포트는 따로 (SERVER_ID = 폴더·쿠키 이름)
-export const APPS = ["kakao", "nh", "hana", "ibk", "kbank"];
+// APP=toss 면 토스 / 토스뱅크 (갤럭시 · 다크 고정, 녹화 인트로 없음 — server/data-toss/). 여러 은행을 모아 보는 앱이라
+// 토스뱅크 통장(main) + 다른 은행 계좌 + 토스머니(accounts.role = 'money') · 카드 · 포인트. 토스 전용 칸·표·API는 APP === "toss" 일 때만
+// (server/toss-seed.mjs 예시 데이터, server/toss-api.mjs 소비 · 자산 · 카드 · 포인트)
+// APP=allone 이면 NH올원뱅크 (NH농협은행 앱 — 콕뱅크 nh 와 다른 앱. 아이폰 · 라이트 고정 + 처음부터 녹화 인트로, server/data-allone/).
+// NH 계좌는 은행 코드 'nh' 로 저장 (앱 이름 allone 은 은행 코드가 아님). 올원 전용 칸·표(accounts.blocked, profile.notice_*, recent_hidden)는
+// APP === "allone" 일 때만 (server/allone-seed.mjs 예시 데이터)
+export const APPS = ["kakao", "nh", "hana", "ibk", "kbank", "toss", "allone"];
 const appArg = process.argv.indexOf("--app");
 export const SERVER_ID = process.env.APP ?? (appArg > 0 ? process.argv[appArg + 1] : "kakao");
+// 두 번째 서버(녹화 인트로를 켠 변형) → 화면은 원래 앱. 데이터 폴더 · 쿠키 · 포트만 SERVER_ID 로 따로
 // APP=ibk2 는 같은 i-ONE Bank 화면에 녹화 인트로(실제 기기 홈 화면 → 앱 찾기 → 탭 영상)를 켠 서버 (예전 단독 프로젝트 practice/ibk-app 을 합침)
-export const INTRO = SERVER_ID === "kbank2" || SERVER_ID === "ibk2";
-export const APP = SERVER_ID === "kbank2" ? "kbank" : SERVER_ID === "ibk2" ? "ibk" : SERVER_ID;
-if (!APPS.includes(APP)) throw new Error(`APP은 kakao, nh, hana, ibk, ibk2, kbank, kbank2 중 하나 (지금: ${SERVER_ID})`);
+// APP=kakao2 는 카카오뱅크 새 녹화(2026-11, 아이폰) 화면 + 녹화 인트로(앱 보관함 → 금융 폴더 B 아이콘 탭) — 데이터는 카카오뱅크와 같은 예시
+const VARIANTS = { kbank2: "kbank", ibk2: "ibk", kakao2: "kakao" };
+// 두 번째 서버가 아니라 자기 서버인데 처음부터 녹화 인트로가 있는 앱 — allone: 아이폰 홈 화면(그려서 만듦) → all one 아이콘 탭 → 앱이 켜짐
+const INTRO_APPS = ["allone"];
+const VARIANT = Object.hasOwn(VARIANTS, SERVER_ID);
+export const APP = VARIANT ? VARIANTS[SERVER_ID] : SERVER_ID;
+export const INTRO = VARIANT || INTRO_APPS.includes(APP);
+if (!APPS.includes(APP)) throw new Error(`APP은 kakao, kakao2, nh, hana, ibk, ibk2, kbank, kbank2, toss, allone 중 하나 (지금: ${SERVER_ID})`);
 const here = dirname(fileURLToPath(import.meta.url));
 export const DATA = process.env.DATA_DIR ?? resolve(here, SERVER_ID === "kakao" ? "data" : `data-${SERVER_ID}`);
 mkdirSync(resolve(DATA, "profiles"), { recursive: true });
@@ -163,6 +177,95 @@ function migrate(d) {
     d.exec("DELETE FROM accounts WHERE kind = 'mini'; ALTER TABLE profile DROP COLUMN mini_account_no;");
   }
   d.exec("UPDATE accounts SET badge = NULL WHERE kind = 'main'"); // 예전 "한도계좌" 뱃지(모임통장 표시) 제거
+  // 토스 전용 칸·표 (다른 앱 DB 파일은 건드리지 않음 — 칸이 없어도 다른 앱 코드는 이 칸을 읽지 않음)
+  if (APP === "toss") {
+    const add = (table, column, type) => columns(table).includes(column) || d.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+    add("accounts", "role", "TEXT"); // 'money' = 토스머니 (홈 둘째 줄 · 자산 · 내 계좌). 그 밖엔 NULL
+    add("accounts", "favorite", "INTEGER NOT NULL DEFAULT 0"); // 송금 '어디로 보낼까요?' 내 계좌 줄의 ★
+    add("accounts", "opened_at", "TEXT"); // 'YYYY-MM-DD' 개설일 (증명서 '개설일 YY.MM.DD')
+    add("transactions", "category", "TEXT"); // 소비 분류 (식비 · 주거·통신 · 캐시백 · 이자 …). NULL 이면 #이체 → 이체, 그 밖엔 카테고리 없음
+    add("transactions", "channel", "TEXT"); // 'card' | 'account' | 'pay' (소비 탭). NULL 이면 tag 로 계산 (#체크카드 → card, 그 밖엔 account)
+    add("transactions", "card_id", "TEXT"); // 결제한 카드 (cards.id)
+    add("transactions", "cancelled", "INTEGER NOT NULL DEFAULT 0"); // 취소된 결제 (소비에서 취소선, 합계에서 뺌)
+    add("transactions", "exclude", "INTEGER NOT NULL DEFAULT 0"); // 소비에서 제외 (카드값 자동이체 등, 회색 금액)
+    add("profile", "point_chances", "INTEGER NOT NULL DEFAULT 3"); // 홈 '송금·결제 후 받는 포인트 N번'
+    add("profile", "reward_max", "INTEGER"); // 홈 배너 '{M}월 최대 적립금 N원' (NULL = 배너 숨김)
+    add("profile", "reward_dismissed", "TEXT"); // 'YYYY-MM' 그 달에 배너 × 를 누름
+    add("profile", "ad_snooze_until", "TEXT"); // 이체 뒤 광고 '3일 동안 안보기' 끝나는 때 (ISO)
+    const cardsTable = (name) => `
+      CREATE TABLE ${name} (
+        id         TEXT PRIMARY KEY,
+        name       TEXT NOT NULL,              -- 카드 상품 이름 (토스뱅크 체크카드 …)
+        bank_code  TEXT NOT NULL,
+        account_id TEXT REFERENCES accounts(id) ON DELETE SET NULL, -- 연결 계좌 (신용카드는 카드값이 나가는 결제 계좌)
+        art        TEXT,                       -- 카드 그림 이름 (화면 쪽 CSS/에셋 키)
+        kind       TEXT NOT NULL DEFAULT 'check' CHECK (kind IN ('check', 'credit')),
+        bill       INTEGER,                    -- 신용카드 다음 카드값 (홈 소비 카드 '{D}일 낼 카드값' 줄)
+        pay_day    INTEGER,                    -- 신용카드 결제일 1~31 (그 달에 없는 날이면 마지막 날)
+        sort       INTEGER NOT NULL DEFAULT 0
+      );`;
+    // 예전 cards 표 (체크 · 선불 + 선불 잔액 · 마지막 사용일) → 체크 · 신용 + 카드값 · 결제일. CHECK 는 ALTER 로 못 바꿔서
+    // 새 표에 옮겨 담음 (한 번만 — 예전 표에만 last_used_at 칸이 있음). 예시 데이터의 선불카드 c-youth 는 예시 신용카드 c-day 로
+    // (카드값 = 예전 잔액, 결제일 13일, 결제 계좌 = 하나 계좌가 있으면), 그 밖의 선불카드는 체크카드로. 그림 이름도 새 이름으로.
+    // 같은 때 예전 예시 데이터 그대로인 줄만 새 예시 이름으로 (사용자가 바꾼 줄은 그대로): 계좌 · 카드는 id · 이름이, 거래는 계좌 · 가게 · 금액 · 태그 ·
+    // 분류 · 카드 · 시각(예전 예시 c(4, "16:00") · c(3, "16:45"))이 예전 값과 꼭 같을 때만 — 사용자가 넣은 같은 이름 줄 · 금액을 고친 줄은 안 바뀜.
+    // 금액은 안 바꿈 → 잔액 · 거래 후 잔액 · 합계는 그대로. 나머지 사용자 데이터도 그대로 (예시 전체를 새로 받으려면 🔔 → 기본 → '예시 데이터로')
+    if (columns("cards").includes("last_used_at")) {
+      const seeded = "id = 'c-youth' AND kind = 'prepaid'";
+      const payFrom = d.prepare("SELECT 1 FROM accounts WHERE id = 'hana'").get() ? "'hana'" : "NULL";
+      transaction(
+        () =>
+          d.exec(`
+            ${cardsTable("cards_new")}
+            INSERT INTO cards_new (id, name, bank_code, account_id, art, kind, bill, pay_day, sort)
+              SELECT 'c-day', '토스뱅크 하나카드 Day', 'hana', ${payFrom}, 'hana-day', 'credit', COALESCE(balance, 0), 13, sort FROM cards WHERE ${seeded};
+            INSERT INTO cards_new (id, name, bank_code, account_id, art, kind, bill, pay_day, sort)
+              SELECT id, name, bank_code, account_id, CASE art WHEN 'hana-young' THEN 'hana-travlog' WHEN 'toss-youth' THEN NULL ELSE art END, 'check', NULL, NULL, sort
+                FROM cards WHERE NOT (${seeded});
+            UPDATE transactions SET card_id = 'c-day' WHERE card_id = 'c-youth' AND NOT EXISTS (SELECT 1 FROM cards_new WHERE id = 'c-youth');
+            DROP TABLE cards;
+            ALTER TABLE cards_new RENAME TO cards;
+            UPDATE accounts SET name = '주거래하나 통장' WHERE id = 'hana' AND name = '영하나플러스 통장';
+            UPDATE cards SET name = '트래블로그 체크카드' WHERE id = 'c-hana' AND name = 'Young Hana+ 체크카드';
+            UPDATE transactions SET merchant = '튼튼헬스', category = '문화·여가'
+              WHERE merchant = '바른학원' AND category = '교육' AND card_id = 'c-hana' AND account_id = 'hana'
+                AND amount = -150000 AND tag = '#체크카드' AND substr(at, 12, 8) = '16:00:00';
+            UPDATE transactions SET merchant = '바다주유소', category = '교통'
+              WHERE merchant = '새싹문구' AND category = '교육' AND card_id = 'c-toss' AND account_id = 'main'
+                AND amount = -12000 AND tag = '#체크카드' AND substr(at, 12, 8) = '16:45:00';
+          `),
+        d,
+      );
+    }
+    d.exec(`
+      ${cardsTable("IF NOT EXISTS cards")}
+      CREATE TABLE IF NOT EXISTS points (
+        id      TEXT PRIMARY KEY,
+        name    TEXT NOT NULL,                   -- 토스포인트 · 하나머니 …
+        balance INTEGER NOT NULL DEFAULT 0,
+        icon    TEXT,
+        sort    INTEGER NOT NULL DEFAULT 0
+      );
+    `);
+  }
+  // NH올원뱅크 전용 칸·표 (다른 앱 DB 파일은 건드리지 않음). 한도제한은 badge 가 아니라 따로 — 위 UPDATE 가 main 의 badge 를 열 때마다 지움
+  if (APP === "allone") {
+    const add = (table, column, type) => columns(table).includes(column) || d.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+    add("accounts", "blocked", "INTEGER NOT NULL DEFAULT 0"); // 1 = 지급정지 — 이 계좌에서 보내면 403 ACCOUNT_BLOCKED (화면은 '안내' 팝업). 입금은 그대로. 🔔 패널에서 걸고 풂
+    if (columns("accounts").includes("limited")) d.exec("ALTER TABLE accounts DROP COLUMN limited"); // '한도제한' 표시 제거 (쓰지 않음)
+    if (columns("accounts").includes("dispute_at")) d.exec("ALTER TABLE accounts DROP COLUMN dispute_at"); // 예전 이의제기 접수 칸 (쓰지 않음)
+    add("profile", "notice_on", "INTEGER NOT NULL DEFAULT 1"); // 정기점검 안내 시트 보이기
+    add("profile", "notice_items", "TEXT"); // 시트 첫 장 항목 JSON [{title, when}] (NULL = 화면이 계산한 기본값)
+    // 누구에게 보낼까요 '최근' 삭제하기: 이 시각까지 보낸 이체는 최근 목록에서 숨김 (그 뒤에 새로 보내면 다시 나옴)
+    d.exec(`
+      CREATE TABLE IF NOT EXISTS recent_hidden (
+        bank_code TEXT NOT NULL,
+        number    TEXT NOT NULL,                 -- 숫자만
+        hidden_at TEXT NOT NULL,                 -- 'YYYY-MM-DDTHH:mm:ss'
+        PRIMARY KEY (bank_code, number)
+      );
+    `);
+  }
 }
 
 // 여러 쿼리를 "전부 성공 아니면 전부 취소"로 묶기 (잔액 변경 + 거래 기록이 따로 놀면 안 되니까)
@@ -547,6 +650,8 @@ export const SEEDS = {
   hana: { example: (d, name) => seedHanaExample(d, name), empty: seedHanaEmpty },
   ibk: { example: (d, name) => seedIbkExample(d, name), empty: seedIbkEmpty },
   kbank: { example: (d, name) => seedKbankExample(d, name), empty: seedKbankEmpty },
+  toss: { example: (d, name) => seedTossExample(d, name), empty: (d, name) => seedTossEmpty(d, name) },
+  allone: { example: (d, name) => seedAlloneExample(d, name), empty: (d, name) => seedAlloneEmpty(d, name) },
 };
 
 // ---------- 처음 켤 때 ----------

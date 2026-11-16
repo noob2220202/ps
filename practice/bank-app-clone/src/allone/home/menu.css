@@ -1,0 +1,363 @@
+/* ===== NH올원뱅크 전체메뉴 · 통합검색 (home.md §2.18–§2.19). 클래스는 ao-home- 로 시작.
+   좌표: 화면 층 안 y = 화면 y − 59 (C3 39.750 · 40.546 · 42.100, y px/3 에서 잰 잉크 상자) ===== */
+
+.ao-home-menu,
+.ao-home-search {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+  font-family: var(--ao-font);
+  letter-spacing: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+:where(.ao-home-menu, .ao-home-search) button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- 전체메뉴 머리줄 (화면 71–97) ---------- */
+.ao-home-menu__hdr {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50px;
+}
+/* 이름 Bold + 님 (잉크 x 20.98–82.6 · 가운데 84.17), › 6.33 × 12 (x 91.59), 로그아웃 알약 x 114.24 68.6 × 26 테 #dcdcdc */
+.ao-home-menu__name {
+  position: absolute;
+  left: 20.5px;
+  top: 12.67px;
+  display: flex;
+  align-items: center;
+  height: 26px;
+  font-size: 18.8px;
+  line-height: 26px;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+}
+.ao-home-menu__name b {
+  font-weight: 700;
+}
+.ao-home-menu__name > svg {
+  margin-left: 8.6px;
+}
+.ao-home-menu__logout {
+  position: relative;
+  top: -0.67px; /* 테 잉크 71–97 (C3 39.750) */
+  width: 68px;
+  height: 26px;
+  margin-left: 16.3px;
+  border: 1px solid #dcdcdc;
+  border-radius: 13px;
+  font-size: 14px;
+  line-height: 25px;
+  letter-spacing: -0.6px;
+  text-align: center;
+  color: #111;
+}
+.ao-home-menu__icon {
+  position: absolute;
+  top: 3px;
+  width: 44px;
+  height: 44px;
+}
+.ao-home-menu__icon > svg {
+  position: absolute;
+}
+
+/* 검색 줄 (화면 116.9–164.9): 돋보기 x 31.64, 안내 Regular 15.5 / −0.2 #808080 잉크 x 56.95 · 가운데 141.3 */
+.ao-home-menu__search {
+  position: absolute;
+  left: 0;
+  top: 57.9px;
+  width: 318px;
+  height: 48px;
+}
+.ao-home-menu__search span {
+  position: absolute;
+  left: 56.2px;
+  top: 15.4px;
+  font-size: 15.5px;
+  line-height: 20px;
+  letter-spacing: -0.2px;
+  color: #808080;
+  white-space: nowrap;
+}
+/* AI톡 타일 (잉크 x 324.81 · 화면 y 116.75, 48 × 48) */
+.ao-home-menu__ai {
+  position: absolute;
+  left: 324.81px;
+  top: 57.75px;
+  width: 48.5px;
+  height: 48.75px;
+}
+.ao-home-menu__ai .ao-home-art {
+  left: 0;
+  top: 0;
+}
+
+/* 바로가기 4칸 (화면 176–264, 칸 88.25 폭 x 20 부터), 글 Regular 14.5 / −0.4 #111 가운데 232.5 */
+.ao-home-menu__quick {
+  position: absolute;
+  left: 0;
+  top: 117px;
+  width: 393px;
+  height: 88px;
+}
+.ao-home-menu__qbtn {
+  position: absolute;
+  top: 0;
+  width: 88.25px;
+  height: 88px;
+}
+.ao-home-menu__qlabel {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: 45.17px; /* 잉크 위 225.33 (C3 39.750) */
+  font-size: 14.5px;
+  line-height: 20px;
+  letter-spacing: -0.4px;
+  text-align: center;
+  color: #111;
+  white-space: nowrap;
+}
+
+/* ---------- 왼쪽 목록 (x 0–124.23, 화면 266 부터 줄 50) · 오른쪽 목록 ---------- */
+.ao-home-menu__rail,
+.ao-home-menu__list {
+  position: absolute;
+  top: 207px; /* 화면 266 (위 구분선 265–266 #f4f4f4) */
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.ao-home-menu__rail::-webkit-scrollbar,
+.ao-home-menu__list::-webkit-scrollbar {
+  display: none;
+}
+.ao-home-menu::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 206px;
+  height: 1px;
+  background: #f4f4f4;
+}
+.ao-home-menu__rail {
+  left: 0;
+  width: 124.23px;
+}
+.ao-home-menu__rrow {
+  display: block;
+  width: 100%;
+  height: 50px;
+  padding-left: 24.3px;
+  padding-top: 0.5px;
+  font-size: 14.6px;
+  line-height: 50px;
+  letter-spacing: -0.2px; /* 잉크 폭: 이체/출금 24.98–78.6 · 공과금/채권 –90.6 (C3 39.750) */
+  color: #4f4f4f;
+  white-space: nowrap;
+}
+.ao-home-menu__rrow--on {
+  background: var(--ao-green, #0c8f2d);
+  color: #fff;
+  font-weight: 700;
+}
+.ao-home-menu__list {
+  left: 124.23px;
+  right: 0;
+}
+/* 머리글: 초록 막대 2.33 × 10.33 (x 135.89) + Bold 15.5 (잉크 x 144.88, 가운데 = 칸 위 +25.67). 첫 줄 가운데 = 머리글 +57.3, 줄 52, 다음 머리글 = 마지막 줄 +68.7 */
+.ao-home-menu__sec {
+  position: relative;
+  padding: 56.97px 0 17.03px;
+}
+.ao-home-menu__h {
+  position: absolute;
+  left: 20.3px;
+  top: 15.67px;
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.ao-home-menu__h::before {
+  content: "";
+  position: absolute;
+  left: -8.64px;
+  top: 4.17px;
+  width: 2.33px;
+  height: 10.33px;
+  background: var(--ao-green, #0c8f2d);
+}
+.ao-home-menu__item {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 52px;
+  padding-left: 22.1px;
+  font-size: 15.6px;
+  line-height: 50.2px;
+  letter-spacing: -0.15px; /* 잉크 폭: 전체계좌조회 146.9–224.8 · 거래중지계좌조회 –251.5 */
+  white-space: nowrap;
+}
+.ao-home-menu__pin {
+  position: absolute;
+  left: 229.14px;
+  top: 16.2px;
+}
+.ao-home-menu__tail {
+  height: 340px; /* 마지막 칸도 맨 위까지 올라오게 */
+}
+
+/* ---------- 통합검색 (C3 40.546 / 42.100) ---------- */
+/* 칸 x 24–369 · 화면 137–191 (345 × 54) 둥글기 12, 테 #eee → 고르면 #0c8f2d */
+.ao-home-search__field {
+  position: absolute;
+  left: 24px;
+  top: 78px;
+  width: 345px;
+  height: 54px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fff;
+}
+.ao-home-search__field--on {
+  border-color: var(--ao-green, #0c8f2d);
+}
+/* 글 Regular 17 (안내 #8a8a8a 잉크 x 46.29, 친 글 #000 x 46.63 · 가운데 165), 커서 2 × 28 (화면 150–178) */
+.ao-home-search__text {
+  position: absolute;
+  left: 21px;
+  top: 16px;
+  display: flex;
+  align-items: center;
+  max-width: 240px;
+  height: 22px;
+  overflow: hidden;
+  font-size: 18.6px;
+  line-height: 22px;
+  letter-spacing: -0.3px;
+  white-space: pre;
+}
+.ao-home-search__text--ph {
+  color: #8a8a8a;
+}
+.ao-home-search__text .ao-caret {
+  flex: none;
+  margin-left: 0.7px;
+}
+.ao-home-search__text .ao-home-search__caret0 {
+  position: absolute;
+  left: -1px;
+  margin-left: 0;
+}
+/* 지우기 Ø 18 #616161 (x 293.09, 가운데 164), 돋보기 19.98 (x 328.06, 화면 154) */
+.ao-home-search__clear {
+  position: absolute;
+  left: 263px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+}
+.ao-home-search__clear::before {
+  content: "";
+  position: absolute;
+  left: 5.09px;
+  top: 9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #616161;
+}
+.ao-home-search__clear > svg {
+  position: absolute;
+  left: 10.09px;
+  top: 14px;
+}
+.ao-home-search__go {
+  position: absolute;
+  left: 302px;
+  top: 4px;
+  width: 44px;
+  height: 44px;
+}
+.ao-home-search__go > svg {
+  position: absolute;
+  left: 1.06px;
+  top: 12px;
+}
+/* 자동완성: 글 Regular 14.5 #4e4e4e (잉크 x 24.65 · 가운데 214.8), 스위치 x 86.93 · 화면 200.67 */
+.ao-home-search__auto {
+  position: absolute;
+  left: 24.2px;
+  top: 145.8px;
+  font-size: 14.5px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  color: #4e4e4e;
+}
+.ao-home-search .ao-home-search__switch {
+  position: absolute;
+  left: 86.93px;
+  top: 141.67px;
+}
+/* 인기 검색어: 머리 Bold 17.5 / −0.1 (잉크 x 25.31 · 가운데 281.7), 줄 Regular 16.5 #111 번호 x 38.63 · 글 x 53.62, 간격 58 (첫 가운데 327.67) */
+.ao-home-search__h {
+  position: absolute;
+  left: 24.8px;
+  top: 210.7px;
+  margin: 0;
+  font-size: 17.5px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.1px;
+}
+.ao-home-search__pop {
+  position: absolute;
+  left: 0;
+  width: 393px;
+  height: 58px;
+  font-size: 16.5px;
+  line-height: 58px;
+  color: #111;
+  white-space: nowrap;
+}
+.ao-home-search__pop i {
+  position: absolute;
+  top: 0;
+  right: 343.5px; /* 번호는 오른쪽 맞춤 — "n." 잉크 끝 48.63 (C3 40.546) */
+  font-style: normal;
+}
+.ao-home-search__pop span {
+  position: absolute;
+  top: 0;
+  left: 53.2px;
+}
+.ao-home-search__none {
+  margin: 0;
+  padding-top: 32px;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  text-align: center;
+  color: #808080;
+}

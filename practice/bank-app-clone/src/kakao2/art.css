@@ -1,0 +1,82 @@
+/* kakao2 공용 그림 (art.tsx) */
+
+/* 로딩 스피너: 0.8초 주기, 호 길이(°)와 꼬리 각도(12시에서 시계 방향 °)를 녹화 프레임으로 잰 17칸 (txdetail.md §2.2).
+   원은 3시에서 시작하므로 rotate(꼬리 − 90°). 칸 사이는 직선 */
+.k2-spinner {
+  display: block;
+}
+.k2-spinner circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: k2-spin 800ms linear infinite;
+}
+@keyframes k2-spin {
+  0% {
+    stroke-dasharray: 1 360;
+    transform: rotate(-68.5deg);
+  }
+  6.25% {
+    stroke-dasharray: 10 360;
+    transform: rotate(-64.5deg);
+  }
+  12.5% {
+    stroke-dasharray: 21 360;
+    transform: rotate(-59.5deg);
+  }
+  18.75% {
+    stroke-dasharray: 34 360;
+    transform: rotate(-52deg);
+  }
+  25% {
+    stroke-dasharray: 53 360;
+    transform: rotate(-42deg);
+  }
+  31.25% {
+    stroke-dasharray: 74 360;
+    transform: rotate(-31deg);
+  }
+  37.5% {
+    stroke-dasharray: 102 360;
+    transform: rotate(-18deg);
+  }
+  43.75% {
+    stroke-dasharray: 133 360;
+    transform: rotate(-3deg);
+  }
+  50% {
+    stroke-dasharray: 168 360;
+    transform: rotate(17deg);
+  }
+  56.25% {
+    stroke-dasharray: 141 360;
+    transform: rotate(69deg);
+  }
+  62.5% {
+    stroke-dasharray: 94 360;
+    transform: rotate(130deg);
+  }
+  68.75% {
+    stroke-dasharray: 53 360;
+    transform: rotate(186deg);
+  }
+  75% {
+    stroke-dasharray: 24 360;
+    transform: rotate(228deg);
+  }
+  81.25% {
+    stroke-dasharray: 8 360;
+    transform: rotate(255.5deg);
+  }
+  87.5% {
+    stroke-dasharray: 0.5 360;
+    transform: rotate(275deg);
+  }
+  93.75% {
+    stroke-dasharray: 0.5 360;
+    transform: rotate(278.5deg);
+  }
+  100% {
+    stroke-dasharray: 1 360;
+    transform: rotate(291.5deg);
+  }
+}

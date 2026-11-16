@@ -1,0 +1,119 @@
+/* kakao2 홈 배너 (K2Banner.tsx, home.md §4.4). 높이 121.6 (화면 y 121.2 – 242.8, 슬라이드가 바뀌어도 아래 카드는 그대로).
+   아래 top 은 배너 위끝 기준 */
+.k2-home .k2-banner {
+  position: relative;
+  height: 121.6px;
+}
+/* 점: 지름 4, 왼끝 355 · 362 · 368.7, 위 138.9. 켜짐 #fff / 꺼짐 #6f6f6f */
+.k2-home .k2-banner__dots {
+  position: absolute;
+  right: 20px;
+  top: 17.7px;
+  z-index: 1;
+  display: flex;
+  gap: 3px;
+}
+.k2-home .k2-banner__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #6f6f6f;
+}
+.k2-home .k2-banner__dot + .k2-banner__dot + .k2-banner__dot {
+  margin-left: -0.3px;
+}
+.k2-home .k2-banner__dot--on {
+  background: #fff;
+}
+.k2-home .k2-banner__viewport {
+  height: 100%;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.k2-home .k2-banner__track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+.k2-home .k2-banner__slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+}
+/* 제목 15/700 두 줄 (줄 간격 20, 잉크 가운데 155.7 · 175.7), 왼끝 30 */
+.k2-home .k2-banner__title {
+  position: absolute;
+  left: 30px;
+  top: 24.5px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #fff;
+  white-space: nowrap;
+}
+/* 버튼 칩: 192.8 – 212.8 (높이 20), #443f1e 위 10/700 #cda600 */
+.k2-home .k2-banner__cta {
+  position: absolute;
+  left: 30px;
+  top: 71.6px;
+  height: 20px;
+  padding: 0 6.4px;
+  border-radius: 10px;
+  background: #443f1e;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18.6px;
+  color: #cda600;
+  white-space: nowrap;
+}
+/* 광고 심의 두 줄 7/400 #8d8d8d (잉크 가운데 224.65 · 233) */
+.k2-home .k2-banner__legal {
+  position: absolute;
+  left: 30px;
+  top: 99.8px;
+  font-size: 7px;
+  font-weight: 400;
+  line-height: 8.35px;
+  color: #8d8d8d;
+  white-space: nowrap;
+}
+/* 그림 (녹화에서 바탕째 3배로 자름, 자른 상자 = 이 상자). 오른쪽 것들은 폭이 393 이 아닌 폰에서도 오른끝 기준 */
+.k2-home .k2-banner__image {
+  position: absolute;
+  display: block;
+}
+.k2-home .k2-banner__image--cards {
+  right: 52px;
+  top: 26.8px;
+  width: 61px;
+  height: 66px;
+}
+.k2-home .k2-banner__image--meritz {
+  right: 48px;
+  top: 28.8px;
+  width: 64px;
+  height: 67.6px;
+}
+.k2-home .k2-banner__image--friday {
+  right: 38px;
+  top: 25px;
+  width: 84px;
+  height: 56px;
+  object-fit: contain;
+}
+/* AD: 347 – 363 × 218.8 – 230.8, 0.67 테두리 #8d8d8d, 8/700 */
+.k2-home .k2-banner__ad {
+  position: absolute;
+  right: 30px;
+  top: 97.6px;
+  box-sizing: border-box;
+  width: 16px;
+  height: 12px;
+  border: 0.67px solid #8d8d8d;
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 10.66px;
+  text-align: center;
+  color: #8d8d8d;
+}
