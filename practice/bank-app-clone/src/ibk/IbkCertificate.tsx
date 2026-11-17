@@ -19,7 +19,6 @@ import "./ibk-menu.css";
 
 const BACK_MS = 500; // < 를 뗀 뒤 이체결과조회까지 (82.867 뗌 → 83.367)
 const SPIN_AFTER = 300; // 기록을 못 받은 채 열렸을 때(주소로 바로 열기 등) 이만큼 지나야 점
-const MARK = "연습용 화면 · 실제 이체 아님";
 
 // 'YYYY-MM-DDTHH:mm:ss' → 'YYYY.MM.DD HH:mm:ss'
 const fullTime = (at: string) => `${at.slice(0, 10).replaceAll("-", ".")} ${at.slice(11, 19)}`;
@@ -123,9 +122,6 @@ export function IbkCertificate() {
               <i className="ibc-row ibc-row--end" style={{ top: 41.82 * rows.length }} />
               <div className="ibc-mark" aria-hidden>
                 <div className="ibc-mark__sheet">
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <p key={i}>{`${MARK}　　${MARK}　　${MARK}`}</p>
-                  ))}
                 </div>
               </div>
             </div>
