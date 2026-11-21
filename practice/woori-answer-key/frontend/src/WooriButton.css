@@ -1,0 +1,75 @@
+/* WooriButton — 큰 주 버튼 / 보조 버튼 (주인: send-b 그룹)
+ *
+ * 눌림 (spec/send-b.json transitions[primary-press-scale]):
+ *   색 #185ba4 는 누른 프레임에 바로 (트랜지션 없음), 크기는 누름 +30ms 부터 ease-in-out 125ms 로 가운데 기준 scale 1 → 0.95.
+ *   손 떼면 색은 바로, 크기는 +30ms 부터 같은 길이로 1 로.
+ * 화면마다 다른 값은 CSS 변수로 덮어쓴다 (className/style). 모양·치수(위치·폭·높이·반지름·글자)는 화면 몫.
+ *   --woori-btn-bg / --woori-btn-fg                 평소 면·글자 (주: --woori-primary / 흰색, 보조: --woori-primary-weak / --woori-primary-weak-text)
+ *   --woori-btn-bg-pressed / --woori-btn-fg-pressed 눌림 면·글자 (주: --woori-primary-pressed)
+ *   --woori-btn-bg-disabled / --woori-btn-fg-disabled 비활성 (화면마다 다름. 기본 --woori-primary-disabled / 흰색)
+ *   --woori-btn-press-scale (0.95) · --woori-btn-press-ms (125ms) · --woori-btn-press-ease · --woori-btn-press-delay (30ms)
+ *   --woori-btn-release-ms · --woori-btn-release-ease · --woori-btn-release-delay (기본 = press 값)
+ *   (완료 [확인] 은 0.957 ease-in 87ms / 뗌 ease-in 127ms — done.md 3.4)
+ * 크기는 `scale` 낱 속성이라 화면의 `translate`(WOORI_BOTTOM_FIX·wooriPlace)·`transform` 과 겹치지 않는다.
+ * 보조 버튼([공유]·[추가이체])은 영상에서 눌림 변화가 없다 → 기본은 색·크기 그대로 (변수로 켤 수 있다).
+ * shot 에서는 data-pressed 를 직접 주면 눌린 모습 (woori.css 가 shot 모드 트랜지션을 0s 로).
+ */
+.woori-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  background: var(--woori-btn-bg);
+  color: var(--woori-btn-fg);
+  scale: 1;
+  transform-origin: 50% 50%;
+  transition-property: scale;
+  transition-duration: var(--woori-btn-release-ms, var(--woori-btn-press-ms, 125ms));
+  transition-timing-function: var(--woori-btn-release-ease, var(--woori-btn-press-ease, cubic-bezier(0.42, 0, 0.58, 1)));
+  transition-delay: var(--woori-btn-release-delay, var(--woori-btn-press-delay, 30ms));
+}
+
+.woori-btn--primary {
+  --woori-btn-bg: var(--woori-primary);
+  --woori-btn-fg: var(--woori-text-on-primary, #ffffff);
+  --woori-btn-bg-pressed: var(--woori-primary-pressed);
+  --woori-btn-bg-disabled: var(--woori-primary-disabled);
+  --woori-btn-fg-disabled: var(--woori-text-on-primary, #ffffff);
+}
+
+.woori-btn--secondary {
+  --woori-btn-bg: var(--woori-primary-weak);
+  --woori-btn-fg: var(--woori-primary-weak-text);
+  --woori-btn-bg-pressed: var(--woori-primary-weak);
+  --woori-btn-bg-disabled: var(--woori-primary-weak);
+  --woori-btn-fg-disabled: var(--woori-primary-weak-text);
+  --woori-btn-press-scale: 1;
+}
+
+.woori-btn[data-pressed]:not(:disabled) {
+  background: var(--woori-btn-bg-pressed, var(--woori-btn-bg));
+  color: var(--woori-btn-fg-pressed, var(--woori-btn-fg));
+  scale: var(--woori-btn-press-scale, 0.95);
+  transition-duration: var(--woori-btn-press-ms, 125ms);
+  transition-timing-function: var(--woori-btn-press-ease, cubic-bezier(0.42, 0, 0.58, 1));
+  transition-delay: var(--woori-btn-press-delay, 30ms);
+}
+
+.woori-btn:disabled {
+  background: var(--woori-btn-bg-disabled);
+  color: var(--woori-btn-fg-disabled);
+  cursor: default;
+}

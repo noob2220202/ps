@@ -1,0 +1,435 @@
+[
+ {
+  "name": "send-b/amount-blank-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-blank",
+  "video": "v2",
+  "i0": 2867,
+  "i1": 2870,
+  "t0": 74.723,
+  "t1": 74.816,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-blank-v2.png",
+  "mask": [
+   "224,590,76,76"
+  ],
+  "note": "amount-blank 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-render",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-render-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-render",
+  "video": "v2",
+  "i0": 2873,
+  "i1": 2874,
+  "t0": 75.042,
+  "t1": 75.1,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-render-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ],
+  "note": "amount-render 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-keypad",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-keypad-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-keypad",
+  "video": "v2",
+  "i0": 2879,
+  "i1": 2882,
+  "t0": 75.335,
+  "t1": 76.061,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-keypad-v2.png",
+  "mask": [
+   "512,46,12,1164",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ],
+  "note": "amount-keypad 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-1won",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-confirm-pressed",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-confirm-pressed-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-confirm-pressed",
+  "video": "v2",
+  "i0": 2900,
+  "i1": 2900,
+  "t0": 76.455,
+  "t1": 76.455,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-confirm-pressed-v2.png",
+  "mask": [
+   "512,46,12,1164",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ],
+  "note": "amount-confirm-pressed 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-keypad-hide",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-keypad-hide-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-keypad-hide",
+  "video": "v2",
+  "i0": 2906,
+  "i1": 2906,
+  "t0": 76.738,
+  "t1": 76.738,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-keypad-hide-v2.png",
+  "mask": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ],
+  "note": "amount-keypad-hide 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-1won-form",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-1won-form-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-1won-form",
+  "video": "v2",
+  "i0": 2907,
+  "i1": 2909,
+  "t0": 76.755,
+  "t1": 76.822,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-2won-form-v2.png",
+  "mask": [
+   "512,46,12,1164",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25"
+  ],
+  "note": "amount-1won-form 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-fields-in",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,258,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ],
+  "t": 116,
+  "note": "통장표기 묶음 들어오기 시작 뒤 116ms 위상 (v2 #2916)"
+ },
+ {
+  "name": "send-b/amount-fields-in-v1",
+  "url": "/send/amount?bank=nh-local&acct=12345652789012&frame=1&shot=amount-fields-in",
+  "video": "v1",
+  "i0": 7065,
+  "i1": 7065,
+  "t0": 184.333,
+  "t1": 184.333,
+  "scenario": "v1-start",
+  "ref": "tools/ref/send-b/amount-fields-in-v1.png",
+  "mask": [
+   "512,46,12,1164",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,258,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ],
+  "note": "amount-fields-in 의 v1 판 (교차 확인 · v1 데이터)",
+  "t": 170
+ },
+ {
+  "name": "send-b/amount-next-pressed",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ]
+ },
+ {
+  "name": "send-b/amount-next-pressed-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-next-pressed",
+  "video": "v2",
+  "i0": 2968,
+  "i1": 2969,
+  "t0": 78.109,
+  "t1": 78.126,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-next-pressed-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "512,46,12,1164",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ],
+  "note": "amount-next-pressed 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-next-spinner",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ]
+ },
+ {
+  "name": "send-b/amount-processing",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ]
+ },
+ {
+  "name": "send-b/amount-processing-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=amount-processing",
+  "video": "v2",
+  "i0": 3023,
+  "i1": 3050,
+  "t0": 80.929,
+  "t1": 81.689,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/amount-processing-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,276,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ],
+  "note": "amount-processing 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/amount-2won",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,258,25"
+  ]
+ },
+ {
+  "name": "send-b/amount-form",
+  "maskAdd": [
+   "26,192,265,24",
+   "69,256,146,30",
+   "26,302,258,25",
+   "401,760,61,26",
+   "401,839,61,26"
+  ]
+ },
+ {
+  "name": "send-b/dup-open",
+  "t": 131,
+  "note": "시트 올라오기 시작 뒤 131ms 위상 (v1 #7103)"
+ },
+ {
+  "name": "send-b/password-leak-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=password-leak",
+  "video": "v2",
+  "i0": 3002,
+  "i1": 3002,
+  "t0": 80.453,
+  "t1": 80.453,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/password-leak-v2.png",
+  "mask": [],
+  "note": "password-leak 의 v2 판 (교차 확인 · v2 데이터) — 섞인 키 배치는 v2 관찰값(keep.passwordKeypad.observed.v2)"
+ },
+ {
+  "name": "send-b/password-leak-spinner-v2",
+  "url": "/send/amount?bank=kakao&acct=3333123456789&frame=1&shot=password-leak-spinner",
+  "video": "v2",
+  "i0": 3003,
+  "i1": 3021,
+  "t0": 80.519,
+  "t1": 80.836,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/password-leak-spinner-v2.png",
+  "mask": [
+   "224,590,76,76"
+  ],
+  "note": "password-leak-spinner 의 v2 판 (교차 확인 · v2 데이터) — 섞인 키 배치는 v2 관찰값(keep.passwordKeypad.observed.v2)"
+ },
+ {
+  "name": "send-b/confirm-blank-v2",
+  "url": "/send/confirm?bank=kakao&acct=3333123456789&amount=2&frame=1&shot=confirm-blank",
+  "video": "v2",
+  "i0": 3051,
+  "i1": 3056,
+  "t0": 81.706,
+  "t1": 81.806,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/confirm-blank-v2.png",
+  "mask": [
+   "224,590,76,76"
+  ],
+  "note": "confirm-blank 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/confirm-render",
+  "maskAdd": [
+   "26,192,265,24",
+   "26,303,276,25"
+  ]
+ },
+ {
+  "name": "send-b/confirm-render-v2",
+  "url": "/send/confirm?bank=kakao&acct=3333123456789&amount=2&frame=1&shot=confirm-render",
+  "video": "v2",
+  "i0": 3060,
+  "i1": 3064,
+  "t0": 81.965,
+  "t1": 82.073,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/confirm-render-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "26,192,265,24",
+   "26,303,276,25"
+  ],
+  "note": "confirm-render 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/confirm-idle",
+  "maskAdd": [
+   "26,288,87,37",
+   "26,392,414,25",
+   "409,551,60,27",
+   "409,601,60,26"
+  ]
+ },
+ {
+  "name": "send-b/confirm-idle-v2",
+  "url": "/send/confirm?bank=kakao&acct=3333123456789&amount=2&frame=1&shot=confirm-idle",
+  "video": "v2",
+  "i0": 3136,
+  "i1": 3173,
+  "t0": 83.336,
+  "t1": 84.079,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/confirm-idle-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "96,190,38,24",
+   "26,288,87,37",
+   "26,392,414,25",
+   "409,551,60,27",
+   "409,601,60,26"
+  ],
+  "note": "confirm-idle 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/confirm-transfer-pressed",
+  "maskAdd": [
+   "26,288,87,37",
+   "26,392,414,25",
+   "409,551,60,27",
+   "409,601,60,26"
+  ]
+ },
+ {
+  "name": "send-b/confirm-transfer-pressed-v2",
+  "url": "/send/confirm?bank=kakao&acct=3333123456789&amount=2&frame=1&shot=confirm-transfer-pressed",
+  "video": "v2",
+  "i0": 3174,
+  "i1": 3175,
+  "t0": 84.096,
+  "t1": 84.113,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/confirm-transfer-pressed-v2.png",
+  "mask": [
+   "96,190,38,24",
+   "26,288,87,37",
+   "26,392,414,25",
+   "409,551,60,27",
+   "409,601,60,26"
+  ],
+  "note": "confirm-transfer-pressed 의 v2 판 (교차 확인 · v2 데이터)"
+ },
+ {
+  "name": "send-b/confirm-processing",
+  "maskAdd": [
+   "26,288,87,37",
+   "26,392,414,25",
+   "409,551,60,27",
+   "409,601,60,26"
+  ]
+ },
+ {
+  "name": "send-b/confirm-processing-v2",
+  "url": "/send/confirm?bank=kakao&acct=3333123456789&amount=2&frame=1&shot=confirm-processing",
+  "video": "v2",
+  "i0": 3278,
+  "i1": 3290,
+  "t0": 86.003,
+  "t1": 86.22,
+  "scenario": "v2-start",
+  "ref": "tools/ref/send-b/confirm-processing-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "96,190,38,24",
+   "215,1125,40,38",
+   "26,288,87,37",
+   "26,392,414,25",
+   "409,551,60,27",
+   "409,601,60,26"
+  ],
+  "note": "confirm-processing 의 v2 판 (교차 확인 · v2 데이터)"
+ }
+]

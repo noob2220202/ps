@@ -1,0 +1,441 @@
+[
+ {
+  "name": "check-circle",
+  "file": "woori/done/check-circle.svg",
+  "frameBox": {
+   "x": 218.2791,
+   "y": 188.1212,
+   "w": 87.4818,
+   "h": 87.2727
+  },
+  "state": "idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2286f2",
+  "usedIn": [
+   {
+    "state": "idle",
+    "element": "check-circle",
+    "frameBox": {
+     "x": 218.2791,
+     "y": 188.1212,
+     "w": 87.4818,
+     "h": 87.2727
+    }
+   },
+   {
+    "state": "os-headsup",
+    "element": "check-circle",
+    "frameBox": {
+     "x": 218.2791,
+     "y": 188.1212,
+     "w": 87.4818,
+     "h": 87.2727
+    }
+   },
+   {
+    "state": "idle-headsup",
+    "element": "check-circle",
+    "frameBox": {
+     "x": 218.2791,
+     "y": 188.1212,
+     "w": 87.4818,
+     "h": 87.2727
+    }
+   },
+   {
+    "state": "confirm-pressed",
+    "element": "check-circle",
+    "frameBox": {
+     "x": 218.2791,
+     "y": 188.1212,
+     "w": 87.4818,
+     "h": 87.2727
+    }
+   },
+   {
+    "state": "leaving",
+    "element": "check-circle",
+    "frameBox": {
+     "x": 218.2791,
+     "y": 188.1212,
+     "w": 87.4818,
+     "h": 87.2727
+    }
+   }
+  ],
+  "dp": {
+   "x": 150,
+   "y": 98,
+   "w": 60,
+   "h": 60
+  },
+  "css": "position:absolute; left:150px; top:98px; width:60px; height:60px",
+  "structure": {
+   "root": "svg 60x60 viewBox 0 0 60 60, overflow=\"visible\" (안쪽 g 를 1.05 로 키울 때 바깥이 잘리지 않게)",
+   "badge": "g.woori-done-check__badge — transform-origin 30px 30px. 원+체크를 같이 키우는 scale 을 여기에 건다",
+   "disc": "circle.woori-done-check__disc cx 30 cy 30 r 30 fill #2286f2 (--woori-primary)",
+   "mark": "path.woori-done-check__mark d=\"M18.27 28.56L27.05 37.47L41.701 22.625\" pathLength=\"33.366\" stroke #ffffff 6 round/round, 정지 = stroke-dasharray \"32.938 100\"",
+   "pointsDp": [
+    [
+     18.27,
+     28.56
+    ],
+    [
+     27.05,
+     37.47
+    ],
+    [
+     41.4,
+     22.93
+    ]
+   ],
+   "p2PlusDp": [
+    41.701,
+    22.625
+   ],
+   "legsDp": [
+    12.509,
+    20.429
+   ],
+   "pathLengthDp": 32.938,
+   "pathLengthWithOvershootDp": 33.366
+  },
+  "animation": {
+   "use": "애니메이션은 이 마크업을 화면에 인라인(JSX)으로 옮겨 건다 — <img> 로는 획(stroke-dasharray)을 움직일 수 없다. 정지 모습만이면 <img> 도 같다(아래 verify idle).",
+   "badge": {
+    "target": ".woori-done-check__badge",
+    "property": "transform: scale()",
+    "durationMs": 287.7,
+    "delayMs": 0,
+    "keyframes": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      68.6,
+      1.05,
+      "ease-in-out"
+     ],
+     [
+      211.5,
+      0.95,
+      "linear"
+     ],
+     [
+      287.7,
+      1.0,
+      null
+     ]
+    ],
+    "css": "@keyframes woori-done-circle { 0% { transform: scale(0); animation-timing-function: linear } 23.84% { transform: scale(1.05); animation-timing-function: ease-in-out } 73.51% { transform: scale(0.95); animation-timing-function: linear } 100% { transform: scale(1) } }",
+    "source": "spec/done.md 3.2 (transitions done-circle)"
+   },
+   "mark": {
+    "target": ".woori-done-check__mark",
+    "property": "stroke-dasharray (보이는 길이, dp)",
+    "durationMs": 446,
+    "delayMs": 194,
+    "keyframes": [
+     [
+      0,
+      0,
+      "cubic-bezier(0.32,0,0.67,0)"
+     ],
+     [
+      151.0,
+      12.51,
+      "ease"
+     ],
+     [
+      276.5,
+      33.37,
+      "linear"
+     ],
+     [
+      372.1,
+      31.91,
+      "ease-in-out"
+     ],
+     [
+      446.0,
+      32.94,
+      null
+     ]
+    ],
+    "css": "@keyframes woori-done-check { 0% { stroke-dasharray: 0 100; animation-timing-function: cubic-bezier(0.32,0,0.67,0) } 33.85% { stroke-dasharray: 12.51 100; animation-timing-function: ease } 62.00% { stroke-dasharray: 33.37 100; animation-timing-function: linear } 83.42% { stroke-dasharray: 31.91 100; animation-timing-function: ease-in-out } 100% { stroke-dasharray: 32.94 100 } }",
+    "source": "spec/done.md 3.3 (transitions done-check-stroke)"
+   },
+   "markVisibleFromMs": 210,
+   "markVisibleNote": "획 시작(원 +194ms) 전에는 visibility:hidden. 길이 0 근처 dash 도 둥근 끝 6dp 점으로 그려지는데 영상은 획 시작 +3ms(v2 #3305)·+5ms(v1 #7447)에 점이 없고 +27ms(#3306·#7448)에 처음 보인다 → 보이기 시작을 그 사이 가운데 +16ms(원 +210ms)로 권장. 194 로 두면 shot done/anim-circle-low(t 197.1)에 없는 점이 생긴다(원 자리 RGB 평균차 2.029 → 210 이면 1.554)",
+   "scaleTarget": "원 scale 은 g.__badge(원+체크) 에 건다: 체크 시작 점 위상(done/anim-check-dot, t 246.1, 원 0.969)에서 체크 무게중심 어긋남이 원만 키우면 (−0.725, −0.114)px, 같이 키우면 (−0.248, −0.011)px · 알파 L1 0.0025 → 0.0011. 다른 위상은 원 = 1 이라 같다",
+   "reducedMotion": "설계: prefers-reduced-motion 이면 정지 모습(마크업 그대로)"
+  },
+  "notes": "완료 체크 원: 파란 원 60dp(#2286f2) + 흰 체크(꺾인 선 하나, 굵기 6dp, 둥근 끝·이음). 원 상자 = 앱 (150, 98) 60x60 — 가운데 (180, 128)dp (잰 (180.01, 128.02)). 체크 점(원 상자 기준 dp) [18.27, 28.56] → [27.05, 37.47] → [41.4, 22.93] 는 spec/done.json idle check-mark keep.pointsDpInCircle(4x4 초표본 알파 맞춤) 그대로. 긴 획을 끝 너머 0.428dp(P2+ [41.701, 22.625])까지 늘인 경로라 획 넘침(1.013 = 33.370dp)을 그릴 수 있고, 정지 모습은 stroke-dasharray \"32.938 100\" 으로 P2 까지만 보인다(pathLength = 실제 길이 33.366 → dash 값이 dp 그대로). 굵기 5.85/5.9/6 을 찍어 보면 6 이 가장 맞다(체크 알파 L1 0.0068/0.0056/0.0056, 잉크 양 0.989/1.012/1.027 — 5.9 와 6 은 같은 수준이라 설계 6). Chromium 은 60dp 원을 지름 87.16px(50% 가장자리, 가로 59.77·세로 59.92dp)로 그린다 — 영상 87.62x87.39px(60.10·60.08dp)보다 0.35px 작다. div border-radius 원도 같은 값(87.19)이라 Chromium 원 래스터의 차이로 보고 설계 60 을 둔다(r 30.1 이면 87.48x87.53 으로 맞고 원 자리 평균차 2.358→2.322, r 30.2 는 2.389). 놓는 법: css 그대로(정수 dp). 주인: done.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸 구성 검증 페이지에 css 대로 놓고 찍어 영상과 비교(원 자리 x 205–320, y 175–290). 체크 = 원 안(r<38.5px) 흰 알파 (Y−Y파랑)/(255−Y파랑), 원 = 바깥 띠(r>36px) 파랑 알파 (255−Y)/(255−Y파랑), svgFitL1 = 알파 평균 절대차, relErr = Σ|차|/Σ알파(영상). 원 지름·중심 = 180방향 50% 가장자리 원 맞춤",
+   "idle-v1": {
+    "ref": "v1 #7467–#7483 평균",
+    "shotMAD": 2.358,
+    "shotMax": 136,
+    "lumaMAD": 1.334,
+    "svgFitL1": 0.0056,
+    "relErr": 0.0561,
+    "centroidOffsetPx": [
+     -0.023,
+     -0.0
+    ],
+    "inkMassRatio": 1.027,
+    "discL1": 0.0109
+   },
+   "idle-v2": {
+    "ref": "v2 #3328–#3330 평균",
+    "shotMAD": 2.216,
+    "shotMax": 133,
+    "lumaMAD": 1.232,
+    "svgFitL1": 0.0058,
+    "relErr": 0.0579,
+    "centroidOffsetPx": [
+     -0.014,
+     0.002
+    ],
+    "inkMassRatio": 1.0262,
+    "discL1": 0.0098
+   },
+   "inlineVsImg": {
+    "idle-v1 inline shotMAD": 2.325,
+    "note": "인라인(overflow visible)과 <img> 가 사실상 같다"
+   },
+   "circle": {
+    "shotDiameterPx": 87.16,
+    "videoDiameterPx": [
+     87.622,
+     87.389
+    ],
+    "centerDeltaPx": [
+     -0.02,
+     -0.1
+    ]
+   },
+   "animPhases": {
+    "anim-circle-grow": {
+     "ref": "v2 #3300",
+     "t": 47.1,
+     "shotMAD": 1.215,
+     "discDiameterPx": {
+      "shot": 62.79,
+      "video": 63.01
+     },
+     "markL1": 0.0103
+    },
+    "anim-circle-peak": {
+     "ref": "v2 #3301",
+     "t": 87.1,
+     "shotMAD": 1.8,
+     "discDiameterPx": {
+      "shot": 91.36,
+      "video": 91.88
+     },
+     "markL1": null
+    },
+    "anim-circle-low": {
+     "ref": "v2 #3305",
+     "t": 197.1,
+     "shotMAD": 1.554,
+     "discDiameterPx": {
+      "shot": 82.94,
+      "video": 83.15
+     },
+     "markL1": null
+    },
+    "anim-check-dot": {
+     "ref": "v2 #3307",
+     "t": 246.1,
+     "shotMAD": 1.613,
+     "discDiameterPx": {
+      "shot": 84.75,
+      "video": 84.81
+     },
+     "markL1": 0.0011
+    },
+    "anim-check-short": {
+     "ref": "v2 #3311",
+     "t": 312.1,
+     "shotMAD": 1.757,
+     "discDiameterPx": null,
+     "markL1": 0.0018
+    },
+    "anim-check-long": {
+     "ref": "v2 #3315",
+     "t": 404.1,
+     "shotMAD": 2.013,
+     "discDiameterPx": null,
+     "markL1": 0.0057
+    },
+    "anim-check-over": {
+     "ref": "v2 #3318",
+     "t": 455.1,
+     "shotMAD": 2.072,
+     "discDiameterPx": null,
+     "markL1": 0.0053
+    },
+    "anim-check-under": {
+     "ref": "v2 #3324",
+     "t": 563.1,
+     "shotMAD": 2.046,
+     "discDiameterPx": {
+      "shot": 87.21,
+      "video": 87.51
+     },
+     "markL1": 0.0049
+    }
+   },
+   "animMethod": "인라인 SVG 에 위 keyframes(badge scale, mark dash, 보이기 210ms)를 걸고 Animation.currentTime = t(원 시작부터 ms)로 세워 찍음 — shots.d/done.json anim-* 와 같은 위상·기준 프레임"
+  }
+ },
+ {
+  "name": "ad-iou-illust",
+  "file": "woori/done/ad-iou-illust.png",
+  "frameBox": {
+   "x": 372.8303,
+   "y": 870.303,
+   "w": 93.3139,
+   "h": 93.0909
+  },
+  "state": "idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "idle",
+    "element": "ad-illustration",
+    "frameBox": {
+     "x": 372.8303,
+     "y": 870.303,
+     "w": 93.3139,
+     "h": 93.0909
+    }
+   },
+   {
+    "state": "os-headsup",
+    "element": "ad-illustration",
+    "frameBox": {
+     "x": 372.8303,
+     "y": 870.303,
+     "w": 93.3139,
+     "h": 93.0909
+    }
+   },
+   {
+    "state": "idle-headsup",
+    "element": "ad-illustration",
+    "frameBox": {
+     "x": 372.8303,
+     "y": 870.303,
+     "w": 93.3139,
+     "h": 93.0909
+    }
+   },
+   {
+    "state": "confirm-pressed",
+    "element": "ad-illustration",
+    "frameBox": {
+     "x": 372.8303,
+     "y": 837.3333,
+     "w": 93.3139,
+     "h": 93.0909
+    }
+   },
+   {
+    "state": "leaving",
+    "element": "ad-illustration",
+    "frameBox": {
+     "x": 372.8303,
+     "y": 837.3333,
+     "w": 93.3139,
+     "h": 93.0909
+    }
+   }
+  ],
+  "dp": {
+   "x": 256,
+   "y": 567,
+   "w": 64,
+   "h": 64
+  },
+  "dpV2": {
+   "x": 256,
+   "y": 544.333,
+   "w": 64,
+   "h": 64
+  },
+  "css": "position:absolute; left:256px; top:567px; width:64px; height:64px",
+  "cssV2": "position:absolute; left:256px; top:544px; width:64px; height:64px; translate:0px 0.333px",
+  "inkBoxDp": [
+   258.971,
+   574.341,
+   60.8,
+   55.513
+  ],
+  "notes": "광고 카드(차용증 서비스) 오른쪽 그림: 말린 차용증 종이 + 파란 인장 + 지폐 묶음(여러 색, 사람·캐릭터 없음 → 자른 그림). PNG 상자 = 설계 64x64dp, 카드 오른쪽 안 20dp(오른끝 320) — 잉크 가운데 x 288.0–288.35 = 상자 가운데 288, 잉크 좌우 여백 3.1/3.2px 로 같다. 세로: v1(두 줄 레이아웃) 상자 위끝 567, v2(한 줄) 544.333 — 영상끼리 그림·카드 가장자리가 33.0px(68 기기px = 22.667dp) 옮겨 간다(카드 안 글자는 32.5px = 22.333dp, 7절·8절). 잉크(α>0.1) 상자 [258.971, 574.341, 60.8, 55.513] dp. 원본: v1 idle #7467–#7483 평균(17장이 한 코덱 판 — 화소까지 같음) → 여백 크롭 [360, 858, 120, 118] → EDSR x3 → 역투영 6회(3x3 면적 축소 = 평균 크롭, MAD 0.003) → 설계 상자 격자로 다시 표본(bicubic, 1/3 frame px 칸, 280x279) → 카드색 #ebf3fc(카드 안 띠 중앙값, 표준편차 0.35) 기준 color-to-alpha(최소 α, 밝은 쪽은 여유 큰 R·G 채널만) → 몸통 안쪽 α=1·색 = 합성색: 흰 종이가 카드색과 몇 레벨밖에 안 달라 몸통 윤곽은 원본에서 카드색과 채널 최대차 > 3 레벨 덩어리(닫기·구멍 채움)로 잡고 가장자리 1 frame px 는 c2a α 를 둔다. 카드 위에서는 원본과 같게 합성되고(합성 vs 표본 평균차 0.212), 다른 바탕에서도 종이가 비지 않는다(종이 윗가장자리·말린 끝 일부는 카드색과 차가 3 레벨 이하라 반투명으로 남음). FSRCNN x3 비교는 못 함(스크래치 models/FSRCNN_x3.pb 가 378바이트 — 받다 만 파일). 렌더 단계 S3(v1 +393 / v2 +326ms)에 한 프레임에 나타남(페이드 없음, spec 3.1). 놓는 법: css 그대로 — left/top 정수 dp, 남는 소수는 translate. 주인: done. · critic(2026-11-21): 광고 카드 v1 위끝을 551 → 551.333 으로 고쳤다(상자는 v1↔v2 68 기기px, done.md 2.5) — 그림 상자 = 카드 위끝 + 15.667 이 두 영상 같다",
+  "verify": {
+   "method": "Chromium shot(카드 #ebf3fc r16 + css 대로 PNG) vs 영상 정지 프레임, 그림 상자 + 여백 [368, y, 104, 102] RGB 평균 절대차. bestShift = shot 을 ±1px(0.25 칸) 옮겨 가장 작은 곳",
+   "v1": {
+    "shotMAD": 0.422,
+    "shotMax": 8,
+    "lumaMAD": 0.343,
+    "inkMAD": 0.736,
+    "p99": 4.0,
+    "region": [
+     368,
+     866,
+     104,
+     102
+    ],
+    "bestShift": {
+     "mad": 0.422,
+     "dx": 0.0,
+     "dy": 0.0
+    },
+    "ref": "v1 #7467–#7483 평균"
+   },
+   "v2": {
+    "shotMAD": 1.278,
+    "shotMax": 44,
+    "lumaMAD": 0.727,
+    "inkMAD": 2.757,
+    "p99": 18.0,
+    "region": [
+     368,
+     834,
+     104,
+     102
+    ],
+    "bestShift": {
+     "mad": 1.278,
+     "dx": 0.0,
+     "dy": 0.0
+    },
+    "ref": "v2 #3328–#3333 평균 (idle-v2 + confirm-pressed)",
+    "note": "v2 는 다른 코덱 판 — 영상 v1↔v2 끼리도 그림 자리 평균차 1.64(33.0px 겹침)"
+   },
+   "compositeVsResampledMAD": 0.212,
+   "compositeMax": 5.18,
+   "bpMAD": [
+    0.361,
+    0.085,
+    0.032,
+    0.014,
+    0.007,
+    0.004,
+    0.003
+   ],
+   "opaqueFrac": 0.5059,
+   "alphaFrac": 0.5592
+  },
+  "hq": "woori/done/ad-iou-illust.hq.png"
+ }
+]

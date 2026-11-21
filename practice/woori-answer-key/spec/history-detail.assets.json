@@ -1,0 +1,191 @@
+[
+ {
+  "name": "close-x",
+  "file": "woori/history-detail/close-x.svg",
+  "frameBox": {
+   "x": 466.144,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "deposit",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#3e3f42",
+  "usedIn": [
+   {
+    "state": "deposit-first",
+    "element": "close-x",
+    "frameBox": {
+     "x": 466.144,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw",
+    "element": "close-x",
+    "frameBox": {
+     "x": 466.144,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "confirm-pressed",
+    "element": "close-x",
+    "frameBox": {
+     "x": 466.144,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 320,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "상세 머리 ✕ (24dp 상자, viewBox 24). 두 획 (6,6)–(18,18)·(6,18)–(18,6), 굵기 1.95dp, 둥근 끝, #3e3f42 — 영상에서 획 모형(둥근 끝)을 휘도로 맞춤: 가운데 (332.02, 26.01)dp, 팔 6.04dp, 굵기 1.95dp(입금)/1.97(출금), 색 채널별 #3d3e40/#3e4043. 굵기 2.0·#33353a 같은 후보보다 L1 이 작다(0.12 vs 0.13–0.16). 같은 ✕ 를 send-a(계좌번호·금융회사 페이지 머리)가 쓸 수 있다 — 그 그룹이 크기·색을 대조해 같으면 이 이름을 참조",
+  "verify": {
+   "method": "Chromium 360x880 @16/11, ?frame=1 셸(위 31dp + translate(-0.2925px,0.333px) scaleX(1.0023956))에 img 로 놓고 찍어 기준 프레임과 휘도 비교. svgFitL1 = Σ|영상−렌더| / Σ|255−영상| (크롭 42x42px)",
+   "svgFitL1": 0.12,
+   "svgFitL1Withdraw": 0.115,
+   "centroidOffsetPx": [
+    -0.21,
+    -0.02
+   ],
+   "inkRatio": 0.922
+  }
+ },
+ {
+  "name": "chevron-memo",
+  "file": "woori/history-detail/chevron-memo.svg",
+  "frameBox": {
+   "x": 486.557,
+   "y": 321.939,
+   "w": 10.206,
+   "h": 14.545
+  },
+  "state": "deposit",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#78787a",
+  "usedIn": [
+   {
+    "state": "deposit-first",
+    "element": "memo-chevron",
+    "frameBox": {
+     "x": 486.557,
+     "y": 321.939,
+     "w": 10.206,
+     "h": 14.545
+    }
+   },
+   {
+    "state": "withdraw",
+    "element": "memo-chevron",
+    "frameBox": {
+     "x": 486.557,
+     "y": 321.939,
+     "w": 10.206,
+     "h": 14.545
+    }
+   },
+   {
+    "state": "confirm-pressed",
+    "element": "memo-chevron",
+    "frameBox": {
+     "x": 486.557,
+     "y": 321.939,
+     "w": 10.206,
+     "h": 14.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 334,
+   "y": 190,
+   "w": 7,
+   "h": 10
+  },
+  "notes": "메모를 입력해 보세요 뒤 › (회색 — 인벤토리의 'chevron-right-blue' 는 파랑이 아니다). 7×10dp 상자(정수 dp 에 둔다), 꼭짓점 (5.44, 4.99), 팔 4.06×3.92dp, 굵기 1.4dp, 둥근 끝·이음, #78787a. 잰 꼭짓점 (339.44, 194.99)dp(앱). 굵기 1.5·색 #707173 후보보다 L1 이 작다",
+  "verify": {
+   "method": "close-x 와 같음 (크롭 18x24px)",
+   "svgFitL1": 0.18,
+   "svgFitL1Withdraw": 0.159,
+   "centroidOffsetPx": [
+    0.12,
+    -0.04
+   ],
+   "inkRatio": 0.891
+  }
+ },
+ {
+  "name": "chevron-search",
+  "file": "woori/history-detail/chevron-search.svg",
+  "frameBox": {
+   "x": 485.099,
+   "y": 844.121,
+   "w": 11.664,
+   "h": 18.909
+  },
+  "state": "deposit",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#7a7a7a",
+  "usedIn": [
+   {
+    "state": "deposit-first",
+    "element": "search-chevron",
+    "frameBox": {
+     "x": 485.099,
+     "y": 844.121,
+     "w": 11.664,
+     "h": 18.909
+    }
+   },
+   {
+    "state": "confirm-pressed",
+    "element": "search-chevron",
+    "frameBox": {
+     "x": 485.099,
+     "y": 844.121,
+     "w": 11.664,
+     "h": 18.909
+    }
+   },
+   {
+    "state": "withdraw",
+    "element": "search-chevron",
+    "frameBox": {
+     "x": 485.099,
+     "y": 1021.576,
+     "w": 11.664,
+     "h": 18.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 333,
+   "y": 549,
+   "w": 8,
+   "h": 13
+  },
+  "notes": "'…' 검색하기 뒤 › (회색). 8×13dp 상자 = 검색 글자 top + 1dp(입금 549, 출금 671), 꼭짓점 (6.17, 6.5), 팔 4.92×4.91dp, 굵기 1.85dp(잰 1.75 — 렌더 잉크가 9% 모자라 올림), #7a7a7a. 잰 꼭짓점 (339.17, 555.67 / 677.32)dp. 메모 › 를 1.25배 한 모양(같은 꺾쇠 아이콘 16dp/20dp 로 보임)",
+  "verify": {
+   "method": "close-x 와 같음 (크롭 22x28px)",
+   "svgFitL1": 0.222,
+   "svgFitL1Withdraw": 0.184,
+   "centroidOffsetPx": [
+    0.29,
+    -0.26
+   ],
+   "inkRatio": 1.0
+  }
+ }
+]

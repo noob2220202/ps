@@ -1,0 +1,10 @@
+[
+  { "name": "launch/splash-logo-f60", "url": "/?frame=1&shot=splash-anim", "t": 186.9,
+    "video": "v1", "i0": 60, "i1": 60, "t0": 1.935, "t1": 1.935, "scenario": "v1-start",
+    "note": "WON 로고 애니메이션 중간 위상: 스플래시 마운트(= 영상 #52 1.748311) 뒤 186.9ms. 원 중심 258.23px. 채택 곡선 잔차 +0.02px (spec/launch.md 3.2)" },
+  { "name": "launch/splash-logo-f66", "url": "/?frame=1&shot=splash-anim", "t": 295.0,
+    "video": "v1", "i0": 66, "i1": 66, "t0": 2.043, "t1": 2.043, "scenario": "v1-start",
+    "note": "끝 무렵 위상: 마운트 뒤 295.0ms. 원 중심 276.08px. 채택 곡선 잔차 −0.22px" },
+  { "name": "launch/cert-pin-keypad", "url": "/cert?frame=1&shot=cert-pin-keypad", "noCompare": true, "scenario": "v1-start",
+    "note": "설계 화면(영상에 없음, 보안 검은 화면 동안의 PIN 입력). 찍기만 하고 비교하지 않는다" }
+]

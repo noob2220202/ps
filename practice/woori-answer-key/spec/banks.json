@@ -1,0 +1,1193 @@
+{
+ "_comment": "금융회사 선택 페이지(은행 탭) 21개 — 영상 v2 71.965–72.467(#2765–#2773)에 보인 전부, 순서 그대로. 이름은 영상 글자 그대로(회사 이름 = 개인정보 아님). code = 파일 이름(woori/banks/<code>.png, 32dp 원 로고를 3배로), kftcCode = 금융결제원 표준 기관 코드(공개 값). gridDp 는 설계 dp(앱 뷰포트 기준), framePx 는 v2 bank-idle 기준 프레임(#2772–#2773)에서 잰 값. 주인: send-a (다른 그룹은 banks.<code> 로 참조)",
+ "group": "send-a",
+ "source": "v2 #2772–#2773 (tools/ref/send-a/bank-idle.png)",
+ "tab": "bank",
+ "grid": {
+  "columns": 3,
+  "columnsXdp": [
+   20,
+   129.333,
+   238.667
+  ],
+  "tileWdp": 101.333,
+  "tileHdp": 82,
+  "gapXdp": 8,
+  "row0TopDp": 191.1667,
+  "rowPitchDp": 90.1667,
+  "radiusDp": 12,
+  "fill": "#f6f7fa",
+  "logoDp": 32,
+  "logoTopInTileDp": 11.667,
+  "name": {
+   "sizeDp": 13,
+   "weight": 500,
+   "letterSpacingEm": 0,
+   "color": "#33353a",
+   "align": "center",
+   "topInTileDp": 54,
+   "baselineInTileDp": 65
+  },
+  "visibleRows": "7줄 (7번째 줄 타일 아래끝은 뷰포트 아래로 잘림, 이름은 보임). 스크롤하지 않아 그 아래 은행은 영상에 없음 — 지어내지 않음"
+ },
+ "banks": [
+  {
+   "code": "woori",
+   "name": "우리은행",
+   "kftcCode": "020",
+   "order": 0,
+   "row": 0,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/woori.png",
+   "gridDp": {
+    "x": 20,
+    "y": 191.167,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 202.834,
+    "logoD": 32,
+    "nameTop": 245
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     323.63,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.6,
+     363.66
+    ],
+    "logoInkBox": [
+     79,
+     340,
+     47,
+     48
+    ],
+    "nameInkBox": [
+     70,
+     403,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 0,
+    "ms": 0,
+    "t": 71.965,
+    "frame": 2765
+   },
+   "chipName": "우리"
+  },
+  {
+   "code": "nh",
+   "name": "농협은행",
+   "kftcCode": "011",
+   "order": 1,
+   "row": 0,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/nh.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 191.167,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 202.834,
+    "logoD": 32,
+    "nameTop": 245
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     323.63,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.07,
+     363.7
+    ],
+    "logoInkBox": [
+     238,
+     340,
+     48,
+     48
+    ],
+    "nameInkBox": [
+     230,
+     402,
+     64,
+     18
+    ]
+   },
+   "logoStage": {
+    "stage": 0,
+    "ms": 0,
+    "t": 71.965,
+    "frame": 2765
+   },
+   "chipName": "농협"
+  },
+  {
+   "code": "kb",
+   "name": "국민은행",
+   "kftcCode": "004",
+   "order": 2,
+   "row": 0,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/kb.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 191.167,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 202.834,
+    "logoD": 32,
+    "nameTop": 245
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     323.63,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.44,
+     363.64
+    ],
+    "logoInkBox": [
+     398,
+     340,
+     48,
+     48
+    ],
+    "nameInkBox": [
+     389,
+     403,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 0,
+    "ms": 0,
+    "t": 71.965,
+    "frame": 2765
+   },
+   "chipName": "국민"
+  },
+  {
+   "code": "kakao",
+   "name": "카카오뱅크",
+   "kftcCode": "090",
+   "order": 3,
+   "row": 1,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/kakao.png",
+   "gridDp": {
+    "x": 20,
+    "y": 281.333,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 293.0,
+    "logoD": 32,
+    "nameTop": 335
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     455.22,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.67,
+     495.11
+    ],
+    "logoInkBox": [
+     79,
+     470,
+     49,
+     50
+    ],
+    "nameInkBox": [
+     62,
+     534,
+     81,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 0,
+    "ms": 0,
+    "t": 71.965,
+    "frame": 2765
+   },
+   "chipName": "카카오뱅크"
+  },
+  {
+   "code": "shinhan",
+   "name": "신한은행",
+   "kftcCode": "088",
+   "order": 4,
+   "row": 1,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/shinhan.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 281.333,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 293.0,
+    "logoD": 32,
+    "nameTop": 335
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     455.22,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.04,
+     495.07
+    ],
+    "logoInkBox": [
+     238,
+     471,
+     48,
+     49
+    ],
+    "nameInkBox": [
+     230,
+     534,
+     63,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 1,
+    "ms": 58,
+    "t": 72.023,
+    "frame": 2766
+   }
+  },
+  {
+   "code": "hana",
+   "name": "하나은행",
+   "kftcCode": "081",
+   "order": 5,
+   "row": 1,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/hana.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 281.333,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 293.0,
+    "logoD": 32,
+    "nameTop": 335
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     455.22,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.44,
+     495.04
+    ],
+    "logoInkBox": [
+     398,
+     471,
+     48,
+     49
+    ],
+    "nameInkBox": [
+     389,
+     534,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 1,
+    "ms": 58,
+    "t": 72.023,
+    "frame": 2766
+   }
+  },
+  {
+   "code": "ibk",
+   "name": "기업은행",
+   "kftcCode": "003",
+   "order": 6,
+   "row": 2,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/ibk.png",
+   "gridDp": {
+    "x": 20,
+    "y": 371.5,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 383.167,
+    "logoD": 32,
+    "nameTop": 426
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     585.96,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.57,
+     626.42
+    ],
+    "logoInkBox": [
+     79,
+     602,
+     47,
+     48
+    ],
+    "nameInkBox": [
+     71,
+     665,
+     63,
+     18
+    ]
+   },
+   "logoStage": {
+    "stage": 1,
+    "ms": 58,
+    "t": 72.023,
+    "frame": 2766
+   }
+  },
+  {
+   "code": "toss",
+   "name": "토스뱅크",
+   "kftcCode": "092",
+   "order": 7,
+   "row": 2,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/toss.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 371.5,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 383.167,
+    "logoD": 32,
+    "nameTop": 426
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     585.96,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.02,
+     626.44
+    ],
+    "logoInkBox": [
+     239,
+     603,
+     47,
+     47
+    ],
+    "nameInkBox": [
+     230,
+     666,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 3,
+    "ms": 108,
+    "t": 72.073,
+    "frame": 2768
+   }
+  },
+  {
+   "code": "kfcc",
+   "name": "새마을금고",
+   "kftcCode": "045",
+   "order": 8,
+   "row": 2,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/kfcc.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 371.5,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 383.167,
+    "logoD": 32,
+    "nameTop": 426
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     585.96,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.46,
+     626.44
+    ],
+    "logoInkBox": [
+     398,
+     603,
+     48,
+     48
+    ],
+    "nameInkBox": [
+     381,
+     665,
+     81,
+     18
+    ]
+   },
+   "logoStage": {
+    "stage": 2,
+    "ms": 75,
+    "t": 72.04,
+    "frame": 2767
+   }
+  },
+  {
+   "code": "kbank",
+   "name": "케이뱅크",
+   "kftcCode": "089",
+   "order": 9,
+   "row": 3,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/kbank.png",
+   "gridDp": {
+    "x": 20,
+    "y": 461.667,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 473.334,
+    "logoD": 32,
+    "nameTop": 516
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     717.24,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.57,
+     757.33
+    ],
+    "logoInkBox": [
+     79,
+     734,
+     49,
+     48
+    ],
+    "nameInkBox": [
+     70,
+     796,
+     65,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 2,
+    "ms": 75,
+    "t": 72.04,
+    "frame": 2767
+   }
+  },
+  {
+   "code": "im",
+   "name": "iM뱅크(대구)",
+   "kftcCode": "031",
+   "order": 10,
+   "row": 3,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/im.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 461.667,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 473.334,
+    "logoD": 32,
+    "nameTop": 516
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     717.24,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.05,
+     757.36
+    ],
+    "logoInkBox": [
+     238,
+     734,
+     48,
+     48
+    ],
+    "nameInkBox": [
+     213,
+     796,
+     98,
+     20
+    ]
+   },
+   "logoStage": {
+    "stage": 0,
+    "ms": 0,
+    "t": 71.965,
+    "frame": 2765
+   }
+  },
+  {
+   "code": "busan",
+   "name": "부산은행",
+   "kftcCode": "032",
+   "order": 11,
+   "row": 3,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/busan.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 461.667,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 473.334,
+    "logoD": 32,
+    "nameTop": 516
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     717.24,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.48,
+     757.36
+    ],
+    "logoInkBox": [
+     398,
+     734,
+     48,
+     48
+    ],
+    "nameInkBox": [
+     389,
+     796,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 2,
+    "ms": 75,
+    "t": 72.04,
+    "frame": 2767
+   }
+  },
+  {
+   "code": "sc",
+   "name": "SC제일은행",
+   "kftcCode": "023",
+   "order": 12,
+   "row": 4,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/sc.png",
+   "gridDp": {
+    "x": 20,
+    "y": 551.833,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 563.5,
+    "logoD": 32,
+    "nameTop": 606
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     848.22,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.58,
+     888.75
+    ],
+    "logoInkBox": [
+     79,
+     865,
+     47,
+     49
+    ],
+    "nameInkBox": [
+     58,
+     928,
+     89,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 2,
+    "ms": 75,
+    "t": 72.04,
+    "frame": 2767
+   }
+  },
+  {
+   "code": "kyongnam",
+   "name": "경남은행",
+   "kftcCode": "039",
+   "order": 13,
+   "row": 4,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/kyongnam.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 551.833,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 563.5,
+    "logoD": 32,
+    "nameTop": 606
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     848.22,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.05,
+     888.77
+    ],
+    "logoInkBox": [
+     238,
+     865,
+     50,
+     49
+    ],
+    "nameInkBox": [
+     230,
+     928,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 3,
+    "ms": 108,
+    "t": 72.073,
+    "frame": 2768
+   }
+  },
+  {
+   "code": "kwangju",
+   "name": "광주은행",
+   "kftcCode": "034",
+   "order": 14,
+   "row": 4,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/kwangju.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 551.833,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 563.5,
+    "logoD": 32,
+    "nameTop": 606
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     848.22,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.43,
+     888.74
+    ],
+    "logoInkBox": [
+     398,
+     865,
+     49,
+     49
+    ],
+    "nameInkBox": [
+     389,
+     928,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 3,
+    "ms": 108,
+    "t": 72.073,
+    "frame": 2768
+   }
+  },
+  {
+   "code": "deutsche",
+   "name": "도이치은행",
+   "kftcCode": "055",
+   "order": 15,
+   "row": 5,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/deutsche.png",
+   "gridDp": {
+    "x": 20,
+    "y": 642.0,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 653.667,
+    "logoD": 32,
+    "nameTop": 696
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     979.01,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.57,
+     1019.65
+    ],
+    "logoInkBox": [
+     79,
+     996,
+     47,
+     48
+    ],
+    "nameInkBox": [
+     62,
+     1059,
+     80,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 3,
+    "ms": 108,
+    "t": 72.073,
+    "frame": 2768
+   }
+  },
+  {
+   "code": "nfcf",
+   "name": "산림조합",
+   "kftcCode": "064",
+   "order": 16,
+   "row": 5,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/nfcf.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 642.0,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 653.667,
+    "logoD": 32,
+    "nameTop": 696
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     979.01,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.0,
+     1019.64
+    ],
+    "logoInkBox": [
+     238,
+     996,
+     48,
+     48
+    ],
+    "nameInkBox": [
+     230,
+     1059,
+     65,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 4,
+    "ms": 133,
+    "t": 72.098,
+    "frame": 2769
+   }
+  },
+  {
+   "code": "kdb",
+   "name": "산업은행",
+   "kftcCode": "002",
+   "order": 17,
+   "row": 5,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/kdb.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 642.0,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 653.667,
+    "logoD": 32,
+    "nameTop": 696
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     979.01,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.44,
+     1019.65
+    ],
+    "logoInkBox": [
+     398,
+     996,
+     50,
+     48
+    ],
+    "nameInkBox": [
+     389,
+     1059,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 4,
+    "ms": 133,
+    "t": 72.098,
+    "frame": 2769
+   }
+  },
+  {
+   "code": "suhyup",
+   "name": "수협은행",
+   "kftcCode": "007",
+   "order": 18,
+   "row": 6,
+   "col": 0,
+   "type": "bank",
+   "logo": "woori/banks/suhyup.png",
+   "gridDp": {
+    "x": 20,
+    "y": 732.167,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 54.666,
+    "logoY": 743.834,
+    "logoD": 32,
+    "nameTop": 786
+   },
+   "framePx": {
+    "tileBox": [
+     28.96,
+     1110.39,
+     147.99,
+     119.08
+    ],
+    "logoCenter": [
+     102.57,
+     1151.03
+    ],
+    "logoInkBox": [
+     79,
+     1127,
+     47,
+     49
+    ],
+    "nameInkBox": [
+     70,
+     1190,
+     64,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 0,
+    "ms": 0,
+    "t": 71.965,
+    "frame": 2765
+   },
+   "chipName": "수협"
+  },
+  {
+   "code": "suhyup-central",
+   "name": "수협중앙회",
+   "kftcCode": "030",
+   "order": 19,
+   "row": 6,
+   "col": 1,
+   "type": "bank",
+   "logo": "woori/banks/suhyup-central.png",
+   "gridDp": {
+    "x": 129.333,
+    "y": 732.167,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 164.0,
+    "logoY": 743.834,
+    "logoD": 32,
+    "nameTop": 786
+   },
+   "framePx": {
+    "tileBox": [
+     187.74,
+     1110.39,
+     148.29,
+     119.08
+    ],
+    "logoCenter": [
+     262.01,
+     1151.04
+    ],
+    "logoInkBox": [
+     238,
+     1127,
+     48,
+     49
+    ],
+    "nameInkBox": [
+     221,
+     1190,
+     80,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 5,
+    "ms": 179,
+    "t": 72.144,
+    "frame": 2771
+   }
+  },
+  {
+   "code": "cu",
+   "name": "신협",
+   "kftcCode": "048",
+   "order": 20,
+   "row": 6,
+   "col": 2,
+   "type": "bank",
+   "logo": "woori/banks/cu.png",
+   "gridDp": {
+    "x": 238.667,
+    "y": 732.167,
+    "w": 101.333,
+    "h": 82,
+    "logoX": 273.334,
+    "logoY": 743.834,
+    "logoD": 32,
+    "nameTop": 786
+   },
+   "framePx": {
+    "tileBox": [
+     347.76,
+     1110.39,
+     148.24,
+     119.08
+    ],
+    "logoCenter": [
+     421.44,
+     1151.04
+    ],
+    "logoInkBox": [
+     398,
+     1127,
+     48,
+     49
+    ],
+    "nameInkBox": [
+     406,
+     1190,
+     30,
+     17
+    ]
+   },
+   "logoStage": {
+    "stage": 5,
+    "ms": 179,
+    "t": 72.144,
+    "frame": 2771
+   }
+  }
+ ],
+ "chipOnly": [
+  {
+   "code": "citi",
+   "name": "한국씨티",
+   "kftcCode": "027",
+   "logo": "woori/banks/citi.png",
+   "chipName": "한국씨티",
+   "note": "추천 칩(v2 67.348–67.732, 69.523–69.824)에만 나옴. 그리드에 없음. 로고는 칩의 16dp 그림에서 자른다(32dp 원본 없음)"
+  }
+ ],
+ "aliases": [
+  {
+   "code": "nh-local",
+   "name": "지역농축협",
+   "kftcCode": "012",
+   "logo": "woori/banks/nh.png",
+   "note": "최근입금계좌·금액 화면의 받는 계좌 은행. 로고는 농협은행(nh)과 같은 그림(노란 원 + 흰 NH 마크)을 40dp/24dp 로"
+  }
+ ],
+ "chipNames": {
+  "woori": "우리",
+  "kakao": "카카오뱅크",
+  "nh": "농협",
+  "kb": "국민",
+  "suhyup": "수협",
+  "citi": "한국씨티"
+ },
+ "securities": {
+  "items": [],
+  "note": "[증권사] 탭은 영상에서 누르지 않아 목록이 없음 — 빈 배열(설계: 탭은 그리되 비어 있거나 은행 목록 유지는 앱 결정)"
+ },
+ "logoStages": [
+  {
+   "stage": 0,
+   "t": 71.965,
+   "frame": 2765,
+   "ms": 0,
+   "codes": [
+    "woori",
+    "nh",
+    "kb",
+    "kakao",
+    "im",
+    "suhyup"
+   ]
+  },
+  {
+   "stage": 1,
+   "t": 72.023,
+   "frame": 2766,
+   "ms": 58,
+   "codes": [
+    "shinhan",
+    "hana",
+    "ibk"
+   ]
+  },
+  {
+   "stage": 2,
+   "t": 72.04,
+   "frame": 2767,
+   "ms": 75,
+   "codes": [
+    "kfcc",
+    "kbank",
+    "busan",
+    "sc"
+   ]
+  },
+  {
+   "stage": 3,
+   "t": 72.073,
+   "frame": 2768,
+   "ms": 108,
+   "codes": [
+    "toss",
+    "kyongnam",
+    "kwangju",
+    "deutsche"
+   ]
+  },
+  {
+   "stage": 4,
+   "t": 72.098,
+   "frame": 2769,
+   "ms": 133,
+   "codes": [
+    "nfcf",
+    "kdb"
+   ]
+  },
+  {
+   "stage": 5,
+   "t": 72.144,
+   "frame": 2771,
+   "ms": 179,
+   "codes": [
+    "suhyup-central",
+    "cu"
+   ]
+  }
+ ],
+ "assets": "로고 PNG 22개(woori/banks/<code>.png, 이름 banks.<code>)는 spec/send-a.assets.json 에 있다 — 원 밖 투명, 140x140 = 32dp 원 상자(frame 46.657x46.545px) x3, 로고가 PNG 가운데(frameBox = 잰 원 자리). citi 만 70x70(16dp 칩에서). 칩(16dp)·은행 칸(28dp)·아바타(40dp)는 같은 그림을 크기만 바꿔 쓴다"
+}

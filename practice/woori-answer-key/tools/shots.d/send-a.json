@@ -1,0 +1,193 @@
+[
+ {
+  "name": "send-a/where-idle",
+  "url": "/send?frame=1&shot=where-idle",
+  "video": "v1",
+  "i0": 6952,
+  "i1": 6960,
+  "t0": 178.095,
+  "t1": 180.235,
+  "scenario": "v1-start",
+  "mask": [
+   "108,488,276,62"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 108,488,276,62 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/where-row-tap-spinner",
+  "url": "/send?frame=1&shot=where-row-tap-spinner",
+  "video": "v1",
+  "i0": 6961,
+  "i1": 7018,
+  "t0": 180.302,
+  "t1": 181.784,
+  "scenario": "v1-start",
+  "mask": [
+   "224,590,76,76",
+   "108,488,276,62"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 108,488,276,62 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/where-reveal",
+  "url": "/send?frame=1&shot=where-reveal",
+  "video": "v2",
+  "i0": 2848,
+  "i1": 2850,
+  "t0": 74.214,
+  "t1": 74.414,
+  "scenario": "v2-start",
+  "mask": [
+   "224,590,76,76",
+   "108,488,276,62"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 108,488,276,62 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-push",
+  "url": "/send/account?frame=1&shot=account-push",
+  "video": "v2",
+  "i0": 2600,
+  "i1": 2600,
+  "t0": 63.852,
+  "t1": 63.852,
+  "scenario": "v2-start",
+  "mask": [
+   "108,488,276,62"
+  ],
+  "t": 110,
+  "note": "push 곡선 시작 뒤 110ms 위상 (영상 #2600, 새 페이지 왼끝 155.8px) / 개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 108,488,276,62 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-focus",
+  "url": "/send/account?frame=1&shot=account-focus",
+  "video": "v2",
+  "i0": 2622,
+  "i1": 2622,
+  "t0": 64.261,
+  "t1": 64.261,
+  "scenario": "v2-start",
+  "mask": [
+   "27,240,6,43"
+  ],
+  "t": 159,
+  "note": "포커스 밑줄 곡선 시작 뒤 159ms (영상 #2622, 폭 116px)"
+ },
+ {
+  "name": "send-a/account-keyboard-up",
+  "url": "/send/account?frame=1&shot=account-keyboard-up",
+  "video": "v2",
+  "i0": 2647,
+  "i1": 2647,
+  "t0": 64.773,
+  "t1": 64.773,
+  "scenario": "v2-start",
+  "mask": [
+   "27,240,6,43"
+  ],
+  "note": "키보드는 translateY 80dp(잰 윗변 855.3px)에 멈춘 모습으로 그린다 — 곡선 위상(t) 대신 잰 자리 (VFR 시각 흔들림, spec send-a.md 9.7)"
+ },
+ {
+  "name": "send-a/account-typing",
+  "url": "/send/account?frame=1&shot=account-typing",
+  "video": "v2",
+  "i0": 2698,
+  "i1": 2700,
+  "t0": 68.001,
+  "t1": 68.084,
+  "scenario": "v2-start",
+  "mask": [
+   "141,240,8,43",
+   "26,244,262,32"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-typed",
+  "url": "/send/account?frame=1&shot=account-typed",
+  "video": "v2",
+  "i0": 2735,
+  "i1": 2738,
+  "t0": 70.46,
+  "t1": 71.356,
+  "scenario": "v2-start",
+  "mask": [
+   "280,240,8,43",
+   "26,244,262,32"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-bank-selected",
+  "url": "/send/account?frame=1&shot=account-bank-selected",
+  "video": "v2",
+  "i0": 2775,
+  "i1": 2776,
+  "t0": 72.716,
+  "t1": 72.749,
+  "scenario": "v2-start",
+  "mask": [
+   "26,244,262,32"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-ready",
+  "url": "/send/account?frame=1&shot=account-ready",
+  "video": "v2",
+  "i0": 2800,
+  "i1": 2800,
+  "t0": 73.177,
+  "t1": 73.177,
+  "scenario": "v2-start",
+  "mask": [
+   "26,244,262,32"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-confirm-pressed",
+  "url": "/send/account?frame=1&shot=account-confirm-pressed",
+  "video": "v2",
+  "i0": 2801,
+  "i1": 2801,
+  "t0": 73.201,
+  "t1": 73.201,
+  "scenario": "v2-start",
+  "mask": [
+   "224,590,76,76",
+   "26,244,262,32"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/account-confirm-spinner",
+  "url": "/send/account?frame=1&shot=account-confirm-spinner",
+  "video": "v2",
+  "i0": 2805,
+  "i1": 2847,
+  "t0": 73.368,
+  "t1": 74.189,
+  "scenario": "v2-start",
+  "mask": [
+   "224,590,76,76",
+   "26,244,262,32"
+  ],
+  "note": "개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ },
+ {
+  "name": "send-a/bank-open",
+  "url": "/send/account/bank?frame=1&shot=bank-open",
+  "video": "v2",
+  "i0": 2751,
+  "i1": 2751,
+  "t0": 71.655,
+  "t1": 71.655,
+  "scenario": "v2-start",
+  "mask": [
+   "26,244,262,32"
+  ],
+  "t": 110,
+  "note": "금융회사 push 곡선 시작 뒤 110ms (영상 #2751, 왼끝 155.9px) / 개인정보 글자 상자(더미 이름·계좌·입력 숫자는 실제와 글자 폭이 다름) 26,244,262,32 를 마스크에 더함"
+ }
+]

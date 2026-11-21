@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="58" viewBox="0 0 72 58" fill="none">
+<!-- 배너 4 그림의 캐릭터 자리 독창 대체 그림 (영상의 캐릭터를 따라 그리지 않음): 지구본 + eSIM 카드 + 여행가방 손잡이.
+     (critic 고침: 앞 판의 '얼굴 없는 주머니 + 파란 띠 + 흰 점' 은 원래 캐릭터의 실루엣·셔츠 무늬와 너무 비슷해 다시 그림.)
+     단위 dp, 상자 = 카드 기준 (224, 30) 72x58. banner-img-04.png(가방·바탕) 위에 겹쳐 그린다. 비교에서는 이 상자를 마스크한다. -->
+<ellipse cx="33" cy="53.5" rx="24" ry="3.8" fill="#c6dbee" opacity="0.9"/>
+<path d="M62 47L55 40" stroke="#3d6fae" stroke-width="3.8" stroke-linecap="round"/>
+<rect x="53" y="42.5" width="16.5" height="12.5" rx="3.2" fill="#b7c2d7"/>
+<rect x="55.6" y="45" width="11.4" height="2.3" rx="1.15" fill="#dfe5f0"/>
+<circle cx="32" cy="33" r="19.5" fill="#f4efe8"/>
+<circle cx="32" cy="33" r="19.5" stroke="#3d6fae" stroke-width="2.2"/>
+<ellipse cx="32" cy="33" rx="8.2" ry="19.5" stroke="#3d6fae" stroke-width="1.8"/>
+<path d="M12.5 33H51.5M15.2 23.2H48.8M15.2 42.8H48.8" stroke="#3d6fae" stroke-width="1.8"/>
+<path d="M22 27.5C24.5 25 28 25.8 29.5 28.2C30.6 30 29 32.6 26.4 32.2C24.3 31.9 23.6 33.9 22 33.4C20.4 32.9 20.3 29.2 22 27.5Z" fill="#9fc3e6"/>
+<path d="M36.5 36.2C39.2 34.6 43 35.4 44.2 37.8C45 39.6 43.2 41.6 40.6 41C38.8 40.6 37.6 42.4 36.2 41.6C34.9 40.8 35 37.1 36.5 36.2Z" fill="#9fc3e6"/>
+<g transform="rotate(-12 27 8.5)">
+<rect x="18.5" y="1.5" width="17" height="13" rx="2.2" fill="#ffffff" stroke="#3d6fae" stroke-width="1.4"/>
+<rect x="21.5" y="4.3" width="7.4" height="7.2" rx="1.2" fill="#e8c35a"/>
+<path d="M21.5 7.9H28.9M25.2 4.3V11.5" stroke="#c9a23c" stroke-width="0.8"/>
+</g>
+</svg>

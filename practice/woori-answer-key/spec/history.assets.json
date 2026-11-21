@@ -1,0 +1,5840 @@
+[
+ {
+  "name": "back-chevron",
+  "file": "woori/history/back-chevron.svg",
+  "frameBox": {
+   "x": 22.903,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-344-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#37373a",
+  "usedIn": [
+   {
+    "state": "loading-skeleton",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "render",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "render-toggle",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "all-top-spinner",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "reload-spinner",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "reload-spinner-withdraw",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "render-342",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "all-scroll",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "all-scrolled-102",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scrolled-1991",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scrolled-2376",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scrolled-3781",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scrolled-4471",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scrolled-64",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scrolled-10194",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag1",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-318",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag2",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-472",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag3",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-1594",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag4",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-1754",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag5",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-2351",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag6",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-3223",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scroll-drag7",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "deposit-scrolled",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag1",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-329",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag2",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-738",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag3",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-911",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag4",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-1041",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag5",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-4058",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag6",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag7",
+    "element": "back",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "launch/cert-pin-spinner",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 33.9,
+     "y": 73.29,
+     "w": 11.4,
+     "h": 20.03
+    },
+    "note": "launch 스펙 box 는 잉크 상자 — 그림 상자는 history 와 같은 24dp (16,14)"
+   },
+   {
+    "state": "launch/cert-pin-filled",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 33.9,
+     "y": 73.29,
+     "w": 11.4,
+     "h": 20.03
+    },
+    "note": "launch 스펙 box 는 잉크 상자 — 그림 상자는 history 와 같은 24dp (16,14)"
+   },
+   {
+    "state": "send-a/where-render",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-a/where-idle",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-a/where-row-tap-spinner",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-a/where-reveal",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-a/account-push",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-render",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-keypad",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-1won",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-confirm-pressed",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-keypad-hide",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-1won-form",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-next-pressed",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-next-spinner",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-processing",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-2won",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/confirm-render",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/confirm-idle",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/confirm-transfer-pressed",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/confirm-processing",
+    "element": "back-chevron",
+    "frameBox": {
+     "x": 22.903,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 16.0,
+   "y": 14.0,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:16px; top:14px; width:24px; height:24px",
+  "notes": "일반 페이지 머리 ‹ (주인 history — launch 인증서 PIN·send-a 이체 대상·send-b 금액/확인 머리도 같은 그림, 같은 상자). 24dp 상자 (16,14) 안 꼭짓점 (8.464, 11.989), 팔 가로 5.989 · 세로 ±5.994 (45°), 굵기 1.975dp, 둥근 끝·둥근 이음, #37373a (≈ --woori-text #33353a, 얇은 선이라 코어가 Δ4 옅게 찍힘). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 맨 위 정지 9장(v1 5 + v2 4) 평균 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 끝 모양: 둥근 끝 fitMAD 0.56 < square 0.91 < butt 1.06. 다른 그룹 자리(launch·send-a·send-b 기준 그림)에서도 같은 상자로 svgFitL1 0.0026–0.0045(account-push 는 흰 베일 밑이라 0.010). 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    19,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "top-344-all": {
+     "svgFitL1": 0.0043,
+     "relErr": 0.0932,
+     "centroidOffsetPx": [
+      -0.175,
+      -0.154
+     ],
+     "inkMassRatio": 0.9653,
+     "rgbMAD": 0.857,
+     "rgbMax": 29
+    },
+    "top-344": {
+     "svgFitL1": 0.0057,
+     "relErr": 0.1186,
+     "centroidOffsetPx": [
+      -0.385,
+      -0.009
+     ],
+     "inkMassRatio": 0.9257,
+     "rgbMAD": 1.158,
+     "rgbMax": 30
+    },
+    "all-top": {
+     "svgFitL1": 0.0048,
+     "relErr": 0.1071,
+     "centroidOffsetPx": [
+      -0.091,
+      -0.051
+     ],
+     "inkMassRatio": 0.9772,
+     "rgbMAD": 0.975,
+     "rgbMax": 28
+    },
+    "deposit-top": {
+     "svgFitL1": 0.0041,
+     "relErr": 0.0915,
+     "centroidOffsetPx": [
+      -0.054,
+      -0.003
+     ],
+     "inkMassRatio": 0.989,
+     "rgbMAD": 0.813,
+     "rgbMax": 21
+    },
+    "top-342-all": {
+     "svgFitL1": 0.0046,
+     "relErr": 0.0996,
+     "centroidOffsetPx": [
+      -0.306,
+      -0.248
+     ],
+     "inkMassRatio": 0.951,
+     "rgbMAD": 0.938,
+     "rgbMax": 29
+    }
+   },
+   "svgFitL1": 0.005,
+   "relErr": 0.1,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "crossGroup": {
+    "launch/cert-pin-filled@16,14": {
+     "svgFitL1": 0.0045,
+     "relErr": 0.1023,
+     "centroidOffsetPx": [
+      -0.095,
+      -0.001
+     ],
+     "inkMassRatio": 1.0021,
+     "rgbMAD": 0.914,
+     "rgbMax": 26,
+     "boxDp": [
+      16,
+      14
+     ],
+     "color": "#33353a"
+    },
+    "send-a/where-idle@16,14": {
+     "svgFitL1": 0.003,
+     "relErr": 0.067,
+     "centroidOffsetPx": [
+      -0.066,
+      0.001
+     ],
+     "inkMassRatio": 0.9812,
+     "rgbMAD": 0.599,
+     "rgbMax": 20,
+     "boxDp": [
+      16,
+      14
+     ],
+     "color": "#3b3a3b"
+    },
+    "send-a/account-push@veil@16,14": {
+     "svgFitL1": 0.0101,
+     "relErr": 0.2707,
+     "centroidOffsetPx": [
+      -0.058,
+      -0.049
+     ],
+     "inkMassRatio": 1.1883,
+     "rgbMAD": 1.974,
+     "rgbMax": 52,
+     "boxDp": [
+      16,
+      14
+     ],
+     "color": "#3b3a3b"
+    },
+    "send-b/amount-keypad-hide@16,14": {
+     "svgFitL1": 0.0036,
+     "relErr": 0.0779,
+     "centroidOffsetPx": [
+      -0.118,
+      -0.128
+     ],
+     "inkMassRatio": 0.9612,
+     "rgbMAD": 0.729,
+     "rgbMax": 24,
+     "boxDp": [
+      16,
+      14
+     ],
+     "color": "#3b3a3b"
+    },
+    "send-b/confirm-render@16,14": {
+     "svgFitL1": 0.0026,
+     "relErr": 0.0581,
+     "centroidOffsetPx": [
+      -0.063,
+      -0.003
+     ],
+     "inkMassRatio": 0.9914,
+     "rgbMAD": 0.531,
+     "rgbMax": 20,
+     "boxDp": [
+      16,
+      14
+     ],
+     "color": "#3b3a3b"
+    }
+   },
+   "modelFit": {
+    "src": "combo-top (맨 위 정지 9장 평균: top-344-all·top-344·all-top·deposit-top·withdraw-top·top-342-all·top-344-withdraw·filter-deposit-top·all-top-spinner)",
+    "rect": [
+     20,
+     63,
+     60,
+     103
+    ],
+    "params": [
+     8.464,
+     11.9887,
+     5.9892,
+     5.9935,
+     1.9753,
+     0.3977
+    ],
+    "paramNames": [
+     "vx",
+     "vy",
+     "a(가로)",
+     "h(세로 반)",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.398,
+    "colors": [
+     "#37373a"
+    ],
+    "bg": "#ffffff",
+    "fitMAD": 0.56,
+    "fitMax": 11,
+    "svgFitL1Model": 0.0044,
+    "variant": "round",
+    "variantsTried": [
+     "round"
+    ],
+    "otherSrcMAD": {
+     "top-344-all": 0.603,
+     "all-top": 0.627,
+     "combo-top-v1": 0.576,
+     "combo-top-v2": 0.654
+    },
+    "widthFactor": 1.0,
+    "widthScan": {
+     "0.92": 0.0078,
+     "0.96": 0.0062,
+     "1.00": 0.0046,
+     "1.04": 0.0059,
+     "1.08": 0.0066,
+     "1.12": 0.0074,
+     "1.16": 0.0083
+    }
+   }
+  }
+ },
+ {
+  "name": "woori-logo-40",
+  "file": "woori/history/woori-logo-40.png",
+  "frameBox": {
+   "x": 27.277,
+   "y": 213.333,
+   "w": 61.237,
+   "h": 61.091
+  },
+  "state": "top-344-all",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "render",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "render-toggle",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "all-top-spinner",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "reload-spinner",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "reload-spinner-withdraw",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "render-342",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "logo",
+    "frameBox": {
+     "x": 27.277,
+     "y": 213.333,
+     "w": 61.237,
+     "h": 61.091
+    }
+   }
+  ],
+  "dp": {
+   "x": 19.0,
+   "y": 115.333,
+   "w": 42.0,
+   "h": 42.0
+  },
+  "css": "position:absolute; left:19px; top:115px; width:42px; height:42px; translate:0px 0.333px",
+  "notes": "계좌 카드 우리은행 로고 원 40dp (연하늘 원 + 파랑 그라데이션 로고). **PNG 상자 = 원 설계 상자 (20,116.333,40,40)dp 에서 바깥으로 1dp (19,115.333,42,42)** — 잰 원이 가운데 (40.113, 136.477)dp · 반지름 20.055dp 라 설계보다 (+0.11, +0.14)dp 옆·아래로 있어 40dp 상자면 가장자리가 잘린다. css 는 PNG 상자 그대로. 만든 법: 맨 위 정지 9장(v1 5 + v2 4) 평균 그림 크롭(여백 8) → EDSR x3 → 역투영 6회 → PNG 상자의 소수 위치·크기(184x183)로 다시 표본(cubic). α = 잰 원의 해석적 덮임(3x 화소 4x4 표본, 흐림 없음 — 영상의 가장자리 흐림 σ 0.72px 는 코덱), 원 가장자리 화소 색 = 원 고리에서 맞춘 색 #c1e1fb, 안쪽은 EDSR 색(α=1), 원 밖 투명. 원 맞춤은 로고 그림(안쪽 15.5dp)을 뺀 고리 띠에서 원 모형(가운데·반지름·안 색·흐림)을 최소제곱 — v1/v2 따로 맞춰도 가운데 ±0.02dp, 반지름 20.04–20.07. home.woori-logo-40(홈 WON 통장 카드)과 같은 그림이다 — 원을 맞춰 겹치면 원 안 평균차 6.2 레벨(소수 이동까지 맞추면 5.3), 남는 차이는 선명도(홈은 기준 그림 1장, 이것은 9장 평균)와 코덱. 흰 카드 위에서만 쓴다.",
+  "circle": {
+   "designDp": [
+    20,
+    116.333,
+    40,
+    40
+   ],
+   "measuredCenterDp": [
+    40.113,
+    136.477
+   ],
+   "measuredRadiusDp": 20.055,
+   "perSrc": {
+    "combo-top-v1": [
+     40.112,
+     136.477,
+     20.055
+    ],
+    "combo-top-v2": [
+     40.123,
+     136.466,
+     20.043
+    ],
+    "top-344-all": [
+     40.126,
+     136.481,
+     20.052
+    ],
+    "all-top": [
+     40.086,
+     136.44,
+     20.07
+    ]
+   },
+   "rimColor": "#c1e1fb",
+   "edgeSigmaPx": 0.722
+  },
+  "verify": {
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → 3x 화소를 frame 화소에 배정해 면적 평균 vs 기준 그림 (frame px, RGB 평균 절대차)",
+   "composite": {
+    "combo-top": {
+     "compositeMAD": 1.391,
+     "compositeMax": 29.1,
+     "compositeP99": 14.7
+    },
+    "combo-top-v1": {
+     "compositeMAD": 1.618,
+     "compositeMax": 28.0,
+     "compositeP99": 15.0
+    },
+    "combo-top-v2": {
+     "compositeMAD": 1.631,
+     "compositeMax": 32.1,
+     "compositeP99": 14.8
+    },
+    "top-344-all": {
+     "compositeMAD": 1.963,
+     "compositeMax": 30.9,
+     "compositeP99": 15.3
+    },
+    "all-top": {
+     "compositeMAD": 2.812,
+     "compositeMax": 36.4,
+     "compositeP99": 17.8
+    },
+    "deposit-top": {
+     "compositeMAD": 2.365,
+     "compositeMax": 29.0,
+     "compositeP99": 15.0
+    },
+    "top-342-all": {
+     "compositeMAD": 1.853,
+     "compositeMax": 33.1,
+     "compositeP99": 14.6
+    }
+   },
+   "render": {
+    "method": "Chromium 360x880 @16/11 셸에 css 대로 img, 기준 그림과 화소 RGB 평균 절대차 (disc = 원 안쪽 1dp 안, rim = 가장자리 ±1dp)",
+    "region": [
+     25,
+     211,
+     66,
+     66
+    ],
+    "rgbMAD": {
+     "combo-top": {
+      "disc": 0.912,
+      "rim": 3.23,
+      "all": 1.222,
+      "max": 29
+     },
+     "top-344-all": {
+      "disc": 1.735,
+      "rim": 3.455,
+      "all": 1.614,
+      "max": 30
+     },
+     "top-344": {
+      "disc": 1.805,
+      "rim": 3.53,
+      "all": 1.604,
+      "max": 32
+     },
+     "all-top": {
+      "disc": 2.573,
+      "rim": 4.37,
+      "all": 2.547,
+      "max": 32
+     },
+     "deposit-top": {
+      "disc": 2.08,
+      "rim": 3.779,
+      "all": 2.093,
+      "max": 38
+     },
+     "withdraw-top": {
+      "disc": 1.694,
+      "rim": 3.524,
+      "all": 1.765,
+      "max": 32
+     },
+     "top-342-all": {
+      "disc": 1.696,
+      "rim": 3.302,
+      "all": 1.508,
+      "max": 33
+     },
+     "top-344-withdraw": {
+      "disc": 1.75,
+      "rim": 3.566,
+      "all": 1.804,
+      "max": 32
+     },
+     "filter-deposit-top": {
+      "disc": 1.733,
+      "rim": 3.511,
+      "all": 1.805,
+      "max": 33
+     }
+    }
+   },
+   "vsHome": {
+    "meanAbsInDisc": 6.15,
+    "meanAbsLogoCore": 11.04,
+    "p95InDisc": 27.8,
+    "eccShift3x": [
+     0.45,
+     0.82
+    ],
+    "meanAbsInDiscAligned": 5.28,
+    "meanAbsLogoCoreAligned": 9.23
+   },
+   "srcFrames": [
+    "top-344-all",
+    "top-344",
+    "all-top",
+    "deposit-top",
+    "withdraw-top",
+    "top-342-all",
+    "top-344-withdraw",
+    "filter-deposit-top",
+    "all-top-spinner"
+   ]
+  },
+  "hq": "woori/history/woori-logo-40.hq.svg"
+ },
+ {
+  "name": "chevron-down-small",
+  "file": "woori/history/chevron-down-small.svg",
+  "frameBox": {
+   "x": 214.78,
+   "y": 217.358,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "top-344-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#6f7071",
+  "usedIn": [
+   {
+    "state": "all-top-spinner",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "reload-spinner",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "reload-spinner-withdraw",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "acctChevron",
+    "frameBox": {
+     "x": 214.78,
+     "y": 217.357,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-render",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-render",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-keypad",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.038,
+     "y": 149.511,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 149.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-keypad",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.48,
+     "y": 259.521,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 259.859,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-1won",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.038,
+     "y": 149.511,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 149.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-1won",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.48,
+     "y": 259.521,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 259.859,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-confirm-pressed",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.038,
+     "y": 149.511,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 149.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-confirm-pressed",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.48,
+     "y": 259.521,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 259.859,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-keypad-hide",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.038,
+     "y": 149.511,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 149.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-keypad-hide",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.48,
+     "y": 259.521,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 259.859,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-1won-form",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-1won-form",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-next-pressed",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-next-pressed",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-next-spinner",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-next-spinner",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-processing",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-processing",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-2won",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.038,
+     "y": 149.511,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 149.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-2won",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.48,
+     "y": 259.521,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 259.859,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.044,
+     "y": 149.948,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 150.352,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "to-chevron",
+    "frameBox": {
+     "x": 242.517,
+     "y": 259.957,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 242.337,
+     "y": 260.344,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/confirm-render",
+    "element": "from-chevron",
+    "frameBox": {
+     "x": 258.038,
+     "y": 149.511,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "specFrameBox": {
+     "x": 258.331,
+     "y": 149.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   }
+  ],
+  "dp": {
+   "x": 147.6,
+   "y": 118.1,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:147px; top:118px; width:16px; height:16px; translate:0.6px 0.1px",
+  "notes": "계좌 이름 \"WON 통장\" 옆 ⌄ (주인 history — send-b 금액·확인 화면 출금/받는 계좌 ⌄ 도 같은 그림). 16dp 상자 (147.6,118.1) = 잉크 가운데 − 8 (글자 끝 + 6dp 를 따라 x 가 움직인다). 꼭짓점 (8.046, 10.739), 팔 가로 ±4.976 · 세로 4.954 (45°), 굵기 1.623dp, 둥근 끝·이음, #6f7071 (= --woori-text-secondary). 큰 꺾쇠 한 벌: chevron-down(20dp 상자, 팔 4.96·굵기 1.69)·chevron-right(16dp ›, 팔 5.01·굵기 1.62)와 같은 그림(팔 ≈4.97, 굵기 1.62–1.69). send-b 자리에서 따로 맞춘 모양 변수도 같다(팔 4.95–5.02, 굵기 1.64–1.66) — 상자만 다르다: send-b 스펙 상자보다 출금 ⌄ (−0.20, −0.25~−0.28)dp, 받는 ⌄ (+0.10~+0.12, −0.23~−0.27)dp 가 잰 자리(usedIn frameBox, specFrameBox = 그 스펙 값). send-b 색은 #4a4b4e 로 적혀 있다 → mask-image + 그 자리 색으로 그리거나 색만 바꾼 사본을 쓴다(모양 같음). 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    211,
+    214,
+    31,
+    30
+   ],
+   "sites": {
+    "top-344-all": {
+     "svgFitL1": 0.008,
+     "relErr": 0.1333,
+     "centroidOffsetPx": [
+      -0.131,
+      -0.083
+     ],
+     "inkMassRatio": 0.8994,
+     "rgbMAD": 1.144,
+     "rgbMax": 22
+    },
+    "top-344": {
+     "svgFitL1": 0.0054,
+     "relErr": 0.0939,
+     "centroidOffsetPx": [
+      0.073,
+      0.059
+     ],
+     "inkMassRatio": 0.9313,
+     "rgbMAD": 0.792,
+     "rgbMax": 19
+    },
+    "all-top": {
+     "svgFitL1": 0.0088,
+     "relErr": 0.1482,
+     "centroidOffsetPx": [
+      0.01,
+      -0.097
+     ],
+     "inkMassRatio": 0.9029,
+     "rgbMAD": 1.281,
+     "rgbMax": 24
+    },
+    "deposit-top": {
+     "svgFitL1": 0.0092,
+     "relErr": 0.1537,
+     "centroidOffsetPx": [
+      -0.174,
+      -0.016
+     ],
+     "inkMassRatio": 0.9035,
+     "rgbMAD": 1.309,
+     "rgbMax": 20
+    },
+    "top-342-all": {
+     "svgFitL1": 0.0061,
+     "relErr": 0.1055,
+     "centroidOffsetPx": [
+      0.09,
+      0.077
+     ],
+     "inkMassRatio": 0.925,
+     "rgbMAD": 0.894,
+     "rgbMax": 18
+    }
+   },
+   "svgFitL1": 0.008,
+   "relErr": 0.133,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "crossGroup": {
+    "send-b/amount-keypad-hide@fit@177.273,71.456": {
+     "svgFitL1": 0.009,
+     "relErr": 0.1439,
+     "centroidOffsetPx": [
+      -0.108,
+      0.004
+     ],
+     "inkMassRatio": 0.9532,
+     "rgbMAD": 1.287,
+     "rgbMax": 26,
+     "boxDp": [
+      177.273,
+      71.456
+     ],
+     "color": "#707071"
+    },
+    "send-b/amount-keypad-hide@spec@177.47,71.7": {
+     "svgFitL1": 0.0196,
+     "relErr": 0.3239,
+     "centroidOffsetPx": [
+      0.18,
+      0.348
+     ],
+     "inkMassRatio": 0.8874,
+     "rgbMAD": 2.801,
+     "rgbMax": 68,
+     "boxDp": [
+      177.47,
+      71.7
+     ],
+     "color": "#707071"
+    },
+    "send-b/amount-form@fit@177.273,71.756": {
+     "svgFitL1": 0.011,
+     "relErr": 0.1718,
+     "centroidOffsetPx": [
+      0.059,
+      0.168
+     ],
+     "inkMassRatio": 0.9043,
+     "rgbMAD": 1.556,
+     "rgbMax": 18,
+     "boxDp": [
+      177.273,
+      71.756
+     ],
+     "color": "#727274"
+    },
+    "send-b/amount-form@spec@177.47,72.033": {
+     "svgFitL1": 0.0238,
+     "relErr": 0.3591,
+     "centroidOffsetPx": [
+      0.332,
+      0.56
+     ],
+     "inkMassRatio": 0.8348,
+     "rgbMAD": 3.351,
+     "rgbMax": 90,
+     "boxDp": [
+      177.47,
+      72.033
+     ],
+     "color": "#727274"
+    },
+    "send-b/amount-1won@fit@177.266,71.454": {
+     "svgFitL1": 0.0076,
+     "relErr": 0.1243,
+     "centroidOffsetPx": [
+      -0.041,
+      0.041
+     ],
+     "inkMassRatio": 0.9772,
+     "rgbMAD": 1.094,
+     "rgbMax": 24,
+     "boxDp": [
+      177.266,
+      71.454
+     ],
+     "color": "#6f6f71"
+    },
+    "send-b/amount-1won@spec@177.47,71.7": {
+     "svgFitL1": 0.0181,
+     "relErr": 0.3065,
+     "centroidOffsetPx": [
+      0.251,
+      0.377
+     ],
+     "inkMassRatio": 0.9131,
+     "rgbMAD": 2.598,
+     "rgbMax": 67,
+     "boxDp": [
+      177.47,
+      71.7
+     ],
+     "color": "#6f6f71"
+    },
+    "send-b/amount-keypad-hide@fit@166.598,147.087": {
+     "svgFitL1": 0.008,
+     "relErr": 0.1259,
+     "centroidOffsetPx": [
+      -0.241,
+      -0.157
+     ],
+     "inkMassRatio": 0.9385,
+     "rgbMAD": 1.138,
+     "rgbMax": 17,
+     "boxDp": [
+      166.598,
+      147.087
+     ],
+     "color": "#717273"
+    },
+    "send-b/amount-keypad-hide@spec@166.5,147.32": {
+     "svgFitL1": 0.0172,
+     "relErr": 0.2798,
+     "centroidOffsetPx": [
+      -0.387,
+      0.185
+     ],
+     "inkMassRatio": 0.8755,
+     "rgbMAD": 2.433,
+     "rgbMax": 56,
+     "boxDp": [
+      166.5,
+      147.32
+     ],
+     "color": "#717273"
+    },
+    "send-b/amount-form@fit@166.623,147.387": {
+     "svgFitL1": 0.0145,
+     "relErr": 0.2194,
+     "centroidOffsetPx": [
+      -0.161,
+      -0.053
+     ],
+     "inkMassRatio": 0.8777,
+     "rgbMAD": 2.067,
+     "rgbMax": 26,
+     "boxDp": [
+      166.623,
+      147.387
+     ],
+     "color": "#6f6f73"
+    },
+    "send-b/amount-form@spec@166.5,147.653": {
+     "svgFitL1": 0.0233,
+     "relErr": 0.3414,
+     "centroidOffsetPx": [
+      -0.305,
+      0.33
+     ],
+     "inkMassRatio": 0.8203,
+     "rgbMAD": 3.326,
+     "rgbMax": 74,
+     "boxDp": [
+      166.5,
+      147.653
+     ],
+     "color": "#6f6f73"
+    }
+   },
+   "modelFit": {
+    "src": "combo-top (맨 위 정지 9장 평균: top-344-all·top-344·all-top·deposit-top·withdraw-top·top-342-all·top-344-withdraw·filter-deposit-top·all-top-spinner)",
+    "rect": [
+     212,
+     215,
+     241,
+     243
+    ],
+    "params": [
+     8.0456,
+     10.7386,
+     4.9759,
+     4.9544,
+     1.6227,
+     0.416
+    ],
+    "paramNames": [
+     "vx",
+     "vy",
+     "a(가로 반)",
+     "h(세로)",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.416,
+    "colors": [
+     "#6f7071"
+    ],
+    "bg": "#ffffff",
+    "fitMAD": 0.73,
+    "fitMax": 7,
+    "svgFitL1Model": 0.0087,
+    "variant": "round",
+    "variantsTried": [
+     "round"
+    ],
+    "otherSrcMAD": {
+     "top-344-all": 0.759,
+     "all-top": 1.03,
+     "combo-top-v1": 0.72,
+     "combo-top-v2": 0.808
+    },
+    "widthFactor": 1.0,
+    "widthScan": {
+     "0.92": 0.0098,
+     "0.96": 0.0086,
+     "1.00": 0.008,
+     "1.04": 0.009,
+     "1.08": 0.0113,
+     "1.12": 0.0126,
+     "1.16": 0.0138
+    }
+   }
+  }
+ },
+ {
+  "name": "copy",
+  "file": "woori/history/copy.svg",
+  "frameBox": {
+   "x": 321.77,
+   "y": 250.376,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "top-344-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#858587",
+  "usedIn": [
+   {
+    "state": "all-top-spinner",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "reload-spinner",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "reload-spinner-withdraw",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "copy",
+    "frameBox": {
+     "x": 321.77,
+     "y": 250.375,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 220.98,
+   "y": 140.8,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:220px; top:140px; width:16px; height:16px; translate:0.98px 0.8px",
+  "notes": "계좌번호 옆 복사 (16dp 상자 (220.98,140.8) = 잉크 가운데 − 8; **x 는 계좌 글자 끝 + 4dp 를 따라간다** — 더미 계좌번호는 영상 글자와 폭이 달라 글자 끝에 붙여 놓는다). 앞 둥근 사각 6.162–13.989 × 6.078–13.824 r 1.410 + 뒤 ㄱ자(왼쪽 아래 끝 (3.674, 9.540) → 왼쪽 2.017 → 위 1.900 → 오른쪽 9.670 → 끝 3.453, 꺾임 r 1.397), 굵기 1.332dp, 둥근 끝·이음, #858587 (≈ --woori-text-tertiary #828487). home.copy(홈 WON 통장 카드)와 같은 그림이다 — 모양 변수 차이 ≤0.25dp(앞 사각 y +0.2, 뒤 위끝 +0.24, 모서리 r 1.41 vs 1.55), 굵기 1.33 vs 1.34. 홈 자리와 상자 기준이 달라 두 파일을 따로 둔다. 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    318,
+    247,
+    31,
+    30
+   ],
+   "sites": {
+    "top-344-all": {
+     "svgFitL1": 0.0193,
+     "relErr": 0.1262,
+     "centroidOffsetPx": [
+      0.012,
+      0.069
+     ],
+     "inkMassRatio": 0.9355,
+     "rgbMAD": 2.472,
+     "rgbMax": 43
+    },
+    "top-344": {
+     "svgFitL1": 0.0163,
+     "relErr": 0.1099,
+     "centroidOffsetPx": [
+      0.104,
+      0.085
+     ],
+     "inkMassRatio": 0.9628,
+     "rgbMAD": 2.004,
+     "rgbMax": 37
+    },
+    "all-top": {
+     "svgFitL1": 0.0204,
+     "relErr": 0.137,
+     "centroidOffsetPx": [
+      0.11,
+      0.286
+     ],
+     "inkMassRatio": 0.9587,
+     "rgbMAD": 2.547,
+     "rgbMax": 37
+    },
+    "deposit-top": {
+     "svgFitL1": 0.0219,
+     "relErr": 0.146,
+     "centroidOffsetPx": [
+      -0.005,
+      0.33
+     ],
+     "inkMassRatio": 0.9515,
+     "rgbMAD": 2.668,
+     "rgbMax": 34
+    },
+    "top-342-all": {
+     "svgFitL1": 0.0164,
+     "relErr": 0.1114,
+     "centroidOffsetPx": [
+      0.104,
+      0.046
+     ],
+     "inkMassRatio": 0.9694,
+     "rgbMAD": 2.05,
+     "rgbMax": 37
+    }
+   },
+   "svgFitL1": 0.019,
+   "relErr": 0.126,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "combo-top (맨 위 정지 9장 평균: top-344-all·top-344·all-top·deposit-top·withdraw-top·top-342-all·top-344-withdraw·filter-deposit-top·all-top-spinner)",
+    "rect": [
+     319,
+     248,
+     348,
+     276
+    ],
+    "params": [
+     6.1615,
+     6.0781,
+     13.9889,
+     13.8243,
+     1.4099,
+     3.6738,
+     9.5398,
+     2.0165,
+     1.9,
+     9.6699,
+     3.4525,
+     1.3965,
+     1.3319,
+     0.3584
+    ],
+    "paramNames": [
+     "fx0",
+     "fy0",
+     "fx1",
+     "fy1",
+     "fr",
+     "bxe",
+     "bye",
+     "bxl",
+     "byt",
+     "bxr",
+     "bre",
+     "br",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.358,
+    "colors": [
+     "#858587"
+    ],
+    "bg": "#fefefe",
+    "fitMAD": 1.822,
+    "fitMax": 33,
+    "svgFitL1Model": 0.0141,
+    "variant": "round",
+    "variantsTried": [
+     "round"
+    ],
+    "otherSrcMAD": {
+     "top-344-all": 2.494,
+     "all-top": 2.457,
+     "combo-top-v1": 1.755,
+     "combo-top-v2": 1.962
+    },
+    "widthFactor": 1.0,
+    "widthScan": {
+     "0.92": 0.0261,
+     "0.96": 0.0204,
+     "1.00": 0.0193,
+     "1.04": 0.0202,
+     "1.08": 0.0237,
+     "1.12": 0.0264,
+     "1.16": 0.0348
+    }
+   }
+  }
+ },
+ {
+  "name": "search",
+  "file": "woori/history/search.svg",
+  "frameBox": {
+   "x": 28.735,
+   "y": 599.758,
+   "w": 29.161,
+   "h": 29.091
+  },
+  "state": "top-344-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#707072",
+  "usedIn": [
+   {
+    "state": "all-top-spinner",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "reload-spinner",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "reload-spinner-withdraw",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "search",
+    "frameBox": {
+     "x": 28.735,
+     "y": 599.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-scroll",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-scrolled-102",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 497.869,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-1991",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-2376",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-3781",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-4471",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scrolled-64",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 535.757,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scrolled-10194",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag1",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 368.018,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-318",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 281.75,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag2",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 164.775,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-472",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag3",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-1594",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag4",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-1754",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag5",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-2351",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag6",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-3223",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag7",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag1",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 426.73,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-329",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 270.933,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag2",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-738",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag3",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-911",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag4",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-1041",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag5",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-4058",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag6",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag7",
+    "element": "blockSearch",
+    "frameBox": {
+     "x": 28.735,
+     "y": 132.364,
+     "w": 29.161,
+     "h": 29.091
+    }
+   }
+  ],
+  "dp": {
+   "x": 20.0,
+   "y": 381.0,
+   "w": 20,
+   "h": 20
+  },
+  "css": "position:absolute; left:20px; top:381px; width:20px; height:20px",
+  "notes": "필터 줄 돋보기 🔍 (20dp 상자 (20,381); 붙은 필터 블록에서는 (20,59.667) 등 블록과 함께 움직인다). 고리 가운데 (8.456, 8.823) 반지름 5.986, 손잡이 각 45.0°, 가운데에서 12.484 까지, 굵기 1.736dp(맞춤 1.669 × 렌더 대조 1.04), 고리 = 원 획, 손잡이 끝 각짐(butt — 둥근 끝 fitMAD 1.53 > butt 1.36), #707072 (≈ --woori-text-secondary). 탭 동작은 영상에 없음. 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    25,
+    596,
+    36,
+    36
+   ],
+   "sites": {
+    "top-344-all": {
+     "svgFitL1": 0.0171,
+     "relErr": 0.1386,
+     "centroidOffsetPx": [
+      -0.107,
+      -0.19
+     ],
+     "inkMassRatio": 1.0004,
+     "rgbMAD": 2.475,
+     "rgbMax": 63
+    },
+    "top-344": {
+     "svgFitL1": 0.0162,
+     "relErr": 0.135,
+     "centroidOffsetPx": [
+      -0.115,
+      -0.077
+     ],
+     "inkMassRatio": 1.0298,
+     "rgbMAD": 2.314,
+     "rgbMax": 59
+    },
+    "all-top": {
+     "svgFitL1": 0.018,
+     "relErr": 0.1461,
+     "centroidOffsetPx": [
+      -0.16,
+      -0.093
+     ],
+     "inkMassRatio": 1.0026,
+     "rgbMAD": 2.609,
+     "rgbMax": 59
+    },
+    "deposit-top": {
+     "svgFitL1": 0.0197,
+     "relErr": 0.162,
+     "centroidOffsetPx": [
+      -0.202,
+      -0.098
+     ],
+     "inkMassRatio": 1.0159,
+     "rgbMAD": 2.807,
+     "rgbMax": 60
+    },
+    "top-342-all": {
+     "svgFitL1": 0.0161,
+     "relErr": 0.1344,
+     "centroidOffsetPx": [
+      -0.147,
+      -0.155
+     ],
+     "inkMassRatio": 1.0312,
+     "rgbMAD": 2.3,
+     "rgbMax": 56
+    },
+    "deposit-scrolled-1991@stuck": {
+     "svgFitL1": 0.0199,
+     "relErr": 0.1615,
+     "centroidOffsetPx": [
+      -0.132,
+      -0.092
+     ],
+     "inkMassRatio": 0.9575,
+     "rgbMAD": 2.847,
+     "rgbMax": 43
+    },
+    "deposit-scrolled-3781@stuck": {
+     "svgFitL1": 0.0205,
+     "relErr": 0.1641,
+     "centroidOffsetPx": [
+      -0.122,
+      -0.195
+     ],
+     "inkMassRatio": 0.9465,
+     "rgbMAD": 2.934,
+     "rgbMax": 43
+    },
+    "withdraw-scrolled-10194@stuck": {
+     "svgFitL1": 0.0181,
+     "relErr": 0.1497,
+     "centroidOffsetPx": [
+      -0.003,
+      -0.045
+     ],
+     "inkMassRatio": 0.9796,
+     "rgbMAD": 2.584,
+     "rgbMax": 45
+    }
+   },
+   "svgFitL1": 0.018,
+   "relErr": 0.148,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "combo-top (맨 위 정지 9장 평균: top-344-all·top-344·all-top·deposit-top·withdraw-top·top-342-all·top-344-withdraw·filter-deposit-top·all-top-spinner)",
+    "rect": [
+     26,
+     597,
+     60,
+     631
+    ],
+    "params": [
+     8.4564,
+     8.823,
+     5.9858,
+     0.785,
+     12.484,
+     1.6691,
+     0.4085
+    ],
+    "paramNames": [
+     "cx",
+     "cy",
+     "r",
+     "θ(rad)",
+     "L(가운데→손잡이 끝)",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.408,
+    "colors": [
+     "#707072",
+     "#6f6f70"
+    ],
+    "bg": "#ffffff",
+    "fitMAD": 1.358,
+    "fitMax": 46,
+    "svgFitL1Model": 0.0136,
+    "variant": "butt",
+    "variantsTried": [
+     "round",
+     "butt"
+    ],
+    "otherSrcMAD": {
+     "top-344-all": 1.468,
+     "all-top": 1.654,
+     "combo-top-v1": 1.37,
+     "combo-top-v2": 1.456
+    },
+    "widthFactor": 1.04,
+    "widthScan": {
+     "0.92": 0.0221,
+     "0.96": 0.0186,
+     "1.00": 0.0178,
+     "1.04": 0.0171,
+     "1.08": 0.0175,
+     "1.12": 0.0213,
+     "1.16": 0.0229
+    }
+   }
+  }
+ },
+ {
+  "name": "filter-sliders",
+  "file": "woori/history/filter-sliders.svg",
+  "frameBox": {
+   "x": 466.144,
+   "y": 600.485,
+   "w": 29.161,
+   "h": 29.091
+  },
+  "state": "top-344-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#6d6f73",
+  "usedIn": [
+   {
+    "state": "all-top-spinner",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "reload-spinner",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "reload-spinner-withdraw",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "filterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 600.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-scroll",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-scrolled-102",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 498.596,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-1991",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-2376",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-3781",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled-4471",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scrolled-64",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 536.484,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scrolled-10194",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag1",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 368.745,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-318",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 282.477,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag2",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 165.502,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-472",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag3",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-1594",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag4",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-1754",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag5",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-2351",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag6",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-pause-3223",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scroll-drag7",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-scrolled",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag1",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 427.457,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-329",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 271.66,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag2",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-738",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag3",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-911",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag4",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-1041",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag5",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-pause-4058",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag6",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-scroll-drag7",
+    "element": "blockFilterIcon",
+    "frameBox": {
+     "x": 466.144,
+     "y": 133.091,
+     "w": 29.161,
+     "h": 29.091
+    }
+   }
+  ],
+  "dp": {
+   "x": 320.0,
+   "y": 381.5,
+   "w": 20,
+   "h": 20
+  },
+  "css": "position:absolute; left:320px; top:381px; width:20px; height:20px; translate:0px 0.5px",
+  "notes": "필터 줄 오른쪽 조절(슬라이더) 아이콘 (20dp 상자 (320,381.5), 오른끝 340; 붙은 블록에서는 (320,60.167) 등). 위 줄 y 6.334: x 3.050–16.968, 고리 가운데 x 12.514 · 아래 줄 y 13.325: x 3.064–16.997, 고리 가운데 x 7.526, 고리 반지름 2.492, 굵기 고리 1.703 · 줄 1.696 dp(맞춤 × 렌더 대조 1.04), 줄은 고리 바깥에서 끊긴다(고리 안은 비어 있음), 줄 끝 둥근, #6d6f73 (≈ --woori-text-secondary). 누르면 조회조건 시트(눌림 효과 없음). 고리 안쪽이 조금 푸르스름하게 찍힌 것(B−R ≈ +8)은 코덱 색 번짐 — 흰색. 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    463,
+    597,
+    36,
+    36
+   ],
+   "sites": {
+    "top-344-all": {
+     "svgFitL1": 0.017,
+     "relErr": 0.1248,
+     "centroidOffsetPx": [
+      -0.199,
+      -0.246
+     ],
+     "inkMassRatio": 0.98,
+     "rgbMAD": 2.457,
+     "rgbMax": 33
+    },
+    "top-344": {
+     "svgFitL1": 0.0139,
+     "relErr": 0.1043,
+     "centroidOffsetPx": [
+      -0.033,
+      -0.161
+     ],
+     "inkMassRatio": 1.0019,
+     "rgbMAD": 2.03,
+     "rgbMax": 34
+    },
+    "all-top": {
+     "svgFitL1": 0.0192,
+     "relErr": 0.1396,
+     "centroidOffsetPx": [
+      -0.121,
+      -0.247
+     ],
+     "inkMassRatio": 0.9712,
+     "rgbMAD": 2.786,
+     "rgbMax": 37
+    },
+    "deposit-top": {
+     "svgFitL1": 0.0196,
+     "relErr": 0.1446,
+     "centroidOffsetPx": [
+      -0.081,
+      -0.137
+     ],
+     "inkMassRatio": 0.9857,
+     "rgbMAD": 2.815,
+     "rgbMax": 33
+    },
+    "top-342-all": {
+     "svgFitL1": 0.0148,
+     "relErr": 0.111,
+     "centroidOffsetPx": [
+      -0.09,
+      -0.083
+     ],
+     "inkMassRatio": 1.0012,
+     "rgbMAD": 2.182,
+     "rgbMax": 33
+    },
+    "deposit-scrolled-1991@stuck": {
+     "svgFitL1": 0.0213,
+     "relErr": 0.1515,
+     "centroidOffsetPx": [
+      -0.469,
+      -0.199
+     ],
+     "inkMassRatio": 0.9738,
+     "rgbMAD": 3.067,
+     "rgbMax": 30
+    },
+    "deposit-scrolled-3781@stuck": {
+     "svgFitL1": 0.0203,
+     "relErr": 0.1459,
+     "centroidOffsetPx": [
+      -0.324,
+      -0.327
+     ],
+     "inkMassRatio": 0.982,
+     "rgbMAD": 2.938,
+     "rgbMax": 34
+    },
+    "withdraw-scrolled-10194@stuck": {
+     "svgFitL1": 0.0206,
+     "relErr": 0.1478,
+     "centroidOffsetPx": [
+      -0.313,
+      -0.208
+     ],
+     "inkMassRatio": 0.9807,
+     "rgbMAD": 2.977,
+     "rgbMax": 37
+    }
+   },
+   "svgFitL1": 0.019,
+   "relErr": 0.142,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "combo-top (맨 위 정지 9장 평균: top-344-all·top-344·all-top·deposit-top·withdraw-top·top-342-all·top-344-withdraw·filter-deposit-top·all-top-spinner)",
+    "rect": [
+     464,
+     598,
+     498,
+     632
+    ],
+    "params": [
+     3.0505,
+     16.9678,
+     3.0642,
+     16.9965,
+     6.3338,
+     13.3254,
+     12.514,
+     7.5258,
+     2.4919,
+     1.6373,
+     1.6304,
+     0.4158
+    ],
+    "paramNames": [
+     "x0a",
+     "x1a",
+     "x0b",
+     "x1b",
+     "y1",
+     "y2",
+     "c1x",
+     "c2x",
+     "rc",
+     "wr(고리)",
+     "wl(줄)",
+     "σpx"
+    ],
+    "sigmaPx": 0.416,
+    "colors": [
+     "#6d6f73",
+     "#6d6e71"
+    ],
+    "bg": "#ffffff",
+    "fitMAD": 1.541,
+    "fitMax": 17,
+    "svgFitL1Model": 0.0147,
+    "variant": "round",
+    "variantsTried": [
+     "round",
+     "butt"
+    ],
+    "otherSrcMAD": {
+     "top-344-all": 1.743,
+     "all-top": 2.026,
+     "combo-top-v1": 1.514,
+     "combo-top-v2": 1.681
+    },
+    "widthFactor": 1.04,
+    "widthScan": {
+     "0.92": 0.0222,
+     "0.96": 0.02015,
+     "1.00": 0.0196,
+     "1.04": 0.0194,
+     "1.08": 0.02095,
+     "1.12": 0.0256,
+     "1.16": 0.02855
+    }
+   }
+  }
+ },
+ {
+  "name": "chevron-down",
+  "file": "woori/history/chevron-down.svg",
+  "frameBox": {
+   "x": 436.984,
+   "y": 734.546,
+   "w": 29.161,
+   "h": 29.091
+  },
+  "state": "top-344-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#828488",
+  "usedIn": [
+   {
+    "state": "all-top-spinner",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "spinner-off",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344-all",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "all-top",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "deposit-top",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-deposit-spinner",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-deposit-top",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "withdraw-top",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "filter-withdraw-spinner",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-344-withdraw",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "leave-spinner",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-pressed",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-wait",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "transfer-spinner",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   },
+   {
+    "state": "top-342-all",
+    "element": "sumChevron",
+    "frameBox": {
+     "x": 436.984,
+     "y": 734.545,
+     "w": 29.161,
+     "h": 29.091
+    }
+   }
+  ],
+  "dp": {
+   "x": 300.0,
+   "y": 473.667,
+   "w": 20,
+   "h": 20
+  },
+  "css": "position:absolute; left:300px; top:473px; width:20px; height:20px; translate:0px 0.667px",
+  "notes": "기간 내 합계 상자 오른쪽 ⌄ (20dp 상자 (300,473.667), 회색 바탕 #f6f7fa 위). 꼭짓점 (10.017, 12.190), 팔 가로 ±4.961 · 세로 4.993, 굵기 1.687dp, 둥근 끝·이음, #828488 (≈ --woori-text-tertiary). chevron-down-small 과 같은 꺾쇠(팔 ≈4.97)를 20dp 상자 가운데에 둔 것. 펼침(⌄ 180° 회전)은 영상에 없음 → 설계값(history.md 8절). 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    433,
+    731,
+    37,
+    36
+   ],
+   "sites": {
+    "top-344-all": {
+     "svgFitL1": 0.0041,
+     "relErr": 0.0991,
+     "centroidOffsetPx": [
+      0.038,
+      0.127
+     ],
+     "inkMassRatio": 1.0042,
+     "rgbMAD": 0.6,
+     "rgbMax": 18
+    },
+    "top-344": {
+     "svgFitL1": 0.0043,
+     "relErr": 0.105,
+     "centroidOffsetPx": [
+      0.031,
+      0.075
+     ],
+     "inkMassRatio": 1.0029,
+     "rgbMAD": 0.803,
+     "rgbMax": 20
+    },
+    "all-top": {
+     "svgFitL1": 0.0068,
+     "relErr": 0.1612,
+     "centroidOffsetPx": [
+      -0.005,
+      0.055
+     ],
+     "inkMassRatio": 0.9786,
+     "rgbMAD": 0.973,
+     "rgbMax": 28
+    },
+    "deposit-top": {
+     "svgFitL1": 0.0061,
+     "relErr": 0.1424,
+     "centroidOffsetPx": [
+      -0.019,
+      0.214
+     ],
+     "inkMassRatio": 0.9677,
+     "rgbMAD": 0.966,
+     "rgbMax": 18
+    },
+    "top-342-all": {
+     "svgFitL1": 0.0044,
+     "relErr": 0.1076,
+     "centroidOffsetPx": [
+      0.0,
+      0.11
+     ],
+     "inkMassRatio": 1.0153,
+     "rgbMAD": 0.671,
+     "rgbMax": 23
+    }
+   },
+   "svgFitL1": 0.004,
+   "relErr": 0.108,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "combo-top (맨 위 정지 9장 평균: top-344-all·top-344·all-top·deposit-top·withdraw-top·top-342-all·top-344-withdraw·filter-deposit-top·all-top-spinner)",
+    "rect": [
+     434,
+     732,
+     469,
+     766
+    ],
+    "params": [
+     10.0173,
+     12.1899,
+     4.9613,
+     4.9932,
+     1.6874,
+     0.3971
+    ],
+    "paramNames": [
+     "vx",
+     "vy",
+     "a(가로 반)",
+     "h(세로)",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.397,
+    "colors": [
+     "#828488"
+    ],
+    "bg": "#f6f7fa",
+    "fitMAD": 0.361,
+    "fitMax": 11,
+    "svgFitL1Model": 0.0031,
+    "variant": "round",
+    "variantsTried": [
+     "round"
+    ],
+    "otherSrcMAD": {
+     "top-344-all": 0.397,
+     "all-top": 0.777,
+     "combo-top-v1": 0.442,
+     "combo-top-v2": 0.367
+    },
+    "widthFactor": 1.0,
+    "widthScan": {
+     "0.92": 0.0053,
+     "0.96": 0.0048,
+     "1.00": 0.0044,
+     "1.04": 0.0052,
+     "1.08": 0.0069,
+     "1.12": 0.0077,
+     "1.16": 0.0086
+    }
+   }
+  }
+ },
+ {
+  "name": "close-x",
+  "file": "woori/history/close-x.svg",
+  "frameBox": {
+   "x": 460.312,
+   "y": 591.03,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "sheet-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#37373a",
+  "usedIn": [
+   {
+    "state": "sheet-all",
+    "element": "sheetClose",
+    "frameBox": {
+     "x": 460.312,
+     "y": 591.03,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "sheet-deposit",
+    "element": "sheetClose",
+    "frameBox": {
+     "x": 460.312,
+     "y": 591.03,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "sheet-withdraw",
+    "element": "sheetClose",
+    "frameBox": {
+     "x": 460.312,
+     "y": 591.03,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "sheet-apply-pressed",
+    "element": "sheetClose",
+    "frameBox": {
+     "x": 460.312,
+     "y": 591.03,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "sheet-apply-pressed-top",
+    "element": "sheetClose",
+    "frameBox": {
+     "x": 460.312,
+     "y": 591.03,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "send-b/dup-open",
+    "element": "dup-close",
+    "frameBox": {
+     "x": 460.299,
+     "y": 699.921,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 460.02,
+     "y": 700.318,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/dup-idle",
+    "element": "dup-close",
+    "frameBox": {
+     "x": 460.299,
+     "y": 635.65,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 460.02,
+     "y": 636.048,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/dup-yes-pressed",
+    "element": "dup-close",
+    "frameBox": {
+     "x": 460.299,
+     "y": 635.65,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 460.02,
+     "y": 636.048,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/password-leak",
+    "element": "pw-close",
+    "frameBox": {
+     "x": 460.302,
+     "y": 466.416,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 460.02,
+     "y": 467.045,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   },
+   {
+    "state": "send-b/password-leak-spinner",
+    "element": "pw-close",
+    "frameBox": {
+     "x": 460.302,
+     "y": 466.416,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "specFrameBox": {
+     "x": 460.02,
+     "y": 467.045,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "note": "send-b 자리: 같은 그림, 상자는 그 기준 그림에서 다시 맞춘 값"
+   }
+  ],
+  "dp": {
+   "x": 316.0,
+   "y": 375.0,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:316px; top:375px; width:24px; height:24px",
+  "notes": "시트 ✕ (조회조건 시트 위 오른쪽, 24dp 상자 (316,375); 주인 history — send-b 중복 경고 시트·비밀번호 시트 ✕ 도 같은 그림). 가운데 (12.016, 12.327), 팔 반 6.047 (14.1dp 대각), 굵기 1.918dp, 둥근 끝, #37373a (≈ --woori-text). history-detail.close-x(상세 머리 ✕, 팔 6.04·굵기 1.95)와 같은 그림이다(±0.04dp) — 상자 기준만 다르다. send-b 자리에서 다시 맞춘 모양도 같다(팔 6.00–6.06, 굵기 1.89–1.97): 가운데 x 가 328.01dp 로 이 상자(316)와 같다 → send-b 스펙 상자 x 315.8 은 316 이 맞고, y 는 중복 경고 −0.27 · 비밀번호 −0.43dp (usedIn frameBox; 스펙 값은 specFrameBox). 영상에서 누른 적 없음 → 시트 닫힘(설계). 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    457,
+    588,
+    42,
+    41
+   ],
+   "sites": {
+    "sheet-all": {
+     "svgFitL1": 0.0111,
+     "relErr": 0.1259,
+     "centroidOffsetPx": [
+      -0.135,
+      -0.167
+     ],
+     "inkMassRatio": 0.9487,
+     "rgbMAD": 2.242,
+     "rgbMax": 30
+    },
+    "sheet-deposit": {
+     "svgFitL1": 0.0104,
+     "relErr": 0.1193,
+     "centroidOffsetPx": [
+      -0.16,
+      -0.108
+     ],
+     "inkMassRatio": 0.9618,
+     "rgbMAD": 2.076,
+     "rgbMax": 37
+    },
+    "sheet-withdraw": {
+     "svgFitL1": 0.0109,
+     "relErr": 0.1235,
+     "centroidOffsetPx": [
+      -0.074,
+      -0.189
+     ],
+     "inkMassRatio": 0.9501,
+     "rgbMAD": 2.196,
+     "rgbMax": 30
+    },
+    "sheet-apply-pressed": {
+     "svgFitL1": 0.009,
+     "relErr": 0.1042,
+     "centroidOffsetPx": [
+      -0.159,
+      -0.135
+     ],
+     "inkMassRatio": 0.969,
+     "rgbMAD": 1.808,
+     "rgbMax": 26
+    }
+   },
+   "svgFitL1": 0.011,
+   "relErr": 0.121,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "crossGroup": {
+    "send-b/dup-idle@spec@315.8,405.95": {
+     "svgFitL1": 0.0224,
+     "relErr": 0.2579,
+     "centroidOffsetPx": [
+      -0.467,
+      0.156
+     ],
+     "inkMassRatio": 0.9606,
+     "rgbMAD": 4.492,
+     "rgbMax": 121,
+     "boxDp": [
+      315.8,
+      405.95
+     ],
+     "color": "#3b3a3b"
+    },
+    "send-b/dup-idle@fit@315.991,405.676": {
+     "svgFitL1": 0.0095,
+     "relErr": 0.1139,
+     "centroidOffsetPx": [
+      -0.178,
+      -0.431
+     ],
+     "inkMassRatio": 0.9469,
+     "rgbMAD": 1.916,
+     "rgbMax": 33,
+     "boxDp": [
+      315.991,
+      405.676
+     ],
+     "color": "#35353a"
+    },
+    "send-b/password-leak@spec@315.8,289.76": {
+     "svgFitL1": 0.0305,
+     "relErr": 0.3377,
+     "centroidOffsetPx": [
+      -0.481,
+      0.47
+     ],
+     "inkMassRatio": 0.924,
+     "rgbMAD": 6.079,
+     "rgbMax": 149,
+     "boxDp": [
+      315.8,
+      289.76
+     ],
+     "color": "#3b3a3b"
+    },
+    "send-b/password-leak@fit@315.993,289.327": {
+     "svgFitL1": 0.0102,
+     "relErr": 0.1176,
+     "centroidOffsetPx": [
+      -0.191,
+      -0.177
+     ],
+     "inkMassRatio": 0.9482,
+     "rgbMAD": 2.053,
+     "rgbMax": 40,
+     "boxDp": [
+      315.993,
+      289.327
+     ],
+     "color": "#343538"
+    }
+   },
+   "modelFit": {
+    "src": "combo-sheet (시트 정지 5장 평균: sheet-all·sheet-deposit·sheet-withdraw·sheet-apply-pressed·sheet-apply-pressed-top)",
+    "rect": [
+     458,
+     589,
+     498,
+     628
+    ],
+    "params": [
+     12.0158,
+     12.3274,
+     6.047,
+     1.9178,
+     0.4003
+    ],
+    "paramNames": [
+     "cx",
+     "cy",
+     "L(팔 반)",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.4,
+    "colors": [
+     "#37373a"
+    ],
+    "bg": "#ffffff",
+    "fitMAD": 1.424,
+    "fitMax": 17,
+    "svgFitL1Model": 0.0096,
+    "variant": "round",
+    "variantsTried": [
+     "round"
+    ],
+    "otherSrcMAD": {
+     "sheet-all": 1.703,
+     "sheet-apply-pressed": 1.272,
+     "sheet-withdraw": 1.684
+    },
+    "widthFactor": 1.0,
+    "widthScan": {
+     "0.92": 0.01205,
+     "0.96": 0.01105,
+     "1.00": 0.01065,
+     "1.04": 0.01105,
+     "1.08": 0.0137,
+     "1.12": 0.0152,
+     "1.16": 0.0215
+    }
+   }
+  }
+ },
+ {
+  "name": "chevron-down-tiny",
+  "file": "woori/history/chevron-down-tiny.svg",
+  "frameBox": {
+   "x": 306.344,
+   "y": 1009.939,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "sheet-all",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#707071",
+  "usedIn": [
+   {
+    "state": "sheet-all",
+    "element": "detailChevron",
+    "frameBox": {
+     "x": 306.344,
+     "y": 1009.939,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "sheet-deposit",
+    "element": "detailChevron",
+    "frameBox": {
+     "x": 306.344,
+     "y": 1009.939,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "sheet-withdraw",
+    "element": "detailChevron",
+    "frameBox": {
+     "x": 306.344,
+     "y": 1009.939,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "sheet-apply-pressed",
+    "element": "detailChevron",
+    "frameBox": {
+     "x": 306.344,
+     "y": 1009.939,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "sheet-apply-pressed-top",
+    "element": "detailChevron",
+    "frameBox": {
+     "x": 306.344,
+     "y": 1009.939,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 210.4,
+   "y": 663.0,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:210px; top:663px; width:16px; height:16px; translate:0.4px 0px",
+  "notes": "시트 \"상세조건조회\" 옆 아주 작은 ⌄ (16dp 상자 (210.4,663)). 꼭짓점 (7.908, 10.007), 팔 가로 ±3.986 · 세로 4.013, 굵기 1.363dp, 둥근 끝·이음, #707071 (≈ --woori-text-secondary). 작은 꺾쇠 한 벌(팔 ≈3.93, 굵기 ≈1.40): chevron-down-12 · chevron-right-12 (done·send-b 의 12dp ⌄/›)와 같은 그림을 16dp 상자에 둔 것. 처음 맞춤은 가늘고 흐린 국소 최소(굵기 1.11, σ 0.51)로 빠져 σ 0.40 으로 묶은 맞춤에서 다시 시작했다(fitMAD 1.03 → 0.80). 맞춤·놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "region": [
+    303,
+    1006,
+    30,
+    31
+   ],
+   "sites": {
+    "sheet-all": {
+     "svgFitL1": 0.0085,
+     "relErr": 0.2025,
+     "centroidOffsetPx": [
+      0.087,
+      0.106
+     ],
+     "inkMassRatio": 0.9065,
+     "rgbMAD": 1.217,
+     "rgbMax": 27
+    },
+    "sheet-deposit": {
+     "svgFitL1": 0.0078,
+     "relErr": 0.1874,
+     "centroidOffsetPx": [
+      0.054,
+      0.363
+     ],
+     "inkMassRatio": 0.9147,
+     "rgbMAD": 1.115,
+     "rgbMax": 25
+    },
+    "sheet-withdraw": {
+     "svgFitL1": 0.0089,
+     "relErr": 0.2085,
+     "centroidOffsetPx": [
+      0.358,
+      0.2
+     ],
+     "inkMassRatio": 0.8927,
+     "rgbMAD": 1.273,
+     "rgbMax": 26
+    },
+    "sheet-apply-pressed": {
+     "svgFitL1": 0.008,
+     "relErr": 0.1887,
+     "centroidOffsetPx": [
+      0.12,
+      0.177
+     ],
+     "inkMassRatio": 0.8986,
+     "rgbMAD": 1.144,
+     "rgbMax": 28
+    }
+   },
+   "svgFitL1": 0.008,
+   "relErr": 0.196,
+   "summary": "svgFitL1·relErr = history 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "combo-sheet (시트 정지 5장 평균: sheet-all·sheet-deposit·sheet-withdraw·sheet-apply-pressed·sheet-apply-pressed-top)",
+    "rect": [
+     304,
+     1007,
+     332,
+     1036
+    ],
+    "params": [
+     7.9084,
+     10.0068,
+     3.9863,
+     4.013,
+     1.3635,
+     0.4183
+    ],
+    "paramNames": [
+     "vx",
+     "vy",
+     "a(가로 반)",
+     "h(세로)",
+     "w",
+     "σpx"
+    ],
+    "sigmaPx": 0.418,
+    "colors": [
+     "#707071"
+    ],
+    "bg": "#ffffff",
+    "fitMAD": 0.799,
+    "fitMax": 12,
+    "svgFitL1Model": 0.008,
+    "variant": "round",
+    "variantsTried": [
+     "round"
+    ],
+    "otherSrcMAD": {
+     "sheet-all": 0.843,
+     "sheet-apply-pressed": 0.856,
+     "sheet-withdraw": 0.939
+    },
+    "widthFactor": 1.0,
+    "widthScan": {
+     "0.92": 0.009,
+     "0.96": 0.00855,
+     "1.00": 0.00825,
+     "1.04": 0.0084,
+     "1.08": 0.00885,
+     "1.12": 0.0107,
+     "1.16": 0.01135
+    }
+   }
+  }
+ },
+ {
+  "name": "chevron-right",
+  "file": "woori/history/chevron-right.svg",
+  "frameBox": {
+   "x": 478.829,
+   "y": 761.867,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "send-b/amount-form",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#6e6e71",
+  "usedIn": [
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "recv-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 761.867,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "my-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 840.776,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-next-pressed",
+    "element": "recv-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 761.867,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-next-pressed",
+    "element": "my-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 840.776,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-next-spinner",
+    "element": "recv-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 761.867,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-next-spinner",
+    "element": "my-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 840.776,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-processing",
+    "element": "recv-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 761.867,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-processing",
+    "element": "my-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 840.776,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "recv-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 761.867,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "my-label-chevron",
+    "frameBox": {
+     "x": 478.829,
+     "y": 840.776,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 328.7,
+   "y": 492.45,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:328px; top:492px; width:16px; height:16px; translate:0.7px 0.45px",
+  "notes": "큰 › 16dp (history 화면에는 없음 — send-b 가 \"주인 history\" 로 참조: 받는분에게 표시 › · 나에게 표시 ›). send-b 기준 그림 3곳(amount-form 두 줄, amount-processing)에서 꺾은선 모형을 맞춘 값의 평균: 꼭짓점 (10.486, 7.947), 팔 가로 5.009 · 세로 ±4.988, 굵기 1.622dp(1.604–1.631), 둥근 끝·이음, #6e6e71. 16dp 상자 = 잉크 가운데 − 8 (send-b 스펙 상자 그대로 맞음, svgFitL1 0.007–0.009). send-b 스펙 색 #9a9ca0 은 가는 선의 가장 진한 화소 값이고, 덮임 모형으로 되살린 선 색은 #6c6d6f–#717072 다. chevron-down-small 을 돌린 것과 같은 그림. home.chevron-right(공지 줄 ›)도 같은 꺾쇠지만 홈 상자 안 자리가 0.31dp 왼쪽이라(홈 marquee 자리에서 이 파일 L1 0.024) 홈은 제 파일을 쓴다. 놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "svgFitL1": 0.008,
+   "relErr": 0.141,
+   "summary": "history 화면에 없는 그림 — svgFitL1·relErr = 권하는 상자(usedIn frameBox)에 놓은 다른 그룹 기준 그림들의 중앙값 (@spec = 그 그룹 스펙 상자 그대로, @ink = 잰 잉크 가운데 상자)",
+   "crossGroup": {
+    "send-b/amount-form@spec@328.7,492.45": {
+     "svgFitL1": 0.0091,
+     "relErr": 0.1571,
+     "centroidOffsetPx": [
+      -0.354,
+      0.127
+     ],
+     "inkMassRatio": 0.968,
+     "rgbMAD": 1.326,
+     "rgbMax": 26,
+     "boxDp": [
+      328.7,
+      492.45
+     ],
+     "color": "#6c6d6f"
+    },
+    "send-b/amount-form@spec@328.7,546.7": {
+     "svgFitL1": 0.0073,
+     "relErr": 0.1267,
+     "centroidOffsetPx": [
+      -0.236,
+      -0.155
+     ],
+     "inkMassRatio": 0.9694,
+     "rgbMAD": 1.038,
+     "rgbMax": 19,
+     "boxDp": [
+      328.7,
+      546.7
+     ],
+     "color": "#717072"
+    },
+    "send-b/amount-processing@spec@328.7,546.7": {
+     "svgFitL1": 0.008,
+     "relErr": 0.1394,
+     "centroidOffsetPx": [
+      -0.206,
+      -0.069
+     ],
+     "inkMassRatio": 0.9725,
+     "rgbMAD": 1.153,
+     "rgbMax": 23,
+     "boxDp": [
+      328.7,
+      546.7
+     ],
+     "color": "#6e6e71"
+    },
+    "send-b/amount-processing@spec@328.7,492.45": {
+     "svgFitL1": 0.0081,
+     "relErr": 0.1412,
+     "centroidOffsetPx": [
+      -0.224,
+      -0.157
+     ],
+     "inkMassRatio": 0.9714,
+     "rgbMAD": 1.177,
+     "rgbMax": 30,
+     "boxDp": [
+      328.7,
+      492.45
+     ],
+     "color": "#6e6e71"
+    },
+    "send-b/amount-next-spinner@spec@328.7,492.45": {
+     "svgFitL1": 0.0094,
+     "relErr": 0.1565,
+     "centroidOffsetPx": [
+      -0.466,
+      -0.243
+     ],
+     "inkMassRatio": 0.9358,
+     "rgbMAD": 1.353,
+     "rgbMax": 23,
+     "boxDp": [
+      328.7,
+      492.45
+     ],
+     "color": "#6e6e71"
+    },
+    "home/marquee@home@312,634.667": {
+     "svgFitL1": 0.024,
+     "relErr": 0.3739,
+     "centroidOffsetPx": [
+      0.339,
+      -0.054
+     ],
+     "inkMassRatio": 0.8548,
+     "rgbMAD": 3.371,
+     "rgbMax": 75,
+     "boxDp": [
+      312,
+      634.667
+     ],
+     "color": "#737275"
+    }
+   },
+   "derivedFrom": "work: spec-work/history/assets/work/derived.json (다른 그룹 기준 그림에서 맞춘 꺾은선 변수 평균, 각 자리 맞춤은 work/x/fits_x.json)"
+  }
+ },
+ {
+  "name": "chevron-right-12",
+  "file": "woori/history/chevron-right-12.svg",
+  "frameBox": {
+   "x": 452.115,
+   "y": 628.368,
+   "w": 17.496,
+   "h": 17.455
+  },
+  "state": "done/idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#6d6f72",
+  "usedIn": [
+   {
+    "state": "done/render",
+    "element": "memo-chevron",
+    "frameBox": {
+     "x": 452.115,
+     "y": 595.883,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 452.264,
+     "y": 596.267,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-right 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "done/idle",
+    "element": "memo-chevron",
+    "frameBox": {
+     "x": 452.115,
+     "y": 628.368,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 452.264,
+     "y": 628.751,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-right 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "done/confirm-pressed",
+    "element": "memo-chevron",
+    "frameBox": {
+     "x": 452.115,
+     "y": 595.883,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 452.264,
+     "y": 596.267,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-right 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "first-time-chevron",
+    "frameBox": {
+     "x": 322.309,
+     "y": 352.959,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 322.251,
+     "y": 352.766,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-right 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-2won",
+    "element": "first-time-chevron",
+    "frameBox": {
+     "x": 322.309,
+     "y": 352.475,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 322.251,
+     "y": 352.281,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-right 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "first-time-chevron",
+    "frameBox": {
+     "x": 322.309,
+     "y": 352.959,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 322.251,
+     "y": 352.766,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-right 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   }
+  ],
+  "dp": {
+   "x": 310.378,
+   "y": 400.669,
+   "w": 12,
+   "h": 12
+  },
+  "css": "position:absolute; left:310px; top:400px; width:12px; height:12px; translate:0.3777px 0.6693px",
+  "notes": "작은 › 12dp (history 화면에는 없음 — done 메모 ›, send-b \"처음 보내는 계좌예요\" 칩 › 가 history 이름으로 참조). done 3곳 + send-b 2곳 + 작은 ⌄ 5곳 + history 시트 ⌄ 1곳의 꺾은선 맞춤 평균: 팔 3.929 (3.799–4.013, 45°), 굵기 1.400dp (1.363–1.429), 둥근 끝·이음. 12dp 상자 잉크 가운데 (6,6) 에 둔다 → 꼭짓점 (7.964, 6). 색 #6d6f72 (done 3곳 맞춤 평균; send-b 분홍 칩 위는 #72666b). 16dp 큰 › (chevron-right, 팔 5.01) 를 12dp 로 줄이면 팔 3.76·굵기 1.22 가 되어 잰 값(3.93·1.40)과 어긋나므로 따로 둔다. 자리: done 메모 › 는 done 스펙 상자보다 (-0.10, -0.26)dp, send-b 칩 › 는 (+0.04, +0.13)dp 옮긴 곳(usedIn). 놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "svgFitL1": 0.006,
+   "relErr": 0.103,
+   "summary": "history 화면에 없는 그림 — svgFitL1·relErr = 권하는 상자(usedIn frameBox)에 놓은 다른 그룹 기준 그림들의 중앙값 (@spec = 그 그룹 스펙 상자 그대로, @ink = 잰 잉크 가운데 상자)",
+   "crossGroup": {
+    "done/idle@spec@310.48,400.933": {
+     "svgFitL1": 0.0206,
+     "relErr": 0.3383,
+     "centroidOffsetPx": [
+      0.135,
+      0.459
+     ],
+     "inkMassRatio": 1.0009,
+     "rgbMAD": 2.917,
+     "rgbMax": 62,
+     "boxDp": [
+      310.48,
+      400.933
+     ],
+     "color": "#6c6d70"
+    },
+    "done/idle@ink@310.377,400.679": {
+     "svgFitL1": 0.0084,
+     "relErr": 0.1329,
+     "centroidOffsetPx": [
+      -0.042,
+      0.135
+     ],
+     "inkMassRatio": 0.9382,
+     "rgbMAD": 1.237,
+     "rgbMax": 20,
+     "boxDp": [
+      310.377,
+      400.679
+     ],
+     "color": "#6c6d70"
+    },
+    "done/render@spec@310.48,378.6": {
+     "svgFitL1": 0.0192,
+     "relErr": 0.3021,
+     "centroidOffsetPx": [
+      0.162,
+      0.377
+     ],
+     "inkMassRatio": 1.0005,
+     "rgbMAD": 2.95,
+     "rgbMax": 70,
+     "boxDp": [
+      310.48,
+      378.6
+     ],
+     "color": "#6f7477"
+    },
+    "done/render@ink@310.374,378.328": {
+     "svgFitL1": 0.0062,
+     "relErr": 0.1019,
+     "centroidOffsetPx": [
+      -0.016,
+      0.063
+     ],
+     "inkMassRatio": 0.9421,
+     "rgbMAD": 1.221,
+     "rgbMax": 19,
+     "boxDp": [
+      310.374,
+      378.328
+     ],
+     "color": "#6f7477"
+    },
+    "done/confirm-pressed@spec@310.48,378.6": {
+     "svgFitL1": 0.0189,
+     "relErr": 0.3036,
+     "centroidOffsetPx": [
+      0.165,
+      0.44
+     ],
+     "inkMassRatio": 1.0213,
+     "rgbMAD": 2.807,
+     "rgbMax": 73,
+     "boxDp": [
+      310.48,
+      378.6
+     ],
+     "color": "#6b6c6f"
+    },
+    "done/confirm-pressed@ink@310.382,378.335": {
+     "svgFitL1": 0.0071,
+     "relErr": 0.1187,
+     "centroidOffsetPx": [
+      -0.011,
+      0.131
+     ],
+     "inkMassRatio": 0.9604,
+     "rgbMAD": 1.167,
+     "rgbMax": 23,
+     "boxDp": [
+      310.382,
+      378.335
+     ],
+     "color": "#6b6c6f"
+    },
+    "send-b/amount-2won@spec@221.31,210.86": {
+     "svgFitL1": 0.0105,
+     "relErr": 0.1653,
+     "centroidOffsetPx": [
+      -0.037,
+      -0.156
+     ],
+     "inkMassRatio": 1.0035,
+     "rgbMAD": 1.863,
+     "rgbMax": 33,
+     "boxDp": [
+      221.31,
+      210.86
+     ],
+     "color": "#73676c"
+    },
+    "send-b/amount-2won@ink@221.353,210.994": {
+     "svgFitL1": 0.0055,
+     "relErr": 0.0867,
+     "centroidOffsetPx": [
+      0.02,
+      0.096
+     ],
+     "inkMassRatio": 1.005,
+     "rgbMAD": 1.203,
+     "rgbMax": 28,
+     "boxDp": [
+      221.353,
+      210.994
+     ],
+     "color": "#73676c"
+    },
+    "send-b/amount-form@spec@221.31,211.193": {
+     "svgFitL1": 0.0104,
+     "relErr": 0.172,
+     "centroidOffsetPx": [
+      -0.087,
+      -0.214
+     ],
+     "inkMassRatio": 1.012,
+     "rgbMAD": 1.904,
+     "rgbMax": 35,
+     "boxDp": [
+      221.31,
+      211.193
+     ],
+     "color": "#72666b"
+    },
+    "send-b/amount-form@ink@221.346,211.325": {
+     "svgFitL1": 0.0063,
+     "relErr": 0.1035,
+     "centroidOffsetPx": [
+      -0.008,
+      -0.101
+     ],
+     "inkMassRatio": 0.9837,
+     "rgbMAD": 1.344,
+     "rgbMax": 23,
+     "boxDp": [
+      221.346,
+      211.325
+     ],
+     "color": "#72666b"
+    }
+   },
+   "derivedFrom": "work: spec-work/history/assets/work/derived.json (다른 그룹 기준 그림에서 맞춘 꺾은선 변수 평균, 각 자리 맞춤은 work/x/fits_x.json)"
+  }
+ },
+ {
+  "name": "chevron-down-12",
+  "file": "woori/history/chevron-down-12.svg",
+  "frameBox": {
+   "x": 282.392,
+   "y": 755.888,
+   "w": 17.496,
+   "h": 17.455
+  },
+  "state": "done/idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#6e6f71",
+  "usedIn": [
+   {
+    "state": "done/render",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.392,
+     "y": 723.403,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 282.403,
+     "y": 723.147,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "done/idle",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.392,
+     "y": 755.888,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 282.403,
+     "y": 755.631,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "done/confirm-pressed",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.392,
+     "y": 723.403,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 282.403,
+     "y": 723.147,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-fields-in",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.395,
+     "y": 929.009,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 281.995,
+     "y": 928.776,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-next-pressed",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.395,
+     "y": 929.009,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 281.995,
+     "y": 928.776,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-next-spinner",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.395,
+     "y": 929.009,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 281.995,
+     "y": 928.776,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-processing",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.395,
+     "y": 929.009,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 281.995,
+     "y": 928.776,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   },
+   {
+    "state": "send-b/amount-form",
+    "element": "more-chevron",
+    "frameBox": {
+     "x": 282.395,
+     "y": 929.009,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "specFrameBox": {
+     "x": 281.995,
+     "y": 928.776,
+     "w": 17.496,
+     "h": 17.455
+    },
+    "note": "그 그룹 스펙은 이 자리를 history.chevron-down-small 로 적었지만 그림은 12dp 작은 꺾쇠다 → 이 파일. 상자 = 잰 잉크 가운데 − 6 (스펙 상자 = specFrameBox)"
+   }
+  ],
+  "dp": {
+   "x": 193.972,
+   "y": 488.339,
+   "w": 12,
+   "h": 12
+  },
+  "css": "position:absolute; left:193px; top:488px; width:12px; height:12px; translate:0.972px 0.3393px",
+  "notes": "작은 ⌄ 12dp (history 화면에는 없음 — done·send-b \"더보기\" ⌄ 가 history.chevron-down-small 이름으로 참조했지만 그림은 작은 꺾쇠). chevron-right-12 와 같은 꺾쇠를 아래로: 팔 3.929, 굵기 1.400dp, 둥근 끝·이음, 12dp 상자 잉크 가운데 (6,6) → 꼭짓점 (6, 7.964). 색 #6e6f71 (done 3곳 + send-b 2곳 맞춤 평균). history 시트의 chevron-down-tiny(16dp 상자)와 같은 그림. 자리: done 더보기 ⌄ 는 done 스펙 상자보다 (-0.01, +0.18)dp, send-b 더보기 ⌄ 는 (+0.27, +0.16)dp 옮긴 곳(usedIn). 놓는 법은 back-chevron 과 같다.",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 <img> 를 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((화소−바탕)·(잉크−바탕) 투영, 0–1) 평균 절대차(상자 + 3px 영역), relErr = Σ|Δα|/Σα(영상), centroidOffsetPx = 렌더 − 영상 잉크 무게중심(frame px). 다른 그룹 자리는 그 자리 잉크 색으로 다시 칠해 모양만 비교",
+   "svgFitL1": 0.006,
+   "relErr": 0.098,
+   "summary": "history 화면에 없는 그림 — svgFitL1·relErr = 권하는 상자(usedIn frameBox)에 놓은 다른 그룹 기준 그림들의 중앙값 (@spec = 그 그룹 스펙 상자 그대로, @ink = 잰 잉크 가운데 상자)",
+   "crossGroup": {
+    "done/idle@spec@193.98,488.163": {
+     "svgFitL1": 0.013,
+     "relErr": 0.2176,
+     "centroidOffsetPx": [
+      -0.002,
+      -0.247
+     ],
+     "inkMassRatio": 1.0294,
+     "rgbMAD": 1.85,
+     "rgbMax": 40,
+     "boxDp": [
+      193.98,
+      488.163
+     ],
+     "color": "#6b6c6f"
+    },
+    "done/idle@ink@193.962,488.34": {
+     "svgFitL1": 0.0058,
+     "relErr": 0.0979,
+     "centroidOffsetPx": [
+      -0.032,
+      0.006
+     ],
+     "inkMassRatio": 1.0246,
+     "rgbMAD": 0.856,
+     "rgbMax": 19,
+     "boxDp": [
+      193.962,
+      488.34
+     ],
+     "color": "#6b6c6f"
+    },
+    "done/render@spec@193.98,465.83": {
+     "svgFitL1": 0.0136,
+     "relErr": 0.2173,
+     "centroidOffsetPx": [
+      -0.018,
+      -0.223
+     ],
+     "inkMassRatio": 1.0221,
+     "rgbMAD": 2.376,
+     "rgbMax": 49,
+     "boxDp": [
+      193.98,
+      465.83
+     ],
+     "color": "#6f7073"
+    },
+    "done/render@ink@193.973,465.997": {
+     "svgFitL1": 0.0059,
+     "relErr": 0.0948,
+     "centroidOffsetPx": [
+      -0.028,
+      0.019
+     ],
+     "inkMassRatio": 1.022,
+     "rgbMAD": 1.344,
+     "rgbMax": 25,
+     "boxDp": [
+      193.973,
+      465.997
+     ],
+     "color": "#6f7073"
+    },
+    "done/confirm-pressed@spec@193.98,465.83": {
+     "svgFitL1": 0.014,
+     "relErr": 0.2205,
+     "centroidOffsetPx": [
+      0.013,
+      -0.268
+     ],
+     "inkMassRatio": 1.007,
+     "rgbMAD": 2.2,
+     "rgbMax": 49,
+     "boxDp": [
+      193.98,
+      465.83
+     ],
+     "color": "#6a6e72"
+    },
+    "done/confirm-pressed@ink@193.981,466.015": {
+     "svgFitL1": 0.006,
+     "relErr": 0.0946,
+     "centroidOffsetPx": [
+      0.015,
+      -0.025
+     ],
+     "inkMassRatio": 1.0066,
+     "rgbMAD": 1.1,
+     "rgbMax": 18,
+     "boxDp": [
+      193.981,
+      466.015
+     ],
+     "color": "#6a6e72"
+    },
+    "send-b/amount-form@spec@193.7,607.2": {
+     "svgFitL1": 0.0201,
+     "relErr": 0.3419,
+     "centroidOffsetPx": [
+      -0.447,
+      -0.198
+     ],
+     "inkMassRatio": 0.9124,
+     "rgbMAD": 2.857,
+     "rgbMax": 82,
+     "boxDp": [
+      193.7,
+      607.2
+     ],
+     "color": "#717171"
+    },
+    "send-b/amount-form@ink@193.982,607.368": {
+     "svgFitL1": 0.0091,
+     "relErr": 0.1427,
+     "centroidOffsetPx": [
+      -0.043,
+      0.053
+     ],
+     "inkMassRatio": 0.9206,
+     "rgbMAD": 1.293,
+     "rgbMax": 23,
+     "boxDp": [
+      193.982,
+      607.368
+     ],
+     "color": "#717171"
+    },
+    "send-b/amount-processing@spec@193.7,607.2": {
+     "svgFitL1": 0.0192,
+     "relErr": 0.3292,
+     "centroidOffsetPx": [
+      -0.427,
+      -0.195
+     ],
+     "inkMassRatio": 0.9222,
+     "rgbMAD": 2.741,
+     "rgbMax": 82,
+     "boxDp": [
+      193.7,
+      607.2
+     ],
+     "color": "#707070"
+    },
+    "send-b/amount-processing@ink@193.966,607.353": {
+     "svgFitL1": 0.0078,
+     "relErr": 0.1293,
+     "centroidOffsetPx": [
+      -0.04,
+      0.052
+     ],
+     "inkMassRatio": 0.9583,
+     "rgbMAD": 1.122,
+     "rgbMax": 20,
+     "boxDp": [
+      193.966,
+      607.353
+     ],
+     "color": "#707070"
+    }
+   },
+   "derivedFrom": "work: spec-work/history/assets/work/derived.json (다른 그룹 기준 그림에서 맞춘 꺾은선 변수 평균, 각 자리 맞춤은 work/x/fits_x.json)"
+  }
+ }
+]

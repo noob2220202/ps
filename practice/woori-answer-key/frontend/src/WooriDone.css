@@ -1,0 +1,168 @@
+/* WooriDone — /send/done 이체 완료 (spec/done.md 2.1–2.5, 3.1–3.4)
+ * 앱 뷰포트 기준 dp 절대 위치. 머리 없음. 체크 원·획은 CSS 애니메이션 (영상 표본 키프레임).
+ */
+.woori-done {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--woori-bg, #ffffff);
+}
+.woori-done__t {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--woori-text);
+  font-size: 15px;
+  font-weight: 500;
+}
+.woori-done__label {
+  color: #6c6e73;
+}
+.woori-done__right {
+  text-align: right;
+}
+.woori-done__center {
+  position: absolute;
+  left: 0;
+  width: 360px;
+  margin: 0;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--woori-text);
+  font-size: 22px;
+  font-weight: 600;
+}
+.woori-done__icon {
+  position: absolute;
+  display: block;
+}
+.woori-done__mask {
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* 체크 원 60dp (150, 98) */
+.woori-done-check__badge {
+  position: absolute;
+  left: 150px;
+  top: 98px;
+  width: 60px;
+  height: 60px;
+  overflow: visible;
+  transform-origin: 50% 50%;
+}
+.woori-done-check__path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 32.94 100;
+}
+.woori-done-check--anim .woori-done-check__badge {
+  animation-name: woori-done-circle;
+  animation-duration: 288ms;
+  animation-fill-mode: both;
+}
+.woori-done-check--anim .woori-done-check__path {
+  animation-name: woori-done-check, woori-done-check-show;
+  animation-duration: 446ms, 210ms;
+  animation-delay: 194ms, 0ms;
+  animation-timing-function: linear, step-end;
+  animation-fill-mode: both, both;
+}
+@keyframes woori-done-circle {
+  0% { transform: scale(0); animation-timing-function: linear; }
+  23.84% { transform: scale(1.05); animation-timing-function: ease-in-out; }
+  73.51% { transform: scale(0.95); animation-timing-function: linear; }
+  100% { transform: scale(1); }
+}
+@keyframes woori-done-check {
+  0% { stroke-dasharray: 0 100; animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+  33.85% { stroke-dasharray: 12.51 100; animation-timing-function: ease; }
+  62% { stroke-dasharray: 33.37 100; animation-timing-function: linear; }
+  83.42% { stroke-dasharray: 31.91 100; animation-timing-function: ease-in-out; }
+  100% { stroke-dasharray: 32.94 100; }
+}
+/* 획 시작 전에는 숨김 (길이 0 dash 도 둥근 끝 점으로 그려진다) — 원 +210ms 에 보임 */
+@keyframes woori-done-check-show {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 이체 정보 카드 · 광고 카드 */
+.woori-done__card {
+  position: absolute;
+  left: 20px;
+  width: 320px;
+  border-radius: 16px;
+  background: var(--woori-surface);
+}
+.woori-done__ad {
+  position: absolute;
+  left: 20px;
+  width: 320px;
+  height: 96px;
+  border-radius: 16px;
+  background: var(--woori-ad-card);
+}
+.woori-done__pill {
+  position: absolute;
+  box-sizing: border-box;
+  width: 48px;
+  height: 27px;
+  border: 1px solid #dddddd;
+  border-radius: 13.5px;
+  background: #ffffff;
+}
+.woori-done__pill > span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-top: -1px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.0025em;
+  line-height: 1;
+  text-align: center;
+  color: var(--woori-text-body);
+}
+.woori-done__line {
+  position: absolute;
+  left: 41px;
+  width: 278px;
+  height: 1px;
+  background: var(--woori-divider-on-surface);
+}
+
+.woori-done__btn {
+  position: absolute;
+  height: 56px;
+  border-radius: 12px;
+  align-items: flex-start;
+  padding-top: 20.333px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.0025em;
+  line-height: 1;
+}
+/* 완료 [확인] 눌림: scale 0.957 ease-in 87ms (지연 0) · 뗌 ease-in 127ms (3.4) */
+.woori-done__confirm {
+  --woori-btn-press-scale: 0.957;
+  --woori-btn-press-ms: 87ms;
+  --woori-btn-press-ease: cubic-bezier(0.42, 0, 1, 1);
+  --woori-btn-press-delay: 0ms;
+  --woori-btn-release-ms: 127ms;
+  --woori-btn-release-ease: cubic-bezier(0.42, 0, 1, 1);
+  --woori-btn-release-delay: 0ms;
+}
+.woori-done__spinner-top {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}

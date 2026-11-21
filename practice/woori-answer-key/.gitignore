@@ -1,0 +1,22 @@
+node_modules/
+dist/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.vite/
+tools/ref/
+tools/out/
+__pycache__/
+*.pyc
+# APK (로컬 모드, tools/build-apk.sh) — 빌드 산출물·Gradle 캐시·SDK 경로 (frontend/android/.gitignore 도 같은 것을 뺀다)
+frontend/dist-apk/
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+frontend/android/local.properties
+frontend/android/capacitor-cordova-android-plugins/
+frontend/android/app/src/main/assets/public/
+*.apk
+*.aab
+.gradle/

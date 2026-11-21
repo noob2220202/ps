@@ -1,0 +1,24 @@
+{
+  "name": "woori-answer-key",
+  "private": true,
+  "version": "1.0.0",
+  "description": "우리WON뱅킹 클론 답지 — 루트 스크립트. 루트 의존성은 비교 하네스(tools/shot.cjs)용 playwright 하나뿐, 앱 패키지는 frontend/, backend/",
+  "scripts": {
+    "setup": "npm install && node tools/dev-woori.cjs --install && npx playwright install chromium",
+    "dev:woori": "node tools/dev-woori.cjs",
+    "build": "npm --prefix frontend run build && node tools/check-dist.cjs",
+    "apk": "bash tools/build-apk.sh",
+    "check:local": "node --disable-warning=ExperimentalWarning tools/woori-local-check.cjs",
+    "lint": "node tools/lint.cjs",
+    "test": "npm --prefix backend test",
+    "shots": "node tools/shot.cjs --full",
+    "selftest": "node tools/selftest.cjs",
+    "spec:dp": "node tools/spec-to-dp.cjs",
+    "gen": "node tools/gen-from-spec.cjs --shots",
+    "check": "node tools/spec-to-dp.cjs --check && node tools/gen-from-spec.cjs --check && node tools/check-dist.cjs --selftest",
+    "check:dist": "node tools/check-dist.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

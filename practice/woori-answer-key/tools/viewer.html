@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Woori Overlay Viewer</title>
+<style>
+  :root { --bg:#16181d; --panel:#1f2229; --line:#2e323b; --fg:#e4e6eb; --dim:#9aa3b2; --acc:#3a8dff; --ruler:#ff2d55; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.45 system-ui, sans-serif; display:flex; min-height:100vh; }
+  aside { width:336px; flex:none; padding:14px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; max-height:100vh; position:sticky; top:0; }
+  h1 { font-size:15px; margin:0 0 10px; }
+  fieldset { border:1px solid var(--line); border-radius:8px; margin:0 0 10px; padding:8px 10px 10px; }
+  legend { color:var(--dim); padding:0 4px; }
+  label { display:flex; align-items:center; gap:6px; margin:4px 0; white-space:nowrap; }
+  input[type=text], input[type=number], select { width:100%; background:#111317; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:5px 6px; font:inherit; }
+  input[type=range] { width:100%; }
+  button { background:#2a2f39; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; cursor:pointer; }
+  button:hover { border-color:var(--acc); }
+  .row { display:flex; gap:6px; align-items:center; }
+  .row > * { flex:1; min-width:0; }
+  .mono { font-family: ui-monospace, Menlo, monospace; }
+  .swatch { display:inline-block; width:14px; height:14px; border:1px solid #fff4; vertical-align:middle; border-radius:3px; }
+  .readout { background:#0f1114; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:0 0 10px; }
+  .readout .big { font:600 21px/1.25 ui-monospace, Menlo, monospace; color:#fff; }
+  .readout .big small { font-size:13px; color:var(--acc); font-weight:500; }
+  .readout .sub { font:12px/1.5 ui-monospace, Menlo, monospace; color:var(--dim); }
+  .readout .ruler { margin-top:6px; padding-top:6px; border-top:1px dashed var(--line); font:600 14px/1.4 ui-monospace, Menlo, monospace; color:#ffd0da; }
+  main { flex:1; padding:16px; overflow:auto; }
+  #wrap { transform-origin: 0 0; }
+  /* 무대 = 폰 뷰포트 360x880 dp (CSS px). 영상(524x1280 frame px)은 배치에 따라 1:1(폭 360.25) 또는 dp 맞춤(폭 359.39, 왼쪽 0.29)으로 겹친다 */
+  #stage { position:relative; width:360px; height:880px; background:#fff; box-shadow:0 0 0 1px #000, 0 8px 30px #0008; overflow:hidden; }
+  #app { position:absolute; left:0; top:0; width:360px; height:880px; border:0; background:#fff; }
+  #ov, #ovimg { position:absolute; top:0; height:880px; object-fit:fill; pointer-events:none; opacity:.5; }
+  #grid { position:absolute; left:0; top:0; width:360px; height:880px; pointer-events:none; display:none; transform-origin:0 0;
+    background-image: linear-gradient(#ff00ff22 1px, transparent 1px), linear-gradient(90deg, #ff00ff22 1px, transparent 1px),
+                      linear-gradient(#ff00ff55 1px, transparent 1px), linear-gradient(90deg, #ff00ff55 1px, transparent 1px);
+    background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px; }
+  .cross { position:absolute; pointer-events:none; background:var(--ruler); display:none; }
+  #cx { width:1px; height:880px; top:0; } #cy { height:1px; width:360px; left:0; }
+  #box { position:absolute; pointer-events:none; display:none; outline:1px solid var(--ruler); background:#ff2d5518; }
+  #catcher { position:absolute; inset:0; pointer-events:none; cursor:crosshair; }
+  kbd { background:#0c0d10; border:1px solid var(--line); border-radius:4px; padding:0 4px; font-size:11px; }
+  .help { color:var(--dim); font-size:12px; }
+  .warn { color:#ffb347; font-size:12px; }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Woori 오버레이 뷰어 <span class="help">D1 단위</span></h1>
+
+  <div class="readout">
+    <div class="big" id="dp">x – · y – <small>dp</small></div>
+    <div class="sub" id="dpc">앱 내용 기준 (상태바 31.333dp 아래): –</div>
+    <div class="sub" id="px">frame px: –</div>
+    <div class="sub">영상 색 <span class="swatch" id="sw"></span> <span id="col">-</span></div>
+    <div class="ruler" id="rul" style="display:none"></div>
+  </div>
+
+  <fieldset><legend>앱</legend>
+    <select id="shots"><option value="">(tools/shots.json 상태 선택)</option></select>
+    <div class="row" style="margin-top:6px"><input id="url" type="text"><button id="go" style="flex:none">이동</button></div>
+    <label>배치 <select id="layout">
+      <option value="frame">?frame=1 앱 (가로 보정됨) — 영상 1:1</option>
+      <option value="iso">보정 없는 앱 — 영상을 dp 에 맞춤</option></select></label>
+    <div class="help" id="scn"></div>
+  </fieldset>
+  <fieldset><legend>겹칠 기준</legend>
+    <label><input type="radio" name="src" value="video" checked> 영상 <select id="vsel" style="margin-left:4px;width:auto"></select> <span class="help" id="vnote"></span></label>
+    <label><input type="radio" name="src" value="ref"> ref PNG <select id="refs" style="margin-left:4px"></select></label>
+    <label><input type="radio" name="src" value="none"> 없음</label>
+  </fieldset>
+  <fieldset><legend>시각 · 프레임 (영상)</legend>
+    <div class="row"><label style="margin:0">t <input id="t" type="number" step="0.001" min="0" value="0"></label>
+      <label style="margin:0"># <input id="fi" type="number" step="1" min="0" value="0"></label></div>
+    <input id="tr" type="range" min="0" max="200" step="0.001" value="0">
+    <div class="sub mono" id="finfo">-</div>
+    <div class="row"><button data-dt="-1">-1s</button><button data-dt="-0.1">-0.1</button><button data-df="-1">◀ #</button><button data-df="1"># ▶</button><button data-dt="0.1">+0.1</button><button data-dt="1">+1s</button></div>
+    <div class="row" style="margin-top:6px"><button id="play">재생/정지</button><select id="rate"><option>1</option><option>0.5</option><option>0.25</option><option>0.1</option></select></div>
+  </fieldset>
+  <fieldset><legend>표시</legend>
+    <label>불투명도 <input id="op" type="range" min="0" max="100" value="50"><span id="opv" class="mono">50%</span></label>
+    <label><input type="checkbox" id="diff"> 차이(difference) 모드 — 일치하면 검정</label>
+    <label><input type="checkbox" id="gridc"> 10dp/50dp 격자 <select id="gorg" style="width:auto"><option value="screen">화면 기준</option><option value="app">앱 내용 기준</option></select></label>
+    <label><input type="checkbox" id="crossc"> 십자선</label>
+    <label>배율 <select id="zoom">
+      <option value="1">1 (실제 dp 크기)</option><option value="1.4545" selected>1.4545 (= 16/11, 영상 1:1)</option>
+      <option>2</option><option>2.5</option><option>3</option><option>4</option></select></label>
+  </fieldset>
+  <fieldset><legend>측정</legend>
+    <label><input type="checkbox" id="measure"> 측정 모드 (<kbd>M</kbd>, 앱 클릭 차단)</label>
+    <div class="help">측정 모드에서 끌면 자(사각형)가 생겨 x/y/w/h 를 dp 로 보여 준다. <kbd>Esc</kbd> 지우기.
+      측정 모드가 꺼져 있으면 <kbd>Alt</kbd> 를 누른 채 움직여도 된다.<br>
+      좌표는 커서 아래 영상 픽셀(frame px)의 왼쪽 위 모서리. 가로와 세로 배율이 다르다 (D1):
+      x_dp = 180 + (x_px − 262.02)/1.45803, y_dp = y_px × 0.6875, 폭 = px ÷ 1.45803, 높이 = px × 0.6875.</div>
+  </fieldset>
+  <div class="help">
+    <kbd>Space</kbd> 오버레이 켜기/끄기 · <kbd>←</kbd><kbd>→</kbd> 원본 프레임 하나씩 (VFR) · <kbd>Shift</kbd>+방향키 1초 ·
+    <kbd>↑</kbd><kbd>↓</kbd> 불투명도 ±10 · <kbd>D</kbd> 차이 모드 · <kbd>G</kbd> 격자 · <kbd>H</kbd> 십자선 · <kbd>M</kbd> 측정 모드<br>
+    앱 URL 에 <code>?frame=1</code> 이 있어야 상태바(31.333dp)·내비 바(48dp) 자리와 가로 보정이 들어가 영상과 1:1 이다 (배치 '영상 1:1').
+    보정 없이 그린 앱은 배치를 'dp 에 맞춤' 으로 둔다 (영상 폭 359.39dp, 왼쪽 0.29dp).
+  </div>
+</aside>
+<main>
+  <div id="wrap">
+    <div id="stage">
+      <iframe id="app"></iframe>
+      <video id="ov" muted playsinline preload="auto"></video>
+      <img id="ovimg" alt="" style="display:none">
+      <div id="grid"></div>
+      <div class="cross" id="cx"></div><div class="cross" id="cy"></div>
+      <div id="box"></div>
+      <div id="catcher"></div>
+    </div>
+  </div>
+</main>
+<script>
+const CFG = __WOORI_VIEWER_CONFIG__;
+const FW = CFG.frame.w, FH = CFG.frame.h, VW = CFG.viewportDp.w, VH = CFG.viewportDp.h;
+const KX = CFG.pxPerDpX, CXP = CFG.xCenterPx, CXD = CFG.xCenterDp, KY = CFG.dpPerPxY, SB = CFG.statusBarDp;
+/* D1: frame px ↔ dp */
+const xDp = (px) => CXD + (px - CXP) / KX, xPx = (dp) => CXP + KX * (dp - CXD);
+const yDp = (px) => px * KY, wDp = (px) => px / KX, hDp = (px) => px * KY;
+const f2 = (v) => (Math.round(v * 100) / 100).toFixed(2);
+const $ = (s) => document.querySelector(s);
+const app = $('#app'), ov = $('#ov'), ovimg = $('#ovimg'), stage = $('#stage');
+const cv = document.createElement('canvas'); cv.width = FW; cv.height = FH;
+const ctx = cv.getContext('2d', { willReadFrequently: true });
+let src = 'video', visible = true, video = 'v1', pts = null, curT = 0;
+const store = { get(k, d) { try { const v = localStorage.getItem('wooriViewer.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('wooriViewer.' + k, JSON.stringify(v)); } catch { /* 저장 못 해도 동작 */ } } };
+
+/* ── 배치: 영상 frame px ↔ 무대 CSS px ───────────────────
+ *  frame: ?frame=1 앱은 셸 transform 으로 가로가 보정돼 영상과 1:1 → 영상 픽셀 fx 는 CSS fx × 11/16 (폭 360.25)
+ *  iso:   보정 없는 앱은 CSS px = 레이아웃 dp → 영상 픽셀 fx 는 CSS xDp(fx) (폭 359.39, 왼쪽 0.29)
+ *  세로는 둘 다 CSS = fy × 0.6875 (= 화면 dp) */
+const layout = () => $('#layout').value;
+const cssX = (fx) => (layout() === 'iso' ? xDp(fx) : fx * KY);
+const fxOfCss = (X) => (layout() === 'iso' ? xPx(X) : X / KY);
+const cssY = (fy) => fy * KY;
+function placeOverlay() {
+  const left = cssX(0), width = cssX(FW) - cssX(0);
+  for (const el of [ov, ovimg]) { el.style.left = left + 'px'; el.style.width = width + 'px'; }
+  // 격자: dp 격자선 x = 10k 는 영상 xPx(10k) → CSS cssX(xPx(10k)). frame 배치에서는 셸 transform 과 같은 꼴
+  const g = $('#grid');
+  const tx = cssX(xPx(0)), kx = cssX(xPx(100)) - cssX(xPx(0));
+  g.style.transform = `translateX(${tx}px) scaleX(${kx / 100})`;
+  g.style.backgroundPosition = $('#gorg').value === 'app' ? `0 ${SB}px` : '0 0';
+}
+
+/* ── 앱 ─────────────────────────────────────────────── */
+function setUrl(u, auto = true) {
+  $('#url').value = u; app.src = u; store.set('url', u);
+  if (auto) { $('#layout').value = /[?&]frame=1(&|$|#)/.test(u) ? 'frame' : 'iso'; placeOverlay(); store.set('layout', $('#layout').value); }
+}
+$('#go').onclick = () => setUrl($('#url').value);
+$('#url').onkeydown = (e) => { if (e.key === 'Enter') setUrl($('#url').value); };
+$('#layout').onchange = () => { placeOverlay(); store.set('layout', $('#layout').value); };
+
+/* ── 영상 · pts (VFR: 시각 t 의 화면 = pts ≤ t 인 마지막 프레임) ───── */
+function frameAt(t) {
+  if (!pts) return null;
+  let lo = 0, hi = pts.length; // 첫 pts > t 의 자리
+  while (lo < hi) { const m = (lo + hi) >> 1; if (pts[m] <= t + 1e-6) lo = m + 1; else hi = m; }
+  return Math.max(0, lo - 1);
+}
+function showT(t) {
+  const i = frameAt(t);
+  $('#t').value = t.toFixed(3); $('#tr').value = t;
+  if (i == null) { $('#finfo').textContent = `t ${t.toFixed(3)}s (pts 없음: 1/60s 단위)`; return; }
+  $('#fi').value = i;
+  const nx = pts[i + 1];
+  $('#finfo').textContent = `${video} #${i} · pts ${pts[i].toFixed(3)}s` + (nx != null ? ` · 다음 #${i + 1} +${Math.round((nx - pts[i]) * 1000)}ms` : ' · 마지막');
+}
+/** 시각 t 로: 그 프레임이 확실히 보이도록 video 는 그 프레임 구간의 가운데로 옮긴다 (pts 경계에서 앞 프레임이 나오지 않게) */
+function setT(t) {
+  const dur = pts ? pts[pts.length - 1] + 0.05 : (ov.duration || 1e9);
+  curT = Math.max(0, Math.min(dur, Number(t) || 0));
+  const i = frameAt(curT);
+  if (i != null) { const a = pts[i], b = pts[i + 1] ?? a + 1 / 30; ov.currentTime = (a + b) / 2; } else ov.currentTime = curT;
+  showT(curT); store.set('t.' + video, curT);
+}
+function setFrame(i) {
+  if (!pts) return setT(curT + (i - (Number($('#fi').value) || 0)) / 60);
+  i = Math.max(0, Math.min(pts.length - 1, Math.round(i)));
+  setT(pts[i]);
+}
+function stepFrame(d) { const i = frameAt(curT); if (i == null) setT(curT + d / 60); else setFrame(i + d); }
+async function setVideo(v, t) {
+  video = v; $('#vsel').value = v; store.set('video', v);
+  pts = null;
+  try { const r = await fetch(`/pts/${v}.json`); if (r.ok) pts = await r.json(); } catch { /* pts 없이 */ }
+  $('#vnote').textContent = CFG.videos[v] ? (CFG.raw ? '원본 (손잡이 보임)' : 'clean') : '없음';
+  if (pts) $('#tr').max = pts[pts.length - 1];
+  ov.src = `/video/${v}.mp4`;
+  ov.addEventListener('loadedmetadata', () => { if (!pts) $('#tr').max = ov.duration; setT(t ?? store.get('t.' + v, 0)); }, { once: true });
+}
+$('#vsel').innerHTML = Object.keys(CFG.videos).map((v) => `<option value="${v}"${CFG.videos[v] ? '' : ' disabled'}>${v}</option>`).join('');
+$('#vsel').onchange = () => setVideo($('#vsel').value);
+$('#t').onchange = () => setT($('#t').value);
+$('#fi').onchange = () => setFrame(Number($('#fi').value));
+$('#tr').oninput = () => setT($('#tr').value);
+document.querySelectorAll('[data-dt]').forEach((b) => (b.onclick = () => setT(curT + Number(b.dataset.dt))));
+document.querySelectorAll('[data-df]').forEach((b) => (b.onclick = () => stepFrame(Number(b.dataset.df))));
+$('#play').onclick = () => { ov.playbackRate = Number($('#rate').value); if (ov.paused) ov.play(); else { ov.pause(); setT(ov.currentTime); } };
+ov.ontimeupdate = () => { if (!ov.paused) { curT = ov.currentTime; showT(curT); } };
+
+/* ── 표시 ─────────────────────────────────────────────── */
+function applyView() {
+  const op = Number($('#op').value) / 100;
+  $('#opv').textContent = Math.round(op * 100) + '%';
+  const blend = $('#diff').checked ? 'difference' : 'normal';
+  for (const el of [ov, ovimg]) { el.style.opacity = $('#diff').checked ? 1 : op; el.style.mixBlendMode = blend; }
+  ov.style.display = visible && src === 'video' ? '' : 'none';
+  ovimg.style.display = visible && src === 'ref' ? '' : 'none';
+  $('#grid').style.display = $('#gridc').checked ? 'block' : 'none';
+  const z = Number($('#zoom').value);
+  $('#wrap').style.transform = `scale(${z})`;
+  $('#wrap').style.width = VW * z + 'px'; $('#wrap').style.height = VH * z + 'px';
+  stage.style.imageRendering = z > 1 / KY + 1e-3 ? 'pixelated' : 'auto';
+  placeOverlay();
+  store.set('view', { op: $('#op').value, diff: $('#diff').checked, grid: $('#gridc').checked, gorg: $('#gorg').value, zoom: $('#zoom').value, cross: $('#crossc').checked });
+}
+for (const id of ['#op', '#diff', '#gridc', '#gorg', '#zoom', '#crossc']) $(id).addEventListener('input', applyView);
+document.querySelectorAll('input[name=src]').forEach((r) => (r.onchange = () => { src = r.value; applyView(); }));
+$('#refs').onchange = () => { ovimg.src = '/ref/' + $('#refs').value; src = 'ref'; document.querySelector('input[value=ref]').checked = true; applyView(); };
+
+fetch('/refs.json').then((r) => r.json()).then((list) => {
+  $('#refs').innerHTML = list.map((f) => `<option>${f}</option>`).join('');
+  if (list.length) ovimg.src = '/ref/' + list[0];
+}).catch(() => {});
+fetch('/shots.json').then((r) => (r.ok ? r.json() : { shots: [] })).then((spec) => {
+  const jobs = spec.shots || [];
+  const tag = (j) => (j.video ? `  ${j.video} #${j.i0 ?? '?'}–#${j.i1 ?? '?'}` : '') + (j.scenario && j.scenario !== CFG.defaultScenario ? `  (${j.scenario})` : '');
+  $('#shots').innerHTML += jobs.map((j, i) => `<option value="${i}">${j.name}${tag(j)}</option>`).join('');
+  $('#shots').onchange = async () => {
+    const j = jobs[Number($('#shots').value)]; if (!j) return;
+    const scenario = j.scenario || CFG.defaultScenario;
+    // 백엔드를 그 상태의 시나리오로 맞춘 뒤 앱을 연다 (영상 속 이체 전/후 데이터)
+    const r = await fetch('/reset?scenario=' + encodeURIComponent(scenario), { method: 'POST' }).then((x) => x.json()).catch(() => ({ ok: false }));
+    $('#scn').textContent = `백엔드 시나리오: ${scenario} — ${CFG.scenarios[scenario] || ''}${r.ok ? '' : ' (리셋 실패 — 백엔드/프록시 확인)'}` +
+      (j.t != null ? ` · 애니메이션 위상 t=${j.t}ms 는 shot.cjs 에서만 멈춤` : '');
+    setUrl(j.url.startsWith('/') ? CFG.app + j.url : j.url);
+    if (j.video && CFG.videos[j.video]) {
+      const mid = j.i0 != null && j.i1 != null ? Math.round((Number(j.i0) + Number(j.i1)) / 2) : null;
+      if (j.video !== video) await setVideo(j.video, j.t0 != null ? Number(j.t0) : 0);
+      if (mid != null && pts) setFrame(mid); else if (j.t0 != null) setT(j.t1 != null ? (Number(j.t0) + Number(j.t1)) / 2 : Number(j.t0));
+    }
+    const refName = j.name + '.png';
+    if ([...$('#refs').options].some((o) => o.value === refName)) { $('#refs').value = refName; ovimg.src = '/ref/' + refName; }
+  };
+}).catch(() => {});
+
+/* ── 측정: 커서 아래 영상 픽셀 → dp (D1, 비등방) ─────────── */
+let anchor = null, dragging = false;
+/** 화면 좌표 → 영상 픽셀 (frame px, 정수) */
+function toFrame(e) {
+  const r = stage.getBoundingClientRect(), z = r.width / VW; // 화면 px per CSS px
+  const X = (e.clientX - r.left) / z, Y = (e.clientY - r.top) / z;
+  return { fx: Math.max(0, Math.min(FW - 1, Math.floor(fxOfCss(X)))), fy: Math.max(0, Math.min(FH - 1, Math.floor(Y / KY))) };
+}
+function sampleColor(fx, fy) {
+  try {
+    if (src === 'ref' && ovimg.complete) ctx.drawImage(ovimg, 0, 0, FW, FH); else ctx.drawImage(ov, 0, 0, FW, FH);
+    const d = ctx.getImageData(fx, fy, 1, 1).data;
+    const hex = '#' + [d[0], d[1], d[2]].map((v) => v.toString(16).padStart(2, '0')).join('');
+    $('#col').textContent = `${hex}  rgb(${d[0]},${d[1]},${d[2]})`; $('#sw').style.background = hex;
+  } catch { $('#col').textContent = '-'; }
+}
+function show({ fx, fy }) {
+  const x = xDp(fx), y = yDp(fy);
+  $('#dp').innerHTML = `x ${f2(x)} · y ${f2(y)} <small>dp</small>`;
+  $('#dpc').textContent = `앱 내용 기준 (상태바 31.333dp 아래): x ${f2(x)}, y ${f2(y - SB)} dp`;
+  $('#px').textContent = `frame px: x ${fx}, y ${fy}`;
+  sampleColor(fx, fy);
+  const cross = $('#crossc').checked;
+  $('#cx').style.display = $('#cy').style.display = cross ? 'block' : 'none';
+  if (cross) { $('#cx').style.left = cssX(fx) + 'px'; $('#cy').style.top = cssY(fy) + 'px'; }
+  if (anchor && dragging) drawRuler(anchor, { fx, fy });
+}
+function drawRuler(a, b) {
+  const x0 = Math.min(a.fx, b.fx), y0 = Math.min(a.fy, b.fy), x1 = Math.max(a.fx, b.fx) + 1, y1 = Math.max(a.fy, b.fy) + 1;
+  const w = x1 - x0, h = y1 - y0;
+  Object.assign($('#box').style, { display: 'block', left: cssX(x0) + 'px', top: cssY(y0) + 'px', width: cssX(x1) - cssX(x0) + 'px', height: cssY(h) + 'px' });
+  $('#rul').style.display = 'block';
+  $('#rul').innerHTML = `자: x ${f2(xDp(x0))} y ${f2(yDp(y0))} · w ${f2(wDp(w))} h ${f2(hDp(h))} dp<br>` +
+    `<span class="sub" style="color:var(--dim)">앱 내용 기준 y ${f2(yDp(y0) - SB)} dp · frame px [${x0}, ${y0}, ${w}, ${h}]</span>`;
+}
+function clearRuler() { anchor = null; dragging = false; $('#box').style.display = 'none'; $('#rul').style.display = 'none'; }
+stage.addEventListener('mousemove', (e) => show(toFrame(e)));
+$('#catcher').addEventListener('mousedown', (e) => { anchor = toFrame(e); dragging = true; drawRuler(anchor, anchor); e.preventDefault(); });
+window.addEventListener('mouseup', () => { dragging = false; });
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Alt') { $('#catcher').style.pointerEvents = 'auto'; return; }
+  if (e.key === 'Escape') { clearRuler(); return; }
+  if (e.target.tagName === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'checkbox' && e.target.type !== 'radio') return;
+  if (e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowLeft') { if (e.shiftKey) setT(curT - 1); else stepFrame(-1); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { if (e.shiftKey) setT(curT + 1); else stepFrame(1); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { $('#op').value = Math.min(100, Number($('#op').value) + 10); applyView(); e.preventDefault(); }
+  else if (e.key === 'ArrowDown') { $('#op').value = Math.max(0, Number($('#op').value) - 10); applyView(); e.preventDefault(); }
+  else if (e.key === ' ') { visible = !visible; applyView(); e.preventDefault(); }
+  else if (e.key === 'd' || e.key === 'D') { $('#diff').checked = !$('#diff').checked; applyView(); }
+  else if (e.key === 'g' || e.key === 'G') { $('#gridc').checked = !$('#gridc').checked; applyView(); }
+  else if (e.key === 'h' || e.key === 'H') { $('#crossc').checked = !$('#crossc').checked; applyView(); }
+  else if (e.key === 'm' || e.key === 'M') { $('#measure').checked = !$('#measure').checked; applyMeasure(); }
+});
+function applyMeasure() { $('#catcher').style.pointerEvents = $('#measure').checked ? 'auto' : 'none'; }
+$('#measure').addEventListener('input', applyMeasure);
+window.addEventListener('keyup', (e) => { if (e.key === 'Alt') applyMeasure(); });
+
+/* ── 복원 ─────────────────────────────────────────────── */
+const v0 = store.get('view', null);
+if (v0) { $('#op').value = v0.op; $('#diff').checked = !!v0.diff; $('#gridc').checked = !!v0.grid; $('#gorg').value = v0.gorg || 'screen'; $('#zoom').value = v0.zoom; $('#crossc').checked = !!v0.cross; }
+if (![...$('#zoom').options].some((o) => o.value === $('#zoom').value)) $('#zoom').value = '1.4545';
+setUrl(store.get('url', CFG.app + '/home?frame=1'), false);
+$('#layout').value = store.get('layout', /[?&]frame=1(&|$|#)/.test($('#url').value) ? 'frame' : 'iso');
+applyView();
+const firstVideo = [store.get('video', 'v1'), 'v1', 'v2'].find((v) => CFG.videos[v]) || 'v1';
+setVideo(firstVideo);
+</script>
+</body>
+</html>

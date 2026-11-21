@@ -1,0 +1,23 @@
+{
+  "name": "woori-answer-key-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "우리WON뱅킹 클론 답지 — Express + node:sqlite 백엔드",
+  "type": "commonjs",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server.js",
+    "reset:v1-start": "node --disable-warning=ExperimentalWarning seed.js v1-start",
+    "reset:v2-start": "node --disable-warning=ExperimentalWarning seed.js v2-start",
+    "reset:v2-end": "node --disable-warning=ExperimentalWarning seed.js v2-end",
+    "test": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"test/*.test.js\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

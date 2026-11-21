@@ -1,0 +1,403 @@
+/* WooriSendAmount — /send/amount 금액 입력 · 중복 경고 시트 · 계좌 비밀번호 시트 (spec/send-b.md 2.1–2.6, 3.1–3.7)
+ * 모든 요소는 앱 뷰포트 기준 dp 절대 위치 (화면 tsx 의 at() = 정수 left/top + 소수 translate). 글자는 line-height 1.
+ */
+.woori-amt {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--woori-bg, #ffffff);
+}
+
+.woori-amt__layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.woori-amt__layer > * {
+  pointer-events: auto;
+}
+
+/* 키패드가 열린 동안 머리 아래 내용이 1기기px(0.333dp) 위 (3.1 S6) */
+.woori-amt__upper--keypad {
+  translate: 0 -0.333px;
+}
+
+.woori-amt__t {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--woori-text);
+  font-weight: 500;
+}
+
+.woori-amt__row {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--woori-text);
+}
+
+.woori-amt__icon {
+  position: absolute;
+  display: block;
+}
+.woori-amt__row .woori-amt__icon,
+.woori-amt__chip-first .woori-amt__icon {
+  position: relative;
+  flex: none;
+}
+.woori-amt__mask {
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.woori-amt__btn-reset {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 처음 보내는 계좌 칩 */
+.woori-amt__chip-first {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  height: 28.167px;
+  padding: 8px 10px 0;
+  border-radius: 6px;
+  background: #fdeaf1;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 금액 아랫줄 막대 */
+.woori-amt__bar {
+  flex: none;
+  width: 1px;
+  height: 11.667px;
+  margin: 2.333px 6.08px 0 6.14px;
+  background: #eaeaea;
+}
+
+/* ── 금액 키패드 ── */
+.woori-amt__quick {
+  position: absolute;
+  top: 460px;
+  width: 57.6px;
+  height: 28.667px;
+  border-radius: 6px;
+  background: var(--woori-bg-gray);
+}
+.woori-amt__quick-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7px;
+  translate: 0 0.25px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  color: #46474c;
+}
+
+.woori-amt__key {
+  position: absolute;
+  width: 120px;
+  height: 52px;
+}
+.woori-amt__key-label {
+  position: absolute;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--woori-text);
+}
+
+/* 키패드 [확인]: 물결만 있고 줄지 않는다 (3.3) */
+.woori-amt__kp-confirm {
+  position: absolute;
+  width: 328px;
+  height: 52.333px;
+  border-radius: 12px;
+  overflow: hidden;
+  align-items: flex-start;
+  padding-top: 18.667px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  --woori-btn-bg: var(--woori-primary-keypad);
+  --woori-btn-bg-disabled: var(--woori-primary-disabled);
+  --woori-btn-press-scale: 1;
+}
+.woori-amt__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: #000000;
+  pointer-events: none;
+  animation-name: woori-amt-ripple, woori-amt-ripple-fade;
+  animation-duration: var(--woori-amt-ripple-ms, 200ms), 60ms;
+  animation-timing-function: linear, linear;
+  animation-fill-mode: both, both;
+}
+.woori-amt__kp-confirm > span {
+  position: relative;
+}
+@keyframes woori-amt-ripple {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes woori-amt-ripple-fade {
+  from {
+    opacity: 0.055;
+  }
+  to {
+    opacity: 0.13;
+  }
+}
+
+/* ── 폼: 버튼 · 통장표기 묶음 ── */
+.woori-amt__btn {
+  position: absolute;
+  height: 56px;
+  border-radius: 12px;
+  align-items: flex-start;
+  padding-top: 19.333px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.woori-amt__fields--in {
+  animation-name: woori-amt-fields-y, woori-amt-fields-a;
+  animation-duration: 750ms, 825ms;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1), cubic-bezier(0.25, 1, 0.5, 1);
+  animation-delay: var(--woori-amt-fields-delay, 194ms), var(--woori-amt-fields-delay, 194ms);
+  animation-fill-mode: both, both;
+}
+@keyframes woori-amt-fields-y {
+  from {
+    transform: translateY(48px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes woori-amt-fields-a {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.woori-amt__line {
+  position: absolute;
+  height: 1px;
+}
+
+/* ── 스피너 (시트 위) ── */
+.woori-amt__spinner-top {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ── 중복 경고 시트 ── */
+.woori-amt__dup-sheet {
+  height: 426.667px;
+  border-radius: 24px 24px 0 0;
+}
+.woori-amt__pw-sheet {
+  height: 544px;
+  border-radius: 20px 20px 0 0;
+}
+.woori-amt__sheet-x {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+}
+.woori-amt__sheet-x::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+.woori-amt__center {
+  position: absolute;
+  left: 0;
+  width: 360px;
+  margin: 0;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--woori-text);
+}
+
+.woori-amt__warn {
+  position: absolute;
+  left: 147px;
+  top: 63px;
+  width: 66px;
+  height: 62px;
+}
+.woori-amt__warn-tri,
+.woori-amt__warn-bar,
+.woori-amt__warn-dot {
+  position: absolute;
+  display: block;
+}
+.woori-amt__warn-tri {
+  left: 0;
+  top: 0;
+  width: 66px;
+  height: 62px;
+  transform-origin: 49.3% 49.5%;
+}
+.woori-amt__warn-bar {
+  left: 30.153px;
+  top: 19.143px;
+  width: 5.785px;
+  height: 20.297px;
+  transform-origin: 50% 100%;
+}
+.woori-amt__warn-dot {
+  left: 30.135px;
+  top: 44.049px;
+  width: 5.822px;
+  height: 5.822px;
+  transform-origin: 50% 100%;
+}
+.woori-amt__warn--anim .woori-amt__warn-tri {
+  animation-name: woori-amt-warn-tri;
+  animation-duration: 317ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.woori-amt__warn--anim .woori-amt__warn-bar {
+  animation-name: woori-amt-warn-bar;
+  animation-duration: 1020ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.woori-amt__warn--anim .woori-amt__warn-dot {
+  animation-name: woori-amt-warn-dot;
+  animation-duration: 1020ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+/* 삼각형: 시트 시작부터 배율 (3.6 표, 317ms) */
+@keyframes woori-amt-warn-tri {
+  0% { transform: scale(0.45); }
+  9.8% { transform: scale(0.735); }
+  14.8% { transform: scale(0.881); }
+  30.9% { transform: scale(0.96); }
+  36% { transform: scale(1.045); }
+  41.3% { transform: scale(1.025); }
+  46.7% { transform: scale(1.014); }
+  51.7% { transform: scale(0.975); }
+  57.1% { transform: scale(0.957); }
+  62.8% { transform: scale(0.953); }
+  68.5% { transform: scale(0.952); }
+  76% { transform: scale(0.959); }
+  81.4% { transform: scale(0.979); }
+  89% { transform: scale(0.988); }
+  100% { transform: scale(1); }
+}
+/* 흰 점: 시트 시작 +282ms 나타남 → 떨어짐 → 바닥 → 납작 → 둥글게 (1020ms 기준 %) */
+@keyframes woori-amt-warn-dot {
+  0%, 27.5% { opacity: 0; transform: translateY(-15.6px) scale(0.4); }
+  27.6% { opacity: 1; transform: translateY(-15.6px) scale(0.4); }
+  31.1% { opacity: 1; transform: translateY(-15.9px) scale(1); animation-timing-function: ease-in; }
+  34.2% { transform: translateY(-12px) scale(1); }
+  37.6% { transform: translateY(-7.5px) scale(1); }
+  40.8% { transform: translateY(-3.4px) scale(1); }
+  44.1% { transform: translateY(-1.7px) scale(1); }
+  48.2% { opacity: 1; transform: translateY(0) scale(1); }
+  51.6% { transform: translateY(0) scale(1.2, 0.43); }
+  55.7% { transform: translateY(0) scale(1.35, 0.15); }
+  58.2% { transform: translateY(0) scale(1.2, 0.43); }
+  62.9%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* 흰 막대: +726ms 부터 아래끝 기준으로 자람 → 살짝 줄었다 제자리 */
+@keyframes woori-amt-warn-bar {
+  0%, 71.1% { opacity: 0; transform: scaleY(0); }
+  71.2% { opacity: 1; transform: scaleY(0.223); }
+  72.8% { transform: scaleY(0.359); }
+  74.5% { transform: scaleY(0.495); }
+  76.1% { transform: scaleY(0.631); }
+  77.7% { transform: scaleY(0.732); }
+  79.3% { transform: scaleY(0.834); }
+  81% { transform: scaleY(0.902); }
+  82.6% { transform: scaleY(0.97); }
+  91.7% { transform: scaleY(0.902); }
+  98.1% { transform: scaleY(0.97); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+.woori-amt__ago {
+  position: absolute;
+  left: 20px;
+  width: 320px;
+  height: 65.333px;
+  border-radius: 16px;
+  background: var(--woori-surface);
+}
+
+/* ── 비밀번호 시트 ── */
+.woori-amt__dot {
+  position: absolute;
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #747474;
+}
+.woori-amt__dot--on {
+  border: 0;
+  background: var(--woori-primary-keypad);
+}
+.woori-amt__pw-key {
+  position: absolute;
+  width: 120px;
+  height: 65.25px;
+}
+.woori-amt__pw-key::before {
+  content: '';
+  position: absolute;
+  left: 11.4px;
+  top: 4.625px;
+  width: 97.2px;
+  height: 56px;
+  border-radius: 5.3px;
+  background: transparent;
+}
+.woori-amt__pw-key:active::before {
+  background: #e6eaee;
+}
+.woori-amt__pw-key > * {
+  position: absolute;
+}
+.woori-amt__pw-error {
+  color: #e2412e;
+}

@@ -1,0 +1,5 @@
+/* WooriSpinner — 굵기만 덮어쓴다 (주인 history, spec/history.md 4.5):
+   v2 #116–#178 각도 단면 325개 중앙값 50% 폭 5.36dp → 5.333dp(16 기기px). 반지름 20 · 색 · 움직임은 woori.css 그대로. */
+.woori-spinner .woori-spinner__arc {
+  stroke-width: 5.333px;
+}

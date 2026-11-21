@@ -1,0 +1,126 @@
+/*
+ * WooriSendBank — /send/account/bank 금융회사를 선택해 주세요 (spec/send-a.md 2.5)
+ * 요소는 앱 뷰포트 기준 dp 로 absolute. 소수 상자는 WooriSendFlow.fbox, 글자는 line-height:1 상자 left/top.
+ */
+.woori-send-bank {
+  position: relative;
+  height: 100%;
+  overflow: clip;
+  background: var(--woori-bg);
+  color: var(--woori-text);
+}
+
+.woori-send-bank__close {
+  display: block;
+}
+
+.woori-send-bank__close > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.woori-send-bank__title,
+.woori-send-bank__tab-text,
+.woori-send-bank__name {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.woori-send-bank__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--woori-text);
+}
+
+.woori-send-bank__tabs {
+  position: absolute;
+  left: 20px;
+  top: 123px;
+  width: 320px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--woori-bg-gray);
+}
+
+/* 탭 안 상자는 페이지 좌표로 놓았다 → 바탕 위치만큼 되돌린다 */
+.woori-send-bank__tabs > * {
+  margin-left: -20px;
+  margin-top: -123px;
+}
+
+.woori-send-bank__pill {
+  border-radius: 6px;
+  background: var(--woori-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.woori-send-bank__tab {
+  position: absolute;
+}
+
+.woori-send-bank__tab-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-placeholder);
+}
+
+.woori-send-bank__tab-text--on {
+  color: var(--woori-text);
+}
+
+.woori-send-bank__tile {
+  border-radius: 12px;
+  background: var(--woori-surface);
+}
+
+.woori-send-bank__logo {
+  display: block;
+  pointer-events: none;
+}
+
+/* 이름 13/500 타일 가운데 (left = 타일 가운데, translateX −50%) */
+.woori-send-bank__name {
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--woori-text);
+  pointer-events: none;
+}
+
+/* push shot (bank-open): 아래 계좌번호 페이지 + 베일 0.8 (한 프레임에) + 이 페이지 translateX 100% → 0 easeOutCubic 322ms */
+.woori-send-bank__push {
+  position: relative;
+  height: 100%;
+}
+
+.woori-send-bank__push-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--woori-bg);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.woori-send-bank__push-page {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  will-change: transform;
+  animation-name: woori-send-bank-push;
+  animation-duration: 322ms;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes woori-send-bank-push {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}

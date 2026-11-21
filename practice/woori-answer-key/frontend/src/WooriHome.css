@@ -1,0 +1,934 @@
+/* WooriHome — /home (spec/home.md). 좌표는 앱 dp (= CSS px). 애니메이션은 이름 있는 롱핸드 (frontend/README) */
+.woori-home {
+  position: relative;
+  height: 100%;
+  overflow: clip;
+  background: #eff0f3;
+}
+
+.woori-home--white {
+  background: #ffffff;
+}
+
+.woori-home__t {
+  position: absolute;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.woori-home__art {
+  position: absolute;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.woori-home__box {
+  position: absolute;
+}
+
+/* ── 스크롤 상자 (앱 0–740.667, 탭바 위끝까지) ── */
+.woori-home__scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 60px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.woori-home__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.woori-home__content {
+  position: relative;
+}
+
+/* ── 머리 (고정, 불투명 #eff0f3) ── */
+.woori-home__header {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 52px;
+  z-index: 2;
+  background: #eff0f3;
+}
+
+.woori-home__header .woori-home__art {
+  pointer-events: auto;
+}
+
+.woori-home__mode {
+  position: absolute;
+  left: 20px;
+  top: 11px;
+  width: 84.167px;
+  height: 30px;
+  border-radius: 15px;
+  background: #797e86;
+}
+
+.woori-home__mode-on {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 45.5px;
+  height: 26px;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+/* AI 말풍선: 테두리 고정 + 안쪽 "AI" / "≡" 주기 (3.8, 7.982s 전역 시계) + 반짝이 */
+.woori-home__ai {
+  position: absolute;
+  left: 236px;
+  top: 14px;
+  width: 24px;
+  height: 24px;
+}
+
+.woori-home__ai > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.woori-home__ai-sparkle {
+  position: absolute;
+  left: 11px;
+  top: -3px;
+  width: 14px;
+  height: 15px;
+  transform-origin: 0 0;
+  transform: translate(0.2003px, 0.9792px) scale(1.028786, 1.008333);
+}
+
+.woori-home__ai-sparkle > img {
+  display: block;
+  width: 14px;
+  height: 15px;
+}
+
+.woori-home__ai.is-cycling .woori-home__ai-ai {
+  animation-name: woori-home-ai-ai;
+  animation-duration: 7982ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: var(--ai-delay, 0ms);
+}
+
+.woori-home__ai.is-cycling .woori-home__ai-lines {
+  animation-name: woori-home-ai-lines;
+  animation-duration: 7982ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: var(--ai-delay, 0ms);
+}
+
+.woori-home__ai.is-cycling .woori-home__ai-sparkle > img {
+  transform-origin: 50% 50%;
+  animation-name: woori-home-ai-sparkle;
+  animation-duration: 7982ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-delay: var(--ai-delay, 0ms);
+}
+
+/* 주기 안 ms: 0–160 AI 페이드 아웃 · 160–280 빈 말풍선 · 280–660 ≡ 그려짐 · 660–1500 ≡ · 1500–1670 ≡ 페이드 아웃 · 1670–1790 빈 · 1790–1990 AI 페이드 인 */
+@keyframes woori-home-ai-ai {
+  0% {
+    opacity: 1;
+  }
+  2.0045% {
+    opacity: 0;
+  }
+  22.4255% {
+    opacity: 0;
+  }
+  24.931% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes woori-home-ai-lines {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  3.5079% {
+    opacity: 1;
+    clip-path: inset(0 75% 0 0);
+  }
+  8.2686% {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+  18.7923% {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+  20.9221% {
+    opacity: 0;
+    clip-path: inset(0);
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(0);
+  }
+}
+
+/* 반짝이: 주기 +2.32s → +3.07s 동안 두 번 흔들림 (끝 최대 ≈45°, 크기 0.9–1.0) — 모양은 설계 근사 */
+@keyframes woori-home-ai-sparkle {
+  0%,
+  29.065% {
+    transform: none;
+  }
+  31.4% {
+    transform: rotate(45deg) scale(0.9);
+  }
+  33.7% {
+    transform: none;
+  }
+  36.05% {
+    transform: rotate(30deg) scale(0.94);
+  }
+  38.46%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ── 공지 카드 줄 (가로 캐러셀) ── */
+.woori-home__notice-clip {
+  position: absolute;
+  left: 0;
+  top: 60px;
+  width: 360px;
+  height: 72px;
+  overflow: hidden;
+}
+
+.woori-home__notice-track {
+  position: absolute;
+  inset: 0;
+}
+
+/* 3.2 notice-carousel-settle: 11.065 → 11.959 (894ms) 표본 px ÷ 1.45803 → dp, 선형 보간 */
+.woori-home__notice-track.is-settling {
+  animation-name: woori-home-notice-settle;
+  animation-duration: 894ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes woori-home-notice-settle {
+  0% {
+    transform: translateX(-32.098px);
+  }
+  2.796% {
+    transform: translateX(-36.762px);
+  }
+  4.586% {
+    transform: translateX(-39.025px);
+  }
+  6.488% {
+    transform: translateX(-39.917px);
+  }
+  12.081% {
+    transform: translateX(-43.621px);
+  }
+  18.792% {
+    transform: translateX(-43.141px);
+  }
+  21.477% {
+    transform: translateX(-41.083px);
+  }
+  24.385% {
+    transform: translateX(-38.957px);
+  }
+  41.387% {
+    transform: translateX(-38.957px);
+  }
+  41.611% {
+    transform: translateX(-30.795px);
+  }
+  50.783% {
+    transform: translateX(-30.795px);
+  }
+  52.796% {
+    transform: translateX(-18.45px);
+  }
+  55.817% {
+    transform: translateX(-13.1px);
+  }
+  58.166% {
+    transform: translateX(-10.631px);
+  }
+  64.43% {
+    transform: translateX(-10.631px);
+  }
+  66.779% {
+    transform: translateX(-6.379px);
+  }
+  69.016% {
+    transform: translateX(-5.281px);
+  }
+  71.029% {
+    transform: translateX(-4.047px);
+  }
+  72.931% {
+    transform: translateX(-3.498px);
+  }
+  75.615% {
+    transform: translateX(-2.812px);
+  }
+  77.517% {
+    transform: translateX(-2.126px);
+  }
+  81.208% {
+    transform: translateX(-1.44px);
+  }
+  84.116% {
+    transform: translateX(-0.754px);
+  }
+  91.611% {
+    transform: translateX(-0.48px);
+  }
+  95.19% {
+    transform: translateX(-0.274px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+.woori-home__notice-card {
+  position: absolute;
+  top: 0;
+  width: 328px;
+  height: 72px;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.woori-home__notice-tile {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #fdf2cf;
+}
+
+/* 점 5개 (1/5): 활성 16x6 알약 #1b1f27, 나머지 6dp 원 #707f88, 피치 12 */
+.woori-home__dots {
+  position: absolute;
+  left: 148px;
+  top: 141px;
+  width: 64px;
+  height: 6px;
+}
+
+.woori-home__dots > i {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #707f88;
+}
+
+.woori-home__dots > i.is-on {
+  left: 0;
+  width: 16px;
+  background: #1b1f27;
+}
+
+.woori-home__chip {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.woori-home__toggle {
+  border-radius: 8px;
+  background: #7d828c;
+}
+
+.woori-home__toggle > i {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.woori-home__card {
+  position: absolute;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.woori-home__add-btn {
+  border-radius: 16.167px;
+  background: #2286f2;
+}
+
+/* ── WON 통장 ── */
+.woori-home__won {
+  position: absolute;
+  width: 328px;
+  border-radius: 16px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.woori-home__won.has-strip {
+  background: #3794f6;
+}
+
+.woori-home__won-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 328px;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.woori-home__won-acct {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: #828487;
+  white-space: nowrap;
+}
+
+.woori-home__won-acct > img {
+  display: block;
+  margin-left: 3.996px;
+  margin-top: -1px;
+}
+
+.woori-home__limit-chip {
+  border-radius: 10px;
+  background: #eff0f3;
+}
+
+.woori-home__balance {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 오도미터 (3.5): 창 518.667–546.667, 숫자 줄 피치 28 */
+.woori-home__balance--roll {
+  height: 28px;
+  color: #201f22;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.woori-home__odo-col {
+  position: relative;
+  display: block;
+  height: 28px;
+  overflow: hidden;
+}
+
+.woori-home__odo-strip {
+  display: block;
+  transform: translateY(var(--odo-to));
+}
+
+.woori-home__odo-strip.is-rolling {
+  animation-name: woori-home-odo-roll, woori-home-odo-fade;
+  animation-duration: 620ms, 460ms;
+  animation-timing-function: cubic-bezier(0, 0, 0.2, 1), cubic-bezier(0, 0, 0.2, 1);
+  animation-fill-mode: both, both;
+}
+
+.woori-home__balance--roll .woori-home__odo-strip:not(.is-rolling) {
+  transform: translateY(var(--odo-from));
+}
+
+@keyframes woori-home-odo-roll {
+  from {
+    transform: translateY(var(--odo-from));
+  }
+  to {
+    transform: translateY(var(--odo-to));
+  }
+}
+
+@keyframes woori-home-odo-fade {
+  from {
+    opacity: 0.05;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.woori-home__odo-digit {
+  display: block;
+  height: 28px;
+  padding-top: 3.333px;
+  box-sizing: border-box;
+}
+
+.woori-home__odo-static {
+  display: block;
+  padding-top: 3.333px;
+  letter-spacing: 0;
+  color: #212022;
+}
+
+.woori-home__transfer {
+  position: absolute;
+  width: 48px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 1px solid #e2e2e2;
+  border-radius: 16px;
+  background: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.woori-home__all {
+  position: absolute;
+  width: 328px;
+  height: 48px;
+  box-sizing: border-box;
+  border: 1px solid #cfd8e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.woori-home__all > .woori-home__t {
+  margin: -1px 0 0 -1px;
+}
+
+.woori-home__skel {
+  background: #eff0f3;
+}
+
+.woori-home__skel--sq {
+  border-radius: 5.5px;
+}
+
+/* ── 중간 배너 (카드 120dp, 줄 피치 348, ease 300ms) ── */
+.woori-home__banner {
+  position: absolute;
+  width: 360px;
+  height: 120px;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.woori-home__banner-track {
+  position: absolute;
+  inset: 0;
+}
+
+.woori-home__banner-track.is-moving {
+  animation-name: woori-home-banner-move;
+  animation-duration: 300ms;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+@keyframes woori-home-banner-move {
+  from {
+    transform: translateX(var(--banner-from));
+  }
+  to {
+    transform: translateX(0px);
+  }
+}
+
+.woori-home__banner-card {
+  position: absolute;
+  top: 0;
+  width: 328px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.woori-home__banner-pill {
+  position: absolute;
+  width: 83.333px;
+  height: 20px;
+  border-radius: 10px;
+  background: #ffffff;
+  z-index: 1;
+}
+
+.woori-home__icon-btn {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.woori-home__icon-btn > img {
+  display: block;
+}
+
+.woori-home__banner-count10 {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4.333px;
+  display: flex;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.woori-home__banner-pause {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.woori-home__banner-pause > img {
+  display: block;
+}
+
+/* ⏸ 를 누르면 ▶ (영상에 없음 — 설계) */
+.woori-home__play {
+  display: block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-style: solid;
+  border-width: 4.5px 0 4.5px 7px;
+  border-color: transparent transparent transparent #707174;
+}
+
+/* ── 추천서비스 ── */
+.woori-home__rec {
+  position: absolute;
+  width: 360px;
+  height: 235px;
+  overflow: hidden;
+}
+
+.woori-home__rec-track {
+  position: absolute;
+  inset: 0;
+}
+
+.woori-home__rec-card {
+  position: absolute;
+  top: 0;
+  width: 288px;
+  height: 235px;
+  border-radius: 16px;
+}
+
+.woori-home__rec-circle {
+  position: absolute;
+  left: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: #ffffff;
+}
+
+/* ── 우리금융그룹 서비스 마키 (33.23dp/s 왼쪽 · 카드마다 ±7.87dp 4.88s, 이웃 반대 위상) ── */
+.woori-home__marquee {
+  position: absolute;
+  width: 360px;
+  height: 180px;
+  overflow: hidden;
+}
+
+.woori-home__marquee-track {
+  position: absolute;
+  inset: 0;
+  animation-name: woori-home-marquee-flow;
+  animation-duration: 27445ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes woori-home-marquee-flow {
+  from {
+    transform: translateX(0px);
+  }
+  to {
+    transform: translateX(-912px);
+  }
+}
+
+.woori-home__mq-card {
+  position: absolute;
+  top: 8px;
+  width: 140px;
+  height: 164px;
+  box-sizing: border-box;
+  border: 1px solid #e4e4e4;
+  border-radius: 24px;
+  background: #ffffff;
+  animation-name: woori-home-marquee-bob;
+  animation-duration: 4880ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.woori-home__mq-card.is-odd {
+  animation-delay: -2440ms;
+}
+
+@keyframes woori-home-marquee-bob {
+  0% {
+    transform: translateY(-7.87px);
+  }
+  50% {
+    transform: translateY(7.87px);
+  }
+  100% {
+    transform: translateY(-7.87px);
+  }
+}
+
+.woori-home__mq-title {
+  position: absolute;
+  left: 16px;
+  top: 23px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.woori-home__mq-line {
+  position: absolute;
+  left: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: #727273;
+  white-space: nowrap;
+}
+
+/* ── 공지 줄 ── */
+.woori-home__notice-line {
+  position: absolute;
+  width: 328px;
+  height: 60px;
+  box-sizing: border-box;
+  border: 1px solid #dfdfdf;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.woori-home__notice-line > * {
+  margin: -1px 0 0 -1px;
+}
+
+.woori-home__notice-chip {
+  position: absolute;
+  width: 32.333px;
+  height: 20px;
+  border-radius: 10px;
+  background: #6c727a;
+}
+
+.woori-home__ellipsis {
+  max-width: 214.81px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 오버레이 스크롤바 (3.18): 오른쪽 4dp, rgba(0,0,0,0.36), 마지막 움직임 0.39s 뒤 linear 250ms ── */
+.woori-home__scrollbar {
+  position: absolute;
+  left: 356px;
+  top: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.36);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.woori-home__scrollbar.is-fading {
+  animation-name: woori-home-sb-fade;
+  animation-duration: 250ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes woori-home-sb-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ── 로그인 로딩 캐릭터 대체 그림 (launch.assets.json notes 의 CSS 그대로) ── */
+.woori-home__loader {
+  position: absolute;
+  left: 124px;
+  top: 314px;
+  translate: 0 0.3333px;
+  width: 112px;
+  height: 112px;
+  overflow: hidden;
+}
+
+.woori-home__loader-hexes {
+  position: absolute;
+  left: -112px;
+  top: 0;
+  width: 224px;
+  height: 112px;
+  background: url(/woori/launch/login-loader-hexes.svg) repeat-x 0 0 / 112px 112px;
+  animation-name: woori-launch-loader-flow;
+  animation-duration: 583.333ms;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes woori-launch-loader-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(112px);
+  }
+}
+
+.woori-home__loader-bob {
+  position: absolute;
+  inset: 0;
+  animation-name: woori-launch-loader-bob;
+  animation-duration: 880ms;
+  animation-timing-function: ease-in-out;
+  animation-delay: -124ms;
+  animation-iteration-count: infinite;
+}
+
+@keyframes woori-launch-loader-bob {
+  0% {
+    transform: translateY(-3.09px);
+  }
+  50% {
+    transform: translateY(3.09px);
+  }
+  100% {
+    transform: translateY(-3.09px);
+  }
+}
+
+.woori-home__loader-bob > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 112px;
+  height: 112px;
+}
+
+.woori-home__loader-bob > .woori-home__loader-wings {
+  transform-origin: 54.46% 36.61%;
+  animation-name: woori-launch-loader-flap;
+  animation-duration: 240ms;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+
+@keyframes woori-launch-loader-flap {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0.6);
+  }
+}
+
+/* ── 프로모션 팝업 시트 (2.2): 앱 564–800.667, 보라 가로 그라데이션, 위 r 20 ── */
+.woori-home__popup {
+  background: linear-gradient(90deg, #9166fe, #814bfd);
+  border-radius: 20px 20px 0 0;
+}
+
+.woori-home__popup-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 192px;
+  height: 44.667px;
+  background: #ffffff;
+}
+
+.woori-home__popup-btn {
+  position: absolute;
+  top: 0;
+  height: 44.667px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.woori-home__popup-btn:first-child {
+  left: 0;
+}
+
+.woori-home__popup-pressed {
+  background: #b3b3b4;
+}
+
+.woori-home__error {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 300px;
+  margin: 0;
+  font-size: 13px;
+  color: #c33;
+  text-align: center;
+}

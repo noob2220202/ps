@@ -1,0 +1,92 @@
+[
+ {
+  "name": "home/popup-open",
+  "t": 97,
+  "_note": "시트·딤 easeOutCubic 176ms 시작(11.577) 후 97ms = 영상 11.674 (#311). 앱 shot=popup-open 은 열림 애니메이션을 이 위상에 세운다"
+ },
+ {
+  "name": "home/popup-close",
+  "t": 83,
+  "_note": "닫힘 linear 160ms 시작(12.712) 후 83ms = 영상 12.795 (#351)"
+ },
+ {
+  "name": "home/popup-balance-roll",
+  "t": 250,
+  "_note": "오도미터 첫 숫자(11.809) 후 250ms = 영상 12.059 (#325), E≈0.64"
+ },
+ {
+  "name": "home/balance-roll",
+  "t": 336,
+  "_note": "오도미터 시작(2.959) 후 336ms = 영상 3.295 (#61), E≈0.88 (233원)"
+ },
+ {
+  "name": "home/banner-swipe-3",
+  "t": 72,
+  "_note": "스와이프 2→3: 손 뗀 자리(카드 줄 −66.5px = −45.61dp)에서 ease 300ms 정착 시작 후 72ms = 영상 #534 (줄 −243.4px). 앱 shot=banner-swipe-3 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-4",
+  "t": 74,
+  "_note": "스와이프 3→4: 손 뗀 자리(카드 줄 −85.1px = −58.39dp)에서 ease 300ms 정착 시작 후 74ms = 영상 #573 (줄 −258.4px). 앱 shot=banner-swipe-4 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-5",
+  "t": 72,
+  "_note": "스와이프 4→5: 손 뗀 자리(카드 줄 −85.8px = −58.85dp)에서 ease 300ms 정착 시작 후 72ms = 영상 #601 (줄 −254.9px). 앱 shot=banner-swipe-5 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-6",
+  "t": 82,
+  "_note": "스와이프 5→6: 손 뗀 자리(카드 줄 −85.8px = −58.88dp)에서 ease 300ms 정착 시작 후 82ms = 영상 #635 (줄 −290.8px). 앱 shot=banner-swipe-6 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-7",
+  "t": 78,
+  "_note": "스와이프 6→7: 손 뗀 자리(카드 줄 −44.5px = −30.49dp)에서 ease 300ms 정착 시작 후 78ms = 영상 #672 (줄 −234.3px). 앱 shot=banner-swipe-7 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-8",
+  "t": 84,
+  "_note": "스와이프 7→8: 손 뗀 자리(카드 줄 −66.8px = −45.79dp)에서 ease 300ms 정착 시작 후 84ms = 영상 #705 (줄 −273.9px). 앱 shot=banner-swipe-8 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-9",
+  "t": 81,
+  "_note": "스와이프 8→9: 손 뗀 자리(카드 줄 −61.3px = −42.07dp)에서 ease 300ms 정착 시작 후 81ms = 영상 #745 (줄 −267.4px). 앱 shot=banner-swipe-9 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-swipe-10",
+  "t": 74,
+  "_note": "스와이프 9→10: 손 뗀 자리(카드 줄 −91.5px = −62.73dp)에서 ease 300ms 정착 시작 후 74ms = 영상 #775 (줄 −258.3px). 앱 shot=banner-swipe-10 은 이 위상에 세운다"
+ },
+ {
+  "name": "home/banner-next-5",
+  "t": 83.3,
+  "_note": "› 탭 4→5: ease 300ms 시작 후 83.3ms (vsync 5칸) = 영상 #4201 (줄 −238.5px), 카운터 5/10"
+ },
+ {
+  "name": "home/banner-next-6",
+  "t": 83.3,
+  "_note": "› 탭 5→6: ease 300ms 시작 후 83.3ms (vsync 5칸) = 영상 #4257 (줄 −238.6px), 카운터 6/10"
+ },
+ {
+  "name": "home/banner-next-7",
+  "t": 83.3,
+  "_note": "› 탭 6→7: ease 300ms 시작 후 83.3ms (vsync 5칸) = 영상 #4315 (줄 −238.5px), 카운터 7/10"
+ },
+ {
+  "name": "home/banner-next-8",
+  "t": 100.0,
+  "_note": "› 탭 7→8: ease 300ms 시작 후 100.0ms (vsync 6칸) = 영상 #4359 (줄 −293.2px), 카운터 8/10"
+ },
+ {
+  "name": "home/banner-next-9",
+  "t": 83.3,
+  "_note": "› 탭 8→9: ease 300ms 시작 후 83.3ms (vsync 5칸) = 영상 #4406 (줄 −238.5px), 카운터 9/10"
+ },
+ {
+  "name": "home/banner-next-10",
+  "t": 83.3,
+  "_note": "› 탭 9→10: ease 300ms 시작 후 83.3ms (vsync 5칸) = 영상 #4454 (줄 −238.5px), 카운터 10/10"
+ }
+]

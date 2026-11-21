@@ -1,0 +1,2879 @@
+{
+ "_units": {
+  "unit": "dp",
+  "source": "spec/launch.json",
+  "generatedBy": "tools/spec-to-dp.cjs",
+  "xMap": "x_dp = 180 + (x_px − 262.02) / 1.45803 · 폭 = px / 1.45803",
+  "yMap": "y_dp = y_px × 0.6875 (화면 위끝 기준, 앱 안 y = y_dp − 31.333) · 높이·방향 없는 길이 = px × 0.6875",
+  "note": "길이·위치 숫자만 D1 식으로 (소수 셋째 자리). 문자열 안의 숫자(mask 등)·시간·프레임 번호·오차값과 \"dp\"·\"keep\" 아래는 그대로."
+ },
+ "group": "launch",
+ "route": "/",
+ "source": "v1-clean.mp4 1.748–10.061 (+ 키패드 설계용 누출 프레임 v1 #7192–#7208, v2 #3003–#3021). 측정 스크립트·중간값: SP/spec-work/launch/",
+ "coords": "box = frame px(524x1280, 화면 절대, 잉크/50% 가장자리 소수 px). dp = 설계 dp (앱 뷰포트 기준 y, 가로 D1: x_dp = 180 + (x_px − 262.02)/1.45803). spec/dp/launch.json 은 spec-to-dp 생성",
+ "privacy": "이 그룹 화면에는 이름·계좌가 없다. 누출 프레임의 누른 키 위치(비밀번호 자릿값)는 적지 않는다",
+ "states": [
+  {
+   "id": "splash-logo-start",
+   "video": "v1",
+   "i0": 52,
+   "i1": 54,
+   "t0": 1.748,
+   "t1": 1.793,
+   "mask": [],
+   "refFrame": "tools/ref/launch/splash-logo-start.png",
+   "route": "/",
+   "scenario": "v1-start",
+   "inventoryId": "splash:logo-start",
+   "summary": "앱 실행 첫 프레임(런처에서 한 프레임에 교체). 흰 바탕, WON 로고(남색 원이 회색 트랙 왼쪽), WON 글자, iF·MA 마크, 우리은행. 3장(80ms)뿐",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#eff0f3",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #eff0f3 — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "logo-track",
+     "type": "shape",
+     "box": {
+      "x": 142.353,
+      "y": 394.018,
+      "w": 75.149,
+      "h": 40.878
+     },
+     "dp": {
+      "x": 142.35,
+      "y": 362.68,
+      "w": 75.15,
+      "h": 40.88
+     },
+     "fill": "#d0d0d0",
+     "radius": 20.439,
+     "note": "회색 알약(트랙). 양 끝 반원(오른 끝 원 맞춤 r 29.73px, rms 0.08). 시작 상태에서 원 오른쪽에 보이고 끝 상태에선 원·채움에 다 가려진다. 높이 40.88dp·폭 75.15dp — 로고 그림 배율이라 정수 dp 아님",
+     "asset": "launch.splash-logo-track"
+    },
+    {
+     "name": "logo-fill",
+     "type": "gradient",
+     "box": {
+      "x": 142.353,
+      "y": 394.018,
+      "w": 25.436,
+      "h": 41
+     },
+     "dp": {
+      "x": 142.35,
+      "y": 362.68,
+      "w": 25.44,
+      "h": 41
+     },
+     "fill": "linear-gradient(90deg, #2bc8f4 0, #cefffd 35.80dp, #e9ffff 41.88dp, #ffffff 46.65dp) — 트랙 좌표에 고정 (24.6dp = #9beefa)",
+     "radius": 20.5,
+     "note": "하늘색 그라데이션 채움. 왼끝 = 트랙 왼끝(왼 반원 맞춤 207.13px, rms 0.06), 오른끝 = 남색 원 중심(원에 가려 안 보임). 색은 트랙에 붙어 있다(프레임마다 같은 x 의 색이 같다 — 늘어나지 않고 드러난다). 끝 상태 보이는 부분 x 207.1–243.0px: R 2.88/px·G 1.07/px·B 0.26/px 직선(rms 4.5/1.2/2.1 — 4:2:0 색차). 원 중심(49.86dp) 너머 정지점은 가려지는 외삽값. 시작 상태에서는 폭이 원 반지름(25.4dp)뿐이라 전부 원 뒤. 에셋 단계 재측정: 색은 끝 프레임 x 211–240 곧은 안쪽(행 592–613) 채널별 직선 최소제곱 R 43.06+4.543·x, G 199.61+1.547·x, B 243.69+0.270·x (x = 트랙 왼끝에서 dp, rms 1.5/1.0/1.6) — 0dp #2bc8f4, 24.6dp #9beefa, 그 너머는 같은 직선을 255 에서 자름(원 위아래 모서리 틈에 ≈35dp 까지 조금 보임). 높이는 Y 평면 모양 맞춤 41.0dp(트랙보다 0.12dp 큼). 에셋 launch.splash-logo-fill",
+     "keep": {
+      "measuredRGB": {
+       "x207_13": [
+        49,
+        200,
+        242
+       ],
+       "x243_0": [
+        152,
+        238,
+        251
+       ],
+       "x225_5": [
+        99,
+        218,
+        249
+       ]
+      }
+     },
+     "asset": "launch.splash-logo-fill"
+    },
+    {
+     "name": "logo-circle",
+     "type": "shape",
+     "box": {
+      "x": 142.513,
+      "y": 389.126,
+      "w": 50.553,
+      "h": 50.674
+     },
+     "dp": {
+      "x": 142.51,
+      "y": 357.79,
+      "w": 50.55,
+      "h": 50.67
+     },
+     "fill": "#00259f",
+     "radius": 25.337,
+     "cx": 167.79,
+     "cy": 414.463,
+     "r": 25.337,
+     "note": "남색 원(맨 위). 원 맞춤 rms 0.06px, 지름 73.71px = 가로 50.55dp / 세로 50.67dp (원이라 둘 다 50.6dp 로). 중심 시작 x 244.217px = 167.79dp, y 602.855px = 앱 383.13dp. 크기·색·불투명도는 애니메이션 중 변하지 않음(반지름 36.84–36.96px)",
+     "asset": "launch.splash-logo-circle"
+    },
+    {
+     "name": "won-wordmark",
+     "type": "image",
+     "box": {
+      "x": 143.999,
+      "y": 450.313,
+      "w": 71.782,
+      "h": 22.076
+     },
+     "dp": {
+      "x": 144,
+      "y": 418.98,
+      "w": 71.78,
+      "h": 22.08
+     },
+     "asset": "launch.splash-won-wordmark",
+     "note": "'WON' 글자 로고(남색 #00259f — 글자 안쪽 평평한 화소 중앙값 (0,37,159), 원과 같은 색. 가장 진한 4% 코어 #04238f 는 가장자리 링잉). 그림(에셋 splash-won-wordmark). 가운데 x 261.86px ≈ 180dp · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)",
+     "color": "#00259f"
+    },
+    {
+     "name": "if-award",
+     "type": "image",
+     "box": {
+      "x": 134.294,
+      "y": 608.382,
+      "w": 91.452,
+      "h": 45.437
+     },
+     "dp": {
+      "x": 134.29,
+      "y": 577.05,
+      "w": 91.45,
+      "h": 45.44
+     },
+     "asset": "launch.splash-if-award",
+     "note": "iF DESIGN AWARD 2026 (빨간 사각 2개). 그림(에셋 splash-if-award) · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)"
+    },
+    {
+     "name": "ma-cert",
+     "type": "image",
+     "box": {
+      "x": 122.539,
+      "y": 678.755,
+      "w": 114.113,
+      "h": 35.695
+     },
+     "dp": {
+      "x": 122.54,
+      "y": 647.42,
+      "w": 114.11,
+      "h": 35.7
+     },
+     "asset": "launch.splash-ma-cert",
+     "note": "MA 모바일 접근성 인증 마크 + 글자. 그림(에셋 splash-ma-cert) · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)"
+    },
+    {
+     "name": "woori-wordmark",
+     "type": "image",
+     "box": {
+      "x": 151.18,
+      "y": 776.057,
+      "w": 58.25,
+      "h": 15.957
+     },
+     "dp": {
+      "x": 151.18,
+      "y": 744.72,
+      "w": 58.25,
+      "h": 15.96
+     },
+     "asset": "launch.splash-woori-wordmark",
+     "note": "'우리은행' 글자 로고(파랑). 그림(에셋 splash-woori-wordmark) · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)"
+    }
+   ]
+  },
+  {
+   "id": "splash-logo-end",
+   "video": "v1",
+   "i0": 70,
+   "i1": 91,
+   "t0": 2.11,
+   "t1": 2.822,
+   "mask": [],
+   "refFrame": "tools/ref/launch/splash-logo-end.png",
+   "route": "/",
+   "scenario": "v1-start",
+   "inventoryId": "splash:logo-end",
+   "summary": "로고 애니메이션 끝: 남색 원이 트랙 오른끝, 왼쪽은 하늘색 그라데이션. 2.841 까지 정지(상태바만 바뀜)",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#eff0f3",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #eff0f3 — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "logo-track",
+     "type": "shape",
+     "box": {
+      "x": 142.353,
+      "y": 394.018,
+      "w": 75.149,
+      "h": 40.878
+     },
+     "dp": {
+      "x": 142.35,
+      "y": 362.68,
+      "w": 75.15,
+      "h": 40.88
+     },
+     "fill": "#d0d0d0",
+     "radius": 20.439,
+     "note": "회색 알약(트랙). 양 끝 반원(오른 끝 원 맞춤 r 29.73px, rms 0.08). 시작 상태에서 원 오른쪽에 보이고 끝 상태에선 원·채움에 다 가려진다. 높이 40.88dp·폭 75.15dp — 로고 그림 배율이라 정수 dp 아님",
+     "asset": "launch.splash-logo-track"
+    },
+    {
+     "name": "logo-fill",
+     "type": "gradient",
+     "box": {
+      "x": 142.353,
+      "y": 394.018,
+      "w": 49.852,
+      "h": 41
+     },
+     "dp": {
+      "x": 142.35,
+      "y": 362.68,
+      "w": 49.85,
+      "h": 41
+     },
+     "fill": "linear-gradient(90deg, #2bc8f4 0, #cefffd 35.80dp, #e9ffff 41.88dp, #ffffff 46.65dp) — 트랙 좌표에 고정 (24.6dp = #9beefa)",
+     "radius": 20.5,
+     "note": "하늘색 그라데이션 채움. 왼끝 = 트랙 왼끝(왼 반원 맞춤 207.13px, rms 0.06), 오른끝 = 남색 원 중심(원에 가려 안 보임). 색은 트랙에 붙어 있다(프레임마다 같은 x 의 색이 같다 — 늘어나지 않고 드러난다). 끝 상태 보이는 부분 x 207.1–243.0px: R 2.88/px·G 1.07/px·B 0.26/px 직선(rms 4.5/1.2/2.1 — 4:2:0 색차). 원 중심(49.86dp) 너머 정지점은 가려지는 외삽값. 에셋 단계 재측정: 색은 끝 프레임 x 211–240 곧은 안쪽(행 592–613) 채널별 직선 최소제곱 R 43.06+4.543·x, G 199.61+1.547·x, B 243.69+0.270·x (x = 트랙 왼끝에서 dp, rms 1.5/1.0/1.6) — 0dp #2bc8f4, 24.6dp #9beefa, 그 너머는 같은 직선을 255 에서 자름(원 위아래 모서리 틈에 ≈35dp 까지 조금 보임). 높이는 Y 평면 모양 맞춤 41.0dp(트랙보다 0.12dp 큼). 에셋 launch.splash-logo-fill",
+     "keep": {
+      "measuredRGB": {
+       "x207_13": [
+        49,
+        200,
+        242
+       ],
+       "x243_0": [
+        152,
+        238,
+        251
+       ],
+       "x225_5": [
+        99,
+        218,
+        249
+       ]
+      }
+     },
+     "asset": "launch.splash-logo-fill"
+    },
+    {
+     "name": "logo-circle",
+     "type": "shape",
+     "box": {
+      "x": 166.929,
+      "y": 389.126,
+      "w": 50.553,
+      "h": 50.674
+     },
+     "dp": {
+      "x": 166.93,
+      "y": 357.79,
+      "w": 50.55,
+      "h": 50.67
+     },
+     "fill": "#00259f",
+     "radius": 25.337,
+     "cx": 192.206,
+     "cy": 414.463,
+     "r": 25.337,
+     "note": "남색 원(맨 위). 원 맞춤 rms 0.06px, 지름 73.71px = 가로 50.55dp / 세로 50.67dp (원이라 둘 다 50.6dp 로). 중심 끝 x 279.816px = 192.21dp, y 602.855px = 앱 383.13dp. 크기·색·불투명도는 애니메이션 중 변하지 않음(반지름 36.84–36.96px)",
+     "asset": "launch.splash-logo-circle"
+    },
+    {
+     "name": "won-wordmark",
+     "type": "image",
+     "box": {
+      "x": 143.999,
+      "y": 450.313,
+      "w": 71.782,
+      "h": 22.076
+     },
+     "dp": {
+      "x": 144,
+      "y": 418.98,
+      "w": 71.78,
+      "h": 22.08
+     },
+     "asset": "launch.splash-won-wordmark",
+     "note": "'WON' 글자 로고(남색 #00259f — 글자 안쪽 평평한 화소 중앙값 (0,37,159), 원과 같은 색. 가장 진한 4% 코어 #04238f 는 가장자리 링잉). 그림(에셋 splash-won-wordmark). 가운데 x 261.86px ≈ 180dp · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)",
+     "color": "#00259f"
+    },
+    {
+     "name": "if-award",
+     "type": "image",
+     "box": {
+      "x": 134.294,
+      "y": 608.382,
+      "w": 91.452,
+      "h": 45.437
+     },
+     "dp": {
+      "x": 134.29,
+      "y": 577.05,
+      "w": 91.45,
+      "h": 45.44
+     },
+     "asset": "launch.splash-if-award",
+     "note": "iF DESIGN AWARD 2026 (빨간 사각 2개). 그림(에셋 splash-if-award) · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)"
+    },
+    {
+     "name": "ma-cert",
+     "type": "image",
+     "box": {
+      "x": 122.539,
+      "y": 678.755,
+      "w": 114.113,
+      "h": 35.695
+     },
+     "dp": {
+      "x": 122.54,
+      "y": 647.42,
+      "w": 114.11,
+      "h": 35.7
+     },
+     "asset": "launch.splash-ma-cert",
+     "note": "MA 모바일 접근성 인증 마크 + 글자. 그림(에셋 splash-ma-cert) · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)"
+    },
+    {
+     "name": "woori-wordmark",
+     "type": "image",
+     "box": {
+      "x": 151.18,
+      "y": 776.057,
+      "w": 58.25,
+      "h": 15.957
+     },
+     "dp": {
+      "x": 151.18,
+      "y": 744.72,
+      "w": 58.25,
+      "h": 15.96
+     },
+     "asset": "launch.splash-woori-wordmark",
+     "note": "'우리은행' 글자 로고(파랑). 그림(에셋 splash-woori-wordmark) · 상자 = 잉크 상자(50% 가장자리). 시작·끝 상태 같은 자리(차이 0)"
+    }
+   ]
+  },
+  {
+   "id": "cert-pin-spinner",
+   "video": "v1",
+   "i0": 130,
+   "i1": 207,
+   "t0": 7.395,
+   "t1": 8.748,
+   "mask": [
+    "228,594,68,68"
+   ],
+   "refFrame": "tools/ref/launch/cert-pin-spinner.png",
+   "route": "/cert",
+   "scenario": "v1-start",
+   "inventoryId": "cert-pin:spinner",
+   "summary": "우리WON인증서: 6점 다 참 + 가운데 스피너(보안 검은 화면 컷 뒤 첫 프레임). 키패드 없음. 스피너 마스크",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#ffffff",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #ffffff — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "back-chevron",
+     "type": "icon",
+     "box": {
+      "x": 23.542,
+      "y": 50.387,
+      "w": 7.819,
+      "h": 13.771
+     },
+     "dp": {
+      "x": 23.54,
+      "y": 19.05,
+      "w": 7.82,
+      "h": 13.77
+     },
+     "color": "#33353a",
+     "owner": "history",
+     "asset": "history.back-chevron",
+     "note": "‹ 뒤로 — 주인 history(일반 페이지 머리). 잉크 상자만 잼(코어 #3a3a3b). 헤더 띠·제목 없음"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "text": "우리WON인증서",
+     "box": {
+      "x": 106.202,
+      "y": 142.863,
+      "w": 145.834,
+      "h": 19.456
+     },
+     "dp": {
+      "x": 106.2,
+      "y": 111.53,
+      "w": 145.83,
+      "h": 19.46
+     },
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0691,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1164,
+       "advanceDp": 148.36,
+       "baselineDpApp": 129,
+       "inkScale": 0.958
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 105.625,
+      "top": 110,
+      "transform": "none",
+      "fontSize": 22,
+      "fontWeight": 700,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#33353a"
+     },
+     "align": "center",
+     "note": "가운데 정렬(left + advance/2 = 179.81dp). 22dp/700"
+    },
+    {
+     "name": "subtitle",
+     "type": "text",
+     "text": "6자리 비밀번호를 입력해 주세요.",
+     "box": {
+      "x": 84.062,
+      "y": 176.069,
+      "w": 191.471,
+      "h": 13.145
+     },
+     "dp": {
+      "x": 84.06,
+      "y": 144.74,
+      "w": 191.47,
+      "h": 13.15
+     },
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0.0025,
+      "numeric": "proportional",
+      "fitError": 0.1179,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3628,
+       "advanceDp": 193.5,
+       "baselineDpApp": 156.25,
+       "inkScale": 0.887
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 83.21875,
+      "top": 144,
+      "transform": "translateY(0.25px)",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0.0025em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#707173"
+     },
+     "align": "center",
+     "note": "15dp/500/+0.0025em (spec/font.md 10절 critic-font 과 같은 값). 둥근 값 자간 0 은 0.189 — 18자에서 ≈1px 차이라 best 를 쓴다"
+    },
+    {
+     "name": "pin-dot-1",
+     "type": "shape",
+     "box": {
+      "x": 114.127,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 114,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "채운 점: 측정 #076ef4 (코어 10x10 중앙값) → 토큰 primary-keypad #076ef2 (Δ2). 지름 가로 17.37px(11.91dp)·세로 17.56px(12.07dp) → 12dp, 간격 34.974px = 23.99dp → 24dp, 여섯 점 가운데 262.08px = 180.04dp"
+    },
+    {
+     "name": "pin-dot-2",
+     "type": "shape",
+     "box": {
+      "x": 138.091,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 138,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-3",
+     "type": "shape",
+     "box": {
+      "x": 162.096,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 162,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-4",
+     "type": "shape",
+     "box": {
+      "x": 186.046,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 186,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-5",
+     "type": "shape",
+     "box": {
+      "x": 210.078,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 210,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-6",
+     "type": "shape",
+     "box": {
+      "x": 234.063,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 234,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "auto-login-check",
+     "type": "icon",
+     "box": {
+      "x": 129.692,
+      "y": 291.624,
+      "w": 23.991,
+      "h": 23.987
+     },
+     "dp": {
+      "x": 129.5,
+      "y": 260.33,
+      "w": 24,
+      "h": 24
+     },
+     "color": "#33353a",
+     "asset": "launch.check-circle-outline",
+     "cx": 141.688,
+     "cy": 303.621,
+     "strokeWidth": 1.574,
+     "note": "원 테두리 + 체크(체크된 상태). 바깥 지름 24dp(잉크 23.99x23.99dp), 테두리 평균 반지름 16.45px(11.31dp)·굵기 ≈2.29px(1.57dp → 1.5dp 설계). 체크: 왼끝(−5.6,−0.1)dp → 꼭짓점(−0.5,+3.3) → 오른끝(+5.7,−3.6) (원 중심 기준), 끝 둥긂. 코어 #383a3a → 토큰 text #33353a. 에셋 단계 모델 맞춤(cert-pin-filled 휘도, 획 중심선, 색 토큰 고정, rms 4.9): 원 중심 (141.62, 앱 272.32)dp·중심 반지름 11.24·굵기 1.51, 체크 (−5.0, 0.0) → (−1.39, +3.54) → (+4.92, −2.79)·굵기 1.99 → 에셋 check-circle-outline.svg 는 r 11.25·1.5, 체크 굵기 2 (svgFitL1 0.0175)"
+    },
+    {
+     "name": "auto-login-label",
+     "type": "text",
+     "text": "자동 로그인",
+     "box": {
+      "x": 162.175,
+      "y": 297.096,
+      "w": 66.837,
+      "h": 13.069
+     },
+     "dp": {
+      "x": 162.17,
+      "y": 265.76,
+      "w": 66.84,
+      "h": 13.07
+     },
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1283,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.4085,
+       "advanceDp": 68.48,
+       "baselineDpApp": 277.25,
+       "inkScale": 0.874,
+       "previous": "15/500/+0.0075em design 0.1795 · shot 0.4445 (1단계 값, critic 에서 자간 0 이 더 맞음)"
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 161.703125,
+      "top": 265,
+      "transform": "translateY(0.25px)",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#33353a"
+     },
+     "align": "center",
+     "note": "아이콘 오른끝(153.5dp)에서 ≈8dp 띄움. critic 재측정: 15/500/자간 0 이 design 0.128 · shot 0.409 로 +0.0075em(0.180 · 0.445)보다 맞다(같은 상자·글자색 #33353a, 고정 값 직접 렌더). 도구의 rounded 재렌더가 (15, 0)을 1.19 로 잘못 매겨 1단계에서 놓쳤다 — 8절"
+    },
+    {
+     "name": "other-login-btn",
+     "type": "shape",
+     "box": {
+      "x": 94,
+      "y": 759.963,
+      "w": 172.212,
+      "h": 40.047
+     },
+     "dp": {
+      "x": 94,
+      "y": 728.67,
+      "w": 172,
+      "h": 40
+     },
+     "fill": "#ffffff",
+     "border": "1dp solid #dddddd",
+     "radius": 19.999,
+     "note": "테두리만 있는 알약 버튼. 바깥 상자는 1dp 선 잉크 중심(위 1106.13 · 아래 1162.93 · 왼 137.36 · 오른 386.99px) ± 0.5dp. 폭 172.2dp = 글자 advance 124 + 좌우 24, 높이 40.05dp, 아래끝 = 화면 800.0dp(웹뷰 아래끝에서 32dp 위). 테두리 색: 1dp 환산 잉크 49/1.4545 → 휘도 221 = #dddddd"
+    },
+    {
+     "name": "other-login-label",
+     "type": "text",
+     "text": "다른 방법으로 로그인",
+     "box": {
+      "x": 118.938,
+      "y": 773.431,
+      "w": 122.103,
+      "h": 13.145
+     },
+     "dp": {
+      "x": 118.94,
+      "y": 742.1,
+      "w": 122.1,
+      "h": 13.15
+     },
+     "color": "#4a4b4e",
+     "colorToken": "--woori-text-body",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1543,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2737,
+       "advanceDp": 124,
+       "baselineDpApp": 754,
+       "inkScale": 0.998
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 118.125,
+      "top": 742,
+      "transform": "none",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#4a4b4e"
+     },
+     "align": "center",
+     "note": "버튼 가운데(118.125 + 124/2 = 180.1dp). 색을 토큰으로 주고 맞춘 값(500/15/0, inkScale 1.0). 600 도 0.173 으로 거의 같다 — 8절"
+    },
+    {
+     "name": "spinner",
+     "type": "spinner",
+     "box": {
+      "x": 156.667,
+      "y": 408.375,
+      "w": 46.638,
+      "h": 46.75
+     },
+     "dp": {
+      "x": 156.67,
+      "y": 377.04,
+      "w": 46.64,
+      "h": 46.75
+     },
+     "owner": "history",
+     "cx": 179.918,
+     "cy": 431.688,
+     "note": "공통 2색 원호 스피너 — 모양·주기 주인 history. 중심 (261.90, 627.91)px = (179.93dp, 앱 400.35dp) = 웹뷰 가운데(앱 400.33). 바깥 맞춤 반지름 33.1px. 첫 프레임(7.395)이 \"점 두 개\" 위상(주기 시작)으로 나타나고 8.765 에 페이드 없이 사라짐. 비교 마스크 228,594,68,68"
+    }
+   ]
+  },
+  {
+   "id": "cert-pin-filled",
+   "video": "v1",
+   "i0": 208,
+   "i1": 231,
+   "t0": 8.765,
+   "t1": 9.226,
+   "mask": [],
+   "refFrame": "tools/ref/launch/cert-pin-filled.png",
+   "route": "/cert",
+   "scenario": "v1-start",
+   "inventoryId": "cert-pin:filled",
+   "summary": "스피너가 페이드 없이 사라진 뒤 정지(477ms). 6점·자동 로그인(체크)·다른 방법으로 로그인",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#ffffff",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #ffffff — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "back-chevron",
+     "type": "icon",
+     "box": {
+      "x": 23.542,
+      "y": 50.387,
+      "w": 7.819,
+      "h": 13.771
+     },
+     "dp": {
+      "x": 23.54,
+      "y": 19.05,
+      "w": 7.82,
+      "h": 13.77
+     },
+     "color": "#33353a",
+     "owner": "history",
+     "asset": "history.back-chevron",
+     "note": "‹ 뒤로 — 주인 history(일반 페이지 머리). 잉크 상자만 잼(코어 #3a3a3b). 헤더 띠·제목 없음"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "text": "우리WON인증서",
+     "box": {
+      "x": 106.202,
+      "y": 142.863,
+      "w": 145.834,
+      "h": 19.456
+     },
+     "dp": {
+      "x": 106.2,
+      "y": 111.53,
+      "w": 145.83,
+      "h": 19.46
+     },
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0691,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1164,
+       "advanceDp": 148.36,
+       "baselineDpApp": 129,
+       "inkScale": 0.958
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 105.625,
+      "top": 110,
+      "transform": "none",
+      "fontSize": 22,
+      "fontWeight": 700,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#33353a"
+     },
+     "align": "center",
+     "note": "가운데 정렬(left + advance/2 = 179.81dp). 22dp/700"
+    },
+    {
+     "name": "subtitle",
+     "type": "text",
+     "text": "6자리 비밀번호를 입력해 주세요.",
+     "box": {
+      "x": 84.062,
+      "y": 176.069,
+      "w": 191.471,
+      "h": 13.145
+     },
+     "dp": {
+      "x": 84.06,
+      "y": 144.74,
+      "w": 191.47,
+      "h": 13.15
+     },
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0.0025,
+      "numeric": "proportional",
+      "fitError": 0.1179,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3628,
+       "advanceDp": 193.5,
+       "baselineDpApp": 156.25,
+       "inkScale": 0.887
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 83.21875,
+      "top": 144,
+      "transform": "translateY(0.25px)",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0.0025em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#707173"
+     },
+     "align": "center",
+     "note": "15dp/500/+0.0025em (spec/font.md 10절 critic-font 과 같은 값). 둥근 값 자간 0 은 0.189 — 18자에서 ≈1px 차이라 best 를 쓴다"
+    },
+    {
+     "name": "pin-dot-1",
+     "type": "shape",
+     "box": {
+      "x": 114.127,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 114,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "채운 점: 측정 #076ef4 (코어 10x10 중앙값) → 토큰 primary-keypad #076ef2 (Δ2). 지름 가로 17.37px(11.91dp)·세로 17.56px(12.07dp) → 12dp, 간격 34.974px = 23.99dp → 24dp, 여섯 점 가운데 262.08px = 180.04dp"
+    },
+    {
+     "name": "pin-dot-2",
+     "type": "shape",
+     "box": {
+      "x": 138.091,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 138,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-3",
+     "type": "shape",
+     "box": {
+      "x": 162.096,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 162,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-4",
+     "type": "shape",
+     "box": {
+      "x": 186.046,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 186,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-5",
+     "type": "shape",
+     "box": {
+      "x": 210.078,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 210,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "pin-dot-6",
+     "type": "shape",
+     "box": {
+      "x": 234.063,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 234,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "#076ef2",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp"
+    },
+    {
+     "name": "auto-login-check",
+     "type": "icon",
+     "box": {
+      "x": 129.692,
+      "y": 291.624,
+      "w": 23.991,
+      "h": 23.987
+     },
+     "dp": {
+      "x": 129.5,
+      "y": 260.33,
+      "w": 24,
+      "h": 24
+     },
+     "color": "#33353a",
+     "asset": "launch.check-circle-outline",
+     "cx": 141.688,
+     "cy": 303.621,
+     "strokeWidth": 1.574,
+     "note": "원 테두리 + 체크(체크된 상태). 바깥 지름 24dp(잉크 23.99x23.99dp), 테두리 평균 반지름 16.45px(11.31dp)·굵기 ≈2.29px(1.57dp → 1.5dp 설계). 체크: 왼끝(−5.6,−0.1)dp → 꼭짓점(−0.5,+3.3) → 오른끝(+5.7,−3.6) (원 중심 기준), 끝 둥긂. 코어 #383a3a → 토큰 text #33353a. 에셋 단계 모델 맞춤(cert-pin-filled 휘도, 획 중심선, 색 토큰 고정, rms 4.9): 원 중심 (141.62, 앱 272.32)dp·중심 반지름 11.24·굵기 1.51, 체크 (−5.0, 0.0) → (−1.39, +3.54) → (+4.92, −2.79)·굵기 1.99 → 에셋 check-circle-outline.svg 는 r 11.25·1.5, 체크 굵기 2 (svgFitL1 0.0175)"
+    },
+    {
+     "name": "auto-login-label",
+     "type": "text",
+     "text": "자동 로그인",
+     "box": {
+      "x": 162.175,
+      "y": 297.096,
+      "w": 66.837,
+      "h": 13.069
+     },
+     "dp": {
+      "x": 162.17,
+      "y": 265.76,
+      "w": 66.84,
+      "h": 13.07
+     },
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1283,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.4085,
+       "advanceDp": 68.48,
+       "baselineDpApp": 277.25,
+       "inkScale": 0.874,
+       "previous": "15/500/+0.0075em design 0.1795 · shot 0.4445 (1단계 값, critic 에서 자간 0 이 더 맞음)"
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 161.703125,
+      "top": 265,
+      "transform": "translateY(0.25px)",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#33353a"
+     },
+     "align": "center",
+     "note": "아이콘 오른끝(153.5dp)에서 ≈8dp 띄움. critic 재측정: 15/500/자간 0 이 design 0.128 · shot 0.409 로 +0.0075em(0.180 · 0.445)보다 맞다(같은 상자·글자색 #33353a, 고정 값 직접 렌더). 도구의 rounded 재렌더가 (15, 0)을 1.19 로 잘못 매겨 1단계에서 놓쳤다 — 8절"
+    },
+    {
+     "name": "other-login-btn",
+     "type": "shape",
+     "box": {
+      "x": 94,
+      "y": 759.963,
+      "w": 172.212,
+      "h": 40.047
+     },
+     "dp": {
+      "x": 94,
+      "y": 728.67,
+      "w": 172,
+      "h": 40
+     },
+     "fill": "#ffffff",
+     "border": "1dp solid #dddddd",
+     "radius": 19.999,
+     "note": "테두리만 있는 알약 버튼. 바깥 상자는 1dp 선 잉크 중심(위 1106.13 · 아래 1162.93 · 왼 137.36 · 오른 386.99px) ± 0.5dp. 폭 172.2dp = 글자 advance 124 + 좌우 24, 높이 40.05dp, 아래끝 = 화면 800.0dp(웹뷰 아래끝에서 32dp 위). 테두리 색: 1dp 환산 잉크 49/1.4545 → 휘도 221 = #dddddd"
+    },
+    {
+     "name": "other-login-label",
+     "type": "text",
+     "text": "다른 방법으로 로그인",
+     "box": {
+      "x": 118.938,
+      "y": 773.431,
+      "w": 122.103,
+      "h": 13.145
+     },
+     "dp": {
+      "x": 118.94,
+      "y": 742.1,
+      "w": 122.1,
+      "h": 13.15
+     },
+     "color": "#4a4b4e",
+     "colorToken": "--woori-text-body",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1543,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2737,
+       "advanceDp": 124,
+       "baselineDpApp": 754,
+       "inkScale": 0.998
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 118.125,
+      "top": 742,
+      "transform": "none",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#4a4b4e"
+     },
+     "align": "center",
+     "note": "버튼 가운데(118.125 + 124/2 = 180.1dp). 색을 토큰으로 주고 맞춘 값(500/15/0, inkScale 1.0). 600 도 0.173 으로 거의 같다 — 8절"
+    }
+   ]
+  },
+  {
+   "id": "login-loading-blank",
+   "video": "v1",
+   "i0": 232,
+   "i1": 234,
+   "t0": 9.242,
+   "t1": 9.301,
+   "mask": [
+    "454,1132,36,36"
+   ],
+   "refFrame": "tools/ref/launch/login-loading-blank.png",
+   "route": "/home",
+   "scenario": "v1-start",
+   "inventoryId": "login-loading:blank",
+   "summary": "흰 화면 + 하단 탭바(홈 선택)만. 3장(77ms). 상태바·내비 바는 #eff0f3",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 740.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 740.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#eff0f3",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #eff0f3 — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "tabbar",
+     "type": "shape",
+     "owner": "home",
+     "box": {
+      "x": 0,
+      "y": 772.001,
+      "w": 360,
+      "h": 60
+     },
+     "dp": {
+      "x": 0,
+      "y": 740.667,
+      "w": 360,
+      "h": 60
+     },
+     "fill": "#eff0f3",
+     "colorToken": "--woori-bg-gray",
+     "note": "하단 탭바 — 주인 home(아이콘·글자·선택 표시는 home 스펙). 여기서는 자리만: 위끝 1122.89px(흰 255 ↔ 240 의 50%) = 앱 740.67dp, 높이 60dp(웹뷰 아래끝까지), 바탕 #eff0f3. 위끝 바로 위 1121–1122 행이 253/251 로 아주 옅다(그림자/선 여부는 home 이 확인). 아이콘 잉크(px): 상품 36,1135,32,33 · 자산·소비 141,1133,35,35 · 홈(선택, 파랑) 246,1135,32,34 · 주식 351,1135,32,33 · 혜택 454,1132,35,36(캐릭터 대체) · 글자 y 1179–1194. 이 상태의 탭바는 홈 첫 그리기(10.229) 전까지 같다(#240·#272 와 차이 ≤ 20, >12 화소 61개) · 혜택 아이콘(잉크 454,1132 35x36)은 home 의 캐릭터 대체 그림이라 이 상태 비교 마스크 454,1132,36,36 (home 과 같은 값). gen 은 다른 그룹 에셋의 character 마스크를 이 그룹 상태에 넣지 않으므로 상태 mask 에 직접 둔다"
+    }
+   ]
+  },
+  {
+   "id": "login-loading-character",
+   "video": "v1",
+   "i0": 235,
+   "i1": 271,
+   "t0": 9.319,
+   "t1": 9.994,
+   "mask": [
+    "180,502,165,165",
+    "454,1132,36,36"
+   ],
+   "refFrame": "tools/ref/launch/login-loading-character.png",
+   "route": "/home",
+   "scenario": "v1-start",
+   "inventoryId": "login-loading:character",
+   "summary": "가운데 캐릭터 로딩 애니메이션(692ms) — character: true, 대체 그림 + 비교 마스크(112dp 정사각 상자). 나머지는 blank 와 같음",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 740.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 740.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#eff0f3",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #eff0f3 — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "tabbar",
+     "type": "shape",
+     "owner": "home",
+     "box": {
+      "x": 0,
+      "y": 772.001,
+      "w": 360,
+      "h": 60
+     },
+     "dp": {
+      "x": 0,
+      "y": 740.667,
+      "w": 360,
+      "h": 60
+     },
+     "fill": "#eff0f3",
+     "colorToken": "--woori-bg-gray",
+     "note": "하단 탭바 — 주인 home(아이콘·글자·선택 표시는 home 스펙). 여기서는 자리만: 위끝 1122.89px(흰 255 ↔ 240 의 50%) = 앱 740.67dp, 높이 60dp(웹뷰 아래끝까지), 바탕 #eff0f3. 위끝 바로 위 1121–1122 행이 253/251 로 아주 옅다(그림자/선 여부는 home 이 확인). 아이콘 잉크(px): 상품 36,1135,32,33 · 자산·소비 141,1133,35,35 · 홈(선택, 파랑) 246,1135,32,34 · 주식 351,1135,32,33 · 혜택 454,1132,35,36(캐릭터 대체) · 글자 y 1179–1194. 이 상태의 탭바는 홈 첫 그리기(10.229) 전까지 같다(#240·#272 와 차이 ≤ 20, >12 화소 61개) · 혜택 아이콘(잉크 454,1132 35x36)은 home 의 캐릭터 대체 그림이라 이 상태 비교 마스크 454,1132,36,36 (home 과 같은 값). gen 은 다른 그룹 에셋의 character 마스크를 이 그룹 상태에 넣지 않으므로 상태 mask 에 직접 둔다"
+    },
+    {
+     "name": "loader-art",
+     "type": "image",
+     "character": true,
+     "design": true,
+     "box": {
+      "x": 124,
+      "y": 345.666,
+      "w": 112,
+      "h": 112
+     },
+     "dp": {
+      "x": 124,
+      "y": 314.333,
+      "w": 112,
+      "h": 112
+     },
+     "clip": [
+      124,
+      345.668,
+      112,
+      112.001
+     ],
+     "inkExt": [
+      124.432,
+      365.75,
+      236.227,
+      446.875
+     ],
+     "asset": "launch.login-loader-hexes · launch.login-loader-wings · launch.login-loader-body (세 겹, character: true)",
+     "note": "캐릭터(마스코트) 로딩 — 자르거나 따라 그리지 않는다. 같은 자리·크기에 우리가 새로 그린 도형 그림(대체). 상자: 112x112dp 정사각을 탭바 위 내용 영역(앱 0–740.67) 가운데(180, 370.33)에. 근거: 보이는 그림이 가로 181–344px(= 124.4–236.2dp, 폭 111.8dp)에서 잘린다(육각형이 이 선에서 나가고 들어옴), 세로 532–650px. 내용 영역 가운데 = 584.2px = 홈 로딩 스피너 중심(≈585). 색감: 하늘색 몸통(#4fc0f5 계열)·노랑(#f8d030 계열) 줄무늬·노란 육각형(벌집). 비교 마스크 180,502,165,165"
+    }
+   ]
+  }
+ ],
+ "designStates": [
+  {
+   "id": "cert-pin-keypad",
+   "design": true,
+   "route": "/cert",
+   "scenario": "v1-start",
+   "video": null,
+   "summary": "설계값(영상에 없음): 우리WON인증서 PIN 입력 중 — 빈 점 6개 + 아래 보안 키패드(섞인 숫자 3x4). 녹화의 보안 검은 화면(v1 2.841–7.395) 동안 앱이 보여 줄 화면. 비교 없음",
+   "elements": [
+    {
+     "name": "page-bg",
+     "type": "shape",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "fill": "#ffffff",
+     "note": "앱 뷰포트 바탕. 가로 0–360dp 전체(영상에는 0.29–359.68dp 만 담김)"
+    },
+    {
+     "name": "os-bars",
+     "type": "os",
+     "fill": "#ffffff",
+     "note": "상태바(0–45.576px)·3버튼 내비 바(1210.182–1280px) 바탕 #ffffff — OS 가 그림, 앱이 그리지 않음, 기본 마스크"
+    },
+    {
+     "name": "back-chevron",
+     "type": "icon",
+     "box": {
+      "x": 23.542,
+      "y": 50.387,
+      "w": 7.819,
+      "h": 13.771
+     },
+     "dp": {
+      "x": 23.54,
+      "y": 19.05,
+      "w": 7.82,
+      "h": 13.77
+     },
+     "color": "#33353a",
+     "owner": "history",
+     "asset": "history.back-chevron",
+     "note": "‹ 뒤로 — 주인 history(일반 페이지 머리). 잉크 상자만 잼(코어 #3a3a3b). 헤더 띠·제목 없음"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "text": "우리WON인증서",
+     "box": {
+      "x": 106.202,
+      "y": 142.863,
+      "w": 145.834,
+      "h": 19.456
+     },
+     "dp": {
+      "x": 106.2,
+      "y": 111.53,
+      "w": 145.83,
+      "h": 19.46
+     },
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0691,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1164,
+       "advanceDp": 148.36,
+       "baselineDpApp": 129,
+       "inkScale": 0.958
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 105.625,
+      "top": 110,
+      "transform": "none",
+      "fontSize": 22,
+      "fontWeight": 700,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#33353a"
+     },
+     "align": "center",
+     "note": "가운데 정렬(left + advance/2 = 179.81dp). 22dp/700"
+    },
+    {
+     "name": "subtitle",
+     "type": "text",
+     "text": "6자리 비밀번호를 입력해 주세요.",
+     "box": {
+      "x": 84.062,
+      "y": 176.069,
+      "w": 191.471,
+      "h": 13.145
+     },
+     "dp": {
+      "x": 84.06,
+      "y": 144.74,
+      "w": 191.47,
+      "h": 13.15
+     },
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0.0025,
+      "numeric": "proportional",
+      "fitError": 0.1179,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3628,
+       "advanceDp": 193.5,
+       "baselineDpApp": 156.25,
+       "inkScale": 0.887
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 83.21875,
+      "top": 144,
+      "transform": "translateY(0.25px)",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0.0025em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#707173"
+     },
+     "align": "center",
+     "note": "15dp/500/+0.0025em (spec/font.md 10절 critic-font 과 같은 값). 둥근 값 자간 0 은 0.189 — 18자에서 ≈1px 차이라 best 를 쓴다"
+    },
+    {
+     "name": "pin-dot-1",
+     "type": "shape",
+     "box": {
+      "x": 114.127,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 114,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "transparent",
+     "colorToken": "--woori-primary-keypad",
+     "note": "설계값(영상에 없음): 입력 전 빈 점 = 12dp 원, 테두리 1dp #707173(토큰 text-secondary). 근거: 계좌 비밀번호 시트 누출 v1 #7191 의 4번째 빈 점 — 테두리 중심 지름 15.85px(10.87dp) → 바깥 12dp, 휘도 ≈114 (1dp 선 잉크 합 205/1.4545). 누르면 채운 점(#076ef2)으로 바뀐다",
+     "design": true,
+     "border": "1dp solid #707173 (빈 점, 안쪽으로 — box-sizing: border-box)"
+    },
+    {
+     "name": "pin-dot-2",
+     "type": "shape",
+     "box": {
+      "x": 138.091,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 138,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "transparent",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp",
+     "design": true,
+     "border": "1dp solid #707173 (빈 점, 안쪽으로 — box-sizing: border-box)"
+    },
+    {
+     "name": "pin-dot-3",
+     "type": "shape",
+     "box": {
+      "x": 162.096,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 162,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "transparent",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp",
+     "design": true,
+     "border": "1dp solid #707173 (빈 점, 안쪽으로 — box-sizing: border-box)"
+    },
+    {
+     "name": "pin-dot-4",
+     "type": "shape",
+     "box": {
+      "x": 186.046,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 186,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "transparent",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp",
+     "design": true,
+     "border": "1dp solid #707173 (빈 점, 안쪽으로 — box-sizing: border-box)"
+    },
+    {
+     "name": "pin-dot-5",
+     "type": "shape",
+     "box": {
+      "x": 210.078,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 210,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "transparent",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp",
+     "design": true,
+     "border": "1dp solid #707173 (빈 점, 안쪽으로 — box-sizing: border-box)"
+    },
+    {
+     "name": "pin-dot-6",
+     "type": "shape",
+     "box": {
+      "x": 234.063,
+      "y": 247.651,
+      "w": 11.913,
+      "h": 12.073
+     },
+     "dp": {
+      "x": 234,
+      "y": 216.33,
+      "w": 12,
+      "h": 12
+     },
+     "radius": 6,
+     "fill": "transparent",
+     "colorToken": "--woori-primary-keypad",
+     "note": "pin-dot-1 과 같음, x + 24dp",
+     "design": true,
+     "border": "1dp solid #707173 (빈 점, 안쪽으로 — box-sizing: border-box)"
+    },
+    {
+     "name": "auto-login-check",
+     "type": "icon",
+     "box": {
+      "x": 129.692,
+      "y": 291.624,
+      "w": 23.991,
+      "h": 23.987
+     },
+     "dp": {
+      "x": 129.5,
+      "y": 260.33,
+      "w": 24,
+      "h": 24
+     },
+     "color": "#33353a",
+     "asset": "launch.check-circle-outline",
+     "cx": 141.688,
+     "cy": 303.621,
+     "strokeWidth": 1.574,
+     "note": "원 테두리 + 체크(체크된 상태). 바깥 지름 24dp(잉크 23.99x23.99dp), 테두리 평균 반지름 16.45px(11.31dp)·굵기 ≈2.29px(1.57dp → 1.5dp 설계). 체크: 왼끝(−5.6,−0.1)dp → 꼭짓점(−0.5,+3.3) → 오른끝(+5.7,−3.6) (원 중심 기준), 끝 둥긂. 코어 #383a3a → 토큰 text #33353a"
+    },
+    {
+     "name": "auto-login-label",
+     "type": "text",
+     "text": "자동 로그인",
+     "box": {
+      "x": 162.175,
+      "y": 297.096,
+      "w": 66.837,
+      "h": 13.069
+     },
+     "dp": {
+      "x": 162.17,
+      "y": 265.76,
+      "w": 66.84,
+      "h": 13.07
+     },
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1283,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.4085,
+       "advanceDp": 68.48,
+       "baselineDpApp": 277.25,
+       "inkScale": 0.874,
+       "previous": "15/500/+0.0075em design 0.1795 · shot 0.4445 (1단계 값, critic 에서 자간 0 이 더 맞음)"
+      }
+     },
+     "css": {
+      "position": "absolute",
+      "left": 161.703125,
+      "top": 265,
+      "transform": "translateY(0.25px)",
+      "fontSize": 15,
+      "fontWeight": 500,
+      "letterSpacing": "0em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#33353a"
+     },
+     "align": "center",
+     "note": "아이콘 오른끝(153.5dp)에서 ≈8dp 띄움. critic 재측정: 15/500/자간 0 이 design 0.128 · shot 0.409 로 +0.0075em(0.180 · 0.445)보다 맞다(같은 상자·글자색 #33353a, 고정 값 직접 렌더). 도구의 rounded 재렌더가 (15, 0)을 1.19 로 잘못 매겨 1단계에서 놓쳤다 — 8절"
+    },
+    {
+     "name": "keypad",
+     "type": "shape",
+     "design": true,
+     "box": {
+      "x": 0,
+      "y": 566.503,
+      "w": 360,
+      "h": 265.497
+     },
+     "dp": {
+      "x": 0,
+      "y": 535.17,
+      "w": 360,
+      "h": 265.497
+     },
+     "fill": "#ffffff",
+     "note": "보안 키패드 판(설계). 위끝 앱 535.17dp = 계좌 비밀번호 시트의 첫 줄 칸 위끝: 1줄 숫자(25dp, line-height 1) 상자 top 555.17(textfit, 두 영상 같은 값)이 칸 가운데에 오도록 − 20. 줄 간격 65dp(같은 숫자가 두 영상에서 다른 줄에 있는 9쌍: 64.98 ± 0.01dp, 4줄 9 는 64.99), 열 120dp(120.03). 아래끝 = 웹뷰 아래끝(4줄 x 65 + 아래 5.5dp). 페이지 아래(다른 방법으로 로그인 버튼)를 덮는다. 바탕 흰색(시트와 같음)"
+    },
+    {
+     "name": "key-r1c1",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 0,
+      "y": 566.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 0,
+      "y": 535.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "5",
+     "row": 1,
+     "col": 1,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": "숫자 25dp/500 (누출 v1 \"6\" 0.056 · \"4\" 0.057 · v2 \"4\" 0.051, 금액 키패드와 같은 값). 한 글자라 자간 의미 없음(도구값 −0.06 은 뒤 여백만 바꿈 → 0). line-height 1 상자를 칸 가운데에: 1줄 top = 535.17 + 32.5 − 12.5 = 555.17 (textfit 1줄 top 555 + translateY 0.25px 와 같음)"
+    },
+    {
+     "name": "key-r1c2",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 120,
+      "y": 566.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 120,
+      "y": 535.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "9",
+     "row": 1,
+     "col": 2,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r1c3",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 240,
+      "y": 566.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 240,
+      "y": 535.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "1",
+     "row": 1,
+     "col": 3,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r2c1",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 0,
+      "y": 631.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 0,
+      "y": 600.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "7",
+     "row": 2,
+     "col": 1,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r2c2",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 120,
+      "y": 631.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 120,
+      "y": 600.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "0",
+     "row": 2,
+     "col": 2,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r2c3",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 240,
+      "y": 631.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 240,
+      "y": 600.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "3",
+     "row": 2,
+     "col": 3,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r3c1",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 0,
+      "y": 696.504,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 0,
+      "y": 665.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "8",
+     "row": 3,
+     "col": 1,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r3c2",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 120,
+      "y": 696.504,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 120,
+      "y": 665.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "2",
+     "row": 3,
+     "col": 2,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r3c3",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 240,
+      "y": 696.504,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 240,
+      "y": 665.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "6",
+     "row": 3,
+     "col": 3,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r4c1",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 0,
+      "y": 761.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 0,
+      "y": 730.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "전체삭제",
+     "row": 4,
+     "col": 1,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 600,
+      "letterSpacingEm": -0.0025,
+      "numeric": "proportional",
+      "fitError": 0.0836,
+      "keep": {
+       "sizeDp": 16,
+       "shotFitError": 0.2179
+      }
+     },
+     "color": "#33353a",
+     "css": {
+      "position": "absolute",
+      "left": 32.3125,
+      "top": 756,
+      "transform": "none",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "letterSpacing": "-0.0025em",
+      "lineHeight": 1,
+      "fontVariantNumeric": "normal",
+      "color": "#35363a"
+     },
+     "note": "누출 v1·v2 같은 값: 600/16/−0.0025em (둥근 0em 은 0.107). 잉크 48.0,1145.06,77.35x20.63px, 가운데 x 59.9dp. textfit 위치 left 32.31 top 756(앱). 칸 가운데 정렬로 놓고 shot 으로 top 확인"
+    },
+    {
+     "name": "key-r4c2",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 120,
+      "y": 761.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 120,
+      "y": 730.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "4",
+     "row": 4,
+     "col": 2,
+     "font": {
+      "family": "Pretendard Variable",
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0574,
+      "keep": {
+       "sizeDp": 25,
+       "shotFitError": 0.0982
+      }
+     },
+     "color": "#33353a",
+     "note": ""
+    },
+    {
+     "name": "key-r4c3",
+     "type": "key",
+     "design": true,
+     "box": {
+      "x": 240,
+      "y": 761.503,
+      "w": 120,
+      "h": 65
+     },
+     "dp": {
+      "x": 240,
+      "y": 730.17,
+      "w": 120,
+      "h": 65
+     },
+     "label": "←",
+     "row": 4,
+     "col": 3,
+     "icon": "send-b.keypad-backspace",
+     "iconInkBox": [
+      291.123,
+      787.105,
+      17.791,
+      13.833
+     ],
+     "note": "← 아이콘(주인 send-b, 금액 키패드와 같은 그림). 누출 잉크 25.94x20.12px = 17.79x13.83dp, 잉크 가운데 (300.0dp, 앱 762.69) = 칸 가운데"
+    },
+    {
+     "name": "key-pressed",
+     "type": "shape",
+     "design": true,
+     "box": {
+      "x": 131.25,
+      "y": 636.004,
+      "w": 97.5,
+      "h": 56
+     },
+     "dp": {
+      "x": 131.25,
+      "y": 604.67,
+      "w": 97.5,
+      "h": 56
+     },
+     "fill": "#e6eaee",
+     "radius": 5.9,
+     "note": "누른 키 강조(누르는 동안, 설계). 누출 v1 첫 프레임 #7191 한 장에서 색·크기만 잼: (230,234,238) #e6eaee, 97.56x56.09dp(critic 재측정 97.44x56.0), 모서리 반지름 8.6px = 5.9dp → 6dp. 칸 안 가운데(가로 inset 11.25, 세로 4.5dp). 여기 상자 위치는 예시(2줄 2칸) — 영상에서 누른 칸의 위치는 비밀번호 자릿값이라 적지 않는다"
+    }
+   ]
+  }
+ ],
+ "transitions": [
+  {
+   "id": "launch-to-splash",
+   "from": "launcher(앱 밖, 컷)",
+   "to": "splash-logo-start",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 52,
+    "t": 1.748311,
+    "evidence": "#51(1.732) 런처 → #52 스플래시 전체가 한 프레임에. 확대·페이드 없음"
+   },
+   "durationMs": 0,
+   "note": "앱은 스플래시부터 시작(녹화 0 = 영상 1.748). 상태바·내비 바가 #eff0f3 로 바뀌는 것도 같은 프레임(OS)"
+  },
+  {
+   "id": "splash-logo",
+   "from": "splash-logo-start",
+   "to": "splash-logo-end",
+   "property": "logo-circle translateX 0 → +24.42dp (35.60px), logo-fill 폭 = 원 중심 − 트랙 왼끝 (25.44 → 49.86dp) 같은 곡선",
+   "trigger": {
+    "video": "v1",
+    "frame": 52,
+    "t": 1.748311,
+    "evidence": "스플래시 첫 프레임(마운트). 원은 #52–#54 정지, #55(1.828) 첫 움직임 +0.72px"
+   },
+   "keep": {
+    "latencyMs": 84.1,
+    "endMs": 349.8
+   },
+   "durationMs": 265.7,
+   "dx": 24.416,
+   "samplesX": [
+    [
+     -0.3,
+     167.792
+    ],
+    [
+     18.7,
+     167.79
+    ],
+    [
+     44.7,
+     167.79
+    ],
+    [
+     79.7,
+     168.285
+    ],
+    [
+     95.7,
+     169.054
+    ],
+    [
+     122.7,
+     171.07
+    ],
+    [
+     148.7,
+     173.536
+    ],
+    [
+     170.7,
+     175.395
+    ],
+    [
+     186.7,
+     177.399
+    ],
+    [
+     202.7,
+     179.431
+    ],
+    [
+     219.7,
+     181.462
+    ],
+    [
+     237.7,
+     182.461
+    ],
+    [
+     261.7,
+     184.491
+    ],
+    [
+     277.7,
+     188.167
+    ],
+    [
+     294.7,
+     189.642
+    ],
+    [
+     311.7,
+     191.311
+    ],
+    [
+     328.7,
+     191.677
+    ],
+    [
+     344.7,
+     192.14
+    ],
+    [
+     361.7,
+     192.206
+    ],
+    [
+     379.7,
+     192.206
+    ]
+   ],
+   "curve": {
+    "name": "cubic-bezier 자유 맞춤 (rms 최소)",
+    "cubicBezier": [
+     1,
+     0.967,
+     0.663,
+     0.931
+    ],
+    "rms": 0.504,
+    "keep": {
+     "alternatives": [
+      {
+       "name": "linear",
+       "startMs": 92.4,
+       "durationMs": 231.6,
+       "rms": 0.672
+      },
+      {
+       "name": "md-accelerate(0.4,0,1,1)",
+       "startMs": 34,
+       "durationMs": 279,
+       "rms": 0.676
+      },
+      {
+       "name": "ease-in",
+       "startMs": 33.5,
+       "durationMs": 276.1,
+       "rms": 0.699
+      },
+      {
+       "name": "ease-in-out",
+       "startMs": 40.1,
+       "durationMs": 337.8,
+       "rms": 0.762
+      },
+      {
+       "name": "ease-out",
+       "startMs": 110.9,
+       "durationMs": 268.7,
+       "rms": 1.15
+      },
+      {
+       "name": "md-standard(0.4,0,0.2,1)",
+       "startMs": 55.6,
+       "durationMs": 416.7,
+       "rms": 1.553
+      }
+     ],
+     "fitNote": "흔들림 허용 없음, pts 그대로 #52–#74. 150 시작점 Nelder-Mead. 잔차가 큰 프레임 #63(−0.35)·#64(−1.46)·#65(+0.95)은 녹화 시각 흔들림(앞뒤 프레임 간격 18/24/16ms 에 이동 1.46/2.96/5.36px)"
+    }
+   },
+   "note": "움직이는 것은 남색 원 하나(+ 그 뒤 드러나는 그라데이션)뿐. 크기·불투명도 변화 없음. WON 글자·iF·MA·우리은행은 정지(#52–#91 앱 영역 변화 0). 1단계 값 \"md-accelerate 281ms\" 는 clean 영상에서 279ms·rms 0.676 으로 2등권 — 자유 곡선이 rms 0.504 로 가장 작다(D8). 곡선은 처음 기울기 ≈0.97(거의 일정 속도로 출발), 끝 기울기 0.2(살짝 감속)"
+  },
+  {
+   "id": "splash-to-cert",
+   "from": "splash-logo-end",
+   "to": "cert-pin-keypad (설계, 녹화에선 보안 검은 화면)",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 92,
+    "t": 2.840978,
+    "evidence": "#91(2.822) 스플래시 → #92 화면 전체 검정(FLAG_SECURE). 스플래시 첫 프레임에서 1092.7ms"
+   },
+   "keep": {
+    "latencyMs": 1092.7,
+    "afterLogoEndMs": 742.9
+   },
+   "durationMs": 0,
+   "note": "앱: 스플래시 첫 그림 후 1092.7ms 에 /cert 로 교체(replace, 애니메이션 없음). 검은 화면은 OS 가 가린 것 — 앱은 설계 PIN 화면을 그린다"
+  },
+  {
+   "id": "cert-complete",
+   "from": "cert-pin-keypad (설계)",
+   "to": "cert-pin-spinner",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 130,
+    "t": 7.394911,
+    "evidence": "컷 끝. 6점 다 참 + 키패드 없음 + 스피너 첫 위상(점 두 개)이 한 프레임에"
+   },
+   "durationMs": 0,
+   "note": "6번째 키를 누르면(뗄 때) 같은 프레임에: 6번째 점 채움, 키패드 숨김, 스피너 시작(위상 0). 녹화 대본은 6번째 탭이 7.395 에 오게 한다"
+  },
+  {
+   "id": "cert-spinner-off",
+   "from": "cert-pin-spinner",
+   "to": "cert-pin-filled",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 208,
+    "t": 8.765311,
+    "evidence": "#207(8.748) 스피너 화소 227 → #208 0. 페이드 없음"
+   },
+   "keep": {
+    "latencyMs": 1370.4
+   },
+   "durationMs": 0,
+   "note": "스피너는 cert-complete 뒤 1370.4ms 동안 돈다(첫 위상이 같은 프레임 #178 8.247 — 상관 0.70, 주기는 history 스펙)"
+  },
+  {
+   "id": "cert-to-login-loading",
+   "from": "cert-pin-filled",
+   "to": "login-loading-blank",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 232,
+    "t": 9.242367,
+    "evidence": "#231(9.226) 인증서 → #232 흰 화면 + 탭바. 상태바·내비 바 흰색 → #eff0f3 같은 프레임"
+   },
+   "keep": {
+    "latencyMs": 477.1,
+    "fromCompleteMs": 1847.5
+   },
+   "durationMs": 0,
+   "note": "스피너가 사라지고 477.1ms 뒤 /home 으로 replace. /home 첫 진입의 처음 769ms 를 launch 의 로그인 로딩이 그린다(아래 2개)"
+  },
+  {
+   "id": "login-character-on",
+   "from": "login-loading-blank",
+   "to": "login-loading-character",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 235,
+    "t": 9.318678,
+    "evidence": "#234(9.301) 빈 화면 → #235 캐릭터 그림 전체(화소 수 #235–#237 같음 = 페이드 없음)"
+   },
+   "keep": {
+    "latencyMs": 76.3
+   },
+   "durationMs": 0,
+   "note": "흰 화면 + 탭바 76.3ms 뒤 캐릭터 로딩이 한 프레임에 나타남"
+  },
+  {
+   "id": "login-character-loop",
+   "from": "login-loading-character",
+   "to": "login-loading-character",
+   "property": "loop (대체 그림 움직임)",
+   "trigger": {
+    "video": "v1",
+    "frame": 235,
+    "t": 9.318678,
+    "evidence": "나타난 프레임이 움직임 시작"
+   },
+   "durationMs": 692.2,
+   "samplesY": [
+    [
+     0,
+     402.188
+    ],
+    [
+     57,
+     403.563
+    ],
+    [
+     90.3,
+     404.938
+    ],
+    [
+     140.2,
+     405.625
+    ],
+    [
+     182.6,
+     406.313
+    ],
+    [
+     232.4,
+     407
+    ],
+    [
+     265.7,
+     407.688
+    ],
+    [
+     315.8,
+     407.688
+    ],
+    [
+     349.4,
+     407.344
+    ],
+    [
+     399.6,
+     407
+    ],
+    [
+     450.1,
+     406.313
+    ],
+    [
+     493.3,
+     405.625
+    ],
+    [
+     533.6,
+     404.938
+    ],
+    [
+     575.2,
+     403.563
+    ],
+    [
+     616.7,
+     402.875
+    ],
+    [
+     675.6,
+     402.188
+    ]
+   ],
+   "keep": {
+    "frameStepMs": 41.7,
+    "bobPeriodMs": 880,
+    "bobAmplitudeDp": 3.09,
+    "bobLowestMs": 316,
+    "hexSpeedDpPerS": 192,
+    "hexDirection": "left→right (오른쪽으로 흐름)"
+   },
+   "curve": {
+    "name": "sine (몸통 위아래)",
+    "rms": 0.32
+   },
+   "note": "원래 그림(참고만): 몸통이 위아래로 흔들림(몸통 중앙값 y, px) — 사인 맞춤 주기 880ms·진폭 ±4.49px(±3.09dp), 가장 낮음 +316ms. 날개 펄럭임, 뒤의 노란 육각형이 오른쪽으로 ≈280px/s(192dp/s) 흐르며 112dp 상자 양 끝에서 잘림(오른쪽 육각형 9.634 에 나가고 9.668 왼쪽에서 들어옴). 그림은 24fps 단위로 바뀜(갱신 간격 33/50ms 번갈아, 평균 45ms). 대체 그림도 같은 리듬(위아래 ±3dp·주기 ≈0.88s, 뒤 도형이 오른쪽으로 흐름)이면 된다 — 마스크 안이라 비교되지 않음"
+  },
+  {
+   "id": "login-to-home-spinner",
+   "from": "login-loading-character",
+   "to": "home-loading:spinner (주인 home)",
+   "property": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 272,
+    "t": 10.010833,
+    "evidence": "#271(9.994) 캐릭터 → #272 캐릭터 없고 2색 원호 스피너(잉크 x 228–295, 중심 ≈262,584)"
+   },
+   "keep": {
+    "latencyMs": 692.2
+   },
+   "durationMs": 0,
+   "note": "캐릭터가 나타나고 692.2ms 뒤 페이드 없이 사라지고 같은 프레임에 홈 로딩 스피너(중심 = 내용 영역 가운데). 그 뒤(10.061 일반홈|쉬운 알약 …)는 home 스펙"
+  }
+ ],
+ "cuts": [
+  {
+   "id": "launcher",
+   "video": "v1",
+   "i0": 0,
+   "i1": 51,
+   "t0": 0,
+   "t1": 1.748,
+   "what": "삼성 앱 검색(런처, OS)",
+   "rule": "자름. 앱은 스플래시부터. 녹화 0 = 영상 1.748(#52)"
+  },
+  {
+   "id": "secure-black-cert",
+   "video": "v1",
+   "i0": 92,
+   "i1": 129,
+   "t0": 2.841,
+   "t1": 7.395,
+   "durationMs": 4554,
+   "what": "FLAG_SECURE 검은 화면 — 우리WON인증서 6자리 PIN 입력(키패드가 보안 창이라 녹화에 안 남음). 앱 영역 평균 0.0–0.02, 최대 12. 상태바·내비 바도 거의 검정(아이콘 흔적만). 이 사이 원본 프레임은 38장뿐(상태바만 바뀜)",
+   "rule": "시간 비교에서 자름(비교·기준 프레임 없음). 앱은 2.841 에 설계 화면 cert-pin-keypad(빈 점 6 + 보안 키패드)를 그린다. 녹화 대본은 이 4.554s 안에서 키 6번을 누르고 6번째를 7.395 에 맞춘다 (그 순간 cert-pin-spinner: 6점·키패드 숨김·스피너). 겹쳐 보기 mp4 는 원본이 검정인 동안 앱 그림 그대로. 다음 화면 규칙: 컷 뒤 첫 프레임은 \"6점 다 참 + 스피너 위상 0\""
+  },
+  {
+   "id": "secure-black-password-v1",
+   "video": "v1",
+   "i0": 7163,
+   "i1": 7190,
+   "t0": 186.449,
+   "t1": 188.273,
+   "owner": "send-b",
+   "what": "계좌 비밀번호 입력(보안 검은 화면)",
+   "rule": "주인 send-b. 앱은 비밀번호 시트(섞인 키패드). 컷 뒤 첫 프레임 #7191 은 \"점 3개 + 4번째 키 누름 강조\", 다음 프레임 #7192(+84ms) 4점 + 강조 사라짐, #7193 스피너"
+  },
+  {
+   "id": "secure-black-password-v2",
+   "video": "v2",
+   "i0": 2970,
+   "i1": 3001,
+   "t0": 78.201,
+   "t1": 80.453,
+   "owner": "send-b",
+   "what": "계좌 비밀번호 입력(보안 검은 화면)",
+   "rule": "주인 send-b. 컷 뒤 첫 프레임 #3002 은 4점 다 참(강조 없음), #3004 스피너"
+  }
+ ],
+ "behaviors": [
+  {
+   "id": "pin-key-press",
+   "design": true,
+   "what": "보안 키패드 숫자 키 누름",
+   "rule": "누르는 동안 칸 가운데 97.5x56dp·반지름 6dp·#e6eaee 강조. 손을 떼는 프레임에 강조가 사라지고 다음 빈 점이 채워진다(누출 v1: #7191 강조 + 점 3개 → #7192(+83.8ms) 강조 없음 + 점 4개). 진동·소리 없음. 애니메이션 없음(한 프레임)"
+  },
+  {
+   "id": "pin-delete-all",
+   "design": true,
+   "what": "[전체삭제]",
+   "rule": "채운 점 모두 비움. 같은 강조(눌림)"
+  },
+  {
+   "id": "pin-backspace",
+   "design": true,
+   "what": "[←]",
+   "rule": "마지막 채운 점 하나 비움"
+  },
+  {
+   "id": "pin-complete",
+   "what": "6번째 숫자",
+   "rule": "cert-complete 전환: 키패드 숨김 + 스피너 1370ms → 스피너 끔 → 477ms 뒤 /home(replace)"
+  },
+  {
+   "id": "pin-shuffle",
+   "design": true,
+   "what": "키 배치",
+   "rule": "열 때마다 0–9 를 섞어 1–3줄 9칸 + 4줄 가운데 1칸에 둔다(4줄 양쪽은 [전체삭제]·[←] 고정). shot 은 시드 고정 배치 5 9 1 / 7 0 3 / 8 2 6 / 전체삭제 4 ← (영상의 두 배치와 다르게 고름). 섞기·키패드 컴포넌트는 send-b 와 같이 쓴다"
+  },
+  {
+   "id": "cert-back",
+   "design": true,
+   "what": "‹ 뒤로 (인증서 화면)",
+   "rule": "영상에서 누르지 않음. 앱을 끝내는 대신 스플래시(/)로 replace — 설계"
+  },
+  {
+   "id": "auto-login-toggle",
+   "design": true,
+   "what": "✓ 자동 로그인",
+   "rule": "영상에서 누르지 않음. 체크 아이콘을 체크 없는 원으로 바꾸는 토글(설계, 그림 없음 → 원만)"
+  },
+  {
+   "id": "other-login",
+   "design": true,
+   "what": "[다른 방법으로 로그인]",
+   "rule": "영상에서 누르지 않음. 눌림 색 모름 → 아무 동작 없음"
+  },
+  {
+   "id": "splash-touch",
+   "what": "스플래시",
+   "rule": "터치 반응 없음. 시간으로만 넘어감"
+  }
+ ],
+ "assetsPlan": [
+  {
+   "name": "splash-won-wordmark",
+   "file": "woori/launch/splash-won-wordmark.png",
+   "kind": "png",
+   "frameBox": [
+    142.264,
+    448.938,
+    76.13,
+    25.438
+   ],
+   "state": "splash-logo-end"
+  },
+  {
+   "name": "splash-if-award",
+   "file": "woori/launch/splash-if-award.png",
+   "kind": "png",
+   "frameBox": [
+    132.662,
+    606.375,
+    95.334,
+    49.5
+   ],
+   "state": "splash-logo-end"
+  },
+  {
+   "name": "splash-ma-cert",
+   "file": "woori/launch/splash-ma-cert.png",
+   "kind": "png",
+   "frameBox": [
+    121.003,
+    677.188,
+    117.282,
+    39.188
+   ],
+   "state": "splash-logo-end"
+  },
+  {
+   "name": "splash-woori-wordmark",
+   "file": "woori/launch/splash-woori-wordmark.png",
+   "kind": "png",
+   "frameBox": [
+    149.123,
+    774.125,
+    62.413,
+    20.625
+   ],
+   "state": "splash-logo-end"
+  },
+  {
+   "name": "splash-logo-track",
+   "file": "woori/launch/splash-logo-track.svg",
+   "kind": "svg",
+   "frameBox": [
+    142.35,
+    394.013,
+    75.15,
+    40.88
+   ],
+   "state": "splash-logo-start"
+  },
+  {
+   "name": "splash-logo-fill",
+   "file": "woori/launch/splash-logo-fill.svg",
+   "kind": "svg",
+   "frameBox": [
+    142.35,
+    394.013,
+    75.15,
+    41
+   ],
+   "state": "splash-logo-end"
+  },
+  {
+   "name": "splash-logo-circle",
+   "file": "woori/launch/splash-logo-circle.svg",
+   "kind": "svg",
+   "frameBox": [
+    142.49,
+    389.163,
+    50.6,
+    50.6
+   ],
+   "state": "splash-logo-start"
+  },
+  {
+   "name": "check-circle-outline",
+   "file": "woori/launch/check-circle-outline.svg",
+   "kind": "svg",
+   "frameBox": [
+    129.62,
+    291.653,
+    24,
+    24
+   ],
+   "state": "cert-pin-filled"
+  },
+  {
+   "name": "check-circle-off",
+   "file": "woori/launch/check-circle-off.svg",
+   "kind": "svg (설계값)",
+   "frameBox": [
+    129.62,
+    291.653,
+    24,
+    24
+   ],
+   "state": "cert-pin-filled"
+  },
+  {
+   "name": "login-loader-hexes",
+   "file": "woori/launch/login-loader-hexes.svg",
+   "kind": "svg (character: true, 독창적 대체 그림)",
+   "frameBox": [
+    124,
+    345.667,
+    112,
+    112
+   ],
+   "state": "login-loading-character"
+  },
+  {
+   "name": "login-loader-wings",
+   "file": "woori/launch/login-loader-wings.svg",
+   "kind": "svg (character: true, 독창적 대체 그림)",
+   "frameBox": [
+    124,
+    345.667,
+    112,
+    112
+   ],
+   "state": "login-loading-character"
+  },
+  {
+   "name": "login-loader-body",
+   "file": "woori/launch/login-loader-body.svg",
+   "kind": "svg (character: true, 독창적 대체 그림)",
+   "frameBox": [
+    124,
+    345.667,
+    112,
+    112
+   ],
+   "state": "login-loading-character"
+  }
+ ],
+ "assetRefs": [
+  {
+   "name": "history.back-chevron",
+   "usedIn": "cert-pin ‹"
+  },
+  {
+   "name": "send-b.keypad-backspace",
+   "usedIn": "보안 키패드 ←"
+  },
+  {
+   "name": "home.tab-*",
+   "usedIn": "login-loading 탭바 (혜택 아이콘은 home 의 캐릭터 대체)"
+  },
+  {
+   "name": "history 공통 스피너(CSS)",
+   "usedIn": "cert-pin-spinner"
+  },
+  {
+   "name": "WON 로고 원·트랙·그라데이션 → 에셋 launch.splash-logo-circle · splash-logo-track · splash-logo-fill (SVG 3겹)",
+   "usedIn": "splash — 애니메이션 때문에 세 겹으로 나눠 그림. 같은 값의 CSS 도형으로 그려도 된다"
+  }
+ ],
+ "crossVideo": [
+  {
+   "what": "launch 상태는 v1 에만 있다(v2 는 거래내역에서 시작)",
+   "mad": null
+  },
+  {
+   "what": "키패드 설계 근거(계좌 비밀번호 시트 누출): v1 #7192–#7208 vs v2 #3003–#3021, 시트(y 420–1210)에서 숫자 칸·스피너 빼고",
+   "mad": 0.177,
+   "pctOver24": 0,
+   "note": "같은 시트 — 숫자 배치만 다르다(섞기). 숫자 25dp/500·전체삭제 600/16 도 두 영상 같은 값"
+  }
+ ],
+ "tokensUsed": [
+  "--woori-text #33353a",
+  "--woori-text-secondary #707173",
+  "--woori-text-body #4a4b4e",
+  "--woori-primary-keypad #076ef2",
+  "--woori-bg #ffffff",
+  "--woori-bg-gray #eff0f3 (탭바·OS 띠)",
+  "--woori-spinner-arc-dark/light (history)"
+ ],
+ "newColors": [
+  {
+   "name": "logo-navy",
+   "value": "#00259f",
+   "where": "남색 원 중앙값 (0,37,159)"
+  },
+  {
+   "name": "logo-track",
+   "value": "#d0d0d0",
+   "where": "회색 트랙 (208,208,208) 시작 프레임"
+  },
+  {
+   "name": "logo-gradient",
+   "value": "#2bc8f4 → #9beefa(24.6dp) → (같은 직선, 255 에서 자름) #cefffd 35.80dp · #e9ffff 41.88dp · #ffffff 46.65dp",
+   "where": "끝 프레임 x 211–240, 행 592–613 채널별 직선 최소제곱 (에셋 단계 재측정)"
+  },
+  {
+   "name": "outline-btn-border",
+   "value": "#dddddd",
+   "where": "다른 방법으로 로그인 테두리, 1dp 환산"
+  },
+  {
+   "name": "key-pressed",
+   "value": "#e6eaee",
+   "where": "누출 v1 #7191 누름 강조"
+  }
+ ],
+ "assetsPlanNote": "정본은 spec/launch.assets.json (파일·frameBox·놓는 css·만든 법·검증 값). 여기는 목록만"
+}

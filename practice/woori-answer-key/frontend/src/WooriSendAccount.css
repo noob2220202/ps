@@ -1,0 +1,264 @@
+/*
+ * WooriSendAccount — /send/account 계좌번호를 입력해 주세요 (spec/send-a.md 2.3 · 2.4 · 3.2–3.4)
+ * 요소는 앱 뷰포트 기준 dp 로 absolute (글자 = line-height:1 상자 left/top = 스펙 L·T). 소수 상자는 WooriSendFlow.fbox.
+ */
+.woori-send-account {
+  position: relative;
+  height: 100%;
+  overflow: clip;
+  background: var(--woori-bg);
+  color: var(--woori-text);
+}
+
+.woori-send-account__close,
+.woori-send-account__clear {
+  display: block;
+}
+
+.woori-send-account__close > img,
+.woori-send-account__clear > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.woori-send-account__title,
+.woori-send-account__value,
+.woori-send-account__placeholder,
+.woori-send-account__bank-name,
+.woori-send-account__chip-text,
+.woori-send-account__confirm-text,
+.woori-send-account__error {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.woori-send-account__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--woori-text);
+}
+
+/* 입력칸 줄 = 누름 영역 (값·안내·커서는 페이지 좌표로 놓았다 → 줄 위끝 120 만큼 되돌림) */
+.woori-send-account__field {
+  position: absolute;
+  left: 0;
+  top: 120px;
+  width: 310px;
+  height: 56px;
+}
+
+.woori-send-account__field > :not(.woori-send-account__input) {
+  margin-top: -120px;
+}
+
+.woori-send-account__value {
+  display: flex;
+  align-items: flex-start;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--woori-text);
+}
+
+.woori-send-account__placeholder {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--woori-placeholder);
+}
+
+/* 보이지 않는 입력칸 (포커스·실제 폰 시스템 키보드·데스크톱 타이핑). 그리는 것은 값 span 과 직접 그린 커서 */
+.woori-send-account__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  opacity: 0;
+  color: transparent;
+  caret-color: transparent;
+  background: transparent;
+  font-size: 16px;
+}
+
+/* 커서: 1dp × 26.333 (#2b292e), 깜빡임 ≈500ms (caret-blink, 비교는 마스크) */
+.woori-send-account__caret {
+  background: #2b292e;
+  animation-name: woori-send-account-caret;
+  animation-duration: 1000ms;
+  animation-timing-function: step-end;
+  animation-iteration-count: infinite;
+}
+
+.woori-send-account__caret--inline {
+  position: relative;
+  top: -2px;
+  width: 1px;
+  height: 26.333px;
+  margin-left: 0.5px;
+}
+
+@keyframes woori-send-account-caret {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.woori-send-account__line {
+  background: #e6eaee;
+  pointer-events: none;
+}
+
+.woori-send-account__line--bank {
+  background: #e8e9ee;
+}
+
+/* 포커스 밑줄: 가운데에서 양쪽으로 scaleX 0 → 1, easeInOutCubic 404ms (3.3). 꺼질 때는 한 프레임 (언마운트) */
+.woori-send-account__line--focus {
+  background: #46474c;
+  transform-origin: 50% 50%;
+  animation-name: woori-send-account-line;
+  animation-duration: 404ms;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes woori-send-account-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.woori-send-account__bank {
+  position: absolute;
+  left: 0;
+  top: 186px;
+  width: 360px;
+  height: 56px;
+}
+
+.woori-send-account__bank > * {
+  margin-top: -186px;
+}
+
+.woori-send-account__bank-logo,
+.woori-send-account__chevron,
+.woori-send-account__chip-logo {
+  display: block;
+  pointer-events: none;
+}
+
+.woori-send-account__bank-name {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.0025em;
+  color: var(--woori-text);
+}
+
+/* 추천 은행 칩: #eff0f3 r6 + 아주 옅은 아래 그림자, 로고 16dp + 글자 15/500 (2.3) */
+.woori-send-account__chip {
+  border-radius: 6px;
+  background: var(--woori-bg-gray);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.woori-send-account__chip-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--woori-text-body);
+  pointer-events: none;
+}
+
+.woori-send-account__error {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e5483e;
+}
+
+/* [확인]: (16, 728.667) 328×56 r12, 아래 16dp (bottom 16 + 높이 56 → WOORI_BOTTOM_FIX). 눌림 = 색만 #185ba4 (3.4) */
+.woori-send-account .woori-send-account__confirm {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  width: 328px;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--woori-primary);
+  transform: none;
+  scale: none;
+  transition: none;
+  animation-name: none;
+}
+
+.woori-send-account .woori-send-account__confirm--pressed {
+  background: var(--woori-primary-pressed);
+}
+
+.woori-send-account__confirm-text {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.0025em;
+  color: var(--woori-text-on-primary, #ffffff);
+}
+
+/* push shot (account-push): 아래 '어디로 이체' + 베일 0→0.8 linear 326ms (30ms 늦게) + 이 페이지 translateX 100% → 0 easeOutCubic 322ms */
+.woori-send-account__push {
+  position: relative;
+  height: 100%;
+}
+
+.woori-send-account__push-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--woori-bg);
+  opacity: 0.8;
+  pointer-events: none;
+  animation-name: woori-send-account-veil;
+  animation-duration: 326ms;
+  animation-delay: 30ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes woori-send-account-veil {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+
+.woori-send-account__push-page {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  will-change: transform;
+  animation-name: woori-send-account-push;
+  animation-duration: 322ms;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes woori-send-account-push {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}

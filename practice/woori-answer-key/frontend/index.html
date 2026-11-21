@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="format-detection" content="telephone=no" />
+    <!--
+      글꼴 (spec/font.md 8절): Pretendard Variable 1.3.9 를 자체 호스팅 (public/fonts, OFL 1.1). 앱과 tools/woori-textfit.cjs 가 같은 CSS·파일로 그린다.
+      font-display: block 이라 대체 글꼴 깜빡임이 없다. shot 준비 신호는 글꼴 로드 뒤에 켠다 (WooriShot.markShotReady).
+    -->
+    <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/woori-font.css" />
+    <!--
+      테마·프레임 모드 미리 정하기: 첫 페인트 전에 <html data-theme / data-frame> 를 단다 (빌드에서 CSS 가 JS 보다 먼저 칠해지므로).
+      순서는 WooriTheme.initTheme · main.tsx initFrameMode 와 같다:
+        테마  ?theme=dark|light > sessionStorage 'woori.theme' > prefers-color-scheme (?theme=auto 는 저장값 무시)
+        프레임 ?frame=1 > sessionStorage 'woori.frame' (?frame=0 으로 끔)
+      읽기만 한다. 저장·지우기, 시스템 테마 구독은 JS 몫. theme-color meta 는 하나만 둔다 (WooriTheme 이 그것만 고친다)
+    -->
+    <script>
+      (function () {
+        var p = new URLSearchParams(location.search)
+        var q = p.get('theme')
+        var t = q === 'dark' || q === 'light' ? q : null
+        var f = p.get('frame')
+        try {
+          if (!t && q !== 'auto') {
+            var v = sessionStorage.getItem('woori.theme')
+            if (v === 'dark' || v === 'light') t = v
+          }
+          if (f !== '1' && f !== '0' && sessionStorage.getItem('woori.frame') === '1') f = '1'
+        } catch (e) {
+          /* 저장소를 못 쓰면 URL·시스템 값만 */
+        }
+        if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        document.documentElement.dataset.theme = t
+        if (f === '1') document.documentElement.dataset.frame = '1'
+      })()
+    </script>
+    <title>우리WON뱅킹 (답지)</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+/* WooriTabBar — 하단 탭바 (spec/home.md 2.1 tabbar · tab_*). 상자 위끝 740.000 (정수), 면은 740.667 부터 */
+.woori-tabbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60.667px;
+  z-index: 3;
+}
+
+.woori-tabbar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 61px;
+  translate: 0 0.667px;
+  background: #eff0f3;
+}
+
+.woori-tabbar__tab {
+  position: absolute;
+  top: 0;
+  width: 72px;
+  height: 61px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.woori-tabbar__icon {
+  position: absolute;
+  display: block;
+  user-select: none;
+}
+
+/* 홈 탭이 선택이 아닐 때 (영상에 없음 — 설계): 파란 집을 회색으로 */
+.woori-tabbar__icon--off {
+  filter: grayscale(1) brightness(0.45);
+}
+
+.woori-tabbar__label {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}

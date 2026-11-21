@@ -1,0 +1,585 @@
+[
+ {
+  "name": "splash-won-wordmark",
+  "file": "woori/launch/splash-won-wordmark.png",
+  "frameBox": {
+   "x": 207,
+   "y": 653,
+   "w": 111,
+   "h": 37
+  },
+  "state": "splash-logo-end",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "won-wordmark",
+    "frameBox": {
+     "x": 207,
+     "y": 653,
+     "w": 111,
+     "h": 37
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "won-wordmark",
+    "frameBox": {
+     "x": 207,
+     "y": 653,
+     "w": 111,
+     "h": 37
+    }
+   }
+  ],
+  "dp": {
+   "x": 142.2642,
+   "y": 417.6042,
+   "w": 76.1301,
+   "h": 25.4375
+  },
+  "css": "position:absolute; left:142px; top:417px; width:76px; height:25px; transform-origin:0 0; transform:translate(0.2642px, 0.6042px) scale(1.00171, 1.0175)",
+  "notes": "'WON' 글자 로고 (남색 #00259f — 로고 원과 같은 색, 잉크 Y<60 화소 중앙값 (0,37,159)). 'O' 속 구멍은 투명. splash-logo-end 구간 #70–#91(22장, 화질 회복 뒤) 채널별 중앙값 → 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 역투영 6회(3x3 면적 축소가 중앙값과 같아지게) → 흰색(#ffffff) 기준 color-to-alpha(최소 α, α<0.03 → 0, 저해상 잉크 범위 1px 팽창 밖 → 0). 흰 스플래시 바탕 위에서 원본과 같게 합성된다. 시작 상태(#52–#54)와 같은 자리·같은 그림(움직이지 않음, 차이는 첫 프레임 코덱 화질뿐: 평균 1.0–1.5). 놓는 법: css 그대로 — left/top/width/height 는 정수 dp, 소수 위치·크기는 transform(translate·scale). Chromium 은 레이아웃 크기(width/height)도 정수 dp 로 반올림하므로 소수 width/height 를 그대로 주면 그림이 늘거나 줄어 어긋난다 (실험: 같은 그림을 소수 크기로 놓으면 shot 평균차 3.2–10.1, 정수 상자+transform 이면 1.5–2.2).",
+  "verify": {
+   "compositeMAD": 0.74,
+   "compositeMax": 7.5,
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → 3x3 면적 축소 vs 중앙값 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": {
+    "end": 1.96,
+    "start": 3.0
+   },
+   "shotMax": {
+    "end": 27,
+    "start": 32
+   },
+   "shotMethod": "Chromium(Playwright 1.63) 360x880 DSF 16/11 + ?frame=1 셸 구성, css 대로 놓고 찍어 기준 프레임 splash-logo-end/start 와 비교(상자 ±2px, RGB 평균 절대차). 스플래시 전체(앱 영역) 평균차: 끝 0.127 · 시작 0.235. 남는 차이는 Chromium 의 3x→1x 축소 필터(면적 평균이 아님)와 코덱 링잉",
+   "shotMADFractionalSize": 4.56,
+   "shotMADFrameRes1x": 0.24
+  },
+  "hq": "woori/launch/splash-won-wordmark.hq.svg"
+ },
+ {
+  "name": "splash-if-award",
+  "file": "woori/launch/splash-if-award.png",
+  "frameBox": {
+   "x": 193,
+   "y": 882,
+   "w": 139,
+   "h": 72
+  },
+  "state": "splash-logo-end",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "if-award",
+    "frameBox": {
+     "x": 193,
+     "y": 882,
+     "w": 139,
+     "h": 72
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "if-award",
+    "frameBox": {
+     "x": 193,
+     "y": 882,
+     "w": 139,
+     "h": 72
+    }
+   }
+  ],
+  "dp": {
+   "x": 132.6622,
+   "y": 575.0417,
+   "w": 95.3341,
+   "h": 49.5
+  },
+  "css": "position:absolute; left:132px; top:575px; width:95px; height:50px; transform-origin:0 0; transform:translate(0.6622px, 0.0417px) scale(1.00352, 0.99)",
+  "notes": "iF DESIGN AWARD 2026 (빨간 사각 2개, 코어 (230,0,18)). 사각 바깥 윤곽 안(가장자리 2px@3x 빼고)은 α=1 — 흰 글자(iF·DESIGN AWARD 2026)와 그 가장자리도 불투명이라 다른 바탕에서도 비지 않는다. splash-logo-end 구간 #70–#91(22장, 화질 회복 뒤) 채널별 중앙값 → 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 역투영 6회(3x3 면적 축소가 중앙값과 같아지게) → 흰색(#ffffff) 기준 color-to-alpha(최소 α, α<0.03 → 0, 저해상 잉크 범위 1px 팽창 밖 → 0). 흰 스플래시 바탕 위에서 원본과 같게 합성된다. 시작 상태(#52–#54)와 같은 자리·같은 그림(움직이지 않음, 차이는 첫 프레임 코덱 화질뿐: 평균 1.0–1.5). 놓는 법: css 그대로 — left/top/width/height 는 정수 dp, 소수 위치·크기는 transform(translate·scale). Chromium 은 레이아웃 크기(width/height)도 정수 dp 로 반올림하므로 소수 width/height 를 그대로 주면 그림이 늘거나 줄어 어긋난다 (실험: 같은 그림을 소수 크기로 놓으면 shot 평균차 3.2–10.1, 정수 상자+transform 이면 1.5–2.2).",
+  "verify": {
+   "compositeMAD": 0.335,
+   "compositeMax": 7.0,
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → 3x3 면적 축소 vs 중앙값 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": {
+    "end": 1.48,
+    "start": 2.39
+   },
+   "shotMax": {
+    "end": 21,
+    "start": 25
+   },
+   "shotMethod": "Chromium(Playwright 1.63) 360x880 DSF 16/11 + ?frame=1 셸 구성, css 대로 놓고 찍어 기준 프레임 splash-logo-end/start 와 비교(상자 ±2px, RGB 평균 절대차). 스플래시 전체(앱 영역) 평균차: 끝 0.127 · 시작 0.235. 남는 차이는 Chromium 의 3x→1x 축소 필터(면적 평균이 아님)와 코덱 링잉",
+   "shotMADFractionalSize": 7.62,
+   "shotMADFrameRes1x": 0.16
+  },
+  "hq": "woori/launch/splash-if-award.hq.png"
+ },
+ {
+  "name": "splash-ma-cert",
+  "file": "woori/launch/splash-ma-cert.png",
+  "frameBox": {
+   "x": 176,
+   "y": 985,
+   "w": 171,
+   "h": 57
+  },
+  "state": "splash-logo-end",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "ma-cert",
+    "frameBox": {
+     "x": 176,
+     "y": 985,
+     "w": 171,
+     "h": 57
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "ma-cert",
+    "frameBox": {
+     "x": 176,
+     "y": 985,
+     "w": 171,
+     "h": 57
+    }
+   }
+  ],
+  "dp": {
+   "x": 121.0026,
+   "y": 645.8542,
+   "w": 117.2815,
+   "h": 39.1875
+  },
+  "css": "position:absolute; left:121px; top:645px; width:117px; height:39px; transform-origin:0 0; transform:translate(0.0026px, 0.8542px) scale(1.00241, 1.00481)",
+  "notes": "MA 모바일 접근성 인증 마크(남색 (35,63,144)) + 'Mobile Accessibility / 모바일 접근성 인증' 글자. 남색 판의 볼록 껍질 안(가장자리 2px@3x 빼고)은 α=1 이라 흰 MA 글자도 불투명 — 판 밖으로 나온 'M' 왼획 끝만 투명(흰 바탕에서는 같다). splash-logo-end 구간 #70–#91(22장, 화질 회복 뒤) 채널별 중앙값 → 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 역투영 6회(3x3 면적 축소가 중앙값과 같아지게) → 흰색(#ffffff) 기준 color-to-alpha(최소 α, α<0.03 → 0, 저해상 잉크 범위 1px 팽창 밖 → 0). 흰 스플래시 바탕 위에서 원본과 같게 합성된다. 시작 상태(#52–#54)와 같은 자리·같은 그림(움직이지 않음, 차이는 첫 프레임 코덱 화질뿐: 평균 1.0–1.5). 놓는 법: css 그대로 — left/top/width/height 는 정수 dp, 소수 위치·크기는 transform(translate·scale). Chromium 은 레이아웃 크기(width/height)도 정수 dp 로 반올림하므로 소수 width/height 를 그대로 주면 그림이 늘거나 줄어 어긋난다 (실험: 같은 그림을 소수 크기로 놓으면 shot 평균차 3.2–10.1, 정수 상자+transform 이면 1.5–2.2).",
+  "verify": {
+   "compositeMAD": 0.426,
+   "compositeMax": 7.0,
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → 3x3 면적 축소 vs 중앙값 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": {
+    "end": 1.43,
+    "start": 2.05
+   },
+   "shotMax": {
+    "end": 21,
+    "start": 26
+   },
+   "shotMethod": "Chromium(Playwright 1.63) 360x880 DSF 16/11 + ?frame=1 셸 구성, css 대로 놓고 찍어 기준 프레임 splash-logo-end/start 와 비교(상자 ±2px, RGB 평균 절대차). 스플래시 전체(앱 영역) 평균차: 끝 0.127 · 시작 0.235. 남는 차이는 Chromium 의 3x→1x 축소 필터(면적 평균이 아님)와 코덱 링잉",
+   "shotMADFractionalSize": 3.19,
+   "shotMADFrameRes1x": 0.2
+  },
+  "hq": "woori/launch/splash-ma-cert.hq.png"
+ },
+ {
+  "name": "splash-woori-wordmark",
+  "file": "woori/launch/splash-woori-wordmark.png",
+  "frameBox": {
+   "x": 217,
+   "y": 1126,
+   "w": 91,
+   "h": 30
+  },
+  "state": "splash-logo-end",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "woori-wordmark",
+    "frameBox": {
+     "x": 217,
+     "y": 1126,
+     "w": 91,
+     "h": 30
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "woori-wordmark",
+    "frameBox": {
+     "x": 217,
+     "y": 1126,
+     "w": 91,
+     "h": 30
+    }
+   }
+  ],
+  "dp": {
+   "x": 149.1227,
+   "y": 742.7917,
+   "w": 62.413,
+   "h": 20.625
+  },
+  "css": "position:absolute; left:149px; top:742px; width:62px; height:21px; transform-origin:0 0; transform:translate(0.1227px, 0.7917px) scale(1.00666, 0.982143)",
+  "notes": "'우리은행' 글자 로고 (파랑, 가장 진한 3% 중앙값 #0c5997 — 획이 가늘어 코덱이 옅게 만든 값). 'ㅇ' 속 구멍은 투명. splash-logo-end 구간 #70–#91(22장, 화질 회복 뒤) 채널별 중앙값 → 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 역투영 6회(3x3 면적 축소가 중앙값과 같아지게) → 흰색(#ffffff) 기준 color-to-alpha(최소 α, α<0.03 → 0, 저해상 잉크 범위 1px 팽창 밖 → 0). 흰 스플래시 바탕 위에서 원본과 같게 합성된다. 시작 상태(#52–#54)와 같은 자리·같은 그림(움직이지 않음, 차이는 첫 프레임 코덱 화질뿐: 평균 1.0–1.5). 놓는 법: css 그대로 — left/top/width/height 는 정수 dp, 소수 위치·크기는 transform(translate·scale). Chromium 은 레이아웃 크기(width/height)도 정수 dp 로 반올림하므로 소수 width/height 를 그대로 주면 그림이 늘거나 줄어 어긋난다 (실험: 같은 그림을 소수 크기로 놓으면 shot 평균차 3.2–10.1, 정수 상자+transform 이면 1.5–2.2).",
+  "verify": {
+   "compositeMAD": 0.842,
+   "compositeMax": 7.0,
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → 3x3 면적 축소 vs 중앙값 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": {
+    "end": 2.2,
+    "start": 2.8
+   },
+   "shotMax": {
+    "end": 21,
+    "start": 22
+   },
+   "shotMethod": "Chromium(Playwright 1.63) 360x880 DSF 16/11 + ?frame=1 셸 구성, css 대로 놓고 찍어 기준 프레임 splash-logo-end/start 와 비교(상자 ±2px, RGB 평균 절대차). 스플래시 전체(앱 영역) 평균차: 끝 0.127 · 시작 0.235. 남는 차이는 Chromium 의 3x→1x 축소 필터(면적 평균이 아님)와 코덱 링잉",
+   "shotMADFractionalSize": 10.07,
+   "shotMADFrameRes1x": 0.26
+  },
+  "hq": "woori/launch/splash-woori-wordmark.hq.svg"
+ },
+ {
+  "name": "splash-logo-track",
+  "file": "woori/launch/splash-logo-track.svg",
+  "frameBox": {
+   "x": 207.1252,
+   "y": 573.1103,
+   "w": 109.571,
+   "h": 59.4618
+  },
+  "state": "splash-logo-start",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#d0d0d0",
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "logo-track",
+    "frameBox": {
+     "x": 207.1252,
+     "y": 573.1103,
+     "w": 109.571,
+     "h": 59.4618
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "logo-track",
+    "frameBox": {
+     "x": 207.1252,
+     "y": 573.1103,
+     "w": 109.571,
+     "h": 59.4618
+    }
+   }
+  ],
+  "dp": {
+   "x": 142.35,
+   "y": 362.68,
+   "w": 75.15,
+   "h": 40.88
+  },
+  "css": "position:absolute; left:142px; top:362px; width:75px; height:41px; transform-origin:0 0; transform:translate(0.35px, 0.68px) scale(1.002, 0.997073)",
+  "notes": "WON 로고 맨 아래 겹: 회색 알약 트랙 75.15x40.88dp, #d0d0d0, 양 끝 반원(rx 20.44). 움직이지 않는다. Y 평면(4:2:0 색 번짐·RGB 클리핑 없음) 모델 맞춤: 오른끝 217.50dp·위 362.74·높이 40.81 (스펙 2.1 의 가장자리 측정 142.35/362.68/75.15/40.88 과 ±0.07dp). 놓는 법: css 그대로 — left/top/width/height 는 정수 dp, 소수 위치·크기는 transform(translate·scale). Chromium 은 레이아웃 크기(width/height)도 정수 dp 로 반올림하므로 소수 width/height 를 그대로 주면 그림이 늘거나 줄어 어긋난다 (실험: 같은 그림을 소수 크기로 놓으면 shot 평균차 3.2–10.1, 정수 상자+transform 이면 1.5–2.2).",
+  "verify": {
+   "method": "트랙+채움+원을 아래 css·애니메이션 위상으로 놓고 Chromium shot(DSF 16/11) vs 기준 프레임 splash-logo-start/-f60(#60)/-f66(#66)/-end, 로고 영역 x 198–327 y 558–647",
+   "shotMAD": {
+    "start": 1.95,
+    "f60": 2.28,
+    "f66": 2.18,
+    "end": 2.11
+   },
+   "shotMax": {
+    "start": 114,
+    "f60": 102,
+    "f66": 109,
+    "end": 109
+   },
+   "fillVisibleMAD": {
+    "start": 2.57,
+    "f60": 3.88,
+    "f66": 3.71,
+    "end": 3.32
+   },
+   "note": "원 안쪽 차이 0, 채움 안쪽 평균 차 (−0.04, +0.29, +0.02). 남는 차이는 가장자리 4:2:0 색 번짐·코덱 링잉(가장자리 한 줄)"
+  }
+ },
+ {
+  "name": "splash-logo-fill",
+  "file": "woori/launch/splash-logo-fill.svg",
+  "frameBox": {
+   "x": 207.1252,
+   "y": 573.1103,
+   "w": 109.571,
+   "h": 59.6364
+  },
+  "state": "splash-logo-end",
+  "scale": 1,
+  "kind": "svg",
+  "color": "linear-gradient(90deg, #2bc8f4 0, #cefffd 35.80dp, #e9ffff 41.88dp, #ffffff 46.65dp) (트랙 왼끝 기준)",
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "logo-fill",
+    "frameBox": {
+     "x": 207.1252,
+     "y": 573.1103,
+     "w": 109.571,
+     "h": 59.6364
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "logo-fill",
+    "frameBox": {
+     "x": 207.1252,
+     "y": 573.1103,
+     "w": 109.571,
+     "h": 59.6364
+    }
+   }
+  ],
+  "dp": {
+   "x": 142.35,
+   "y": 362.68,
+   "w": 75.15,
+   "h": 41.0
+  },
+  "css": "자르는 상자 position:absolute; left:142px; top:362px; height:41px; transform:translate(0.35px, 0.68px); overflow:hidden; width 25.44dp(시작) → 49.86dp(끝) (= 원 중심 − 트랙 왼끝, 원과 같은 시간·곡선) / 안의 img position:absolute; left:0; top:0; width:75px; height:41px; transform-origin:0 0; transform:scale(1.002, 1)",
+  "notes": "WON 로고 가운데 겹: 하늘색 그라데이션 알약(트랙과 같은 왼끝·폭 75.15dp, 높이 41.0dp, rx 20.5). 그라데이션은 그림(트랙 좌표)에 붙어 있고 늘어나지 않는다 — 왼끝 고정·overflow:hidden 상자의 폭만 원 중심까지 넓힌다(상자의 오른 가장자리는 늘 원 밑이라 정수 dp 반올림이 보이지 않는다). 색: 끝 프레임 x 211–240(곧은 안쪽 행 592–613) 채널별 직선 최소제곱 R 43.06+4.543·x, G 199.61+1.547·x, B 243.69+0.270·x (x = 트랙 왼끝에서 dp, rms 1.5/1.0/1.6) → 0dp #2bc8f4, 24.6dp(끝에 보이는 끝) #9beefa. 그 너머는 같은 직선을 255 에서 자른 값(G 35.80·B 41.88·R 46.65dp 에서 255) — 원 위아래 모서리 틈(≈35dp 까지)에 조금 보인다. 높이 41.0dp 는 Y 평면 모양 맞춤(위 362.675·높이 40.996, 트랙보다 0.12dp 큼). 스펙 2.1 의 #31c8f2→#98eefb 보다 shot 차이가 작다(끝 채움 영역 3.32 vs 3.51).",
+  "verify": {
+   "method": "트랙+채움+원을 아래 css·애니메이션 위상으로 놓고 Chromium shot(DSF 16/11) vs 기준 프레임 splash-logo-start/-f60(#60)/-f66(#66)/-end, 로고 영역 x 198–327 y 558–647",
+   "shotMAD": {
+    "start": 1.95,
+    "f60": 2.28,
+    "f66": 2.18,
+    "end": 2.11
+   },
+   "shotMax": {
+    "start": 114,
+    "f60": 102,
+    "f66": 109,
+    "end": 109
+   },
+   "fillVisibleMAD": {
+    "start": 2.57,
+    "f60": 3.88,
+    "f66": 3.71,
+    "end": 3.32
+   },
+   "note": "원 안쪽 차이 0, 채움 안쪽 평균 차 (−0.04, +0.29, +0.02). 남는 차이는 가장자리 4:2:0 색 번짐·코덱 링잉(가장자리 한 줄)"
+  }
+ },
+ {
+  "name": "splash-logo-circle",
+  "file": "woori/launch/splash-logo-circle.svg",
+  "frameBox": {
+   "x": 207.3293,
+   "y": 566.0558,
+   "w": 73.7763,
+   "h": 73.6
+  },
+  "state": "splash-logo-start",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#00259f",
+  "usedIn": [
+   {
+    "state": "splash-logo-start",
+    "element": "logo-circle",
+    "frameBox": {
+     "x": 207.3293,
+     "y": 566.0558,
+     "w": 73.7763,
+     "h": 73.6
+    }
+   },
+   {
+    "state": "splash-logo-end",
+    "element": "logo-circle",
+    "frameBox": {
+     "x": 242.9344,
+     "y": 566.0558,
+     "w": 73.7763,
+     "h": 73.6
+    }
+   }
+  ],
+  "dp": {
+   "x": 142.48999999999998,
+   "y": 357.83,
+   "w": 50.6,
+   "h": 50.6
+  },
+  "css": "position:absolute; left:142px; top:357px; width:51px; height:51px; transform-origin:0 0; transform:translate(0.49px, 0.83px) scale(0.992157, 0.992157) — 움직임: transform 을 통째로 키프레임에 (시작 translate(0.49px, 0.83px) scale(0.992157, 0.992157) → 끝 translate(24.91px, 0.83px) scale(0.992157, 0.992157), 이동 24.42dp)",
+  "notes": "WON 로고 맨 위 겹: 남색 원 지름 50.6dp #00259f (0,37,159). 시작 중심 (167.79, 앱 383.13)dp → 끝 (192.21, 383.13): transform translateX 0 → 24.42dp, 265.7ms cubic-bezier(1, 0.967, 0.663, 0.931) 지연 84.1ms (spec 3.2). Y 평면 맞춤: 중심 167.797→192.201, y 383.137, 반지름 25.304dp. 크기·색 변화 없음. css 의 scale 뒤에 translateX 를 덧붙이거나(transform 목록) 바깥 상자를 움직인다.",
+  "verify": {
+   "method": "트랙+채움+원을 아래 css·애니메이션 위상으로 놓고 Chromium shot(DSF 16/11) vs 기준 프레임 splash-logo-start/-f60(#60)/-f66(#66)/-end, 로고 영역 x 198–327 y 558–647",
+   "shotMAD": {
+    "start": 1.95,
+    "f60": 2.28,
+    "f66": 2.18,
+    "end": 2.11
+   },
+   "shotMax": {
+    "start": 114,
+    "f60": 102,
+    "f66": 109,
+    "end": 109
+   },
+   "fillVisibleMAD": {
+    "start": 2.57,
+    "f60": 3.88,
+    "f66": 3.71,
+    "end": 3.32
+   },
+   "note": "원 안쪽 차이 0, 채움 안쪽 평균 차 (−0.04, +0.29, +0.02). 남는 차이는 가장자리 4:2:0 색 번짐·코덱 링잉(가장자리 한 줄)"
+  }
+ },
+ {
+  "name": "check-circle-outline",
+  "file": "woori/launch/check-circle-outline.svg",
+  "frameBox": {
+   "x": 188.5644,
+   "y": 424.223,
+   "w": 34.9927,
+   "h": 34.9091
+  },
+  "state": "cert-pin-filled",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#33353a",
+  "usedIn": [
+   {
+    "state": "cert-pin-spinner",
+    "element": "auto-login-check",
+    "frameBox": {
+     "x": 188.5644,
+     "y": 424.223,
+     "w": 34.9927,
+     "h": 34.9091
+    }
+   },
+   {
+    "state": "cert-pin-filled",
+    "element": "auto-login-check",
+    "frameBox": {
+     "x": 188.5644,
+     "y": 424.223,
+     "w": 34.9927,
+     "h": 34.9091
+    }
+   }
+  ],
+  "dp": {
+   "x": 129.62,
+   "y": 260.32,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:129px; top:260px; width:24px; height:24px; transform-origin:0 0; transform:translate(0.62px, 0.32px)",
+  "notes": "자동 로그인 ✓ (켬): 원 테두리(중심 반지름 11.25dp, 굵기 1.5dp) + 체크(굵기 2dp, 둥근 끝·꺾임) #33353a(--woori-text). 체크 꼭짓점(원 중심 기준 dp): (−5.0, 0.0) → (−1.39, +3.54) → (+4.92, −2.79) — 두 획 모두 45°. cert-pin-filled #208–#231 중앙값 휘도에 모델 맞춤(색을 토큰 휘도로 고정, 6x6 초표본, rms 4.9): 중심 (141.62, 앱 272.32)dp, 원 반지름 11.24, 굵기 1.51, 체크 굵기 1.99. 설계 상자(스펙 2.2)는 129.5, 260.33 — 맞춘 중심은 0.12dp 오른쪽이라 frameBox 는 맞춘 값. 24x24dp 라 크기는 정수, 위치 소수만 translate(wooriPlace 와 같다).",
+  "verify": {
+   "method": "Chromium shot(DSF 16/11, css 대로) vs cert-pin-filled 기준 프레임, 상자 183,418 48x48 의 알파((255−Y)/(255−Y잉크)) 비교",
+   "svgFitL1": 0.0175,
+   "relErr": 0.1352,
+   "centroidOffsetPx": [
+    -0.067,
+    -0.047
+   ],
+   "inkMassRatio": 0.9599,
+   "rgbMAD": 3.463
+  }
+ },
+ {
+  "name": "check-circle-off",
+  "file": "woori/launch/check-circle-off.svg",
+  "frameBox": {
+   "x": 188.5644,
+   "y": 424.223,
+   "w": 34.9927,
+   "h": 34.9091
+  },
+  "state": "cert-pin-filled",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#33353a",
+  "dp": {
+   "x": 129.62,
+   "y": 260.32,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:129px; top:260px; width:24px; height:24px; transform-origin:0 0; transform:translate(0.62px, 0.32px)",
+  "notes": "**설계값(영상에 없음)**: 자동 로그인 끔 — 같은 원 테두리만(체크 없음). 스펙 4절 auto-login-toggle 설계 동작용. 24x24dp 라 크기는 정수, 위치 소수만 translate(wooriPlace 와 같다).",
+  "design": true
+ },
+ {
+  "name": "login-loader-hexes",
+  "file": "woori/launch/login-loader-hexes.svg",
+  "frameBox": {
+   "x": 180.3703,
+   "y": 502.7879,
+   "w": 163.2994,
+   "h": 162.9091
+  },
+  "state": "login-loading-character",
+  "scale": 1,
+  "kind": "svg",
+  "character": true,
+  "dp": {
+   "x": 124,
+   "y": 314.3333,
+   "w": 112,
+   "h": 112
+  },
+  "notes": "뒤 겹: 노란 육각형 무늬 한 칸(112dp, 가로로 이어 붙여도 이음매 없음 — 도형이 칸 경계를 넘지 않음). 오른쪽으로 192dp/s 흐름. 캐릭터(마스코트) 자리의 **독창적 대체 그림** — 영상의 캐릭터를 자르거나 따라 그리지 않고 단순 도형으로 새로 그렸다(BRIEF D4). 같은 상자 112x112dp(앱 124, 314.33)·대략의 색감(하늘색·노랑). 비교에서는 상자를 마스크한다. 세 겹(육각형 띠·날개·몸통)을 화면 CSS 로 움직인다: 상자 .woori-launch__loader { position:absolute; left:124px; top:314px; translate:0 0.3333px; width:112px; height:112px; overflow:hidden } 육각형 띠 { position:absolute; left:-112px; top:0; width:224px; height:112px; background:url(/woori/launch/login-loader-hexes.svg) repeat-x 0 0 / 112px 112px; animation-name:woori-launch-loader-flow; animation-duration:583.333ms; animation-timing-function:linear; animation-iteration-count:infinite } @keyframes woori-launch-loader-flow { from { transform:translateX(0) } to { transform:translateX(112px) } } (= 192dp/s 오른쪽으로) · 몸통+날개 묶음 { position:absolute; inset:0; animation-name:woori-launch-loader-bob; animation-duration:880ms; animation-timing-function:ease-in-out; animation-delay:-124ms; animation-iteration-count:infinite } @keyframes woori-launch-loader-bob { 0% { transform:translateY(-3.09px) } 50% { transform:translateY(3.09px) } 100% { transform:translateY(-3.09px) } } (주기 880ms·진폭 ±3.09dp, −124ms 위상 → 가장 낮은 때 +316ms = 원래 그림 실측) · 그 안에 날개 img(뒤) → 몸통 img(앞), 둘 다 0,0 112x112. 날개 { transform-origin:54.46% 36.61%; animation-name:woori-launch-loader-flap; animation-duration:240ms; animation-timing-function:ease-in-out; animation-direction:alternate; animation-iteration-count:infinite } @keyframes woori-launch-loader-flap { from { transform:scaleY(1) } to { transform:scaleY(0.6) } } (날개 리듬은 설계값). shot(?shot=login-loading-character)은 t=0 위상(시작 모습)에서 멈춰도 된다 — 마스크 안."
+ },
+ {
+  "name": "login-loader-wings",
+  "file": "woori/launch/login-loader-wings.svg",
+  "frameBox": {
+   "x": 180.3703,
+   "y": 502.7879,
+   "w": 163.2994,
+   "h": 162.9091
+  },
+  "state": "login-loading-character",
+  "scale": 1,
+  "kind": "svg",
+  "character": true,
+  "dp": {
+   "x": 124,
+   "y": 314.3333,
+   "w": 112,
+   "h": 112
+  },
+  "notes": "가운데 겹: 반투명 흰 날개 2장(뿌리 (61, 41)dp). 몸통과 함께 위아래로 움직이며 펄럭임. 캐릭터(마스코트) 자리의 **독창적 대체 그림** — 영상의 캐릭터를 자르거나 따라 그리지 않고 단순 도형으로 새로 그렸다(BRIEF D4). 같은 상자 112x112dp(앱 124, 314.33)·대략의 색감(하늘색·노랑). 비교에서는 상자를 마스크한다. 세 겹(육각형 띠·날개·몸통)을 화면 CSS 로 움직인다: 상자 .woori-launch__loader { position:absolute; left:124px; top:314px; translate:0 0.3333px; width:112px; height:112px; overflow:hidden } 육각형 띠 { position:absolute; left:-112px; top:0; width:224px; height:112px; background:url(/woori/launch/login-loader-hexes.svg) repeat-x 0 0 / 112px 112px; animation-name:woori-launch-loader-flow; animation-duration:583.333ms; animation-timing-function:linear; animation-iteration-count:infinite } @keyframes woori-launch-loader-flow { from { transform:translateX(0) } to { transform:translateX(112px) } } (= 192dp/s 오른쪽으로) · 몸통+날개 묶음 { position:absolute; inset:0; animation-name:woori-launch-loader-bob; animation-duration:880ms; animation-timing-function:ease-in-out; animation-delay:-124ms; animation-iteration-count:infinite } @keyframes woori-launch-loader-bob { 0% { transform:translateY(-3.09px) } 50% { transform:translateY(3.09px) } 100% { transform:translateY(-3.09px) } } (주기 880ms·진폭 ±3.09dp, −124ms 위상 → 가장 낮은 때 +316ms = 원래 그림 실측) · 그 안에 날개 img(뒤) → 몸통 img(앞), 둘 다 0,0 112x112. 날개 { transform-origin:54.46% 36.61%; animation-name:woori-launch-loader-flap; animation-duration:240ms; animation-timing-function:ease-in-out; animation-direction:alternate; animation-iteration-count:infinite } @keyframes woori-launch-loader-flap { from { transform:scaleY(1) } to { transform:scaleY(0.6) } } (날개 리듬은 설계값). shot(?shot=login-loading-character)은 t=0 위상(시작 모습)에서 멈춰도 된다 — 마스크 안."
+ },
+ {
+  "name": "login-loader-body",
+  "file": "woori/launch/login-loader-body.svg",
+  "frameBox": {
+   "x": 180.3703,
+   "y": 502.7879,
+   "w": 163.2994,
+   "h": 162.9091
+  },
+  "state": "login-loading-character",
+  "scale": 1,
+  "kind": "svg",
+  "character": true,
+  "dp": {
+   "x": 124,
+   "y": 314.3333,
+   "w": 112,
+   "h": 112
+  },
+  "notes": "앞 겹: 하늘색 알약 몸통(40x50dp, −12° 기울임) + 노란 띠 2개 + 아래 그늘 + 윤기. 위아래로 ±3.09dp. 캐릭터(마스코트) 자리의 **독창적 대체 그림** — 영상의 캐릭터를 자르거나 따라 그리지 않고 단순 도형으로 새로 그렸다(BRIEF D4). 같은 상자 112x112dp(앱 124, 314.33)·대략의 색감(하늘색·노랑). 비교에서는 상자를 마스크한다. 세 겹(육각형 띠·날개·몸통)을 화면 CSS 로 움직인다: 상자 .woori-launch__loader { position:absolute; left:124px; top:314px; translate:0 0.3333px; width:112px; height:112px; overflow:hidden } 육각형 띠 { position:absolute; left:-112px; top:0; width:224px; height:112px; background:url(/woori/launch/login-loader-hexes.svg) repeat-x 0 0 / 112px 112px; animation-name:woori-launch-loader-flow; animation-duration:583.333ms; animation-timing-function:linear; animation-iteration-count:infinite } @keyframes woori-launch-loader-flow { from { transform:translateX(0) } to { transform:translateX(112px) } } (= 192dp/s 오른쪽으로) · 몸통+날개 묶음 { position:absolute; inset:0; animation-name:woori-launch-loader-bob; animation-duration:880ms; animation-timing-function:ease-in-out; animation-delay:-124ms; animation-iteration-count:infinite } @keyframes woori-launch-loader-bob { 0% { transform:translateY(-3.09px) } 50% { transform:translateY(3.09px) } 100% { transform:translateY(-3.09px) } } (주기 880ms·진폭 ±3.09dp, −124ms 위상 → 가장 낮은 때 +316ms = 원래 그림 실측) · 그 안에 날개 img(뒤) → 몸통 img(앞), 둘 다 0,0 112x112. 날개 { transform-origin:54.46% 36.61%; animation-name:woori-launch-loader-flap; animation-duration:240ms; animation-timing-function:ease-in-out; animation-direction:alternate; animation-iteration-count:infinite } @keyframes woori-launch-loader-flap { from { transform:scaleY(1) } to { transform:scaleY(0.6) } } (날개 리듬은 설계값). shot(?shot=login-loading-character)은 t=0 위상(시작 모습)에서 멈춰도 된다 — 마스크 안."
+ }
+]

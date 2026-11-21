@@ -1,0 +1,154 @@
+/* WooriHistoryDetail — 거래내역 상세 (spec/history-detail.md 2절). 위치는 tsx 가 wooriPlace 로 (정수 dp + translate) */
+.woori-hd {
+  position: relative;
+  width: 360px;
+  height: 100%;
+  overflow: hidden;
+  background: var(--woori-bg, #ffffff);
+}
+.woori-hd__header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+/* 머리 아래 ~ 하단 바 위 (52–726) 내용 스크롤 (영상에서는 스크롤하지 않음 — 설계) */
+.woori-hd__scroll {
+  position: absolute;
+  left: 0;
+  top: 52px;
+  width: 360px;
+  height: 674px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.woori-hd__scroll::-webkit-scrollbar {
+  display: none;
+}
+.woori-hd__content {
+  position: relative;
+  width: 360px;
+}
+.woori-hd__content > * {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+.woori-hd__name,
+.woori-hd__amount {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--woori-text, #33353a);
+}
+.woori-hd__label {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--woori-text-secondary, #707173);
+}
+/* 값 열: 15/500 자간 −0.5px tabular, 오른끝 340 (advance 끝 = 끝 자간 포함) */
+.woori-hd__value {
+  width: 340px;
+  text-align: right;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--woori-text, #33353a);
+}
+.woori-hd__memo {
+  width: 320px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--woori-blue-text, #1f67bd);
+  cursor: pointer;
+}
+.woori-hd__memo-chevron {
+  width: 7px;
+  height: 10px;
+}
+.woori-hd__divider {
+  width: 320px;
+  height: 1px;
+  background: var(--woori-divider-light, #f2f2f2);
+}
+/* [보기] 알약: 301.333–340 × 27, r13.5, 1dp #dddddd 테두리 (레이아웃 39 폭 → scaleX 로 38.667) */
+.woori-hd__pill {
+  box-sizing: border-box;
+  width: 39px;
+  height: 27px;
+  border: 1px solid #dddddd;
+  border-radius: 13.5px;
+  background: var(--woori-bg, #ffffff);
+  transform: scaleX(0.991453);
+  transform-origin: 100% 50%;
+}
+.woori-hd__pill-text {
+  width: 38.667px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.0075em;
+  color: var(--woori-text-body, #4a4b4e);
+  pointer-events: none;
+}
+.woori-hd__search {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--woori-text, #33353a);
+}
+.woori-hd__search-chevron {
+  width: 8px;
+  height: 13px;
+}
+/* 출금·이체형: 검색 줄 아래 둥근 테두리 상자 (윗변만 하단 바 위로 보인다 — 내용은 설계값, 비움) */
+.woori-hd__outline-box {
+  box-sizing: border-box;
+  width: 320px;
+  height: 56px;
+  border: 1px solid #f3f3f3;
+  border-radius: 8px;
+}
+.woori-hd__bar {
+  position: absolute;
+  left: 0;
+  top: 726px;
+  width: 360px;
+  height: 74.667px;
+  background: var(--woori-bg, #ffffff);
+  z-index: 1;
+}
+.woori-hd__btn {
+  position: absolute;
+  z-index: 1;
+  bottom: 16px;
+  height: 56px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  /* 글자 top 748 (textfit): 가운데 정렬(748.167)이 shot 에서 1.5px 위로 나와 아래로 1.05dp 내림 */
+  padding-top: 2.1px;
+  /* 눌림은 색만 (상세 3.4 — 크기 변화 없음) */
+  --woori-btn-press-scale: 1;
+}
+/* [공유] 16–118.333: 레이아웃 103 폭을 오른쪽 0.667 잘라 낸다 (소수 폭은 반올림되므로) */
+.woori-hd__btn--share {
+  left: 16px;
+  width: 103px;
+  clip-path: inset(0 0.667px 0 0 round 0 12px 12px 0);
+  border-radius: 12px;
+}
+/* [확인] 126.333–344: 레이아웃 126 + translate 0.333, 폭 218 에서 오른쪽 0.333 잘라 냄 */
+.woori-hd__btn--confirm {
+  left: 126px;
+  width: 218px;
+  clip-path: inset(0 0.333px 0 0 round 0 12px 12px 0);
+  border-radius: 12px;
+}

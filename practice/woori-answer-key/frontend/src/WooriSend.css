@@ -1,0 +1,225 @@
+/*
+ * WooriSend — /send 어디로 이체하시겠어요? (spec/send-a.md 2.1 · 2.2 · 3.1)
+ * 모든 요소는 앱 뷰포트 기준 dp 로 absolute (글자 = line-height:1 상자의 left/top, 스펙 L·T). 소수 상자는 WooriSendFlow.fbox.
+ */
+.woori-send {
+  position: relative;
+  height: 100%;
+  overflow: clip;
+  background: var(--woori-bg);
+  color: var(--woori-text);
+}
+
+.woori-send__title,
+.woori-send__placeholder,
+.woori-send__recent,
+.woori-send__edit,
+.woori-send__tab-text,
+.woori-send__row-line1,
+.woori-send__acct,
+.woori-send__contact-text {
+  position: absolute;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.woori-send__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--woori-text);
+}
+
+.woori-send__input {
+  position: absolute;
+  left: 0;
+  top: 116px;
+  width: 360px;
+  height: 56px;
+}
+
+/* 버튼 안 글자·아이콘은 페이지 기준 좌표로 적었으므로 버튼 위끝(116)만큼 되돌린다 */
+.woori-send__input > * {
+  margin-top: -116px;
+}
+
+.woori-send__placeholder {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--woori-placeholder);
+}
+
+.woori-send__icon {
+  display: block;
+  pointer-events: none;
+}
+
+.woori-send__underline {
+  background: #e5e9eb;
+}
+
+.woori-send__tabs {
+  position: absolute;
+  left: 20px;
+  top: 190px;
+  width: 320px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--woori-bg-gray);
+}
+
+/* 탭 안 상자들은 페이지 좌표(fbox)로 놓았다 → 바탕 위치만큼 되돌린다 */
+.woori-send__tabs > * {
+  margin-left: -20px;
+  margin-top: -190px;
+}
+
+.woori-send__pill {
+  border-radius: 6px;
+  background: var(--woori-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.woori-send__sep {
+  background: #dcdde0;
+}
+
+.woori-send__tab-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-placeholder);
+}
+
+.woori-send__tab-text--on {
+  color: var(--woori-text);
+}
+
+.woori-send__recent {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--woori-text);
+}
+
+.woori-send__edit {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--woori-text-secondary);
+}
+
+.woori-send__sk {
+  border-radius: 4px;
+  background: var(--woori-skeleton, var(--woori-bg-gray));
+}
+
+.woori-send__row {
+  position: absolute;
+  left: 0;
+  width: 360px;
+  height: 64px;
+}
+
+.woori-send__avatar {
+  display: block;
+  pointer-events: none;
+}
+
+.woori-send__row-line1 {
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.woori-send__name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.0025em;
+  color: var(--woori-text);
+}
+
+/* 이름 | 날짜 사이 1dp×12 막대 (이름 끝 + 8, 날짜는 막대 + 8). 위끝 309.333 = 줄 위끝 307 + 2.333 */
+.woori-send__bar {
+  width: 1px;
+  height: 12px;
+  margin: 2px 8px 0;
+  translate: 0 0.333px;
+  background: #e0e0e0;
+}
+
+.woori-send__date {
+  margin-top: 1px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary);
+}
+
+.woori-send__acct {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary);
+  pointer-events: none;
+}
+
+.woori-send__star {
+  pointer-events: none;
+}
+
+/* 바닥 줄: 원 아래끝 = 뷰포트 아래 20dp (bottom 20 · 높이 40 → WOORI_BOTTOM_FIX). 안쪽 좌표는 줄 위끝 기준 */
+.woori-send__contact {
+  position: absolute;
+  left: 0;
+  bottom: 20px;
+  width: 360px;
+  height: 40px;
+}
+
+/* S1 부터 translateY 10dp → 0 + opacity 0 → 1, md-decelerate 336ms (S1 + 11ms) — 3.1 */
+.woori-send__contact--in {
+  animation-name: woori-send-contact-in;
+  animation-duration: 336ms;
+  animation-delay: 11ms;
+  animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes woori-send-contact-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.woori-send__contact-circle {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--woori-bg-gray);
+}
+
+.woori-send__contact-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--woori-text);
+}
+
+.woori-send__veil {
+  position: absolute;
+  inset: 0;
+  background: var(--woori-bg);
+  pointer-events: none;
+}
+
+/* 페이지 스택 베일(z 3) 위 스피너 자리 (reveal 동안) */
+.woori-send__top {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}

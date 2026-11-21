@@ -1,0 +1,21 @@
+{
+  "appId": "dev.answerkey.won",
+  "appName": "WON 답지",
+  "webDir": "dist-apk",
+  "loggingBehavior": "debug",
+  "android": {
+    "path": "android",
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "style": "LIGHT"
+    },
+    "CapacitorHttp": {
+      "enabled": false
+    }
+  }
+}

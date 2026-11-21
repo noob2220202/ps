@@ -1,0 +1,336 @@
+[
+ {
+  "name": "done/blank",
+  "url": "/send/done?frame=1&shot=blank",
+  "video": "v1",
+  "i0": 7429,
+  "i1": 7439,
+  "t0": 193.407,
+  "t1": 193.624,
+  "scenario": "v2-start",
+  "mask": [
+   "224,590,76,76"
+  ]
+ },
+ {
+  "name": "done/render",
+  "url": "/send/done?frame=1&shot=render",
+  "video": "v1",
+  "i0": 7440,
+  "i1": 7440,
+  "t0": 193.641,
+  "t1": 193.641,
+  "scenario": "v2-start",
+  "mask": [
+   "224,590,76,76"
+  ],
+  "maskAdd": [
+   "172,322,100,38",
+   "232,492,198,26"
+  ]
+ },
+ {
+  "name": "done/idle",
+  "url": "/send/done?frame=1&shot=idle",
+  "video": "v1",
+  "i0": 7467,
+  "i1": 7483,
+  "t0": 194.461,
+  "t1": 195.73,
+  "scenario": "v2-start",
+  "mask": [],
+  "maskAdd": [
+   "172,322,100,38",
+   "232,524,198,26"
+  ]
+ },
+ {
+  "name": "done/os-headsup",
+  "url": "/send/done?frame=1&shot=os-headsup",
+  "video": "v1",
+  "i0": 7484,
+  "i1": 7489,
+  "t0": 196.12,
+  "t1": 196.21,
+  "scenario": "v2-start",
+  "mask": [
+   "24,38,476,90"
+  ],
+  "maskAdd": [
+   "172,322,100,38",
+   "232,524,198,26"
+  ]
+ },
+ {
+  "name": "done/idle-headsup",
+  "url": "/send/done?frame=1&shot=idle-headsup",
+  "video": "v1",
+  "i0": 7522,
+  "i1": 7523,
+  "t0": 196.944,
+  "t1": 197.251,
+  "scenario": "v2-start",
+  "mask": [
+   "24,38,476,90",
+   "224,590,76,76"
+  ],
+  "maskAdd": [
+   "172,322,100,38",
+   "232,524,198,26"
+  ]
+ },
+ {
+  "name": "done/confirm-pressed",
+  "url": "/send/done?frame=1&shot=confirm-pressed",
+  "video": "v2",
+  "i0": 3331,
+  "i1": 3332,
+  "t0": 87.214,
+  "t1": 87.306,
+  "scenario": "v2-end",
+  "mask": [],
+  "maskAdd": [
+   "172,322,100,38",
+   "250,490,180,30"
+  ]
+ },
+ {
+  "name": "done/leaving",
+  "url": "/send/done?frame=1&shot=leaving",
+  "video": "v2",
+  "i0": 3346,
+  "i1": 3347,
+  "t0": 87.574,
+  "t1": 87.591,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76"
+  ],
+  "maskAdd": [
+   "172,322,100,38",
+   "250,490,180,30"
+  ]
+ },
+ {
+  "name": "done/blank-v2",
+  "url": "/send/done?frame=1&shot=blank",
+  "video": "v2",
+  "i0": 3291,
+  "i1": 3298,
+  "t0": 86.237,
+  "t1": 86.421,
+  "scenario": "v2-end",
+  "ref": "tools/ref/done/blank-v2.png",
+  "mask": [
+   "224,590,76,76"
+  ],
+  "note": "blank 의 v2 판 (교차 확인)"
+ },
+ {
+  "name": "done/render-v2",
+  "url": "/send/done?frame=1&shot=render",
+  "video": "v2",
+  "i0": 3299,
+  "i1": 3299,
+  "t0": 86.454,
+  "t1": 86.454,
+  "scenario": "v2-end",
+  "ref": "tools/ref/done/render-v2.png",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30",
+   "200,168,125,128"
+  ],
+  "note": "render(S1) 의 v2 판 — v2 는 원 점(4px)이 보여 원 자리 마스크"
+ },
+ {
+  "name": "done/idle-v2",
+  "url": "/send/done?frame=1&shot=idle",
+  "video": "v2",
+  "i0": 3328,
+  "i1": 3330,
+  "t0": 87.09,
+  "t1": 87.196,
+  "scenario": "v2-end",
+  "ref": "tools/ref/done/idle-v2.png",
+  "mask": [
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "idle 의 v2 판 (받는 계좌 한 줄 레이아웃)"
+ },
+ {
+  "name": "done/confirm-pressed-v1",
+  "url": "/send/done?frame=1&shot=confirm-pressed",
+  "video": "v1",
+  "i0": 7490,
+  "i1": 7490,
+  "t0": 196.228,
+  "t1": 196.228,
+  "scenario": "v2-start",
+  "ref": "tools/ref/done/confirm-pressed-v1.png",
+  "mask": [
+   "24,38,476,90",
+   "172,322,100,38",
+   "232,524,198,26"
+  ],
+  "note": "confirm-pressed 의 v1 판 (두 줄 레이아웃, 헤드업 마스크)"
+ },
+ {
+  "name": "done/leaving-v1",
+  "url": "/send/done?frame=1&shot=leaving",
+  "video": "v1",
+  "i0": 7503,
+  "i1": 7511,
+  "t0": 196.512,
+  "t1": 196.695,
+  "scenario": "v2-start",
+  "ref": "tools/ref/done/leaving-v1.png",
+  "mask": [
+   "24,38,476,90",
+   "224,590,76,76",
+   "172,322,100,38",
+   "232,524,198,26"
+  ],
+  "note": "leaving 의 v1 판 (critic: #7503–#7511 — #7502 는 뗌 크기 복귀, #7513– 는 글자 래스터가 바뀜)"
+ },
+ {
+  "name": "done/anim-circle-grow",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 47.1,
+  "video": "v2",
+  "i0": 3300,
+  "i1": 3300,
+  "t0": 86.498,
+  "t1": 86.498,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30",
+   "370,840,100,90"
+  ],
+  "note": "체크 애니메이션 위상 t=47.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 원 지름 63px(0.72) · S2 단계(은행 이름·광고 글자, 그림 전)"
+ },
+ {
+  "name": "done/anim-circle-peak",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 87.1,
+  "video": "v2",
+  "i0": 3301,
+  "i1": 3301,
+  "t0": 86.538,
+  "t1": 86.538,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30",
+   "370,840,100,90"
+  ],
+  "note": "체크 애니메이션 위상 t=87.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 원 1.05 (91.9px)"
+ },
+ {
+  "name": "done/anim-circle-low",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 197.1,
+  "video": "v2",
+  "i0": 3305,
+  "i1": 3305,
+  "t0": 86.648,
+  "t1": 86.648,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "체크 애니메이션 위상 t=197.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 원 0.95 (83.2px)"
+ },
+ {
+  "name": "done/anim-check-dot",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 246.1,
+  "video": "v2",
+  "i0": 3307,
+  "i1": 3307,
+  "t0": 86.697,
+  "t1": 86.697,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "체크 애니메이션 위상 t=246.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 원 0.969 + 체크 시작 흰 점(그린 길이 1.2px)"
+ },
+ {
+  "name": "done/anim-check-short",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 312.1,
+  "video": "v2",
+  "i0": 3311,
+  "i1": 3311,
+  "t0": 86.763,
+  "t1": 86.763,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "체크 애니메이션 위상 t=312.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 짧은 획 9px(원 1.0)"
+ },
+ {
+  "name": "done/anim-check-long",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 404.1,
+  "video": "v2",
+  "i0": 3315,
+  "i1": 3315,
+  "t0": 86.855,
+  "t1": 86.855,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "체크 애니메이션 위상 t=404.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 긴 획 40.8px / 48.0"
+ },
+ {
+  "name": "done/anim-check-over",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 455.1,
+  "video": "v2",
+  "i0": 3318,
+  "i1": 3318,
+  "t0": 86.906,
+  "t1": 86.906,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "체크 애니메이션 위상 t=455.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 끝 넘침 48.6px(1.013)"
+ },
+ {
+  "name": "done/anim-check-under",
+  "url": "/send/done?frame=1&shot=check-anim",
+  "t": 563.1,
+  "video": "v2",
+  "i0": 3324,
+  "i1": 3324,
+  "t0": 87.014,
+  "t1": 87.014,
+  "scenario": "v2-end",
+  "mask": [
+   "224,590,76,76",
+   "172,322,100,38",
+   "250,490,180,30"
+  ],
+  "note": "체크 애니메이션 위상 t=563.1ms(원 시작 기준, ?shot=check-anim = idle 데이터로 원·획 애니메이션을 처음부터). 끝 모자람 46.5px(0.969), 스피너 꺼진 뒤"
+ }
+]

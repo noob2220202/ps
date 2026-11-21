@@ -1,0 +1,638 @@
+/* WooriHistory — 거래내역조회 (spec/history.md). 위치는 tsx 가 wooriPlace 로 (정수 dp + translate) */
+.woori-hi {
+  position: relative;
+  width: 360px;
+  background: var(--woori-bg, #ffffff);
+}
+.woori-hi > *,
+.woori-hi__block > *,
+.woori-hi__row > * {
+  position: absolute;
+  margin: 0;
+}
+.woori-hi__t {
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0;
+}
+.woori-hi__header {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* 계좌 영역 */
+.woori-hi__badge {
+  box-sizing: border-box;
+  width: 53.333px;
+  height: 20px;
+  padding: 4px 0 0 6px;
+  border-radius: 10px;
+  background: var(--woori-bg-gray, #eff0f3);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--woori-text-body, #4a4b4e);
+  white-space: nowrap;
+}
+.woori-hi__logo {
+  width: 40px;
+  height: 40px;
+}
+.woori-hi__acct-name,
+.woori-hi__acct-no {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+  white-space: nowrap;
+}
+.woori-hi__acct-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__acct-name img {
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+}
+.woori-hi__acct-no {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary, #828487);
+}
+.woori-hi__acct-no img {
+  width: 16px;
+  height: 16px;
+  margin: -0.2px 0 0 4px;
+}
+.woori-hi__balance,
+.woori-hi__avail,
+.woori-hi__amount,
+.woori-hi__rowbal {
+  width: 340px;
+  text-align: right;
+}
+.woori-hi__balance {
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__avail {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary, #828487);
+}
+.woori-hi__btn {
+  width: 156px;
+  height: 48px;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+}
+/* [이체] 눌림: #185ba4 즉시 + scale 0.99 (50ms linear, 3.8) */
+.woori-hi__btn--transfer {
+  --woori-btn-press-scale: 0.99;
+  --woori-btn-press-ms: 50ms;
+  --woori-btn-press-ease: linear;
+  --woori-btn-press-delay: 0ms;
+  letter-spacing: -0.0025em;
+}
+.woori-hi__btn--collect {
+  --woori-btn-fg: var(--woori-blue-text, #1f67bd);
+}
+.woori-hi__band {
+  width: 360px;
+  height: 8px;
+  background: var(--woori-surface, #f6f7fa);
+}
+
+/* 필터·기간 블록 (84dp, 흰 바탕) */
+.woori-hi__block {
+  position: absolute;
+  width: 360px;
+  height: 84px;
+  background: var(--woori-bg, #ffffff);
+}
+.woori-hi__icon20 {
+  width: 20px;
+  height: 20px;
+}
+.woori-hi__filter-hit {
+  width: 170px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+.woori-hi__filter {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__filter--tight {
+  letter-spacing: -0.0025em;
+}
+.woori-hi__fdot {
+  width: 2px;
+  height: 2px;
+  border-radius: 1px;
+  background: #515151;
+}
+.woori-hi__period {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__bal-label {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.0025em;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__toggle {
+  width: 40px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--woori-toggle-off, #7d858c);
+  cursor: pointer;
+}
+.woori-hi__toggle.is-on {
+  background: var(--woori-primary, #2286f2);
+}
+.woori-hi__knob {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+}
+/* 끔: 14dp 가운데 (311, 12) · 켬 1단계: 18dp 가운데 313 · 켬: 18dp 가운데 328 (트랙 기준 y 가운데 12) */
+.woori-hi__knob--off {
+  left: 4px;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+}
+.woori-hi__knob--mid {
+  left: 4px;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+}
+.woori-hi__knob--on {
+  left: 19px;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+}
+
+/* 기간 내 합계 · 선 */
+.woori-hi__sum {
+  box-sizing: border-box;
+  width: 320px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: var(--woori-surface, #f6f7fa);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.woori-hi__sum-label {
+  position: absolute;
+  left: 20px;
+  top: 18px;
+  translate: 0 0.333px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__sum-chevron {
+  position: absolute;
+  left: 280px;
+  top: 16px;
+  width: 20px;
+  height: 20px;
+}
+.woori-hi__sum-chevron.is-open {
+  rotate: 180deg;
+}
+/* 펼침 (영상에 없음 — 설계값) */
+.woori-hi__sum-detail {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--woori-text-secondary, #707173);
+}
+.woori-hi__sum-detail > span {
+  display: flex;
+  justify-content: space-between;
+}
+.woori-hi__sum-detail b {
+  font-weight: 600;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__line {
+  width: 320px;
+  height: 1px;
+  background: var(--woori-divider, #e6e6e6);
+}
+
+/* 날짜 묶음 사이 선: 1dp 환산 ≈#e9e9e9–#efefef (9.2), all-top 기준 프레임 241 */
+.woori-hi__line--date {
+  background: #efefef;
+}
+
+/* 목록 */
+.woori-hi__month {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--woori-text-body, #4a4b4e);
+}
+.woori-hi__row {
+  width: 360px;
+  height: 94px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.woori-hi__dateline {
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.woori-hi__date {
+  color: var(--woori-text-secondary, #707173);
+}
+.woori-hi__dot {
+  width: 2px;
+  height: 2px;
+  margin: 6.85px 0 0 4.92px;
+  border-radius: 1px;
+  background: #7e7d80;
+}
+.woori-hi__time {
+  margin-left: 4.79px;
+  color: var(--woori-text-tertiary, #828487);
+}
+.woori-hi__name {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__amount {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi__amount.is-in {
+  color: var(--woori-blue-text, #1f67bd);
+}
+.woori-hi__rowbal {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-secondary, #707173);
+}
+
+/* 스켈레톤 + 반짝임 한 번 (3.2): 띠 0.44W (뒤 0.36W 서서히 밝아짐, 앞 0.08W 뚝), 최대 흰색 α 0.53, ≈350ms */
+.woori-hi__sk {
+  overflow: hidden;
+  border-radius: 4.5px;
+  background: var(--woori-bg-gray, #eff0f3);
+}
+.woori-hi__sk::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.53) 81.8%, rgba(255, 255, 255, 0) 100%);
+  transform: translateX(228%);
+  animation-name: woori-hi-shimmer;
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1);
+  animation-delay: 42ms;
+  animation-fill-mode: both;
+}
+@keyframes woori-hi-shimmer {
+  from {
+    transform: translateX(-81.8%);
+  }
+  to {
+    transform: translateX(228%);
+  }
+}
+
+/* 겹침 자리 요소 */
+.woori-hi__spinner {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.woori-hi__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: var(--woori-bg, #ffffff);
+  pointer-events: none;
+  opacity: 0;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.woori-hi__veil--in {
+  animation-name: woori-hi-veil-in;
+  animation-duration: 330ms;
+}
+.woori-hi__veil--out {
+  animation-name: woori-hi-veil-out;
+  animation-duration: 271ms;
+  animation-delay: 30ms;
+}
+@keyframes woori-hi-veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.69;
+  }
+}
+@keyframes woori-hi-veil-out {
+  from {
+    opacity: 0.69;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* 오버레이 스크롤바 (9.5): x 356–360, rgba(0,0,0,.37), 각진 끝. 마지막 움직임 +392ms 부터 linear 255ms 사라짐 */
+.woori-hi__scrollbar {
+  position: absolute;
+  left: 356px;
+  top: 0;
+  width: 4px;
+  height: 0;
+  background: rgba(0, 0, 0, 0.37);
+  opacity: 0;
+  pointer-events: none;
+}
+.woori-hi__scrollbar.is-shown {
+  opacity: 1;
+}
+.woori-hi__scrollbar.is-fading {
+  animation-name: woori-hi-sb-fade;
+  animation-duration: 255ms;
+  animation-delay: 392ms;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes woori-hi-sb-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* 조회조건 시트 (2.5): 위끝 343.333, 위 모서리 24, 윗변 그림자(설계 근사) */
+.woori-hi-sheet {
+  --woori-sheet-radius: 24px;
+  box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.1);
+}
+.woori-hi-sheet__body {
+  position: relative;
+  width: 360px;
+  height: 100%;
+}
+.woori-hi-sheet__body > * {
+  position: absolute;
+  margin: 0;
+}
+.woori-hi-sheet__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi-sheet__close {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent url('/woori/history/close-x.svg') no-repeat 0 0 / 24px 24px;
+  cursor: pointer;
+}
+.woori-hi-sheet__label {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi-sheet__segment {
+  width: 320px;
+  height: 45.333px;
+  border-radius: 8px;
+  background: var(--woori-bg-gray, #eff0f3);
+}
+.woori-hi-sheet__seg-on {
+  width: 63.2px;
+  height: 41.333px;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.woori-hi-sheet__seg {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary, #828487);
+  pointer-events: none;
+}
+.woori-hi-sheet__seg.is-on {
+  color: #38383c;
+}
+.woori-hi-sheet__seg-sep {
+  width: 1px;
+  height: 16px;
+  background: #dedede;
+}
+.woori-hi-sheet__type {
+  box-sizing: border-box;
+  width: 101.333px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--woori-bg-gray, #eff0f3);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.woori-hi-sheet__type.is-on {
+  box-shadow: inset 0 0 0 2px var(--woori-primary, #2286f2);
+}
+.woori-hi-sheet__type-text {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.0025em;
+  color: var(--woori-text, #33353a);
+}
+.woori-hi-sheet__detail {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--woori-text-secondary, #707173);
+}
+.woori-hi-sheet__detail-chevron {
+  width: 16px;
+  height: 16px;
+}
+.woori-hi-sheet__btn {
+  height: 56px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.0025em;
+}
+/* [초기화] 16–118.3 (레이아웃 103 − 오른쪽 0.7 잘라냄) · [적용하기] 126.3–344 */
+.woori-hi-sheet__btn--reset {
+  width: 103px;
+  clip-path: inset(0 0.7px 0 0 round 0 12px 12px 0);
+  --woori-btn-bg: var(--woori-bg-gray, #eff0f3);
+  --woori-btn-fg: var(--woori-text-body, #4a4b4e);
+  --woori-btn-bg-pressed: var(--woori-bg-gray, #eff0f3);
+}
+.woori-hi-sheet__btn--apply {
+  width: 218px;
+  clip-path: inset(0 0.3px 0 0 round 0 12px 12px 0);
+  --woori-btn-press-scale: 0.99;
+  --woori-btn-press-ms: 50ms;
+  --woori-btn-press-ease: linear;
+  --woori-btn-press-delay: 0ms;
+}
+
+/* ── 실제 앱 몫 (영상에 없음 — 설계값. 프레임 shot 의 기본 모양에는 보이는 것이 더해지지 않는다) ── */
+
+/* 필터 줄: 영상 글자('3개월 · ? · 최신순')가 아닐 때 — 같은 오른끝(317.5)에 맞춘 한 줄 */
+.woori-hi__filter-row {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.0025em;
+  color: var(--woori-text, #33353a);
+  pointer-events: none;
+}
+.woori-hi__filter-row > i {
+  width: 2px;
+  height: 2px;
+  margin: 0 4.6px;
+  border-radius: 1px;
+  background: #515151;
+}
+
+/* 빈 목록 */
+.woori-hi__empty {
+  width: 360px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary, #828487);
+}
+
+/* 시트: 조회기간 칸 누름 자리 (투명) · 상세조건 누름 자리 (투명) */
+.woori-hi-sheet__seg-hit,
+.woori-hi-sheet__detail-hit {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.woori-hi-sheet__seg-hit {
+  width: 63.2px;
+  height: 41.333px;
+}
+.woori-hi-sheet__detail-hit {
+  width: 140px;
+  height: 38px;
+}
+.woori-hi-sheet__detail-chevron.is-open {
+  rotate: 180deg;
+}
+/* 글자·⌄ 는 누름을 아래 누름 자리로 넘긴다 */
+.woori-hi-sheet__detail,
+.woori-hi-sheet__detail-chevron {
+  pointer-events: none;
+}
+
+/* 직접입력: 시작일 ~ 종료일 (type=date, 조회기간 칸 아래 한 줄) */
+.woori-hi-sheet__dates {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 320px;
+  height: 44px;
+}
+.woori-hi-sheet__date {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--woori-bg-gray, #eff0f3);
+  color: var(--woori-text, #33353a);
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 44px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.woori-hi-sheet__date:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--woori-primary, #2286f2);
+}
+.woori-hi-sheet__tilde {
+  flex: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary, #828487);
+}
+
+/* 상세조건 펼침: 정렬 [최신순][과거순] — 거래구분 칸과 같은 모양, 두 칸 */
+.woori-hi-sheet__type--half {
+  width: 156px;
+}
+.woori-hi-sheet__type-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.0025em;
+  color: var(--woori-text, #33353a);
+}

@@ -1,0 +1,3419 @@
+[
+ {
+  "name": "woori",
+  "file": "woori/banks/woori.png",
+  "frameBox": {
+   "x": 79.268,
+   "y": 340.394,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "account-typed",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-bank-selected",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-ready",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-confirm-pressed",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-confirm-spinner",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-open",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-render",
+    "element": "logo-woori",
+    "frameBox": {
+     "x": 79.28,
+     "y": 340.607,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   },
+   {
+    "state": "bank-idle",
+    "element": "logo-woori",
+    "frameBox": {
+     "x": 79.28,
+     "y": 340.607,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.658,
+   "y": 202.688,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "우리은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 1줄 1칸. 원 맞춤: 중심 (102.597, 363.667)px · 반지름 23.324px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.092px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-woori) 중심과 차이 (-0.01, -0.21)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 0.948,
+   "compositeInnerMAD": 0.295,
+   "compositeRingMAD": 3.477,
+   "compositeLumaMAD": 0.478,
+   "compositeLumaRingMAD": 1.516,
+   "compositeMax": 25,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 1.764,
+   "shotInnerMAD": 1.265,
+   "shotRingMAD": 3.555,
+   "shotLumaMAD": 1.248,
+   "shotMax": 23,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    2.188,
+    1.374,
+    1.131,
+    1.027,
+    0.984,
+    0.962,
+    0.948
+   ],
+   "reuse": [
+    {
+     "state": "account-typed",
+     "element": "chip-1-logo",
+     "sizeDp": 16.0,
+     "frames": "v2 #2735–#2738",
+     "bg": "#eff0f3",
+     "measuredCenterPx": [
+      54.97,
+      447.53
+     ],
+     "compositeMAD": 4.914,
+     "compositeInnerMAD": 6.119,
+     "shotMAD": 5.185,
+     "shotInnerMAD": 6.233,
+     "shotLumaMAD": 2.574
+    }
+   ]
+  },
+  "hq": "woori/banks/woori.hq.svg"
+ },
+ {
+  "name": "nh",
+  "file": "woori/banks/nh.png",
+  "frameBox": {
+   "x": 238.741,
+   "y": 340.43,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "where-idle",
+    "element": "recent-avatar",
+    "frameBox": {
+     "x": 28.67,
+     "y": 489.7,
+     "w": 58.66,
+     "h": 58.3
+    },
+    "video": "v1",
+    "sizeDp": 40.0
+   },
+   {
+    "state": "where-row-tap-spinner",
+    "element": "recent-avatar",
+    "frameBox": {
+     "x": 28.67,
+     "y": 489.7,
+     "w": 58.66,
+     "h": 58.3
+    },
+    "video": "v1",
+    "sizeDp": 40.0
+   },
+   {
+    "state": "where-reveal",
+    "element": "recent-avatar",
+    "frameBox": {
+     "x": 28.67,
+     "y": 489.7,
+     "w": 58.66,
+     "h": 58.3
+    },
+    "video": "v2",
+    "sizeDp": 40.0
+   },
+   {
+    "state": "account-push",
+    "element": "recent-avatar",
+    "frameBox": {
+     "x": 28.67,
+     "y": 489.7,
+     "w": 58.66,
+     "h": 58.3
+    },
+    "video": "v2",
+    "sizeDp": 40.0
+   },
+   {
+    "state": "account-typed",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.724,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-bank-selected",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.724,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-ready",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.724,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-confirm-pressed",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.724,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-confirm-spinner",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.724,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-open",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.724,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-render",
+    "element": "logo-nh",
+    "frameBox": {
+     "x": 238.691,
+     "y": 340.607,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   },
+   {
+    "state": "bank-idle",
+    "element": "logo-nh",
+    "frameBox": {
+     "x": 238.691,
+     "y": 340.607,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 164.034,
+   "y": 202.712,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "농협은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 1줄 2칸. 원 맞춤: 중심 (262.069, 363.703)px · 반지름 23.336px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.074px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-nh) 중심과 차이 (+0.05, -0.18)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분. 지역농축협(nh-local, 최근입금계좌 아바타 40dp)도 이 그림.",
+  "verify": {
+   "compositeMAD": 2.809,
+   "compositeInnerMAD": 0.308,
+   "compositeRingMAD": 13.031,
+   "compositeLumaMAD": 0.856,
+   "compositeLumaRingMAD": 3.457,
+   "compositeMax": 150,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.954,
+   "shotInnerMAD": 1.222,
+   "shotRingMAD": 13.119,
+   "shotLumaMAD": 1.417,
+   "shotMax": 148,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    4.005,
+    3.283,
+    3.046,
+    2.928,
+    2.868,
+    2.832,
+    2.809
+   ],
+   "reuse": [
+    {
+     "state": "where-idle",
+     "element": "recent-avatar",
+     "sizeDp": 40.0,
+     "frames": "v1 #6952–#6960",
+     "bg": "#ffffff",
+     "measuredCenterPx": [
+      57.92,
+      518.86
+     ],
+     "compositeMAD": 5.859,
+     "compositeInnerMAD": 5.106,
+     "shotMAD": 6.694,
+     "shotInnerMAD": 5.191,
+     "shotLumaMAD": 2.556
+    },
+    {
+     "state": "account-typed",
+     "element": "chip-3-logo",
+     "sizeDp": 16.0,
+     "frames": "v2 #2735–#2738",
+     "bg": "#eff0f4",
+     "measuredCenterPx": [
+      327.21,
+      447.57
+     ],
+     "compositeMAD": 9.555,
+     "compositeInnerMAD": 8.369,
+     "shotMAD": 10.145,
+     "shotInnerMAD": 8.108,
+     "shotLumaMAD": 3.1
+    }
+   ]
+  },
+  "hq": "woori/banks/nh.hq.png"
+ },
+ {
+  "name": "kb",
+  "file": "woori/banks/kb.png",
+  "frameBox": {
+   "x": 398.104,
+   "y": 340.369,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "account-typing",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 207.587,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-render",
+    "element": "logo-kb",
+    "frameBox": {
+     "x": 398.103,
+     "y": 340.607,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   },
+   {
+    "state": "bank-idle",
+    "element": "logo-kb",
+    "frameBox": {
+     "x": 398.103,
+     "y": 340.607,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.334,
+   "y": 202.67,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "국민은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 1줄 3칸. 원 맞춤: 중심 (421.432, 363.642)px · 반지름 23.299px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.055px · 바탕 #f7f8fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kb) 중심과 차이 (+0.00, -0.24)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.115,
+   "compositeInnerMAD": 0.231,
+   "compositeRingMAD": 3.996,
+   "compositeLumaMAD": 0.856,
+   "compositeLumaRingMAD": 3.29,
+   "compositeMax": 23,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 1.939,
+   "shotInnerMAD": 0.978,
+   "shotRingMAD": 5.166,
+   "shotLumaMAD": 1.609,
+   "shotMax": 35,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    2.038,
+    1.399,
+    1.226,
+    1.16,
+    1.136,
+    1.124,
+    1.115
+   ],
+   "reuse": [
+    {
+     "state": "account-typing",
+     "element": "chip-2-logo",
+     "sizeDp": 16.0,
+     "frames": "v2 #2698–#2700",
+     "bg": "#eff0f3",
+     "measuredCenterPx": [
+      219.24,
+      447.51
+     ],
+     "compositeMAD": 5.561,
+     "compositeInnerMAD": 6.323,
+     "shotMAD": 5.585,
+     "shotInnerMAD": 6.215,
+     "shotLumaMAD": 2.803
+    }
+   ]
+  },
+  "hq": "woori/banks/kb.hq.svg"
+ },
+ {
+  "name": "kakao",
+  "file": "woori/banks/kakao.png",
+  "frameBox": {
+   "x": 79.332,
+   "y": 471.835,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "account-typing",
+    "element": "chip-1-logo",
+    "frameBox": {
+     "x": 43.315,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-typed",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 151.453,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-bank-selected",
+    "element": "bank-logo",
+    "frameBox": {
+     "x": 29.0,
+     "y": 338.0,
+     "w": 41.0,
+     "h": 41.0
+    },
+    "video": "v2",
+    "sizeDp": 28.0
+   },
+   {
+    "state": "account-bank-selected",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 151.453,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-ready",
+    "element": "bank-logo",
+    "frameBox": {
+     "x": 29.0,
+     "y": 338.0,
+     "w": 41.0,
+     "h": 41.0
+    },
+    "video": "v2",
+    "sizeDp": 28.0
+   },
+   {
+    "state": "account-ready",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 151.453,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-confirm-pressed",
+    "element": "bank-logo",
+    "frameBox": {
+     "x": 29.0,
+     "y": 338.0,
+     "w": 41.0,
+     "h": 41.0
+    },
+    "video": "v2",
+    "sizeDp": 28.0
+   },
+   {
+    "state": "account-confirm-pressed",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 151.453,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "account-confirm-spinner",
+    "element": "bank-logo",
+    "frameBox": {
+     "x": 29.0,
+     "y": 338.0,
+     "w": 41.0,
+     "h": 41.0
+    },
+    "video": "v2",
+    "sizeDp": 28.0
+   },
+   {
+    "state": "account-confirm-spinner",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 151.453,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-open",
+    "element": "chip-2-logo",
+    "frameBox": {
+     "x": 151.453,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-render",
+    "element": "logo-kakao",
+    "frameBox": {
+     "x": 79.28,
+     "y": 471.758,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   },
+   {
+    "state": "bank-idle",
+    "element": "logo-kakao",
+    "frameBox": {
+     "x": 79.28,
+     "y": 471.758,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.702,
+   "y": 293.053,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "카카오뱅크 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 2줄 1칸. 원 맞춤: 중심 (102.661, 495.108)px · 반지름 23.379px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.116px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kakao) 중심과 차이 (+0.05, +0.08)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 3.153,
+   "compositeInnerMAD": 0.4,
+   "compositeRingMAD": 14.947,
+   "compositeLumaMAD": 0.698,
+   "compositeLumaRingMAD": 2.732,
+   "compositeMax": 189,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 4.281,
+   "shotInnerMAD": 1.23,
+   "shotRingMAD": 14.34,
+   "shotLumaMAD": 1.327,
+   "shotMax": 190,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    4.543,
+    3.575,
+    3.341,
+    3.244,
+    3.2,
+    3.174,
+    3.154
+   ],
+   "reuse": [
+    {
+     "state": "account-typing",
+     "element": "chip-1-logo",
+     "sizeDp": 16.0,
+     "frames": "v2 #2698–#2700",
+     "bg": "#eff0f3",
+     "measuredCenterPx": [
+      54.99,
+      447.58
+     ],
+     "compositeMAD": 10.501,
+     "compositeInnerMAD": 7.746,
+     "shotMAD": 11.407,
+     "shotInnerMAD": 8.045,
+     "shotLumaMAD": 2.964
+    },
+    {
+     "state": "account-typed",
+     "element": "chip-2-logo",
+     "sizeDp": 16.0,
+     "frames": "v2 #2735–#2738",
+     "bg": "#eff0f3",
+     "measuredCenterPx": [
+      162.86,
+      447.57
+     ],
+     "compositeMAD": 10.878,
+     "compositeInnerMAD": 8.014,
+     "shotMAD": 11.425,
+     "shotInnerMAD": 7.969,
+     "shotLumaMAD": 2.878
+    },
+    {
+     "state": "account-ready",
+     "element": "bank-logo",
+     "sizeDp": 28.0,
+     "frames": "v2 #2780–#2800",
+     "bg": "#ffffff",
+     "measuredCenterPx": [
+      49.24,
+      358.42
+     ],
+     "compositeMAD": 6.738,
+     "compositeInnerMAD": 4.457,
+     "shotMAD": 7.752,
+     "shotInnerMAD": 4.551,
+     "shotLumaMAD": 3.126
+    }
+   ]
+  },
+  "hq": "woori/banks/kakao.hq.svg"
+ },
+ {
+  "name": "shinhan",
+  "file": "woori/banks/shinhan.png",
+  "frameBox": {
+   "x": 238.707,
+   "y": 471.794,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-shinhan",
+    "frameBox": {
+     "x": 238.691,
+     "y": 471.758,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 164.011,
+   "y": 293.025,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "신한은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 2줄 2칸. 원 맞춤: 중심 (262.036, 495.066)px · 반지름 23.326px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.055px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-shinhan) 중심과 차이 (+0.02, +0.04)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.963,
+   "compositeInnerMAD": 0.615,
+   "compositeRingMAD": 13.353,
+   "compositeLumaMAD": 1.457,
+   "compositeLumaRingMAD": 6.828,
+   "compositeMax": 142,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 4.17,
+   "shotInnerMAD": 1.812,
+   "shotRingMAD": 12.452,
+   "shotLumaMAD": 2.345,
+   "shotMax": 144,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    5.022,
+    3.74,
+    3.341,
+    3.154,
+    3.055,
+    2.999,
+    2.964
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/shinhan.hq.svg"
+ },
+ {
+  "name": "hana",
+  "file": "woori/banks/hana.png",
+  "frameBox": {
+   "x": 398.115,
+   "y": 471.764,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-hana",
+    "frameBox": {
+     "x": 398.103,
+     "y": 471.758,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.342,
+   "y": 293.004,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "하나은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 2줄 3칸. 원 맞춤: 중심 (421.444, 495.036)px · 반지름 23.307px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.06px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-hana) 중심과 차이 (+0.01, +0.01)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.962,
+   "compositeInnerMAD": 0.297,
+   "compositeRingMAD": 8.748,
+   "compositeLumaMAD": 0.961,
+   "compositeLumaRingMAD": 4.209,
+   "compositeMax": 94,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.059,
+   "shotInnerMAD": 1.138,
+   "shotRingMAD": 9.513,
+   "shotLumaMAD": 1.873,
+   "shotMax": 96,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.02,
+    2.312,
+    2.126,
+    2.044,
+    2.002,
+    1.978,
+    1.962
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/hana.hq.svg"
+ },
+ {
+  "name": "ibk",
+  "file": "woori/banks/ibk.png",
+  "frameBox": {
+   "x": 79.241,
+   "y": 603.149,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-ibk",
+    "frameBox": {
+     "x": 79.28,
+     "y": 602.91,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.64,
+   "y": 383.332,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "기업은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 3줄 1칸. 원 맞춤: 중심 (102.57, 626.421)px · 반지름 23.305px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.053px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-ibk) 중심과 차이 (-0.04, +0.24)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.78,
+   "compositeInnerMAD": 0.348,
+   "compositeRingMAD": 7.631,
+   "compositeLumaMAD": 0.82,
+   "compositeLumaRingMAD": 3.344,
+   "compositeMax": 56,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.083,
+   "shotInnerMAD": 1.687,
+   "shotRingMAD": 7.83,
+   "shotLumaMAD": 1.997,
+   "shotMax": 55,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.527,
+    2.416,
+    2.072,
+    1.92,
+    1.844,
+    1.807,
+    1.78
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/ibk.hq.png"
+ },
+ {
+  "name": "toss",
+  "file": "woori/banks/toss.png",
+  "frameBox": {
+   "x": 238.701,
+   "y": 603.164,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-toss",
+    "frameBox": {
+     "x": 238.691,
+     "y": 602.91,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 164.007,
+   "y": 383.342,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "토스뱅크 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 3줄 2칸. 원 맞춤: 중심 (262.029, 626.437)px · 반지름 23.259px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.195px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-toss) 중심과 차이 (+0.01, +0.25)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 0.652,
+   "compositeInnerMAD": 0.239,
+   "compositeRingMAD": 2.104,
+   "compositeLumaMAD": 0.337,
+   "compositeLumaRingMAD": 1.216,
+   "compositeMax": 14,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 1.278,
+   "shotInnerMAD": 1.012,
+   "shotRingMAD": 2.141,
+   "shotLumaMAD": 0.949,
+   "shotMax": 15,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    1.346,
+    0.858,
+    0.727,
+    0.68,
+    0.664,
+    0.657,
+    0.652
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/toss.hq.svg"
+ },
+ {
+  "name": "kfcc",
+  "file": "woori/banks/kfcc.png",
+  "frameBox": {
+   "x": 398.134,
+   "y": 603.175,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-kfcc",
+    "frameBox": {
+     "x": 398.103,
+     "y": 602.91,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.355,
+   "y": 383.349,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "새마을금고 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 3줄 3칸. 원 맞춤: 중심 (421.463, 626.448)px · 반지름 23.332px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.059px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kfcc) 중심과 차이 (+0.03, +0.27)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.123,
+   "compositeInnerMAD": 0.3,
+   "compositeRingMAD": 9.428,
+   "compositeLumaMAD": 0.75,
+   "compositeLumaRingMAD": 3.125,
+   "compositeMax": 91,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.451,
+   "shotInnerMAD": 1.531,
+   "shotRingMAD": 9.791,
+   "shotLumaMAD": 1.78,
+   "shotMax": 99,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.491,
+    2.608,
+    2.344,
+    2.23,
+    2.177,
+    2.147,
+    2.123
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/kfcc.hq.svg"
+ },
+ {
+  "name": "kbank",
+  "file": "woori/banks/kbank.png",
+  "frameBox": {
+   "x": 79.244,
+   "y": 734.058,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-kbank",
+    "frameBox": {
+     "x": 79.28,
+     "y": 734.061,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.642,
+   "y": 473.332,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "케이뱅크 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 4줄 1칸. 원 맞춤: 중심 (102.573, 757.331)px · 반지름 23.305px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.056px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kbank) 중심과 차이 (-0.04, -0.00)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.083,
+   "compositeInnerMAD": 0.332,
+   "compositeRingMAD": 9.403,
+   "compositeLumaMAD": 1.091,
+   "compositeLumaRingMAD": 4.811,
+   "compositeMax": 101,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.289,
+   "shotInnerMAD": 1.421,
+   "shotRingMAD": 9.773,
+   "shotLumaMAD": 2.308,
+   "shotMax": 97,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.634,
+    2.67,
+    2.374,
+    2.234,
+    2.156,
+    2.112,
+    2.083
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/kbank.hq.svg"
+ },
+ {
+  "name": "im",
+  "file": "woori/banks/im.png",
+  "frameBox": {
+   "x": 238.721,
+   "y": 734.094,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-render",
+    "element": "logo-im",
+    "frameBox": {
+     "x": 238.691,
+     "y": 734.061,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   },
+   {
+    "state": "bank-idle",
+    "element": "logo-im",
+    "frameBox": {
+     "x": 238.691,
+     "y": 734.061,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 164.02,
+   "y": 473.356,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "iM뱅크(대구) 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 4줄 2칸. 원 맞춤: 중심 (262.05, 757.366)px · 반지름 23.339px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.082px · 바탕 #f6f7fb. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-im) 중심과 차이 (+0.03, +0.03)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.858,
+   "compositeInnerMAD": 0.391,
+   "compositeRingMAD": 13.043,
+   "compositeLumaMAD": 1.291,
+   "compositeLumaRingMAD": 5.407,
+   "compositeMax": 152,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.784,
+   "shotInnerMAD": 1.033,
+   "shotRingMAD": 13.037,
+   "shotLumaMAD": 1.948,
+   "shotMax": 142,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    4.125,
+    3.305,
+    3.078,
+    2.975,
+    2.92,
+    2.882,
+    2.858
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/im.hq.svg"
+ },
+ {
+  "name": "busan",
+  "file": "woori/banks/busan.png",
+  "frameBox": {
+   "x": 398.152,
+   "y": 734.092,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-busan",
+    "frameBox": {
+     "x": 398.103,
+     "y": 734.061,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.367,
+   "y": 473.355,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "부산은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 4줄 3칸. 원 맞춤: 중심 (421.48, 757.365)px · 반지름 23.339px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.074px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-busan) 중심과 차이 (+0.05, +0.03)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.266,
+   "compositeInnerMAD": 0.31,
+   "compositeRingMAD": 10.577,
+   "compositeLumaMAD": 1.24,
+   "compositeLumaRingMAD": 5.747,
+   "compositeMax": 73,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.825,
+   "shotInnerMAD": 1.436,
+   "shotRingMAD": 11.956,
+   "shotLumaMAD": 2.691,
+   "shotMax": 77,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.689,
+    2.765,
+    2.509,
+    2.394,
+    2.334,
+    2.294,
+    2.267
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/busan.hq.svg"
+ },
+ {
+  "name": "sc",
+  "file": "woori/banks/sc.png",
+  "frameBox": {
+   "x": 79.249,
+   "y": 865.477,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-sc",
+    "frameBox": {
+     "x": 79.28,
+     "y": 865.213,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.645,
+   "y": 563.682,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "SC제일은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 5줄 1칸. 원 맞춤: 중심 (102.578, 888.749)px · 반지름 23.31px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.055px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-sc) 중심과 차이 (-0.03, +0.26)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.093,
+   "compositeInnerMAD": 0.264,
+   "compositeRingMAD": 9.48,
+   "compositeLumaMAD": 0.858,
+   "compositeLumaRingMAD": 3.779,
+   "compositeMax": 79,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.076,
+   "shotInnerMAD": 1.158,
+   "shotRingMAD": 9.589,
+   "shotLumaMAD": 1.636,
+   "shotMax": 77,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.288,
+    2.513,
+    2.288,
+    2.189,
+    2.141,
+    2.113,
+    2.093
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/sc.hq.svg"
+ },
+ {
+  "name": "kyongnam",
+  "file": "woori/banks/kyongnam.png",
+  "frameBox": {
+   "x": 238.723,
+   "y": 865.501,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-kyongnam",
+    "frameBox": {
+     "x": 238.691,
+     "y": 865.213,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 164.022,
+   "y": 563.699,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "경남은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 5줄 2칸. 원 맞춤: 중심 (262.052, 888.774)px · 반지름 23.333px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.068px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kyongnam) 중심과 차이 (+0.03, +0.29)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.644,
+   "compositeInnerMAD": 0.312,
+   "compositeRingMAD": 12.548,
+   "compositeLumaMAD": 1.534,
+   "compositeLumaRingMAD": 7.396,
+   "compositeMax": 77,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.833,
+   "shotInnerMAD": 1.403,
+   "shotRingMAD": 12.127,
+   "shotLumaMAD": 2.48,
+   "shotMax": 83,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.978,
+    3.119,
+    2.889,
+    2.782,
+    2.725,
+    2.679,
+    2.644
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/kyongnam.hq.svg"
+ },
+ {
+  "name": "kwangju",
+  "file": "woori/banks/kwangju.png",
+  "frameBox": {
+   "x": 398.103,
+   "y": 865.47,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-kwangju",
+    "frameBox": {
+     "x": 398.103,
+     "y": 865.213,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.333,
+   "y": 563.677,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "광주은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 5줄 3칸. 원 맞춤: 중심 (421.432, 888.742)px · 반지름 23.3px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.057px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kwangju) 중심과 차이 (+0.00, +0.26)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.981,
+   "compositeInnerMAD": 0.355,
+   "compositeRingMAD": 8.397,
+   "compositeLumaMAD": 0.971,
+   "compositeLumaRingMAD": 4.073,
+   "compositeMax": 71,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.292,
+   "shotInnerMAD": 1.414,
+   "shotRingMAD": 9.603,
+   "shotLumaMAD": 2.167,
+   "shotMax": 65,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.336,
+    2.465,
+    2.21,
+    2.098,
+    2.039,
+    2.007,
+    1.981
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/kwangju.hq.svg"
+ },
+ {
+  "name": "deutsche",
+  "file": "woori/banks/deutsche.png",
+  "frameBox": {
+   "x": 79.238,
+   "y": 996.377,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-deutsche",
+    "frameBox": {
+     "x": 79.28,
+     "y": 996.364,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.638,
+   "y": 653.676,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "도이치은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 6줄 1칸. 원 맞춤: 중심 (102.566, 1019.649)px · 반지름 23.307px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.056px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-deutsche) 중심과 차이 (-0.04, +0.01)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.595,
+   "compositeInnerMAD": 0.315,
+   "compositeRingMAD": 6.821,
+   "compositeLumaMAD": 0.888,
+   "compositeLumaRingMAD": 3.742,
+   "compositeMax": 65,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 2.977,
+   "shotInnerMAD": 1.724,
+   "shotRingMAD": 7.359,
+   "shotLumaMAD": 2.333,
+   "shotMax": 62,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.448,
+    2.235,
+    1.875,
+    1.714,
+    1.653,
+    1.618,
+    1.595
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/deutsche.hq.svg"
+ },
+ {
+  "name": "nfcf",
+  "file": "woori/banks/nfcf.png",
+  "frameBox": {
+   "x": 238.674,
+   "y": 996.373,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-nfcf",
+    "frameBox": {
+     "x": 238.691,
+     "y": 996.364,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 163.988,
+   "y": 653.673,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "산림조합 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 6줄 2칸. 원 맞춤: 중심 (262.003, 1019.646)px · 반지름 23.298px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.055px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-nfcf) 중심과 차이 (-0.02, +0.01)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.569,
+   "compositeInnerMAD": 0.241,
+   "compositeRingMAD": 6.773,
+   "compositeLumaMAD": 0.936,
+   "compositeLumaRingMAD": 4.329,
+   "compositeMax": 39,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 2.374,
+   "shotInnerMAD": 1.042,
+   "shotRingMAD": 6.796,
+   "shotLumaMAD": 1.763,
+   "shotMax": 50,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    2.748,
+    1.994,
+    1.764,
+    1.663,
+    1.615,
+    1.587,
+    1.569
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/nfcf.hq.svg"
+ },
+ {
+  "name": "kdb",
+  "file": "woori/banks/kdb.png",
+  "frameBox": {
+   "x": 398.109,
+   "y": 996.381,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-kdb",
+    "frameBox": {
+     "x": 398.103,
+     "y": 996.364,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.338,
+   "y": 653.679,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "산업은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 6줄 3칸. 원 맞춤: 중심 (421.438, 1019.653)px · 반지름 23.3px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.055px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-kdb) 중심과 차이 (+0.01, +0.02)px. 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 1.686,
+   "compositeInnerMAD": 0.291,
+   "compositeRingMAD": 7.323,
+   "compositeLumaMAD": 0.981,
+   "compositeLumaRingMAD": 4.355,
+   "compositeMax": 53,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 2.933,
+   "shotInnerMAD": 1.384,
+   "shotRingMAD": 8.289,
+   "shotLumaMAD": 2.259,
+   "shotMax": 59,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    3.072,
+    2.196,
+    1.931,
+    1.808,
+    1.747,
+    1.711,
+    1.686
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/kdb.hq.svg"
+ },
+ {
+  "name": "suhyup",
+  "file": "woori/banks/suhyup.png",
+  "frameBox": {
+   "x": 79.243,
+   "y": 1127.757,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "account-typing",
+    "element": "chip-3-logo",
+    "frameBox": {
+     "x": 315.482,
+     "y": 436.121,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16.0
+   },
+   {
+    "state": "bank-render",
+    "element": "logo-suhyup",
+    "frameBox": {
+     "x": 79.28,
+     "y": 1127.516,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   },
+   {
+    "state": "bank-idle",
+    "element": "logo-suhyup",
+    "frameBox": {
+     "x": 79.28,
+     "y": 1127.516,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 54.641,
+   "y": 744.0,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "수협은행 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 7줄 1칸. 원 맞춤: 중심 (102.571, 1151.03)px · 반지름 23.305px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.06px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-suhyup) 중심과 차이 (-0.04, +0.24)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.32,
+   "compositeInnerMAD": 0.359,
+   "compositeRingMAD": 10.373,
+   "compositeLumaMAD": 1.074,
+   "compositeLumaRingMAD": 4.438,
+   "compositeMax": 86,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.441,
+   "shotInnerMAD": 1.534,
+   "shotRingMAD": 9.961,
+   "shotLumaMAD": 2.05,
+   "shotMax": 86,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    4.077,
+    2.932,
+    2.612,
+    2.468,
+    2.394,
+    2.35,
+    2.32
+   ],
+   "reuse": [
+    {
+     "state": "account-typing",
+     "element": "chip-3-logo",
+     "sizeDp": 16.0,
+     "frames": "v2 #2698–#2700",
+     "bg": "#eff1f3",
+     "measuredCenterPx": [
+      327.15,
+      447.52
+     ],
+     "compositeMAD": 8.959,
+     "compositeInnerMAD": 8.213,
+     "shotMAD": 9.641,
+     "shotInnerMAD": 8.128,
+     "shotLumaMAD": 4.478
+    }
+   ]
+  },
+  "hq": "woori/banks/suhyup.hq.svg"
+ },
+ {
+  "name": "suhyup-central",
+  "file": "woori/banks/suhyup-central.png",
+  "frameBox": {
+   "x": 238.684,
+   "y": 1127.763,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-suhyup-central",
+    "frameBox": {
+     "x": 238.691,
+     "y": 1127.516,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 163.995,
+   "y": 744.004,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "수협중앙회 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 7줄 2칸. 원 맞춤: 중심 (262.013, 1151.036)px · 반지름 23.298px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.06px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-suhyup-central) 중심과 차이 (-0.01, +0.25)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.442,
+   "compositeInnerMAD": 0.411,
+   "compositeRingMAD": 10.957,
+   "compositeLumaMAD": 1.186,
+   "compositeLumaRingMAD": 5.129,
+   "compositeMax": 83,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.618,
+   "shotInnerMAD": 1.538,
+   "shotRingMAD": 10.713,
+   "shotLumaMAD": 2.082,
+   "shotMax": 78,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    4.222,
+    3.077,
+    2.755,
+    2.607,
+    2.526,
+    2.477,
+    2.442
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/suhyup-central.hq.svg"
+ },
+ {
+  "name": "cu",
+  "file": "woori/banks/cu.png",
+  "frameBox": {
+   "x": 398.115,
+   "y": 1127.765,
+   "w": 46.657,
+   "h": 46.545
+  },
+  "state": "bank-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "bank-idle",
+    "element": "logo-cu",
+    "frameBox": {
+     "x": 398.103,
+     "y": 1127.516,
+     "w": 46.657,
+     "h": 46.545
+    },
+    "video": "v2",
+    "sizeDp": 32.0
+   }
+  ],
+  "dp": {
+   "x": 273.342,
+   "y": 744.005,
+   "w": 32.0,
+   "h": 32.0
+  },
+  "notes": "신협 로고(원 32dp, 원 밖 투명) 140x140 = 32dp x3 상자(frame 46.657x46.545px x3). 금융회사 그리드 7줄 3칸. 원 맞춤: 중심 (421.443, 1151.038)px · 반지름 23.304px(설계 16dp = 23.33/23.27px) · 테두리 흔들림 0.062px · 바탕 #f6f7fa. frameBox = 잰 원 중심 기준 상자(로고가 PNG 가운데). spec 설계 상자(bank-idle logo-cu) 중심과 차이 (+0.01, +0.25)px — 2·4·6번째 줄(0부터)은 +0.25px(기기 px 반올림: 줄 간격 270.5 기기px 가 271/270 으로 번갈아). 같은 그림을 다른 크기로 쓴다: 칩 16dp · 은행 칸 28dp · 아바타 40dp (banks.json). v2 bank-idle #2772–#2773 채널별 중앙값 → 원 맞춤(휘도 반지름 방향 50% 지점, 720방향, 최소제곱 원) → 원 중심에 맞춘 32dp 상자(46.657x46.545px)를 여백 8px 포함 크롭 → EDSR x3(cv2.dnn_superres) → 상자 격자 140x140 으로 재표본(바이큐빅) → 해석적 원 알파(8x8 표본 커버리지, 원 = 상자 꽉) → 가장자리 1.33px 띠는 안쪽 색으로 인페인트(바탕 번짐 제거) → 역투영 6회(타일 바탕 #f6f7fa 에 합성해 frame px 면적 축소가 중앙값과 같아지게, 띠 밖만 고침). 가장자리 RGB 차(ring)가 큰 것은 영상의 4:2:0 색차 번짐(휘도 ring 은 1–7) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 2.224,
+   "compositeInnerMAD": 0.502,
+   "compositeRingMAD": 9.189,
+   "compositeLumaMAD": 1.136,
+   "compositeLumaRingMAD": 4.602,
+   "compositeMax": 81,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 3.825,
+   "shotInnerMAD": 2.06,
+   "shotRingMAD": 9.911,
+   "shotLumaMAD": 2.693,
+   "shotMax": 83,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    4.604,
+    3.088,
+    2.637,
+    2.436,
+    2.328,
+    2.267,
+    2.224
+   ],
+   "reuse": []
+  },
+  "hq": "woori/banks/cu.hq.svg"
+ },
+ {
+  "name": "citi",
+  "file": "woori/banks/citi.png",
+  "frameBox": {
+   "x": 207.573,
+   "y": 435.867,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "account-typing",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "account-typing",
+    "element": "chip-2-logo@4자리",
+    "frameBox": {
+     "x": 207.573,
+     "y": 435.867,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16,
+    "frames": "v2 #2687–#2692"
+   },
+   {
+    "state": "account-typing",
+    "element": "chip-3-logo@10자리",
+    "frameBox": {
+     "x": 315.486,
+     "y": 435.873,
+     "w": 23.328,
+     "h": 23.273
+    },
+    "video": "v2",
+    "sizeDp": 16,
+    "frames": "v2 #2720–#2722"
+   }
+  ],
+  "dp": {
+   "x": 142.657,
+   "y": 268.325,
+   "w": 16.0,
+   "h": 16.0
+  },
+  "notes": "한국씨티 로고(파란 원 + 흰 마크) — 그리드에 없고 추천 칩(16dp)에만 나온다(banks.json chipOnly). 32dp 원본이 없어 칩 로고 두 자리 (4자리 칩 2번째 v2 #2687–#2692, 10자리 칩 3번째 #2720–#2722)를 함께 역투영해 만든 70x70(16dp x3) — 다른 은행(140px, 32dp 원본)보다 해상도가 낮다. 원 맞춤 중심 [219.237, 447.504]px 반지름 11.644px(설계 16dp = 11.66px), 칩 바탕 #eff0f3. 두 자리 그림이 아주 같지 않아(코덱·위상) 한쪽만 쓰면 다른 쪽이 6.1 로 나빠 두 자리 평균으로 맞췄다. FSRCNN_x3 비교는 못 함(scratchpad/models/FSRCNN_x3.pb 가 378바이트로 깨져 읽기 실패).",
+  "verify": {
+   "compositeMAD": 4.303,
+   "compositeInnerMAD": 2.583,
+   "compositeRingMAD": 7.708,
+   "compositeLumaMAD": 2.591,
+   "compositeLumaRingMAD": 4.883,
+   "compositeMax": 52,
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → frame px 면적 축소(9x9 표본) vs 중앙값 크롭, 상자 화소 전체 RGB 평균 절대차. inner = 원 안(r−1.5px), ring = 가장자리 ±1.5px",
+   "shotMAD": 5.07,
+   "shotInnerMAD": 3.251,
+   "shotRingMAD": 7.813,
+   "shotLumaMAD": 2.971,
+   "shotMax": 58,
+   "shotMethod": "Chromium(Playwright) 360x880 DSF 16/11, ?frame=1 셸(31dp + translate(-0.2925px,0.333px) scaleX(1.0023956) + 48dp)에 img 를 잰 중심에 놓고(정수 left/top + 소수 translate) 찍어 같은 기준 프레임과 비교 — 원 + 바깥 2px",
+   "backprojMAD": [
+    [
+     5.014,
+     6.899
+    ],
+    [
+     4.649,
+     4.909
+    ],
+    [
+     4.461,
+     4.593
+    ],
+    [
+     4.403,
+     4.486
+    ],
+    [
+     4.371,
+     4.441
+    ],
+    [
+     4.346,
+     4.418
+    ],
+    [
+     4.329,
+     4.399
+    ],
+    [
+     4.315,
+     4.385
+    ],
+    [
+     4.304,
+     4.373
+    ]
+   ],
+   "reuse": [
+    {
+     "state": "account-typing(10자리)",
+     "element": "chip-3-logo",
+     "sizeDp": 16,
+     "frames": "v2 #2720–#2722",
+     "bg": "#f0f0f3",
+     "measuredCenterPx": [
+      327.15,
+      447.51
+     ],
+     "compositeMAD": 4.373,
+     "compositeInnerMAD": 2.688,
+     "shotMAD": 5.977,
+     "shotInnerMAD": 4.202,
+     "shotLumaMAD": 3.98
+    }
+   ]
+  },
+  "hq": "woori/banks/citi.hq.png"
+ },
+ {
+  "name": "camera",
+  "file": "woori/send-a/camera.svg",
+  "frameBox": {
+   "x": 460.312,
+   "y": 232.485,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "where-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2a2b2c",
+  "usedIn": [
+   {
+    "state": "where-render",
+    "element": "camera",
+    "frameBox": {
+     "x": 460.312,
+     "y": 232.485,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "where-idle",
+    "element": "camera",
+    "frameBox": {
+     "x": 460.312,
+     "y": 232.485,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1"
+   },
+   {
+    "state": "where-row-tap-spinner",
+    "element": "camera",
+    "frameBox": {
+     "x": 460.312,
+     "y": 232.485,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1"
+   },
+   {
+    "state": "where-reveal",
+    "element": "camera",
+    "frameBox": {
+     "x": 460.312,
+     "y": 232.485,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-push",
+    "element": "camera",
+    "frameBox": {
+     "x": 460.312,
+     "y": 232.485,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 316,
+   "y": 128.5,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "카메라(계좌 촬영) 선 아이콘 — 어디로 이체 입력 줄 오른쪽. 둥근 사각 몸통(모서리 2.3·윗 돌출 사다리꼴 이음 1.16) + 렌즈 원(r 3.0), 획 2.03dp 둥근 이음. 색 #2a2b2c (바탕 #ffffff).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: where-idle v1 #6952–#6960 중앙값",
+   "fitMAD": 3.249,
+   "fitMax": 44,
+   "svgFitL1": 0.012,
+   "shotMAD": 3.832,
+   "shotLumaMAD": 3.814,
+   "shotMax": 65,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [458, 230, 498, 269] 비교 (RGB 평균 절대차)"
+  }
+ },
+ {
+  "name": "star-outline",
+  "file": "woori/send-a/star-outline.svg",
+  "frameBox": {
+   "x": 460.312,
+   "y": 486.546,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "where-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#87898b",
+  "usedIn": [
+   {
+    "state": "where-idle",
+    "element": "recent-star",
+    "frameBox": {
+     "x": 460.312,
+     "y": 486.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1"
+   },
+   {
+    "state": "where-row-tap-spinner",
+    "element": "recent-star",
+    "frameBox": {
+     "x": 460.312,
+     "y": 486.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1"
+   },
+   {
+    "state": "where-reveal",
+    "element": "recent-star",
+    "frameBox": {
+     "x": 460.312,
+     "y": 486.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-push",
+    "element": "recent-star",
+    "frameBox": {
+     "x": 460.312,
+     "y": 486.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 316,
+   "y": 303.167,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "☆ 즐겨찾기(빈 별) — 최근입금계좌 행. 꼭짓점 10개 별(바깥 R 10.42·안 0.51R, 꼭짓점 둥글림 0.95/1.02), 획 2.03dp. done 의 ☆ 와 같은 그림이면 하나로(주인 확인). 색 #87898b (바탕 #ffffff).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: where-idle v1 #6952–#6960 중앙값",
+   "fitMAD": 1.61,
+   "fitMax": 21,
+   "svgFitL1": 0.0112,
+   "shotMAD": 1.834,
+   "shotLumaMAD": 1.868,
+   "shotMax": 28,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [458, 484, 498, 524] 비교 (RGB 평균 절대차)"
+  }
+ },
+ {
+  "name": "plus",
+  "file": "woori/send-a/plus.svg",
+  "frameBox": {
+   "x": 40.399,
+   "y": 1134.546,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "where-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#6b7073",
+  "usedIn": [
+   {
+    "state": "where-render",
+    "element": "contact-plus",
+    "frameBox": {
+     "x": 40.399,
+     "y": 1134.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "where-idle",
+    "element": "contact-plus",
+    "frameBox": {
+     "x": 40.399,
+     "y": 1134.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1"
+   },
+   {
+    "state": "where-row-tap-spinner",
+    "element": "contact-plus",
+    "frameBox": {
+     "x": 40.399,
+     "y": 1134.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1"
+   },
+   {
+    "state": "where-reveal",
+    "element": "contact-plus",
+    "frameBox": {
+     "x": 40.399,
+     "y": 1134.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-push",
+    "element": "contact-plus",
+    "frameBox": {
+     "x": 40.399,
+     "y": 1134.546,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 28,
+   "y": 748.667,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "＋ — 연락처로 이체하기 원(40dp #eff0f3) 안. 가로·세로 14dp 선, 획 2.01dp 둥근 끝. 색 #6b7073 (바탕 #eff0f3).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: where-idle v1 #6952–#6960 중앙값",
+   "fitMAD": 0.864,
+   "fitMax": 10,
+   "svgFitL1": 0.003,
+   "shotMAD": 0.841,
+   "shotLumaMAD": 0.683,
+   "shotMax": 22,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [42, 1136, 74, 1168] 비교 (RGB 평균 절대차)",
+   "otherSrcMAD": {
+    "wi2": 1.164
+   },
+   "shotMADv2": 1.161
+  }
+ },
+ {
+  "name": "close",
+  "file": "woori/send-a/close.svg",
+  "frameBox": {
+   "x": 466.144,
+   "y": 62.06,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "account-typed",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#393a3d",
+  "usedIn": [
+   {
+    "state": "account-empty",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-focus",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-focused",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-keyboard-up",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-keyboard",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-typing",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-typed",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-bank-selected",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-ready",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-confirm-pressed",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-confirm-spinner",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "bank-open",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "bank-render",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   },
+   {
+    "state": "bank-idle",
+    "element": "close",
+    "frameBox": {
+     "x": 466.144,
+     "y": 62.06,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 320,
+   "y": 11.333,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "✕ 닫기 — 계좌번호·금융회사 페이지 머리. 두 획 (6.05,5.84)–(17.96,17.75), 굵기 2.06dp 둥근 끝. history-detail.close-x(팔 6.04, 굵기 1.95, #3e3f42)와 같은 모양 — 합칠지는 주인 결정. 색 #393a3d (바탕 #ffffff).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: account-typed v2 #2735–#2738 중앙값",
+   "fitMAD": 2.547,
+   "fitMax": 25,
+   "svgFitL1": 0.0119,
+   "shotMAD": 2.812,
+   "shotLumaMAD": 2.898,
+   "shotMax": 36,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [468, 64, 500, 96] 비교 (RGB 평균 절대차)",
+   "otherSrcMAD": {
+    "bi": 2.179
+   },
+   "shotMADBankIdle": 2.419
+  }
+ },
+ {
+  "name": "clear-circle",
+  "file": "woori/send-a/clear-circle.svg",
+  "frameBox": {
+   "x": 466.144,
+   "y": 247.03,
+   "w": 29.161,
+   "h": 29.091
+  },
+  "state": "account-typed",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#81858c",
+  "usedIn": [
+   {
+    "state": "account-typing",
+    "element": "clear",
+    "frameBox": {
+     "x": 466.144,
+     "y": 247.03,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-typed",
+    "element": "clear",
+    "frameBox": {
+     "x": 466.144,
+     "y": 247.03,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 320,
+   "y": 138.5,
+   "w": 20,
+   "h": 20
+  },
+  "notes": "ⓧ 지우기 — 입력칸 오른쪽. 회색 원(r 8.31) + 밝은 ✕(팔 2.42, 굵기 1.81 둥근 끝). ✕ 색 #f2f7fb 는 흐림 없이 그렸을 때 영상과 가장 가까운 값(설계상 흰색). 색 #81858c, #f2f7fb (바탕 #ffffff).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: account-typed v2 #2735–#2738 중앙값",
+   "fitMAD": 2.204,
+   "fitMax": 17,
+   "svgFitL1": null,
+   "shotMAD": 2.598,
+   "shotLumaMAD": 2.517,
+   "shotMax": 32,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [464, 245, 497, 278] 비교 (RGB 평균 절대차)"
+  }
+ },
+ {
+  "name": "chevron-down",
+  "file": "woori/send-a/chevron-down.svg",
+  "frameBox": {
+   "x": 466.144,
+   "y": 343.515,
+   "w": 29.161,
+   "h": 29.091
+  },
+  "state": "account-ready",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#403e42",
+  "usedIn": [
+   {
+    "state": "account-empty",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-focus",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-focused",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-keyboard-up",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-keyboard",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-typing",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-typed",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-bank-selected",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-ready",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-confirm-pressed",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "account-confirm-spinner",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   },
+   {
+    "state": "bank-open",
+    "element": "bank-chevron",
+    "frameBox": {
+     "x": 466.144,
+     "y": 343.515,
+     "w": 29.161,
+     "h": 29.091
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 320,
+   "y": 204.833,
+   "w": 20,
+   "h": 20
+  },
+  "notes": "⌄ 은행/증권사 선택 줄 오른쪽 — 꼭짓점 (10.02,12.62), 팔 반폭 4.95·높이 4.88, 획 1.70dp 둥근 끝·이음. 색 #403e42 (바탕 #ffffff).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: account-ready v2 #2780–#2800 중앙값(로고·⌄ 정지 구간)",
+   "fitMAD": 1.642,
+   "fitMax": 19,
+   "svgFitL1": 0.0075,
+   "shotMAD": 1.966,
+   "shotLumaMAD": 1.998,
+   "shotMax": 33,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [466, 345, 496, 370] 비교 (RGB 평균 절대차)"
+  }
+ },
+ {
+  "name": "kb-backspace",
+  "file": "woori/send-a/kb-backspace.svg",
+  "frameBox": {
+   "x": 430.179,
+   "y": 843.878,
+   "w": 46.657,
+   "h": 34.909
+  },
+  "state": "account-keyboard",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#070708",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-icon-backspace",
+    "frameBox": {
+     "x": 430.179,
+     "y": 843.878,
+     "w": 46.657,
+     "h": 34.909
+    },
+    "video": "v2",
+    "inkBox": {
+     "x": 432.3,
+     "y": 845.44,
+     "w": 42.45,
+     "h": 32.21
+    }
+   }
+  ],
+  "dp": {
+   "x": 295.333,
+   "y": 548.833,
+   "w": 32,
+   "h": 24
+  },
+  "notes": "키보드 ⌫ (흰 키 위 검정) — 32x24dp 상자(키 가운데 311.333, 560.833 에 가운데). 왼쪽이 뾰족한 오각형 테두리(꼭짓점 둥글림 3.2/1.8/4.4) + 안 ✕(팔 3.51), 획 2.26dp. 잰 획 질량 위 2.19 / 아래 2.26 / 오른쪽 2.28dp 라 균일 획으로는 MAD 가 남는다. 색 #070708 (바탕 #ffffff).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: 키보드 키 눌림 없는 31장 평균 (v2 #2677–#2739, kb_idle_mean)",
+   "fitMAD": 3.432,
+   "fitMax": 81,
+   "svgFitL1": 0.0114,
+   "shotMAD": 4.681,
+   "shotLumaMAD": 4.68,
+   "shotMax": 91,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [428, 840, 480, 883] 비교 (RGB 평균 절대차)"
+  }
+ },
+ {
+  "name": "kb-nav-mic",
+  "file": "woori/send-a/kb-nav-mic.svg",
+  "frameBox": {
+   "x": 11.239,
+   "y": 1227.637,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "account-keyboard",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#3c3c3d",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-nav-mic",
+    "frameBox": {
+     "x": 11.239,
+     "y": 1227.637,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2",
+    "inkBox": {
+     "x": 15.54,
+     "y": 1228.54,
+     "w": 25.22,
+     "h": 33.08
+    }
+   }
+  ],
+  "dp": {
+   "x": 8,
+   "y": 812.667,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "OS 내비 줄(키보드 모드) 마이크 — 바깥 캡슐 + 안 캡슐 + 받침 U 띠(테두리) + 기둥 + 받침대 알약, 모두 테두리 선 1.3dp(안 캡슐 1.18). 기본 마스크 안(겹쳐 보기 녹화용). 24dp 상자 (8, 812.667). 색 #3c3c3d (바탕 #000000).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: 키보드 키 눌림 없는 31장 평균 (v2 #2677–#2739, kb_idle_mean)",
+   "fitMAD": 4.005,
+   "fitMax": 63,
+   "svgFitL1": 0.0539,
+   "shotMAD": 5.59,
+   "shotLumaMAD": 5.458,
+   "shotMax": 66,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [10, 1224, 48, 1266] 비교 (RGB 평균 절대차)",
+   "note": "#nav 스페이서 위끝(831.667dp = 1209.70px)은 기기 px 1210 으로 맞춰져 그 안의 그림이 약 0.3–0.5px 아래로 찍힌다(이 shot 의 최적 이동 −0.4px). 칠하는 쪽에서 보정할 것"
+  }
+ },
+ {
+  "name": "kb-nav-recents",
+  "file": "woori/send-a/kb-nav-recents.svg",
+  "frameBox": {
+   "x": 97.263,
+   "y": 1229.576,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "account-keyboard",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#acacac",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-nav-recents",
+    "frameBox": {
+     "x": 97.263,
+     "y": 1229.576,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2",
+    "inkBox": {
+     "x": 104.47,
+     "y": 1235.65,
+     "w": 21.45,
+     "h": 22.8
+    }
+   }
+  ],
+  "dp": {
+   "x": 67,
+   "y": 814,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "OS 내비 ||| 최근 앱 (키보드 모드) — 세로 막대 3개(간격 6.25dp, 길이 13.6dp), 굵기 1.42dp 둥근 끝. 기본 마스크 안. 24dp 상자 (67, 814). 색 #acacac (바탕 #000000).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: 키보드 키 눌림 없는 31장 평균 (v2 #2677–#2739, kb_idle_mean)",
+   "fitMAD": 1.966,
+   "fitMax": 24,
+   "svgFitL1": 0.0106,
+   "shotMAD": 3.298,
+   "shotLumaMAD": 3.274,
+   "shotMax": 77,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [100, 1231, 131, 1263] 비교 (RGB 평균 절대차)",
+   "note": "#nav 스페이서 위끝(831.667dp = 1209.70px)은 기기 px 1210 으로 맞춰져 그 안의 그림이 약 0.3–0.5px 아래로 찍힌다(이 shot 의 최적 이동 −0.4px). 칠하는 쪽에서 보정할 것"
+  }
+ },
+ {
+  "name": "kb-nav-home",
+  "file": "woori/send-a/kb-nav-home.svg",
+  "frameBox": {
+   "x": 244.524,
+   "y": 1229.576,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "account-keyboard",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#a8a8a8",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-nav-home",
+    "frameBox": {
+     "x": 244.524,
+     "y": 1229.576,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2",
+    "inkBox": {
+     "x": 249.77,
+     "y": 1234.83,
+     "w": 24.44,
+     "h": 24.38
+    }
+   }
+  ],
+  "dp": {
+   "x": 168,
+   "y": 814,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "OS 내비 ○ 홈 — 둥근 사각 테두리 14.3dp(rx 5.08), 획 1.62dp. 기본 마스크 안. 24dp 상자 (168, 814). 색 #a8a8a8 (바탕 #000000).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: 키보드 키 눌림 없는 31장 평균 (v2 #2677–#2739, kb_idle_mean)",
+   "fitMAD": 1.983,
+   "fitMax": 32,
+   "svgFitL1": 0.0091,
+   "shotMAD": 7.209,
+   "shotLumaMAD": 7.173,
+   "shotMax": 109,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [245, 1230, 279, 1264] 비교 (RGB 평균 절대차)",
+   "note": "#nav 스페이서 위끝(831.667dp = 1209.70px)은 기기 px 1210 으로 맞춰져 그 안의 그림이 약 0.3–0.5px 아래로 찍힌다(이 shot 의 최적 이동 −0.4px). 칠하는 쪽에서 보정할 것"
+  }
+ },
+ {
+  "name": "kb-nav-hide",
+  "file": "woori/send-a/kb-nav-hide.svg",
+  "frameBox": {
+   "x": 391.785,
+   "y": 1229.576,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "account-keyboard",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#aaaaaa",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-nav-hide",
+    "frameBox": {
+     "x": 391.785,
+     "y": 1229.576,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2",
+    "inkBox": {
+     "x": 397.28,
+     "y": 1239.44,
+     "w": 24.07,
+     "h": 15.09
+    }
+   }
+  ],
+  "dp": {
+   "x": 269,
+   "y": 814,
+   "w": 24,
+   "h": 24
+  },
+  "notes": "OS 내비 ⌄ 키보드 내리기(평소 ‹ 자리) — 팔 반폭 7.26·높이 8.38, 획 1.48dp. 기본 마스크 안. 24dp 상자 (269, 814). 색 #aaaaaa (바탕 #000000).",
+  "verify": {
+   "method": "파라메트릭 SVG 맞춤: 상자 안 dp 좌표 기하(선분·원호·둥근 다각형 획/면) → frame px 8x8 표본 커버리지(D1 축별) → 색은 최소제곱 → 넬더–미드. 흐림 0(Chromium 처럼 날카롭게)으로 맞춤. 원본: 키보드 키 눌림 없는 31장 평균 (v2 #2677–#2739, kb_idle_mean)",
+   "fitMAD": 0.892,
+   "fitMax": 42,
+   "svgFitL1": 0.0045,
+   "shotMAD": 4.073,
+   "shotLumaMAD": 4.054,
+   "shotMax": 115,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 상자 자리(정수 left/top + 소수 translate)에 놓고 찍어 맞춤 영역 [392, 1233, 428, 1261] 비교 (RGB 평균 절대차)",
+   "note": "#nav 스페이서 위끝(831.667dp = 1209.70px)은 기기 px 1210 으로 맞춰져 그 안의 그림이 약 0.3–0.5px 아래로 찍힌다(이 shot 의 최적 이동 −0.4px). 칠하는 쪽에서 보정할 것"
+  }
+ },
+ {
+  "name": "kb-glyph-2",
+  "file": "woori/send-a/kb-glyph-2.png",
+  "frameBox": {
+   "x": 186,
+   "y": 846,
+   "w": 25,
+   "h": 33
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#000000",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-label-2",
+    "frameBox": {
+     "x": 186,
+     "y": 846,
+     "w": 25,
+     "h": 33
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 187.387,
+     "y": 844.121,
+     "w": 21.987,
+     "h": 36.364
+    }
+   }
+  ],
+  "dp": {
+   "x": 127.861,
+   "y": 550.292,
+   "w": 17.146,
+   "h": 22.688
+  },
+  "notes": "숫자 키 '2' — Pretendard 600/25 맞춤 오차가 큰(0.215) 숫자라 그림으로(9.3절). 노란 키 #eee13f 위 검정. 나머지 숫자는 Pretendard. 단색 글자 그림: RGB = #000000 고정, 알파만 그림 — 바탕 #eee13f 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox). 합성 RGB 차 5.96 은 노란 키 위 검정 글자 둘레의 4:2:0 색차 번짐(휘도 차 0.85) — 앱이 재현할 수 없는 코덱 성분.",
+  "verify": {
+   "compositeMAD": 5.955,
+   "compositeMax": 133,
+   "compositeInkMAD": 8.742,
+   "backprojAlphaMAD": [
+    0.0092,
+    0.0035,
+    0.002,
+    0.0013,
+    0.0009,
+    0.0007,
+    0.0005
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 6.244,
+   "shotLumaMAD": 2.241,
+   "shotMax": 133,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-glyph-dotdash",
+  "file": "woori/send-a/kb-glyph-dotdash.png",
+  "frameBox": {
+   "x": 440,
+   "y": 1051,
+   "w": 28,
+   "h": 22
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#000000",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-label-dotdash",
+    "frameBox": {
+     "x": 440,
+     "y": 1051,
+     "w": 28,
+     "h": 22
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 442.82,
+     "y": 1053.51,
+     "w": 22.64,
+     "h": 16.97
+    }
+   }
+  ],
+  "dp": {
+   "x": 302.069,
+   "y": 691.229,
+   "w": 19.204,
+   "h": 15.125
+  },
+  "notes": "기능 키 '.-' (흰 키 위 검정). 마침표 + 위로 올라간 짧은 가로줄. 단색 글자 그림: RGB = #000000 고정, 알파만 그림 — 바탕 #ffffff 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.581,
+   "compositeMax": 7,
+   "compositeInkMAD": 1.116,
+   "backprojAlphaMAD": [
+    0.0071,
+    0.0036,
+    0.0027,
+    0.0022,
+    0.0019,
+    0.0016,
+    0.0014
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 2.037,
+   "shotLumaMAD": 2.037,
+   "shotMax": 31,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-glyph-comma",
+  "file": "woori/send-a/kb-glyph-comma.png",
+  "frameBox": {
+   "x": 447,
+   "y": 1157,
+   "w": 12,
+   "h": 16
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#000000",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-label-comma",
+    "frameBox": {
+     "x": 447,
+     "y": 1157,
+     "w": 12,
+     "h": 16
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 449.09,
+     "y": 1159.56,
+     "w": 7.2,
+     "h": 10.99
+    }
+   }
+  ],
+  "dp": {
+   "x": 306.87,
+   "y": 764.104,
+   "w": 8.23,
+   "h": 11.0
+  },
+  "notes": "기능 키 ',' (흰 키 위 검정, 키 가운데보다 아래). 단색 글자 그림: RGB = #000000 고정, 알파만 그림 — 바탕 #ffffff 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.727,
+   "compositeMax": 4,
+   "compositeInkMAD": 0.693,
+   "backprojAlphaMAD": [
+    0.0121,
+    0.0053,
+    0.0035,
+    0.0025,
+    0.002,
+    0.0016,
+    0.0013
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 2.484,
+   "shotLumaMAD": 2.484,
+   "shotMax": 21,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-tb-eq",
+  "file": "woori/send-a/kb-tb-eq.png",
+  "frameBox": {
+   "x": 30,
+   "y": 765,
+   "w": 17,
+   "h": 13
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-tb-eq",
+    "frameBox": {
+     "x": 30,
+     "y": 765,
+     "w": 17,
+     "h": 13
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 32.12,
+     "y": 767.05,
+     "w": 11.96,
+     "h": 8.4
+    }
+   }
+  ],
+  "dp": {
+   "x": 20.867,
+   "y": 494.604,
+   "w": 11.66,
+   "h": 8.938
+  },
+  "notes": "도구줄 '=' (칸 1/6). 단색 글자 그림: RGB = #ffffff 고정, 알파만 그림 — 바탕 #161518 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.542,
+   "compositeMax": 2,
+   "compositeInkMAD": 0.709,
+   "backprojAlphaMAD": [
+    0.014,
+    0.0043,
+    0.0021,
+    0.0013,
+    0.0009,
+    0.0007,
+    0.0005
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 4.093,
+   "shotLumaMAD": 4.066,
+   "shotMax": 25,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-tb-at",
+  "file": "woori/send-a/kb-tb-at.png",
+  "frameBox": {
+   "x": 101,
+   "y": 759,
+   "w": 28,
+   "h": 28
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-tb-at",
+    "frameBox": {
+     "x": 101,
+     "y": 759,
+     "w": 28,
+     "h": 28
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 103.33,
+     "y": 761.52,
+     "w": 23.01,
+     "h": 23.21
+    }
+   }
+  ],
+  "dp": {
+   "x": 69.563,
+   "y": 490.479,
+   "w": 19.204,
+   "h": 19.25
+  },
+  "notes": "도구줄 '@' (칸 2/6). 단색 글자 그림: RGB = #ffffff 고정, 알파만 그림 — 바탕 #161518 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.817,
+   "compositeMax": 6,
+   "compositeInkMAD": 0.92,
+   "backprojAlphaMAD": [
+    0.0174,
+    0.0069,
+    0.0044,
+    0.0032,
+    0.0024,
+    0.0019,
+    0.0015
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 2.964,
+   "shotLumaMAD": 2.812,
+   "shotMax": 18,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-tb-plus",
+  "file": "woori/send-a/kb-tb-plus.png",
+  "frameBox": {
+   "x": 183,
+   "y": 763,
+   "w": 17,
+   "h": 17
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-tb-plus",
+    "frameBox": {
+     "x": 183,
+     "y": 763,
+     "w": 17,
+     "h": 17
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 185.66,
+     "y": 765.26,
+     "w": 11.9,
+     "h": 12.02
+    }
+   }
+  ],
+  "dp": {
+   "x": 125.804,
+   "y": 493.229,
+   "w": 11.66,
+   "h": 11.688
+  },
+  "notes": "도구줄 '+' (칸 3/6). 단색 글자 그림: RGB = #ffffff 고정, 알파만 그림 — 바탕 #161518 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.467,
+   "compositeMax": 4,
+   "compositeInkMAD": 0.746,
+   "backprojAlphaMAD": [
+    0.01,
+    0.0028,
+    0.0015,
+    0.001,
+    0.0008,
+    0.0006,
+    0.0005
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 2.404,
+   "shotLumaMAD": 2.387,
+   "shotMax": 22,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-tb-rparen",
+  "file": "woori/send-a/kb-tb-rparen.png",
+  "frameBox": {
+   "x": 262,
+   "y": 758,
+   "w": 12,
+   "h": 30
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-tb-rparen",
+    "frameBox": {
+     "x": 262,
+     "y": 758,
+     "w": 12,
+     "h": 30
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 264.71,
+     "y": 760.38,
+     "w": 6.92,
+     "h": 24.74
+    }
+   }
+  ],
+  "dp": {
+   "x": 179.986,
+   "y": 489.792,
+   "w": 8.23,
+   "h": 20.625
+  },
+  "notes": "도구줄 ')' (칸 4/6). 단색 글자 그림: RGB = #ffffff 고정, 알파만 그림 — 바탕 #161518 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.522,
+   "compositeMax": 4,
+   "compositeInkMAD": 0.826,
+   "backprojAlphaMAD": [
+    0.0106,
+    0.0039,
+    0.0024,
+    0.0016,
+    0.0012,
+    0.0009,
+    0.0007
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 1.593,
+   "shotLumaMAD": 1.516,
+   "shotMax": 12,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-tb-lparen",
+  "file": "woori/send-a/kb-tb-lparen.png",
+  "frameBox": {
+   "x": 340,
+   "y": 758,
+   "w": 12,
+   "h": 30
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-tb-lparen",
+    "frameBox": {
+     "x": 340,
+     "y": 758,
+     "w": 12,
+     "h": 30
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 342.46,
+     "y": 760.39,
+     "w": 6.95,
+     "h": 24.76
+    }
+   }
+  ],
+  "dp": {
+   "x": 233.483,
+   "y": 489.792,
+   "w": 8.23,
+   "h": 20.625
+  },
+  "notes": "도구줄 '(' (칸 5/6). 단색 글자 그림: RGB = #ffffff 고정, 알파만 그림 — 바탕 #161518 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.644,
+   "compositeMax": 5,
+   "compositeInkMAD": 0.968,
+   "backprojAlphaMAD": [
+    0.0111,
+    0.0048,
+    0.0033,
+    0.0024,
+    0.0019,
+    0.0015,
+    0.0012
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 1.893,
+   "shotLumaMAD": 1.804,
+   "shotMax": 16,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ },
+ {
+  "name": "kb-tb-dot",
+  "file": "woori/send-a/kb-tb-dot.png",
+  "frameBox": {
+   "x": 418,
+   "y": 775,
+   "w": 8,
+   "h": 8
+  },
+  "state": "account-keyboard",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "account-keyboard",
+    "element": "kb-tb-dot",
+    "frameBox": {
+     "x": 418,
+     "y": 775,
+     "w": 8,
+     "h": 8
+    },
+    "video": "v2",
+    "textBox": {
+     "x": 420.38,
+     "y": 777.3,
+     "w": 3.52,
+     "h": 3.5
+    }
+   }
+  ],
+  "dp": {
+   "x": 286.98,
+   "y": 501.479,
+   "w": 5.487,
+   "h": 5.5
+  },
+  "notes": "도구줄 '.' (칸 6/6). 단색 글자 그림: RGB = #ffffff 고정, 알파만 그림 — 바탕 #161518 위에 놓는다. 키 눌림 없는 31장 평균(kb_idle_mean, v2 #2677–#2739) → 여백 8px 크롭 → EDSR x3 → 바탕–글자색 직선 위 투영으로 α → 역투영 6회(3x3 면적 축소 α = 원본 α) → α<0.03 → 0, 원본 잉크 1px 넓힌 밖 → 0. frameBox = 잉크 + 2px 정수 상자 (spec 요소 상자는 글자 줄 상자 — usedIn.textBox).",
+  "verify": {
+   "compositeMAD": 0.565,
+   "compositeMax": 3,
+   "compositeInkMAD": 0.698,
+   "backprojAlphaMAD": [
+    0.0087,
+    0.0036,
+    0.0022,
+    0.0015,
+    0.001,
+    0.0007,
+    0.0006
+   ],
+   "compositeMethod": "PNG 를 잰 바탕에 합성 → 3x3 면적 축소 vs 31장 평균 크롭 (frame px, RGB 평균 절대차)",
+   "shotMAD": 2.0,
+   "shotLumaMAD": 1.965,
+   "shotMax": 23,
+   "shotMethod": "Chromium 360x880 DSF 16/11 ?frame=1 셸에 img 를 frameBox 자리(정수 left/top + 소수 translate·scale)에 놓고 찍어 비교 — Chromium 의 3x→1x 축소는 면적 평균이 아니라 합성 값보다 크다"
+  }
+ }
+]

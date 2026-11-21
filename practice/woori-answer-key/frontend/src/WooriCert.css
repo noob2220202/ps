@@ -1,0 +1,205 @@
+/* WooriCert — 우리WON인증서 PIN (spec/launch.md 2.2·2.4). 글자는 textfit best (launch.json css), 그림은 launch.assets.json css */
+.woori-cert {
+  position: relative;
+  height: 100%;
+  overflow: clip;
+  background: #ffffff;
+  outline: none;
+}
+
+.woori-cert button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.woori-cert__back {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  width: 24px;
+  height: 24px;
+}
+
+.woori-cert__back > img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.woori-cert__title {
+  position: absolute;
+  left: 105px;
+  top: 110px;
+  translate: 0.625px 0;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0em;
+  line-height: 1;
+  color: #33353a;
+  white-space: nowrap;
+}
+
+.woori-cert__subtitle {
+  position: absolute;
+  left: 83px;
+  top: 144px;
+  translate: 0.21875px 0;
+  transform: translateY(0.25px);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.0025em;
+  line-height: 1;
+  color: #707173;
+  white-space: nowrap;
+}
+
+/* PIN 점 6개: 12dp, 간격 24, 가운데 180 (x 114…234), y 216.333. 채움 #076ef2 / 빈 점 1dp #707173 테두리 (설계) */
+.woori-cert__dots {
+  position: absolute;
+  left: 114px;
+  top: 216px;
+  translate: 0 0.333px;
+  width: 132px;
+  height: 12px;
+}
+
+.woori-cert__dots > i {
+  position: absolute;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: 1px solid #707173;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.woori-cert__dots > i.is-on {
+  border: 0;
+  background: #076ef2;
+}
+
+.woori-cert__auto {
+  position: absolute;
+  left: 129px;
+  top: 260px;
+  width: 110px;
+  height: 24px;
+}
+
+.woori-cert__auto > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  transform-origin: 0 0;
+  transform: translate(0.62px, 0.32px);
+}
+
+.woori-cert__auto > span {
+  position: absolute;
+  left: 32px;
+  top: 5px;
+  translate: 0.703px 0;
+  transform: translateY(0.25px);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0em;
+  line-height: 1;
+  color: #33353a;
+  white-space: nowrap;
+}
+
+/* [다른 방법으로 로그인]: 94, 728.667, 172x40, 테두리 1dp #dddddd, r 20 */
+.woori-cert .woori-cert__other {
+  position: absolute;
+  width: 172px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #dddddd;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.woori-cert__other > span {
+  position: absolute;
+  left: 23px;
+  top: 12px;
+  translate: 0.125px 0.333px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0em;
+  line-height: 1;
+  color: #4a4b4e;
+  white-space: nowrap;
+}
+
+/* 보안 키패드 (설계): 판 535.17–800.67, 3열 120 x 4줄 65, 흰 바탕·구분선 없음 */
+.woori-cert__pad {
+  position: absolute;
+  width: 360px;
+  height: 265.5px;
+  background: #ffffff;
+}
+
+.woori-cert .woori-cert__key {
+  position: absolute;
+  width: 120px;
+  height: 65px;
+}
+
+.woori-cert__key.is-pressed::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 4px;
+  translate: 0.25px 0.5px;
+  width: 97.5px;
+  height: 56px;
+  border-radius: 6px;
+  background: #e6eaee;
+}
+
+.woori-cert__digit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 20px;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+  color: #33353a;
+  text-align: center;
+}
+
+.woori-cert__clear {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 25px;
+  translate: 0 0.83px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.0025em;
+  line-height: 1;
+  color: #35363a;
+  text-align: center;
+}
+
+.woori-cert__bs {
+  position: absolute;
+  left: 48px;
+  top: 20px;
+  translate: 0 0.5px;
+  width: 24px;
+  height: 24px;
+}

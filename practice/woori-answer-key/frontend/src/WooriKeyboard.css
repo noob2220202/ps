@@ -1,0 +1,79 @@
+/*
+ * WooriKeyboard — 삼성 키보드(노란 테마) 숫자 자판 (spec/send-a.md 9절)
+ * 창: 앱 y 476.667 (= 화면 508dp, 영상 738.95px) 부터 372dp. top 은 정수(476) + translate 0.667 (레이아웃 위치는 정수 dp 로 반올림, 9.1).
+ * 올라옴/내려감은 transform 애니메이션 (translate 속성과 따로 합쳐진다). 롱핸드로 쓴다 (frontend/README — 빌드 압축 사고).
+ */
+.woori-kb {
+  position: absolute;
+  left: 0;
+  top: 476px;
+  translate: 0 0.667px;
+  width: 360px;
+  height: 372px;
+  z-index: 5;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.woori-kb--opening {
+  animation-name: woori-kb-up;
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  animation-fill-mode: both;
+}
+
+.woori-kb--closing {
+  animation-name: woori-kb-down;
+  animation-duration: 348ms;
+  animation-delay: 20ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes woori-kb-up {
+  from {
+    transform: translateY(372px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes woori-kb-down {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(372px);
+  }
+}
+
+.woori-kb__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+}
+
+.woori-kb__label {
+  position: absolute;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #000000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.woori-kb__label--go {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.woori-kb__glyph {
+  display: block;
+  pointer-events: none;
+}

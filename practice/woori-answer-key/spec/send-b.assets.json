@@ -1,0 +1,1140 @@
+[
+ {
+  "name": "keypad-backspace",
+  "file": "woori/send-b/keypad-backspace.svg",
+  "frameBox": {
+   "x": 419.487,
+   "y": 1029.333,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "amount-keypad",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#33353a",
+  "usedIn": [
+   {
+    "state": "amount-keypad",
+    "element": "key-backspace",
+    "frameBox": {
+     "x": 419.487,
+     "y": 1029.333,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "amount-1won",
+    "element": "key-backspace",
+    "frameBox": {
+     "x": 419.487,
+     "y": 1029.333,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "amount-confirm-pressed",
+    "element": "key-backspace",
+    "frameBox": {
+     "x": 419.487,
+     "y": 1029.333,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "amount-2won",
+    "element": "key-backspace",
+    "frameBox": {
+     "x": 419.487,
+     "y": 1029.333,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "password-leak",
+    "element": "pw-backspace",
+    "frameBox": {
+     "x": 419.487,
+     "y": 1137.455,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "password-leak-spinner",
+    "element": "pw-backspace",
+    "frameBox": {
+     "x": 419.487,
+     "y": 1137.455,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 288.0,
+   "y": 676.333,
+   "w": 24.0,
+   "h": 24.0
+  },
+  "css": "position:absolute; left:288px; top:676px; width:24px; height:24px; translate:0px 0.333px",
+  "cssPassword": "position:absolute; left:288px; top:750px; width:24px; height:24px; translate:0px 0.667px",
+  "notes": "← 지우기: 금액 키패드 셋째 열·넷째 행, 계좌 비밀번호 키패드 마지막 줄 오른쪽 (주인 send-b). 24dp 상자, 선 2dp 둥근 끝·꺾임: 축 x 4→20 (y 12), 날개 (10,6)–(4,12)–(10,18). 네 자리(금액 v1 #7031–#7033 · v2 #2879–#2882, 비밀번호 v1 #7192 · v2 #3002)를 Y 평면 모델(세 선분 캡슐, 6x6 초표본)로 따로 맞춘 값: 끝 x 4.03, 4.04, 4.06, 4.06, 축 끝 19.97, 20.00, 20.01, 20.01, 날개 뒤 5.95, 5.94, 5.95, 5.94 · 위아래 5.98, 5.98, 6.03, 6.03, 굵기 2.005, 2.014, 2.010, 2.008 (dp) → 설계값으로 둥글게. 가운데 = 열 가운데 300. 상자 top: 금액 676.333 (= 2029 기기px, 행 가운데 688.33), 비밀번호 750.667 (행 가운데 762.67) — 스펙 2.1/2.6 의 676.14 · 750.73 보다 정확(선 모델 맞춤). 색 = --woori-text #33353a (키 숫자와 같은 토큰). 휘도를 풀어 맞추면 잉크가 #3b3d42 쪽(얇은 선이 코덱에 번져 옅어진 값): shot 평균차 금액 v1/v2 1.153/1.367(토큰) vs 0.968/1.125(#3b3d42), 비밀번호 2.23/2.498 vs 2.256/2.579 — 차이가 작아 토큰색을 둔다. 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸 구성 검증 페이지에 css 대로 놓고 찍어 정지 프레임 중앙값과 비교. svgFitL1 = 휘도 알파((255−Y)/(255−Y잉크)) 평균 절대차, relErr = Σ|알파차|/Σ알파(영상)",
+   "sites": {
+    "amount-v1": {
+     "shotMAD": 1.153,
+     "shotMax": 28,
+     "region": [
+      415.0,
+      1027.0,
+      44.0,
+      40.0
+     ],
+     "svgFitL1": 0.006,
+     "relErr": 0.0751,
+     "centroidOffsetPx": [
+      0.08,
+      0.005
+     ],
+     "inkMassRatio": 1.0192,
+     "lumaMAD": 1.203
+    },
+    "amount-v2": {
+     "shotMAD": 1.367,
+     "shotMax": 26,
+     "region": [
+      415.0,
+      1027.0,
+      44.0,
+      40.0
+     ],
+     "svgFitL1": 0.0071,
+     "relErr": 0.0882,
+     "centroidOffsetPx": [
+      -0.121,
+      0.026
+     ],
+     "inkMassRatio": 1.009,
+     "lumaMAD": 1.426
+    },
+    "password-v1": {
+     "shotMAD": 2.23,
+     "shotMax": 42,
+     "region": [
+      415.0,
+      1135.0,
+      44.0,
+      40.0
+     ],
+     "svgFitL1": 0.0114,
+     "relErr": 0.1364,
+     "centroidOffsetPx": [
+      -0.419,
+      -0.075
+     ],
+     "inkMassRatio": 0.941,
+     "lumaMAD": 2.298
+    },
+    "password-v2": {
+     "shotMAD": 2.498,
+     "shotMax": 43,
+     "region": [
+      415.0,
+      1135.0,
+      44.0,
+      40.0
+     ],
+     "svgFitL1": 0.0126,
+     "relErr": 0.1482,
+     "centroidOffsetPx": [
+      -0.645,
+      -0.033
+     ],
+     "inkMassRatio": 0.9257,
+     "lumaMAD": 2.539
+    }
+   },
+   "modelFit": {
+    "bksp-amount-v1": {
+     "tx": 292.0329,
+     "ty": 688.3294,
+     "sx": 307.9661,
+     "ax": 5.9472,
+     "ay": 5.9801,
+     "sw": 2.0045,
+     "L": 59.5819,
+     "rms": 2.119
+    },
+    "bksp-amount-v2": {
+     "tx": 292.0433,
+     "ty": 688.3288,
+     "sx": 308.002,
+     "ax": 5.9376,
+     "ay": 5.9777,
+     "sw": 2.0145,
+     "L": 60.6679,
+     "rms": 2.399
+    },
+    "bksp-pw-v1": {
+     "tx": 292.0587,
+     "ty": 762.6682,
+     "sx": 308.0122,
+     "ax": 5.9456,
+     "ay": 6.028,
+     "sw": 2.0095,
+     "L": 60.8723,
+     "rms": 3.21
+    },
+    "bksp-pw-v2": {
+     "tx": 292.0621,
+     "ty": 762.6693,
+     "sx": 308.0142,
+     "ax": 5.9381,
+     "ay": 6.0337,
+     "sw": 2.0076,
+     "L": 60.459,
+     "rms": 3.484
+    }
+   },
+   "svgFitL1": 0.006,
+   "note": "비밀번호 자리는 프레임 한 장(누출 프레임)이라 코덱 블록이 커서 차이가 크다(무게중심 −0.4/−0.6px 는 블록 잡음 — 같은 장에 모델을 맞추면 끝 x 292.06, 금액 자리와 0.02dp 차)."
+  }
+ },
+ {
+  "name": "confirm-arrow",
+  "file": "woori/send-b/confirm-arrow.svg",
+  "frameBox": {
+   "x": 110.359,
+   "y": 189.571,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "confirm-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#8a8a8b",
+  "usedIn": [
+   {
+    "state": "confirm-idle",
+    "element": "route-arrow",
+    "frameBox": {
+     "x": 110.359,
+     "y": 189.571,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "confirm-transfer-pressed",
+    "element": "route-arrow",
+    "frameBox": {
+     "x": 110.359,
+     "y": 189.571,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "confirm-processing",
+    "element": "route-arrow",
+    "frameBox": {
+     "x": 110.359,
+     "y": 189.571,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 75.982,
+   "y": 98.997,
+   "w": 16.0,
+   "h": 16.0
+  },
+  "css": "position:absolute; left:75px; top:98px; width:16px; height:16px; translate:0.982px 0.997px",
+  "notes": "확인 머리 로고 사이 → (회색). 이 상자는 반복 애니메이션의 끝(멈춘) 자리 — 움직임은 send-b.md 3.10 (translateX −16dp→0 easeInOutCubic 610ms · opacity, 주기 800ms, 비교 마스크 96,190,60,24). 16dp 상자, 선 1.409dp 둥근 끝·꺾임: 축 x 2.718→13.282 (y 8), 날개 뒤 3.902 · 위아래 3.913. 세 정지 자리(v1 #7371–#7374 · #7414–#7418, v2 #3142–#3147)를 따로 맞춘 끝 x 89.262–89.267, y 106.99–107.00 (dp, 앱) — 두 영상 같은 자리. 가운데 (83.98, 107.00): 스펙 2.7 route-arrow 상자(75.96, 98.8)보다 0.2dp 아래. 색 #8a8a8b (축 코어 #888889–#8a8a8b, 모델 잉크 휘도 138.7) — 스펙의 #8a8c90 보다 shot 차가 작다(v1/v2 1.37/1.078 vs 1.454/1.147). 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "verify": {
+   "method": "keypad-backspace 와 같음 (정지 자리 중앙값과 비교)",
+   "sites": {
+    "v1": {
+     "shotMAD": 1.37,
+     "shotMax": 17,
+     "region": [
+      102,
+      186,
+      37,
+      28
+     ],
+     "svgFitL1": 0.0113,
+     "relErr": 0.1659,
+     "centroidOffsetPx": [
+      0.484,
+      -0.051
+     ],
+     "inkMassRatio": 0.8677,
+     "lumaMAD": 1.387
+    },
+    "v2": {
+     "shotMAD": 1.078,
+     "shotMax": 22,
+     "region": [
+      102,
+      186,
+      37,
+      28
+     ],
+     "svgFitL1": 0.0089,
+     "relErr": 0.1344,
+     "centroidOffsetPx": [
+      0.213,
+      0.082
+     ],
+     "inkMassRatio": 0.9036,
+     "lumaMAD": 1.086
+    }
+   },
+   "svgFitL1": 0.0089,
+   "modelFit": {
+    "arrow-v1a": {
+     "tx": 89.2623,
+     "ty": 106.9893,
+     "sx": 78.7102,
+     "ax": 3.9404,
+     "ay": 3.9217,
+     "sw": 1.406,
+     "L": 139.5587,
+     "rms": 2.243,
+     "frames": "v1 #7371–#7374"
+    },
+    "arrow-v1b": {
+     "tx": 89.263,
+     "ty": 107.0001,
+     "sx": 78.704,
+     "ax": 3.8777,
+     "ay": 3.9056,
+     "sw": 1.4099,
+     "L": 138.2653,
+     "rms": 2.352,
+     "frames": "v1 #7414–#7418"
+    },
+    "arrow-v2": {
+     "tx": 89.2668,
+     "ty": 107.0029,
+     "sx": 78.6855,
+     "ax": 3.887,
+     "ay": 3.9121,
+     "sw": 1.4121,
+     "L": 138.3515,
+     "rms": 2.247,
+     "frames": "v2 #3142–#3147"
+    }
+   },
+   "note": "잉크 양 0.87–0.90 은 영상 바탕이 이 자리에서 1–2 레벨 어두운 몫(로고 고리·코덱 안개)이 대부분 — 바탕을 빼면 ±4%%"
+  }
+ },
+ {
+  "name": "warning-triangle",
+  "file": "woori/send-b/warning-triangle.svg",
+  "frameBox": {
+   "x": 213.905,
+   "y": 681.212,
+   "w": 96.23,
+   "h": 90.182
+  },
+  "state": "dup-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#fdb80e",
+  "usedIn": [
+   {
+    "state": "dup-open",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 212.7,
+     "y": 744.316,
+     "w": 98.636,
+     "h": 92.436
+    },
+    "scale": 1.025,
+    "note": "시트가 아직 44.16dp 아래(윗변 653.9px), 배율 1.025 — 상자는 잉크 가운데 기준으로 키운 값"
+   },
+   {
+    "state": "dup-idle",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 213.905,
+     "y": 681.212,
+     "w": 96.23,
+     "h": 90.182
+    }
+   },
+   {
+    "state": "dup-yes-pressed",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 213.905,
+     "y": 681.212,
+     "w": 96.23,
+     "h": 90.182
+    }
+   }
+  ],
+  "dp": {
+   "x": 147.0,
+   "y": 437.0,
+   "w": 66.0,
+   "h": 62.0
+  },
+  "css": "position:absolute; left:147px; top:437px; width:66px; height:62px",
+  "inkBoxDp": [
+   147.619,
+   438.022,
+   64.854,
+   60.028
+  ],
+  "notes": "중복 경고 시트 ⚠ 의 노란 둥근 삼각형(느낌표 없이 — 느낌표는 warning-bang-bar · warning-bang-dot 를 위에 따로 그려 움직인다). 66x62dp 상자 (147, 437) = 시트 윗변 374 + 63. 모양(Y 평면 모델, v1 #7151–#7162 중앙값, 느낌표 자리 빼고 맞춤, rms 1.57): 날카로운 꼭짓점 위 (180.046, 431.417) · 밑변 y 498.051 · 반폭 36.551, 모서리 반지름 위 6.12 · 아래 5.98 → 잉크 상자 [147.62, 438.02, 64.85, 60.03] (dp, 앱), 가운데 x 180.046(= 화면 가운데 180). 색 #fdb80e (안쪽 평평한 곳 중앙값 BGR [14, 184, 253] — 스펙 2.5 의 #fbb715 와 다름, 이 값을 쓴다). **삼각형도 움직인다(스펙 3.6 에 없음)**: 시트와 같이 올라오면서 잉크 가운데 (180.05, 468.04) 기준 배율이 바뀐다 — 시트 시작(184.921) 뒤 ms: 배율 +31 0.735, +47 0.881, +98 0.960, +114 1.045, +131 1.025, +148 1.014, +164 0.975, +181 0.957, +199 0.953, +217 0.952, +241 0.959, +258 0.979, +282 0.988, +317 1.000. 앞 두 값(+31·+47)은 시트 곡선에서 뺀 jank 프레임(늦게 그려짐)이라 시각이 덜 믿을 만하다. 작게(≈0.5 추정) 시작해 +114ms 에 1.045 로 넘쳤다가 +217ms 에 0.952 로 줄고 +317ms 에 1 로 멈추는 튕김(스프링). 가운데는 시트와 같이 움직이고(dx·dy ≈ 0), transform-origin = 상자 안 (33.05, 31.04)dp. dup-open 기준 프레임(#7103, +131ms)은 배율 1.025. 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "animation": {
+   "property": "scale",
+   "origin": "ink center",
+   "originInBoxDp": [
+    33.046,
+    31.036
+   ],
+   "zeroT": 184.921,
+   "zeroNote": "시트 윗변이 움직이기 시작한 시각(send-b.md 3.5, 손 뗌 184.809 + 112ms)",
+   "samples": [
+    [
+     31,
+     0.7351
+    ],
+    [
+     47,
+     0.8815
+    ],
+    [
+     98,
+     0.9595
+    ],
+    [
+     114,
+     1.0446
+    ],
+    [
+     131,
+     1.025
+    ],
+    [
+     148,
+     1.0137
+    ],
+    [
+     164,
+     0.9745
+    ],
+    [
+     181,
+     0.9572
+    ],
+    [
+     199,
+     0.9533
+    ],
+    [
+     217,
+     0.9523
+    ],
+    [
+     241,
+     0.9586
+    ],
+    [
+     258,
+     0.9785
+    ],
+    [
+     282,
+     0.988
+    ],
+    [
+     317,
+     1.0004
+    ]
+   ],
+   "frames": "v1 #7099–#7115",
+   "fit": "정지 삼각형 모델을 잉크 가운데 기준 s 배 + 이동으로 프레임마다 맞춤(4x4 초표본, 느낌표 열 뺌)"
+  },
+  "verify": {
+   "method": "Chromium shot(검증 페이지, 삼각형+막대+점) vs v1 #7151–#7162 중앙값, 상자 205,672 116x110",
+   "shotMAD": 2.432,
+   "shotMax": 182,
+   "lumaMAD": 0.889,
+   "svgFitL1": 0.0123,
+   "relErr": 0.0328,
+   "inkMassRatio": 0.987,
+   "note": "RGB 최대차는 노랑/흰 가장자리의 4:2:0 색 번짐(B 채널 평균차 4.8, 휘도는 0.89)"
+  }
+ },
+ {
+  "name": "warning-bang-bar",
+  "file": "woori/send-b/warning-bang-bar.svg",
+  "frameBox": {
+   "x": 257.869,
+   "y": 709.056,
+   "w": 8.435,
+   "h": 29.523
+  },
+  "state": "dup-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "dup-idle",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 257.869,
+     "y": 709.056,
+     "w": 8.435,
+     "h": 29.523
+    }
+   },
+   {
+    "state": "dup-yes-pressed",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 257.869,
+     "y": 709.056,
+     "w": 8.435,
+     "h": 29.523
+    }
+   }
+  ],
+  "dp": {
+   "x": 177.153,
+   "y": 456.143,
+   "w": 5.785,
+   "h": 20.297
+  },
+  "css": "position:absolute; left:177px; top:456px; width:6px; height:20px; transform-origin:0 0; transform:translate(0.1530px, 0.1430px) scale(0.964167, 1.014850)",
+  "notes": "⚠ 느낌표 막대(흰, 위아래 반원 끝) — 끝 모양 상자: 가운데 x 180.046, 위 456.143 · 아래 476.440, 폭 5.785 (dp, 앱; v1 #7151–#7162 중앙값 맞춤 rms 1.62). 애니메이션(스펙 3.6 표): 185.647 부터 점 위에서 자라 오른다(scaleY, transform-origin 아래끝) → 위끝이 185.781 에 708.41px(앱 455.68)까지 넘쳤다가 185.872–185.889 에 710.8px 로 내려가고 185.956 부터 709.19px(이 상자 위끝)에 멈춘다. 그래서 dup-idle 기준 구간 #7142–#7151 은 막대 위끝이 ±0.8px 흔들리는 프레임을 포함한다 (완전히 멈춘 건 #7151 부터). 바탕이 흰 시트라 흰 칠로 그린다(구멍으로 뚫어도 같다). 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험)."
+ },
+ {
+  "name": "warning-bang-dot",
+  "file": "woori/send-b/warning-bang-dot.svg",
+  "frameBox": {
+   "x": 257.843,
+   "y": 745.283,
+   "w": 8.489,
+   "h": 8.468
+  },
+  "state": "dup-idle",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "dup-idle",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 257.843,
+     "y": 745.283,
+     "w": 8.489,
+     "h": 8.468
+    }
+   },
+   {
+    "state": "dup-yes-pressed",
+    "element": "dup-warning-icon",
+    "frameBox": {
+     "x": 257.843,
+     "y": 745.283,
+     "w": 8.489,
+     "h": 8.468
+    }
+   }
+  ],
+  "dp": {
+   "x": 177.135,
+   "y": 481.049,
+   "w": 5.822,
+   "h": 5.822
+  },
+  "css": "position:absolute; left:177px; top:481px; width:6px; height:6px; transform-origin:0 0; transform:translate(0.1350px, 0.0490px) scale(0.970333, 0.970333)",
+  "notes": "⚠ 느낌표 점(흰 원) — 끝 자리: 가운데 (180.046, 483.960), 반지름 2.911 (dp, 앱). 막대와의 틈 4.61dp. 애니메이션(스펙 3.6 표): 시트가 선 뒤 +24ms 에 삼각형 가운데 위쪽(y 724–728px)에 작게 나타나 커지고 → 떨어져 바닥(746–753px)에 닿아 납작해졌다(752–753) 다시 둥글어진 뒤 이 자리에 멈춘다 — scale·translateY 키프레임. 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험)."
+ },
+ {
+  "name": "siren",
+  "file": "woori/send-b/siren.png",
+  "frameBox": {
+   "x": 41,
+   "y": 350,
+   "w": 23,
+   "h": 22
+  },
+  "state": "amount-form",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "amount-fields-in",
+    "element": "first-time-siren",
+    "frameBox": {
+     "x": 41,
+     "y": 350,
+     "w": 23,
+     "h": 22
+    },
+    "video": "v2"
+   },
+   {
+    "state": "amount-2won",
+    "element": "first-time-siren",
+    "frameBox": {
+     "x": 41,
+     "y": 350,
+     "w": 23,
+     "h": 22
+    },
+    "video": "v2"
+   },
+   {
+    "state": "amount-form",
+    "element": "first-time-siren",
+    "frameBox": {
+     "x": 41,
+     "y": 350,
+     "w": 23,
+     "h": 22
+    },
+    "video": "v2"
+   }
+  ],
+  "dp": {
+   "x": 28.412,
+   "y": 209.292,
+   "w": 15.775,
+   "h": 15.125
+  },
+  "css": "position:absolute; left:28px; top:209px; width:16px; height:15px; transform-origin:0 0; transform:translate(0.4119px, 0.2917px) scale(0.985919, 1.008333)",
+  "notes": "🚨 처음 보내는 계좌 칩(v2, 분홍 #fdeaf1)의 사이렌 그림(여러 색, 이모지 모양 — 사람·캐릭터 아님). PNG 상자 = frame px 정수 상자 41,350 23x22 (잉크 x 43–62 · y 352–370 + 여백) → 69x66. 칩 안 12dp 자리(스펙 first-time-siren (29.96, 210.86))보다 그림 잉크가 조금 크다(≈13dp) — PNG 상자는 칩 왼끝 20 + 8.41, 칩 위끝 203 + 6.29 에 놓는다. 원본: 칩이 멈춘 v2 프레임의 코덱 판 네 가지(v2 #2875 · #2884 · #2895 · #2950; 각 판은 여러 프레임이 화소까지 같고, 판끼리는 평균 4–6 레벨 다름) 평균 → 여백 8px 크롭 → EDSR x3 → 역투영 6회(3x3 면적 축소 = 평균 크롭) → 분홍 바탕 기준 color-to-alpha(최소 α, 밝은 쪽은 여유 큰 B·G 채널만) → 몸통 바깥 윤곽 안(가장자리 2px@3x 빼고)은 α=1·색 = 합성색. 분홍 칩 위에서 원본과 같게 합성된다. FSRCNN x3 비교는 못 함(스크래치 models/FSRCNN_x3.pb 가 378바이트 — 받다 만 파일). 칩의 🚨 · › 는 render 단계 S3(v2 +319ms)에 나타난다. 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "verify": {
+   "compositeMAD": 0.543,
+   "compositeMax": 4.9,
+   "bpMAD": [
+    2.881,
+    0.875,
+    0.382,
+    0.21,
+    0.137,
+    0.099,
+    0.075
+   ],
+   "compositeMethod": "PNG 를 분홍(#fdeaf1)에 합성 → 3x3 면적 축소 vs 네 판 평균 크롭 (frame px, RGB 평균 절대차)",
+   "perCodecVersionMAD": {
+    "#2875": 4.868,
+    "#2884": 4.962,
+    "#2895": 4.904,
+    "#2950": 5.022
+   },
+   "shotMAD": 1.1,
+   "shotMax": 16,
+   "shotMethod": "Chromium shot(분홍 칩 + css 대로 PNG) vs 네 판 평균, 상자 36,345 34x33"
+  },
+  "hq": "woori/send-b/siren.hq.png"
+ },
+ {
+  "name": "confirm-logo-woori",
+  "file": "woori/send-b/confirm-logo-woori.png",
+  "frameBox": {
+   "x": 28.726,
+   "y": 166.357,
+   "w": 69.985,
+   "h": 69.818
+  },
+  "state": "confirm-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "confirm-render",
+    "element": "from-logo",
+    "frameBox": {
+     "x": 28.731,
+     "y": 144.559,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1",
+    "sizeDp": 24
+   },
+   {
+    "state": "confirm-idle",
+    "element": "from-logo-48",
+    "frameBox": {
+     "x": 28.726,
+     "y": 166.357,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v1",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-transfer-pressed",
+    "element": "from-logo-48",
+    "frameBox": {
+     "x": 28.726,
+     "y": 166.357,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v1",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-processing",
+    "element": "from-logo-48",
+    "frameBox": {
+     "x": 28.726,
+     "y": 166.357,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v1",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-idle",
+    "element": "from-logo-48",
+    "frameBox": {
+     "x": 28.725,
+     "y": 166.363,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v2",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-transfer-pressed",
+    "element": "from-logo-48",
+    "frameBox": {
+     "x": 28.725,
+     "y": 166.363,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v2",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-processing",
+    "element": "from-logo-48",
+    "frameBox": {
+     "x": 28.725,
+     "y": 166.363,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v2",
+    "sizeDp": 48
+   }
+  ],
+  "dp": {
+   "x": 19.994,
+   "y": 83.037,
+   "w": 48.0,
+   "h": 48.0
+  },
+  "css": "position:absolute; left:19px; top:83px; width:48px; height:48px; translate:0.994px 0.037px",
+  "notes": "이체 확인 머리의 출금 계좌 우리은행 로고 48dp 원(그림의 주인은 send-a banks.woori — 이건 같은 그림을 확인 화면 48dp 자리에서 직접 자른 크기 전용 판). 확인 페이지 안(confirm-render 24dp → 모핑 → 48dp)에서는 이 그림 하나를 크기만 바꿔 쓴다: 모핑 진행도 p = easeInOutCubic 805ms (send-b.md 3.9) 로 원 상자가 24dp 가운데 v1 (31.997, 80.051) → 48dp 가운데 (43.994, 107.037) (dp, 앱) 곧게 · 지름 24→48 정비례. 금액 화면 24dp 와 그 밖의 은행은 banks.<code> (send-a) 를 쓴다. 원 맞춤(가장자리 휘도 50%, 720 방향, sd 0.078px): 가운데 (43.994, 107.037), 지름 48.058dp. 원본: v1·v2 정지 구간 중앙값(v1 #7300–#7357 · v2 #3136–#3179 · #3278–#3290) → 원 상자(48dp = 69.985x69.818 frame px) 격자로 EDSR x3 재표본(210x209) → 해석적 원 알파 → 가장자리 띠(1.33px) 인페인트 → 역투영 6회 (우리 로고는 v1·v2 두 자리 잔차를 함께) (send-a 은행 로고와 같은 방법). 48dp 원 위끝은 두 로고 모두 ≈83.04–83.09 (스펙 2.7 의 to-logo-48 (96, 83.67) 은 템플릿 맞춤 오차 — 원 가장자리로 다시 재면 출금 로고와 같은 y). banks.woori(32dp 원본) 를 같은 48dp 자리에 놓으면 안쪽 평균차 4.92 / 4.93 → 이 그림은 0.72 / 0.79 — 48dp 에서는 이 그림이 뚜렷이 낫다 (한 영상으로 만들고 다른 영상에서 재도 안쪽 1.34). 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "verify": {
+   "composite": {
+    "v1-confirm": {
+     "mad": 1.269,
+     "max": 32,
+     "inner": 0.722,
+     "ring": 4.226,
+     "lumaMAD": 0.942,
+     "lumaRing": 2.836
+    },
+    "v2-confirm": {
+     "mad": 1.32,
+     "max": 32,
+     "inner": 0.789,
+     "ring": 4.22,
+     "lumaMAD": 0.97,
+     "lumaRing": 2.826
+    }
+   },
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → frame 화소 면적 평균 vs 중앙값 (inner = 원 안 1.5px 안쪽, ring = 가장자리 ±1.5px). ring 의 큰 값은 노랑/흰 가장자리의 4:2:0 색 번짐(휘도 ring 은 작다)",
+   "bpMAD": [
+    [
+     1.871,
+     2.239
+    ],
+    [
+     1.467,
+     1.545
+    ],
+    [
+     1.345,
+     1.402
+    ],
+    [
+     1.303,
+     1.357
+    ],
+    [
+     1.286,
+     1.338
+    ],
+    [
+     1.276,
+     1.328
+    ],
+    [
+     1.269,
+     1.32
+    ]
+   ],
+   "vsBanksAtSameSite": {
+    "v1-confirm": {
+     "banksMAD": 4.247,
+     "banksInner": 4.923,
+     "thisMAD": 1.269,
+     "thisInner": 0.723
+    },
+    "v2-confirm": {
+     "banksMAD": 4.261,
+     "banksInner": 4.931,
+     "thisMAD": 1.32,
+     "thisInner": 0.789
+    },
+    "v1-amount": {
+     "banksMAD": 5.067,
+     "banksInner": 5.942,
+     "thisMAD": 4.655,
+     "thisInner": 5.187
+    },
+    "v2-amount": {
+     "banksMAD": 5.117,
+     "banksInner": 6.052,
+     "thisMAD": null,
+     "thisInner": null
+    },
+    "v1-crender": {
+     "banksMAD": 5.112,
+     "banksInner": 6.039,
+     "thisMAD": 4.792,
+     "thisInner": 5.376
+    }
+   },
+   "crossVideo": {
+    "v1→v2": {
+     "mad": 1.714,
+     "max": 32,
+     "inner": 1.34,
+     "ring": 4.282,
+     "lumaMAD": 1.253,
+     "lumaRing": 2.875
+    },
+    "v2→v1": {
+     "mad": 1.721,
+     "max": 32,
+     "inner": 1.352,
+     "ring": 4.324,
+     "lumaMAD": 1.275,
+     "lumaRing": 2.902
+    }
+   },
+   "shot": {
+    "v1": {
+     "shotMAD": 1.319,
+     "shotMax": 32,
+     "region": [
+      24,
+      160,
+      79,
+      83
+     ]
+    },
+    "v2": {
+     "shotMAD": 1.375,
+     "shotMax": 30,
+     "region": [
+      24,
+      160,
+      79,
+      83
+     ]
+    }
+   },
+   "shotMethod": "Chromium shot(검증 페이지, 맞춘 가운데에 48dp 로 css) vs 정지 자리 중앙값(v1 #7414–#7418 / v2 #3142–#3147), 상자 ±5px"
+  },
+  "hq": "woori/send-b/confirm-logo-woori.hq.svg"
+ },
+ {
+  "name": "confirm-logo-nh",
+  "file": "woori/send-b/confirm-logo-nh.png",
+  "frameBox": {
+   "x": 139.61,
+   "y": 166.373,
+   "w": 69.985,
+   "h": 69.818
+  },
+  "state": "confirm-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "confirm-render",
+    "element": "to-logo",
+    "frameBox": {
+     "x": 28.763,
+     "y": 255.091,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v1",
+    "sizeDp": 24
+   },
+   {
+    "state": "confirm-idle",
+    "element": "to-logo-48",
+    "frameBox": {
+     "x": 139.61,
+     "y": 166.373,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v1",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-transfer-pressed",
+    "element": "to-logo-48",
+    "frameBox": {
+     "x": 139.61,
+     "y": 166.373,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v1",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-processing",
+    "element": "to-logo-48",
+    "frameBox": {
+     "x": 139.61,
+     "y": 166.373,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v1",
+    "sizeDp": 48
+   }
+  ],
+  "dp": {
+   "x": 96.044,
+   "y": 83.048,
+   "w": 48.0,
+   "h": 48.0
+  },
+  "css": "position:absolute; left:96px; top:83px; width:48px; height:48px; translate:0.044px 0.048px",
+  "notes": "이체 확인 머리의 받는 계좌 지역농축협(nh-local — 농협은행 nh 와 같은 그림) 로고 48dp 원(그림의 주인은 send-a banks.nh — 이건 같은 그림을 확인 화면 48dp 자리에서 직접 자른 크기 전용 판). 확인 페이지 안(confirm-render 24dp → 모핑 → 48dp)에서는 이 그림 하나를 크기만 바꿔 쓴다: 모핑 진행도 p = easeInOutCubic 805ms (send-b.md 3.9) 로 원 상자가 24dp 가운데 v1 (32.019, 156.042) → 48dp 가운데 (120.044, 107.048) (dp, 앱) 곧게 · 지름 24→48 정비례. 금액 화면 24dp 와 그 밖의 은행은 banks.<code> (send-a) 를 쓴다. 원 맞춤(가장자리 휘도 50%, 720 방향, sd 0.079px): 가운데 (120.044, 107.048), 지름 48.082dp. 원본: v1 정지 구간 중앙값(v1 #7300–#7357) → 원 상자(48dp = 69.985x69.818 frame px) 격자로 EDSR x3 재표본(210x209) → 해석적 원 알파 → 가장자리 띠(1.33px) 인페인트 → 역투영 6회 (send-a 은행 로고와 같은 방법). 48dp 원 위끝은 두 로고 모두 ≈83.04–83.09 (스펙 2.7 의 to-logo-48 (96, 83.67) 은 템플릿 맞춤 오차 — 원 가장자리로 다시 재면 출금 로고와 같은 y). banks.nh(32dp 원본) 를 같은 48dp 자리에 놓으면 안쪽 평균차 5.41 → 이 그림은 0.27 — 48dp 에서는 이 그림이 뚜렷이 낫다. 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "verify": {
+   "composite": {
+    "v1-confirm": {
+     "mad": 2.125,
+     "max": 147,
+     "inner": 0.254,
+     "ring": 13.197,
+     "lumaMAD": 1.026,
+     "lumaRing": 5.225
+    }
+   },
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → frame 화소 면적 평균 vs 중앙값 (inner = 원 안 1.5px 안쪽, ring = 가장자리 ±1.5px). ring 의 큰 값은 노랑/흰 가장자리의 4:2:0 색 번짐(휘도 ring 은 작다)",
+   "bpMAD": [
+    3.036,
+    2.454,
+    2.283,
+    2.203,
+    2.163,
+    2.14,
+    2.125
+   ],
+   "vsBanksAtSameSite": {
+    "v1-confirm": {
+     "banksMAD": 5.907,
+     "banksInner": 5.405,
+     "thisMAD": 2.139,
+     "thisInner": 0.268
+    },
+    "v1-amount": {
+     "banksMAD": 7.072,
+     "banksInner": 5.169,
+     "thisMAD": 7.14,
+     "thisInner": 5.148
+    },
+    "v1-crender": {
+     "banksMAD": 6.891,
+     "banksInner": 5.274,
+     "thisMAD": 7.422,
+     "thisInner": 5.843
+    }
+   },
+   "shot": {
+    "v1": {
+     "shotMAD": 2.14,
+     "shotMax": 147,
+     "region": [
+      135,
+      160,
+      80,
+      83
+     ]
+    }
+   },
+   "shotMethod": "Chromium shot(검증 페이지, 맞춘 가운데에 48dp 로 css) vs 정지 자리 중앙값(v1 #7414–#7418 / v2 #3142–#3147), 상자 ±5px"
+  },
+  "hq": "woori/send-b/confirm-logo-nh.hq.png"
+ },
+ {
+  "name": "confirm-logo-kakao",
+  "file": "woori/send-b/confirm-logo-kakao.png",
+  "frameBox": {
+   "x": 139.664,
+   "y": 166.428,
+   "w": 69.985,
+   "h": 69.818
+  },
+  "state": "confirm-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "confirm-render",
+    "element": "to-logo",
+    "frameBox": {
+     "x": 28.823,
+     "y": 255.15,
+     "w": 34.993,
+     "h": 34.909
+    },
+    "video": "v2",
+    "sizeDp": 24
+   },
+   {
+    "state": "confirm-idle",
+    "element": "to-logo-48",
+    "frameBox": {
+     "x": 139.664,
+     "y": 166.428,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v2",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-transfer-pressed",
+    "element": "to-logo-48",
+    "frameBox": {
+     "x": 139.664,
+     "y": 166.428,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v2",
+    "sizeDp": 48
+   },
+   {
+    "state": "confirm-processing",
+    "element": "to-logo-48",
+    "frameBox": {
+     "x": 139.664,
+     "y": 166.428,
+     "w": 69.985,
+     "h": 69.818
+    },
+    "video": "v2",
+    "sizeDp": 48
+   }
+  ],
+  "dp": {
+   "x": 96.081,
+   "y": 83.086,
+   "w": 48.0,
+   "h": 48.0
+  },
+  "css": "position:absolute; left:96px; top:83px; width:48px; height:48px; translate:0.081px 0.086px",
+  "notes": "이체 확인 머리의 받는 계좌 카카오뱅크 로고 48dp 원(그림의 주인은 send-a banks.kakao — 이건 같은 그림을 확인 화면 48dp 자리에서 직접 자른 크기 전용 판). 확인 페이지 안(confirm-render 24dp → 모핑 → 48dp)에서는 이 그림 하나를 크기만 바꿔 쓴다: 모핑 진행도 p = easeInOutCubic 805ms (send-b.md 3.9) 로 원 상자가 24dp 가운데 v2 (32.060, 156.082) → 48dp 가운데 (120.081, 107.086) (dp, 앱) 곧게 · 지름 24→48 정비례. 금액 화면 24dp 와 그 밖의 은행은 banks.<code> (send-a) 를 쓴다. 원 맞춤(가장자리 휘도 50%, 720 방향, sd 0.107px): 가운데 (120.081, 107.086), 지름 48.177dp. 원본: v2 정지 구간 중앙값(v2 #3136–#3179 · #3278–#3290) → 원 상자(48dp = 69.985x69.818 frame px) 격자로 EDSR x3 재표본(210x209) → 해석적 원 알파 → 가장자리 띠(1.33px) 인페인트 → 역투영 6회 (send-a 은행 로고와 같은 방법). 48dp 원 위끝은 두 로고 모두 ≈83.04–83.09 (스펙 2.7 의 to-logo-48 (96, 83.67) 은 템플릿 맞춤 오차 — 원 가장자리로 다시 재면 출금 로고와 같은 y). banks.kakao(32dp 원본) 를 같은 48dp 자리에 놓으면 안쪽 평균차 4.97 → 이 그림은 0.34 — 48dp 에서는 이 그림이 뚜렷이 낫다. 놓는 법: css 그대로 — left/top 은 정수 dp, 남는 소수는 translate(wooriPlace 와 같은 규칙). 소수 크기는 정수 상자 + scale (Chromium 이 레이아웃 크기를 반올림해 그림이 늘거나 주는 것을 피함, launch 에셋 실험).",
+  "verify": {
+   "composite": {
+    "v2-confirm": {
+     "mad": 2.452,
+     "max": 196,
+     "inner": 0.329,
+     "ring": 15.705,
+     "lumaMAD": 0.972,
+     "lumaRing": 4.991
+    }
+   },
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → frame 화소 면적 평균 vs 중앙값 (inner = 원 안 1.5px 안쪽, ring = 가장자리 ±1.5px). ring 의 큰 값은 노랑/흰 가장자리의 4:2:0 색 번짐(휘도 ring 은 작다)",
+   "bpMAD": [
+    3.471,
+    2.765,
+    2.598,
+    2.524,
+    2.488,
+    2.466,
+    2.452
+   ],
+   "vsBanksAtSameSite": {
+    "v2-confirm": {
+     "banksMAD": 5.851,
+     "banksInner": 4.975,
+     "thisMAD": 2.459,
+     "thisInner": 0.34
+    },
+    "v2-amount": {
+     "banksMAD": 7.677,
+     "banksInner": 4.852,
+     "thisMAD": 8.02,
+     "thisInner": 5.381
+    },
+    "v2-crender": {
+     "banksMAD": 7.675,
+     "banksInner": 5.361,
+     "thisMAD": 8.195,
+     "thisInner": 6.241
+    }
+   },
+   "shot": {
+    "v2": {
+     "shotMAD": 2.349,
+     "shotMax": 196,
+     "region": [
+      135,
+      160,
+      80,
+      83
+     ]
+    }
+   },
+   "shotMethod": "Chromium shot(검증 페이지, 맞춘 가운데에 48dp 로 css) vs 정지 자리 중앙값(v1 #7414–#7418 / v2 #3142–#3147), 상자 ±5px"
+  },
+  "hq": "woori/send-b/confirm-logo-kakao.hq.svg"
+ }
+]

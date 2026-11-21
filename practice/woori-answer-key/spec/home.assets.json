@@ -1,0 +1,6467 @@
+[
+ {
+  "name": "wallet",
+  "file": "woori/home/wallet.svg",
+  "frameBox": {
+   "x": 285.348,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner2",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#313237",
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "ic_wallet",
+    "frameBox": {
+     "x": 285.348,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "ic_wallet",
+    "frameBox": {
+     "x": 285.348,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "ic_wallet",
+    "frameBox": {
+     "x": 285.348,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "ic_wallet",
+    "frameBox": {
+     "x": 285.348,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "ic_wallet",
+    "frameBox": {
+     "x": 285.348,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "ic_wallet",
+    "frameBox": {
+     "x": 285.348,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 196,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:196px; top:14px; width:24px; height:24px",
+  "notes": "머리 지갑 아이콘 (24dp 칸 196,14 — 머리는 고정이라 모든 상태 같은 자리). 선 굵기 1.97dp, 모서리 r1.93, 오른쪽 점 r1.46. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    282,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner2": {
+     "svgFitL1": 0.0152,
+     "relErr": 0.0781,
+     "centroidOffsetPx": [
+      -0.068,
+      0.049
+     ],
+     "inkMassRatio": 0.9636,
+     "rgbMAD": 3.45,
+     "rgbMax": 78
+    },
+    "top-banner1": {
+     "svgFitL1": 0.0147,
+     "relErr": 0.0756,
+     "centroidOffsetPx": [
+      -0.062,
+      0.053
+     ],
+     "inkMassRatio": 0.9607,
+     "rgbMAD": 3.269,
+     "rgbMax": 80
+    },
+    "banner-3": {
+     "svgFitL1": 0.015,
+     "relErr": 0.0768,
+     "centroidOffsetPx": [
+      -0.061,
+      0.047
+     ],
+     "inkMassRatio": 0.9622,
+     "rgbMAD": 3.364,
+     "rgbMax": 74
+    }
+   },
+   "svgFitL1": 0.015,
+   "relErr": 0.0768,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner2",
+    "params": [
+     3.0176,
+     20.9424,
+     3.0238,
+     6.9582,
+     20.9531,
+     16.7586,
+     1.9272,
+     1.9723,
+     16.4607,
+     13.9754,
+     1.4638,
+     0.3734
+    ],
+    "sigmaPx": 0.373,
+    "fitMAD": 2.204,
+    "fitMax": 61,
+    "svgFitL1Model": 0.0107,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "bell-dot",
+  "file": "woori/home/bell-dot.svg",
+  "frameBox": {
+   "x": 401.991,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner2",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2f3336",
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "ic_bell",
+    "frameBox": {
+     "x": 401.991,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "ic_bell",
+    "frameBox": {
+     "x": 401.991,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "ic_bell",
+    "frameBox": {
+     "x": 401.991,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "ic_bell",
+    "frameBox": {
+     "x": 401.991,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "ic_bell",
+    "frameBox": {
+     "x": 401.991,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "ic_bell",
+    "frameBox": {
+     "x": 401.991,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 276,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:276px; top:14px; width:24px; height:24px",
+  "notes": "머리 알림 종(선, #2f3336, 굵기 1.97dp) + 빨간 점(#d3555b, 중심 22.18,2.13 r2.11 — 상자 오른쪽 끝에 걸쳐 0.3dp 잘림, 원래도 같은 자리). 종 아래 추는 납작한 타원호. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    398,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner2": {
+     "svgFitL1": 0.0188,
+     "relErr": 0.1285,
+     "centroidOffsetPx": [
+      -0.07,
+      0.119
+     ],
+     "inkMassRatio": 1.0013,
+     "rgbMAD": 4.336,
+     "rgbMax": 78
+    },
+    "top-banner1": {
+     "svgFitL1": 0.0187,
+     "relErr": 0.1267,
+     "centroidOffsetPx": [
+      -0.057,
+      0.172
+     ],
+     "inkMassRatio": 0.9919,
+     "rgbMAD": 4.053,
+     "rgbMax": 83
+    },
+    "banner-3": {
+     "svgFitL1": 0.0175,
+     "relErr": 0.1219,
+     "centroidOffsetPx": [
+      -0.077,
+      0.175
+     ],
+     "inkMassRatio": 1.0178,
+     "rgbMAD": 4.477,
+     "rgbMax": 78
+    }
+   },
+   "svgFitL1": 0.0187,
+   "relErr": 0.1267,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner2",
+    "params": [
+     12.0087,
+     8.1301,
+     16.5353,
+     6.2895,
+     13.1483,
+     5.4804,
+     8.7081,
+     5.7469,
+     0.772,
+     1.9715,
+     20.0031,
+     2.408,
+     22.1849,
+     2.1321,
+     2.108,
+     0.8329,
+     0.9367,
+     0.4492
+    ],
+    "sigmaPx": 0.449,
+    "fitMAD": 3.442,
+    "fitMax": 77,
+    "svgFitL1Model": 0.0244,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "menu",
+  "file": "woori/home/menu.svg",
+  "frameBox": {
+   "x": 460.312,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner2",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#26282d",
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "ic_menu",
+    "frameBox": {
+     "x": 460.312,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "ic_menu",
+    "frameBox": {
+     "x": 460.312,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "ic_menu",
+    "frameBox": {
+     "x": 460.312,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "ic_menu",
+    "frameBox": {
+     "x": 460.312,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "ic_menu",
+    "frameBox": {
+     "x": 460.312,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "ic_menu",
+    "frameBox": {
+     "x": 460.312,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 316,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:316px; top:14px; width:24px; height:24px",
+  "notes": "머리 ☰ (세 줄 x 3.97–20.07, 간격 6.01, 굵기 1.87dp, 둥근 끝). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    457,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner2": {
+     "svgFitL1": 0.0157,
+     "relErr": 0.1287,
+     "centroidOffsetPx": [
+      -0.101,
+      0.139
+     ],
+     "inkMassRatio": 0.9828,
+     "rgbMAD": 3.604,
+     "rgbMax": 50
+    },
+    "top-banner1": {
+     "svgFitL1": 0.0201,
+     "relErr": 0.1562,
+     "centroidOffsetPx": [
+      -0.066,
+      0.061
+     ],
+     "inkMassRatio": 0.9314,
+     "rgbMAD": 4.052,
+     "rgbMax": 50
+    },
+    "banner-3": {
+     "svgFitL1": 0.0157,
+     "relErr": 0.1284,
+     "centroidOffsetPx": [
+      -0.151,
+      0.003
+     ],
+     "inkMassRatio": 0.9785,
+     "rgbMAD": 3.611,
+     "rgbMax": 51
+    }
+   },
+   "svgFitL1": 0.0157,
+   "relErr": 0.1287,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner2",
+    "params": [
+     3.9731,
+     20.0733,
+     11.9899,
+     6.0092,
+     1.8671,
+     0.4626
+    ],
+    "sigmaPx": 0.463,
+    "fitMAD": 2.749,
+    "fitMax": 33,
+    "svgFitL1Model": 0.0166,
+    "variant": "round"
+   }
+  }
+ },
+ {
+  "name": "ai-chat-bubble",
+  "file": "woori/home/ai-chat-bubble.svg",
+  "frameBox": {
+   "x": 343.67,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner2",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2f3239",
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 236,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:236px; top:14px; width:24px; height:24px",
+  "notes": "AI 말풍선 테두리(고정 겹): 원호(중심 11.1,12.0 r8.69, 위 끝 −83° → 오른쪽 아래 −298°) + 꼬리(19.36,20.37 꺾임 → 19.64,11.71). 굵기 2.0dp. 휘도만으로 맞춤(빈 말풍선 위상 프레임 #436–#440·#710–#715·#786–#790·#1138–#1142 휘도 중앙값, 반짝이 자리 빼고) → 색은 컬러 기준 그림에서 다시 풀어 #2f3239. 겹 순서: bubble → (ai | lines) → sparkle(PNG). 안쪽 내용은 전환 ai-icon-cycle (주기 7.982s, 전역 시계). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    340,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "lines:top-banner2": {
+     "svgFitL1": 0.0192,
+     "relErr": 0.1067,
+     "centroidOffsetPx": [
+      -0.108,
+      -0.114
+     ],
+     "inkMassRatio": 0.9829,
+     "rgbMAD": 4.631,
+     "rgbMax": 105
+    },
+    "ai:scrolled-206": {
+     "svgFitL1": 0.019,
+     "relErr": 0.0986,
+     "centroidOffsetPx": [
+      -0.05,
+      -0.119
+     ],
+     "inkMassRatio": 0.9788,
+     "rgbMAD": 4.409,
+     "rgbMax": 161
+    },
+    "ai:banner-3": {
+     "svgFitL1": 0.0196,
+     "relErr": 0.1016,
+     "centroidOffsetPx": [
+      -0.107,
+      -0.143
+     ],
+     "inkMassRatio": 0.9758,
+     "rgbMAD": 4.772,
+     "rgbMax": 162
+    }
+   },
+   "note": "테두리는 따로 찍지 않고 세 겹(테두리+안쪽+반짝이) 합성으로 검증",
+   "svgFitL1": 0.0192,
+   "relErr": 0.1016,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "ai-empty",
+    "params": [
+     11.105,
+     11.9817,
+     8.6909,
+     -1.4501,
+     -5.2041,
+     18.918,
+     20.3747,
+     11.7066,
+     2.0072,
+     0.3703,
+     19.6448,
+     0.4405
+    ],
+    "sigmaPx": 0.441,
+    "fitMAD": 3.751,
+    "fitMax": 161,
+    "svgFitL1Model": 0.0216,
+    "variant": null
+   },
+   "compositeWith": [
+    "ai-chat-lines",
+    "ai-chat-sparkle"
+   ]
+  }
+ },
+ {
+  "name": "ai-chat-ai",
+  "file": "woori/home/ai-chat-ai.svg",
+  "frameBox": {
+   "x": 343.67,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "scrolled-206",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2b2e34",
+  "usedIn": [
+   {
+    "state": "scrolled-206",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 236,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:236px; top:14px; width:24px; height:24px",
+  "notes": "말풍선 안 \"AI\" 글자 (A: 꼭대기 평평 0.9dp, 반폭 2.61, 아래 15.43, 가로대 13.65 / I: x 14.73), 굵기 1.44dp, 각진 끝. 겹: 주기 1990–7982ms 에 보임, 0–160ms 페이드 아웃·1790–1990ms 페이드 인 (opacity). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    340,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "scrolled-206": {
+     "svgFitL1": 0.019,
+     "relErr": 0.0986,
+     "centroidOffsetPx": [
+      -0.05,
+      -0.119
+     ],
+     "inkMassRatio": 0.9788,
+     "rgbMAD": 4.409,
+     "rgbMax": 161
+    },
+    "banner-3": {
+     "svgFitL1": 0.0196,
+     "relErr": 0.1016,
+     "centroidOffsetPx": [
+      -0.107,
+      -0.143
+     ],
+     "inkMassRatio": 0.9758,
+     "rgbMAD": 4.772,
+     "rgbMax": 162
+    }
+   },
+   "svgFitL1": 0.0196,
+   "relErr": 0.1016,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "ai-ai-y",
+    "params": [
+     9.927,
+     9.6568,
+     2.6136,
+     15.4257,
+     13.6543,
+     14.7298,
+     1.4352,
+     0.8965,
+     0.4475
+    ],
+    "sigmaPx": 0.447,
+    "fitMAD": 4.255,
+    "fitMax": 161,
+    "svgFitL1Model": 0.0236,
+    "variant": null
+   },
+   "compositeWith": [
+    "ai-chat-bubble",
+    "ai-chat-sparkle"
+   ]
+  }
+ },
+ {
+  "name": "ai-chat-lines",
+  "file": "woori/home/ai-chat-lines.svg",
+  "frameBox": {
+   "x": 343.67,
+   "y": 65.939,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner2",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2b2e34",
+  "usedIn": [
+   {
+    "state": "top-banner2",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 343.67,
+     "y": 65.939,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 236,
+   "y": 14,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:236px; top:14px; width:24px; height:24px",
+  "notes": "말풍선 안 \"≡\" 두 줄 (x 7.24 → 15.21 / 13.17, y 11.05 · 14.40, 굵기 1.51dp, 각진 끝). 280–660ms 에 윗줄부터 왼→오로 그려짐(stroke-dashoffset 또는 clip), 1500–1670ms 페이드 아웃. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    340,
+    62,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner2": {
+     "svgFitL1": 0.0192,
+     "relErr": 0.1067,
+     "centroidOffsetPx": [
+      -0.108,
+      -0.114
+     ],
+     "inkMassRatio": 0.9829,
+     "rgbMAD": 4.631,
+     "rgbMax": 105
+    }
+   },
+   "svgFitL1": 0.0192,
+   "relErr": 0.1067,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "ai-lines-y",
+    "params": [
+     7.2439,
+     15.2148,
+     13.1682,
+     11.0543,
+     14.399,
+     1.5133,
+     0.4369
+    ],
+    "sigmaPx": 0.437,
+    "fitMAD": 4.163,
+    "fitMax": 163,
+    "svgFitL1Model": 0.0246,
+    "variant": "butt"
+   },
+   "compositeWith": [
+    "ai-chat-bubble",
+    "ai-chat-sparkle"
+   ]
+  }
+ },
+ {
+  "name": "ai-chat-sparkle",
+  "file": "woori/home/ai-chat-sparkle.png",
+  "frameBox": {
+   "x": 360.0,
+   "y": 63.0,
+   "w": 21.0,
+   "h": 22.0
+  },
+  "state": "top-banner2",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 360.0,
+     "y": 63.0,
+     "w": 21.0,
+     "h": 22.0
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 360.0,
+     "y": 63.0,
+     "w": 21.0,
+     "h": 22.0
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 360.0,
+     "y": 63.0,
+     "w": 21.0,
+     "h": 22.0
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 360.0,
+     "y": 63.0,
+     "w": 21.0,
+     "h": 22.0
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 360.0,
+     "y": 63.0,
+     "w": 21.0,
+     "h": 22.0
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "ic_ai",
+    "frameBox": {
+     "x": 360.0,
+     "y": 63.0,
+     "w": 21.0,
+     "h": 22.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 247.2003,
+   "y": 11.9792,
+   "w": 14.403,
+   "h": 15.125
+  },
+  "css": "position:absolute; left:247px; top:11px; width:14px; height:15px; transform-origin:0 0; transform:translate(0.2003px, 0.9792px) scale(1.028786, 1.008333)",
+  "notes": "AI 말풍선 오른쪽 위 파랑→보라 그라데이션 별(네 갈래). top-banner2·scrolled-206·top-banner1 기준 그림 채널별 중앙값 → 여백 8px 크롭 → EDSR x3 → 역투영 6회 → 바탕 = 머리 #eff0f3 + 말풍선 테두리 모형(3x 렌더) 기준 color-to-alpha. 채도(>40) 지지 영역만 남기고(≡·AI·테두리 끝 제외) 채도>70 안쪽은 α=1. 말풍선 SVG 위에 겹친다. · critic 고침: PNG 아래 끝(57행 아래, x≥34)에 낀 말풍선 테두리 조각(어두운 화소 23개) 지움. critic: 반짝이는 고정이 아니다 — AI 주기 시작 +2.32→+3.07s 동안 별이 돌며 두 번 흔들림(전환 ai-icon-cycle keep.sparkle). 앱은 이 PNG 를 rotate/scale 키프레임으로 돌린다",
+  "verify": {
+   "compositeMAD": 5.409,
+   "compositeMax": 183.0,
+   "note": "compositeMAD 는 테두리 끝·≡ 끝(빼낸 것)도 포함한 크롭 전체 값. 아이콘 전체 합성 검증은 ai-chat-lines/ai 의 verify (Chromium, 세 겹 합성)",
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/ai-chat-sparkle.hq.png"
+ },
+ {
+  "name": "notice-bell",
+  "file": "woori/home/notice-bell.svg",
+  "frameBox": {
+   "x": 57.896,
+   "y": 167.758,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#f9b811",
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "settle",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "cached",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "notice_bell",
+    "frameBox": {
+     "x": 57.896,
+     "y": 167.758,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 40,
+   "y": 84,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:40px; top:84px; width:24px; height:24px",
+  "notes": "공지 카드 종 (채운 노랑 #f9b811 + 주황 추 #e58418). 타일(40dp, #fdf2cf, r12)은 CSS — 이 그림은 타일 가운데 24dp 칸(앱 40,84). 테두리처럼 보이는 진한 가장자리는 4:2:0 색 번짐(코덱)이라 그리지 않음. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    54,
+    164,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0251,
+     "relErr": 0.0939,
+     "centroidOffsetPx": [
+      -0.044,
+      0.021
+     ],
+     "inkMassRatio": 0.9724,
+     "rgbMAD": 3.56,
+     "rgbMax": 118
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0246,
+     "relErr": 0.0918,
+     "centroidOffsetPx": [
+      -0.096,
+      -0.005
+     ],
+     "inkMassRatio": 0.9703,
+     "rgbMAD": 3.695,
+     "rgbMax": 125
+    },
+    "banner-3": {
+     "svgFitL1": 0.0244,
+     "relErr": 0.0913,
+     "centroidOffsetPx": [
+      -0.079,
+      0.022
+     ],
+     "inkMassRatio": 0.973,
+     "rgbMAD": 3.658,
+     "rgbMax": 123
+    }
+   },
+   "svgFitL1": 0.0246,
+   "relErr": 0.0918,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     12.2654,
+     6.7073,
+     9.2541,
+     6.8218,
+     12.7779,
+     8.7957,
+     15.7368,
+     17.7979,
+     1.0671,
+     19.1787,
+     3.3936,
+     3.029,
+     0.6547
+    ],
+    "sigmaPx": 0.655,
+    "fitMAD": 3.404,
+    "fitMax": 76,
+    "svgFitL1Model": 0.026,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "close-x-small",
+  "file": "woori/home/close-x-small.svg",
+  "frameBox": {
+   "x": 460.312,
+   "y": 150.303,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#7e8082",
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "settle",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "cached",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "notice_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 150.303,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "settle",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "cached",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "other_close",
+    "frameBox": {
+     "x": 460.312,
+     "y": 429.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 316,
+   "y": 72,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:316px; top:72px; width:16px; height:16px",
+  "notes": "작은 ✕ (공지 카드·다른 은행 카드 오른쪽 위, 16dp 칸 = 카드 위끝 +12·오른쪽 끝 −28). 반팔 4.12dp, 굵기 1.72dp, 둥근 끝. 다른 은행 카드 ✕ 는 같은 그림을 (316, 264) 에. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    457,
+    147,
+    30,
+    30
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0162,
+     "relErr": 0.1556,
+     "centroidOffsetPx": [
+      -0.285,
+      -0.195
+     ],
+     "inkMassRatio": 0.9395,
+     "rgbMAD": 2.049,
+     "rgbMax": 21
+    },
+    "top-banner3": {
+     "svgFitL1": 0.0189,
+     "relErr": 0.1807,
+     "centroidOffsetPx": [
+      -0.31,
+      -0.359
+     ],
+     "inkMassRatio": 0.9344,
+     "rgbMAD": 2.396,
+     "rgbMax": 23
+    },
+    "banner-3": {
+     "svgFitL1": 0.0216,
+     "relErr": 0.1994,
+     "centroidOffsetPx": [
+      -0.256,
+      -0.243
+     ],
+     "inkMassRatio": 0.902,
+     "rgbMAD": 2.739,
+     "rgbMax": 25
+    }
+   },
+   "svgFitL1": 0.0189,
+   "relErr": 0.1807,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     8.0182,
+     8.0041,
+     4.1194,
+     1.7247,
+     0.429
+    ],
+    "sigmaPx": 0.429,
+    "fitMAD": 1.454,
+    "fitMax": 12,
+    "svgFitL1Model": 0.0171,
+    "variant": "round"
+   }
+  }
+ },
+ {
+  "name": "gear",
+  "file": "woori/home/gear.svg",
+  "frameBox": {
+   "x": 34.567,
+   "y": 359.273,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#7b8188",
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "settle",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "cached",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 359.273,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "scroll-206",
+    "element": "chip_home_gear",
+    "frameBox": {
+     "x": 34.567,
+     "y": 217.193,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 24,
+   "y": 215.667,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:24px; top:215px; width:16px; height:16px; translate:0px 0.667px",
+  "notes": "홈계좌설정 칩 톱니 (6톱니 별, 끝 r7.36 · 골 r4.89, 둥글기 0.81/0.61, 가운데 구멍 r1.95 evenodd). 16dp 칸 = 칩 왼쪽 +8. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    31,
+    356,
+    30,
+    30
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0151,
+     "relErr": 0.0659,
+     "centroidOffsetPx": [
+      0.003,
+      0.014
+     ],
+     "inkMassRatio": 0.9724,
+     "rgbMAD": 2.255,
+     "rgbMax": 30
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0154,
+     "relErr": 0.0674,
+     "centroidOffsetPx": [
+      0.01,
+      -0.0
+     ],
+     "inkMassRatio": 0.9769,
+     "rgbMAD": 2.327,
+     "rgbMax": 27
+    },
+    "banner-3": {
+     "svgFitL1": 0.0152,
+     "relErr": 0.0663,
+     "centroidOffsetPx": [
+      0.009,
+      0.025
+     ],
+     "inkMassRatio": 0.976,
+     "rgbMAD": 2.232,
+     "rgbMax": 29
+    }
+   },
+   "svgFitL1": 0.0152,
+   "relErr": 0.0663,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     7.9696,
+     8.3115,
+     7.3647,
+     4.8854,
+     0.8109,
+     0.6094,
+     -0.0035,
+     1.9528,
+     0.4277
+    ],
+    "sigmaPx": 0.428,
+    "fitMAD": 1.874,
+    "fitMax": 22,
+    "svgFitL1Model": 0.0161,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "kebab",
+  "file": "woori/home/kebab.svg",
+  "frameBox": {
+   "x": 454.48,
+   "y": 674.424,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#848386",
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "settle",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "cached",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 674.424,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 596.815,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "won_kebab",
+    "frameBox": {
+     "x": 454.48,
+     "y": 596.954,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 312,
+   "y": 432.333,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:312px; top:432px; width:24px; height:24px; translate:0px 0.333px",
+  "notes": "WON 통장 카드 ⋮ (24dp 칸 = 카드 위끝 +14). 점 r1.65, 간격 5.82dp. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    451,
+    671,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0082,
+     "relErr": 0.2292,
+     "centroidOffsetPx": [
+      -0.896,
+      0.148
+     ],
+     "inkMassRatio": 0.8281,
+     "rgbMAD": 1.018,
+     "rgbMax": 27
+    },
+    "top-banner3": {
+     "svgFitL1": 0.0088,
+     "relErr": 0.2397,
+     "centroidOffsetPx": [
+      0.468,
+      0.572
+     ],
+     "inkMassRatio": 0.8128,
+     "rgbMAD": 1.085,
+     "rgbMax": 25
+    },
+    "banner-3": {
+     "svgFitL1": 0.0132,
+     "relErr": 0.3262,
+     "centroidOffsetPx": [
+      0.5,
+      -0.161
+     ],
+     "inkMassRatio": 0.734,
+     "rgbMAD": 1.631,
+     "rgbMax": 29
+    }
+   },
+   "svgFitL1": 0.0088,
+   "relErr": 0.2397,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     12.0073,
+     11.6609,
+     5.8155,
+     1.6511,
+     0.403
+    ],
+    "sigmaPx": 0.403,
+    "fitMAD": 0.829,
+    "fitMax": 9,
+    "svgFitL1Model": 0.0076,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "copy",
+  "file": "woori/home/copy.svg",
+  "frameBox": {
+   "x": 339.296,
+   "y": 717.576,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#858585",
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "settle",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "cached",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 717.576,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 639.967,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "won_copy",
+    "frameBox": {
+     "x": 339.296,
+     "y": 640.106,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 233,
+   "y": 462,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:233px; top:462px; width:16px; height:16px",
+  "notes": "계좌번호 옆 복사 (앞 둥근 사각 6.13–14.03 x 5.86–13.67, r1.55 + 뒤 ㄱ자, 굵기 1.34dp). **x 는 계좌 글자 끝 + ≈4dp 를 따라간다** — 이 상자(233)는 영상 계좌 글자 폭 기준; 더미 계좌번호는 폭이 달라 글자 끝에 붙여 놓는다 (스펙 won_copy). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    336,
+    714,
+    30,
+    30
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0227,
+     "relErr": 0.1441,
+     "centroidOffsetPx": [
+      0.007,
+      0.009
+     ],
+     "inkMassRatio": 0.9407,
+     "rgbMAD": 2.801,
+     "rgbMax": 30
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0267,
+     "relErr": 0.1671,
+     "centroidOffsetPx": [
+      -0.001,
+      -0.141
+     ],
+     "inkMassRatio": 0.9266,
+     "rgbMAD": 3.294,
+     "rgbMax": 31
+    },
+    "banner-3": {
+     "svgFitL1": 0.0265,
+     "relErr": 0.1664,
+     "centroidOffsetPx": [
+      -0.041,
+      -0.126
+     ],
+     "inkMassRatio": 0.9293,
+     "rgbMAD": 3.27,
+     "rgbMax": 34
+    }
+   },
+   "svgFitL1": 0.0265,
+   "relErr": 0.1664,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     6.1291,
+     5.8626,
+     14.0308,
+     13.6713,
+     1.5524,
+     3.7375,
+     9.4318,
+     2.0382,
+     1.6645,
+     9.6649,
+     3.3953,
+     1.3864,
+     1.3393,
+     0.3961
+    ],
+    "sigmaPx": 0.396,
+    "fitMAD": 2.282,
+    "fitMax": 28,
+    "svgFitL1Model": 0.0209,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "strip-arrow",
+  "file": "woori/home/strip-arrow.svg",
+  "frameBox": {
+   "x": 72.476,
+   "y": 878.546,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#ffffff",
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "settle",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "cached",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 878.546,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 800.937,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 801.076,
+     "w": 23.328,
+     "h": 23.273
+    }
+   },
+   {
+    "state": "scroll-206",
+    "element": "won_strip_arrow",
+    "frameBox": {
+     "x": 72.476,
+     "y": 736.466,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 50,
+   "y": 572.667,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:50px; top:572px; width:16px; height:16px; translate:0px 0.667px",
+  "notes": "WON 통장 파란 띠(#3794f6) 흰 굽은 화살표 (채운 다각형: 꼬리 곡선 + 둥근 머리). 16dp 칸 = 띠 세로 가운데. 흰/파랑 가장자리의 색 번짐(분홍·청록)은 코덱이라 그리지 않음. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    69,
+    875,
+    30,
+    30
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0232,
+     "relErr": 0.1724,
+     "centroidOffsetPx": [
+      0.107,
+      -0.103
+     ],
+     "inkMassRatio": 0.969,
+     "rgbMAD": 4.326,
+     "rgbMax": 100
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0257,
+     "relErr": 0.1886,
+     "centroidOffsetPx": [
+      0.066,
+      -0.114
+     ],
+     "inkMassRatio": 0.9557,
+     "rgbMAD": 4.388,
+     "rgbMax": 98
+    },
+    "banner-3": {
+     "svgFitL1": 0.0285,
+     "relErr": 0.2048,
+     "centroidOffsetPx": [
+      0.052,
+      -0.123
+     ],
+     "inkMassRatio": 0.9362,
+     "rgbMAD": 4.661,
+     "rgbMax": 107
+    }
+   },
+   "svgFitL1": 0.0257,
+   "relErr": 0.1886,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     2.7642,
+     3.0981,
+     4.2048,
+     5.5197,
+     9.793,
+     6.8219,
+     9.7205,
+     2.6508,
+     15.4177,
+     8.0699,
+     10.1159,
+     13.1803,
+     9.3959,
+     9.6313,
+     1.9373,
+     8.9387,
+     0.953,
+     1.7719,
+     0.5725,
+     0.5567
+    ],
+    "sigmaPx": 0.557,
+    "fitMAD": 4.177,
+    "fitMax": 88,
+    "svgFitL1Model": 0.0219,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "woori-logo-40",
+  "file": "woori/home/woori-logo-40.png",
+  "frameBox": {
+   "x": 44.0,
+   "y": 679.0,
+   "w": 62.0,
+   "h": 62.0
+  },
+  "state": "top-banner1",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "settle",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "cached",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 679.0,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 601.391,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 601.53,
+     "w": 62.0,
+     "h": 62.0
+    }
+   },
+   {
+    "state": "scroll-206",
+    "element": "won_logo_circle",
+    "frameBox": {
+     "x": 44.0,
+     "y": 536.92,
+     "w": 62.0,
+     "h": 62.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 30.4695,
+   "y": 435.4792,
+   "w": 42.5231,
+   "h": 42.625
+  },
+  "css": "position:absolute; left:30px; top:435px; width:43px; height:43px; transform-origin:0 0; transform:translate(0.4695px, 0.4792px) scale(0.988909, 0.991279)",
+  "notes": "WON 통장 카드 우리 로고 원 40dp (연파랑 원 #c0e1fe + 파랑 그라데이션 띠). 원(중심 75.39,710.79 px, 반지름 20dp) 안쪽(가장자리 1.2px 빼고)은 α=1 — 흰 카드 밖에서도 비지 않음, 원 밖 투명. top-banner1 크롭(여백 8) → EDSR x3 → 역투영 6회 → 흰색 기준 color-to-alpha. 원 상자(스펙 won_logo_circle 32,437.333 40x40dp)가 PNG 안 (6,7)px 에 있다 — css 는 PNG 상자 그대로.",
+  "verify": {
+   "compositeMAD": 0.502,
+   "compositeMax": 7.0,
+   "compositeMethod": "PNG 를 흰 바탕에 합성 → 3x3 면적 축소 vs 크롭 (frame px, RGB 평균 절대차)",
+   "otherSrcMAD": {
+    "top-banner3": 2.156,
+    "banner-3": 2.323
+   }
+  },
+  "hq": "woori/home/woori-logo-40.hq.svg"
+ },
+ {
+  "name": "other-bank-logos",
+  "file": "woori/home/other-bank-logos.png",
+  "frameBox": {
+   "x": 168.0,
+   "y": 434.0,
+   "w": 188.0,
+   "h": 52.0
+  },
+  "state": "top-banner1",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "top-banner1",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "settle",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "cached",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "other_logos",
+    "frameBox": {
+     "x": 168.0,
+     "y": 434.0,
+     "w": 188.0,
+     "h": 52.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 115.5157,
+   "y": 267.0417,
+   "w": 128.9411,
+   "h": 35.75
+  },
+  "css": "position:absolute; left:115px; top:267px; width:129px; height:36px; transform-origin:0 0; transform:translate(0.5157px, 0.0417px) scale(0.999543, 0.993056)",
+  "notes": "다른 은행 계좌 카드의 겹친 로고 원 5개(카카오뱅크·토스·KB·하나·…) 한 장. 원 32dp, 피치 23.46dp(34.2px), 가운데 정렬 — 원 합집합 안(가장자리 1.2px 빼고) α=1(원 사이 흰 테두리 포함), 밖 투명. 금융회사 로고의 주인은 send-a(banks.*)지만 이 줄은 크기·겹침·흰 테두리가 달라 홈 그림으로 따로 둔다. top-banner1 크롭 → EDSR x3 → 역투영 → 흰색 기준 color-to-alpha.",
+  "verify": {
+   "compositeMAD": 0.508,
+   "compositeMax": 7.0,
+   "compositeMethod": "흰 바탕 합성 → 3x3 면적 축소 vs 크롭",
+   "otherSrcMAD": {
+    "top-banner3": 1.985,
+    "banner-3": 2.317
+   },
+   "discsPx": [
+    [
+     193.35,
+     459.25,
+     23.33,
+     23.27
+    ],
+    [
+     227.55,
+     459.25,
+     23.33,
+     23.27
+    ],
+    [
+     261.75,
+     459.25,
+     23.33,
+     23.27
+    ],
+    [
+     295.95,
+     459.25,
+     23.33,
+     23.27
+    ],
+    [
+     330.15,
+     459.25,
+     23.33,
+     23.27
+    ]
+   ]
+  },
+  "hq": "woori/home/other-bank-logos.hq.png"
+ },
+ {
+  "name": "tab-product",
+  "file": "woori/home/tab-product.svg",
+  "frameBox": {
+   "x": 34.567,
+   "y": 1133.576,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#444549",
+  "usedIn": [
+   {
+    "state": "loading-spinner",
+    "element": "tab_product_icon",
+    "frameBox": {
+     "x": 34.567,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "tab_product_icon",
+    "frameBox": {
+     "x": 34.567,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "tab_product_icon",
+    "frameBox": {
+     "x": 34.567,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "tab_product_icon",
+    "frameBox": {
+     "x": 34.567,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "tab_product_icon",
+    "frameBox": {
+     "x": 34.567,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 24,
+   "y": 748,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:24px; top:748px; width:24px; height:24px",
+  "notes": "탭 상품 (쇼핑백: 사다리꼴 — 위 반폭 9.23 · 아래 10.14, 모서리 r3.38, 손잡이 U, 굵기 2.0dp). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    31,
+    1130,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0185,
+     "relErr": 0.0889,
+     "centroidOffsetPx": [
+      -0.029,
+      0.084
+     ],
+     "inkMassRatio": 0.9668,
+     "rgbMAD": 3.455,
+     "rgbMax": 59
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0173,
+     "relErr": 0.0846,
+     "centroidOffsetPx": [
+      -0.091,
+      0.084
+     ],
+     "inkMassRatio": 0.9852,
+     "rgbMAD": 4.171,
+     "rgbMax": 60
+    },
+    "banner-3": {
+     "svgFitL1": 0.0176,
+     "relErr": 0.0853,
+     "centroidOffsetPx": [
+      -0.074,
+      0.104
+     ],
+     "inkMassRatio": 0.9744,
+     "rgbMAD": 3.298,
+     "rgbMax": 58
+    }
+   },
+   "svgFitL1": 0.0176,
+   "relErr": 0.0853,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     11.9599,
+     9.2314,
+     10.1426,
+     2.2992,
+     22.3515,
+     3.3861,
+     3.3747,
+     2.0012,
+     8.9854,
+     15.0004,
+     7.3748,
+     11.4851,
+     0.4119
+    ],
+    "sigmaPx": 0.412,
+    "fitMAD": 2.119,
+    "fitMax": 17,
+    "svgFitL1Model": 0.0146,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "tab-asset",
+  "file": "woori/home/tab-asset.svg",
+  "frameBox": {
+   "x": 138.087,
+   "y": 1132.121,
+   "w": 37.909,
+   "h": 37.818
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#49494e",
+  "usedIn": [
+   {
+    "state": "loading-spinner",
+    "element": "tab_asset_icon",
+    "frameBox": {
+     "x": 138.087,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "tab_asset_icon",
+    "frameBox": {
+     "x": 138.087,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "tab_asset_icon",
+    "frameBox": {
+     "x": 138.087,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "tab_asset_icon",
+    "frameBox": {
+     "x": 138.087,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "tab_asset_icon",
+    "frameBox": {
+     "x": 138.087,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   }
+  ],
+  "dp": {
+   "x": 95,
+   "y": 747,
+   "w": 26,
+   "h": 26
+  },
+  "css": "position:absolute; left:95px; top:747px; width:26px; height:26px",
+  "notes": "탭 자산·소비 (파이: 큰 원호 r10.01 + 같은 중심 원호의 조각, 조각은 각진 모서리 evenodd). **파일은 26dp 칸 (95,747)** — 조각이 24dp 칸(96,748) 위·오른쪽 끝에 닿아 잘리지 않게 사방 1dp 여유 (탭 칸 24dp 안 위치는 같다). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    135,
+    1129,
+    44,
+    44
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0169,
+     "relErr": 0.0981,
+     "centroidOffsetPx": [
+      -0.193,
+      0.186
+     ],
+     "inkMassRatio": 0.9885,
+     "rgbMAD": 3.288,
+     "rgbMax": 115
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0164,
+     "relErr": 0.0963,
+     "centroidOffsetPx": [
+      -0.129,
+      0.185
+     ],
+     "inkMassRatio": 0.9951,
+     "rgbMAD": 3.497,
+     "rgbMax": 119
+    },
+    "banner-3": {
+     "svgFitL1": 0.0168,
+     "relErr": 0.0973,
+     "centroidOffsetPx": [
+      -0.159,
+      0.137
+     ],
+     "inkMassRatio": 0.9861,
+     "rgbMAD": 3.137,
+     "rgbMax": 112
+    }
+   },
+   "svgFitL1": 0.0168,
+   "relErr": 0.0973,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     12.969,
+     13.3265,
+     10.0089,
+     -1.8214,
+     -6.026,
+     2.0203,
+     15.082,
+     11.3749,
+     13.3202,
+     13.0148,
+     11.4778,
+     1.9971,
+     0.3847
+    ],
+    "sigmaPx": 0.385,
+    "fitMAD": 2.504,
+    "fitMax": 108,
+    "svgFitL1Model": 0.0132,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "tab-home-on",
+  "file": "woori/home/tab-home-on.svg",
+  "frameBox": {
+   "x": 244.524,
+   "y": 1133.576,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#2584e9",
+  "usedIn": [
+   {
+    "state": "loading-spinner",
+    "element": "tab_home_icon",
+    "frameBox": {
+     "x": 244.524,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "tab_home_icon",
+    "frameBox": {
+     "x": 244.524,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "tab_home_icon",
+    "frameBox": {
+     "x": 244.524,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "tab_home_icon",
+    "frameBox": {
+     "x": 244.524,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "tab_home_icon",
+    "frameBox": {
+     "x": 244.524,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 168,
+   "y": 748,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:168px; top:748px; width:24px; height:24px",
+  "notes": "탭 홈(선택): 채운 오각 집 #2584e9 (꼭짓점 둥글기 1.99 · 어깨 2.45 · 아래 2.51) + 흰 점 r1.45. 파랑 가장자리 색 번짐은 코덱. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    241,
+    1130,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0282,
+     "relErr": 0.0548,
+     "centroidOffsetPx": [
+      -0.211,
+      -0.18
+     ],
+     "inkMassRatio": 0.9817,
+     "rgbMAD": 6.081,
+     "rgbMax": 144
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0281,
+     "relErr": 0.0547,
+     "centroidOffsetPx": [
+      -0.233,
+      -0.199
+     ],
+     "inkMassRatio": 0.9845,
+     "rgbMAD": 6.13,
+     "rgbMax": 143
+    },
+    "banner-3": {
+     "svgFitL1": 0.0283,
+     "relErr": 0.0549,
+     "centroidOffsetPx": [
+      -0.245,
+      -0.207
+     ],
+     "inkMassRatio": 0.9825,
+     "rgbMAD": 6.227,
+     "rgbMax": 141
+    }
+   },
+   "svgFitL1": 0.0282,
+   "relErr": 0.0548,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     11.986,
+     0.4307,
+     10.8515,
+     7.1451,
+     23.7985,
+     1.9876,
+     2.454,
+     2.51,
+     13.5681,
+     1.4476,
+     0.5027
+    ],
+    "sigmaPx": 0.503,
+    "fitMAD": 6.006,
+    "fitMax": 113,
+    "svgFitL1Model": 0.0328,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "tab-stock",
+  "file": "woori/home/tab-stock.svg",
+  "frameBox": {
+   "x": 349.502,
+   "y": 1133.576,
+   "w": 34.993,
+   "h": 34.909
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#48494d",
+  "usedIn": [
+   {
+    "state": "loading-spinner",
+    "element": "tab_stock_icon",
+    "frameBox": {
+     "x": 349.502,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "tab_stock_icon",
+    "frameBox": {
+     "x": 349.502,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "tab_stock_icon",
+    "frameBox": {
+     "x": 349.502,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "tab_stock_icon",
+    "frameBox": {
+     "x": 349.502,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "tab_stock_icon",
+    "frameBox": {
+     "x": 349.502,
+     "y": 1133.576,
+     "w": 34.993,
+     "h": 34.909
+    }
+   }
+  ],
+  "dp": {
+   "x": 240,
+   "y": 748,
+   "w": 24,
+   "h": 24
+  },
+  "css": "position:absolute; left:240px; top:748px; width:24px; height:24px",
+  "notes": "탭 주식 (둥근 사각 r2.83 + 꺾은선 4점, 굵기 2.03dp). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    346,
+    1130,
+    42,
+    42
+   ],
+   "sites": {
+    "top-banner1": {
+     "svgFitL1": 0.0131,
+     "relErr": 0.0576,
+     "centroidOffsetPx": [
+      0.019,
+      0.08
+     ],
+     "inkMassRatio": 1.0009,
+     "rgbMAD": 2.79,
+     "rgbMax": 31
+    },
+    "top-banner2": {
+     "svgFitL1": 0.0145,
+     "relErr": 0.0635,
+     "centroidOffsetPx": [
+      0.002,
+      -0.071
+     ],
+     "inkMassRatio": 0.9973,
+     "rgbMAD": 3.1,
+     "rgbMax": 35
+    },
+    "banner-3": {
+     "svgFitL1": 0.014,
+     "relErr": 0.0614,
+     "centroidOffsetPx": [
+      0.009,
+      -0.031
+     ],
+     "inkMassRatio": 0.9977,
+     "rgbMAD": 2.719,
+     "rgbMax": 31
+    }
+   },
+   "svgFitL1": 0.014,
+   "relErr": 0.0614,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "top-banner1",
+    "params": [
+     2.0627,
+     2.3787,
+     21.9749,
+     22.2727,
+     2.8334,
+     2.0278,
+     5.667,
+     15.398,
+     10.0876,
+     10.9274,
+     14.0061,
+     13.5818,
+     18.2858,
+     9.294,
+     0.3907
+    ],
+    "sigmaPx": 0.391,
+    "fitMAD": 2.739,
+    "fitMax": 22,
+    "svgFitL1Model": 0.0129,
+    "variant": null
+   }
+  }
+ },
+ {
+  "name": "tab-benefit",
+  "file": "woori/home/tab-benefit.svg",
+  "frameBox": {
+   "x": 453.022,
+   "y": 1132.121,
+   "w": 37.909,
+   "h": 37.818
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#48494e",
+  "character": true,
+  "usedIn": [
+   {
+    "state": "loading-spinner",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-header-pill",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-render",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-nav-black",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-balance-unit",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-refresh",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-blank",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-drop-other-bank",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-no-account",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-panel-shrink",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-skeleton",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-account-no-balance",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "loading-other-bank-back",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-open",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-behind-update",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-balance-roll",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-idle",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-close-pressed",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-close-released",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "popup-close",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "settle",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-auto-2",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-auto-2b",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-auto-4",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "cached",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scroll-206",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-3",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner3",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-4",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner4",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-5",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-6",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-7",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-8",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-9",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-swipe-10",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scroll",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "account-tap-spinner-s78",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-next-5",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner5",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-next-6",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner6",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-next-7",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner7",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-next-8",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner8",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-next-9",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner9",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner-next-10",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "banner10",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   },
+   {
+    "state": "account-tap-spinner-s380",
+    "element": "tab_benefit_icon",
+    "frameBox": {
+     "x": 453.022,
+     "y": 1132.121,
+     "w": 37.909,
+     "h": 37.818
+    }
+   }
+  ],
+  "dp": {
+   "x": 311,
+   "y": 747,
+   "w": 26,
+   "h": 26
+  },
+  "css": "position:absolute; left:311px; top:747px; width:26px; height:26px",
+  "notes": "**character: true — 독창 대체 그림.** 영상의 혜택 아이콘(더듬이 달린 얼굴 선 아이콘)은 마스코트 얼굴로 볼 수 있어 따라 그리지 않고, 같은 칸·굵기(1.95dp)·색(#48494e)의 선물 상자 선 아이콘으로 새로 그렸다(BRIEF D4, 결정 필요 — 위험 목록). 파일은 24dp 아이콘을 사방 1dp 여유 둔 26dp(311,747) — 원래 아이콘 더듬이 끝(잉크 454,1132)까지 비교 마스크(453,1132,39,38)가 덮게. 탭바는 모든 상태에 있으므로 usedIn 에 홈 상태 전부를 넣었다(gen 이 마스크로 넣음). 다른 그룹 화면(launch 로그인 로딩·history 등)의 탭바도 같은 마스크가 필요하다 — 그 그룹 스펙이 home.tab-benefit 상자를 마스크로 넣는다."
+ },
+ {
+  "name": "home-character-room",
+  "file": "woori/home/home-character-room.png",
+  "frameBox": {
+   "x": 72.0,
+   "y": 236.0,
+   "w": 368.0,
+   "h": 160.0
+  },
+  "state": "top-banner1",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-nav-black",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-balance-unit",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-refresh",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-drop-other-bank",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-no-account",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-panel-shrink",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-skeleton",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-account-no-balance",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "loading-other-bank-back",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-open",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-behind-update",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-balance-roll",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-idle",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-close-pressed",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-close-released",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "popup-close",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "settle",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-auto-2",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-auto-2b",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 158.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 158.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-auto-4",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": -24.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "cached",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 236.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "scroll-206",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 94.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-4",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner4",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-5",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-6",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-7",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-8",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-9",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "banner-swipe-10",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 30.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 158.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "account-tap-spinner-s78",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": 158.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 72.0,
+     "y": -24.0,
+     "w": 368.0,
+     "h": 160.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 49.6735,
+   "y": 130.9167,
+   "w": 252.3954,
+   "h": 110.0
+  },
+  "css": "position:absolute; left:49px; top:130px; width:252px; height:110px; transform-origin:0 0; transform:translate(0.6735px, 0.9167px) scale(1.001569, 1)",
+  "notes": "홈 맨 위 캐릭터 배너의 **캐릭터가 아닌 부분**(창문·화분과 의자·전등과 불빛·액자·난로)만 영상에서 자른 그림. 캐릭터 무리(곰·벌·분홍 둘 + 담요·털실)는 타원 10개 합집합으로 지워 α=0 — 그 자리는 home-character-banner(독창 대체 그림)가 덮는다. 기준 7장(top-banner1·2·3·settle·banner-3·cached·banner-2to3) 채널별 중앙값(움직이는 창밖 비·전등 흔들림·난로 빛은 중앙값 정지 그림으로 대체) → 패널 바탕(행마다 양옆 여백 중앙값, 세로 그라데이션) 기준 color-to-alpha. 칩(반투명 흰 α0.6, 앱이 그림) 밑: 홈계좌설정 칩의 난로 부분(x≥146.5px)만 (I−153)/0.4 로 되돌리고, 칩 글자·잔액숨김 칩·칩 빛 번짐(7px)·점 5개(CSS)·공지 카드 아래끝(y<238)은 바탕으로. 바닥 띠는 CSS(panel_bg). 장면 전체가 비교 마스크(72,236−s,368,160) 안이다 — 앱은 정지 그림이면 된다. · critic 고침: 지운 타원 밖에 남은 캐릭터 조각 2곳을 더 지움 — 난로 오른쪽 위 곰 몸 가장자리(frame x 176–198, y 338–384, 합성색이 푸르스름/회색인 3x 화소 970개 + 잔점 26개)와 분홍 캐릭터 끝(393–397, 342–347, 45개). 난로 왼쪽의 흰 호(칩 되돌림 경계)는 남아 있음 — 장면 전체가 마스크",
+  "verify": {
+   "compositeMAD": 0.213,
+   "compositeMax": 24.1,
+   "compositeMethod": "패널 바탕 위 합성 → 3x3 면적 축소 vs 손본 크롭 (지운 곳·칩·점 빼고)",
+   "eraseEllipsesPx": [
+    [
+     251,
+     337,
+     70,
+     42
+    ],
+    [
+     292,
+     289,
+     21,
+     19
+    ],
+    [
+     314,
+     342,
+     34,
+     38
+    ],
+    [
+     368,
+     346,
+     25,
+     24
+    ],
+    [
+     328,
+     377,
+     50,
+     24
+    ],
+    [
+     270,
+     382,
+     20,
+     15
+    ],
+    [
+     305,
+     315,
+     26,
+     18
+    ],
+    [
+     201,
+     366,
+     18,
+     15
+    ],
+    [
+     215,
+     374,
+     15,
+     8
+    ],
+    [
+     374,
+     384,
+     20,
+     12
+    ]
+   ],
+   "chipUncompositeAlpha": 0.6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/home-character-room.hq.png"
+ },
+ {
+  "name": "home-character-banner",
+  "file": "woori/home/home-character-banner.svg",
+  "frameBox": {
+   "x": 177.454,
+   "y": 269.576,
+   "w": 218.704,
+   "h": 126.545
+  },
+  "state": "top-banner1",
+  "scale": 1,
+  "kind": "svg",
+  "character": true,
+  "usedIn": [
+   {
+    "state": "loading-render",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-nav-black",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-balance-unit",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-refresh",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-drop-other-bank",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-no-account",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-panel-shrink",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-skeleton",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-account-no-balance",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "loading-other-bank-back",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-open",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-behind-update",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-balance-roll",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-idle",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-close-pressed",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-close-released",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "popup-close",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "settle",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-auto-2",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-auto-2b",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 191.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 191.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-auto-4",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 9.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "cached",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "balance-roll",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-2to3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "account-tap-spinner",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 269.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "scroll-206",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 127.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "scrolled-206",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner3",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-4",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner4",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-5",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-6",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-7",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-8",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-9",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "banner-swipe-10",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 63.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 191.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "account-tap-spinner-s78",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 191.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "character_banner",
+    "frameBox": {
+     "x": 177.454,
+     "y": 9.576,
+     "w": 218.704,
+     "h": 126.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 122,
+   "y": 154,
+   "w": 150,
+   "h": 87
+  },
+  "css": "position:absolute; left:122px; top:154px; width:150px; height:87px",
+  "notes": "**character: true — 독창 대체 그림.** 영상의 곰·벌·분홍 캐릭터를 자르거나 따라 그리지 않고, 같은 자리(캐릭터 무리 상자 앱 122,154 150x87dp)·대략의 색감(연보라·노랑·분홍·주황)으로 새로 디자인한 단순 도형 그림: 구름 쿠션 · 분홍 방울 둘 · 노랑 방울 · 주황 물방울무늬 담요 · 털실. home-character-room.png 위에 겹친다(같은 장면 상자 안). 영상의 캐릭터는 계속 움직이지만(눈 깜빡임·뜨개질) 이 그림은 정지 — 비교에서는 장면 상자 전체가 마스크."
+ },
+ {
+  "name": "home-popup-image",
+  "file": "woori/home/home-popup-image.png",
+  "frameBox": {
+   "x": 313.0,
+   "y": 916.0,
+   "w": 190.0,
+   "h": 191.0
+  },
+  "state": "popup-idle",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "popup-idle",
+    "element": "popup_image",
+    "frameBox": {
+     "x": 313.0,
+     "y": 916.0,
+     "w": 190.0,
+     "h": 191.0
+    }
+   },
+   {
+    "state": "popup-close-pressed",
+    "element": "popup_image",
+    "frameBox": {
+     "x": 313.0,
+     "y": 916.0,
+     "w": 190.0,
+     "h": 191.0
+    }
+   },
+   {
+    "state": "popup-close-released",
+    "element": "popup_image",
+    "frameBox": {
+     "x": 313.0,
+     "y": 916.0,
+     "w": 190.0,
+     "h": 191.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 214.965,
+   "y": 598.4167,
+   "w": 130.3128,
+   "h": 131.3125
+  },
+  "css": "position:absolute; left:214px; top:598px; width:130px; height:131px; transform-origin:0 0; transform:translate(0.965px, 0.4167px) scale(1.002406, 1.002385)",
+  "notes": "프로모션 시트의 \"해외 결제 적립 / 5천 포인트 / 최대 5.3%\" 그림(사람·캐릭터 없음, 중간 배너 2 와 같은 그림을 크게). popup-idle(#340–#342) 크롭 → EDSR x3 → 역투영 6회 → 바탕 = 시트 보라 그라데이션(그림 둘레 화소로 맞춘 2차 곡면, rms 0.80) 기준 color-to-alpha, 큰 덩어리 안(가장자리 7px@3x 빼고) α=1. 시트가 올라온 뒤 11.908 에 한 번에 나타남(스펙 3.3).",
+  "verify": {
+   "compositeMAD": 0.31,
+   "compositeMax": 9.4,
+   "compositeMethod": "맞춘 그라데이션 바탕 위 합성 → 3x3 면적 축소 vs 크롭",
+   "bgPlaneRms": 0.8
+  },
+  "hq": "woori/home/home-popup-image.hq.png"
+ },
+ {
+  "name": "banner-img-01",
+  "file": "woori/home/banner-img-01.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 770.45,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "loading-nav-black",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "loading-nav-black",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 770.45,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "top-banner1",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 1061.85,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 498.351,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 1/10 그림: 선물 상자(분홍 클로버). **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #fbedfa 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 loading-nav-black(카드 위끝 770.450px). 알약·⏸ 밑(선물 상자 아래 가장자리)은 배너 1 의 넘김이 늘 탭바 밑에서 일어나 영상에 드러난 적이 없다 → 둘레로 메운 추정(Telea, 가려진 자리 + 2px). 앱에서도 늘 알약·⏸ 또는 탭바가 덮는 곳. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본. · critic 고침: PNG 3–7행(카드 위끝 1.0–2.4px 아래)에 카드 가장자리 안티에일리어싱이 흰빛 반투명 줄(α≈0.35)로 남아 있어 지움 (1138 화소, 최소 채널 >225 인 것만 — 그림은 남김)",
+  "verify": {
+   "compositeMAD": 0.349,
+   "compositeMax": 18.0,
+   "compositeP99": 4.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#fbedfa",
+   "minDiffLevels": 6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/banner-img-01.hq.png"
+ },
+ {
+  "name": "banner-img-02",
+  "file": "woori/home/banner-img-02.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 855.758,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "scrolled-206",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "scrolled-206",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 855.758,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "top-banner2",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 1061.819,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 984.243,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "return-cached",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 984.349,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "cached",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 1061.819,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 557.0003,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 2/10 그림: 해외 결제 적립(팝업 그림과 같음). **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #f7f0fe 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 scrolled-206(카드 위끝 855.758px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: swipe 밴드, 프레임 8장, 화소당 표본 중앙값 5.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본.",
+  "verify": {
+   "compositeMAD": 0.576,
+   "compositeMax": 15.0,
+   "compositeP99": 4.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#f7f0fe",
+   "minDiffLevels": 6
+  },
+  "hq": "woori/home/banner-img-02.hq.png"
+ },
+ {
+  "name": "banner-img-03",
+  "file": "woori/home/banner-img-03.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 855.758,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner3",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner3",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 855.758,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "top-banner3",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 1061.819,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "banner-3",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 1061.819,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 557.0003,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 3/10 그림: BLACK FRIDAY 통신비 특가 글자 그림 + 알뜰폰 꼬리표. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #e9f7f3 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner3(카드 위끝 855.758px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: swipe 밴드, 프레임 15장, 화소당 표본 중앙값 6.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본.",
+  "verify": {
+   "compositeMAD": 0.987,
+   "compositeMax": 22.0,
+   "compositeP99": 5.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#e9f7f3",
+   "minDiffLevels": 6
+  },
+  "hq": "woori/home/banner-img-03.hq.png"
+ },
+ {
+  "name": "banner-img-04",
+  "file": "woori/home/banner-img-04.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 855.758,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner4",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner4",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 855.758,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 801.939,
+     "w": 209.956,
+     "h": 174.545
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 557.0003,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 4/10 그림: 여행가방 (캐릭터는 대체 그림으로 따로). **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #e2f2fb 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner4(카드 위끝 855.758px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: swipe 밴드, 프레임 14장, 화소당 표본 중앙값 7.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. **캐릭터(하와이안 셔츠 입은 주머니 캐릭터) 자리는 지웠다(α=0)**: 카드 기준 (224,30) 72x58dp 상자에 내접한 타원 + 날개 그림자 타원 — 그 자리는 banner-img-04-character.svg(독창 대체 그림)를 겹쳐 그린다. 여행가방은 캐릭터가 아니라 남김. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본. · critic 고침: PNG 3–7행(카드 위끝 1.0–2.4px 아래)에 카드 가장자리 안티에일리어싱이 흰빛 반투명 줄(α≈0.35)로 남아 있어 지움 (1721 화소, 최소 채널 >225 인 것만 — 그림은 남김)",
+  "verify": {
+   "compositeMAD": 0.475,
+   "compositeMax": 29.0,
+   "compositeP99": 6.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#e2f2fb",
+   "minDiffLevels": 6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/banner-img-04.hq.png"
+ },
+ {
+  "name": "banner-img-05",
+  "file": "woori/home/banner-img-05.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 682.182,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner5",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner5",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 437.6668,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 5/10 그림: 검은 선물 상자 + 금화. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #e9f7f3 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner5(카드 위끝 682.182px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: next 밴드, 프레임 10장, 화소당 표본 중앙값 5.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본. · critic 고침: 그림 칸 왼쪽 끝(카드 184dp~)에 앱이 그리는 제목 \"Pick Up the 꿀머니 이벤트\" 의 마지막 글자 '트' 잔여가 남아 있어 지움(α=0, 3x 화소 2645개, 3x 사각 0,185 75x75). 카드 위끝 잔여 흰 줄(PNG 3–7행)도 지움",
+  "verify": {
+   "compositeMAD": 0.556,
+   "compositeMax": 22.0,
+   "compositeP99": 4.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#e9f7f3",
+   "minDiffLevels": 6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/banner-img-05.hq.png"
+ },
+ {
+  "name": "banner-img-06",
+  "file": "woori/home/banner-img-06.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 682.182,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner6",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner6",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 437.6668,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 6/10 그림: 하트 풍선 + 금화 주머니. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #ebf3fc 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner6(카드 위끝 682.182px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: next 밴드, 프레임 15장, 화소당 표본 중앙값 7.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본.",
+  "verify": {
+   "compositeMAD": 0.35,
+   "compositeMax": 20.0,
+   "compositeP99": 4.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#ebf3fc",
+   "minDiffLevels": 6
+  },
+  "hq": "woori/home/banner-img-06.hq.png"
+ },
+ {
+  "name": "banner-img-07",
+  "file": "woori/home/banner-img-07.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 682.182,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner7",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner7",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 437.6668,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 7/10 그림: 콜라·감자튀김·롤케이크·과자. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #f8f1e1 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner7(카드 위끝 682.182px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: next 밴드, 프레임 12장, 화소당 표본 중앙값 4.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본. · critic 고침: PNG 3–7행(카드 위끝 1.0–2.4px 아래)에 카드 가장자리 안티에일리어싱이 흰빛 반투명 줄(α≈0.35)로 남아 있어 지움 (1064 화소, 최소 채널 >225 인 것만 — 그림은 남김)",
+  "verify": {
+   "compositeMAD": 0.449,
+   "compositeMax": 30.0,
+   "compositeP99": 4.0,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#f8f1e1",
+   "minDiffLevels": 6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/banner-img-07.hq.png"
+ },
+ {
+  "name": "banner-img-08",
+  "file": "woori/home/banner-img-08.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 682.182,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner8",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner8",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 437.6668,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 8/10 그림: 파란 카드 + CU 동전. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #f4f2fe 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner8(카드 위끝 682.182px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: next 밴드, 프레임 13장, 화소당 표본 중앙값 6.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본.",
+  "verify": {
+   "compositeMAD": 0.394,
+   "compositeMax": 13.0,
+   "compositeP99": 4.3,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#f4f2fe",
+   "minDiffLevels": 6
+  },
+  "hq": "woori/home/banner-img-08.hq.png"
+ },
+ {
+  "name": "banner-img-09",
+  "file": "woori/home/banner-img-09.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 682.182,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner9",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner9",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 437.6668,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 9/10 그림: COUNTDOWN FANTASY 2026→2027 글자. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #e9f7f3 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner9(카드 위끝 682.182px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: next 밴드, 프레임 12장, 화소당 표본 중앙값 5.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본. · critic 고침: PNG 3–7행(카드 위끝 1.0–2.4px 아래)에 카드 가장자리 안티에일리어싱이 흰빛 반투명 줄(α≈0.35)로 남아 있어 지움 (603 화소, 최소 채널 >225 인 것만 — 그림은 남김)",
+  "verify": {
+   "compositeMAD": 0.504,
+   "compositeMax": 22.0,
+   "compositeP99": 4.5,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#e9f7f3",
+   "minDiffLevels": 6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/banner-img-09.hq.png"
+ },
+ {
+  "name": "banner-img-10",
+  "file": "woori/home/banner-img-10.png",
+  "frameBox": {
+   "x": 291.181,
+   "y": 682.182,
+   "w": 209.956,
+   "h": 174.545
+  },
+  "state": "banner10",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "banner10",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 291.181,
+     "y": 682.182,
+     "w": 209.956,
+     "h": 174.545
+    }
+   }
+  ],
+  "dp": {
+   "x": 200.0003,
+   "y": 437.6668,
+   "w": 143.9998,
+   "h": 119.9997
+  },
+  "cardBox": {
+   "x": 184,
+   "y": 0,
+   "w": 144,
+   "h": 120
+  },
+  "css": "카드(16dp,120dp, r16, overflow:hidden) 안: position:absolute; left:184px; top:0; width:144px; height:120px",
+  "notes": "중간 배너 10/10 그림: N pay 기프트카드. **모든 배너 그림은 같은 칸** — 카드 기준 (184,0) 144x120dp (카드 오른쪽 끝까지, 카드 높이 전체), PNG 630x524. 카드 바탕 #f8f1e1 기준 color-to-alpha (바탕과 6레벨 안 차이는 투명 — 카드의 옅은 무늬·코덱 잡음), 카드 가장자리 1.2px 안쪽·오른쪽 둥근 모서리(r16dp) 밖은 투명(가장자리는 CSS 카드가 그림). 기준 그림 banner10(카드 위끝 682.182px). 알약·⏸(고정 오버레이) 밑의 가려진 곳은 넘김 프레임(카드가 움직이는 동안 같은 자리가 드러남)에서 복원했다: next 밴드, 프레임 4장, 화소당 표본 중앙값 1.0개 — 열 프로파일 정합으로 카드 이동량을 소수 px 까지 재고(예: #4201 −238.5px = 스펙 banner-next-5 와 같음) 가려지지 않은 프레임 화소를 모아 중앙값. 단 배너 10 은 들어오는 넘김만 있어(9→10) 알약 밑 64%%는 드러난 적 없다 → 그 자리는 기프트카드 아래 바탕이라(카드 아래끝 카드+126px < 알약 +128px) 바탕으로 둠. 크롭(여백 8) → EDSR x3 → 역투영 6회 → 소수 상자에 맞춰 3x 재표본. · critic 고침: 제목 \"내 보험 맞춤 진단 신청하면\" 의 마지막 글자 '면' 잔여 지움(3x 화소 2083개, 3x 사각 0,125 48x81). 카드 위끝 잔여 흰 줄(PNG 3–7행)도 지움",
+  "verify": {
+   "compositeMAD": 0.465,
+   "compositeMax": 30.0,
+   "compositeP99": 4.1,
+   "compositeMethod": "카드 바탕 위 합성 → 정수 frame 격자로 되돌려 3x3 면적 축소 vs (복원한) 크롭, 카드 밖·지운 곳 제외",
+   "cardBg": "#f8f1e1",
+   "minDiffLevels": 6,
+   "critic": "critic 고침 뒤 verify 수치(compositeMAD 등)는 고치기 전 값 — 지운 화소는 카드/패널 바탕과 같은 곳이라 합성 결과 차이는 화소 몇 개"
+  },
+  "hq": "woori/home/banner-img-10.hq.png"
+ },
+ {
+  "name": "banner-img-04-character",
+  "file": "woori/home/banner-img-04-character.svg",
+  "frameBox": {
+   "x": 349.502,
+   "y": 899.394,
+   "w": 104.978,
+   "h": 84.364
+  },
+  "state": "banner4",
+  "scale": 1,
+  "kind": "svg",
+  "character": true,
+  "usedIn": [
+   {
+    "state": "banner4",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 349.502,
+     "y": 899.394,
+     "w": 104.978,
+     "h": 84.364
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 349.502,
+     "y": 845.575,
+     "w": 104.978,
+     "h": 84.364
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 349.502,
+     "y": 725.818,
+     "w": 104.978,
+     "h": 84.364
+    }
+   },
+   {
+    "state": "banner-next-5",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 110.956,
+     "y": 725.818,
+     "w": 104.978,
+     "h": 84.364
+    }
+   },
+   {
+    "state": "banner-swipe-5",
+    "element": "banner_image",
+    "frameBox": {
+     "x": 94.52,
+     "y": 899.394,
+     "w": 104.978,
+     "h": 84.364
+    }
+   }
+  ],
+  "dp": {
+   "x": 240.0001,
+   "y": 587.0,
+   "w": 71.9999,
+   "h": 58.0003
+  },
+  "cardBox": {
+   "x": 224,
+   "y": 30,
+   "w": 72,
+   "h": 58
+  },
+  "css": "카드 안: position:absolute; left:224px; top:30px; width:72px; height:58px (banner-img-04.png 위에)",
+  "notes": "**character: true — 독창 대체 그림 (critic 다시 그림).** 앞 판의 '얼굴 없는 여행 주머니 + 파란 띠 + 흰 점'은 원래 캐릭터(묶은 주머니 몸 + 파란 꽃무늬 셔츠)의 실루엣·무늬를 그대로 따라 독창 그림으로 보기 어려워, 배너 주제(eSIM·해외여행)에 맞춘 **지구본 + eSIM 카드** 단순 도형으로 다시 그렸다. 같은 자리(카드 기준 224,30 72x58dp)·대략의 색감(크림·파랑·연회색). 오른쪽 아래 여행가방 손잡이 덮개(띠·손잡이 사각)는 지운 타원 경계에 걸린 가방 귀퉁이를 덮으려고 그대로 둠. banner-img-04.png 위에 겹친다. 비교에서는 이 상자를 마스크한다."
+ },
+ {
+  "name": "counter-prev",
+  "file": "woori/home/counter-prev.svg",
+  "frameBox": {
+   "x": 320.341,
+   "y": 815.965,
+   "w": 17.496,
+   "h": 17.455
+  },
+  "state": "banner5",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#737274",
+  "usedIn": [
+   {
+    "state": "scrolled-206",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner3",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner4",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 1118.028,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 935.715,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner5",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner6",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner7",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner8",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner9",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner10",
+    "element": "banner_prev_icon",
+    "frameBox": {
+     "x": 320.341,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   }
+  ],
+  "dp": {
+   "x": 220,
+   "y": 529.667,
+   "w": 12,
+   "h": 12
+  },
+  "css": "position:absolute; left:220px; top:529px; width:12px; height:12px; translate:0px 0.667px (page 기준이면 top 790.667 — 스크롤 상자 안)",
+  "notes": "중간 배너 카운터 알약/⏸ 원 안 ‹ (꼭짓점 3.67,6.0 · 가로 3.90 · 세로 반 3.91, 굵기 1.41dp, 둥근 끝). 12dp 칸, page 앱 y 790.667 (= 카드 위끝 698.667 + 92). 알약·⏸ 는 고정 오버레이(카드가 넘어가도 제자리). 기준 그림 banner5 는 scrollTop 379.67 → 화면 앱 y 529.667. ‹ 와 › 는 같은 색으로 맞춤(잰 값 #79787a / #6c6d6c 은 알약 위 코덱 차이). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    317,
+    813,
+    24,
+    24
+   ],
+   "sites": {
+    "banner5": {
+     "svgFitL1": 0.0066,
+     "relErr": 0.1002,
+     "centroidOffsetPx": [
+      -0.075,
+      0.115
+     ],
+     "inkMassRatio": 0.9948,
+     "rgbMAD": 2.167,
+     "rgbMax": 20
+    },
+    "banner6": {
+     "svgFitL1": 0.0051,
+     "relErr": 0.0785,
+     "centroidOffsetPx": [
+      -0.026,
+      0.023
+     ],
+     "inkMassRatio": 1.0018,
+     "rgbMAD": 2.108,
+     "rgbMax": 17
+    },
+    "banner7": {
+     "svgFitL1": 0.0051,
+     "relErr": 0.0778,
+     "centroidOffsetPx": [
+      0.057,
+      0.098
+     ],
+     "inkMassRatio": 0.9891,
+     "rgbMAD": 2.122,
+     "rgbMax": 21
+    }
+   },
+   "svgFitL1": 0.0051,
+   "relErr": 0.0785,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "banner5",
+    "params": [
+     3.6672,
+     6.007,
+     3.8962,
+     3.9064,
+     1.4082,
+     0.3007
+    ],
+    "sigmaPx": 0.301,
+    "fitMAD": 1.783,
+    "fitMax": 12,
+    "svgFitL1Model": 0.0056,
+    "variant": "round"
+   }
+  }
+ },
+ {
+  "name": "counter-next",
+  "file": "woori/home/counter-next.svg",
+  "frameBox": {
+   "x": 407.823,
+   "y": 815.965,
+   "w": 17.496,
+   "h": 17.455
+  },
+  "state": "banner5",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#737274",
+  "usedIn": [
+   {
+    "state": "scrolled-206",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner3",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner4",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 1118.028,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 935.715,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner5",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner6",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner7",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner8",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner9",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner10",
+    "element": "banner_next_icon",
+    "frameBox": {
+     "x": 407.823,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   }
+  ],
+  "dp": {
+   "x": 280,
+   "y": 529.667,
+   "w": 12,
+   "h": 12
+  },
+  "css": "position:absolute; left:280px; top:529px; width:12px; height:12px; translate:0px 0.667px (page 기준이면 top 790.667 — 스크롤 상자 안)",
+  "notes": "중간 배너 카운터 알약/⏸ 원 안 › (꼭짓점 8.29,5.98, 같은 모양 반대 방향). 12dp 칸, page 앱 y 790.667 (= 카드 위끝 698.667 + 92). 알약·⏸ 는 고정 오버레이(카드가 넘어가도 제자리). 기준 그림 banner5 는 scrollTop 379.67 → 화면 앱 y 529.667. ‹ 와 › 는 같은 색으로 맞춤(잰 값 #79787a / #6c6d6c 은 알약 위 코덱 차이). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    404,
+    813,
+    25,
+    24
+   ],
+   "sites": {
+    "banner5": {
+     "svgFitL1": 0.0117,
+     "relErr": 0.1789,
+     "centroidOffsetPx": [
+      -0.006,
+      0.341
+     ],
+     "inkMassRatio": 0.8616,
+     "rgbMAD": 3.045,
+     "rgbMax": 73
+    },
+    "banner6": {
+     "svgFitL1": 0.0041,
+     "relErr": 0.0726,
+     "centroidOffsetPx": [
+      -0.045,
+      -0.122
+     ],
+     "inkMassRatio": 0.9953,
+     "rgbMAD": 5.597,
+     "rgbMax": 60
+    },
+    "banner7": {
+     "svgFitL1": 0.005,
+     "relErr": 0.0889,
+     "centroidOffsetPx": [
+      -0.257,
+      0.298
+     ],
+     "inkMassRatio": 0.9943,
+     "rgbMAD": 6.715,
+     "rgbMax": 121
+    }
+   },
+   "svgFitL1": 0.005,
+   "relErr": 0.0889,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "banner5",
+    "params": [
+     8.285,
+     5.9757,
+     3.8631,
+     3.9053,
+     1.4084,
+     0.4093
+    ],
+    "sigmaPx": 0.409,
+    "fitMAD": 2.619,
+    "fitMax": 10,
+    "svgFitL1Model": 0.0129,
+    "variant": "round"
+   }
+  }
+ },
+ {
+  "name": "counter-pause",
+  "file": "woori/home/counter-pause.svg",
+  "frameBox": {
+   "x": 454.48,
+   "y": 815.965,
+   "w": 17.496,
+   "h": 17.455
+  },
+  "state": "banner5",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#727274",
+  "usedIn": [
+   {
+    "state": "scrolled-206",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner3",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner4",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 989.59,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-78",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 1118.028,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-260",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 935.715,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "scrolled-380",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner5",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner6",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner7",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner8",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner9",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   },
+   {
+    "state": "banner10",
+    "element": "banner_pause_icon",
+    "frameBox": {
+     "x": 454.48,
+     "y": 815.965,
+     "w": 17.496,
+     "h": 17.455
+    }
+   }
+  ],
+  "dp": {
+   "x": 312,
+   "y": 529.667,
+   "w": 12,
+   "h": 12
+  },
+  "css": "position:absolute; left:312px; top:529px; width:12px; height:12px; translate:0px 0.667px (page 기준이면 top 790.667 — 스크롤 상자 안)",
+  "notes": "중간 배너 카운터 알약/⏸ 원 안 ⏸ 두 막대 (가운데 6.0,5.99 · 간격 3.02 · 반높이 2.18, 굵기 1.51dp, 둥근 끝). 12dp 칸, page 앱 y 790.667 (= 카드 위끝 698.667 + 92). 알약·⏸ 는 고정 오버레이(카드가 넘어가도 제자리). 기준 그림 banner5 는 scrollTop 379.67 → 화면 앱 y 529.667. ‹ 와 › 는 같은 색으로 맞춤(잰 값 #79787a / #6c6d6c 은 알약 위 코덱 차이). 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    451,
+    813,
+    24,
+    24
+   ],
+   "sites": {
+    "banner5": {
+     "svgFitL1": 0.0206,
+     "relErr": 0.2707,
+     "centroidOffsetPx": [
+      2.012,
+      1.613
+     ],
+     "inkMassRatio": 0.8039,
+     "rgbMAD": 5.252,
+     "rgbMax": 219
+    },
+    "banner6": {
+     "svgFitL1": 0.0084,
+     "relErr": 0.128,
+     "centroidOffsetPx": [
+      0.02,
+      -0.055
+     ],
+     "inkMassRatio": 0.9337,
+     "rgbMAD": 2.922,
+     "rgbMax": 16
+    },
+    "banner7": {
+     "svgFitL1": 0.0109,
+     "relErr": 0.1615,
+     "centroidOffsetPx": [
+      0.364,
+      0.099
+     ],
+     "inkMassRatio": 0.9046,
+     "rgbMAD": 3.906,
+     "rgbMax": 27
+    }
+   },
+   "svgFitL1": 0.0109,
+   "relErr": 0.1615,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "banner5",
+    "params": [
+     6.0035,
+     5.9889,
+     3.0162,
+     2.1824,
+     1.5126,
+     0.3956
+    ],
+    "sigmaPx": 0.396,
+    "fitMAD": 2.503,
+    "fitMax": 170,
+    "svgFitL1Model": 0.0128,
+    "variant": "round"
+   }
+  }
+ },
+ {
+  "name": "chevron-right",
+  "file": "woori/home/chevron-right.svg",
+  "frameBox": {
+   "x": 454.48,
+   "y": 968.728,
+   "w": 23.328,
+   "h": 23.273
+  },
+  "state": "marquee",
+  "scale": 1,
+  "kind": "svg",
+  "color": "#737275",
+  "usedIn": [
+   {
+    "state": "marquee",
+    "element": "notice_chevron",
+    "frameBox": {
+     "x": 454.48,
+     "y": 968.728,
+     "w": 23.328,
+     "h": 23.273
+    }
+   }
+  ],
+  "dp": {
+   "x": 312,
+   "y": 634.667,
+   "w": 16,
+   "h": 16
+  },
+  "css": "position:absolute; left:312px; top:634px; width:16px; height:16px; translate:0px 0.667px (page 기준 top 1455.667)",
+  "notes": "공지 줄 오른쪽 › (꼭짓점 10.18,7.99 · 가로 5.0 · 세로 반 4.98, 굵기 1.66dp, 둥근 끝). 16dp 칸 = 공지 상자 세로 가운데(page 앱 1455.667). 기준 그림 marquee(scrollTop 821dp) 화면 앱 y 634.667. 손으로 그린 SVG(단위 dp, viewBox = 상자 dp). 모양 변수를 정지 기준 그림에 최소제곱으로 맞춤(frame px 화소마다 8x8 표본 덮임 + 코덱 흐림 σ, D1 좌표) → 색은 맞춤값. 놓는 법: css 그대로 (left/top/width/height 정수 dp, 소수 위치는 translate — launch 와 같은 규칙).",
+  "verify": {
+   "method": "Chromium(Playwright) 360x880 DSF 16/11 + ?frame=1 셸(위 31dp, translate(-0.2925px,0.333px) scaleX(1.0023956))에 css 대로 놓고 찍어 기준 그림과 비교. svgFitL1 = 휘도 알파((바탕−Y)·(바탕−잉크) 투영) 평균 절대차, relErr = Σ|Δα|/Σα(영상)",
+   "region": [
+    451,
+    965,
+    30,
+    31
+   ],
+   "sites": {
+    "marquee": {
+     "svgFitL1": 0.0122,
+     "relErr": 0.1893,
+     "centroidOffsetPx": [
+      -0.118,
+      -0.024
+     ],
+     "inkMassRatio": 0.9134,
+     "rgbMAD": 1.713,
+     "rgbMax": 22
+    }
+   },
+   "svgFitL1": 0.0122,
+   "relErr": 0.1893,
+   "summary": "svgFitL1·relErr = 비교한 기준 그림들의 중앙값",
+   "modelFit": {
+    "src": "marquee",
+    "params": [
+     10.1758,
+     7.9932,
+     5.0035,
+     4.9805,
+     1.6616,
+     0.4155
+    ],
+    "sigmaPx": 0.415,
+    "fitMAD": 1.347,
+    "fitMax": 13,
+    "svgFitL1Model": 0.0123,
+    "variant": "round"
+   }
+  }
+ },
+ {
+  "name": "svc-won-mobile",
+  "file": "woori/home/svc-won-mobile.png",
+  "frameBox": {
+   "x": 61.0,
+   "y": 198.0,
+   "w": 39.0,
+   "h": 50.0
+  },
+  "state": "marquee",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "scrolled-380",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "banner5",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "banner6",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "banner7",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "banner8",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "banner9",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "banner10",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 1012.508,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "scroll",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 685.26,
+     "w": 39.0,
+     "h": 50.0
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "svc_icon1",
+    "frameBox": {
+     "x": 61.0,
+     "y": 198.0,
+     "w": 39.0,
+     "h": 50.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 42.129,
+   "y": 104.7917,
+   "w": 26.7484,
+   "h": 34.375
+  },
+  "css": "position:absolute; left:42px; top:104px; width:27px; height:34px; transform-origin:0 0; transform:translate(0.129px, 0.7917px) scale(0.990681, 1.011029) (marquee 화면 좌표 — page 기준은 y + 1194.18px)",
+  "notes": "추천서비스 카드 흰 원(48dp) 안 3D 아이콘. marquee 기준 그림(맨 아래 정지 #945–#1005 중앙값 — 이 카드는 움직이지 않음)에서 원 안(반지름 33.5px)만 크롭 → EDSR x3 → 역투영 6회 → 흰색 기준 color-to-alpha (흰 원 위에서 원본과 같음, 흰 부분은 투명). page 위치 = 이 상자 y + 1194.18px.",
+  "verify": {
+   "compositeMAD": 0.86,
+   "compositeMax": 7.0,
+   "compositeMethod": "흰 바탕 합성 → 3x3 면적 축소 vs 크롭"
+  },
+  "hq": "woori/home/svc-won-mobile.hq.png"
+ },
+ {
+  "name": "svc-exchange-pocket",
+  "file": "woori/home/svc-exchange-pocket.png",
+  "frameBox": {
+   "x": 56.0,
+   "y": 309.0,
+   "w": 52.0,
+   "h": 41.0
+  },
+  "state": "marquee",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "scroll",
+    "element": "svc_icon2",
+    "frameBox": {
+     "x": 56.0,
+     "y": 796.26,
+     "w": 52.0,
+     "h": 41.0
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "svc_icon2",
+    "frameBox": {
+     "x": 56.0,
+     "y": 309.0,
+     "w": 52.0,
+     "h": 41.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 38.6998,
+   "y": 181.1042,
+   "w": 35.6646,
+   "h": 28.1875
+  },
+  "css": "position:absolute; left:38px; top:181px; width:36px; height:28px; transform-origin:0 0; transform:translate(0.6998px, 0.1042px) scale(0.990683, 1.006696) (marquee 화면 좌표 — page 기준은 y + 1194.18px)",
+  "notes": "추천서비스 카드 흰 원(48dp) 안 3D 아이콘. marquee 기준 그림(맨 아래 정지 #945–#1005 중앙값 — 이 카드는 움직이지 않음)에서 원 안(반지름 33.5px)만 크롭 → EDSR x3 → 역투영 6회 → 흰색 기준 color-to-alpha (흰 원 위에서 원본과 같음, 흰 부분은 투명). page 위치 = 이 상자 y + 1194.18px.",
+  "verify": {
+   "compositeMAD": 1.141,
+   "compositeMax": 7.0,
+   "compositeMethod": "흰 바탕 합성 → 3x3 면적 축소 vs 크롭"
+  },
+  "hq": "woori/home/svc-exchange-pocket.hq.png"
+ },
+ {
+  "name": "svc-won-wallet",
+  "file": "woori/home/svc-won-wallet.png",
+  "frameBox": {
+   "x": 60.0,
+   "y": 416.0,
+   "w": 44.0,
+   "h": 40.0
+  },
+  "state": "marquee",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "scroll",
+    "element": "svc_icon3",
+    "frameBox": {
+     "x": 60.0,
+     "y": 903.26,
+     "w": 44.0,
+     "h": 40.0
+    }
+   },
+   {
+    "state": "marquee",
+    "element": "svc_icon3",
+    "frameBox": {
+     "x": 60.0,
+     "y": 416.0,
+     "w": 44.0,
+     "h": 40.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 41.4432,
+   "y": 254.6667,
+   "w": 30.1777,
+   "h": 27.5
+  },
+  "css": "position:absolute; left:41px; top:254px; width:30px; height:28px; transform-origin:0 0; transform:translate(0.4432px, 0.6667px) scale(1.005923, 0.982143) (marquee 화면 좌표 — page 기준은 y + 1194.18px)",
+  "notes": "추천서비스 카드 흰 원(48dp) 안 3D 아이콘. marquee 기준 그림(맨 아래 정지 #945–#1005 중앙값 — 이 카드는 움직이지 않음)에서 원 안(반지름 33.5px)만 크롭 → EDSR x3 → 역투영 6회 → 흰색 기준 color-to-alpha (흰 원 위에서 원본과 같음, 흰 부분은 투명). page 위치 = 이 상자 y + 1194.18px.",
+  "verify": {
+   "compositeMAD": 0.902,
+   "compositeMax": 7.0,
+   "compositeMethod": "흰 바탕 합성 → 3x3 면적 축소 vs 크롭"
+  },
+  "hq": "woori/home/svc-won-wallet.hq.png"
+ },
+ {
+  "name": "grp-capital-car",
+  "file": "woori/home/grp-capital-car.png",
+  "frameBox": {
+   "x": 127.0,
+   "y": 777.0,
+   "w": 70.0,
+   "h": 43.0
+  },
+  "state": "marquee",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "marquee",
+    "element": "marquee_card_icon",
+    "frameBox": {
+     "x": 127.0,
+     "y": 777.0,
+     "w": 70.0,
+     "h": 43.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 87.3956,
+   "y": 502.8542,
+   "w": 48.01,
+   "h": 29.5625
+  },
+  "css": "마키 카드(140x164dp) 안 오른쪽 아래 — 이 상자는 marquee 상태 #950(t=25.676) 프레임에서의 화면 위치 (카드가 흐르고 출렁여 고정 위치 없음)",
+  "notes": "우리금융그룹 서비스 마키 캐피탈 카드 — 자동차 3D(흰 차 + 파란 ₩ 꼬리표). 마키가 늘 움직여 정지 프레임이 없다 → 맨 아래 정지 구간 #945–#1005 61장에서 아이콘을 템플릿 정합(정규화 상관 ≥0.99, 소수 px)으로 따라가 #950 자리에 맞춰 놓고 채널별 중앙값 → EDSR x3 → 흰색 기준 color-to-alpha. 움직이는 동안 코덱이 흐려 다른 아이콘보다 부드럽다. 정합 이동량 첫·끝 [945, 5.650000095367432, -1.2300000190734863, 0.99] / [1005, -47.36000061035156, 13.819999694824219, 0.991].",
+  "verify": {
+   "compositeMAD": 0.519,
+   "compositeMax": 6.7,
+   "framesUsed": 61
+  },
+  "hq": "woori/home/grp-capital-car.hq.png"
+ },
+ {
+  "name": "grp-securities-chart",
+  "file": "woori/home/grp-securities-chart.png",
+  "frameBox": {
+   "x": 355.0,
+   "y": 792.0,
+   "w": 55.0,
+   "h": 44.0
+  },
+  "state": "marquee",
+  "scale": 3,
+  "kind": "png",
+  "alpha": true,
+  "usedIn": [
+   {
+    "state": "marquee",
+    "element": "marquee_card_icon",
+    "frameBox": {
+     "x": 355.0,
+     "y": 792.0,
+     "w": 55.0,
+     "h": 44.0
+    }
+   }
+  ],
+  "dp": {
+   "x": 243.771,
+   "y": 513.1667,
+   "w": 37.7221,
+   "h": 30.25
+  },
+  "css": "마키 카드(140x164dp) 안 오른쪽 아래 — 이 상자는 marquee 상태 #950(t=25.676) 프레임에서의 화면 위치 (카드가 흐르고 출렁여 고정 위치 없음)",
+  "notes": "우리금융그룹 서비스 마키 증권 카드 — 주황 막대 차트 + 화살표 3D. 마키가 늘 움직여 정지 프레임이 없다 → 맨 아래 정지 구간 #945–#1005 61장에서 아이콘을 템플릿 정합(정규화 상관 ≥0.99, 소수 px)으로 따라가 #950 자리에 맞춰 놓고 채널별 중앙값 → EDSR x3 → 흰색 기준 color-to-alpha. 움직이는 동안 코덱이 흐려 다른 아이콘보다 부드럽다. 정합 이동량 첫·끝 [945, 5.71999979019165, 1.1799999475479126, 0.994] / [1005, -47.29999923706055, -13.899999618530273, 0.993].",
+  "verify": {
+   "compositeMAD": 0.476,
+   "compositeMax": 6.5,
+   "framesUsed": 61
+  },
+  "hq": "woori/home/grp-securities-chart.hq.png"
+ }
+]

@@ -1,0 +1,5206 @@
+{
+ "_units": {
+  "unit": "dp",
+  "source": "spec/history-detail.json",
+  "generatedBy": "tools/spec-to-dp.cjs",
+  "xMap": "x_dp = 180 + (x_px − 262.02) / 1.45803 · 폭 = px / 1.45803",
+  "yMap": "y_dp = y_px × 0.6875 (화면 위끝 기준, 앱 안 y = y_dp − 31.333) · 높이·방향 없는 길이 = px × 0.6875",
+  "note": "길이·위치 숫자만 D1 식으로 (소수 셋째 자리). 문자열 안의 숫자(mask 등)·시간·프레임 번호·오차값과 \"dp\"·\"keep\" 아래는 그대로."
+ },
+ "group": "history-detail",
+ "route": "/history/:txId",
+ "segment": "v1 91.367–95.867 (상세 ① 입금, 닫기 OS 뒤로) · 101.486–104.697 (상세 ② 출금·이체, 닫기 ✕) · 154.314–156.521 (상세 ③ 입금, 닫기 [확인]). v2 에는 없다",
+ "screens": [
+  "history-detail (입금형 deposit / 출금·이체형 withdraw-transfer)"
+ ],
+ "coordinateSystem": "box·inkBox = frame px (524x1280, 화면 절대, 상태바 포함). dp = 설계 dp (y 는 앱 뷰포트 기준 = CSS top). 변환은 D1 (units.json): x_dp = 180 + (x_px − 262.02)/1.45803, y_dp = y_px × 0.6875 − 31.333",
+ "privacy": "글자는 더미(입금 상대 한지호, 받는 분·출금 상대 정우진/농협정우진, 지역농축협 12345652789012). 기준 프레임 PNG(tools/ref/history-detail)만 실제 화면. privacyMask = 더미 글자 폭·모양이 달라 비교에서 뺄 상자(shots.d maskAdd)",
+ "measuredHow": "clean 영상 정지 구간 중앙값(tools/ref.py). 상자 = 휘도 모형 맞춤(둥근 사각·선·꺾쇠를 frame px 격자에 6배 표본으로 그려 L1 최소), 가로선 = 잉크 합(1dp 환산)·중심. 글자 = tools/woori-textfit.cjs best(design 값 + shot 위치). 시간 = 프레임 pts 그대로(D8)",
+ "fontNote": "글꼴 Pretendard Variable. 값 열만 15dp/500/자간 −0.5px(−0.0333em)/tabular-nums (font.md 열린 질문 '14.75 vs 15dp' → 15dp, 5.2절). font.sizePx 는 frame px(=dp×16/11), 설계 dp 는 font.keep.sizeDp",
+ "states": [
+  {
+   "id": "deposit",
+   "inventoryId": "history-detail:deposit",
+   "video": "v1",
+   "i0": 6038,
+   "i1": 6048,
+   "t0": 154.589,
+   "t1": 155.502,
+   "kind": "HOLD",
+   "mask": [],
+   "refFrame": "tools/ref/history-detail/deposit.png",
+   "route": "/history/tx-20261120-212947",
+   "scenario": "v1-start",
+   "summary": "입금형 상세(상세 ③): 머리 '거래내역 상세' ✕ / 한지호 / +100,000원 / 메모입력·거래일시·거래구분·거래후 잔액·의뢰인·수표금액·관리점 7행 / '한지호' 검색하기 › / [공유][확인]. 상세 ①(91.641–95.699)과 같은 화면 — ①은 OS 알림이 머리를 가려 ③을 기준으로",
+   "privacyMask": [
+    "28,173,83,34",
+    "440,593,56,24",
+    "28,841,157,25"
+   ],
+   "elements": [
+    {
+     "name": "page",
+     "type": "page",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "colorToken": "--woori-bg",
+     "note": "상세 페이지 바탕 = 앱 뷰포트 전체(흰색, 직각). 목록 위에 겹쳐 올라오는 페이지(열기 3.1·닫기 3.3). 상태바·내비 바도 흰색"
+    },
+    {
+     "name": "header",
+     "type": "box",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 52
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 52
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "note": "머리 52dp (구분선·그림자 없음). 제목·✕ 의 세로 가운데 26dp. 일반 페이지 머리(‹)와 다른 상세 전용 머리 — ‹ 없음"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "box": {
+      "x": 133.922,
+      "y": 49.334,
+      "w": 92.2,
+      "h": 17
+     },
+     "dp": {
+      "x": 133.922,
+      "y": 18,
+      "w": 92.2,
+      "h": 17
+     },
+     "text": "거래내역 상세",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#363639",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0934,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.2145,
+       "leftDp": 133.9219,
+       "topDp": 18,
+       "translateYPx": 0,
+       "baselineDpApp": 32,
+       "advanceDp": 92.2,
+       "textfitId": "d-title",
+       "css": "position:absolute; left:133.9219px; top:18px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      134.034,
+      48.813,
+      91.219,
+      15.813
+     ],
+     "note": "머리 제목 17/600 가운데 정렬(left+adv/2 = 180.02). 거래내역조회 머리 제목과 같은 값"
+    },
+    {
+     "name": "close-x",
+     "type": "icon",
+     "box": {
+      "x": 320.02,
+      "y": 45.343,
+      "w": 24,
+      "h": 24
+     },
+     "dp": {
+      "x": 320,
+      "y": 14,
+      "w": 24,
+      "h": 24
+     },
+     "src": "woori/history-detail/close-x.svg",
+     "color": "#3e3f42",
+     "inkBox": [
+      324.702,
+      50.188,
+      14.403,
+      14.438
+     ],
+     "note": "✕ 24dp 상자(설계). 두 획 (6,6)–(18,18)·(6,18)–(18,6), 굵기 1.95dp, 둥근 끝, #3e3f42 (잰 가운데 (332.0, 26.0)dp, 팔 6.04dp). 탭 = 닫기(3.3). 그림 history-detail.close-x"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "box": {
+      "x": 19.813,
+      "y": 119.334,
+      "w": 57.05,
+      "h": 22
+     },
+     "dp": {
+      "x": 19.812,
+      "y": 88,
+      "w": 57.05,
+      "h": 22
+     },
+     "text": "한지호",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#33343a",
+     "font": {
+      "sizePx": 22,
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0741,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.117,
+       "leftDp": 19.8125,
+       "topDp": 88,
+       "translateYPx": 0,
+       "baselineDpApp": 107,
+       "advanceDp": 57.05,
+       "textfitId": "d-name",
+       "css": "position:absolute; left:19.8125px; top:88px; font-size:22px; font-weight:700; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      120.313,
+      54.183,
+      20.625
+     ],
+     "note": "상대 표시 이름 22/700 (목록 행의 이름 문자열 그대로). 개인정보 → 더미. 왼쪽 20dp"
+    },
+    {
+     "name": "amount",
+     "type": "text",
+     "box": {
+      "x": 19.953,
+      "y": 150.334,
+      "w": 121.25,
+      "h": 22
+     },
+     "dp": {
+      "x": 19.953,
+      "y": 119,
+      "w": 121.25,
+      "h": 22
+     },
+     "text": "+100,000원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#33353a",
+     "font": {
+      "sizePx": 22,
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1018,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1244,
+       "leftDp": 19.9531,
+       "topDp": 119,
+       "translateYPx": 0,
+       "baselineDpApp": 138,
+       "advanceDp": 121.25,
+       "textfitId": "d-amount",
+       "css": "position:absolute; left:19.9531px; top:119px; font-size:22px; font-weight:700; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      21.553,
+      151.25,
+      118.653,
+      22.688
+     ],
+     "note": "금액 22/700 — 입금도 **검정**(목록의 입금 파랑과 다르다). 숫자 proportional. 왼쪽 20dp"
+    },
+    {
+     "name": "label-memo",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 219.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 188,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "메모입력",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1319,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3624,
+       "leftDp": 20,
+       "topDp": 188,
+       "translateYPx": 0,
+       "baselineDpApp": 200,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-memo",
+       "css": "position:absolute; left:20px; top:188px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      219.313,
+      49.382,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "memo-link",
+     "type": "text",
+     "box": {
+      "x": 204.469,
+      "y": 219.333,
+      "w": 115.56,
+      "h": 14
+     },
+     "dp": {
+      "x": 204.469,
+      "y": 188,
+      "w": 115.56,
+      "h": 14
+     },
+     "text": "메모를 입력해 보세요",
+     "color": "#1f67bd",
+     "colorToken": "--woori-blue-text",
+     "colorMeasured": "#2d67ab",
+     "font": {
+      "sizePx": 14,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1365,
+      "keep": {
+       "sizeDp": 14,
+       "shotFitError": 0.352,
+       "leftDp": 204.4688,
+       "topDp": 188,
+       "translateYPx": 0.25,
+       "baselineDpApp": 200.25,
+       "advanceDp": 115.56,
+       "textfitId": "d-v-memo@col",
+       "css": "position:absolute; left:204.4688px; top:188px; transform:translateY(0.25px); font-size:14px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      204.677,
+      220,
+      115.224,
+      13.063
+     ],
+     "note": "메모 링크 14/600 파랑, 오른쪽 끝 320dp (› 앞). 탭 = 메모 입력(영상에서 누르지 않음)"
+    },
+    {
+     "name": "memo-chevron",
+     "type": "icon",
+     "box": {
+      "x": 334,
+      "y": 221.333,
+      "w": 7,
+      "h": 10
+     },
+     "dp": {
+      "x": 334,
+      "y": 190,
+      "w": 7,
+      "h": 10
+     },
+     "boxFromDesign": true,
+     "src": "woori/history-detail/chevron-memo.svg",
+     "color": "#78787a",
+     "inkBox": [
+      334.304,
+      221.375,
+      6.173,
+      9.625
+     ],
+     "note": "› 회색(파랑 아님) 45° 꺾쇠, 팔 4.06×3.92dp, 굵기 1.4dp, 끝 x 340.1 · 가운데 y 195.0dp(앱). 상자 7×10dp 정수 dp 에 둔다(소수 dp 는 반올림됨)"
+    },
+    {
+     "name": "divider-1",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 249.37,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 218,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-datetime",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 266.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 235,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "거래일시",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707275",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1225,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2531,
+       "leftDp": 20,
+       "topDp": 235,
+       "translateYPx": 0,
+       "baselineDpApp": 247,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-date",
+       "css": "position:absolute; left:20px; top:235px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-datetime",
+     "type": "text",
+     "box": {
+      "x": 198.234,
+      "y": 266.333,
+      "w": 141.83,
+      "h": 15
+     },
+     "dp": {
+      "x": 198.234,
+      "y": 235,
+      "w": 141.83,
+      "h": 15
+     },
+     "text": "2026.11.20 21:29:47",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36373a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1159,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2512,
+       "leftDp": 198.2344,
+       "topDp": 235,
+       "translateYPx": 0,
+       "baselineDpApp": 247,
+       "advanceDp": 141.83,
+       "textfitId": "d-v-date@15-0333",
+       "css": "position:absolute; left:198.2344px; top:235px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      199.19,
+      267.438,
+      140.601,
+      11.688
+     ],
+     "note": "날짜·시각 한 문자열(공백 하나) · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-2",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 296.645,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 265.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-type",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 313.334,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 282,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "거래구분",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#717276",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1226,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2026,
+       "leftDp": 20,
+       "topDp": 282,
+       "translateYPx": 0.25,
+       "baselineDpApp": 294.25,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-type",
+       "css": "position:absolute; left:20px; top:282px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-type",
+     "type": "text",
+     "box": {
+      "x": 304.219,
+      "y": 313.334,
+      "w": 35.69,
+      "h": 15
+     },
+     "dp": {
+      "x": 304.219,
+      "y": 282,
+      "w": 35.69,
+      "h": 15
+     },
+     "text": "0543",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36373b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1292,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1827,
+       "leftDp": 304.2188,
+       "topDp": 282,
+       "translateYPx": 0.25,
+       "baselineDpApp": 294.25,
+       "advanceDp": 35.69,
+       "textfitId": "d-v-type@15-0333",
+       "css": "position:absolute; left:304.2188px; top:282px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      304.812,
+      314.875,
+      34.979,
+      11.688
+     ],
+     "note": "거래구분 코드 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-3",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 343.945,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 312.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안) [critic: 선 중심 501.01px (deposit·deposit-first·confirm-pressed 세 기준 프레임 ±0.03) — 전 값 499.732 은 4행 위 코덱 잡음이 섞인 중심]"
+    },
+    {
+     "name": "label-balance",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 361.334,
+      "w": 68.48,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 330,
+      "w": 68.48,
+      "h": 15
+     },
+     "text": "거래후 잔액",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#6f7174",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1252,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1979,
+       "leftDp": 20,
+       "topDp": 330,
+       "translateYPx": 0,
+       "baselineDpApp": 342,
+       "advanceDp": 68.48,
+       "textfitId": "d-l-bal",
+       "css": "position:absolute; left:20px; top:330px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-balance",
+     "type": "text",
+     "box": {
+      "x": 270.531,
+      "y": 361.334,
+      "w": 69.44,
+      "h": 15
+     },
+     "dp": {
+      "x": 270.531,
+      "y": 330,
+      "w": 69.44,
+      "h": 15
+     },
+     "text": "100,001원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38383a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.135,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1548,
+       "leftDp": 270.5312,
+       "topDp": 330,
+       "translateYPx": 0,
+       "baselineDpApp": 342,
+       "advanceDp": 69.44,
+       "textfitId": "d-v-bal@15-0333",
+       "css": "position:absolute; left:270.5312px; top:330px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      272.577,
+      360.938,
+      67.214,
+      15.813
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-4",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 391.671,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 360,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-requester",
+     "type": "text",
+     "box": {
+      "x": 20.078,
+      "y": 408.333,
+      "w": 38.67,
+      "h": 15
+     },
+     "dp": {
+      "x": 20.078,
+      "y": 377,
+      "w": 38.67,
+      "h": 15
+     },
+     "text": "의뢰인",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707273",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.005,
+      "numeric": "proportional",
+      "fitError": 0.1422,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3137,
+       "leftDp": 20.0781,
+       "topDp": 377,
+       "translateYPx": 0.25,
+       "baselineDpApp": 389.25,
+       "advanceDp": 38.67,
+       "textfitId": "d-l-req",
+       "css": "position:absolute; left:20.0781px; top:377px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.005em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-requester",
+     "type": "text",
+     "box": {
+      "x": 302.531,
+      "y": 408.333,
+      "w": 37.55,
+      "h": 15
+     },
+     "dp": {
+      "x": 302.531,
+      "y": 377,
+      "w": 37.55,
+      "h": 15
+     },
+     "text": "한지호",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36373a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.03,
+      "numeric": "proportional",
+      "fitError": 0.1116,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2832,
+       "leftDp": 302.5312,
+       "topDp": 377,
+       "translateYPx": 0.25,
+       "baselineDpApp": 389.25,
+       "advanceDp": 37.55,
+       "textfitId": "d-v-req@15-0333",
+       "css": "position:absolute; left:302.5312px; top:377px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      303.441,
+      409.063,
+      35.665,
+      13.75
+     ],
+     "note": "의뢰인 = 상대 이름(더미) · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-5",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 438.978,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 407.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안) [critic: 선 중심 639.24px (deposit·deposit-first·confirm-pressed 세 기준 프레임 ±0.03) — 전 값 637.973 은 4행 위 코덱 잡음이 섞인 중심]"
+    },
+    {
+     "name": "label-cheque",
+     "type": "text",
+     "box": {
+      "x": 20.188,
+      "y": 456.334,
+      "w": 51.56,
+      "h": 15
+     },
+     "dp": {
+      "x": 20.188,
+      "y": 425,
+      "w": 51.56,
+      "h": 15
+     },
+     "text": "수표금액",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.005,
+      "numeric": "proportional",
+      "fitError": 0.1526,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2642,
+       "leftDp": 20.1875,
+       "topDp": 425,
+       "translateYPx": 0,
+       "baselineDpApp": 437,
+       "advanceDp": 51.56,
+       "textfitId": "d-l-cheque",
+       "css": "position:absolute; left:20.1875px; top:425px; font-size:15px; font-weight:500; letter-spacing:-0.005em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-cheque",
+     "type": "text",
+     "box": {
+      "x": 318.625,
+      "y": 456.334,
+      "w": 21.23,
+      "h": 15
+     },
+     "dp": {
+      "x": 318.625,
+      "y": 425,
+      "w": 21.23,
+      "h": 15
+     },
+     "text": "0원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36383b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "proportional",
+      "fitError": 0.1279,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1908,
+       "leftDp": 318.625,
+       "topDp": 425,
+       "translateYPx": 0,
+       "baselineDpApp": 437,
+       "advanceDp": 21.23,
+       "textfitId": "d-v-cheque@15-0333",
+       "css": "position:absolute; left:318.625px; top:425px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      319.215,
+      455.813,
+      20.576,
+      13.75
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-6",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 486.168,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 454.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-branch",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 503.333,
+      "w": 38.91,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 472,
+      "w": 38.91,
+      "h": 15
+     },
+     "text": "관리점",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727273",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1166,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.167,
+       "leftDp": 20,
+       "topDp": 472,
+       "translateYPx": 0,
+       "baselineDpApp": 484,
+       "advanceDp": 38.91,
+       "textfitId": "d-l-branch",
+       "css": "position:absolute; left:20px; top:472px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-branch",
+     "type": "text",
+     "box": {
+      "x": 265.188,
+      "y": 503.333,
+      "w": 74.8,
+      "h": 15
+     },
+     "dp": {
+      "x": 265.188,
+      "y": 472,
+      "w": 74.8,
+      "h": 15
+     },
+     "text": "플랫폼사업부",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38383b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "proportional",
+      "fitError": 1.0094,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1643,
+       "leftDp": 265.1875,
+       "topDp": 472,
+       "translateYPx": 0,
+       "baselineDpApp": 484,
+       "advanceDp": 74.8,
+       "textfitId": "d-v-branch@15-0333",
+       "css": "position:absolute; left:265.1875px; top:472px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      265.718,
+      503.25,
+      74.758,
+      13.75
+     ],
+     "note": "design 경로 고정값 맞춤이 위치 찾기에서 실패(1.0) — 크기 범위 탐색 15/−0.035 tabular 0.101, shot 0.164 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "search-link",
+     "type": "text",
+     "box": {
+      "x": 19.969,
+      "y": 579.334,
+      "w": 107.09,
+      "h": 16
+     },
+     "dp": {
+      "x": 19.969,
+      "y": 548,
+      "w": 107.09,
+      "h": 16
+     },
+     "text": "'한지호' 검색하기",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38373a",
+     "font": {
+      "sizePx": 16,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0934,
+      "keep": {
+       "sizeDp": 16,
+       "shotFitError": 0.3107,
+       "leftDp": 19.9688,
+       "topDp": 548,
+       "translateYPx": 0,
+       "baselineDpApp": 561,
+       "advanceDp": 107.09,
+       "textfitId": "d-search",
+       "css": "position:absolute; left:19.9688px; top:548px; font-size:16px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      579.563,
+      104.936,
+      14.438
+     ],
+     "note": "'…' 검색하기 16/500/0 (따옴표 안 = 제목 이름). 마지막 행 아래 46dp. 탭 = 이 이름으로 거래 검색(영상에서 누르지 않음)"
+    },
+    {
+     "name": "search-chevron",
+     "type": "icon",
+     "box": {
+      "x": 333,
+      "y": 580.333,
+      "w": 8,
+      "h": 13
+     },
+     "dp": {
+      "x": 333,
+      "y": 549,
+      "w": 8,
+      "h": 13
+     },
+     "boxFromDesign": true,
+     "src": "woori/history-detail/chevron-search.svg",
+     "color": "#7a7a7a",
+     "note": "› 회색 꺾쇠, 팔 4.92×4.91dp, 굵기 1.85dp(잰 1.75 — 렌더 잉크 맞춤), 끝 x 340.0. 상자 = 글자 top + 1dp (가운데 = 글자 줄 가운데 −0.5dp)"
+    },
+    {
+     "name": "bottom-bar",
+     "type": "box",
+     "box": {
+      "x": 0,
+      "y": 757.334,
+      "w": 360,
+      "h": 74.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 726,
+      "w": 360,
+      "h": 74.667
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "dpLoose": false,
+     "note": "하단 버튼 바(흰색, 그림자 없음). 위끝 726dp 는 출금형에서 아래 숨은 상자가 잘리는 줄(1101.5px)로 잰 값 — 입금형에서는 안 보인다. 페이지와 함께 움직인다(열기·닫기)"
+    },
+    {
+     "name": "btn-share",
+     "type": "box",
+     "box": {
+      "x": 15.836,
+      "y": 759.936,
+      "w": 102.356,
+      "h": 56.352
+     },
+     "dp": {
+      "x": 16,
+      "y": 728.667,
+      "w": 102.333,
+      "h": 56
+     },
+     "fill": "#e3f1fd",
+     "colorToken": "--woori-primary-weak",
+     "radius": 12,
+     "note": "[공유] 16–118.33dp (잰 15.84–118.19/118.37). 폭 = (328 − 8)의 32% 근처(102.4) 또는 307 기기px. 모서리 12dp. 아래 여백 16dp(뷰포트 아래끝 800.667)"
+    },
+    {
+     "name": "btn-share-text",
+     "type": "text",
+     "box": {
+      "x": 52.422,
+      "y": 779.334,
+      "w": 29.48,
+      "h": 17
+     },
+     "dp": {
+      "x": 52.422,
+      "y": 748,
+      "w": 29.48,
+      "h": 17
+     },
+     "text": "공유",
+     "color": "#1e67bd",
+     "colorToken": "--woori-primary-weak-text",
+     "colorMeasured": "#2169bd",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0937,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.3229,
+       "leftDp": 52.4219,
+       "topDp": 748,
+       "translateYPx": 0,
+       "baselineDpApp": 762,
+       "advanceDp": 29.48,
+       "textfitId": "d-share",
+       "css": "position:absolute; left:52.4219px; top:748px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      52.417,
+      780.313,
+      29.492,
+      15.125
+     ],
+     "note": "17/600, 버튼 가운데 (자간 0 으로 둥글린 값 0.0937, 최적 +0.0025em 0.0923)"
+    },
+    {
+     "name": "btn-confirm",
+     "type": "box",
+     "box": {
+      "x": 126.301,
+      "y": 759.993,
+      "w": 217.735,
+      "h": 56.139
+     },
+     "dp": {
+      "x": 126.333,
+      "y": 728.667,
+      "w": 217.667,
+      "h": 56
+     },
+     "fill": "#2286f2",
+     "colorToken": "--woori-primary",
+     "radius": 12,
+     "note": "[확인] 126.33–344dp (잰 126.30–344.04), 간격 8dp, 모서리 12dp. 탭 = 닫기(3.3)"
+    },
+    {
+     "name": "btn-confirm-text",
+     "type": "text",
+     "box": {
+      "x": 220.469,
+      "y": 779.334,
+      "w": 29.56,
+      "h": 17
+     },
+     "dp": {
+      "x": 220.469,
+      "y": 748,
+      "w": 29.56,
+      "h": 17
+     },
+     "text": "확인",
+     "color": "#ffffff",
+     "colorToken": "--woori-text-on-primary",
+     "colorMeasured": "#f6fdfc",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1075,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.3026,
+       "leftDp": 220.4688,
+       "topDp": 748,
+       "translateYPx": 0,
+       "baselineDpApp": 762,
+       "advanceDp": 29.56,
+       "textfitId": "d-confirm",
+       "css": "position:absolute; left:220.4688px; top:748px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      220.452,
+      779.625,
+      28.806,
+      15.813
+     ],
+     "note": "17/600 흰 글자, 버튼 가운데 (잰 코어 #f6fdfc; 자간 0 으로 둥글린 값 0.1075, 최적 +0.005em 0.1008)"
+    }
+   ]
+  },
+  {
+   "id": "deposit-first",
+   "inventoryId": "history-detail:deposit",
+   "video": "v1",
+   "i0": 3697,
+   "i1": 3748,
+   "t0": 92.179,
+   "t1": 95.676,
+   "kind": "HOLD",
+   "mask": [
+    "134,38,258,84"
+   ],
+   "refFrame": "tools/ref/history-detail/deposit-first.png",
+   "route": "/history/tx-20261120-212947",
+   "scenario": "v1-start",
+   "summary": "입금형 상세 ①(같은 화면, 교차 확인용). OS 메신저 알림 pill(91.874–95.205)이 상태바·머리 위에 떠서 마스크. 요소는 deposit 과 같다(7절)",
+   "privacyMask": [
+    "28,173,83,34",
+    "440,593,56,24",
+    "28,841,157,25"
+   ],
+   "elements": []
+  },
+  {
+   "id": "withdraw",
+   "inventoryId": "history-detail:withdraw",
+   "video": "v1",
+   "i0": 3893,
+   "i1": 3903,
+   "t0": 102.215,
+   "t1": 104.497,
+   "kind": "HOLD",
+   "mask": [],
+   "refFrame": "tools/ref/history-detail/withdraw.png",
+   "route": "/history/tx-20261121-110240",
+   "scenario": "v1-start",
+   "summary": "출금·이체형 상세(상세 ②): 농협정우진 / -1원 / 메모입력·거래일시·받는 분(2줄)·받는 분 통장표기·이체확인증[보기]·거래구분·거래후 잔액·수표금액·관리점 9행 / '농협정우진' 검색하기 › / [공유][확인]. 가운데 스피너가 사라진 뒤(102.215)부터 — 101.871–102.215 는 같은 화면 + 스피너(점 단계)",
+   "privacyMask": [
+    "27,173,141,34",
+    "439,454,58,24",
+    "216,487,281,24",
+    "439,556,58,24",
+    "28,1018,197,26"
+   ],
+   "elements": [
+    {
+     "name": "page",
+     "type": "page",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "colorToken": "--woori-bg",
+     "note": "상세 페이지 바탕 = 앱 뷰포트 전체(흰색, 직각). 목록 위에 겹쳐 올라오는 페이지(열기 3.1·닫기 3.3). 상태바·내비 바도 흰색"
+    },
+    {
+     "name": "header",
+     "type": "box",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 52
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 52
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "note": "머리 52dp (구분선·그림자 없음). 제목·✕ 의 세로 가운데 26dp. 일반 페이지 머리(‹)와 다른 상세 전용 머리 — ‹ 없음"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "box": {
+      "x": 133.922,
+      "y": 49.334,
+      "w": 92.2,
+      "h": 17
+     },
+     "dp": {
+      "x": 133.922,
+      "y": 18,
+      "w": 92.2,
+      "h": 17
+     },
+     "text": "거래내역 상세",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#363639",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0934,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.2145,
+       "leftDp": 133.9219,
+       "topDp": 18,
+       "translateYPx": 0,
+       "baselineDpApp": 32,
+       "advanceDp": 92.2,
+       "textfitId": "d-title",
+       "css": "position:absolute; left:133.9219px; top:18px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      134.034,
+      48.813,
+      91.219,
+      15.813
+     ],
+     "note": "머리 제목 17/600 가운데 정렬(left+adv/2 = 180.02). 거래내역조회 머리 제목과 같은 값"
+    },
+    {
+     "name": "close-x",
+     "type": "icon",
+     "box": {
+      "x": 320.02,
+      "y": 45.343,
+      "w": 24,
+      "h": 24
+     },
+     "dp": {
+      "x": 320,
+      "y": 14,
+      "w": 24,
+      "h": 24
+     },
+     "src": "woori/history-detail/close-x.svg",
+     "color": "#3e3f42",
+     "inkBox": [
+      324.702,
+      50.188,
+      14.403,
+      14.438
+     ],
+     "note": "✕ 24dp 상자(설계). 두 획 (6,6)–(18,18)·(6,18)–(18,6), 굵기 1.95dp, 둥근 끝, #3e3f42 (잰 가운데 (332.0, 26.0)dp, 팔 6.04dp). 탭 = 닫기(3.3). 그림 history-detail.close-x"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "box": {
+      "x": 19.969,
+      "y": 119.334,
+      "w": 95.08,
+      "h": 22
+     },
+     "dp": {
+      "x": 19.969,
+      "y": 88,
+      "w": 95.08,
+      "h": 22
+     },
+     "text": "농협정우진",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#333539",
+     "font": {
+      "sizePx": 22,
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0699,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1368,
+       "leftDp": 19.9688,
+       "topDp": 88,
+       "translateYPx": 0,
+       "baselineDpApp": 107,
+       "advanceDp": 95.08,
+       "textfitId": "w-name",
+       "css": "position:absolute; left:19.9688px; top:88px; font-size:22px; font-weight:700; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.182,
+      120.313,
+      93.962,
+      20.625
+     ],
+     "note": "상대 표시 이름 22/700 (목록 행의 이름 문자열 그대로). 개인정보 → 더미. 왼쪽 20dp"
+    },
+    {
+     "name": "amount",
+     "type": "text",
+     "box": {
+      "x": 19.984,
+      "y": 150.334,
+      "w": 39.2,
+      "h": 22
+     },
+     "dp": {
+      "x": 19.984,
+      "y": 119,
+      "w": 39.2,
+      "h": 22
+     },
+     "text": "-1원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#33353a",
+     "font": {
+      "sizePx": 22,
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0685,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1556,
+       "leftDp": 19.9844,
+       "topDp": 119,
+       "translateYPx": 0,
+       "baselineDpApp": 138,
+       "advanceDp": 39.2,
+       "textfitId": "w-amount",
+       "css": "position:absolute; left:19.9844px; top:119px; font-size:22px; font-weight:700; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      151.25,
+      37.036,
+      19.938
+     ],
+     "note": "금액 22/700 — 입금도 **검정**(목록의 입금 파랑과 다르다). 숫자 proportional. 왼쪽 20dp"
+    },
+    {
+     "name": "label-memo",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 219.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 188,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "메모입력",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1319,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3624,
+       "leftDp": 20,
+       "topDp": 188,
+       "translateYPx": 0,
+       "baselineDpApp": 200,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-memo",
+       "css": "position:absolute; left:20px; top:188px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      219.313,
+      49.382,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "memo-link",
+     "type": "text",
+     "box": {
+      "x": 204.469,
+      "y": 219.333,
+      "w": 115.56,
+      "h": 14
+     },
+     "dp": {
+      "x": 204.469,
+      "y": 188,
+      "w": 115.56,
+      "h": 14
+     },
+     "text": "메모를 입력해 보세요",
+     "color": "#1f67bd",
+     "colorToken": "--woori-blue-text",
+     "colorMeasured": "#2d67ab",
+     "font": {
+      "sizePx": 14,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1365,
+      "keep": {
+       "sizeDp": 14,
+       "shotFitError": 0.352,
+       "leftDp": 204.4688,
+       "topDp": 188,
+       "translateYPx": 0.25,
+       "baselineDpApp": 200.25,
+       "advanceDp": 115.56,
+       "textfitId": "d-v-memo@col",
+       "css": "position:absolute; left:204.4688px; top:188px; transform:translateY(0.25px); font-size:14px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      204.677,
+      220,
+      115.224,
+      13.063
+     ],
+     "note": "메모 링크 14/600 파랑, 오른쪽 끝 320dp (› 앞). 탭 = 메모 입력(영상에서 누르지 않음)"
+    },
+    {
+     "name": "memo-chevron",
+     "type": "icon",
+     "box": {
+      "x": 334,
+      "y": 221.333,
+      "w": 7,
+      "h": 10
+     },
+     "dp": {
+      "x": 334,
+      "y": 190,
+      "w": 7,
+      "h": 10
+     },
+     "boxFromDesign": true,
+     "src": "woori/history-detail/chevron-memo.svg",
+     "color": "#78787a",
+     "inkBox": [
+      334.304,
+      221.375,
+      6.173,
+      9.625
+     ],
+     "note": "› 회색(파랑 아님) 45° 꺾쇠, 팔 4.06×3.92dp, 굵기 1.4dp, 끝 x 340.1 · 가운데 y 195.0dp(앱). 상자 7×10dp 정수 dp 에 둔다(소수 dp 는 반올림됨)"
+    },
+    {
+     "name": "divider-1",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 249.338,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 218,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-datetime",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 266.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 235,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "거래일시",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707275",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1225,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2531,
+       "leftDp": 20,
+       "topDp": 235,
+       "translateYPx": 0,
+       "baselineDpApp": 247,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-date",
+       "css": "position:absolute; left:20px; top:235px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-datetime",
+     "type": "text",
+     "box": {
+      "x": 198.218,
+      "y": 266.333,
+      "w": 141.83,
+      "h": 15
+     },
+     "dp": {
+      "x": 198.219,
+      "y": 235,
+      "w": 141.83,
+      "h": 15
+     },
+     "text": "2026.11.21 11:02:40",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#383839",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1196,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.244,
+       "leftDp": 198.2188,
+       "topDp": 235,
+       "translateYPx": 0,
+       "baselineDpApp": 247,
+       "advanceDp": 141.83,
+       "textfitId": "w-v-date@15-0333",
+       "css": "position:absolute; left:198.2188px; top:235px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      199.19,
+      267.438,
+      140.601,
+      11.688
+     ],
+     "note": "날짜·시각 한 문자열 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-2",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 296.75,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 265.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-recipient",
+     "type": "text",
+     "box": {
+      "x": 19.937,
+      "y": 313.334,
+      "w": 42.56,
+      "h": 15
+     },
+     "dp": {
+      "x": 19.938,
+      "y": 282,
+      "w": 42.56,
+      "h": 15
+     },
+     "text": "받는 분",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1254,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2128,
+       "leftDp": 19.9375,
+       "topDp": 282,
+       "translateYPx": 0.25,
+       "baselineDpApp": 294.25,
+       "advanceDp": 42.56,
+       "textfitId": "w-l-recv@15",
+       "css": "position:absolute; left:19.9375px; top:282px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      313.5,
+      41.837,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-recipient",
+     "type": "text",
+     "box": {
+      "x": 302.609,
+      "y": 313.334,
+      "w": 37.41,
+      "h": 15
+     },
+     "dp": {
+      "x": 302.609,
+      "y": 282,
+      "w": 37.41,
+      "h": 15
+     },
+     "text": "정우진",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#39383c",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1197,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1795,
+       "leftDp": 302.6094,
+       "topDp": 282,
+       "translateYPx": 0.25,
+       "baselineDpApp": 294.25,
+       "advanceDp": 37.41,
+       "textfitId": "w-v-recv@15-0333",
+       "css": "position:absolute; left:302.6094px; top:282px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      302.755,
+      313.5,
+      37.036,
+      13.75
+     ],
+     "note": "받는 분 이름(더미) 1줄째 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "value-recipient-account",
+     "type": "text",
+     "box": {
+      "x": 149.61,
+      "y": 336.333,
+      "w": 190.36,
+      "h": 15
+     },
+     "dp": {
+      "x": 149.609,
+      "y": 305,
+      "w": 190.36,
+      "h": 15
+     },
+     "text": "지역농축협 12345652789012",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#363639",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1349,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3261,
+       "leftDp": 149.6094,
+       "topDp": 305,
+       "translateYPx": 0,
+       "baselineDpApp": 317,
+       "advanceDp": 190.36,
+       "textfitId": "w-v-recv2@15-0333",
+       "css": "position:absolute; left:149.6094px; top:305px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      149.809,
+      336.188,
+      189.982,
+      13.75
+     ],
+     "note": "2줄째: 은행 이름 + 공백 + 계좌번호(하이픈 없음, 더미). 오른쪽 정렬 두 줄 — 줄 간격 22.667dp(행 높이 +22.667, 영상 기준선 차 22.0±0.34). 앱은 '은행 계좌' 를 둘째 줄로 따로 둔다(길면 꺾이는 게 아니라 늘 2줄) · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-3",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 366.625,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 335.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-recipient-mark",
+     "type": "text",
+     "box": {
+      "x": 19.984,
+      "y": 384.333,
+      "w": 98.08,
+      "h": 15
+     },
+     "dp": {
+      "x": 19.984,
+      "y": 353,
+      "w": 98.08,
+      "h": 15
+     },
+     "text": "받는 분 통장표기",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707174",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1316,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1753,
+       "leftDp": 19.9844,
+       "topDp": 353,
+       "translateYPx": 0,
+       "baselineDpApp": 365,
+       "advanceDp": 98.08,
+       "textfitId": "w-l-recvmark@15",
+       "css": "position:absolute; left:19.9844px; top:353px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      383.625,
+      96.02,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-recipient-mark",
+     "type": "text",
+     "box": {
+      "x": 302.531,
+      "y": 384.333,
+      "w": 37.55,
+      "h": 15
+     },
+     "dp": {
+      "x": 302.531,
+      "y": 353,
+      "w": 37.55,
+      "h": 15
+     },
+     "text": "정우진",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#39383b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.03,
+      "numeric": "tabular",
+      "fitError": 0.1221,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1739,
+       "leftDp": 302.5312,
+       "topDp": 353,
+       "translateYPx": 0,
+       "baselineDpApp": 365,
+       "advanceDp": 37.55,
+       "textfitId": "w-v-recvmark@15-0333",
+       "css": "position:absolute; left:302.5312px; top:353px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      302.755,
+      383.625,
+      37.036,
+      13.75
+     ],
+     "note": "통장표기 = 받는 분 이름(더미) · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-4",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 414.05,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 382.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-receipt",
+     "type": "text",
+     "box": {
+      "x": 19.969,
+      "y": 433.333,
+      "w": 64.83,
+      "h": 15
+     },
+     "dp": {
+      "x": 19.969,
+      "y": 402,
+      "w": 64.83,
+      "h": 15
+     },
+     "text": "이체확인증",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#717274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1094,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2475,
+       "leftDp": 19.9688,
+       "topDp": 402,
+       "translateYPx": 0,
+       "baselineDpApp": 414,
+       "advanceDp": 64.83,
+       "textfitId": "w-l-receipt",
+       "css": "position:absolute; left:19.9688px; top:402px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      433.125,
+      63.785,
+      14.438
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "receipt-pill",
+     "type": "box",
+     "box": {
+      "x": 301.348,
+      "y": 427.039,
+      "w": 38.693,
+      "h": 26.962
+     },
+     "dp": {
+      "x": 301.333,
+      "y": 395.667,
+      "w": 38.667,
+      "h": 27
+     },
+     "fill": "#ffffff",
+     "radius": 13.5,
+     "borderWidth": 1,
+     "border": "#dddddd",
+     "note": "[보기] 알약: 흰 바탕 + 1dp 테두리 #dddddd, 모서리 둥글게(반지름 ≥ 높이/2, 잰 13.9dp). 잰 x 301.35–340.04, y 395.71–422.67(앱) → 38.69×26.96dp = 116×81 기기px. 행 가운데(409.17) 정렬. 오른쪽 끝 340. 탭 = 이체확인증(영상에서 누르지 않음) [critic: 테두리 색 = 곧은 네 변(위·아래·왼·오른 가운데)의 잉크 합을 1dp 로 환산 219.5/222.8/221.9/219.5 → #dddddd. 전 값 #e2e2e2 는 덮임 비율 최소제곱이라 코덱으로 퍼진 잉크를 덜 셌다(구분선은 같은 잉크 합 방법으로 #f0f0f0)]"
+    },
+    {
+     "name": "receipt-pill-text",
+     "type": "text",
+     "box": {
+      "x": 310.23,
+      "y": 434.334,
+      "w": 20.94,
+      "h": 12
+     },
+     "dp": {
+      "x": 310.23,
+      "y": 403,
+      "w": 20.94,
+      "h": 12
+     },
+     "text": "보기",
+     "color": "#4a4b4e",
+     "colorToken": "--woori-text-body",
+     "colorMeasured": "#4e4e50",
+     "font": {
+      "sizePx": 12,
+      "weight": 600,
+      "letterSpacingEm": 0.0075,
+      "numeric": "proportional",
+      "fitError": 0.1055,
+      "keep": {
+       "sizeDp": 12,
+       "shotFitError": 0.1055,
+       "leftDp": 310.23,
+       "topDp": 403,
+       "translateYPx": 0,
+       "baselineDpApp": 413,
+       "advanceDp": 20.94,
+       "textfitId": "w-pill@col",
+       "css": "position:absolute; left:310.23px; top:403px; font-size:12px; font-weight:600; letter-spacing:0.0075em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      310.299,
+      434.5,
+      19.89,
+      11
+     ],
+     "note": "12/600 (색 #4a4b4e 로 맞춤 0.1055; 500 은 0.151). 알약 가운데(320.7)"
+    },
+    {
+     "name": "divider-5",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 465.969,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 434.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-type",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 483.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 452,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "거래구분",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707273",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1225,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3608,
+       "leftDp": 20,
+       "topDp": 452,
+       "translateYPx": 0,
+       "baselineDpApp": 464,
+       "advanceDp": 51.86,
+       "textfitId": "w-l-type",
+       "css": "position:absolute; left:20px; top:452px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.182,
+      483.313,
+      51.439,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-type",
+     "type": "text",
+     "box": {
+      "x": 302.563,
+      "y": 483.333,
+      "w": 37.41,
+      "h": 15
+     },
+     "dp": {
+      "x": 302.562,
+      "y": 452,
+      "w": 37.41,
+      "h": 15
+     },
+     "text": "모바일",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#363639",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1244,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3309,
+       "leftDp": 302.5625,
+       "topDp": 452,
+       "translateYPx": 0,
+       "baselineDpApp": 464,
+       "advanceDp": 37.41,
+       "textfitId": "w-v-type@15-0333",
+       "css": "position:absolute; left:302.5625px; top:452px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      302.755,
+      483.313,
+      37.036,
+      13.75
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-6",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 513.338,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 482,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-balance",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 530.333,
+      "w": 68.48,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 499,
+      "w": 68.48,
+      "h": 15
+     },
+     "text": "거래후 잔액",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1164,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2828,
+       "leftDp": 20,
+       "topDp": 499,
+       "translateYPx": 0,
+       "baselineDpApp": 511,
+       "advanceDp": 68.48,
+       "textfitId": "w-l-bal",
+       "css": "position:absolute; left:20px; top:499px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.182,
+      530.75,
+      67.214,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-balance",
+     "type": "text",
+     "box": {
+      "x": 300.703,
+      "y": 530.333,
+      "w": 39.23,
+      "h": 15
+     },
+     "dp": {
+      "x": 300.703,
+      "y": 499,
+      "w": 39.23,
+      "h": 15
+     },
+     "text": "345원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38373a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1305,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2396,
+       "leftDp": 300.7031,
+       "topDp": 499,
+       "translateYPx": 0,
+       "baselineDpApp": 511,
+       "advanceDp": 39.23,
+       "textfitId": "w-v-bal@15-0333",
+       "css": "position:absolute; left:300.7031px; top:499px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      301.383,
+      530.75,
+      38.408,
+      13.063
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-7",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 560.418,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 529.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-cheque",
+     "type": "text",
+     "box": {
+      "x": 20.188,
+      "y": 577.334,
+      "w": 51.56,
+      "h": 15
+     },
+     "dp": {
+      "x": 20.188,
+      "y": 546,
+      "w": 51.56,
+      "h": 15
+     },
+     "text": "수표금액",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.005,
+      "numeric": "proportional",
+      "fitError": 0.1532,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2461,
+       "leftDp": 20.1875,
+       "topDp": 546,
+       "translateYPx": 0.25,
+       "baselineDpApp": 558.25,
+       "advanceDp": 51.56,
+       "textfitId": "c-w-l-cheque",
+       "css": "position:absolute; left:20.1875px; top:546px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.005em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.182,
+      577.5,
+      50.753,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp [critic: 출금 기준 프레임에서 다시 맞춤 — 15/500/−0.005em, top 546 +0.25px, 기준선 558.25 (전에는 입금형 437 을 복사)]"
+    },
+    {
+     "name": "value-cheque",
+     "type": "text",
+     "box": {
+      "x": 318.625,
+      "y": 577.334,
+      "w": 21.23,
+      "h": 15
+     },
+     "dp": {
+      "x": 318.625,
+      "y": 546,
+      "w": 21.23,
+      "h": 15
+     },
+     "text": "0원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38383a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "proportional",
+      "fitError": 0.1266,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.174,
+       "leftDp": 318.625,
+       "topDp": 546,
+       "translateYPx": 0.25,
+       "baselineDpApp": 558.25,
+       "advanceDp": 21.23,
+       "textfitId": "w-v-cheque@15-0333",
+       "css": "position:absolute; left:318.625px; top:546px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      319.215,
+      577.5,
+      20.576,
+      13.75
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-8",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 607.938,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 576.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-branch",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 625.334,
+      "w": 38.91,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 594,
+      "w": 38.91,
+      "h": 15
+     },
+     "text": "관리점",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727273",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.111,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1514,
+       "leftDp": 20,
+       "topDp": 594,
+       "translateYPx": 0,
+       "baselineDpApp": 606,
+       "advanceDp": 38.91,
+       "textfitId": "c-w-l-branch",
+       "css": "position:absolute; left:20px; top:594px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.182,
+      624.938,
+      37.036,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp [critic: 출금 기준 프레임에서 다시 맞춤 — 15/500/0, top 594, 기준선 606, left 19.99 (전에는 입금형 484 를 복사)]"
+    },
+    {
+     "name": "value-branch",
+     "type": "text",
+     "box": {
+      "x": 265.188,
+      "y": 625.334,
+      "w": 74.8,
+      "h": 15
+     },
+     "dp": {
+      "x": 265.188,
+      "y": 594,
+      "w": 74.8,
+      "h": 15
+     },
+     "text": "디지털영업부",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#39383a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 1.0136,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1491,
+       "leftDp": 265.1875,
+       "topDp": 594,
+       "translateYPx": 0,
+       "baselineDpApp": 606,
+       "advanceDp": 74.8,
+       "textfitId": "w-v-branch@15-0333",
+       "css": "position:absolute; left:265.1875px; top:594px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      266.404,
+      624.938,
+      74.073,
+      13.75
+     ],
+     "note": "design 고정값 맞춤 위치 찾기 실패(1.0) — shot 0.149 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "search-link",
+     "type": "text",
+     "box": {
+      "x": 19.969,
+      "y": 701.333,
+      "w": 134.75,
+      "h": 16
+     },
+     "dp": {
+      "x": 19.969,
+      "y": 670,
+      "w": 134.75,
+      "h": 16
+     },
+     "text": "'농협정우진' 검색하기",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38373a",
+     "font": {
+      "sizePx": 16,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0921,
+      "keep": {
+       "sizeDp": 16,
+       "shotFitError": 0.1339,
+       "leftDp": 19.9688,
+       "topDp": 670,
+       "translateYPx": 0,
+       "baselineDpApp": 683,
+       "advanceDp": 134.75,
+       "textfitId": "w-search",
+       "css": "position:absolute; left:19.9688px; top:670px; font-size:16px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      701.25,
+      132.37,
+      15.125
+     ],
+     "note": "'…' 검색하기 16/500/0 (따옴표 안 = 제목 이름). 마지막 행 아래 46dp. 탭 = 이 이름으로 거래 검색(영상에서 누르지 않음)"
+    },
+    {
+     "name": "search-chevron",
+     "type": "icon",
+     "box": {
+      "x": 333,
+      "y": 702.334,
+      "w": 8,
+      "h": 13
+     },
+     "dp": {
+      "x": 333,
+      "y": 671,
+      "w": 8,
+      "h": 13
+     },
+     "boxFromDesign": true,
+     "src": "woori/history-detail/chevron-search.svg",
+     "color": "#7a7a7a",
+     "note": "› 회색 꺾쇠, 팔 4.92×4.91dp, 굵기 1.85dp(잰 1.75 — 렌더 잉크 맞춤), 끝 x 340.0. 상자 = 글자 top + 1dp (가운데 = 글자 줄 가운데 −0.5dp)"
+    },
+    {
+     "name": "hidden-outline-box",
+     "type": "box",
+     "box": {
+      "x": 20.5,
+      "y": 752.034,
+      "w": 319.5,
+      "h": 5.3
+     },
+     "dp": {
+      "x": 20.5,
+      "y": 720.7,
+      "w": 319.5,
+      "h": 5.3
+     },
+     "border": "#f3f3f3",
+     "borderWidth": 1,
+     "dpLoose": true,
+     "note": "출금·이체형만: '…' 검색하기 아래 테두리 상자의 위 가장자리만 하단 바 위로 보인다(y 1093.5–1101.5px, 앱 720.4–726dp, 둥근 위 모서리 r≈5dp, 1dp #f3f3f3 근처, 안쪽 흰색). 나머지는 하단 바에 가려 영상에 없다 — 내용 모름(다시 이체 같은 외곽선 버튼으로 추정, 설계값). 첫 그림(3.2, 3행 없음)에는 없다 [critic: 위 모서리 휘도 모형 맞춤(1dp 테두리, 양쪽 모서리 30x14px) → 반지름 8–9dp(전 r≈5), 위끝 720.6–720.7dp, 왼끝 20.5–20.9dp, 선 1dp 환산 #f3f3f3(잉크 합 17)]",
+     "radius": 8
+    },
+    {
+     "name": "bottom-bar",
+     "type": "box",
+     "box": {
+      "x": 0,
+      "y": 757.334,
+      "w": 360,
+      "h": 74.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 726,
+      "w": 360,
+      "h": 74.667
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "dpLoose": false,
+     "note": "하단 버튼 바(흰색, 그림자 없음). 위끝 726dp 는 출금형에서 아래 숨은 상자가 잘리는 줄(1101.5px)로 잰 값 — 입금형에서는 안 보인다. 페이지와 함께 움직인다(열기·닫기)"
+    },
+    {
+     "name": "btn-share",
+     "type": "box",
+     "box": {
+      "x": 15.836,
+      "y": 759.936,
+      "w": 102.356,
+      "h": 56.352
+     },
+     "dp": {
+      "x": 16,
+      "y": 728.667,
+      "w": 102.333,
+      "h": 56
+     },
+     "fill": "#e3f1fd",
+     "colorToken": "--woori-primary-weak",
+     "radius": 12,
+     "note": "[공유] 16–118.33dp (잰 15.84–118.19/118.37). 폭 = (328 − 8)의 32% 근처(102.4) 또는 307 기기px. 모서리 12dp. 아래 여백 16dp(뷰포트 아래끝 800.667)"
+    },
+    {
+     "name": "btn-share-text",
+     "type": "text",
+     "box": {
+      "x": 52.422,
+      "y": 779.334,
+      "w": 29.48,
+      "h": 17
+     },
+     "dp": {
+      "x": 52.422,
+      "y": 748,
+      "w": 29.48,
+      "h": 17
+     },
+     "text": "공유",
+     "color": "#1e67bd",
+     "colorToken": "--woori-primary-weak-text",
+     "colorMeasured": "#2169bd",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0937,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.3229,
+       "leftDp": 52.4219,
+       "topDp": 748,
+       "translateYPx": 0,
+       "baselineDpApp": 762,
+       "advanceDp": 29.48,
+       "textfitId": "d-share",
+       "css": "position:absolute; left:52.4219px; top:748px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      52.417,
+      780.313,
+      29.492,
+      15.125
+     ],
+     "note": "17/600, 버튼 가운데 (자간 0 으로 둥글린 값 0.0937, 최적 +0.0025em 0.0923)"
+    },
+    {
+     "name": "btn-confirm",
+     "type": "box",
+     "box": {
+      "x": 126.301,
+      "y": 759.993,
+      "w": 217.735,
+      "h": 56.139
+     },
+     "dp": {
+      "x": 126.333,
+      "y": 728.667,
+      "w": 217.667,
+      "h": 56
+     },
+     "fill": "#2286f2",
+     "colorToken": "--woori-primary",
+     "radius": 12,
+     "note": "[확인] 126.33–344dp (잰 126.30–344.04), 간격 8dp, 모서리 12dp. 탭 = 닫기(3.3)"
+    },
+    {
+     "name": "btn-confirm-text",
+     "type": "text",
+     "box": {
+      "x": 220.469,
+      "y": 779.334,
+      "w": 29.56,
+      "h": 17
+     },
+     "dp": {
+      "x": 220.469,
+      "y": 748,
+      "w": 29.56,
+      "h": 17
+     },
+     "text": "확인",
+     "color": "#ffffff",
+     "colorToken": "--woori-text-on-primary",
+     "colorMeasured": "#f6fdfc",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1075,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.3026,
+       "leftDp": 220.4688,
+       "topDp": 748,
+       "translateYPx": 0,
+       "baselineDpApp": 762,
+       "advanceDp": 29.56,
+       "textfitId": "d-confirm",
+       "css": "position:absolute; left:220.4688px; top:748px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      220.452,
+      779.625,
+      28.806,
+      15.813
+     ],
+     "note": "17/600 흰 글자, 버튼 가운데 (잰 코어 #f6fdfc; 자간 0 으로 둥글린 값 0.1075, 최적 +0.005em 0.1008)"
+    }
+   ]
+  },
+  {
+   "id": "confirm-pressed",
+   "inventoryId": "history-detail:confirm-pressed",
+   "video": "v1",
+   "i0": 6049,
+   "i1": 6049,
+   "t0": 156.237,
+   "t1": 156.237,
+   "kind": "CHANGE",
+   "mask": [],
+   "refFrame": "tools/ref/history-detail/confirm-pressed.png",
+   "route": "/history/tx-20261120-212947",
+   "scenario": "v1-start",
+   "summary": "입금형 상세에서 [확인] 눌림(#185ba4) 한 프레임 — 다음 프레임(156.273)부터 닫힘. 버튼 색 말고는 deposit 과 같다",
+   "privacyMask": [
+    "28,173,83,34",
+    "440,593,56,24",
+    "28,841,157,25"
+   ],
+   "elements": [
+    {
+     "name": "page",
+     "type": "page",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 800.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 800.667
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "colorToken": "--woori-bg",
+     "note": "상세 페이지 바탕 = 앱 뷰포트 전체(흰색, 직각). 목록 위에 겹쳐 올라오는 페이지(열기 3.1·닫기 3.3). 상태바·내비 바도 흰색"
+    },
+    {
+     "name": "header",
+     "type": "box",
+     "box": {
+      "x": 0,
+      "y": 31.334,
+      "w": 360,
+      "h": 52
+     },
+     "dp": {
+      "x": 0,
+      "y": 0,
+      "w": 360,
+      "h": 52
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "note": "머리 52dp (구분선·그림자 없음). 제목·✕ 의 세로 가운데 26dp. 일반 페이지 머리(‹)와 다른 상세 전용 머리 — ‹ 없음"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "box": {
+      "x": 133.922,
+      "y": 49.334,
+      "w": 92.2,
+      "h": 17
+     },
+     "dp": {
+      "x": 133.922,
+      "y": 18,
+      "w": 92.2,
+      "h": 17
+     },
+     "text": "거래내역 상세",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#363639",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0934,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.2145,
+       "leftDp": 133.9219,
+       "topDp": 18,
+       "translateYPx": 0,
+       "baselineDpApp": 32,
+       "advanceDp": 92.2,
+       "textfitId": "d-title",
+       "css": "position:absolute; left:133.9219px; top:18px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      134.034,
+      48.813,
+      91.219,
+      15.813
+     ],
+     "note": "머리 제목 17/600 가운데 정렬(left+adv/2 = 180.02). 거래내역조회 머리 제목과 같은 값"
+    },
+    {
+     "name": "close-x",
+     "type": "icon",
+     "box": {
+      "x": 320.02,
+      "y": 45.343,
+      "w": 24,
+      "h": 24
+     },
+     "dp": {
+      "x": 320,
+      "y": 14,
+      "w": 24,
+      "h": 24
+     },
+     "src": "woori/history-detail/close-x.svg",
+     "color": "#3e3f42",
+     "inkBox": [
+      324.702,
+      50.188,
+      14.403,
+      14.438
+     ],
+     "note": "✕ 24dp 상자(설계). 두 획 (6,6)–(18,18)·(6,18)–(18,6), 굵기 1.95dp, 둥근 끝, #3e3f42 (잰 가운데 (332.0, 26.0)dp, 팔 6.04dp). 탭 = 닫기(3.3). 그림 history-detail.close-x"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "box": {
+      "x": 19.813,
+      "y": 119.334,
+      "w": 57.05,
+      "h": 22
+     },
+     "dp": {
+      "x": 19.812,
+      "y": 88,
+      "w": 57.05,
+      "h": 22
+     },
+     "text": "한지호",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#33343a",
+     "font": {
+      "sizePx": 22,
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0741,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.117,
+       "leftDp": 19.8125,
+       "topDp": 88,
+       "translateYPx": 0,
+       "baselineDpApp": 107,
+       "advanceDp": 57.05,
+       "textfitId": "d-name",
+       "css": "position:absolute; left:19.8125px; top:88px; font-size:22px; font-weight:700; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      120.313,
+      54.183,
+      20.625
+     ],
+     "note": "상대 표시 이름 22/700 (목록 행의 이름 문자열 그대로). 개인정보 → 더미. 왼쪽 20dp"
+    },
+    {
+     "name": "amount",
+     "type": "text",
+     "box": {
+      "x": 19.953,
+      "y": 150.334,
+      "w": 121.25,
+      "h": 22
+     },
+     "dp": {
+      "x": 19.953,
+      "y": 119,
+      "w": 121.25,
+      "h": 22
+     },
+     "text": "+100,000원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#33353a",
+     "font": {
+      "sizePx": 22,
+      "weight": 700,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1018,
+      "keep": {
+       "sizeDp": 22,
+       "shotFitError": 0.1244,
+       "leftDp": 19.9531,
+       "topDp": 119,
+       "translateYPx": 0,
+       "baselineDpApp": 138,
+       "advanceDp": 121.25,
+       "textfitId": "d-amount",
+       "css": "position:absolute; left:19.9531px; top:119px; font-size:22px; font-weight:700; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      21.553,
+      151.25,
+      118.653,
+      22.688
+     ],
+     "note": "금액 22/700 — 입금도 **검정**(목록의 입금 파랑과 다르다). 숫자 proportional. 왼쪽 20dp"
+    },
+    {
+     "name": "label-memo",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 219.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 188,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "메모입력",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1319,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3624,
+       "leftDp": 20,
+       "topDp": 188,
+       "translateYPx": 0,
+       "baselineDpApp": 200,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-memo",
+       "css": "position:absolute; left:20px; top:188px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      219.313,
+      49.382,
+      13.75
+     ],
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "memo-link",
+     "type": "text",
+     "box": {
+      "x": 204.469,
+      "y": 219.333,
+      "w": 115.56,
+      "h": 14
+     },
+     "dp": {
+      "x": 204.469,
+      "y": 188,
+      "w": 115.56,
+      "h": 14
+     },
+     "text": "메모를 입력해 보세요",
+     "color": "#1f67bd",
+     "colorToken": "--woori-blue-text",
+     "colorMeasured": "#2d67ab",
+     "font": {
+      "sizePx": 14,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1365,
+      "keep": {
+       "sizeDp": 14,
+       "shotFitError": 0.352,
+       "leftDp": 204.4688,
+       "topDp": 188,
+       "translateYPx": 0.25,
+       "baselineDpApp": 200.25,
+       "advanceDp": 115.56,
+       "textfitId": "d-v-memo@col",
+       "css": "position:absolute; left:204.4688px; top:188px; transform:translateY(0.25px); font-size:14px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      204.677,
+      220,
+      115.224,
+      13.063
+     ],
+     "note": "메모 링크 14/600 파랑, 오른쪽 끝 320dp (› 앞). 탭 = 메모 입력(영상에서 누르지 않음)"
+    },
+    {
+     "name": "memo-chevron",
+     "type": "icon",
+     "box": {
+      "x": 334,
+      "y": 221.333,
+      "w": 7,
+      "h": 10
+     },
+     "dp": {
+      "x": 334,
+      "y": 190,
+      "w": 7,
+      "h": 10
+     },
+     "boxFromDesign": true,
+     "src": "woori/history-detail/chevron-memo.svg",
+     "color": "#78787a",
+     "inkBox": [
+      334.304,
+      221.375,
+      6.173,
+      9.625
+     ],
+     "note": "› 회색(파랑 아님) 45° 꺾쇠, 팔 4.06×3.92dp, 굵기 1.4dp, 끝 x 340.1 · 가운데 y 195.0dp(앱). 상자 7×10dp 정수 dp 에 둔다(소수 dp 는 반올림됨)"
+    },
+    {
+     "name": "divider-1",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 249.37,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 218,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-datetime",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 266.333,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 235,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "거래일시",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707275",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1225,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2531,
+       "leftDp": 20,
+       "topDp": 235,
+       "translateYPx": 0,
+       "baselineDpApp": 247,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-date",
+       "css": "position:absolute; left:20px; top:235px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-datetime",
+     "type": "text",
+     "box": {
+      "x": 198.234,
+      "y": 266.333,
+      "w": 141.83,
+      "h": 15
+     },
+     "dp": {
+      "x": 198.234,
+      "y": 235,
+      "w": 141.83,
+      "h": 15
+     },
+     "text": "2026.11.20 21:29:47",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36373a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1159,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2512,
+       "leftDp": 198.2344,
+       "topDp": 235,
+       "translateYPx": 0,
+       "baselineDpApp": 247,
+       "advanceDp": 141.83,
+       "textfitId": "d-v-date@15-0333",
+       "css": "position:absolute; left:198.2344px; top:235px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      199.19,
+      267.438,
+      140.601,
+      11.688
+     ],
+     "note": "날짜·시각 한 문자열(공백 하나) · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-2",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 296.645,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 265.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-type",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 313.334,
+      "w": 51.86,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 282,
+      "w": 51.86,
+      "h": 15
+     },
+     "text": "거래구분",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#717276",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1226,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2026,
+       "leftDp": 20,
+       "topDp": 282,
+       "translateYPx": 0.25,
+       "baselineDpApp": 294.25,
+       "advanceDp": 51.86,
+       "textfitId": "d-l-type",
+       "css": "position:absolute; left:20px; top:282px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-type",
+     "type": "text",
+     "box": {
+      "x": 304.219,
+      "y": 313.334,
+      "w": 35.69,
+      "h": 15
+     },
+     "dp": {
+      "x": 304.219,
+      "y": 282,
+      "w": 35.69,
+      "h": 15
+     },
+     "text": "0543",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36373b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.1292,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1827,
+       "leftDp": 304.2188,
+       "topDp": 282,
+       "translateYPx": 0.25,
+       "baselineDpApp": 294.25,
+       "advanceDp": 35.69,
+       "textfitId": "d-v-type@15-0333",
+       "css": "position:absolute; left:304.2188px; top:282px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      304.812,
+      314.875,
+      34.979,
+      11.688
+     ],
+     "note": "거래구분 코드 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-3",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 343.945,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 312.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안) [critic: 선 중심 501.01px (deposit·deposit-first·confirm-pressed 세 기준 프레임 ±0.03) — 전 값 499.732 은 4행 위 코덱 잡음이 섞인 중심]"
+    },
+    {
+     "name": "label-balance",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 361.334,
+      "w": 68.48,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 330,
+      "w": 68.48,
+      "h": 15
+     },
+     "text": "거래후 잔액",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#6f7174",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1252,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1979,
+       "leftDp": 20,
+       "topDp": 330,
+       "translateYPx": 0,
+       "baselineDpApp": 342,
+       "advanceDp": 68.48,
+       "textfitId": "d-l-bal",
+       "css": "position:absolute; left:20px; top:330px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-balance",
+     "type": "text",
+     "box": {
+      "x": 270.531,
+      "y": 361.334,
+      "w": 69.44,
+      "h": 15
+     },
+     "dp": {
+      "x": 270.531,
+      "y": 330,
+      "w": 69.44,
+      "h": 15
+     },
+     "text": "100,001원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38383a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "tabular",
+      "fitError": 0.135,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1548,
+       "leftDp": 270.5312,
+       "topDp": 330,
+       "translateYPx": 0,
+       "baselineDpApp": 342,
+       "advanceDp": 69.44,
+       "textfitId": "d-v-bal@15-0333",
+       "css": "position:absolute; left:270.5312px; top:330px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1; font-variant-numeric:tabular-nums"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      272.577,
+      360.938,
+      67.214,
+      15.813
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-4",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 391.671,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 360,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-requester",
+     "type": "text",
+     "box": {
+      "x": 20.078,
+      "y": 408.333,
+      "w": 38.67,
+      "h": 15
+     },
+     "dp": {
+      "x": 20.078,
+      "y": 377,
+      "w": 38.67,
+      "h": 15
+     },
+     "text": "의뢰인",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#707273",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.005,
+      "numeric": "proportional",
+      "fitError": 0.1422,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.3137,
+       "leftDp": 20.0781,
+       "topDp": 377,
+       "translateYPx": 0.25,
+       "baselineDpApp": 389.25,
+       "advanceDp": 38.67,
+       "textfitId": "d-l-req",
+       "css": "position:absolute; left:20.0781px; top:377px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.005em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-requester",
+     "type": "text",
+     "box": {
+      "x": 302.531,
+      "y": 408.333,
+      "w": 37.55,
+      "h": 15
+     },
+     "dp": {
+      "x": 302.531,
+      "y": 377,
+      "w": 37.55,
+      "h": 15
+     },
+     "text": "한지호",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36373a",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.03,
+      "numeric": "proportional",
+      "fitError": 0.1116,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2832,
+       "leftDp": 302.5312,
+       "topDp": 377,
+       "translateYPx": 0.25,
+       "baselineDpApp": 389.25,
+       "advanceDp": 37.55,
+       "textfitId": "d-v-req@15-0333",
+       "css": "position:absolute; left:302.5312px; top:377px; transform:translateY(0.25px); font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      303.441,
+      409.063,
+      35.665,
+      13.75
+     ],
+     "note": "의뢰인 = 상대 이름(더미) · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-5",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 438.978,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 407.333,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안) [critic: 선 중심 639.24px (deposit·deposit-first·confirm-pressed 세 기준 프레임 ±0.03) — 전 값 637.973 은 4행 위 코덱 잡음이 섞인 중심]"
+    },
+    {
+     "name": "label-cheque",
+     "type": "text",
+     "box": {
+      "x": 20.188,
+      "y": 456.334,
+      "w": 51.56,
+      "h": 15
+     },
+     "dp": {
+      "x": 20.188,
+      "y": 425,
+      "w": 51.56,
+      "h": 15
+     },
+     "text": "수표금액",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727274",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.005,
+      "numeric": "proportional",
+      "fitError": 0.1526,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.2642,
+       "leftDp": 20.1875,
+       "topDp": 425,
+       "translateYPx": 0,
+       "baselineDpApp": 437,
+       "advanceDp": 51.56,
+       "textfitId": "d-l-cheque",
+       "css": "position:absolute; left:20.1875px; top:425px; font-size:15px; font-weight:500; letter-spacing:-0.005em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-cheque",
+     "type": "text",
+     "box": {
+      "x": 318.625,
+      "y": 456.334,
+      "w": 21.23,
+      "h": 15
+     },
+     "dp": {
+      "x": 318.625,
+      "y": 425,
+      "w": 21.23,
+      "h": 15
+     },
+     "text": "0원",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#36383b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "proportional",
+      "fitError": 0.1279,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1908,
+       "leftDp": 318.625,
+       "topDp": 425,
+       "translateYPx": 0,
+       "baselineDpApp": 437,
+       "advanceDp": 21.23,
+       "textfitId": "d-v-cheque@15-0333",
+       "css": "position:absolute; left:318.625px; top:425px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      319.215,
+      455.813,
+      20.576,
+      13.75
+     ],
+     "note": "값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "divider-6",
+     "type": "line",
+     "box": {
+      "x": 20,
+      "y": 486.168,
+      "w": 320,
+      "h": 1
+     },
+     "dp": {
+      "x": 20,
+      "y": 454.667,
+      "w": 320,
+      "h": 1
+     },
+     "fill": "#f2f2f2",
+     "colorToken": "--woori-divider-light",
+     "note": "1dp 구분선 x 20–340 (잰 1dp 환산 #f0f0f0 ±2, 토큰 2레벨 안)"
+    },
+    {
+     "name": "label-branch",
+     "type": "text",
+     "box": {
+      "x": 20,
+      "y": 503.333,
+      "w": 38.91,
+      "h": 15
+     },
+     "dp": {
+      "x": 20,
+      "y": 472,
+      "w": 38.91,
+      "h": 15
+     },
+     "text": "관리점",
+     "color": "#707173",
+     "colorToken": "--woori-text-secondary",
+     "colorMeasured": "#727273",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1166,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.167,
+       "leftDp": 20,
+       "topDp": 472,
+       "translateYPx": 0,
+       "baselineDpApp": 484,
+       "advanceDp": 38.91,
+       "textfitId": "d-l-branch",
+       "css": "position:absolute; left:20px; top:472px; font-size:15px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "note": "항목 라벨 15/500/0, 왼쪽 20dp"
+    },
+    {
+     "name": "value-branch",
+     "type": "text",
+     "box": {
+      "x": 265.188,
+      "y": 503.333,
+      "w": 74.8,
+      "h": 15
+     },
+     "dp": {
+      "x": 265.188,
+      "y": 472,
+      "w": 74.8,
+      "h": 15
+     },
+     "text": "플랫폼사업부",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38383b",
+     "font": {
+      "sizePx": 15,
+      "weight": 500,
+      "letterSpacingEm": -0.0333,
+      "numeric": "proportional",
+      "fitError": 1.0094,
+      "keep": {
+       "sizeDp": 15,
+       "shotFitError": 0.1643,
+       "leftDp": 265.1875,
+       "topDp": 472,
+       "translateYPx": 0,
+       "baselineDpApp": 484,
+       "advanceDp": 74.8,
+       "textfitId": "d-v-branch@15-0333",
+       "css": "position:absolute; left:265.1875px; top:472px; font-size:15px; font-weight:500; letter-spacing:-0.5px; line-height:1"
+      }
+     },
+     "align": "right",
+     "inkBox": [
+      265.718,
+      503.25,
+      74.758,
+      13.75
+     ],
+     "note": "design 경로 고정값 맞춤이 위치 찾기에서 실패(1.0) — 크기 범위 탐색 15/−0.035 tabular 0.101, shot 0.164 · 값 열 15/500 자간 −0.5px(−0.0333em) tabular-nums, 오른쪽 끝 340dp"
+    },
+    {
+     "name": "search-link",
+     "type": "text",
+     "box": {
+      "x": 19.969,
+      "y": 579.334,
+      "w": 107.09,
+      "h": 16
+     },
+     "dp": {
+      "x": 19.969,
+      "y": 548,
+      "w": 107.09,
+      "h": 16
+     },
+     "text": "'한지호' 검색하기",
+     "color": "#33353a",
+     "colorToken": "--woori-text",
+     "colorMeasured": "#38373a",
+     "font": {
+      "sizePx": 16,
+      "weight": 500,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0934,
+      "keep": {
+       "sizeDp": 16,
+       "shotFitError": 0.3107,
+       "leftDp": 19.9688,
+       "topDp": 548,
+       "translateYPx": 0,
+       "baselineDpApp": 561,
+       "advanceDp": 107.09,
+       "textfitId": "d-search",
+       "css": "position:absolute; left:19.9688px; top:548px; font-size:16px; font-weight:500; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "left",
+     "inkBox": [
+      20.867,
+      579.563,
+      104.936,
+      14.438
+     ],
+     "note": "'…' 검색하기 16/500/0 (따옴표 안 = 제목 이름). 마지막 행 아래 46dp. 탭 = 이 이름으로 거래 검색(영상에서 누르지 않음)"
+    },
+    {
+     "name": "search-chevron",
+     "type": "icon",
+     "box": {
+      "x": 333,
+      "y": 580.333,
+      "w": 8,
+      "h": 13
+     },
+     "dp": {
+      "x": 333,
+      "y": 549,
+      "w": 8,
+      "h": 13
+     },
+     "boxFromDesign": true,
+     "src": "woori/history-detail/chevron-search.svg",
+     "color": "#7a7a7a",
+     "note": "› 회색 꺾쇠, 팔 4.92×4.91dp, 굵기 1.85dp(잰 1.75 — 렌더 잉크 맞춤), 끝 x 340.0. 상자 = 글자 top + 1dp (가운데 = 글자 줄 가운데 −0.5dp)"
+    },
+    {
+     "name": "bottom-bar",
+     "type": "box",
+     "box": {
+      "x": 0,
+      "y": 757.334,
+      "w": 360,
+      "h": 74.667
+     },
+     "dp": {
+      "x": 0,
+      "y": 726,
+      "w": 360,
+      "h": 74.667
+     },
+     "boxFromDesign": true,
+     "fill": "#ffffff",
+     "dpLoose": false,
+     "note": "하단 버튼 바(흰색, 그림자 없음). 위끝 726dp 는 출금형에서 아래 숨은 상자가 잘리는 줄(1101.5px)로 잰 값 — 입금형에서는 안 보인다. 페이지와 함께 움직인다(열기·닫기)"
+    },
+    {
+     "name": "btn-share",
+     "type": "box",
+     "box": {
+      "x": 15.836,
+      "y": 759.936,
+      "w": 102.356,
+      "h": 56.352
+     },
+     "dp": {
+      "x": 16,
+      "y": 728.667,
+      "w": 102.333,
+      "h": 56
+     },
+     "fill": "#e3f1fd",
+     "colorToken": "--woori-primary-weak",
+     "radius": 12,
+     "note": "[공유] 16–118.33dp (잰 15.84–118.19/118.37). 폭 = (328 − 8)의 32% 근처(102.4) 또는 307 기기px. 모서리 12dp. 아래 여백 16dp(뷰포트 아래끝 800.667)"
+    },
+    {
+     "name": "btn-share-text",
+     "type": "text",
+     "box": {
+      "x": 52.422,
+      "y": 779.334,
+      "w": 29.48,
+      "h": 17
+     },
+     "dp": {
+      "x": 52.422,
+      "y": 748,
+      "w": 29.48,
+      "h": 17
+     },
+     "text": "공유",
+     "color": "#1e67bd",
+     "colorToken": "--woori-primary-weak-text",
+     "colorMeasured": "#2169bd",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.0937,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.3229,
+       "leftDp": 52.4219,
+       "topDp": 748,
+       "translateYPx": 0,
+       "baselineDpApp": 762,
+       "advanceDp": 29.48,
+       "textfitId": "d-share",
+       "css": "position:absolute; left:52.4219px; top:748px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      52.417,
+      780.313,
+      29.492,
+      15.125
+     ],
+     "note": "17/600, 버튼 가운데 (자간 0 으로 둥글린 값 0.0937, 최적 +0.0025em 0.0923)"
+    },
+    {
+     "name": "btn-confirm",
+     "type": "box",
+     "box": {
+      "x": 126.301,
+      "y": 759.993,
+      "w": 217.735,
+      "h": 56.139
+     },
+     "dp": {
+      "x": 126.333,
+      "y": 728.667,
+      "w": 217.667,
+      "h": 56
+     },
+     "fill": "#185ba4",
+     "colorToken": "--woori-primary-pressed",
+     "radius": 12,
+     "note": "[확인] 눌림 색 #185ba4 (잰 BGR 164,91,24). 누른 프레임 156.237 한 장 → 다음 프레임부터 닫힘이 시작되고, 닫히는 동안에도 눌림 색 그대로(3.3)"
+    },
+    {
+     "name": "btn-confirm-text",
+     "type": "text",
+     "box": {
+      "x": 220.469,
+      "y": 779.334,
+      "w": 29.56,
+      "h": 17
+     },
+     "dp": {
+      "x": 220.469,
+      "y": 748,
+      "w": 29.56,
+      "h": 17
+     },
+     "text": "확인",
+     "color": "#ffffff",
+     "colorToken": "--woori-text-on-primary",
+     "colorMeasured": "#f6fdfc",
+     "font": {
+      "sizePx": 17,
+      "weight": 600,
+      "letterSpacingEm": 0,
+      "numeric": "proportional",
+      "fitError": 0.1075,
+      "keep": {
+       "sizeDp": 17,
+       "shotFitError": 0.3026,
+       "leftDp": 220.4688,
+       "topDp": 748,
+       "translateYPx": 0,
+       "baselineDpApp": 762,
+       "advanceDp": 29.56,
+       "textfitId": "d-confirm",
+       "css": "position:absolute; left:220.4688px; top:748px; font-size:17px; font-weight:600; letter-spacing:0em; line-height:1"
+      }
+     },
+     "align": "center",
+     "inkBox": [
+      220.452,
+      779.625,
+      28.806,
+      15.813
+     ],
+     "note": "17/600 흰 글자, 버튼 가운데 (잰 코어 #f6fdfc; 자간 0 으로 둥글린 값 0.1075, 최적 +0.005em 0.1008)"
+    }
+   ]
+  }
+ ],
+ "transitions": [
+  {
+   "id": "detail-open",
+   "from": "history (주인 history: 입금 목록 맨 위 / 출금 목록 scrollTop 64)",
+   "to": "deposit | withdraw",
+   "kind": "slide-up+fade",
+   "trigger": {
+    "video": "v1",
+    "frame": 6022,
+    "t": 154.314,
+    "evidence": "목록 행 탭(눌림 효과 없음). 움직인 첫 프레임 #6022. 곡선 시작(불투명도 맞춤) ① 91.3446(앞 정지 프레임 91.342) ② 101.507 ③ 154.2936. 상세 ②는 탭 프레임 101.486 에 가운데 스피너가 먼저 뜬다(주인 history)"
+   },
+   "durationMs": 265,
+   "property": "상세 페이지 전체(머리·내용·하단 바 함께): translateY 100dp→0 + opacity 0→1, 같은 시작·같은 곡선",
+   "curve": {
+    "name": "decelerate",
+    "cubicBezier": [
+     0,
+     0,
+     0.2,
+     1
+    ],
+    "rms": 2
+   },
+   "keep": {
+    "latencyMs": {
+     "note": "탭은 화면에 안 보인다(눌림 효과 없음). ②만 탭→스피너 프레임 101.486 → 곡선 시작 101.507 (+21ms)"
+    },
+    "translate": {
+     "fromDp": 100,
+     "fromPx": 145.45,
+     "curve": "decelerate (0,0,0.2,1)",
+     "durMs": 265,
+     "rmsPx": 2,
+     "alternatives": [
+      {
+       "what": "free cubic-bezier(0.229,0.731,0.571,1.0) 269ms, 138px",
+       "rms": 1.92
+      },
+      {
+       "what": "decelerate 267ms, 144px",
+       "rms": 1.95
+      },
+      {
+       "what": "easeOutCubic 295ms, 133px",
+       "rms": 2.01
+      },
+      {
+       "what": "decelerate 250ms, 83dp (1단계 권장값)",
+       "rms": 10.45
+      }
+     ]
+    },
+    "opacity": {
+     "curve": "decelerate (0,0,0.2,1)",
+     "durMs": 265,
+     "rms": 0.018,
+     "alternatives": [
+      {
+       "what": "free cubic-bezier(0.161,0.709,0.471,0.997) 289ms",
+       "rms": 0.0161
+      },
+      {
+       "what": "easeOutQuart 365ms (시작이 ① 창 밖)",
+       "rms": 0.0171
+      },
+      {
+       "what": "decelerate 262ms",
+       "rms": 0.0177
+      },
+      {
+       "what": "standard 364ms (시작이 앞 정지 프레임보다 앞 — 불가)",
+       "rms": 0.0194
+      }
+     ]
+    },
+    "starts": {
+     "open1": 91.3446,
+     "open2": 101.507,
+     "open3": 154.2936
+    },
+    "veil": {
+     "note": "상세 아래 목록에 흰 막(WooriNav push+veil 과 같은 것)이 0 → ≈0.69 로 올라온다. 페이지 위 빈 자리에서 보이는 프레임이 몇 장뿐이고 코덱이 건너뛴 블록과 섞여 불확실: ③ +20ms 0.01, +37ms 0.05, +53ms 0.09, +70ms 0.14 · ② +46ms 0.05, +63ms 0.07, +79ms 0.11 → 설계: linear 330ms 로 0→0.69 (닫힐 때 0.69 에서 시작하는 값과 맞춤)",
+     "toAlpha": 0.69,
+     "durMs": 330,
+     "curve": "linear",
+     "design": true
+    },
+    "samplesHeader": [
+     "i",
+     "t",
+     "msFromStart",
+     "dyPx",
+     "dyDp",
+     "alphaPageBg",
+     "alphaContent"
+    ],
+    "samples": {
+     "open1": [
+      [
+       3656,
+       91.368,
+       22.9,
+       101.9,
+       70.06,
+       0.282,
+       0.26
+      ],
+      [
+       3657,
+       91.384,
+       39.4,
+       83.9,
+       57.68,
+       0.404,
+       0.39
+      ],
+      [
+       3658,
+       91.401,
+       56.1,
+       68.25,
+       46.92,
+       0.517,
+       0.5
+      ],
+      [
+       3659,
+       91.417,
+       72.7,
+       54.75,
+       37.64,
+       0.629,
+       0.593
+      ],
+      [
+       3660,
+       91.434,
+       89.2,
+       43.1,
+       29.63,
+       0.711,
+       0.671
+      ],
+      [
+       3661,
+       91.451,
+       106.1,
+       33.3,
+       22.89,
+       0.789,
+       0.739
+      ],
+      [
+       3662,
+       91.468,
+       123.2,
+       29,
+       19.94,
+       0.814,
+       0.769
+      ],
+      [
+       3663,
+       91.485,
+       140,
+       25.05,
+       17.22,
+       0.811,
+       0.796
+      ],
+      [
+       3664,
+       91.502,
+       157.2,
+       15.5,
+       10.66,
+       0.886,
+       0.879
+      ],
+      [
+       3665,
+       91.526,
+       181.7,
+       12.95,
+       8.9,
+       0.9,
+       0.896
+      ],
+      [
+       3666,
+       91.543,
+       198.3,
+       5.5,
+       3.78,
+       0.957,
+       0.956
+      ],
+      [
+       3667,
+       91.568,
+       223.4,
+       2.3,
+       1.58,
+       0.972,
+       0.978
+      ],
+      [
+       3668,
+       91.585,
+       240.2,
+       1.05,
+       0.72,
+       0.985,
+       0.987
+      ],
+      [
+       3669,
+       91.601,
+       256.6,
+       0.35,
+       0.24,
+       0.998,
+       0.994
+      ],
+      [
+       3670,
+       91.618,
+       273.3,
+       0.05,
+       0.03,
+       0.999,
+       0.996
+      ],
+      [
+       3671,
+       91.641,
+       296.2,
+       0,
+       0,
+       0.999,
+       0.999
+      ]
+     ],
+     "open2": [
+      [
+       3862,
+       101.519,
+       12.2,
+       122.3,
+       84.08,
+       0.143,
+       0.141
+      ],
+      [
+       3863,
+       101.536,
+       29.4,
+       101.9,
+       70.06,
+       0.314,
+       0.258
+      ],
+      [
+       3864,
+       101.553,
+       46,
+       83.9,
+       57.68,
+       0.452,
+       0.386
+      ],
+      [
+       3865,
+       101.57,
+       62.5,
+       68.25,
+       46.92,
+       0.573,
+       0.497
+      ],
+      [
+       3866,
+       101.586,
+       79.3,
+       54.8,
+       37.67,
+       0.668,
+       0.588
+      ],
+      [
+       3867,
+       101.603,
+       96,
+       43.1,
+       29.63,
+       0.742,
+       0.662
+      ],
+      [
+       3868,
+       101.628,
+       121,
+       29,
+       19.94,
+       0.836,
+       0.762
+      ],
+      [
+       3869,
+       101.645,
+       137.8,
+       21.55,
+       14.82,
+       0.878,
+       0.827
+      ],
+      [
+       3870,
+       101.662,
+       154.5,
+       15.5,
+       10.66,
+       0.913,
+       0.875
+      ],
+      [
+       3871,
+       101.678,
+       171.3,
+       10.75,
+       7.39,
+       0.941,
+       0.914
+      ],
+      [
+       3872,
+       101.695,
+       187.9,
+       7,
+       4.81,
+       0.96,
+       0.951
+      ],
+      [
+       3873,
+       101.712,
+       204.6,
+       4.25,
+       2.92,
+       0.968,
+       0.962
+      ],
+      [
+       3874,
+       101.728,
+       221.1,
+       2.4,
+       1.65,
+       0.98,
+       0.979
+      ],
+      [
+       3875,
+       101.829,
+       322.3,
+       0,
+       0,
+       0.994,
+       0.995
+      ]
+     ],
+     "open3": [
+      [
+       6022,
+       154.314,
+       20.2,
+       111.8,
+       76.86,
+       0.244,
+       0.201
+      ],
+      [
+       6023,
+       154.33,
+       36.4,
+       92.5,
+       63.59,
+       0.398,
+       0.328
+      ],
+      [
+       6024,
+       154.346,
+       52.8,
+       75.75,
+       52.08,
+       0.525,
+       0.44
+      ],
+      [
+       6025,
+       154.363,
+       69.7,
+       61.1,
+       42.01,
+       0.627,
+       0.544
+      ],
+      [
+       6026,
+       154.38,
+       86.4,
+       48.65,
+       33.45,
+       0.649,
+       0.625
+      ],
+      [
+       6027,
+       154.397,
+       103.4,
+       37.95,
+       26.09,
+       0.728,
+       0.701
+      ],
+      [
+       6028,
+       154.414,
+       120,
+       28.95,
+       19.9,
+       0.8,
+       0.761
+      ],
+      [
+       6029,
+       154.43,
+       136.6,
+       21.45,
+       14.75,
+       0.832,
+       0.824
+      ],
+      [
+       6030,
+       154.448,
+       154.1,
+       12.9,
+       8.87,
+       0.901,
+       0.892
+      ],
+      [
+       6031,
+       154.472,
+       178.7,
+       8.7,
+       5.98,
+       0.933,
+       0.935
+      ],
+      [
+       6032,
+       154.489,
+       195.2,
+       5.45,
+       3.75,
+       0.955,
+       0.95
+      ],
+      [
+       6033,
+       154.506,
+       211.9,
+       3.15,
+       2.17,
+       0.967,
+       0.964
+      ],
+      [
+       6034,
+       154.522,
+       228.7,
+       1.65,
+       1.13,
+       0.975,
+       0.976
+      ],
+      [
+       6035,
+       154.539,
+       245.4,
+       0.7,
+       0.48,
+       0.99,
+       0.989
+      ],
+      [
+       6036,
+       154.556,
+       262,
+       0.1,
+       0.07,
+       0.991,
+       0.994
+      ],
+      [
+       6037,
+       154.573,
+       279,
+       0,
+       0,
+       0.991,
+       0.997
+      ],
+      [
+       6038,
+       154.589,
+       295.4,
+       0,
+       0,
+       0.994,
+       0.997
+      ]
+     ]
+    },
+    "measuredHow": "프레임마다 F − B = a_bg·pg(dy)·(255 − B) + a_c·(S(dy) − 255) (B = 직전 목록 정지 화면, S = 상세 기준 그림을 dy 만큼 내린 것, 휘도, σ1.2 흐림, 가로 4칸 평균) 를 dy 0.05px 격자에서 최소제곱. a_bg(흰 바탕이 목록을 가린 정도)를 불투명도로 쓴다 — a_c 는 움직임 흐림으로 5–15% 낮게 나온다",
+    "critic": "critic(2026-11-21): 버튼 윗변(B−R 계단) 추적으로 다시 잼 — decelerate 100dp 265ms joint rms 1.36px(①2.04 ②0.72 ③0.88), 시작 91.344·101.511·154.296 (스펙 91.3446·101.507·154.2936, 4ms 안). 불투명도(버튼 B−R 평탄값/208) decelerate 265ms rms 0.015. 다른 거리·길이(95dp 1.37, 105dp 1.46, 250ms 1.75)보다 낫거나 같다"
+   },
+   "note": "1단계 값(+83dp, md-decelerate 250ms)은 첫 프레임이 이미 진행된 것을 거리로 메운 값이라 버린다: 시작을 앞 정지 프레임 뒤로 묶으면 100dp·265ms 가 세 번 모두 맞는다(①은 앞 정지 프레임 91.342 와 첫 움직임 91.367 사이 25ms 창)"
+  },
+  {
+   "id": "detail-withdraw-rows",
+   "from": "withdraw (첫 그림)",
+   "to": "withdraw",
+   "kind": "steps",
+   "trigger": {
+    "video": "v1",
+    "frame": 3874,
+    "t": 101.728,
+    "evidence": "출금 상세 ②: 열리는 동안(101.519–101.712)은 입금형과 같은 6행(메모·일시·구분·잔액·수표금액·관리점)으로 그려져 있다가 #3874 한 프레임에 '받는 분'(2줄)·'받는 분 통장표기'·'이체확인증 [보기]' 3행(169.333dp)이 거래일시 아래에 끼워지고 아래 행·검색 줄이 밀린다(애니메이션 없음)"
+   },
+   "durationMs": 0,
+   "property": "행 끼워 넣기 (한 프레임)",
+   "keep": {
+    "msFromOpenStart": 221,
+    "msFromSpinner": 242,
+    "insertedHeightDp": 169.333,
+    "insertAfter": "divider-2 (거래일시 아래)",
+    "partialLayout": "첫 그림 = withdraw 에서 3행을 뺀 것: 거래구분 행이 265.333 아래로 바로 붙고, 숨은 상자(hidden-outline-box)도 없다. 하단 바는 그대로",
+    "spinner": {
+     "owner": "history",
+     "visible": [
+      101.486,
+      102.215
+     ],
+     "note": "행 탭 프레임(101.486)부터 가운데 스피너(262,628)가 상세 위에 떠 있다가 101.846 쯤 점 단계로 줄고 102.215 에 사라짐. 상세 페이지보다 위(z)에 그린다"
+    }
+   },
+   "note": "앱: 상세 데이터(받는 분 등)를 받은 뒤 3행을 끼운다. 시나리오 재생은 열기 시작 + 221ms. 입금형은 처음부터 다 그린다(③ 첫 프레임부터 7행)"
+  },
+  {
+   "id": "detail-close",
+   "from": "deposit | withdraw",
+   "to": "history (주인 history, 열기 전 위치 그대로)",
+   "kind": "slide-down+fade",
+   "trigger": {
+    "video": "v1",
+    "frame": 6050,
+    "t": 156.273,
+    "evidence": "닫기 세 가지: ① OS 뒤로(◁, 내비 물결 95.460 부터 — OS) → 곡선 시작 95.687 · ② ✕ 탭(눌림 효과 없음, 앞 정지 프레임 104.497) → 104.511 · ③ [확인] 눌림 프레임 156.237 → 156.252 (+15ms)"
+   },
+   "durationMs": 260,
+   "property": "상세 페이지: translateY 0→+96dp(140px) + opacity 1→0 (decelerate). 아래 목록의 흰 막: 0.69→0 linear 271ms (페이지 시작 +30ms)",
+   "curve": {
+    "name": "decelerate",
+    "cubicBezier": [
+     0,
+     0,
+     0.2,
+     1
+    ],
+    "rms": 0.023
+   },
+   "keep": {
+    "latencyMs": {
+     "osBack": "내비 ◁ 물결(눌림) 95.460 → 곡선 시작 95.687 (+227ms, 뗀 시각은 안 보임)",
+     "closeX": "보이는 눌림 없음",
+     "confirm": 15
+    },
+    "translate": {
+     "toDp": 96.6,
+     "toPx": 140.5,
+     "curve": "decelerate (0,0,0.2,1)",
+     "durMs": 240,
+     "rmsPx": 2.74,
+     "starts": {
+      "close1": 95.695,
+      "close2": 104.5151,
+      "close3": 156.2517
+     },
+     "alternatives": [
+      {
+       "what": "free cubic-bezier(0.49,0.574,0.015,0.41) 153ms, 130px",
+       "rms": 2.39
+      },
+      {
+       "what": "fast-out-slow-in-emph 417ms, 155px",
+       "rms": 2.68
+      },
+      {
+       "what": "easeOutCubic 239ms, 134px",
+       "rms": 3.01
+      }
+     ]
+    },
+    "opacity": {
+     "curve": "decelerate (0,0,0.2,1)",
+     "durMs": 260,
+     "rms": 0.023,
+     "starts": {
+      "close1": 95.6873,
+      "close2": 104.5112,
+      "close3": 156.2517
+     },
+     "alternatives": [
+      {
+       "what": "free cubic-bezier(0.021,0.321,0,0.514) 177ms",
+       "rms": 0.0277
+      },
+      {
+       "what": "fast-out-slow-in-emph 358ms",
+       "rms": 0.0359
+      },
+      {
+       "what": "easeOutCubic 296ms",
+       "rms": 0.0398
+      }
+     ]
+    },
+    "veil": {
+     "fromAlpha": 0.69,
+     "toAlpha": 0,
+     "curve": "linear",
+     "durMs": 271,
+     "delayMs": 30,
+     "rms": 0.0189,
+     "note": "페이지가 내려가며 비운 위쪽 자리도 같은 값으로 흰색이 덮여 있다(정지 흰 막). 페이지와 같은 시작이면 rms 0.041, +30ms 0.019. 0.69 는 막이 보이기 시작하는 첫 프레임 값(그 전엔 불투명한 페이지에 가려 안 보임)"
+    },
+    "confirmPressed": "③ 은 닫히는 동안 [확인]이 눌림 색(#185ba4) 그대로 내려간다 (버튼 자리 평균 오차: 눌림 색 1.99 / 원래 색 32.0)",
+    "samplesHeader": [
+     "i",
+     "t",
+     "msFromStart",
+     "dyPx",
+     "dyDp",
+     "alphaContent(=페이지)",
+     "alphaVeil"
+    ],
+    "samples": {
+     "close1": [
+      [
+       3749,
+       95.699,
+       12.1,
+       11.85,
+       8.15,
+       0.915,
+       0.637
+      ],
+      [
+       3750,
+       95.717,
+       29.3,
+       43.6,
+       29.98,
+       0.67,
+       0.743
+      ],
+      [
+       3751,
+       95.733,
+       45.4,
+       61.53,
+       42.3,
+       0.552,
+       0.645
+      ],
+      [
+       3752,
+       95.749,
+       61.9,
+       77.94,
+       53.58,
+       0.453,
+       0.603
+      ],
+      [
+       3753,
+       95.766,
+       79.1,
+       90.66,
+       62.33,
+       0.358,
+       0.562
+      ],
+      [
+       3754,
+       95.783,
+       95.3,
+       102.39,
+       70.39,
+       0.284,
+       0.524
+      ],
+      [
+       3755,
+       95.8,
+       112.3,
+       112.09,
+       77.06,
+       0.227,
+       0.475
+      ],
+      [
+       3756,
+       95.817,
+       129.2,
+       120.24,
+       82.66,
+       0.176,
+       0.43
+      ],
+      [
+       3757,
+       95.833,
+       145.8,
+       127,
+       87.31,
+       0.119,
+       0.388
+      ],
+      [
+       3758,
+       95.85,
+       162.7,
+       131.69,
+       90.54,
+       0.095,
+       0.345
+      ],
+      [
+       3759,
+       95.867,
+       179.4,
+       null,
+       null,
+       0.065,
+       0.302
+      ],
+      [
+       3760,
+       95.883,
+       195.6,
+       null,
+       null,
+       0.045,
+       0.257
+      ],
+      [
+       3761,
+       95.901,
+       213.3,
+       null,
+       null,
+       0.014,
+       0.227
+      ],
+      [
+       3762,
+       95.917,
+       229.7,
+       null,
+       null,
+       0.008,
+       0.18
+      ],
+      [
+       3763,
+       95.934,
+       246.3,
+       null,
+       null,
+       0.004,
+       0.133
+      ],
+      [
+       3764,
+       95.951,
+       263.3,
+       null,
+       null,
+       0,
+       0.087
+      ],
+      [
+       3765,
+       95.967,
+       279.6,
+       null,
+       null,
+       0.001,
+       0.041
+      ],
+      [
+       3766,
+       95.984,
+       296.6,
+       null,
+       null,
+       0,
+       0.003
+      ],
+      [
+       3767,
+       96,
+       313,
+       null,
+       null,
+       0.002,
+       -0.001
+      ],
+      [
+       3768,
+       96.035,
+       347.3,
+       null,
+       null,
+       -0.001,
+       0.001
+      ]
+     ],
+     "close2": [
+      [
+       3904,
+       104.531,
+       19.4,
+       33.45,
+       23,
+       0.744,
+       0.706
+      ],
+      [
+       3905,
+       104.547,
+       35.7,
+       52.84,
+       36.33,
+       0.616,
+       0.664
+      ],
+      [
+       3906,
+       104.564,
+       52.4,
+       69.64,
+       47.88,
+       0.507,
+       0.63
+      ],
+      [
+       3907,
+       104.58,
+       68.9,
+       84.05,
+       57.78,
+       0.405,
+       0.591
+      ],
+      [
+       3908,
+       104.597,
+       86.2,
+       96.66,
+       66.45,
+       0.316,
+       0.55
+      ],
+      [
+       3909,
+       104.614,
+       102.7,
+       107.29,
+       73.76,
+       0.256,
+       0.501
+      ],
+      [
+       3910,
+       104.63,
+       119,
+       115.42,
+       79.35,
+       0.197,
+       0.454
+      ],
+      [
+       3911,
+       104.647,
+       135.6,
+       121.84,
+       83.77,
+       0.146,
+       0.423
+      ],
+      [
+       3912,
+       104.664,
+       152.4,
+       127.8,
+       87.86,
+       0.106,
+       0.375
+      ],
+      [
+       3913,
+       104.68,
+       169.1,
+       null,
+       null,
+       0.033,
+       0.361
+      ],
+      [
+       3914,
+       104.697,
+       185.5,
+       null,
+       null,
+       0.002,
+       0.316
+      ],
+      [
+       3915,
+       104.715,
+       203.4,
+       null,
+       null,
+       -0.001,
+       0.243
+      ],
+      [
+       3916,
+       104.739,
+       227.7,
+       null,
+       null,
+       0.001,
+       0.186
+      ],
+      [
+       3917,
+       104.756,
+       244.4,
+       null,
+       null,
+       -0.001,
+       0.14
+      ],
+      [
+       3918,
+       104.772,
+       260.8,
+       null,
+       null,
+       -0.002,
+       0.094
+      ],
+      [
+       3919,
+       104.789,
+       277.4,
+       null,
+       null,
+       0,
+       0.042
+      ],
+      [
+       3920,
+       104.805,
+       294,
+       null,
+       null,
+       0,
+       0.002
+      ]
+     ],
+     "close3": [
+      [
+       6050,
+       156.273,
+       21.4,
+       33.7,
+       23.17,
+       0.788,
+       0.683
+      ],
+      [
+       6051,
+       156.291,
+       39.7,
+       69.7,
+       47.92,
+       0.538,
+       0.629
+      ],
+      [
+       6052,
+       156.317,
+       65.8,
+       90.75,
+       62.39,
+       0.382,
+       0.582
+      ],
+      [
+       6053,
+       156.338,
+       85.8,
+       96.8,
+       66.55,
+       0.319,
+       0.574
+      ],
+      [
+       6054,
+       156.354,
+       102.1,
+       107.4,
+       73.84,
+       0.253,
+       0.528
+      ],
+      [
+       6055,
+       156.371,
+       119.3,
+       116.4,
+       80.03,
+       0.2,
+       0.486
+      ],
+      [
+       6056,
+       156.387,
+       135.7,
+       123.9,
+       85.18,
+       0.151,
+       0.439
+      ],
+      [
+       6057,
+       156.404,
+       152.3,
+       null,
+       null,
+       0.024,
+       0.437
+      ],
+      [
+       6058,
+       156.421,
+       168.8,
+       null,
+       null,
+       0.023,
+       0.383
+      ],
+      [
+       6059,
+       156.442,
+       190.4,
+       null,
+       null,
+       0.01,
+       0.306
+      ],
+      [
+       6060,
+       156.463,
+       211.1,
+       null,
+       null,
+       0.004,
+       0.252
+      ],
+      [
+       6061,
+       156.479,
+       227.5,
+       null,
+       null,
+       0.004,
+       0.201
+      ],
+      [
+       6062,
+       156.497,
+       245.3,
+       null,
+       null,
+       0.001,
+       0.137
+      ],
+      [
+       6063,
+       156.521,
+       269.5,
+       null,
+       null,
+       -0.003,
+       0.095
+      ],
+      [
+       6064,
+       156.538,
+       286.8,
+       null,
+       null,
+       -0.001,
+       0.025
+      ],
+      [
+       6065,
+       156.563,
+       311.2,
+       null,
+       null,
+       -0.001,
+       0.003
+      ],
+      [
+       6066,
+       156.588,
+       336.2,
+       null,
+       null,
+       -0.001,
+       0.002
+      ],
+      [
+       6067,
+       156.621,
+       369.4,
+       null,
+       null,
+       -0.001,
+       0.002
+      ]
+     ]
+    },
+    "measuredHow": "열기와 같은 식 + 정지 흰 막: F − B = A_s·(255 − B) + A_p·pg(dy)·(S_full − B − A_s(255 − B)). 페이지 위 빈 자리의 흰색(A_s) 은 페이지 dy 와 상관없이 같은 값 → 따로 있는 막. A_p 가 0.08 아래로 내려간 뒤의 dy 는 못 잰다(표에 null)",
+    "critic": "critic(2026-11-21): ① #3750(95.717) 표본을 dy 33.15→43.6px, 페이지 α 0.523→0.67 로 고침 — [확인] 윗변(B−R 계단) 추적 43.7, 이름·금액 덩어리 정합 43.6 이 같고 앞뒤(12.1·61.5)와 곡선에도 맞다. 표본 표로 다시 잰 rms: 이동 2.96→2.74px, 불투명도 0.030→0.023 (곡선·길이·시작은 그대로). 독립 재측정(버튼 윗변 추적): 이동 decelerate 96dp 240ms joint 3.37px(최선 easeOutCubic 80dp 180ms 3.24 — 차이 없음), 불투명도 decelerate 260ms 0.020(시작 95.6925·104.5135·156.252), 막 linear 0.70→0 +32ms 266ms rms 0.015 (스펙 0.69/+30/271 은 같은 자료로 0.017)"
+   },
+   "note": "닫은 뒤 목록은 열기 전 위치 그대로(입금 맨 위 / 출금 scrollTop 64 — 주인 history). 1단계의 '이동 ≈100–140ms, 페이드 ≈170–280ms' 는 흰 막과 페이지를 한 층으로 본 값이라 버린다"
+  },
+  {
+   "id": "confirm-press",
+   "from": "deposit",
+   "to": "confirm-pressed",
+   "kind": "instant",
+   "trigger": {
+    "video": "v1",
+    "frame": 6049,
+    "t": 156.237,
+    "evidence": "[확인] #2286f2 → #185ba4 한 프레임에(전환 애니메이션 없음)"
+   },
+   "durationMs": 0,
+   "property": "버튼 바탕색",
+   "keep": {
+    "pressedMs": 36,
+    "note": "다음 프레임부터 닫힘(detail-close). 영상에서 [공유]는 누르지 않음 — 눌림 색 설계값 없음"
+   }
+  }
+ ],
+ "keep": {
+  "layoutDp": {
+   "header": [
+    0,
+    52
+   ],
+   "nameTop": 88,
+   "amountTop": 119,
+   "rowsTop": 171.667,
+   "rowPitch": 47.333,
+   "rowHeight": 46.333,
+   "divider": 1,
+   "labelTopInRow": 16.33,
+   "twoLineExtra": 22.667,
+   "pillRowHeight": 51,
+   "searchGapAfterRows": 46,
+   "buttonsTop": 728.667,
+   "buttonHeight": 56,
+   "bottomGap": 16,
+   "note": "행 = 높이 46.333 + 1dp 구분선(마지막 행 아래엔 선 없음). 폰에서 142 기기px 주기. 우리 렌더(DSF 16/11)에서는 위치가 정수 dp 로 반올림되므로 행 top 을 직접 정해 놓는 쪽이 정확하다(5.1절 표)"
+  },
+  "valueColumnDecision": {
+   "chosen": "15dp / 500 / letter-spacing −0.5px / tabular-nums",
+   "evidence": [
+    {
+     "text": "거래일시 (입금)",
+     "fitError15": 0.116,
+     "fitErrorFree": 0.124,
+     "free": "14.75/-0.025 tabular"
+    },
+    {
+     "text": "거래일시 (출금)",
+     "fitError15": 0.12,
+     "fitErrorFree": 0.13,
+     "free": "14.75/-0.025 tabular"
+    },
+    {
+     "text": "0543",
+     "fitError15": 0.129,
+     "fitErrorFree": 0.154,
+     "free": "14.75/-0.0225 tabular"
+    },
+    {
+     "text": "지역농축협 + 계좌 14자리",
+     "fitError15": 0.135,
+     "fitErrorFree": 0.184,
+     "free": "14.75/-0.0225 tabular"
+    },
+    {
+     "text": "100,001원",
+     "fitError15": 0.135,
+     "fitErrorFree": 0.125,
+     "free": "15/-0.035 tabular"
+    },
+    {
+     "text": "한글 값 (의뢰인·받는 분·모바일·관리점)",
+     "note": "free 최적이 모두 15dp / −0.03…−0.035em (0.098–0.124)"
+    }
+   ]
+  }
+ }
+}

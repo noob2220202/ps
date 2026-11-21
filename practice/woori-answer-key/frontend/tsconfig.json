@@ -1,0 +1,8 @@
+// 타입 설정은 둘로 나뉜다 (Vite 템플릿과 같은 구조). npm run typecheck = tsc -b 가 둘 다 검사한다.
+//   tsconfig.app.json   src/ — 브라우저 코드 (DOM + vite/client 타입만)
+//   tsconfig.node.json  vite.config.ts — Node 에서 도는 설정 파일 (node 타입)
+// 이 파일 자체는 아무것도 검사하지 않는다: `tsc --noEmit -p .` 은 0 개 파일을 보고 통과하니 쓰지 말 것.
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}
