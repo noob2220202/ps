@@ -30,6 +30,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
  * → 띠를 칠할 때마다 배경이 우리 BandDrawable 인지 확인해 다시 달고(apply), 시작·설정 변경 때는 SystemBars 다음 차례로 post 해서
  *   마지막 색과 아이콘 밝기를 다시 건다.
  * Android 14 이하(edge-to-edge 아님)는 바 자리를 시스템이 window 의 statusBarColor · navigationBarColor 로 칠하므로 그 값도 같이 준다.
+ * Android 7.x(API 24–25)는 내비 바 단추를 어둡게 바꿀 수 없다(늘 흰색 — setAppearanceLightNavigationBars 는 API 26 부터) →
+ * 밝은 내비 띠는 그 기기에서만 검정으로 칠한다 (흰 바탕에 흰 단추가 안 보이지 않게. 검정 내비 띠는 영상 팝업과 같은 색).
  */
 @CapacitorPlugin(name = "WooriBars")
 public class WooriBarsPlugin extends Plugin {
@@ -72,14 +74,16 @@ public class WooriBarsPlugin extends Plugin {
         View decor = window.getDecorView();
         if (band == null) band = new BandDrawable(decor);
         if (decor.getBackground() != band) decor.setBackground(band);
-        band.setColors(lastStatus, lastNav);
+        // API 26 아래는 내비 단추가 늘 흰색 → 밝은 띠면 검정 (API 26 부터는 화면이 바라는 색 그대로, 단추 밝기를 맞춘다)
+        int nav = (Build.VERSION.SDK_INT < 26 && isLight(lastNav)) ? Color.BLACK : lastNav;
+        band.setColors(lastStatus, nav);
         if (!hasColors) return;
         if (Build.VERSION.SDK_INT < 35) {
-            setLegacyBarColors(window, lastStatus, lastNav);
+            setLegacyBarColors(window, lastStatus, nav);
         }
         WindowInsetsControllerCompat c = WindowCompat.getInsetsController(window, decor);
         c.setAppearanceLightStatusBars(isLight(lastStatus));
-        c.setAppearanceLightNavigationBars(isLight(lastNav));
+        c.setAppearanceLightNavigationBars(isLight(nav));
     }
 
     @SuppressWarnings("deprecation")

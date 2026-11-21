@@ -4,6 +4,8 @@
  *
  *   cd frontend && VITE_WOORI_LOCAL=1 npx vite build      # → frontend/dist-apk
  *   node tools/woori-local-check.cjs [--keep]             # 결과 JSON 을 찍고, 하나라도 틀리면 exit 1
+ *   WOORI_LOCAL_DIST=<폴더> node tools/woori-local-check.cjs   # 다른 곳에 빌드한 dist-apk 로 (vite build --outDir <폴더>)
+ * 포트는 고정하지 않는다 (정적 서버·실제 backend 모두 127.0.0.1 의 빈 포트).
  *
  * 하는 일
  *   1. dist-apk 를 정적 서버(SPA 대체: 모르는 경로 → index.html)로 띄운다. '/api' 로 오는 네트워크 요청은 503 + 횟수 기록 → 0 이어야 한다.
@@ -13,6 +15,8 @@
  *   5. 숨은 메뉴: 화면 맨 위 가운데(제목 자리) 5번 탭 → 대화상자(비밀번호 안내 포함) → 'v1 시작' → 처음 화면부터 다시 열림 → 345원.
  *   6. 같은 응답인지: 같은 시나리오·같은 시계(now:'video')로 backend/app.js 를 실제 Express(node:sqlite 메모리 DB)로도 띄워
  *      여러 GET 과 이체 흐름의 JSON 을 그대로 비교한다 (로컬 = sql.js + WooriLocalExpress).
+ *   7. 저장 실패 흉내 (IndexedDB put 이 던진다 = 기기 저장 공간 부족): 이체 실행 → 507 STORAGE_FAILED(한국어 안내), 메모리 잔액도 그대로
+ *      (되돌림) → put 을 되살리면 같은 ticket 으로 다시 이체 201.
  */
 'use strict';
 const fs = require('node:fs');
@@ -21,7 +25,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-const DIST = path.join(ROOT, 'frontend', 'dist-apk');
+const DIST = path.resolve(process.env.WOORI_LOCAL_DIST || path.join(ROOT, 'frontend', 'dist-apk'));
 
 function loadPlaywright() {
   try {
@@ -150,7 +154,8 @@ async function main() {
   const open = async () => {
     ctx = await chromium.launchPersistentContext(profile, { headless: true, viewport: { width: 360, height: 800 }, hasTouch: false });
     const page = ctx.pages()[0] || (await ctx.newPage());
-    page.on('console', (m) => m.type() === 'error' && consoleErrors.push(m.text()));
+    // 7) 저장 실패 흉내에서 WooriLocal 이 남기는 오류 줄은 기대한 것
+    page.on('console', (m) => m.type() === 'error' && !m.text().startsWith('[woori-local] 저장 실패') && consoleErrors.push(m.text()));
     page.on('pageerror', (e) => consoleErrors.push(String(e)));
     return page;
   };
@@ -258,6 +263,31 @@ async function main() {
     } finally {
       await real.close();
     }
+
+    // 7) 저장 실패 흉내: 이체 실행 직전에 IndexedDB put 이 던지게 → 507 · 메모리도 되돌림 → 되살린 뒤 같은 ticket 으로 201
+    const recips7 = await call('GET', '/recipients');
+    const chk7 = await call('POST', '/transfers/check', { fromAccountId: 1, recipientId: recips7.body[0].id, amount: 1 });
+    await call('POST', '/transfers/password', { ticket: chk7.body.ticket, pin: '1234' });
+    const bal7 = (await call('GET', '/accounts')).body[0].balance;
+    await page.evaluate(() => {
+      const put = IDBObjectStore.prototype.put;
+      IDBObjectStore.prototype.put = function () {
+        throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
+      };
+      window.__wooriRestorePut = () => {
+        IDBObjectStore.prototype.put = put;
+      };
+    });
+    const fail7 = await call('POST', '/transfers', { ticket: chk7.body.ticket });
+    const balFail7 = (await call('GET', '/accounts')).body[0].balance;
+    await page.evaluate(() => window.__wooriRestorePut());
+    ok(
+      '저장 실패 → 507 STORAGE_FAILED (한국어 안내) · 메모리 잔액 그대로',
+      fail7.status === 507 && fail7.body.code === 'STORAGE_FAILED' && /저장/.test(fail7.body.error) && balFail7 === bal7,
+      `${fail7.status} ${fail7.body?.code} ${bal7} → ${balFail7}`,
+    );
+    const retry7 = await call('POST', '/transfers', { ticket: chk7.body.ticket });
+    ok('저장이 되살아나면 같은 ticket 으로 이체 201', retry7.status === 201 && retry7.body.balanceAfter === bal7 - 1, `${retry7.status} ${retry7.body?.balanceAfter}`);
     ok("네트워크로 나간 '/api' 요청 0", hits.api === 0, hits.api);
   } catch (e) {
     ok('예외 없이 끝까지', false, String(e).split('\n')[0]);

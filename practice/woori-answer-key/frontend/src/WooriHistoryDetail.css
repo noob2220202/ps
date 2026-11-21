@@ -44,6 +44,27 @@
   letter-spacing: 0;
   color: var(--woori-text, #33353a);
 }
+/* 긴 이름·통장표기 (설계 — 실제 앱만): 저장된·서버가 준 통장표기는 20자까지라 화면 밖·› 밑·줄 제목으로 넘칠 수 있다 → 말줄임.
+ *   제목: 20–340 · 검색 줄: 이름만 (끝 ≈ 322 — ' 검색하기 와 › 333 이 보이게) · 받는 분 통장표기 값: 132–340 (줄 제목 끝 118 앞에서)
+ * overflow-x 만 clip — hidden 이면 line-height 1 이라 한글 잉크 위아래가 잘린다. 프레임·shot 모드는 영상 그대로 (wooriLiveApp 과 같은 조건) */
+:root:not([data-frame='1']):not([data-shot]) .woori-hd__name {
+  max-width: 320px;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+}
+.woori-hd__search-name {
+  display: inline-block;
+  max-width: 236px;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+:root:not([data-frame='1']):not([data-shot]) .woori-hd__value--label {
+  box-sizing: border-box;
+  padding-left: 132px;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+}
 .woori-hd__label {
   font-size: 15px;
   font-weight: 500;

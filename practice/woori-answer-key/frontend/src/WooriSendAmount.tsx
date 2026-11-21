@@ -7,8 +7,10 @@
 // (눌림 회색 칸은 CSS :active 뿐, 입력 숫자는 ref 에만 두고 보낸 뒤 지운다).
 // 키가 다른 화면(APK, 셸 640–900dp): 키패드 층·폼 버튼 층은 아래끝 기준(.woori-amt__layer--bottom), 머리·계좌·금액은 위끝 기준.
 //   셸이 낮아 빠른 금액 줄이 금액 묶음에 닿으면 빠른 금액~[확인] 사이를 고르게 눌러 담는다(keypadSqueeze, 설계). 프레임 모드는 영상 그대로.
-// 영상에 없는 설계: 폼 단계 금액 줄 탭 = 키패드로 돌아가 고치기 · 통장표기 › = 편집 시트(20자, [다음] 검사에 실어 보냄)
-//   · 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert — 확인 화면도 쓴다) · 받는 분을 못 찾으면 토스트 + /send 로.
+// 영상에 없는 설계: 폼 단계 금액 줄 탭 = 키패드로 돌아가 고치기 · 통장표기 › = 편집 시트(10자, [다음] 검사에 실어 보냄)
+//   · 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert — 확인 화면도 쓴다) · 받는 분을 못 찾으면 토스트 + /send 로
+//   · 확인 화면에서 뒤로 = 채운 폼 그대로(금액·통장표기, 비밀번호는 [다음] 으로 다시 — sessionStorage WOORI_SEND_DRAFT_KEY, 실제 앱만).
+//   · 통장표기 시트의 시스템 키보드로 셸이 줄어도 뒤 폼은 키보드 전 자리 그대로 (usePageHeight stable).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { artSrc, bankArtName, type WooriArtName } from './WooriArt.ts'
@@ -18,7 +20,7 @@ import { useWooriStages } from './WooriLoadingPage.tsx'
 import { WooriOverlay, WooriSheet } from './WooriSheet.tsx'
 import { WooriSpinner } from './WooriSpinner.tsx'
 import { useShotReady, useShotState } from './WooriShot.ts'
-import { isFrameMode, useBackTo, useWooriNavigate } from './WooriNav.ts'
+import { isFrameMode, useArrivedByPop, useBackTo, useWooriNavigate } from './WooriNav.ts'
 import { WOORI_BOTTOM_FIX, WOORI_VIDEO_PAGE_H } from './WooriLayout.ts'
 import { wooriApi, WooriApiError, type Account, type LookupResult, type Ticket } from './WooriApi.ts'
 import { wooriLiveApp, wooriToast, wooriTodo } from './WooriEnv.ts'
@@ -121,10 +123,50 @@ function shuffledDigits(seedText: string): number[] {
 /** 시트 열림 (3.5: easeOutCubic 245ms + 딤 linear 305ms, 7ms 늦게) */
 const SHEET_MOTION = { open: { duration: 245, easing: 'cubic-bezier(0.33, 1, 0.68, 1)', dimDuration: 305, dimEasing: 'linear', dimDelay: 7 } }
 
-/** 통장표기 최대 글자 수 (backend transfer.js LABEL_MAX_LENGTH) */
-const LABEL_MAX = 20
+/**
+ * 통장표기 최대 글자 수 (코드 포인트 — 'n/10' 세는 법과 같다). backend transfer.js LABEL_MAX_LENGTH(20) 보다 엄하게:
+ * 한글 10자(≈130dp)·'W' 10자(≈146dp)까지 폼·확인 화면 줄에서 제목과 겹치지 않는다 (설계 — 은행 통장표기는 보통 7–10자)
+ */
+const LABEL_MAX = 10
 /** 고쳐서 다시 해야 하는 [다음] 오류 → 안내 시트를 닫으면 키패드로 (설계) */
 const AMOUNT_ERRORS: ReadonlySet<string> = new Set(['INSUFFICIENT_BALANCE', 'DAILY_LIMIT_EXCEEDED', 'INVALID_AMOUNT'])
+
+/* ── 확인 화면에서 뒤로 왔을 때의 폼 (설계, 실제 앱만) ── */
+/**
+ * 비밀번호를 맞힌 뒤 확인 화면으로 가기 전에 남기는 폼 (sessionStorage): 받는 분 쿼리(key)·입력한 숫자·고친 통장표기.
+ * 뒤로(POP) 돌아온 금액 화면만 읽는다. 새로 들어오면(push·replace·첫 로드) 지우고, 확인 화면은 [이체] 성공·취소 때 지운다
+ * → 보낸 금액이 다시 채워지지 않는다. 숨은 메뉴의 되돌리기도 woori.* 라 지운다.
+ */
+export const WOORI_SEND_DRAFT_KEY = 'woori.send.draft'
+interface SendDraft {
+  key: string
+  digits: string
+  labels: { recipient?: string; my?: string }
+}
+function readSendDraft(key: string): SendDraft | null {
+  if (!wooriLiveApp()) return null
+  try {
+    const d = JSON.parse(sessionStorage.getItem(WOORI_SEND_DRAFT_KEY) || 'null') as SendDraft | null
+    return d && d.key === key && /^[1-9]\d{0,11}$/.test(d.digits) ? { ...d, labels: d.labels ?? {} } : null
+  } catch {
+    return null
+  }
+}
+function saveSendDraft(d: SendDraft) {
+  if (!wooriLiveApp()) return
+  try {
+    sessionStorage.setItem(WOORI_SEND_DRAFT_KEY, JSON.stringify(d))
+  } catch {
+    /* 저장 못 함 — 뒤로 오면 빈 키패드 */
+  }
+}
+function clearSendDraft() {
+  try {
+    sessionStorage.removeItem(WOORI_SEND_DRAFT_KEY)
+  } catch {
+    /* 저장소를 못 씀 */
+  }
+}
 
 /* ── 키 작은 화면 (APK) ── */
 /** 키패드 묶음: 빠른 금액 줄 top · 키패드 [확인] top (영상 dp) */
@@ -146,19 +188,34 @@ function keypadSqueeze(pageH: number, upperBottom: number): number {
 /** 영상 y (키패드 층 안) → 눌러 담은 y: [확인] 자리는 그대로, 위로 갈수록 sq 까지 내려온다. sq 0 이면 y 그대로 */
 const kpY = (y: number, sq: number) => (sq ? y + (sq * (KP_CONFIRM_TOP - y)) / (KP_CONFIRM_TOP - KP_QUICK_TOP) : y)
 
-/** 화면 루트 높이 dp — 실제 앱만 잰다. 프레임 모드는 영상 셸 높이 그대로 (영상 비교 화면이 바뀌지 않게) */
-function usePageHeight(ref: RefObject<HTMLElement | null>): number {
-  const [h, setH] = useState(WOORI_VIDEO_PAGE_H)
+/**
+ * 화면 루트 높이 dp — 실제 앱만 잰다. 프레임 모드는 영상 셸 높이 그대로 (영상 비교 화면이 바뀌지 않게).
+ *   h      지금 높이 (키패드 눌러 담기 keypadSqueeze)
+ *   stable 같은 창 폭에서 본 가장 큰 높이(소수까지) = 시스템 키보드가 떠서 줄기 전 높이 (installWooriFit 의 k 와 같은 방식).
+ *          통장표기 시트가 떠 있는 동안 폼 층을 이 높이 기준에 둔다 (설계)
+ */
+function usePageHeight(ref: RefObject<HTMLElement | null>): { h: number; stable: number } {
+  const [dims, setDims] = useState({ h: WOORI_VIDEO_PAGE_H, stable: WOORI_VIDEO_PAGE_H })
   useLayoutEffect(() => {
     const el = ref.current
     if (!el || isFrameMode()) return
-    const apply = () => setH(el.clientHeight || WOORI_VIDEO_PAGE_H)
+    let winW = -1
+    const apply = () => {
+      const h = el.clientHeight || WOORI_VIDEO_PAGE_H
+      const exact = parseFloat(getComputedStyle(el).height) || h
+      const fresh = Math.abs(window.innerWidth - winW) > 1
+      winW = window.innerWidth
+      setDims((d) => {
+        const stable = fresh ? exact : Math.max(d.stable, exact)
+        return d.h === h && d.stable === stable ? d : { h, stable }
+      })
+    }
     apply()
     const ro = new ResizeObserver(apply)
     ro.observe(el)
     return () => ro.disconnect()
   }, [ref])
-  return h
+  return dims
 }
 
 /* ───────────────────────── shot 상태 ───────────────────────── */
@@ -258,7 +315,14 @@ export default function WooriSendAmount() {
   }, [loadError, backToSend])
 
   const rootRef = useRef<HTMLDivElement>(null)
-  const pageH = usePageHeight(rootRef)
+  const { h: pageH, stable: stableH } = usePageHeight(rootRef)
+
+  // 확인 화면에서 뒤로(POP) 왔으면 그 받는 분의 채운 폼으로 (설계, 실제 앱만). 새로 들어왔으면 지난 폼을 지운다
+  const byPop = useArrivedByPop()
+  const [draft] = useState(() => (byPop ? readSendDraft(paramKey) : null))
+  useEffect(() => {
+    if (!byPop && wooriLiveApp()) clearSendDraft()
+  }, [byPop])
 
   // 단계적 그리기: 데이터가 온 순간부터 (영상: 흰 화면 + 스피너 → 단계마다 한 프레임 교체)
   const stage = useWooriStages(AMOUNT_STAGES_MS, { start: data != null, shotStage: s ? s.stage : null })
@@ -266,13 +330,13 @@ export default function WooriSendAmount() {
 
   // 금액: shot 은 v1(지역농축협) 1원 / v2(카카오뱅크) 2원
   const shotAmount = params.get('bank') === 'nh-local' ? '1' : '2'
-  const [digitsTyped, setDigitsTyped] = useState('')
+  const [digitsTyped, setDigitsTyped] = useState(draft?.digits ?? '')
   const amountStr = s ? (s.typed ? shotAmount : '') : digitsTyped
   const amount = amountStr ? Number(amountStr) : 0
 
-  const [phaseLive, setPhase] = useState<Phase>('keypad')
+  const [phaseLive, setPhase] = useState<Phase>(draft ? 'form' : 'keypad')
   const phase = s ? s.phase : phaseLive
-  const [fieldsLive, setFieldsLive] = useState<'none' | 'anim'>('none')
+  const [fieldsLive, setFieldsLive] = useState<'none' | 'anim'>(draft ? 'anim' : 'none')
   const fields = s ? (s.fields ?? 'none') : fieldsLive
 
   // 버튼·시트·스피너
@@ -286,7 +350,7 @@ export default function WooriSendAmount() {
   // 오류 안내 시트 (window.alert 대신). keypad = 닫으면 키패드로 돌아가 금액을 고친다
   const [alert, setAlert] = useState<{ text: string; open: boolean; keypad: boolean } | null>(null)
   // 통장표기 (설계): 고친 값만 둔다. 없으면 ticket 값 → 기본값 (받는 분 = 보내는 사람 이름, 내 = 받는 분 예금주 — backend 와 같음)
-  const [labels, setLabels] = useState<{ recipient?: string; my?: string }>({})
+  const [labels, setLabels] = useState<{ recipient?: string; my?: string }>(draft?.labels ?? {})
   const [labelEdit, setLabelEdit] = useState<{ field: 'recipient' | 'my'; open: boolean } | null>(null)
   const [labelDraft, setLabelDraft] = useState('')
   const labelInput = useRef<HTMLInputElement>(null)
@@ -362,9 +426,10 @@ export default function WooriSendAmount() {
     })
   }
 
-  /** 폼 → 키패드 (금액 줄 탭 · 금액 오류 안내 뒤, 설계). 입력한 숫자는 그대로, ticket 은 [다음] 에서 새로 */
+  /** 폼 → 키패드 (금액 줄 탭 · 금액 오류 안내 뒤, 설계). 입력한 숫자는 그대로, ticket 은 [다음] 에서 새로.
+   *  [다음] 검사 중 · 비밀번호를 맞혀 확인 화면으로 가는 600ms · 시트가 떠 있는 동안에는 받지 않는다 (가던 길이 옛 ticket 으로 이어지지 않게) */
   const reopenKeypad = () => {
-    if (s) return
+    if (s || busy || pwOpen || dup) return
     setTicket(null)
     setFieldsLive('none')
     setPhase('keypad')
@@ -405,6 +470,8 @@ export default function WooriSendAmount() {
     // 비우면 기본값으로 (backend 도 빈 값 = 기본값)
     const v = [...labelDraft.trim()].slice(0, LABEL_MAX).join('')
     setLabels((cur) => ({ ...cur, [labelEdit.field]: v || undefined }))
+    // 지난 [다음] 의 ticket 통장표기는 이제 옛 값 → 버린다 (비운 칸이 옛 값 대신 기본값으로 바로 보이게. [다음] 이 새로 만든다)
+    setTicket(null)
     closeLabel()
   }
   const openPassword = () => {
@@ -414,8 +481,9 @@ export default function WooriSendAmount() {
     setBusy(false)
     setPwOpen(true)
   }
-  /** 비밀번호 시트 ✕ · 폰 뒤로 */
+  /** 비밀번호 시트 ✕ · 폰 뒤로. 비밀번호 확인 중에는 받지 않는다 (닫힌 뒤에 결과가 와서 확인 화면으로 가지 않게) */
   const closePassword = () => {
+    if (busy) return
     pinRef.current = ''
     setDots(0)
     setPwOpen(false)
@@ -444,8 +512,9 @@ export default function WooriSendAmount() {
     setBusy(true)
     wooriApi.verifyPassword(tk.ticket, pin).then(
       () => {
-        // 시트·딤 한 프레임에 사라짐 → 금액 폼 + 스피너 → 확인 페이지 (3.8)
+        // 시트·딤 한 프레임에 사라짐 → 금액 폼 + 스피너 → 확인 페이지 (3.8). 확인 화면에서 뒤로 오면 이 폼으로 (설계)
         setPwOpen(false)
+        saveSendDraft({ key: paramKey, digits: digitsTyped, labels })
         later(600, () => go(`/send/confirm?ticket=${encodeURIComponent(tk.ticket)}`))
       },
       (e: unknown) => {
@@ -465,7 +534,10 @@ export default function WooriSendAmount() {
   }, [s, params, tk])
 
   const onBack = useCallback(() => go(-1), [go])
-  const onCancel = useCallback(() => go('/home', { replace: true }), [go])
+  const onCancel = useCallback(() => {
+    clearSendDraft()
+    go('/home', { replace: true })
+  }, [go])
 
   if (loadError) {
     // 실제 앱은 위 effect 가 토스트 + /send 로 보낸다 (글자는 프레임·shot 모드에서만)
@@ -482,6 +554,8 @@ export default function WooriSendAmount() {
   }
 
   const keypad = phase === 'keypad' && st >= STAGE_KEYPAD
+  // 폼도 키패드 자리(단계 4)부터 — 뒤로 와서 채운 폼으로 시작할 때 계좌 줄보다 먼저 그리지 않게 (shot 의 폼 상태는 모두 단계 4)
+  const form = phase === 'form' && st >= STAGE_KEYPAD
   const showAccounts = data != null && st >= 2
   const chev = st >= 3
   const first = data?.to.firstTime ?? false
@@ -556,9 +630,10 @@ export default function WooriSendAmount() {
               </p>
             </>
           )}
-          {/* 폼 단계: 금액 줄을 누르면 키패드로 돌아가 고친다 (설계 — 보이지 않는 누름 상자) */}
-          {phase === 'form' && !s && (
-            <button type="button" className="woori-amt__btn-reset woori-amt__hit" style={{ top: 218 + off, height: 80 }} aria-label="금액 고치기" onClick={reopenKeypad} />
+          {/* 폼 단계: 금액 줄을 누르면 키패드로 돌아가 고친다 (설계 — 보이지 않는 누름 상자). 출금가능금액 줄 아래 3dp 까지.
+              z-index 1: 셸 640 + 처음 보내는 계좌 칩이면 아래끝 기준 통장표기 상자(314dp~)와 겹치는 몫도 이쪽 (통장표기 글자는 332dp~) */}
+          {form && !s && (
+            <button type="button" className="woori-amt__btn-reset woori-amt__hit" style={{ top: 218 + off, height: 70, zIndex: 1 }} aria-label="금액 고치기" onClick={reopenKeypad} />
           )}
         </div>
       )}
@@ -627,9 +702,11 @@ export default function WooriSendAmount() {
         </div>
       )}
 
-      {/* 폼 (아래끝 기준 층): 통장표기 묶음 · 유의사항 · [추가이체][다음] */}
-      {phase === 'form' && data && (
-        <div className="woori-amt__layer woori-amt__layer--bottom">
+      {/* 폼 (아래끝 기준 층): 통장표기 묶음 · 유의사항 · [추가이체][다음].
+          통장표기 시트가 떠 있는 동안은 키보드가 뜨기 전 높이(stableH) 기준 — 셸이 줄어도 묶음이 머리·계좌 줄 위로 올라오지 않는다
+          (단추는 키보드 뒤로 가려진다. 키보드가 없으면 CSS 그대로 — h 는 정수 반올림이라 1dp 넘게 줄었을 때만. 프레임 모드는 재지 않아 늘 CSS) */}
+      {form && data && (
+        <div className="woori-amt__layer woori-amt__layer--bottom" style={labelEdit && stableH - pageH > 1 ? { top: stableH - WOORI_VIDEO_PAGE_H } : undefined}>
           {fields !== 'none' && (
             <div
               className={'woori-amt__layer' + (fields === 'anim' ? ' woori-amt__fields--in' : '')}
@@ -638,14 +715,14 @@ export default function WooriSendAmount() {
               <p className="woori-amt__t" style={txt(19.91, 493, 16, 500, { color: '#38383a' })}>
                 받는 분 통장표기
               </p>
-              <p className="woori-amt__t" style={{ ...txt(0, 494, 15, 600, { color: '#707275' }, -0.25), left: undefined, right: 44 }}>
+              <p className="woori-amt__t woori-amt__label-val" style={{ ...txt(0, 494, 15, 600, { color: '#707275' }, -0.25), left: undefined, right: 44 }}>
                 {labelValue('recipient', data)}
               </p>
               <Icon name="history.chevron-right" x={328.7} y={492.45} w={16} h={16} color="#9a9ca0" />
               <p className="woori-amt__t" style={txt(19.94, 548, 16, 500, { color: '#39393b' }, -0.25)}>
                 내 통장표기
               </p>
-              <p className="woori-amt__t" style={{ ...txt(0, 548, 15, 600, { color: '#707275' }), left: undefined, right: 44 }}>
+              <p className="woori-amt__t woori-amt__label-val" style={{ ...txt(0, 548, 15, 600, { color: '#707275' }), left: undefined, right: 44 }}>
                 {labelValue('my', data)}
               </p>
               <Icon name="history.chevron-right" x={328.7} y={546.7} w={16} h={16} color="#9a9ca0" />
@@ -789,7 +866,8 @@ export default function WooriSendAmount() {
         </WooriSheet>
       )}
 
-      {/* 통장표기 편집 시트 (설계 — 영상에 없음): 20자, 비우면 기본값. 글자는 시스템 키보드 */}
+      {/* 통장표기 편집 시트 (설계 — 영상에 없음): 10자(코드 포인트 — maxLength 는 UTF-16 이라 이모지 10개가 '10/20' 에서 막혔다), 비우면 기본값.
+          글자는 시스템 키보드 */}
       {labelEdit && data && (
         <WooriSheet
           open={labelEdit.open}
@@ -812,10 +890,9 @@ export default function WooriSendAmount() {
             type="text"
             value={labelDraft}
             placeholder={labelEdit.field === 'recipient' ? data.from.ownerName : data.to.holderName}
-            maxLength={LABEL_MAX}
             enterKeyHint="done"
             aria-label={labelEdit.field === 'recipient' ? '받는 분 통장표기' : '내 통장표기'}
-            onChange={(e) => setLabelDraft(e.target.value)}
+            onChange={(e) => setLabelDraft([...e.target.value].slice(0, LABEL_MAX).join(''))}
             onKeyDown={(e) => {
               if (e.key === 'Enter') saveLabel()
             }}

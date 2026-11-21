@@ -124,6 +124,17 @@
   color: #333;
 }
 
+/* 체크 상자: woori.css 가 모든 input 의 모양을 지워(appearance: none) 0x0 으로 안 보였다 → 이 메뉴에서만 기본 체크 상자로 되살린다 */
+.woori-local-menu__check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  -webkit-appearance: checkbox;
+  appearance: auto;
+  accent-color: #2b2f36;
+}
+
 .woori-local-menu__error {
   margin: 0 0 10px;
   font-size: 12px;

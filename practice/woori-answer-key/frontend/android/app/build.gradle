@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+// versionCode = 2025-01-01 00:00 UTC 부터 분. tools/build-apk.sh 가 HEAD 커밋 시각으로 재서 -PwooriVersionCode 로 넘긴다 →
+// 클론 깊이(shallow)와 무관하게 새 커밋의 빌드가 늘 더 커서 이전 설치 위로 덮어 깔린다 (예전 커밋 수 150 남짓보다 크고, 한도 2100000000 보다 한참 작다).
+// 넘기지 않으면(Android Studio · ./gradlew 직접) 지금 시각을 같은 단위로
+def wooriVersionCode = (project.findProperty('wooriVersionCode') ?: (System.currentTimeMillis() - 1735689600000L).intdiv(60000L)) as int
+
 android {
     namespace = "dev.answerkey.won"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,9 +12,8 @@ android {
         applicationId "dev.answerkey.won"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // tools/build-apk.sh 가 -PwooriVersionCode=<git 커밋 수> 를 넘긴다 → 새 빌드가 늘 위로 덮어 설치된다 (없으면 1)
-        versionCode((project.findProperty('wooriVersionCode') ?: '1') as int)
-        versionName "1.0.${project.findProperty('wooriVersionCode') ?: '1'}"
+        versionCode wooriVersionCode
+        versionName "1.0.${wooriVersionCode}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

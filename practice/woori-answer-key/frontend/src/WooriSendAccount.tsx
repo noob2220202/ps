@@ -10,7 +10,9 @@
 //     '어디로 이체' 가 베일 0.8 아래 드러남(reveal, 216ms 뒤 linear 311ms 로 걷힘) → 그 페이지가 509ms 뒤 금액 페이지(/send/amount?bank=<spec 코드 kakao·nh-local>&acct=<숫자>)로.
 //   키보드: 프레임 모드에서만 앱이 그린다 (입력칸 inputMode="none"). 실제 폰은 inputMode="numeric" 시스템 키보드 —
 //     보이지 않는 입력칸의 캐럿은 늘 값 끝 (그린 커서 자리. 탭·화살표로 옮겨진 캐럿에 숫자가 끼어들지 않게, 설계).
-//   설계(영상에 없음): 조회 중 ✕·폰 뒤로 = 조회를 끊고 닫는다 (끊긴 조회는 금액 페이지로 가지 않는다) · 번호를 고치면 조회 오류 글자를 지운다.
+//   설계(영상에 없음): 조회 중 ✕·폰 뒤로 = 조회를 끊고 닫는다 (끊긴 조회는 금액 페이지로 가지 않는다) · 번호를 고치면 조회 오류 글자를 지운다 ·
+//     조회 오류 글자: 번호 탓(자리수·형식 400 INVALID_ACCOUNT_NUMBER, 없는 계좌 404) = '계좌번호를 다시 확인해 주세요', 그 밖 = '잠시 후 다시 시도해 주세요' ·
+//     시스템 키보드로 셸이 아주 낮아지면(≈340–400dp) 페이지 높이 바닥 400dp — [확인] 이 칩·오류 글자를 덮지 않고 페이지 스크롤로 닿는다 (CSS).
 // 입력값은 사람이 친 숫자다 — 이 파일에는 계좌번호를 쓰지 않는다 (shot 의 입력값은 자리수만 맞춘 채움 숫자, 비교에서는 개인정보 마스크).
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import './WooriSendAccount.css'
@@ -444,10 +446,12 @@ export default function WooriSendAccount() {
         }, Math.max(0, T_CLOSE - (performance.now() - t0)))
       })
       .catch((e: unknown) => {
+        // 번호 탓인 오류(자리수·형식 400, 없는 계좌 404)는 다시 눌러도 같다 → 번호를 고치라는 글자. 그 밖(통신·서버)은 다시 시도
+        const badNumber = e instanceof WooriApiError && (e.status === 404 || e.code === 'INVALID_ACCOUNT_NUMBER')
         later(() => {
           lookingUp.current = null
           setBusy(false)
-          setError(e instanceof WooriApiError && e.status === 404 ? '계좌번호를 다시 확인해 주세요' : '잠시 후 다시 시도해 주세요')
+          setError(badNumber ? '계좌번호를 다시 확인해 주세요' : '잠시 후 다시 시도해 주세요')
         }, Math.max(0, T_SPINNER + 50 - (performance.now() - t0)))
       })
   }, [bank, value, go])

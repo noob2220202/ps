@@ -7,6 +7,7 @@
 //   항목 표: 첫 행 위끝 171.667, 행 높이 46.333 (2줄 값 69 · 알약 행 51) + 1dp 구분선 #f2f2f2 (마지막 행 아래 없음)
 //     라벨 15/500 --woori-text-secondary 왼쪽 20 · 값 15/500 자간 −0.5px tabular 오른끝 340 · 글자 top = 행 위끝 + 16.333
 //   마지막 행 아래끝 + 46: '…' 검색하기 16/500 + › (333, 글자 top + 1, 8×13)
+//   실제 앱만(설계): 긴 이름·통장표기는 말줄임 — 제목 · 검색 줄의 이름 · 받는 분 통장표기 값 (WooriHistoryDetail.css)
 //   하단 바 726–800.667 흰색: [공유] x16 w102.333 · [확인] x126.333 w217.667, top 728.667 h56 r12
 //   키가 다른 화면(APK, 640–900dp): 하단 바·단추는 페이지 아래끝에 붙고 내용 스크롤 영역은 머리 아래 ~ 하단 바 위 (CSS --woori-page-h — 프레임 모드는 영상 값 그대로)
 // 열기 3.1: translateY 100dp → 0 + opacity 0 → 1, 둘 다 cubic-bezier(0,0,0.2,1) 265ms.
@@ -21,7 +22,7 @@ import { WooriHeader } from './WooriHeader.tsx'
 import { WOORI_BOTTOM_FIX, useWooriScrollFix, wooriPlace } from './WooriLayout.ts'
 import { useWooriStages } from './WooriLoadingPage.tsx'
 import { useBackTo, type WooriTransition } from './WooriNav.ts'
-import { wooriTodo } from './WooriEnv.ts'
+import { wooriLiveApp, wooriTodo } from './WooriEnv.ts'
 import { useShotReady, useShotState } from './WooriShot.ts'
 import { WooriSpinner } from './WooriSpinner.tsx'
 import { useWooriBands } from './WooriTheme.ts'
@@ -76,6 +77,9 @@ const TEXT_FIT: Readonly<Record<string, number>> = {
   '499.333': 499,
   '546.667': 546.25,
 }
+
+/** "'이름' 검색하기" → [이름, "' 검색하기"] (실제 앱에서 이름만 말줄임하려고 — 이 꼴이 아니면 null) */
+const SEARCH_RE = /^'(.*)(' 검색하기)$/
 
 const r3 = (v: number) => Math.round(v * 1000) / 1000
 const fitTop = (v: number) => TEXT_FIT[r3(v).toFixed(3)] ?? r3(v)
@@ -144,6 +148,8 @@ export default function WooriHistoryDetail() {
   const showSpinner = !shot && (isWithdraw ? stage < 2 : false)
   // [확인] 눌림 색은 닫히는 동안 그대로 (3.3 ③)
   const confirmPressed = shot?.state.pressed === true || closing
+  // 실제 앱: 검색 줄의 이름만 말줄임 (긴 통장표기에도 ' 검색하기 와 › 가 보이게 — WooriHistoryDetail.css). 프레임·shot 모드는 글자 한 덩어리 그대로
+  const searchParts = detail && wooriLiveApp() ? SEARCH_RE.exec(detail.display.search) : null
 
   return (
     <div className="woori-hd">
@@ -164,7 +170,14 @@ export default function WooriHistoryDetail() {
                 <div key={y} className="woori-hd__divider" style={at(20, y)} />
               ))}
               <p className="woori-hd__search" style={at(20, searchTop)} onClick={wooriTodo}>
-                {detail.display.search}
+                {searchParts ? (
+                  <>
+                    '<span className="woori-hd__search-name">{searchParts[1]}</span>
+                    {searchParts[2]}
+                  </>
+                ) : (
+                  detail.display.search
+                )}
               </p>
               <img className="woori-hd__search-chevron" src="/woori/history-detail/chevron-search.svg" alt="" style={at(333, searchTop + 1)} />
               {showHiddenBox && <div className="woori-hd__outline-box" style={at(20, searchTop + 50.667)} />}
@@ -215,7 +228,7 @@ function DetailRow({ row }: { row: RowBox }) {
           </p>
         </>
       ) : (
-        <p className="woori-hd__value" style={at(0, textTop)}>
+        <p className={'woori-hd__value' + (field.key === 'recipientLabel' ? ' woori-hd__value--label' : '')} style={at(0, textTop)}>
           {field.value}
         </p>
       )}

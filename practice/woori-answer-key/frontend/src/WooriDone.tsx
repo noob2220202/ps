@@ -3,9 +3,10 @@
 //   흰 페이지+스피너 → S1 본문(받는 계좌는 번호만) + 체크 원 → S2 은행 이름(길면 두 줄로 꺾여 카드가 늘어남) + 광고 카드 → S3 광고 그림 → 스피너 끔.
 //   체크 원: scale 0 → 1.05 → 0.95 → 1 (288ms), 획: 원 +194ms 부터 보이는 길이만 늘어남 (446ms) — 영상 표본 키프레임 (3.2–3.3).
 //   [확인] → 스피너 → 거래내역(/history?type=all, 기록을 바꿔 끼움). [공유]·메모·[보기]·더보기·☆·광고 는 영상에 없는 설계(wooriTodo).
+//   폰 뒤로 = [확인] (APK). 불러오는 중·떠나는 150ms 동안은 받아서 버리고, 불러오기 오류 화면에서는 [확인] 과 같이 거래내역으로.
 //   키가 다른 화면(APK): [공유][확인]은 아래끝 기준(atB), 그 위 내용(체크 원~광고 카드)은 단추 위에서 끝나는 자기 스크롤 영역 —
 //   셸이 낮아(≈730dp 아래) 광고 카드가 단추에 닿으면 스크롤된다. 프레임 모드는 넘칠 일이 없어 스크롤 컨테이너가 아니다(영상 자리·AA 그대로).
-import { useCallback, useEffect, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { artSrc, type WooriArtName } from './WooriArt.ts'
 import { WooriButton } from './WooriButton.tsx'
@@ -56,6 +57,8 @@ function MaskIcon({ name, x, y, w, h, color, onClick }: { name: WooriArtName; x:
 /** 단계 (v1, 흰 화면부터 ms, 3.1): 1 본문 + 체크 원 시작 · 2 은행 이름 + 광고 카드 · 3 광고 그림 · 4 스피너 끔 */
 const DONE_STAGES_MS = [234, 293, 393, 794] as const
 const STAGE_IDLE = 4
+/** 폰 뒤로를 받아서 버린다 (떠나는 중 · 불러오는 중 — WooriSendConfirm 처리 중과 같은 방식) */
+const NOOP = () => {}
 
 interface DoneShot {
   stage: number
@@ -139,13 +142,18 @@ export default function WooriDone() {
   useShotReady(data != null || s?.stage === 0)
 
   const [leaving, setLeaving] = useState(false)
+  const leaveTimer = useRef(0)
   const onConfirm = useCallback(() => {
+    // 한 번만 ([확인] 연타 · 뒤로 + [확인] — 거래내역으로 두 번 바꿔 끼우지 않게)
+    if (leaveTimer.current) return
     setLeaving(true)
-    window.setTimeout(() => go('/history?type=all', { replace: true, state: { from: 'done' } }), 150)
+    leaveTimer.current = window.setTimeout(() => go('/history?type=all', { replace: true, state: { from: 'done' } }), 150)
   }, [go])
-  // 폰 뒤로 버튼 = [확인] (이미 끝난 이체의 확인 화면으로 돌아가지 않게)
+  useEffect(() => () => window.clearTimeout(leaveTimer.current), [])
+  // 폰 뒤로 버튼 = [확인] (이미 끝난 이체의 확인·금액 화면으로 돌아가지 않게). 떠나는 150ms 와 불러오는 동안은 받아서 버린다
+  // (안 받으면 WooriLocal 이 history.back() → 끝난 이체의 금액 화면이 열린다). 불러오기 실패(오류 글자만, [확인] 없음)면 뒤로 = [확인] — 갇히지 않게
   const { top } = useWooriLayer()
-  useWooriBack(top && !s && data != null && !leaving ? onConfirm : null)
+  useWooriBack(top && !s ? (leaving || (data == null && error == null) ? NOOP : onConfirm) : null)
 
   const spinner = s ? st < STAGE_IDLE || !!s.spinner : st < STAGE_IDLE || leaving
   const d = data?.done

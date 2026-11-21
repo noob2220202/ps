@@ -199,6 +199,13 @@
   font-weight: 500;
   color: var(--woori-text);
 }
+/* 통장표기 값 (설계 — 실제 앱만): 긴 값·넓은 라틴 글자는 말줄임 — 제목(받는 분 통장표기 끝 137.9)에 닿지 않게 (오른끝 320 − 170 = 150).
+ * overflow-x 만 clip — hidden 이면 line-height 1 이라 한글 잉크 위아래가 잘린다. 프레임·shot 모드는 영상 그대로 (wooriLiveApp 과 같은 조건) */
+:root:not([data-frame='1']):not([data-shot]) .woori-cf__val--label {
+  max-width: 170px;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+}
 .woori-cf__center {
   position: absolute;
   left: 0;

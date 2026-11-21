@@ -110,6 +110,13 @@
   min-width: 0;
   flex: 1;
 }
+/* 제목·본문 줄바꿈: 한글은 낱말 가운데에서 끊지 않는다 (keep-all — '제한돼/요' 가 아니라 '이용이 / 제한돼요', 토스트와 같음).
+   띄어쓰기 없는 긴 글자는 그래도 끊는다 (overflow-wrap) */
+.woori-notice__title,
+.woori-notice__desc {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
 .woori-notice__title {
   font-size: 15px;
   font-weight: 600;

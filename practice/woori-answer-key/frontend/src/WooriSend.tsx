@@ -12,12 +12,14 @@
 //   편집 → 그 자리에서 편집 모드 (글자 '완료' 파랑). 행의 ☆ 자리에 [삭제] 알약 → 바로 지운다 (화면 먼저, 다음 DELETE — 저장된다).
 //     자주 탭의 [삭제] = 자주에서 빼기 (☆ 끔). 완료 · ‹ · 폰 뒤로 · 탭 바꿈 · 계좌번호 입력 줄 탭은 편집 모드부터 끝낸다. 다 지우면 저절로 끝.
 //   ☆ → 즐겨찾기 켬/끔 (채운 별 = --woori-primary). 자주 탭 = 즐겨찾기한 계좌. 내계좌 탭에는 ☆·편집이 없다.
+//   줄을 빼는 누름([삭제] · 자주 탭 ☆ 끔)은 350ms 안 연타를 한 번만 받는다 (다음 줄이 같은 자리로 올라온다).
+//   저장 실패 = 토스트 + 그 줄을 제자리로 되돌리고 다시 불러온다 (다시 불러오기도 실패하면 지금 행을 둔다).
 //   내계좌 행 탭: 첫 줄은 출금계좌(금액 페이지가 첫 계좌에서 보낸다)라 토스트, 다른 내 계좌는 은행·계좌번호로 금액 페이지.
 //   머리말은 탭마다 (최근입금계좌 · 자주 쓰는 계좌 · 내 계좌), 빈 목록이면 안내 글자.
 //   카메라 · ＋ 연락처로 이체하기 = '답지에는 없는 화면이에요' (wooriTodo).
 //   행 목록은 자기 스크롤 상자(머리말 아래 ~ 연락처 줄 위) — 키 작은 폰(APK 640dp~)에서 행이 연락처 줄 밑으로 숨지 않게. 영상 자리는 그대로.
 // 이름·계좌는 API(최근입금계좌)에서 — 이 파일에는 쓰지 않는다.
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import './WooriSend.css'
@@ -189,7 +191,16 @@ export function WooriSendWhereView({
         </p>
       )}
       {rows && rows.length > 0 && (
-        <WooriSendRows rows={rows} stage={stage} star={tab !== 'mine'} editing={editing} onRow={onRow} onDelete={onDelete} onStar={onStar} />
+        <WooriSendRows
+          rows={rows}
+          stage={stage}
+          star={tab !== 'mine'}
+          editing={editing}
+          delLabel={tab === 'frequent' ? '자주 쓰는 계좌에서 빼기' : '삭제'}
+          onRow={onRow}
+          onDelete={onDelete}
+          onStar={onStar}
+        />
       )}
       {stage >= S.S1 && (
         <div className={`woori-send__contact${animateContact ? ' woori-send__contact--in' : ''}`} style={WOORI_BOTTOM_FIX}>
@@ -224,7 +235,10 @@ interface WooriSendRowsProps {
   stage: number
   /** ☆ 를 그릴지 (내계좌 탭은 없음) */
   star: boolean
+  /** 편집 중이면 행 단추는 꺼 둔다 (누름 없음 — 읽어 주기도 '사용 안 함') */
   editing: boolean
+  /** [삭제] 알약이 하는 일 (읽어 주기 — 보이는 글자는 늘 '삭제'. 자주 탭은 지우지 않고 자주에서 뺀다) */
+  delLabel: string
   onRow?: (r: Recipient) => void
   onDelete?: (r: Recipient) => void
   onStar?: (r: Recipient) => void
@@ -239,7 +253,7 @@ const STAR_PATH =
  * 프레임 모드에서는 useWooriScrollFix 가 상자 원점을 기기 화소에 맞춰 행이 영상 자리(페이지에 바로 그리던 자리) 그대로 그려진다.
  * 마운트와 함께 맞추도록 따로 컴포넌트다 (행이 생길 때 상자가 생긴다).
  */
-function WooriSendRows({ rows, stage, star, editing, onRow, onDelete, onStar }: WooriSendRowsProps) {
+function WooriSendRows({ rows, stage, star, editing, delLabel, onRow, onDelete, onStar }: WooriSendRowsProps) {
   const ref = useRef<HTMLDivElement>(null)
   useWooriScrollFix(ref)
   const y = (pageY: number) => pageY - LIST_TOP
@@ -250,14 +264,17 @@ function WooriSendRows({ rows, stage, star, editing, onRow, onDelete, onStar }: 
         {rows.map((r, i) => {
           const dy = i * ROW_PITCH
           const logo = bankLogoArt(r.logo)
+          // 읽어 주기는 계좌까지 (이름이 같은 받는 분이 여럿일 수 있다 — 어느 줄의 [삭제]·☆ 인지 알게)
+          const acct = `${r.name} ${r.bankName} ${r.accountNumber}`
           return (
             <div key={r.id} className="woori-send__row-wrap">
               <button
                 type="button"
                 className="woori-send__row"
                 style={{ top: Math.floor(297 + dy) - LIST_TOP }}
-                onClick={editing ? undefined : () => onRow?.(r)}
-                aria-label={`${r.name} ${r.bankName} ${r.accountNumber}`}
+                disabled={editing}
+                onClick={() => onRow?.(r)}
+                aria-label={acct}
               />
               {stage >= S.S5 && logo && <img className="woori-send__avatar" src={artSrc(logo)} alt="" style={fbox(20, y(305.333 + dy), 40, 40)} />}
               <div className="woori-send__row-line1" style={textAt(75.88, y(307 + dy))}>
@@ -270,7 +287,7 @@ function WooriSendRows({ rows, stage, star, editing, onRow, onDelete, onStar }: 
               </div>
               {/* 편집: ☆ 자리 [삭제] 알약 296–340 × 28 (☆ 가운데 y 315.167 에 맞춤). 누름 자리는 ::before 로 넓힌다 */}
               {editing && (
-                <button type="button" className="woori-send__del" style={fbox(296, y(301.167 + dy), 44, 28)} aria-label={`${r.name} 삭제`} onClick={() => onDelete?.(r)}>
+                <button type="button" className="woori-send__del" style={fbox(296, y(301.167 + dy), 44, 28)} aria-label={`${acct} ${delLabel}`} onClick={() => onDelete?.(r)}>
                   삭제
                 </button>
               )}
@@ -288,7 +305,7 @@ function WooriSendRows({ rows, stage, star, editing, onRow, onDelete, onStar }: 
                     type="button"
                     className="woori-send__star-btn"
                     style={{ top: Math.floor(291.167 + dy) - LIST_TOP }}
-                    aria-label={`${r.name} 자주 쓰는 계좌`}
+                    aria-label={`${acct} 자주 쓰는 계좌`}
                     aria-pressed={r.favorite}
                     onClick={() => onStar?.(r)}
                   />
@@ -313,8 +330,8 @@ const PUSH_ACCOUNT = {
 /** 행 탭 → 금액 페이지까지 (v1 180.302 → 181.801) */
 const ROW_TO_AMOUNT_MS = 1499
 
-/** [삭제] 연타 막기 (ms) — 지운 줄 자리로 다음 줄이 올라온다 */
-const DELETE_GAP_MS = 350
+/** 줄 빼기([삭제] · 자주 탭 ☆ 끔) 연타 막기 (ms) — 뺀 줄 자리로 다음 줄이 올라온다 */
+const REMOVE_GAP_MS = 350
 
 /** 행 탭 뒤 기다리는 금액 페이지 이동 (뒤로·내려감이면 취소) */
 interface RowNav {
@@ -337,6 +354,8 @@ export default function WooriSend() {
   const stage = useWooriStages(STAGES_V2, { shotStage: shot ? shot.state.stage : null })
   const rowNav = useRef<RowNav | null>(null)
   const recipients = list?.tab === tab ? list.rows : null
+  // 편집 모드는 행이 있을 때만 (빈 목록이면 '편집'·'완료' 가 없다 — 끝낼 단추 없이 켜져 있지 않게, 뒤로도 그냥 나간다)
+  const editOn = editing && !!recipients?.length
 
   useEffect(() => {
     const ac = new AbortController()
@@ -344,7 +363,8 @@ export default function WooriSend() {
       .getRecipients(tab, ac.signal)
       .then((rows) => setList({ tab, rows }))
       .catch((e: unknown) => {
-        if ((e as Error).name !== 'AbortError') setList({ tab, rows: [] })
+        // 같은 탭 다시 불러오기(저장 실패 뒤)가 실패하면 지금 행을 둔다 — 처음 불러오기·탭 바꿈만 빈 목록
+        if ((e as Error).name !== 'AbortError') setList((p) => (p?.tab === tab ? p : { tab, rows: [] }))
       })
     return () => ac.abort()
   }, [tab, reloadSeq])
@@ -388,7 +408,7 @@ export default function WooriSend() {
 
   const onRow = useCallback(
     (r: Recipient) => {
-      if (busy || editing || !list) return
+      if (busy || editOn || !list) return
       let url: string
       if (list.tab === 'mine') {
         // 내계좌 첫 줄 = 출금계좌 (금액 페이지는 첫 계좌에서 보낸다 — 같은 계좌로는 못 보낸다, 백엔드 SAME_ACCOUNT)
@@ -413,7 +433,7 @@ export default function WooriSend() {
           }, wait)
         })
     },
-    [busy, editing, list, go],
+    [busy, editOn, list, go],
   )
 
   const onBack = useCallback(() => {
@@ -429,41 +449,72 @@ export default function WooriSend() {
 
   const onEdit = () => {
     if (!live || busy || !recipients?.length) return
-    setEditing((v) => !v)
+    setEditing(!editOn)
+  }
+
+  // 줄을 빼는 누름([삭제] · 자주 탭 ☆ 끔): 아래 행이 한 프레임에 같은 자리로 올라오므로 연타(REMOVE_GAP_MS 안)는 한 번만 받는다 — 두 줄이 빠지지 않게.
+  // 그 단추에 포커스가 있었으면(키보드·TalkBack) 다음 줄 같은 단추로 옮긴다 (줄이 없으면 고른 탭) — 포커스가 페이지 밖으로 새지 않게
+  const lastRemove = useRef(-Infinity)
+  const refocus = useRef<{ sel: string; at: number } | null>(null)
+  const beginRemove = (sel: string, at: number) => {
+    const now = performance.now()
+    if (now - lastRemove.current < REMOVE_GAP_MS) return false
+    lastRemove.current = now
+    if (document.activeElement?.matches(sel)) refocus.current = { sel, at }
+    return true
+  }
+  useLayoutEffect(() => {
+    const f = refocus.current
+    if (!f || !root) return
+    refocus.current = null
+    const same = root.querySelectorAll<HTMLElement>(f.sel)
+    const next = same.length ? same[Math.min(f.at, same.length - 1)] : root.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+    next?.focus()
+  }, [recipients, root])
+
+  // 저장 실패: 그 줄을 누르기 전 모습으로 제자리에 되돌리고 다시 불러온다 (다시 불러오기마저 실패해도 목록이 비거나 틀리지 않게)
+  const putBack = (listTab: RecipientTab, r: Recipient, at: number) => {
+    setList((p) => {
+      if (p?.tab !== listTab) return p
+      const rows = p.rows.filter((x) => x.id !== r.id)
+      rows.splice(Math.min(at, rows.length), 0, r)
+      return { tab: listTab, rows }
+    })
+    reload()
   }
 
   // 화면 먼저 지우고 저장 (404 = 이미 없음 → 지운 것). 자주 탭은 자주에서 빼기.
-  // 아래 행이 한 프레임에 같은 자리로 올라오므로 [삭제] 연타(DELETE_GAP_MS 안)는 한 번만 받는다 — 두 줄이 지워지지 않게
-  const lastDelete = useRef(-Infinity)
   const onDelete = (r: Recipient) => {
     if (!live || busy || !list) return
-    const now = performance.now()
-    if (now - lastDelete.current < DELETE_GAP_MS) return
-    lastDelete.current = now
     const listTab = list.tab
+    const at = list.rows.findIndex((x) => x.id === r.id)
+    if (!beginRemove('.woori-send__del', at)) return
     setList((p) => (p?.tab === listTab ? { tab: listTab, rows: p.rows.filter((x) => x.id !== r.id) } : p))
     if (list.rows.every((x) => x.id === r.id)) setEditing(false)
     const save = listTab === 'frequent' ? wooriApi.setRecipientFavorite(r.id, false) : wooriApi.deleteRecipient(r.id)
     save.catch((e: unknown) => {
       if (e instanceof WooriApiError && e.status === 404) return
       wooriToast('삭제하지 못했어요. 다시 시도해 주세요')
-      reload()
+      putBack(listTab, r, at)
     })
   }
 
-  // 화면 먼저 바꾸고 저장 (값을 정해 보낸다 — 연타해도 마지막 누름 값). 자주 탭에서 끄면 목록에서 빠진다
+  // 화면 먼저 바꾸고 저장 (값을 정해 보낸다 — 연타해도 마지막 누름 값). 자주 탭에서 끄면 목록에서 빠진다 (그때는 [삭제] 처럼 연타 막기)
   const onStar = (r: Recipient) => {
     if (!live || busy || !list) return
     const next = !r.favorite
     const listTab = list.tab
+    const at = list.rows.findIndex((x) => x.id === r.id)
+    const remove = listTab === 'frequent' && !next
+    if (remove && !beginRemove('.woori-send__star-btn', at)) return
     setList((p) =>
       p?.tab === listTab
-        ? { tab: listTab, rows: listTab === 'frequent' && !next ? p.rows.filter((x) => x.id !== r.id) : p.rows.map((x) => (x.id === r.id ? { ...x, favorite: next } : x)) }
+        ? { tab: listTab, rows: remove ? p.rows.filter((x) => x.id !== r.id) : p.rows.map((x) => (x.id === r.id ? { ...x, favorite: next } : x)) }
         : p,
     )
     wooriApi.setRecipientFavorite(r.id, next).catch(() => {
       wooriToast('자주 쓰는 계좌를 바꾸지 못했어요')
-      reload()
+      putBack(listTab, r, at)
     })
   }
 
@@ -481,14 +532,14 @@ export default function WooriSend() {
         setEditing(false)
         setTab(t)
       }}
-      onBack={editing ? exitEdit : onBack}
+      onBack={editOn ? exitEdit : onBack}
       onInput={() => {
         if (busy) return
         setEditing(false)
         go('/send/account', { transition: PUSH_ACCOUNT })
       }}
       onRow={onRow}
-      editing={editing}
+      editing={editOn}
       onEdit={onEdit}
       onDelete={onDelete}
       onStar={onStar}

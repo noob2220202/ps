@@ -5,6 +5,7 @@
 // 키가 다른 화면(APK): 안내 문구·[이체]는 아래끝 기준(atB — 프레임 모드는 영상 자리 그대로), 위 내용은 424dp 에서 끝나 640dp 셸에서도 겹치지 않는다.
 // 처리 중(버튼 안 스피너)에는 ‹·취소·폰 뒤로를 받지 않는다 — 돈은 이미 나가는 중이라 떠나도 완료 화면이 뒤따라 왔다 (설계).
 // [이체] 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert). 다시 눌러도 안 되는 오류(4xx)면 [확인] 뒤 금액 화면으로.
+// ‹·폰 뒤로 = 금액 화면이 남긴 채운 폼으로 돌아간다 (WOORI_SEND_DRAFT_KEY, 설계). [이체] 성공·취소면 그 폼을 지운다 — 보낸 금액이 다시 채워지지 않게.
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { artSrc, bankArtName, hasArt, type WooriArtName } from './WooriArt.ts'
@@ -17,8 +18,17 @@ import { useShotReady, useShotState } from './WooriShot.ts'
 import { useWooriNavigate } from './WooriNav.ts'
 import { wooriBottomTop } from './WooriLayout.ts'
 import { wooriApi, WooriApiError, type Ticket } from './WooriApi.ts'
-import { WooriSendAlert } from './WooriSendAmount.tsx'
+import { WOORI_SEND_DRAFT_KEY, WooriSendAlert } from './WooriSendAmount.tsx'
 import './WooriSendConfirm.css'
+
+/** 금액 화면이 뒤로 가기용으로 남긴 폼을 지운다 (WooriSendAmount saveSendDraft) */
+function clearSendDraft() {
+  try {
+    sessionStorage.removeItem(WOORI_SEND_DRAFT_KEY)
+  } catch {
+    /* 저장소를 못 씀 */
+  }
+}
 
 const r3 = (v: number) => Math.round(v * 1000) / 1000
 function at(x: number, y: number, dy = 0): CSSProperties {
@@ -138,6 +148,7 @@ export default function WooriSendConfirm() {
     const big = later(500, () => setBigSpinner(true))
     wooriApi.executeTransfer(tk.ticket).then(
       (res) => {
+        clearSendDraft() // 보낸 금액은 뒤로 가도 금액 화면에 다시 채우지 않는다 (페이지가 내려간 뒤에 와도)
         if (!mounted.current) return
         const wait = Math.max(0, 900 - (performance.now() - t0))
         later(wait, () => {
@@ -158,7 +169,10 @@ export default function WooriSendConfirm() {
   }
 
   const onBack = useCallback(() => go(-1), [go])
-  const onCancel = useCallback(() => go('/home', { replace: true }), [go])
+  const onCancel = useCallback(() => {
+    clearSendDraft()
+    go('/home', { replace: true })
+  }, [go])
 
   const spinner = s ? st < 5 || (st >= 6 && st < STAGE_DONE) : (st < 5 || (st >= 6 && st < STAGE_DONE) || bigSpinner)
   const morph = st >= 4
@@ -244,13 +258,13 @@ export default function WooriSendConfirm() {
             <p className="woori-cf__t" style={txt(39.86, 349, 15, 500, { color: '#6c6e72' })}>
               받는 분 통장표기
             </p>
-            <p className="woori-cf__val" style={{ ...at(0, 350), left: undefined, letterSpacing: '-0.0325em' }}>
+            <p className="woori-cf__val woori-cf__val--label" style={{ ...at(0, 350), left: undefined, letterSpacing: '-0.0325em' }}>
               {tk.recipientLabel}
             </p>
             <p className="woori-cf__t" style={txt(39.97, 384, 15, 500, { color: '#6c6e72' })}>
               내 통장표기
             </p>
-            <p className="woori-cf__val" style={{ ...at(0, 384), left: undefined, letterSpacing: '-0.0325em' }}>
+            <p className="woori-cf__val woori-cf__val--label" style={{ ...at(0, 384), left: undefined, letterSpacing: '-0.0325em' }}>
               {tk.myLabel}
             </p>
           </div>

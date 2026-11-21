@@ -8,12 +8,12 @@
 //                              └ 프로모션 팝업 (WooriSheet popup, 첫 진입만)
 // 첫 진입(인증서 → /home): 로그인 로딩 0–768.5ms (흰 화면+탭바 → 76.3ms 캐릭터 대체 그림) → 홈 단계 그리기 (3.1, 한 프레임 교체 = 타이머)
 //   → 공지 줄 가로 정착 (3.2) → 팝업 (3.3, easeOutCubic 176ms) → 딤 뒤 다른 은행 카드·잔액 오도미터 (3.4·3.5) → [닫기] (3.6, linear 160ms).
-// 그 밖의 진입(돌아옴·바로 열기)은 떠날 때 모습(scrollTop·배너 n, sessionStorage)으로 바로 그린다 — 3.9·3.10 다시 그리기 단계는 아직 없음.
+// 그 밖의 진입(돌아옴·바로 열기)은 떠날 때 모습(scrollTop·배너 n, sessionStorage)으로 바로 그린다 (되돌린 스크롤에는 스크롤바 없음) — 3.9·3.10 다시 그리기 단계는 아직 없음.
 //   첫 진입은 그 보관을 보지 않는다 (맨 위·배너 1 부터 — 되돌리기 뒤 다시 로그인해도 영상 순서 그대로).
 // 데이터는 WooriApi(getAccounts) 로만 받는다. 이름·계좌번호를 코드에 쓰지 않는다.
 // 실제 앱(프레임·shot 모드 아님) 몫: 영상에 없어 동작이 없는 곳(머리 아이콘·공지·칩·카드·⋮·배너 그림·추천·탭바 홈 외 탭 …)을 누르면
 //   '답지에는 없는 화면이에요' 토스트 (onClickCapture 한 곳에서 누른 자리 아래 요소로 가린다), 탭바 '홈' = 맨 위로.
-//   계좌번호 복사 아이콘 = 클립보드 + 토스트 (wooriCopy). 계좌 탭 스피너(643ms) 동안은 다른 누름을 받지 않는다.
+//   계좌번호 복사 아이콘 = 클립보드('우리은행 1002-…', 거래내역과 같은 글자) + 토스트 (wooriCopy). 계좌 탭 스피너(643ms) 동안은 다른 누름을 받지 않는다.
 //   팝업 '오늘은 그만 보기' = 그날(서울 날짜) 첫 진입에는 팝업을 건너뛴다 (localStorage 'woori.popup.home').
 //   폰 뒤로 버튼: 팝업이 떠 있으면 [닫기] 와 같이 닫는다 (팝업이 없으면 WooriLocal 이 '한 번 더 누르면 종료').
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
@@ -813,6 +813,8 @@ export default function WooriHome() {
   const [scrollTop, setScrollTop] = useState(shot?.state.scroll ?? cache?.scroll ?? 0)
   const [sb, setSb] = useState<'hidden' | 'shown' | 'fading'>(shot?.state.scrollbar ? 'shown' : 'hidden')
   const sbTimer = useRef(0)
+  /** 돌아옴 때 되돌려 둔 scrollTop — 그 스크롤 이벤트에는 스크롤바를 띄우지 않는다 (영상 3.10 'return-cached': 스크롤바 없이 한 프레임에 다시 그림) */
+  const restoredTop = useRef<number | null>(null)
   // 스크롤 상자 높이: 영상 셸 740.667. 실제 앱은 셸 높이가 폰마다 달라(640–900) 스크롤할 때 잰 값으로 스크롤바 트랙을 맞춘다
   const [viewH, setViewH] = useState(SCROLL_VIEW)
 
@@ -885,7 +887,10 @@ export default function WooriHome() {
     const el = scrollRef.current
     if (!el || view.page !== 'home') return
     const want = shot?.state.scroll ?? cache?.scroll ?? 0
-    if (want) scrollToExact(el, want)
+    if (!want) return
+    scrollToExact(el, want)
+    // 실제로 움직였을 때만 (못 움직였으면 이벤트가 안 온다 — 첫 손가락 스크롤을 삼키지 않게)
+    restoredTop.current = el.scrollTop > 0 ? el.scrollTop : null
   }, [shot, cache, view.page])
 
   const onScroll = () => {
@@ -894,6 +899,10 @@ export default function WooriHome() {
     setScrollTop(el.scrollTop)
     if (shot) return
     if (wooriLiveApp()) setViewH(el.clientHeight)
+    // 되돌려 둔 자리의 이벤트(한 번)는 스크롤바 없이 — 자리를 비교하므로 놓친 이벤트가 사용자의 첫 스크롤을 삼키지 않는다
+    const restored = restoredTop.current
+    restoredTop.current = null
+    if (restored != null && Math.abs(el.scrollTop - restored) < 1) return
     setSb('shown')
     window.clearTimeout(sbTimer.current)
     sbTimer.current = window.setTimeout(() => setSb('fading'), 390)
@@ -1091,7 +1100,8 @@ export default function WooriHome() {
                             // 실제 앱만 (프레임 모드는 예전처럼 카드 탭으로 번진다)
                             if (!wooriLiveApp()) return
                             e.stopPropagation()
-                            wooriCopy(account.number)
+                            // 거래내역 복사와 같은 글자: 은행 이름 + 번호 (다른 은행 앱·메신저에 붙여 넣기 좋게)
+                            wooriCopy(`${account.bankName} ${account.number}`)
                           }}
                         />
                       )}

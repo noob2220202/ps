@@ -14,13 +14,14 @@
 //   필터 줄 글자 자리는 영상 값('3개월 · ? · 최신순')이면 영상 좌표, 다른 글자면 같은 오른끝에 맞춘 줄.
 // 폰 뒤로 버튼: 시트가 열려 있으면 닫기, 아니면 ‹ 와 같이 홈 (스펙 4.1 'OS 뒤로').
 // 기다리는 이동(‹ 676ms · [이체] 645ms · 출금 행 21ms)은 하나만 — 그 사이 행·시트·다른 이동을 누르면 앞의 것은 버린다 (언마운트·덮임도).
-// 계좌번호 복사 아이콘 = 클립보드 복사 + 토스트 (설계). 오버레이 스크롤바는 실제 앱에서 스크롤 상자 높이로 잰다 (키가 다른 화면).
+// 계좌번호 복사 아이콘 = 클립보드 복사('우리은행 1002-…', 홈과 같은 글자) + 토스트 (설계). 오버레이 스크롤바는 실제 앱에서 스크롤 상자 높이로 잰다 (키가 다른 화면).
+// 실제 앱만: 문서 높이는 내용 끝까지(영상 셸 800.667 바닥 없음), 긴 이름(통장표기)은 금액 앞에서 말줄임 (WooriHistory.css).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import { artSrc } from './WooriArt.ts'
 import { wooriApi, type Account, type TxItem, type TxOrder, type TxPage, type TxPeriod, type TxTypeFilter } from './WooriApi.ts'
 import { WooriButton } from './WooriButton.tsx'
-import { useWooriBack, wooriCopy, wooriTodo, wooriToast } from './WooriEnv.ts'
+import { useWooriBack, wooriCopy, wooriLiveApp, wooriTodo, wooriToast } from './WooriEnv.ts'
 import { WooriHeader } from './WooriHeader.tsx'
 import { wooriPlace, wooriScrollTo } from './WooriLayout.ts'
 import { useWooriStages } from './WooriLoadingPage.tsx'
@@ -481,7 +482,8 @@ export default function WooriHistory() {
   const sumExtra = sumOpen ? 64 : 0
 
   const layout = useMemo(() => layoutList(items ?? [], sumExtra), [items, sumExtra])
-  const docHeight = Math.max(VIEWPORT_H, Math.ceil(listShown ? layout.end : 600))
+  // 문서 높이: 영상(프레임·shot)은 셸 800.667 이 바닥. 실제 앱은 내용 끝까지만 — 빈·짧은 목록이 흰 칸으로 스크롤되지 않게 (모자란 아래는 페이지 바탕)
+  const docHeight = Math.max(wooriLiveApp() ? 0 : VIEWPORT_H, Math.ceil(listShown ? layout.end : 600))
 
 
   const block = (stuckCopy: boolean) => (

@@ -50,6 +50,15 @@
   font-weight: 500;
 }
 
+/* 폼 통장표기 값 (설계 — 실제 앱만): 시트는 10자까지지만 다른 데서 온 긴 값·넓은 라틴 글자도 줄 제목(받는 분 통장표기 끝 124.5)에
+ * 닿지 않게 말줄임 (오른끝 316 − 176 = 140). overflow-x 만 clip — hidden 이면 line-height 1 이라 한글 잉크 위아래가 잘린다.
+ * 프레임·shot 모드는 영상 그대로 (wooriLiveApp 과 같은 조건) */
+:root:not([data-frame='1']):not([data-shot]) .woori-amt__label-val {
+  max-width: 176px;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+}
+
 .woori-amt__row {
   position: absolute;
   display: flex;

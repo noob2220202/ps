@@ -7,7 +7,8 @@
 //     열려 있으면 폰 뒤로 버튼('woori-back')을 가장 먼저 받아 닫힌다 (WooriEnv 뒤로 처리 스택, dialog 우선순위).
 //     연습에 필요한 값 안내: 계좌 비밀번호 1234 · 인증서 비밀번호는 아무 6자리 · 이 메뉴 여는 곳.
 //   - 진짜 상태바·내비 바 뒤 색 = 화면이 바라는 띠 색 (useWooriFrameBands → 네이티브 WooriBars 플러그인, android MainActivity 옆).
-//     큰 화면에서 앱 기둥 양옆 바탕이 보이면(WooriEnv useWooriFit().side) 두 바도 그 바탕색(--woori-side-bg) — 기둥이 떠 있는 모양
+//     큰 화면에서 앱 기둥 양옆 바탕이 기둥으로 보일 만큼 넓으면(WooriEnv useWooriFit() side · 한쪽 gutter ≥ 8dp) 두 바도 그 바탕색(--woori-side-bg)
+//     — 기둥이 떠 있는 모양. 640dp 바닥 맞춤으로 생기는 1dp 남짓 틈(360x638 등)은 화면 띠 색 그대로
 // 이 대화상자는 App 밖의 따로 된 React 루트라 position: fixed 를 쓴다 (페이지 내용 상자의 transform 과 무관).
 import './WooriLocalMenu.css'
 import { Capacitor, registerPlugin } from '@capacitor/core'
@@ -189,15 +190,18 @@ function toHex(css: string): string {
 
 /** 앱 기둥 양옆 바탕 (woori.css --woori-side-bg 와 같은 값) */
 const SIDE_BG = '#e9ebee'
+/** 바를 양옆 바탕색으로 바꾸는 한쪽 gutter 폭 (dp) — 이보다 좁은 틈은 떠 있는 기둥으로 보이지 않는다 */
+const COLUMN_GUTTER = 8
 
 function WooriLocalBars() {
   const bands = useWooriFrameBands()
-  const { side } = useWooriFit()
+  const { side, gutter } = useWooriFit()
+  const column = side && gutter >= COLUMN_GUTTER
   useEffect(() => {
-    const statusBar = side ? SIDE_BG : toHex(resolveColor(bands.statusbar))
-    const navBar = side ? SIDE_BG : toHex(resolveColor(bands.navbar))
+    const statusBar = column ? SIDE_BG : toHex(resolveColor(bands.statusbar))
+    const navBar = column ? SIDE_BG : toHex(resolveColor(bands.navbar))
     void WooriBars.setColors({ statusBar, navBar }).catch(() => {})
-  }, [bands, side])
+  }, [bands, column])
   return null
 }
 

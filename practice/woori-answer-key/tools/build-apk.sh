@@ -5,8 +5,9 @@
 #
 # 1) 웹 빌드  VITE_WOORI_LOCAL=1 vite build → frontend/dist-apk  (backend 순수 로직을 sql.js 위에서 앱 안에 품는다 — frontend/src/WooriLocal.ts)
 # 2) npx cap sync android              (dist-apk → android/app/src/main/assets/public, 플러그인 @capacitor/app)
-# 3) gradle assembleDebug              (frontend/android, --max-workers=$WOORI_GRADLE_WORKERS 기본 2, versionCode = git 커밋 수,
-#                                       서명 = 저장소의 고정 연습용 키 frontend/android/app/woori-debug.keystore)
+# 3) gradle assembleDebug              (frontend/android, --max-workers=$WOORI_GRADLE_WORKERS 기본 2,
+#                                       versionCode = HEAD 커밋 시각(2025-01-01 UTC 부터 분), 서명 = 저장소의 고정 연습용 키
+#                                       frontend/android/app/woori-debug.keystore)
 # 4) 복사 → tools/out/apk/WON-answer-key-debug.apk (gitignore)
 #
 # 필요: Node 22, JDK 21, Android SDK (platforms;android-36 · build-tools;35.0.0, 라이선스 수락) — ANDROID_HOME (기본 /opt/android-sdk).
@@ -47,8 +48,13 @@ GRADLE="./gradlew"
 if command -v gradle >/dev/null 2>&1 && gradle --version 2>/dev/null | grep -q "^Gradle $WANT\$"; then
   GRADLE="gradle"
 fi
-# versionCode = git 커밋 수 (새 빌드가 이전 설치 위로 덮어 깔리게). git 이 없으면 1
-VERSION_CODE="$(git -C "$ROOT" rev-list --count HEAD 2>/dev/null || echo 1)"
+# versionCode = HEAD 커밋 시각의 2025-01-01 00:00 UTC 부터 분 (새 빌드가 이전 설치 위로 덮어 깔리게).
+# 커밋 수(rev-list --count)는 얕은 클론(shallow)에서 깊이에 따라 줄어 새 빌드가 '낮은 버전'으로 거절됐다 — 커밋 시각(%ct)은 깊이 1 클론에서도 같다.
+# git 이 없으면 지금 시각. 예전 값(커밋 수 150 남짓)보다 늘 크고 Android 한도 2100000000 보다 한참 작다 (build.gradle 기본값과 같은 단위)
+VERSION_EPOCH=1735689600
+COMMIT_TIME="$(git -C "$ROOT" log -1 --format=%ct HEAD 2>/dev/null || true)"
+case "$COMMIT_TIME" in '' | *[!0-9]*) COMMIT_TIME="$(date +%s)" ;; esac
+VERSION_CODE="$(( (COMMIT_TIME - VERSION_EPOCH) / 60 ))"
 echo "   versionCode $VERSION_CODE"
 "$GRADLE" --no-daemon --max-workers="$WORKERS" -PwooriVersionCode="$VERSION_CODE" assembleDebug
 

@@ -9,6 +9,8 @@
 //     WooriApi.ts 는 그대로 (fetch 만 부른다).
 //   - 저장: 요청이 DB 를 바꾸면(total_changes) DB 바이트 전체를 IndexedDB 에 쓴 뒤에 응답한다 → 앱을 껐다 켜도 잔액·거래내역·이체 결과가 남는다.
 //     처음 실행(저장본 없음)이면 createApp 의 ensureSeeded 가 v1-start(잔액 345원)로 채운다. 스키마가 바뀐 저장본은 버리고 새로 채운다.
+//     쓰기가 실패하면(기기 저장 공간 부족 등) 메모리 DB 를 마지막으로 저장된 바이트로 되돌리고 507 {code:'STORAGE_FAILED'} (한국어 error)
+//     → 화면은 backend 오류처럼 안내하고, 메모리와 저장본(= 다시 켰을 때)이 어긋나지 않는다 (이체가 메모리에서만 된 것처럼 보이지 않게).
 //   - 시계: backend 와 같다 (덮어쓰기 meta → 실제 시각, Asia/Seoul). 숨은 메뉴(WooriLocalMenu)에서 시나리오 되돌리기 + '영상 시각 고정'.
 //   - 숨은 메뉴 열기: 화면 **맨 위 가운데(제목 자리, 앱 x 130–230dp · y 0–44dp)** 를 1.5초 안에 5번 빠르게 탭. 두 번째 탭부터는 앱에 넘기지 않는다.
 //     (예전 왼쪽 위 모서리 32x32 는 머리 ‹(16,14,24,24)와 겹쳐 첫 탭이 뒤로 갔다 — 제목 자리에는 눌리는 단추가 없다.
@@ -184,11 +186,17 @@ const SCHEMA_KEY = `schema-${hash(SCHEMA)}`
 interface LocalRuntime {
   db: WooriLocalDb
   app: unknown
-  /** 지금 DB 를 저장한다 (순서대로, 쓰기가 끝나면 resolve) */
+  /** 지금 DB 를 저장한다 (순서대로, 쓰기가 끝나면 resolve). 실패하면 메모리 DB 를 마지막 저장본으로 되돌리고 reject */
   persist: () => Promise<void>
   /** 저장본에서 열었는지, 새로 채웠는지 */
   origin: 'saved' | 'seeded'
 }
+
+/** 저장 실패 응답 (WooriApi 가 WooriApiError(507) 로 받아 error 를 그대로 보인다) */
+const STORAGE_FAILED = {
+  error: '기기에 저장하지 못해 처리하지 않았습니다. 저장 공간을 확인한 뒤 다시 시도해 주세요',
+  code: 'STORAGE_FAILED',
+} as const
 
 let runtimePromise: Promise<LocalRuntime> | null = null
 
@@ -236,17 +244,42 @@ async function startRuntime(): Promise<LocalRuntime> {
   const app = createApp({ db, hooks: {}, enableDev: true })
   if (origin === 'saved' && db.totalChanges() !== before) origin = 'seeded'
 
+  // 마지막으로 저장된 바이트 = 앱을 다시 켜면 보일 상태 (새로 채운 DB 는 처음 저장이 실패해도 다시 켜면 똑같이 채워진다)
+  let lastSaved: Uint8Array = origin === 'saved' && saved ? saved.bytes : db.exportBytes()
+  /** 되돌린 횟수 — 되돌리기 전에 떠 둔 바이트(되돌린 변경이 들어 있다)는 쓰지 않는다 */
+  let rollbacks = 0
+  const rollback = () => {
+    const next = new SQL.Database(lastSaved)
+    next.exec('PRAGMA foreign_keys = ON;')
+    db.raw.close()
+    db.raw = next
+    rollbacks++
+  }
   let chain: Promise<void> = Promise.resolve()
   const persist = (): Promise<void> => {
     const bytes = db.exportBytes() // 지금 상태를 바로 떠 둔다 (다음 요청이 바꾸기 전에)
     if (!idb) return chain
     const target = idb
+    const at = rollbacks
     chain = chain
       .catch(() => undefined)
-      .then(() => idbPut(target, { schemaKey: SCHEMA_KEY, bytes, savedAt: new Date().toISOString() }))
+      .then(async () => {
+        // 앞 요청의 저장이 실패해 이 요청의 변경도 함께 되돌렸다 → 쓰지 않고 실패
+        if (at !== rollbacks) throw new Error('앞 저장 실패로 되돌림')
+        try {
+          await idbPut(target, { schemaKey: SCHEMA_KEY, bytes, savedAt: new Date().toISOString() })
+          lastSaved = bytes
+        } catch (err) {
+          rollback()
+          throw err
+        }
+      })
     return chain
   }
-  if (origin === 'seeded') await persist()
+  if (origin === 'seeded') {
+    // 처음 저장이 안 돼도 앱은 띄운다 (IndexedDB 를 못 열 때처럼) — 다음 쓰기에서 다시 저장해 본다
+    await persist().catch((err: unknown) => console.error('[woori-local] 처음 저장 실패 — 저장 없이 시작한다', err))
+  }
   try {
     void navigator.storage?.persist?.()
   } catch {
@@ -273,7 +306,15 @@ export async function wooriLocalRequest(method: string, url: string, headers: Re
   const rt = await wooriLocalRuntime()
   const before = rt.db.totalChanges()
   const out = express.dispatch(rt.app, { method, url, headers, body })
-  if (rt.db.totalChanges() !== before) await rt.persist()
+  if (rt.db.totalChanges() !== before) {
+    try {
+      await rt.persist()
+    } catch (err) {
+      // persist 가 이미 메모리 DB 를 마지막 저장본으로 되돌렸다 (이 요청의 변경은 없던 일)
+      console.error('[woori-local] 저장 실패 — 이 요청의 변경을 되돌렸다', err)
+      return new Response(JSON.stringify(STORAGE_FAILED), { status: 507, headers: { 'Content-Type': 'application/json; charset=utf-8' } })
+    }
+  }
   return new Response(out.body, {
     status: out.status,
     headers: { 'Content-Type': out.headers['content-type'] ?? 'application/json; charset=utf-8' },
