@@ -47,7 +47,7 @@ CSS 애니메이션은 이름 있는 단축 속성이나 **롱핸드**로 쓴다
 | `WooriNav.ts` | 이동 방식(전환) 상수 `WOORI_MOTION`, 페이지 스택, `useWooriNavigate`·`useBackTo`·`useArrivedByPop`·`useWooriLayer`, `readShot`·`isFrameMode` |
 | `WooriShot.ts` | `?shot=` 약속: `useShotState`(화면별 등록) · `useShotReady`/`markShotReady`(→ `__WOORI_READY__`) |
 | `WooriTheme.ts` | 토큰(spec/tokens.json → `--woori-*`), 라이트/다크, 프레임 띠 색 `useWooriBands` |
-| `WooriLayout.ts` | 렌더 규칙 도우미: 스크롤 컨테이너 기기 화소 맞춤(`useWooriScrollFix`·`wooriScrollTo`), `wooriPlace`, `WOORI_BOTTOM_FIX` |
+| `WooriLayout.ts` | 렌더 규칙 도우미: 스크롤 컨테이너 기기 화소 맞춤(`useWooriScrollFix`·`wooriScrollTo`), `wooriPlace`, `WOORI_BOTTOM_FIX`, 키가 다른 화면의 아래끝 기준 자리 `wooriBottomTop`·`wooriPlaceBottom` (아래 렌더 규칙 7) |
 | `WooriSpinner.tsx` | 남색·하늘색 원호 스피너 (영상 원호 표본 키프레임) |
 | `WooriSheet.tsx` | 딤 + 아래에서 올라오는 시트 (`sheet`·`popup`), `WooriOverlay`(겹침 자리 포털) |
 | `WooriLoadingPage.tsx` | 흰 페이지 + 스피너 (`WooriLoadingPage`), 단계 시계 `useWooriStages` |
@@ -56,7 +56,7 @@ CSS 애니메이션은 이름 있는 단축 속성이나 **롱핸드**로 쓴다
 | `woori.css` | 전역 스타일 + 뼈대(프레임·셸·레이어·전환·베일·스피너·시트·로딩 페이지) |
 | `Woori<Screen>.tsx` | 화면 자리표시 (아래 라우트 표). `WooriPlaceholder.tsx` 를 쓴다 |
 | `WooriDevFrame.tsx` | `/dev/frame` 뼈대 확인 화면 (기하·스크롤·스피너·시트 shot) |
-| `WooriEnv.ts` | 빌드·실행 플래그: `WOORI_LOCAL`(로컬 빌드) · `wooriIsNative()`(APK 안) · `wooriUsesSystemKeyboard()` · `WOORI_BACK_EVENT`(폰 뒤로 버튼) + 실제 앱 몫(프레임·shot 모드에서는 아무것도 안 함): 뒤로 처리 스택 `useWooriBack` · 토스트 `wooriToast`/`wooriTodo` · 큰 화면 맞춤 `installWooriFit` (아래 'APK') |
+| `WooriEnv.ts` | 빌드·실행 플래그: `WOORI_LOCAL`(로컬 빌드) · `wooriIsNative()`(APK 안) · `wooriUsesSystemKeyboard()` · `WOORI_BACK_EVENT`(폰 뒤로 버튼) + 실제 앱 몫(프레임·shot 모드에서는 아무것도 안 함): 뒤로 처리 스택 `useWooriBack` · 토스트 `wooriToast`/`wooriTodo` · 복사 `wooriCopy`(클립보드 + 토스트) · 화면 맞춤 `installWooriFit` (확대·축소, 레이아웃 높이 640dp 바닥 — 아래 'APK') |
 | `WooriLocal.ts` · `WooriLocalMenu.tsx`(+`.css`) · `WooriLocalExpress.cjs` · `WooriLocalCors.cjs` · `WooriLocalModules.d.ts` · `WooriLocalExpress.d.cts` | **로컬 모드**(서버 없는 APK) — 아래 'APK' |
 
 화면 CSS 는 `woori-<그룹>.css` (`.woori-<그룹>__…` BEM), 에셋은 `public/woori/<그룹>/`, 글꼴은 `public/fonts/` (글꼴 작업 소관 — 고치지 않는다).
@@ -80,7 +80,7 @@ CSS 애니메이션은 이름 있는 단축 속성이나 **롱핸드**로 쓴다
 
 | 약속 | 내용 |
 |---|---|
-| `?frame=1` | 위 31dp 스페이서 + 앱 셸(360 x 800.667dp, `transform: translate(-0.2925px, 0.333px) scaleX(1.0023956)`) + 아래 48dp 스페이서. 뷰포트 360x880 을 DSF 16/11 로 찍으면 524x1280 = 영상 1:1. 세션 동안 유지(`sessionStorage 'woori.frame'`), `?frame=0` 으로 끔. 실제 앱(프레임 아님)에서는 셸이 화면을 채운다 (레이아웃 폭 최대 360dp — 넓은 화면은 `installWooriFit` 이 셸을 확대: 폰은 폭을 꽉, 태블릿은 폰 비율 기둥이 높이를 꽉, 양옆 #e9ebee. 아래 'APK' 큰 화면) |
+| `?frame=1` | 위 31dp 스페이서 + 앱 셸(360 x 800.667dp, `transform: translate(-0.2925px, 0.333px) scaleX(1.0023956)`) + 아래 48dp 스페이서. 뷰포트 360x880 을 DSF 16/11 로 찍으면 524x1280 = 영상 1:1. 세션 동안 유지(`sessionStorage 'woori.frame'`), `?frame=0` 으로 끔. 실제 앱(프레임 아님)에서는 셸이 화면을 채운다 (레이아웃 폭은 늘 360dp — 360dp 가 아닌 화면·640dp 보다 낮은 화면은 `installWooriFit` 이 셸을 확대·축소: 폰은 폭을 꽉, 태블릿·키 작은 화면은 폰 비율 기둥, 양옆 #e9ebee. 레이아웃 높이 640dp 바닥. 아래 'APK' 화면 맞춤) |
 | `?shot=<상태 id>` | 화면이 등록한 shot 상태를 바로 그린다 (`useShotState`). 준비되면 글꼴(`fonts.ready` + `fonts.load`) → `<img>` decode → 2 프레임 뒤 `window.__WOORI_READY__ = true`. 모르는 id 면 `console.error` + READY 안 켬 (shot.cjs 가 15초 뒤 'READY 없음') |
 | `?theme=light\|dark\|auto` | 테마 (`sessionStorage 'woori.theme'`). 다크는 지금 구조만 (토큰 덮어쓰기 표가 비어 있음) |
 | 애니메이션 | **CSS 애니메이션/트랜지션 또는 WAAPI 만** (shot.cjs `--t` 가 `document.getAnimations()` 로 멈춘다). shot 모드(`html[data-shot]`)에서 CSS 트랜지션은 0s, 캐럿 숨김, 스피너는 0 위상 정지(`--woori-spinner-shot-delay`) |
@@ -118,22 +118,29 @@ CSS 애니메이션은 이름 있는 단축 속성이나 **롱핸드**로 쓴다
    또는 (b) `WooriOverlay` 로 레이어 겹침 자리에 그린다. html/body 에 transform 을 걸지 않는다 (units.md 6.2절 5).
 5. 셸·페이지 상자는 `overflow: clip` (스크롤 컨테이너가 아니라 포커스·scrollIntoView 가 몰래 스크롤하지 못한다).
 6. 1dp 선은 1.4545px 잉크(2~3행에 나뉨). 선 중심 = (top + 0.5)·16/11. 글자 크기·위치는 `tools/woori-textfit.cjs` 로 맞춘다 (spec/font.md).
+7. **키가 다른 화면 (APK)**: 실제 폰 웹뷰는 상태바·내비 바를 뺀 높이라 셸이 대개 640–780dp 다 (영상 800.667, 화면 맞춤이 640 아래로는 내리지 않는다).
+   영상에서 아래쪽에 붙어 있던 것(키패드·[확인]·[이체]·아래 단추 줄)은 **아래끝 기준**으로 놓는다: `top: calc(var(--woori-page-h) - (800.667 − y)px)`
+   (`wooriBottomTop(y)` · `wooriPlaceBottom(x, y)`, CSS 는 같은 식). `--woori-page-h` = 실제 앱 `100%` · 프레임 모드 `800.667px` → 프레임 모드에서는 `top: y` 와
+   같은 값이라 영상 비교 화소가 그대로다. 담는 상자가 페이지 높이인 절대 위치 상자에만 쓴다.
+   키 작은 폰에서만 넘치는 목록·내용은 **실제 앱에서만** 자기 스크롤 상자로 (`:root:not([data-frame='1'])` 또는 `useWooriScrollFix` 로 프레임 화소가 같음을 확인) —
+   보기: 이체 최근입금계좌 행 목록, 금융회사 그리드, 이체 완료 위 내용, 거래 상세.
 
 ## 라우트와 페이지 전환 (WooriNav)
 
 | 경로 | 화면 (자리표시) | 그룹 · 메모 |
 |---|---|---|
-| `/` | `WooriSplash` | launch — 스플래시 → `/cert` |
-| `/cert` | `WooriCert` | launch — 우리WON인증서 6자리 (키패드는 영상에 없음 → 설계) |
-| `/home` | `WooriHome` | home |
-| `/history?type=all\|in\|out&period=3m` | `WooriHistory` | history — 조회조건 시트는 화면 상태 (같은 페이지 안 이동은 인스턴스 유지). 조회기간 이번달·3개월·6개월·1년·직접입력(type=date 시작일·종료일), 상세조건조회 ⌄ = 정렬 최신순·과거순, [초기화] = 3개월·전체·최신순 (영상은 3개월·최신순뿐 — 나머지 설계값, 기본 모양은 영상 그대로). URL `period`·`order`·`from`·`to` 도 읽는다 |
-| `/history/:txId` | `WooriHistoryDetail` | history-detail — 목록 위 오버레이: `rise` 로 열면 목록이 아래에 마운트된 채 남고, 뒤로(`sink`) 하면 같은 인스턴스·스크롤로 드러난다 |
-| `/send` | `WooriSend` | send-a — 어디로 이체하시겠어요? |
-| `/send/account` | `WooriSendAccount` | send-a — `push` + 아래 페이지 흰 베일 |
-| `/send/account/bank` | `WooriSendBank` | send-a — `push` (바텀시트 아님). 고르면 `go(-1)` instant |
-| `/send/amount` | `WooriSendAmount` | send-b — 중복 경고·비밀번호 시트는 화면 상태 |
-| `/send/confirm` | `WooriSendConfirm` | send-b |
-| `/send/done` | `WooriDone` | done |
+| `/` | `WooriSplash` | launch — 스플래시 → `/cert`. 키가 다른 화면: 로고 묶음은 셸 가운데, iF·MA·우리은행 글자는 셸 아래끝 기준 (프레임 모드 영상 그대로) |
+| `/cert` | `WooriCert` | launch — 우리WON인증서 6자리 (키패드는 영상에 없음 → 설계). 키패드·[다른 방법으로 로그인] 아래끝 기준 |
+| `/home` | `WooriHome` | home. 설계(실제 앱만): 계좌번호 복사 = 클립보드(`wooriCopy`), ⋮ = 토스트, 첫 진입 팝업 '오늘은 그만 보기' = 서울 날짜 바뀔 때까지 안 띄움(`localStorage 'woori.popup.home'`), 로그인 첫 진입은 늘 맨 위·배너 1(이전 `woori.home.cache` 무시), 계좌 탭 스피너 동안 다른 누름 무시, 오버레이 스크롤바는 잰 스크롤 상자 높이로 |
+| `/notice` | `WooriNotice` | 설계 — 홈 머리 종에서 연다. 알림 목록 + 편집(여러 개 골라 삭제), 읽음·지움은 `localStorage 'woori.notice.v1'` (실제 앱만, 시나리오 되돌리기가 지움) |
+| `/history?type=all\|in\|out&period=3m` | `WooriHistory` | history — 조회조건 시트는 화면 상태 (같은 페이지 안 이동은 인스턴스 유지). 조회기간 이번달·3개월·6개월·1년·직접입력(type=date 시작일·종료일), 상세조건조회 ⌄ = 정렬 최신순·과거순, [초기화] = 3개월·전체·최신순 (영상은 3개월·최신순뿐 — 나머지 설계값, 기본 모양은 영상 그대로). URL `period`·`order`·`from`·`to` 도 읽는다. 직접입력 날짜는 오늘까지. 계좌번호 복사 = `wooriCopy`. ‹·[이체] 대기 중에 행·조회조건을 누르면 기다리던 이동은 취소(마지막 누름이 이긴다) |
+| `/history/:txId` | `WooriHistoryDetail` | history-detail — 목록 위 오버레이: `rise` 로 열면 목록이 아래에 마운트된 채 남고, 뒤로(`sink`) 하면 같은 인스턴스·스크롤로 드러난다. 아래 단추 줄은 아래끝 기준, 내용은 셸 높이에 맞춰 스크롤 |
+| `/send` | `WooriSend` | send-a — 어디로 이체하시겠어요? 설계(실제 앱만): **편집** → 그 자리 편집 모드('완료' 파랑, 행 ☆ 자리에 [삭제] 알약 → 바로 `DELETE /api/recipients/:id`, 자주 탭에서는 자주에서 빼기, 완료·‹·폰 뒤로·탭 바꿈·입력 줄 탭이 편집부터 끝냄, 다 지우면 저절로 끝) · **☆** = 즐겨찾기(`POST …/favorite`, 채운 별 `--woori-primary`, 자주 탭 = 즐겨찾기한 계좌) · 내계좌 탭은 ☆·편집 없음, 출금계좌 줄 탭 = 토스트 · 탭별 머리말·빈 목록 안내 · 행 목록은 자기 스크롤 상자 · 행 탭 스피너 동안 다른 누름 무시, ‹·폰 뒤로는 기다리던 이동 취소 · 카메라·＋연락처 = 토스트. 최근입금계좌 줄을 지우면 자주에서도 빠진다(같은 행). 시나리오 되돌리기가 삭제·즐겨찾기를 되돌린다 |
+| `/send/account` | `WooriSendAccount` | send-a — `push` + 아래 페이지 흰 베일. 설계: 조회 중 ✕·폰 뒤로 = 조회를 버리고 닫기, 계좌번호 16자리까지(백엔드 6–16, 영상은 13자리에서 멈춤) |
+| `/send/account/bank` | `WooriSendBank` | send-a — `push` (바텀시트 아님). 고르면 `go(-1)` instant. 그리드는 실제 앱에서 탭 아래 자기 스크롤(설계 — 프레임 모드는 영상처럼 스크롤 없음) |
+| `/send/amount` | `WooriSendAmount` | send-b — 중복 경고·비밀번호 시트는 화면 상태. 키패드·폼 단추 층 아래끝 기준(`.woori-amt__layer--bottom`), 셸이 낮으면 키패드를 눌러 담는다(keypadSqueeze). 설계: 금액 줄 탭 = 키패드로, 통장표기 › = 편집 시트(20자), 오류 = 안내 시트(`WooriSendAlert`, 네이티브 alert 아님), 없는 `?to=` = 토스트 + `/send` |
+| `/send/confirm` | `WooriSendConfirm` | send-b — 안내·[이체] 아래끝 기준. 처리 중에는 ‹·취소·폰 뒤로 무시. [이체] 오류 = 안내 시트(4xx 면 [확인] 뒤 금액 화면) |
+| `/send/done` | `WooriDone` | done — [공유][확인] 아래끝 기준, 위 내용은 실제 앱에서 자기 스크롤 영역 |
 | `/dev/keyboard` · `/dev/keypad` | `WooriDevKeyboard` · `WooriDevKeypad` | 개발용 단독 확인 (삼성 키보드 · 섞인 키패드) |
 | `/dev/frame` | `WooriDevFrame` | 뼈대 확인 (shot: geometry · nested · nested-nofix · scrolled · bottom · spinner · sheet · popup, shot 없으면 [시트][팝업] 단추) |
 | 그 밖 | → `/home` (replace) | |
@@ -248,11 +255,12 @@ node ../tools/woori-local-check.cjs        # (루트 npm run check:local) dist-a
 | 전송 | `window.fetch` 를 감싸 같은 출처 `/api/…` 만 앱 안 backend 로 → 라우트가 만든 JSON·상태 코드 그대로 `Response`. `WooriApi.ts` 는 그대로 |
 | 저장 | 요청이 DB 를 바꾸면(`total_changes`) DB 바이트 전체를 **IndexedDB**(`woori-answer-key` / `local-db`)에 쓴 **뒤에** 응답 → 앱을 껐다 켜도 잔액·거래내역·이체 결과가 남는다. 처음 실행(저장본 없음) = `ensureSeeded` → **v1-start (345원)**. 스키마가 바뀐 저장본·깨진 저장본은 버리고 새로 채운다. 앱 데이터 지우기 = 처음 상태 |
 | 시계 | backend 와 같다 (덮어쓰기 → 실제 시각 Asia/Seoul). `process.env` 는 빌드가 `{}` 로 바꿔 WOORI_* 기본값 (비밀번호 1234 등) |
-| 숨은 메뉴 | 화면 **맨 위 가운데(제목 자리, 앱 x 130–230dp · y 0–44dp)를 1.5초 안에 5번** 탭 → '시나리오 되돌리기': v1 시작 345원 · v2 시작 344원 · v2 끝 342원 + '시계를 영상 시각에 고정'(기본 켬, `POST /api/dev/reset {now:'video'}`). 고르면 `/` 부터 다시 연다. 두 번째 탭부터는 앱에 넘기지 않는다. 대화상자에 **계좌 비밀번호 1234 · 인증서 비밀번호는 아무 6자리** 안내. (예전 왼쪽 위 32x32 는 머리 ‹ 와 겹쳐 첫 탭이 뒤로 갔다 — 제목 자리에는 동작 있는 단추가 없다) |
+| 숨은 메뉴 | 화면 **맨 위 가운데(제목 자리, 앱 x 130–230dp · y 0–44dp)를 1.5초 안에 5번** 탭 → '시나리오 되돌리기': v1 시작 345원 · v2 시작 344원 · v2 끝 342원 + '시계를 영상 시각에 고정'(기본 켬, `POST /api/dev/reset {now:'video'}`). 고르면 `sessionStorage`·`localStorage` 의 `woori.` 로 시작하는 값(알림 읽음·지움, 홈 팝업 '오늘은 그만 보기', 홈 캐시 …)을 지우고(테마 `woori.theme`·프레임 `woori.frame` 은 남김) `/` 부터 다시 연다. 두 번째 탭부터는 앱에 넘기지 않는다. 대화상자에 **계좌 비밀번호 1234 · 인증서 비밀번호는 아무 6자리** 안내. (예전 왼쪽 위 32x32 는 머리 ‹ 와 겹쳐 첫 탭이 뒤로 갔다 — 제목 자리에는 동작 있는 단추가 없다) |
 | 폰 화면 | 프레임 모드 끔 (`?frame` 없음), `viewport-fit=cover` 를 빼서(로컬 빌드만) Capacitor SystemBars(`insetsHandling: native`)가 웹뷰를 **진짜 상태바·내비 바 사이**에 둔다. 두 바 뒤 색 = 화면의 띠 색(`useWooriBands` → 네이티브 `WooriBars` 플러그인, 어두우면 아이콘 밝게). 키보드가 뜨면 웹뷰가 그 위로 줄어든다. 밝은 테마 고정(강제 다크 끔) |
 | 뒤로 버튼 | `@capacitor/app` backButton → window 에 취소 가능한 `WOORI_BACK_EVENT`('woori-back') → `WooriEnv` 뒤로 처리 스택이 하나만 받는다: 숨은 메뉴(dialog) > 맨 위 페이지의 열린 시트·팝업(`WooriSheet onBack`: 조회조건 시트 · 홈 프로모션 팝업 · 중복 경고 · 계좌 비밀번호) > 페이지 뒤로(`WooriHeader` 의 ‹/✕ 와 같은 동작이 자동 등록, 계좌번호·금융회사 ✕, 거래내역 = ‹(홈), 이체 완료 = [확인]). 아무도 안 받으면 처음 화면(`/` 스플래시 · `/cert` 인증서·로그인 로딩 · `/home`)이면 토스트 '뒤로 버튼을 한 번 더 누르면 종료됩니다' → 2초 안에 또 누르면 `exitApp`, 그 밖은 기록이 있으면 `history.back()`, 없으면 홈. 브라우저 확인용 `wooriDebug.pressBack()` (로컬 빌드) |
-| 큰 화면 | 프레임 모드가 아니면 `installWooriFit`(main.tsx): 앱 레이아웃은 360dp 폭 그대로, 셸을 `transform: scale(k)` (위끝 가운데). 폰 모양(폭을 채워도 높이 600dp 이상)은 k = max(1, 폭/360) → 폭을 꽉 채움 (360x800 · 412x915 · 384x854 → 1 · 1.144 · 1.067), 그 밖(태블릿)은 k = max(1, min(폭/360, 높이/800)) → 폰 비율 기둥이 화면 높이를 채움 (800x1280 → 1.6, 1280x800 → 1). k 는 그 폭에서 본 가장 큰 높이로 정해 시스템 키보드가 떠도 바뀌지 않는다 (셸 높이만 줄어 [확인] 이 키보드 위). 기둥이 화면보다 좁으면 `<html data-woori-side="1">` → 양옆 `--woori-side-bg`(#e9ebee)+옅은 그림자, APK 상태바·내비 바도 그 색 |
-| 토스트 | 영상에 없어 동작이 없는 단추·메뉴(공유·메모·☆·더보기·관리·모으기·복사·🔍·편집·카메라·추가이체·홈 머리 아이콘·공지·카드·배너 그림·추천·탭바 홈 외 탭 …)는 '답지에는 없는 화면이에요' (`wooriTodo`). 탭바 '홈' = 맨 위로. **프레임 모드·shot 모드에서는 토스트를 만들지 않는다** (화면 모양·shot 그대로) |
+| 화면 맞춤 | 프레임 모드가 아니면 `installWooriFit`(main.tsx): 앱 레이아웃은 360dp 폭 그대로, 셸을 `transform: scale(k)` (위끝 가운데), **셸 레이아웃 높이는 640dp 바닥**. 폰 모양(폭을 채워도 높이 640dp 이상)은 k = 폭/360 → 폭을 꽉 채움 (360x800 · 412x915 · 384x854 → 1 · 1.144 · 1.067, 글자 크게 보기로 좁아진 320x690 → 0.889 — 줄여서 360dp 를 다 보인다), 그 밖(태블릿·키 작은 화면)은 k = min(폭/360, max(높이/800, min(1, 높이/640))) → 폰 비율 기둥 (800x1280 → 1.6, 1280x800 → 1, 360x600 → 0.9375, 320x568 → 0.8875). k ≠ 1 이면 `data-woori-fit="scale"`. k 는 그 폭에서 본 가장 큰 높이로 정해 시스템 키보드가 떠도 바뀌지 않는다 (셸 높이만 줄어 [확인] 이 키보드 위). 기둥이 화면보다 좁으면 `<html data-woori-side="1">` → 양옆 `--woori-side-bg`(#e9ebee)+옅은 그림자, APK 상태바·내비 바도 그 색 |
+| 토스트 | 영상에 없어 동작이 없는 단추·메뉴(공유·메모·☆(이체 완료 화면)·더보기·관리·모으기·🔍·카메라·＋연락처로 이체하기·추가이체·금액 화면 ⌄ 줄·사기의심조회·'비밀번호가 기억나지 않아요'·완료 화면 광고·홈 ⋮·홈 머리 아이콘(종 빼고)·공지·카드·배너 그림·추천·[다른 방법으로 로그인]·탭바 홈 외 탭 …)는 '답지에는 없는 화면이에요' (`wooriTodo`). 탭바 '홈' = 맨 위로. **프레임 모드·shot 모드에서는 토스트를 만들지 않는다** (화면 모양·shot 그대로). 실제로 동작하게 만든 것(설계): 이체 편집·☆, 알림(종) 편집, 홈·거래내역 계좌번호 복사(`wooriCopy` → '계좌번호가 복사되었어요'), 통장표기 편집. 토스트는 한 줄 최대 312dp, 낱말 안에서 줄을 바꾸지 않는다(`keep-all`) |
+| 누름 · 선택 | 길게 눌러도 글자가 선택되지 않는다 (`body` `user-select: none` · `-webkit-touch-callout: none`, 입력칸·textarea·contenteditable 은 다시 켬). dvh 를 모르는 옛 웹뷰는 `--woori-shell-h` 가 `100vh` 로 |
 | 키보드 | 삼성 키보드 재현은 끄고 진짜 시스템 키보드: 화면은 `wooriUsesSystemKeyboard()`(로컬 빌드 + 프레임 아님)일 때 재현 키보드를 그리지 않는다 (화면 몫) |
 | 화면 방향 | 세로 고정 (`android:screenOrientation="portrait"`). 가로로 돌리면 셸이 360dp 남짓으로 낮아져 인증서 키패드가 화면 밖으로 나가 로그인이 안 되던 것. 큰 화면(sw600dp 이상)은 Android 16 이 방향 고정을 무시하지만 '큰 화면' 맞춤이 받는다 |
 | 글꼴 크기 | 시스템 글꼴 크기를 따르지 않는다: `MainActivity` 가 웹뷰 `setTextZoom(100)` (기본은 100 × fontScale — 절대 위치 + px 줄 높이 레이아웃이라 글자만 커지면 겹친다). `configChanges` 에 `fontScale` 이 있어 글꼴 크기를 바꿔도 앱이 처음 화면으로 돌아가지 않는다 |

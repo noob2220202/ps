@@ -139,7 +139,7 @@ Done      { transactionId, occurredAt, holderName, to: {name, bankCode, bankName
 
 - `GET /api/banks` 그리드 21곳 = v2 '금융회사를 선택해 주세요' [은행] 탭 순서 (우리은행 · 농협은행 · 국민은행 / 카카오뱅크 · 신한은행 · 하나은행 / … / 수협은행 · 수협중앙회 · 신협).
   영상은 7줄까지만 보였고 스크롤하지 않았다 → 그 아래 은행은 없다. `type=securities` 는 빈 배열 ([증권사] 탭은 누르지 않음).
-  그리드 밖 기관(`all=1`): 지역농축협(`NHLOCAL`, 최근입금계좌·조회 결과, 로고는 농협 마크), 한국씨티(`CITI`, 추천 칩에만 나옴, 로고 없음).
+  그리드 밖 기관(`all=1`): 지역농축협(`NHLOCAL`, 최근입금계좌·조회 결과, 로고는 농협 마크), 한국씨티(`CITI`, 추천 칩에만 나옴, 로고 = 추천 칩에서 딴 그림 `bank-citi`).
 - `logo` 는 프론트 에셋 이름 (inventory assets `bank-woori` … `bank-cu`).
 - `POST /api/lookup`: '농협은행'(`NH`)을 골라도 지역농축협 계좌면 실제 기관 `NHLOCAL` 로 바뀐다 (하나 답지와 같은 처리).
   `firstTime` = 이 앱으로 그 (기관, 계좌)에 보낸 적이 없음 → '처음 보내는 계좌예요. 사기의심조회' 칩 (v2 카카오뱅크 = true, v1 지역농축협 = false).
