@@ -8,6 +8,7 @@
 //     라벨 15/500 --woori-text-secondary 왼쪽 20 · 값 15/500 자간 −0.5px tabular 오른끝 340 · 글자 top = 행 위끝 + 16.333
 //   마지막 행 아래끝 + 46: '…' 검색하기 16/500 + › (333, 글자 top + 1, 8×13)
 //   하단 바 726–800.667 흰색: [공유] x16 w102.333 · [확인] x126.333 w217.667, top 728.667 h56 r12
+//   키가 다른 화면(APK, 640–900dp): 하단 바·단추는 페이지 아래끝에 붙고 내용 스크롤 영역은 머리 아래 ~ 하단 바 위 (CSS --woori-page-h — 프레임 모드는 영상 값 그대로)
 // 열기 3.1: translateY 100dp → 0 + opacity 0 → 1, 둘 다 cubic-bezier(0,0,0.2,1) 265ms.
 // 닫기 3.3: translateY 0 → 96dp cubic-bezier(0,0,0.2,1) 240ms + opacity 1 → 0 같은 곡선 260ms.
 //   목록 위 흰 막(열기 0 → 0.69 linear 330ms · 닫기 0.69 → 0 linear 271ms +30ms)은 목록(WooriHistory)이 그린다 — WooriNav 의 rise/sink 에는 베일이 없다.
@@ -147,7 +148,7 @@ export default function WooriHistoryDetail() {
   return (
     <div className="woori-hd">
       <div ref={scrollRef} className="woori-hd__scroll woori-scroll-fix">
-        <div className="woori-hd__content woori-scroll-fix__content" style={{ height: Math.max(674, Math.ceil(searchTop + 108 - HEADER_H)) }}>
+        <div className="woori-hd__content woori-scroll-fix__content" style={{ height: Math.ceil(searchTop + 108 - HEADER_H) }}>
           {detail && (
             <>
               <p className="woori-hd__name" style={at(20, 88)}>

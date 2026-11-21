@@ -293,6 +293,7 @@ describe('banks / suggest', () => {
     assert.deepEqual((await srv.get('/banks?type=securities')).body, []);
     const all = (await srv.get('/banks?all=1')).body;
     assert.deepEqual(all.slice(21).map((b) => [b.code, b.short, b.inGrid]), [['NHLOCAL', '지역농축협', false], ['CITI', '한국씨티', false]]);
+    assert.deepEqual(all.filter((b) => !b.logo).map((b) => b.code), []); // 한국씨티도 로고 = 추천 칩 그림 bank-citi
     assert.equal((await srv.get('/banks?type=card')).status, 400);
   });
 
@@ -317,6 +318,7 @@ describe('banks / suggest', () => {
     const r = await srv.get('/banks/suggest?digits=13');
     assert.deepEqual(r.body[1], { code: 'KAKAO', name: '카카오뱅크', logo: 'bank-kakao' });
     assert.deepEqual(r.body.map((c) => c.code), ['WOORI', 'KAKAO', 'NH']);
+    assert.deepEqual((await srv.get('/banks/suggest?digits=4')).body[1], { code: 'CITI', name: '한국씨티', logo: 'bank-citi' });
     for (const q of ['', 'digits=-1', 'digits=abc', 'digits=4&seq=v1']) assert.equal((await srv.get(`/banks/suggest?${q}`)).status, 400, q);
   });
 });

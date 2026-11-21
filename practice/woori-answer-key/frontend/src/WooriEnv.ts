@@ -6,7 +6,7 @@
 // 이 모듈이 가진 실제 앱(프레임 모드 아님) 몫 세 가지 — 프레임 모드·shot 모드에서는 아무것도 하지 않는다 (영상 비교 화면이 바뀌지 않게):
 //   1. 뒤로 처리 스택 useWooriBack — 폰 뒤로 버튼(WOORI_BACK_EVENT)을 열린 대화상자 > 시트·팝업 > 페이지(머리 ‹·✕) 순서로 하나만 받는다
 //   2. 토스트 wooriToast · wooriTodo('답지에는 없는 화면이에요') — App 이 셸 안에 그린다 (WooriToastHost)
-//   3. 큰 화면 맞춤 installWooriFit — 앱(360dp 기준 레이아웃) 전체를 확대해 태블릿 화면 높이를 채운다 (아래 '화면 맞춤')
+//   3. 화면 맞춤 installWooriFit — 앱(360dp 기준 레이아웃) 전체를 화면 폭·높이에 맞춰 확대·축소한다 (레이아웃 높이 640dp 바닥, 아래 '화면 맞춤')
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
 import { isFrameMode, readShot } from './WooriNav.ts'
 
@@ -179,12 +179,18 @@ export function useWooriToast(): WooriToastItem | null {
 
 /* ───────────────────────── 3. 화면 맞춤 (프레임 모드 아님) ───────────────────────── */
 //
-// 앱 안 레이아웃은 늘 360dp 폭 기준이다. 넓은 화면에서는 셸(앱 뷰포트)을 transform: scale(k) 로 키운다 (위끝 가운데 기준):
-//   폰 모양(폭을 채워도 높이가 600dp 이상 남는 화면): k = max(1, 폭/360) → 폭을 꽉 채운다 (360x800 · 412x915 · 384x854 → 1 · 1.144 · 1.067)
-//   그 밖(태블릿 세로·가로, 폴더블): k = max(1, min(폭/360, 높이/800)) → 폰 비율 기둥이 화면 높이를 채운다 (800x1280 → 1.6, 1280x800 → 1)
-//   셸 레이아웃 높이 = 지금 높이 / k. 시스템 키보드가 떠서 웹뷰 높이만 줄면 k 는 그대로(그 폭에서 본 가장 큰 높이로 정한다) → 앱만 위로 줄어든다.
+// 앱 안 레이아웃은 늘 360dp 폭 기준이고, 셸 레이아웃 높이는 640dp 아래로 내리지 않는다 (화면들은 640–900dp 높이에서 맞게 그린다).
+// 360dp 가 아닌 화면에서는 셸(앱 뷰포트)을 360dp 폭 그대로 두고 transform: scale(k) 로 키우거나 줄인다 (위끝 가운데 기준):
+//   폰 모양(폭을 채워도 높이가 640dp 이상 남는 화면): k = 폭/360 → 폭을 꽉 채운다 (360x800 · 412x915 · 384x854 → 1 · 1.144 · 1.067,
+//     글자 크게 보기로 폭이 좁아진 320x690 → 0.889: 줄여서 360dp 를 다 보인다)
+//   그 밖(태블릿 세로·가로, 폴더블, 키 작은 화면): 폰 비율 기둥 — k = min(폭/360, max(높이/800, min(1, 높이/640)))
+//     높이 800 이상 → 높이/800 (기둥 높이 800dp 로 화면을 채운다: 800x1280 → 1.6, 1280x800 → 1)
+//     640–800 → 1 (레이아웃 높이 = 화면 높이) · 640 아래 → 높이/640 (레이아웃 높이 640dp 를 줄여 보인다: 360x600 → 0.9375, 320x568 → 0.8875)
+//   셸 레이아웃 높이 = 지금 높이 / k. 시스템 키보드가 떠서 웹뷰 높이만 줄면 k 는 그대로(그 폭에서 본 가장 큰 높이로 정한다) → 앱만 위로 줄어든다
+//   (그동안은 640 아래일 수 있다 — 화면이 키보드 위로 줄어드는 것은 시스템 키보드 몫).
 //   기둥이 화면보다 좁으면 양옆 바탕(--woori-side-bg)이 보이고 <html data-woori-side="1"> — APK 는 상태바·내비 바도 그 색 (WooriLocalMenu).
-// 결과는 <html data-woori-fit="scale">(k > 1 일 때) + --woori-fit-scale · --woori-shell-h. 포인터 좌표를 앱 dp 로 바꿀 때는 wooriFitScale() 로 나눈다.
+// 결과는 <html data-woori-fit="scale">(k ≠ 1 일 때) + --woori-fit-scale · --woori-shell-h. 포인터 좌표를 앱 dp 로 바꿀 때는 wooriFitScale() 로 나눈다
+// (k < 1 도 같다. 셸 getBoundingClientRect 폭 ÷ offsetWidth 로 재도 된다 — WooriLocal appPoint).
 
 export interface WooriFit {
   scale: number
@@ -197,8 +203,8 @@ export interface WooriFit {
 
 const COL_W = 360
 const COL_H = 800
-/** 폭을 꽉 채워도 이만큼(dp) 높이가 남으면 폰으로 보고 폭을 채운다 */
-const PHONE_MIN_H = 600
+/** 셸 레이아웃 높이의 바닥 (dp). 폭을 꽉 채워도 이만큼 높이가 남으면 폰으로 보고 폭을 채운다 */
+const MIN_H = 640
 
 let fitNow: WooriFit = { scale: 1, side: false, width: 0, height: 0 }
 const fitSubs = new Set<() => void>()
@@ -211,9 +217,8 @@ export function wooriFitScale(): number {
 /** 폭·높이(CSS px) → 배율. stableH = 그 폭에서 본 가장 큰 높이 (키보드로 줄어든 높이는 쓰지 않는다) */
 export function wooriFitScaleFor(width: number, stableH: number): number {
   const kw = width / COL_W
-  if (kw <= 1) return 1
-  if (stableH / kw >= PHONE_MIN_H) return kw
-  return Math.max(1, Math.min(kw, stableH / COL_H))
+  if (stableH / kw >= MIN_H) return kw
+  return Math.min(kw, Math.max(stableH / COL_H, Math.min(1, stableH / MIN_H)))
 }
 
 let fitInstalled = false
@@ -235,7 +240,7 @@ export function installWooriFit(): void {
     } else stableH = Math.max(stableH, h)
     const k = Math.round(wooriFitScaleFor(w, stableH) * 10000) / 10000
     const side = COL_W * k < w - 1
-    if (k > 1.0001) {
+    if (Math.abs(k - 1) > 0.0001) {
       root.dataset.wooriFit = 'scale'
       root.style.setProperty('--woori-fit-scale', String(k))
       root.style.setProperty('--woori-shell-h', `${Math.round((h / k) * 1000) / 1000}px`)

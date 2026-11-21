@@ -71,6 +71,33 @@
   color: var(--woori-text);
 }
 
+/* 그리드 스크롤 상자: 탭 아래(GRID_TOP 175) ~ 페이지 아래끝. 안쪽 높이 = 마지막 줄 아래끝 + 20 − 175 (WooriSendBank.tsx BankGrid) */
+.woori-send-bank__grid {
+  position: absolute;
+  left: 0;
+  top: 175px;
+  bottom: 0;
+  width: 360px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none; /* 안드로이드는 오버레이 스크롤바 */
+}
+
+.woori-send-bank__grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* 프레임 모드(영상 비교)는 스크롤 상자가 아니다 — 영상은 스크롤하지 않았다 (7번째 줄이 셸 아래끝에서 잘린 채, 페이지 overflow:clip).
+   스크롤 상자로 두면 기기 화소 반올림을 막는 맞춤(useWooriScrollFix)의 이동·되돌림이 타일 둥근 모서리 경계를 1 레벨 바꾼다 (실측 ≈800 px)
+   → 맞춤도 스크롤도 없이 페이지에 바로 그린 것과 같게 (bank-render·bank-idle 픽셀 그대로) */
+:root[data-frame='1'] .woori-send-bank__grid {
+  overflow: visible;
+}
+
+.woori-send-bank__grid-content {
+  position: relative;
+}
+
 .woori-send-bank__tile {
   border-radius: 12px;
   background: var(--woori-surface);

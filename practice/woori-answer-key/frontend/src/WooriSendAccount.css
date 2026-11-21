@@ -68,21 +68,23 @@
   color: var(--woori-placeholder);
 }
 
-/* 보이지 않는 입력칸 (포커스·실제 폰 시스템 키보드·데스크톱 타이핑). 그리는 것은 값 span 과 직접 그린 커서 */
+/* 보이지 않는 입력칸 (포커스·실제 폰 시스템 키보드·데스크톱 타이핑). 그리는 것은 값 span 과 직접 그린 커서.
+   글자는 값 span 과 같은 자리·크기 (left 20 · 22/600, 줄 가운데 148) → 안드로이드 캐럿·선택 손잡이가 보이는 숫자 위에 뜬다 */
 .woori-send-account__input {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 20px;
   border: 0;
   outline: none;
   opacity: 0;
   color: transparent;
   caret-color: transparent;
   background: transparent;
-  font-size: 16px;
+  font-size: 22px;
+  font-weight: 600;
 }
 
 /* 커서: 1dp × 26.333 (#2b292e), 깜빡임 ≈500ms (caret-blink, 비교는 마스크) */

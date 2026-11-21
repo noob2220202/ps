@@ -4,6 +4,8 @@
 //   push(바텀시트 아님): 계좌번호 페이지의 '은행/증권사 선택' 탭 → 이 페이지가 easeOutCubic 322ms 로 들어옴 (아래 페이지 베일 한 프레임에 0.8).
 //   들어오는 동안 제목 + 회색 탭만 → +344ms ✕·선택 알약 → +419ms 그리드(타일·이름·로고 6개) → 로고 단계 +58/+75/+108/+133/+179ms (페이드 없음).
 //   타일 탭 → 눌림 없이 한 프레임에 계좌번호 페이지로 (go(-1) instant, 고른 은행은 WooriSendFlow 로 넘긴다). 증권사 탭은 영상에 없음 → 빈 목록(설계).
+//   그리드는 탭 아래 자기 스크롤 상자 (실제 앱만, 설계 — 영상은 스크롤하지 않았고 7번째 줄이 셸 아래끝 800.667 에서 잘린다). 키 작은 폰에서도
+//   마지막 줄까지 밀어 올려 고를 수 있게. ✕·제목·탭은 그 자리에 남는다. 프레임 모드는 영상처럼 스크롤 없이 페이지에 바로 그린다 (WooriSendBank.css).
 import { useCallback, useEffect, useState } from 'react'
 import './WooriSendBank.css'
 import { wooriApi, type BankChip } from './WooriApi.ts'
@@ -35,6 +37,10 @@ const ROW0 = 191.167
 const ROW_PITCH = 90.167
 /** 이름 글자 상자 top (줄마다, keep.bankGridDp.nameTop) */
 const NAME_TOP = [245, 335, 426, 516, 606, 696, 786] as const
+/** 그리드 스크롤 상자 위끝 = 탭 바탕 아래끝 167 + 8 (타일 사이 틈만큼, 설계). 안쪽 좌표 = 페이지 dp − GRID_TOP (정수라 소수 자리는 그대로) */
+const GRID_TOP = 175
+/** 마지막 줄 아래 여백 (설계 — 좌우 여백 20 과 같게) */
+const GRID_PAD = 20
 
 interface BankShot {
   stage: number
@@ -81,9 +87,19 @@ function BankView({ stage, banks, tab, onTab, onClose, onPick }: BankViewProps) 
         <button type="button" role="tab" aria-selected={sel === 0} aria-label="은행" className="woori-send-bank__tab" style={{ left: 22, top: 125, width: 158, height: 40 }} onClick={() => onTab?.('bank')} />
         <button type="button" role="tab" aria-selected={sel === 1} aria-label="증권사" className="woori-send-bank__tab" style={{ left: 180, top: 125, width: 158, height: 40 }} onClick={() => onTab?.('securities')} />
       </div>
-      {stage >= 2 &&
-        tab === 'bank' &&
-        banks?.map((b, i) => {
+      {stage >= 2 && tab === 'bank' && banks?.length ? <BankGrid stage={stage} banks={banks} onPick={onPick} /> : null}
+    </div>
+  )
+}
+
+/** 3열 타일 — 탭 아래 스크롤 상자 (위끝 GRID_TOP, 아래끝 페이지 아래끝. 안쪽 높이 = 마지막 줄 아래끝 + GRID_PAD) */
+function BankGrid({ stage, banks, onPick }: { stage: number; banks: SendBank[]; onPick?: (b: SendBank) => void }) {
+  const rows = Math.ceil(banks.length / 3)
+  const height = Math.ceil(ROW0 + (rows - 1) * ROW_PITCH + TILE_H + GRID_PAD) - GRID_TOP
+  return (
+    <div className="woori-send-bank__grid">
+      <div className="woori-send-bank__grid-content" style={{ height }}>
+        {banks.map((b, i) => {
           const col = i % 3
           const row = Math.floor(i / 3)
           const x = COLS[col]
@@ -92,14 +108,15 @@ function BankView({ stage, banks, tab, onTab, onClose, onPick }: BankViewProps) 
           const showLogo = logo && stage >= 2 + (LOGO_STAGE[b.code] ?? 0)
           return (
             <div key={b.code} className="woori-send-bank__cell">
-              <button type="button" className="woori-send-bank__tile" style={fbox(x, y, TILE_W, TILE_H)} onClick={() => onPick?.(b)} aria-label={b.name} />
-              {showLogo && <img className="woori-send-bank__logo" src={artSrc(logo)} alt="" style={fbox(x + 34.667, y + 11.667, 32, 32)} />}
-              <span className="woori-send-bank__name" style={textAt(x + TILE_W / 2, NAME_TOP[row] ?? y + 54)}>
+              <button type="button" className="woori-send-bank__tile" style={fbox(x, y - GRID_TOP, TILE_W, TILE_H)} onClick={() => onPick?.(b)} aria-label={b.name} />
+              {showLogo && <img className="woori-send-bank__logo" src={artSrc(logo)} alt="" style={fbox(x + 34.667, y + 11.667 - GRID_TOP, 32, 32)} />}
+              <span className="woori-send-bank__name" style={textAt(x + TILE_W / 2, (NAME_TOP[row] ?? y + 54) - GRID_TOP)}>
                 {b.name}
               </span>
             </div>
           )
         })}
+      </div>
     </div>
   )
 }

@@ -16,6 +16,25 @@
 .woori-amt__layer > * {
   pointer-events: auto;
 }
+/* 층 안의 층(통장표기 묶음)은 다시 누름을 지나보낸다 — 위 규칙이 덮어 화면 전체가 머리 ‹·취소를 가리던 것 */
+.woori-amt__layer > .woori-amt__layer {
+  pointer-events: none;
+}
+
+/* 아래끝 기준 층 (키패드 · 폼 버튼 묶음): 영상 셸(800.667dp) 한 장을 페이지 아래끝에 맞춰 둔다 → 키 작은 폰(APK)에서도
+ * 키패드·[확인]·[다음]이 아래에 붙어 다 보인다. 안의 자리는 영상 dp 그대로. 프레임 모드는 top 0 (WooriLayout wooriBottomTop) */
+.woori-amt__layer--bottom {
+  top: calc(var(--woori-page-h) - 800.667px);
+  bottom: auto;
+  height: 800.667px;
+}
+
+/* 보이지 않는 누름 상자 (설계): 폼 단계 금액 줄 → 키패드로 · 통장표기 줄 → 편집 시트 */
+.woori-amt__hit {
+  position: absolute;
+  left: 0;
+  width: 360px;
+}
 
 /* 키패드가 열린 동안 머리 아래 내용이 1기기px(0.333dp) 위 (3.1 S6) */
 .woori-amt__upper--keypad {
@@ -400,4 +419,82 @@
 }
 .woori-amt__pw-error {
   color: #e2412e;
+}
+
+/* ── 통장표기 편집 시트 (설계 — 영상에 없음. 중복 경고 시트와 같은 모양, 글자는 시스템 키보드) ── */
+.woori-amt__label-sheet {
+  height: 252px;
+  border-radius: 24px 24px 0 0;
+}
+.woori-amt__label-input {
+  position: absolute;
+  left: 20px;
+  top: 92px;
+  box-sizing: border-box;
+  width: 320px;
+  height: 48px;
+  margin: 0;
+  padding: 0 52px 0 0;
+  border: 0;
+  border-bottom: 1.5px solid var(--woori-divider, #ebebeb);
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--woori-text);
+  caret-color: var(--woori-primary);
+}
+.woori-amt__label-input:focus {
+  border-bottom-color: var(--woori-primary);
+}
+.woori-amt__label-input::placeholder {
+  color: var(--woori-placeholder);
+}
+.woori-amt__label-count {
+  position: absolute;
+  right: 20px;
+  top: 109px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--woori-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* ── 이체 오류 안내 시트 (설계 — 네이티브 alert 대신. ⚠ + 문구 + [확인], 문구 줄 수만큼 높이가 는다) ── */
+.woori-amt__alert {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 16px 18px;
+  border-radius: 24px 24px 0 0;
+}
+.woori-amt__alert .woori-amt__warn {
+  position: relative;
+  left: auto;
+  top: auto;
+  flex: none;
+}
+.woori-amt__alert-text {
+  margin: 30px 4px 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  color: var(--woori-text);
+}
+.woori-amt__alert-ok {
+  flex: none;
+  width: 328px;
+  height: 56px;
+  margin-top: 36px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
 }

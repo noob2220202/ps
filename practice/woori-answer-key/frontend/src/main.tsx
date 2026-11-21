@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import { installWooriFit } from './WooriEnv.ts'
-import { readShot, WOORI_MOTION, type WooriTransition, type WooriTransitionKind } from './WooriNav.ts'
+import { readShot, WOORI_FRAME_KEY, WOORI_MOTION, type WooriTransition, type WooriTransitionKind } from './WooriNav.ts'
 import { markShotReady, registeredShots } from './WooriShot.ts'
 import { getFrameBands, getTheme, setThemeOverride, initTheme, WOORI_TOKEN_SOURCE, type WooriBands, type WooriThemeName } from './WooriTheme.ts'
 
@@ -34,8 +34,6 @@ declare global {
   }
 }
 
-const FRAME_KEY = 'woori.frame'
-
 /**
  * 프레임 모드: ?frame=1 이면 <html data-frame="1"> → 위 31dp 스페이서 + 앱 셸(360 x 800.667dp, 보정 transform) + 아래 48dp 스페이서.
  * 360x880 뷰포트를 DSF 16/11 로 찍으면 524x1280 = 영상 프레임 1:1 (tools/woori-units.cjs FRAME_MODE). 세션 동안 유지되고 ?frame=0 으로 끈다.
@@ -45,9 +43,9 @@ function initFrameMode(search: string) {
   const q = new URLSearchParams(search).get('frame')
   let on = false
   try {
-    if (q === '1') window.sessionStorage.setItem(FRAME_KEY, '1')
-    else if (q === '0') window.sessionStorage.removeItem(FRAME_KEY)
-    on = window.sessionStorage.getItem(FRAME_KEY) === '1'
+    if (q === '1') window.sessionStorage.setItem(WOORI_FRAME_KEY, '1')
+    else if (q === '0') window.sessionStorage.removeItem(WOORI_FRAME_KEY)
+    on = window.sessionStorage.getItem(WOORI_FRAME_KEY) === '1'
   } catch {
     on = q === '1'
   }
@@ -66,7 +64,7 @@ function initShotMode(search: string) {
 initFrameMode(window.location.search)
 initTheme(window.location.search)
 initShotMode(window.location.search)
-// 프레임 모드가 아니면 큰 화면 맞춤 (태블릿: 360dp 기준 앱 전체를 확대해 화면 높이를 채운다 — WooriEnv)
+// 프레임 모드가 아니면 화면 맞춤 (360dp 기준 앱 전체를 화면 폭에 맞춰 확대·축소, 레이아웃 높이는 640dp 아래로 내리지 않는다 — WooriEnv)
 installWooriFit()
 
 // 글꼴 로드 완료 표시: html[data-fonts-ready="1"]

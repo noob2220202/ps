@@ -3,12 +3,14 @@
 //   ✕ / 제목 22/700 / 입력칸(값·안내 22/600, 커서, ⓧ, 밑줄 + 포커스 밑줄) / 은행/증권사 선택(⌄, 밑줄 + 포커스 밑줄) / 추천 은행 칩 / [확인]
 //   흐름 (v2 63.742–74.214, 들어온 순간 = push 곡선 시작 기준):
 //     +360ms 입력칸 자동 포커스: 진한 밑줄이 가운데에서 양쪽으로 easeInOutCubic 404ms · +900ms 삼성 키보드 올라옴(프레임 모드, WooriKeyboard)
-//     숫자 → 값 끝에 추가(13자리까지) · ⓧ · 자리수별 추천 칩 (wooriApi.suggestBanks — 영상 순서표 재생, D7)
+//     숫자 → 값 끝에 추가(16자리까지, 영상은 13자리) · ⓧ · 자리수별 추천 칩 (wooriApi.suggestBanks — 영상 순서표 재생, D7)
 //     은행/증권사 선택 탭 → 포커스 한 프레임에 풀림 → 키보드 내려감 → +134ms 금융회사 페이지 push (베일 한 프레임에 0.8)
 //     은행 고름(금융회사 페이지가 go(-1) instant) → 은행 칸 채움 + [확인] + 281ms 뒤 은행 칸 밑줄 펴짐
 //     [확인] 눌림 #185ba4 167ms → +118ms 스피너·은행 칸 밑줄 꺼짐 → 계좌 조회(wooriApi.lookup) → 누름 +1013ms 이 페이지가 한 프레임에 사라지고
 //     '어디로 이체' 가 베일 0.8 아래 드러남(reveal, 216ms 뒤 linear 311ms 로 걷힘) → 그 페이지가 509ms 뒤 금액 페이지(/send/amount?bank=<spec 코드 kakao·nh-local>&acct=<숫자>)로.
-//   키보드: 프레임 모드에서만 앱이 그린다 (입력칸 inputMode="none"). 실제 폰은 inputMode="numeric" 시스템 키보드.
+//   키보드: 프레임 모드에서만 앱이 그린다 (입력칸 inputMode="none"). 실제 폰은 inputMode="numeric" 시스템 키보드 —
+//     보이지 않는 입력칸의 캐럿은 늘 값 끝 (그린 커서 자리. 탭·화살표로 옮겨진 캐럿에 숫자가 끼어들지 않게, 설계).
+//   설계(영상에 없음): 조회 중 ✕·폰 뒤로 = 조회를 끊고 닫는다 (끊긴 조회는 금액 페이지로 가지 않는다) · 번호를 고치면 조회 오류 글자를 지운다.
 // 입력값은 사람이 친 숫자다 — 이 파일에는 계좌번호를 쓰지 않는다 (shot 의 입력값은 자리수만 맞춘 채움 숫자, 비교에서는 개인정보 마스크).
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import './WooriSendAccount.css'
@@ -31,8 +33,8 @@ export interface SendBank {
   logo: string | null
 }
 
-const MAX_DIGITS = 13
-
+/** 입력 자리수 상한 (설계 — 영상은 13자리에서 멈춤). 실제 계좌번호는 14자리(국민·지역농축협 등)·16자리도 있어 backend 조회(6–16자리)와 같게 */
+const MAX_DIGITS = 16
 
 /** 흐름 시각 (ms, push 곡선 시작 기준 — 3.2·3.3·9.7) */
 const T_FOCUS = 360
@@ -232,6 +234,15 @@ export function WooriSendAccountView({
   )
 }
 
+/**
+ * 보이지 않는 입력칸의 캐럿을 값 끝으로 (시스템 키보드·데스크톱 타이핑). 그린 커서는 늘 끝에 있는데, 탭·화살표로 캐럿이 숫자 사이에 가면
+ * 다음 숫자가 보이지 않는 자리에 끼어든다. 끌어서 고른 범위(복사·붙여넣기)는 그대로 둔다
+ */
+function caretToEnd(el: HTMLInputElement) {
+  const n = el.value.length
+  if (el.selectionStart === el.selectionEnd && el.selectionStart !== n) el.setSelectionRange(n, n)
+}
+
 /** 금융회사 페이지 push (베일은 한 프레임에 0.8) */
 const PUSH_BANK = {
   kind: 'push',
@@ -275,6 +286,8 @@ export default function WooriSendAccount() {
   const [pressed, setPressed] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // [확인] 누름부터 금액 페이지로 갈 때까지의 조회 (그 사이 타이머들). ✕·폰 뒤로·페이지 내림이 끊는다
+  const lookingUp = useRef<{ timers: number[] } | null>(null)
 
   // shot: 고른 은행(카카오뱅크)·push 아래 페이지 데이터
   const banks = useBanks(!!s?.bank)
@@ -341,79 +354,103 @@ export default function WooriSendAccount() {
   }, [])
 
   const activate = useCallback(() => {
-    if (busy) return
+    if (lookingUp.current) return
     setActive(true)
     setFocusLine(true)
     setBankFocus(false)
     setKbOpen(true)
     focusInput()
-  }, [busy, focusInput])
+  }, [focusInput])
+
+  // 번호를 고치면(숫자·⌫·ⓧ·시스템 키보드) 지난 조회 오류는 지운다 — 오류는 그때 번호에 대한 것이다
+  const edit = useCallback((next: (v: string) => string) => {
+    setValue(next)
+    setError(null)
+  }, [])
 
   const onKey = useCallback(
     (k: WooriKeyName) => {
-      if (k.length === 1) setValue((v) => (v.length >= MAX_DIGITS ? v : v + k))
-      else if (k === 'backspace') setValue((v) => v.slice(0, -1))
+      if (k.length === 1) edit((v) => (v.length >= MAX_DIGITS ? v : v + k))
+      else if (k === 'backspace') edit((v) => v.slice(0, -1))
       else if (k === 'go') blur()
     },
-    [blur],
+    [edit, blur],
   )
 
   const openBanks = useCallback(() => {
-    if (busy) return
+    if (lookingUp.current) return
     blur()
     setBankFocus(false)
     window.setTimeout(() => go('/send/account/bank', { transition: PUSH_BANK }), T_BANK_PUSH)
-  }, [busy, blur, go])
+  }, [blur, go])
 
   const pickChip = useCallback(
     (c: BankChip) => {
-      if (busy) return
+      if (lookingUp.current) return
       blur()
       setBank(chipToBank(c))
       setError(null)
       window.setTimeout(() => setBankFocus(true), T_BANK_LINE)
     },
-    [busy, blur],
+    [blur],
   )
 
+  /** 진행 중인 조회를 끊는다: 남은 타이머(눌림·스피너·금액 페이지로 가기)를 지우고 [확인] 을 처음 모습으로 */
+  const cancelLookup = useCallback(() => {
+    const p = lookingUp.current
+    if (!p) return
+    lookingUp.current = null
+    for (const t of p.timers) window.clearTimeout(t)
+    setPressed(false)
+    setBusy(false)
+  }, [])
+  // 페이지가 내려가면(✕ 의 pop 이 끝남 등) 끊긴 조회가 나중에 금액 페이지로 가지 않게
+  useEffect(() => cancelLookup, [cancelLookup])
+
   const onClose = useCallback(() => {
+    cancelLookup()
     if (stepsBackTo('/send') === 1) go(-1, { transition: { kind: 'pop' } })
     else if (historyIndex() > 0) go(-1)
     else go('/send', { replace: true })
-  }, [go])
+  }, [cancelLookup, go])
 
-  // 폰 뒤로 버튼 = ✕ (시스템 키보드가 떠 있으면 Android 가 먼저 키보드를 내린다)
-  useWooriBack(top && !s && !busy ? onClose : null)
+  // 폰 뒤로 버튼 = ✕ (조회 중에도 — 조회를 끊고 닫는다. 시스템 키보드가 떠 있으면 Android 가 먼저 키보드를 내린다)
+  useWooriBack(top && !s ? onClose : null)
 
   const onConfirm = useCallback(() => {
-    if (busy || !bank) return
+    if (lookingUp.current || !bank) return
+    const p: { timers: number[] } = { timers: [] }
+    lookingUp.current = p
+    // 이 조회가 끊기지 않았을 때만 돈다
+    const later = (run: () => void, ms: number) => {
+      p.timers.push(window.setTimeout(() => lookingUp.current === p && run(), ms))
+    }
     const t0 = performance.now()
     setPressed(true)
-    window.setTimeout(() => setPressed(false), T_PRESS)
-    window.setTimeout(() => {
+    later(() => setPressed(false), T_PRESS)
+    later(() => {
       setBusy(true)
       setBankFocus(false)
     }, T_SPINNER)
     wooriApi
       .lookup(bank.code, value)
       .then((lookup) => {
-        const wait = Math.max(0, T_CLOSE - (performance.now() - t0))
-        window.setTimeout(() => {
+        later(() => {
           const url = amountUrl({ bankCode: lookup.bankCode, accountNumber: lookup.accountNumber })
           if (stepsBackTo('/send') === 1) {
             setSendNext(url, { lookup })
             go(-1, { transition: REVEAL })
           } else go(url, { replace: true, state: { lookup } })
-        }, wait)
+        }, Math.max(0, T_CLOSE - (performance.now() - t0)))
       })
       .catch((e: unknown) => {
-        const wait = Math.max(0, T_SPINNER + 50 - (performance.now() - t0))
-        window.setTimeout(() => {
+        later(() => {
+          lookingUp.current = null
           setBusy(false)
           setError(e instanceof WooriApiError && e.status === 404 ? '계좌번호를 다시 확인해 주세요' : '잠시 후 다시 시도해 주세요')
-        }, wait)
+        }, Math.max(0, T_SPINNER + 50 - (performance.now() - t0)))
       })
-  }, [busy, bank, value, go])
+  }, [bank, value, go])
 
   const shotBank = s?.bank ? (banks?.find((b) => b.code === SHOT_BANK_CODE) ?? null) : null
   const ready = chips != null && (!s?.bank || banks != null) && (!s?.push || under != null)
@@ -454,8 +491,13 @@ export default function WooriSendAccount() {
       inputMode={frame ? 'none' : 'numeric'}
       autoComplete="off"
       aria-label="계좌번호"
-      onChange={(e) => setValue(e.target.value.replace(/\D/g, '').slice(0, MAX_DIGITS))}
-      onFocus={() => {
+      onChange={(e) => {
+        const v = e.target.value.replace(/\D/g, '').slice(0, MAX_DIGITS)
+        edit(() => v)
+      }}
+      onSelect={(e) => caretToEnd(e.currentTarget)}
+      onFocus={(e) => {
+        caretToEnd(e.currentTarget)
         setActive(true)
         setFocusLine(true)
         setBankFocus(false)
@@ -480,7 +522,7 @@ export default function WooriSendAccount() {
       error={error}
       onClose={onClose}
       onClear={() => {
-        setValue('')
+        edit(() => '')
         focusInput()
       }}
       onInputTap={activate}

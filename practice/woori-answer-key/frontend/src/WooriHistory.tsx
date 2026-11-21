@@ -13,16 +13,18 @@
 //   [초기화] = 3개월·전체·최신순. 펼침·직접입력 칸은 시트를 위로 키운다 (기본 모양은 영상 그대로 — 프레임 shot 과 같다).
 //   필터 줄 글자 자리는 영상 값('3개월 · ? · 최신순')이면 영상 좌표, 다른 글자면 같은 오른끝에 맞춘 줄.
 // 폰 뒤로 버튼: 시트가 열려 있으면 닫기, 아니면 ‹ 와 같이 홈 (스펙 4.1 'OS 뒤로').
+// 기다리는 이동(‹ 676ms · [이체] 645ms · 출금 행 21ms)은 하나만 — 그 사이 행·시트·다른 이동을 누르면 앞의 것은 버린다 (언마운트·덮임도).
+// 계좌번호 복사 아이콘 = 클립보드 복사 + 토스트 (설계). 오버레이 스크롤바는 실제 앱에서 스크롤 상자 높이로 잰다 (키가 다른 화면).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import { artSrc } from './WooriArt.ts'
 import { wooriApi, type Account, type TxItem, type TxOrder, type TxPage, type TxPeriod, type TxTypeFilter } from './WooriApi.ts'
 import { WooriButton } from './WooriButton.tsx'
-import { useWooriBack, wooriTodo, wooriToast } from './WooriEnv.ts'
+import { useWooriBack, wooriCopy, wooriTodo, wooriToast } from './WooriEnv.ts'
 import { WooriHeader } from './WooriHeader.tsx'
 import { wooriPlace, wooriScrollTo } from './WooriLayout.ts'
 import { useWooriStages } from './WooriLoadingPage.tsx'
-import { useBackTo, useWooriLayer, useWooriNavigate, type WooriTransition } from './WooriNav.ts'
+import { isFrameMode, useBackTo, useWooriLayer, useWooriNavigate, type WooriTransition } from './WooriNav.ts'
 import { WooriOverlay, WooriSheet } from './WooriSheet.tsx'
 import { useShotReady, useShotState } from './WooriShot.ts'
 import { WooriSpinner } from './WooriSpinner.tsx'
@@ -72,7 +74,7 @@ const MONTH_HEADER_GAP = 142.87
 const HEADER_TO_ROW = 55.25
 const DIVIDER_BELOW_DATE = 96.15
 const FIRST_MONTH_BASELINE = 580
-/** 오버레이 스크롤바 (9.5) */
+/** 오버레이 스크롤바 (9.5): 영상 셸 800.667 에서 트랙 9.7 부터 780.667 (아래 10.3 남김) — 실제 앱은 보이는 높이 − 20 */
 const SB_TRACK_TOP = 9.7
 const SB_TRACK = 780.667
 const VIEWPORT_H = 800.667
@@ -261,6 +263,8 @@ export default function WooriHistory() {
   const queryKey = queryKeyOf(query)
   /** 지금 목록이 어느 조회조건으로 받은 것인지 */
   const [loadedKey, setLoadedKey] = useState<string | null>(null)
+  /** 오늘 (서버 시계) 'YYYY-MM-DD' — 직접입력 날짜 칸의 max·min. 직접입력 응답의 range.toDate 는 고른 종료일이라 오늘이 아니다 */
+  const [today, setToday] = useState<string | null>(null)
   const [filled, setFilled] = useState(true)
   const [busySpinner, setBusySpinner] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(s?.sheet != null)
@@ -283,9 +287,15 @@ export default function WooriHistory() {
   const rootRef = useRef<HTMLDivElement>(null)
   const sbRef = useRef<HTMLDivElement>(null)
   const timers = useRef<number[]>([])
+  /** 기다리는 이동 하나 (to = 갈 곳) */
+  const leave = useRef<{ to: string; id: number } | null>(null)
+  const topRef = useRef(top)
+  useEffect(() => {
+    topRef.current = top
+  }, [top])
 
   // 데이터: 계좌 + 목록 (cursor 를 끝까지 따라 받아 합친다)
-  const load = useCallback(async (q: HistQuery, signal?: AbortSignal) => {
+  const load = useCallback(async (q: HistQuery, needToday: boolean, signal?: AbortSignal) => {
     const accounts = await wooriApi.getAccounts(signal)
     const acct = accounts[0]
     let first: TxPage | null = null
@@ -299,18 +309,22 @@ export default function WooriHistory() {
       cursor = p.nextCursor
       if (!cursor) break
     }
-    return { acct, first: first as TxPage, all }
+    // 오늘 = 직접입력이 아닌 응답의 toDate. 직접입력부터 열었으면(URL — 오늘을 아직 모름) 이번달 한 건으로 묻는다 (실패해도 목록은 그대로 — 날짜 칸 max 만 없음)
+    let day = q.period === 'custom' ? null : (first as TxPage).range.toDate
+    if (!day && needToday) day = await wooriApi.getTransactions(acct.id, { period: 'thisMonth', limit: 1 }, signal).then((p) => p.range.toDate, () => null)
+    return { acct, first: first as TxPage, all, day }
   }, [])
 
   useEffect(() => {
     const ac = new AbortController()
     const key = queryKeyOf(query)
-    load(query, ac.signal)
-      .then(({ acct, first, all }) => {
+    load(query, today == null, ac.signal)
+      .then(({ acct, first, all, day }) => {
         setAccount(acct)
         setPage(first)
         setItems(all)
         setLoadedKey(key)
+        if (day) setToday(day)
       })
       .catch((e: unknown) => {
         if (ac.signal.aborted) return
@@ -319,13 +333,39 @@ export default function WooriHistory() {
         setLoadedKey(key)
       })
     return () => ac.abort()
-    // query 는 queryKey 가 같으면 같은 조건이다
+    // query 는 queryKey 가 같으면 같은 조건이다 (today 는 물을지 말지만 정한다 — 바뀌어도 다시 받지 않는다)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [load, queryKey])
 
-  useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), [])
+  useEffect(
+    () => () => {
+      timers.current.forEach((id) => window.clearTimeout(id))
+      if (leave.current) window.clearTimeout(leave.current.id)
+    },
+    [],
+  )
   const later = (fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms))
+  }
+  /** 기다리던 이동을 버린다 (다른 데로 갈 때) */
+  const cancelLeave = () => {
+    if (!leave.current) return
+    window.clearTimeout(leave.current.id)
+    leave.current = null
+    setBusySpinner(false)
+  }
+  /** 스피너를 띄우고 ms 뒤에 이동. 같은 곳으로 또 누르면(폰 뒤로 연타 등) 그대로, 다른 곳이면 앞의 것을 버리고 새로 */
+  const leaveLater = (to: string, fn: () => void, ms: number) => {
+    if (leave.current?.to === to) return
+    cancelLeave()
+    setBusySpinner(true)
+    const id = window.setTimeout(() => {
+      leave.current = null
+      setBusySpinner(false)
+      // 그 사이 다른 페이지가 위에 왔으면(숨은 메뉴의 이동 등) 가지 않는다
+      if (topRef.current) fn()
+    }, ms)
+    leave.current = { to, id }
   }
 
   const scroller = () => findScroller(rootRef.current)
@@ -350,9 +390,12 @@ export default function WooriHistory() {
       if (!sb) return
       const docH = el.scrollHeight
       const max = Math.max(1, docH - el.clientHeight)
-      const len = (SB_TRACK * VIEWPORT_H) / docH
+      // 보이는 높이: 프레임 모드는 영상 셸 값, 실제 앱은 스크롤 상자 높이 (APK 는 상태바·내비 바를 뺀 640–900dp)
+      const viewH = isFrameMode() ? VIEWPORT_H : el.clientHeight
+      const track = viewH - (VIEWPORT_H - SB_TRACK)
+      const len = (track * viewH) / docH
       sb.style.height = `${r4(len)}px`
-      sb.style.translate = `0 ${r4(SB_TRACK_TOP + ((SB_TRACK - len) * Math.min(st, max)) / max)}px`
+      sb.style.translate = `0 ${r4(SB_TRACK_TOP + ((track - len) * Math.min(st, max)) / max)}px`
       sb.classList.remove('is-fading')
       sb.style.opacity = '1'
       void sb.offsetWidth
@@ -367,6 +410,7 @@ export default function WooriHistory() {
 
   /* 동작 */
   const openSheet = () => {
+    cancelLeave()
     setPending(query)
     setDetailOpen(query.order !== 'desc')
     setSheetOpen(true)
@@ -406,20 +450,8 @@ export default function WooriHistory() {
       return { ...p, period, from: p.from ?? page?.range.fromDate, to: p.to ?? page?.range.toDate }
     })
   const closeSheet = () => setSheetOpen(false)
-  const onTransfer = () => {
-    setBusySpinner(true)
-    later(() => {
-      setBusySpinner(false)
-      go('/send')
-    }, TRANSFER_GO_MS)
-  }
-  const onBack = () => {
-    setBusySpinner(true)
-    later(() => {
-      setBusySpinner(false)
-      goHome()
-    }, BACK_GO_MS)
-  }
+  const onTransfer = () => leaveLater('/send', () => go('/send'), TRANSFER_GO_MS)
+  const onBack = () => leaveLater('/home', goHome, BACK_GO_MS)
   // 폰 뒤로 버튼: 시트는 WooriSheet onBack, 그 밖은 ‹ 와 같이 (들어오는 중 ‹ 가 아직 없어도)
   useWooriBack(top && !s ? onBack : null)
   const openRow = (item: TxItem) => {
@@ -428,10 +460,11 @@ export default function WooriHistory() {
       setVeil('in')
       go(`/history/${item.id}`, { transition: DETAIL_RISE, state: { type: item.type } })
     }
-    if (item.type === 'out') {
-      setBusySpinner(true)
-      later(open, 21)
-    } else open()
+    if (item.type === 'out') leaveLater(`/history/${item.id}`, open, 21)
+    else {
+      cancelLeave()
+      open()
+    }
   }
 
   /* 그리기 값 */
@@ -472,7 +505,14 @@ export default function WooriHistory() {
       {showSkeleton && <Skeleton />}
       {showContent && account && (
         <>
-          <AccountArea account={account} iconsOn={iconsOn} transferPressed={s?.transferPressed === true} onTransfer={onTransfer} onTodo={wooriTodo} />
+          <AccountArea
+            account={account}
+            iconsOn={iconsOn}
+            transferPressed={s?.transferPressed === true}
+            onTransfer={onTransfer}
+            onCopy={() => wooriCopy(`${account.bankName} ${account.number}`)}
+            onTodo={wooriTodo}
+          />
           {block(false)}
           {listShown && (
             <>
@@ -527,7 +567,7 @@ export default function WooriHistory() {
         <FilterSheet
           value={pending}
           detailOpen={detailOpen}
-          maxDate={page?.range.toDate}
+          maxDate={today ?? undefined}
           onSelect={(t) => setPending((p) => ({ ...p, type: t }))}
           onPeriod={pickPeriod}
           onOrder={(order) => setPending((p) => ({ ...p, order }))}
@@ -613,13 +653,16 @@ function AccountArea({
   iconsOn,
   transferPressed,
   onTransfer,
+  onCopy,
   onTodo,
 }: {
   account: Account
   iconsOn: boolean
   transferPressed: boolean
   onTransfer: () => void
-  /** 영상에 없는 단추 (WON 통장 ⌄ · 복사 · [모으기]) — 실제 앱에서만 토스트 */
+  /** 계좌번호 복사 (영상에 누르는 장면 없음 — 설계: '우리은행 1002-…' 를 클립보드로 + 토스트) */
+  onCopy: () => void
+  /** 영상에 없는 단추 (WON 통장 ⌄ · [모으기]) — 실제 앱에서만 토스트 */
   onTodo: () => void
 }) {
   return (
@@ -638,7 +681,7 @@ function AccountArea({
         <span>
           {account.bankShort} {account.number}
         </span>
-        {iconsOn && <img src="/woori/history/copy.svg" alt="" onClick={onTodo} />}
+        {iconsOn && <img src="/woori/history/copy.svg" alt="계좌번호 복사" onClick={onCopy} />}
       </div>
       <Text className="woori-hi__balance" style={place(0, 179.25)}>
         {won(account.balance)}
@@ -842,7 +885,7 @@ function sheetExtra(q: HistQuery, detailOpen: boolean) {
   return (q.period === 'custom' ? CUSTOM_H : 0) + (detailOpen ? DETAIL_H : 0)
 }
 
-/** 'YYYY-MM-DD' 오늘에서 1년 전 (직접입력 min, 설계값: 조회는 최근 1년까지가 아니어도 되지만 달력을 너무 넓히지 않는다) */
+/** 'YYYY-MM-DD' 오늘에서 n년 전 (직접입력 min, 설계값: 달력을 너무 넓히지 않는다) */
 function minusYears(iso: string | undefined, n: number) {
   if (!iso) return undefined
   return `${Number(iso.slice(0, 4)) - n}${iso.slice(4)}`

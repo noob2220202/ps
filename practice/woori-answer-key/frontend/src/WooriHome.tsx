@@ -9,14 +9,17 @@
 // 첫 진입(인증서 → /home): 로그인 로딩 0–768.5ms (흰 화면+탭바 → 76.3ms 캐릭터 대체 그림) → 홈 단계 그리기 (3.1, 한 프레임 교체 = 타이머)
 //   → 공지 줄 가로 정착 (3.2) → 팝업 (3.3, easeOutCubic 176ms) → 딤 뒤 다른 은행 카드·잔액 오도미터 (3.4·3.5) → [닫기] (3.6, linear 160ms).
 // 그 밖의 진입(돌아옴·바로 열기)은 떠날 때 모습(scrollTop·배너 n, sessionStorage)으로 바로 그린다 — 3.9·3.10 다시 그리기 단계는 아직 없음.
+//   첫 진입은 그 보관을 보지 않는다 (맨 위·배너 1 부터 — 되돌리기 뒤 다시 로그인해도 영상 순서 그대로).
 // 데이터는 WooriApi(getAccounts) 로만 받는다. 이름·계좌번호를 코드에 쓰지 않는다.
-// 실제 앱(프레임·shot 모드 아님) 몫: 영상에 없어 동작이 없는 곳(머리 아이콘·공지·칩·카드·배너 그림·추천·탭바 홈 외 탭 …)을 누르면
+// 실제 앱(프레임·shot 모드 아님) 몫: 영상에 없어 동작이 없는 곳(머리 아이콘·공지·칩·카드·⋮·배너 그림·추천·탭바 홈 외 탭 …)을 누르면
 //   '답지에는 없는 화면이에요' 토스트 (onClickCapture 한 곳에서 누른 자리 아래 요소로 가린다), 탭바 '홈' = 맨 위로.
+//   계좌번호 복사 아이콘 = 클립보드 + 토스트 (wooriCopy). 계좌 탭 스피너(643ms) 동안은 다른 누름을 받지 않는다.
+//   팝업 '오늘은 그만 보기' = 그날(서울 날짜) 첫 진입에는 팝업을 건너뛴다 (localStorage 'woori.popup.home').
 //   폰 뒤로 버튼: 팝업이 떠 있으면 [닫기] 와 같이 닫는다 (팝업이 없으면 WooriLocal 이 '한 번 더 누르면 종료').
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { artSrc, type WooriArtName } from './WooriArt.ts'
 import { wooriApi, type Account } from './WooriApi.ts'
-import { wooriFitScale, wooriLiveApp, wooriTodo } from './WooriEnv.ts'
+import { wooriCopy, wooriFitScale, wooriLiveApp, wooriTodo } from './WooriEnv.ts'
 import { useWooriScrollFix, wooriPlace, wooriScrollTo } from './WooriLayout.ts'
 import { isFrameMode, useWooriNavigate } from './WooriNav.ts'
 import { WooriSheet } from './WooriSheet.tsx'
@@ -479,7 +482,8 @@ function Balance({ amount, mode, odo, onRolled }: { amount: number; mode: Balanc
             <span
               className={'woori-home__odo-strip' + (mode === 'roll' ? ' is-rolling' : '')}
               style={vars}
-              onAnimationEnd={c === 0 ? onRolled : undefined}
+              // 굴림(620ms)이 끝날 때만 — 같이 도는 페이드(460ms)가 먼저 끝나므로 이름으로 가린다 (영상: 끝까지 굴러 자리잡음, 3.5 v1 표)
+              onAnimationEnd={c === 0 ? (e) => e.animationName === 'woori-home-odo-roll' && onRolled?.() : undefined}
             >
               {digits.map((d, k) => (
                 <span key={k} className="woori-home__odo-digit">
@@ -635,8 +639,8 @@ function scrollToExact(el: HTMLElement, want: number) {
 
 /* ───────────────────────── 오버레이 스크롤바 (3.18) ───────────────────────── */
 
+/** 트랙 = 스크롤 상자 위아래 10dp 안쪽 (영상 셸: 상자 0–740.667 → 트랙 10–730.667) */
 const SB_TRACK_TOP = 10
-const SB_TRACK = 720.667
 const SCROLL_VIEW = 740.667
 
 /* ───────────────────────── AI 아이콘 전역 시계 (3.8) ───────────────────────── */
@@ -686,11 +690,40 @@ function readFirstEntry(): boolean {
     return false
   }
 }
+/** 첫 진입 표시와 지난 로그인의 떠날 때 모습을 함께 지운다 (첫 진입 중 새로고침해도 옛 스크롤로 열리지 않게) */
 function clearFirstEntry() {
   try {
     sessionStorage.removeItem(ENTRY_KEY)
+    sessionStorage.removeItem(CACHE_KEY)
   } catch {
     /* 없음 */
+  }
+}
+
+/* ───────────────────────── 팝업 '오늘은 그만 보기' (설계 — 실제 앱만) ───────────────────────── */
+
+const POPUP_HIDE_KEY = 'woori.popup.home'
+/** 오늘 날짜 'YYYY-MM-DD' (서울 기준 — 기기 시간대와 상관없이 한국 하루로 센다) */
+function seoulToday(): string {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date())
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? ''
+  return `${part('year')}-${part('month')}-${part('day')}`
+}
+/** 오늘 '오늘은 그만 보기' 를 눌렀나. 프레임·shot 모드는 늘 false (영상의 첫 진입은 팝업이 뜬다) */
+function popupHiddenToday(): boolean {
+  if (!wooriLiveApp()) return false
+  try {
+    return localStorage.getItem(POPUP_HIDE_KEY) === seoulToday()
+  } catch {
+    return false
+  }
+}
+function hidePopupToday() {
+  if (!wooriLiveApp()) return
+  try {
+    localStorage.setItem(POPUP_HIDE_KEY, seoulToday())
+  } catch {
+    /* 저장 못 함 — 이번만 닫힌다 */
   }
 }
 
@@ -707,9 +740,11 @@ export default function WooriHome() {
   useEffect(() => {
     if (first) clearFirstEntry()
   }, [first])
-  const [cache] = useState(() => (shot ? null : readCache()))
+  // 첫 진입은 떠날 때 모습을 보지 않는다 (맨 위·배너 1 에서 3.1 단계부터)
+  const [cache] = useState(() => (shot || first ? null : readCache()))
   const stage = useWooriStages(FIRST_STAGES_MS, { start: first, shotStage: first ? null : FIRST_STAGES_MS.length })
-  const [popupDone, setPopupDone] = useState(false)
+  // '오늘은 그만 보기' 를 누른 날은 팝업 단계를 건너뛴다 (팝업 몫의 내비 검정도 함께 — navBlack)
+  const [popupDone, setPopupDone] = useState(() => first && popupHiddenToday())
   const [popupPressed, setPopupPressed] = useState(false)
   const [popupClosing, setPopupClosing] = useState(false)
   const [rolled, setRolled] = useState(false)
@@ -778,6 +813,8 @@ export default function WooriHome() {
   const [scrollTop, setScrollTop] = useState(shot?.state.scroll ?? cache?.scroll ?? 0)
   const [sb, setSb] = useState<'hidden' | 'shown' | 'fading'>(shot?.state.scrollbar ? 'shown' : 'hidden')
   const sbTimer = useRef(0)
+  // 스크롤 상자 높이: 영상 셸 740.667. 실제 앱은 셸 높이가 폰마다 달라(640–900) 스크롤할 때 잰 값으로 스크롤바 트랙을 맞춘다
+  const [viewH, setViewH] = useState(SCROLL_VIEW)
 
   // 레이아웃 (page y, 2.1·2.5 — 보이는 블록에 따라 아래가 붙는다)
   const lay = useMemo(() => {
@@ -838,9 +875,10 @@ export default function WooriHome() {
   }, [lay.panelEnd])
 
   const contentH = Math.round(lay.end * 1000) / 1000
-  const maxScroll = Math.max(0, contentH - SCROLL_VIEW)
-  const sbLen = (SB_TRACK * SCROLL_VIEW) / contentH
-  const sbTop = SB_TRACK_TOP + (maxScroll ? ((SB_TRACK - sbLen) * Math.min(scrollTop, maxScroll)) / maxScroll : 0)
+  const maxScroll = Math.max(0, contentH - viewH)
+  const sbTrack = viewH - 2 * SB_TRACK_TOP
+  const sbLen = (sbTrack * viewH) / contentH
+  const sbTop = SB_TRACK_TOP + (maxScroll ? ((sbTrack - sbLen) * Math.min(scrollTop, maxScroll)) / maxScroll : 0)
 
   // shot·돌아옴 스크롤 위치: 둔 뒤 실제 위치를 재서 남는 소수를 --woori-scroll-residual 로 (이 상자는 정수 CSS px 로 저장되는 경우가 있다)
   useLayoutEffect(() => {
@@ -855,6 +893,7 @@ export default function WooriHome() {
     if (!el) return
     setScrollTop(el.scrollTop)
     if (shot) return
+    if (wooriLiveApp()) setViewH(el.clientHeight)
     setSb('shown')
     window.clearTimeout(sbTimer.current)
     sbTimer.current = window.setTimeout(() => setSb('fading'), 390)
@@ -891,16 +930,23 @@ export default function WooriHome() {
     return () => cancelAnimationFrame(id)
   })
 
-  // 계좌 탭 → 홈 위 스피너 643ms → 거래내역 (3.11)
+  // 계좌 탭 → 홈 위 스피너 643ms → 거래내역 (3.11). 그새 홈이 내려가면 타이머를 지운다 (묵은 이동이 다음 화면에서 거래내역으로 보내지 않게)
+  const tapTimer = useRef(0)
+  useEffect(() => () => window.clearTimeout(tapTimer.current), [])
   const onAccountTap = () => {
     if (tapSpinner || shot) return
     setTapSpinner(true)
-    window.setTimeout(() => go('/history?type=all'), 643)
+    tapTimer.current = window.setTimeout(() => go('/history?type=all'), 643)
   }
 
   // 영상에 없는 곳 누름 → 토스트 (실제 앱만). 배너는 끌어 넘긴 직후의 click 은 빼다
   const swipedAt = useRef(-Infinity)
   const onTodoCapture = (e: ReactMouseEvent) => {
+    // 계좌 탭 스피너 동안은 다른 누름(종·이체·탭바 …)을 받지 않는다 — 곧 거래내역으로 간다
+    if (tapSpinner) {
+      e.stopPropagation()
+      return
+    }
     if (shot || !wooriLiveApp()) return
     const hit = homeTapKind(e.clientX, e.clientY)
     if (hit === 'banner' && performance.now() - swipedAt.current < 400) return
@@ -1034,7 +1080,21 @@ export default function WooriHome() {
                       <span>
                         {account.bankShort} {account.number}
                       </span>
-                      {view.wonUnit && <img src={artSrc('home.copy')} alt="" width={16} height={16} />}
+                      {view.wonUnit && (
+                        <img
+                          src={artSrc('home.copy')}
+                          alt="계좌번호 복사"
+                          role="button"
+                          width={16}
+                          height={16}
+                          onClick={(e) => {
+                            // 실제 앱만 (프레임 모드는 예전처럼 카드 탭으로 번진다)
+                            if (!wooriLiveApp()) return
+                            e.stopPropagation()
+                            wooriCopy(account.number)
+                          }}
+                        />
+                      )}
                     </span>
                   )}
                   {view.wonUnit && <Art name="home.kebab" x={296} y={14} w={24} h={24} className="woori-home__kebab" />}
@@ -1304,7 +1364,15 @@ export default function WooriHome() {
         </T>
         {view.popupImage && <Art name="home.home-popup-image" x={214} y={34} w={130} h={131} transform="translate(0.965px, 0.4167px) scale(1.002406, 1.002385)" />}
         <div className="woori-home__popup-bar">
-          <button type="button" className="woori-home__popup-btn" style={{ left: 0, width: 120 }} onClick={closePopup}>
+          <button
+            type="button"
+            className="woori-home__popup-btn"
+            style={{ left: 0, width: 120 }}
+            onClick={() => {
+              hidePopupToday()
+              closePopup()
+            }}
+          >
             <T x={15.969} y={15} size={14} weight={500} ls="-0.01em" color="#727274" ty={0.25}>
               오늘은 그만 보기
             </T>
@@ -1351,8 +1419,8 @@ const HOME_TODO = [
   '.woori-home__header > .woori-home__art',
   '.woori-home__popup',
 ].join(', ')
-/** WON 카드(누르면 거래내역) 안이지만 따로 동작 없는 것: ⋮ · 복사 */
-const HOME_TODO_IN_CARD = '.woori-home__kebab, .woori-home__won-acct img'
+/** WON 카드(누르면 거래내역) 안이지만 따로 동작 없는 것: ⋮ (CSS 가 이것만 누를 수 있게 둔다). 복사 아이콘은 자기 onClick (wooriCopy) */
+const HOME_TODO_IN_CARD = '.woori-home__kebab'
 /** 여기 닿으면 그 아래는 보지 않는다 (머리·탭바·시트가 내용을 덮는다) */
 const HOME_STOP = '.woori-home__header, .woori-home__content, .woori-sheet, .woori-tabbar, .woori-home'
 

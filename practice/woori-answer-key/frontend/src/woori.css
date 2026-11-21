@@ -12,13 +12,20 @@
   color-scheme: light;
   --woori-font: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
 
-  /* 셸(앱 뷰포트) 크기. 실제 앱: 화면 높이 그대로, 폭은 최대 360dp (넓은 화면은 아래 '큰 화면 맞춤'이 확대 — WooriEnv installWooriFit). 프레임 모드: 360 x 800.667 고정 */
+  /* 셸(앱 뷰포트) 크기. 실제 앱: 화면 높이 그대로, 폭은 최대 360dp (360dp 가 아닌 화면은 아래 '화면 맞춤'이 확대·축소 — WooriEnv installWooriFit).
+     프레임 모드: 360 x 800.667 고정. 높이 100vh 는 dvh 를 모르는 웹뷰(Chromium 108 전)용 — 변수에 dvh 를 그대로 넣으면 쓰는 자리에서 무효가 되어 셸 높이가 0 (빈 화면) */
   --woori-col-w: 360px;
   --woori-shell-w: min(100vw, var(--woori-col-w));
-  --woori-shell-h: 100dvh;
+  --woori-shell-h: 100vh;
 
   /* 시트 패널 위 모서리 (자리표시 — 시트마다 화면 스펙이 정한다) */
   --woori-sheet-radius: 20px;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --woori-shell-h: 100dvh;
+  }
 }
 
 :root[data-theme='dark'] {
@@ -44,6 +51,18 @@ body {
 body {
   background: var(--woori-bg, #ffffff);
   color: var(--woori-text, #333333);
+  /* 길게 눌러도 글자가 선택되지 않게 (안드로이드 웹뷰의 선택 손잡이·'복사/공유' 막대 — 은행 앱은 그러지 않는다). 입력칸은 아래에서 되살린다 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
 }
 
 #root {
@@ -112,8 +131,10 @@ a {
 }
 
 /*
- * 큰 화면 맞춤 (프레임 모드 아님 — WooriEnv installWooriFit 이 <html data-woori-fit / data-woori-side> 와 변수를 단다):
- *   셸 레이아웃은 360dp 폭 그대로, 높이 = 화면 높이 / k. 그린 모습만 scale(k) (위끝 가운데 기준) → 태블릿에서 폰 비율 기둥이 화면 높이를 채운다.
+ * 화면 맞춤 (프레임 모드 아님 — WooriEnv installWooriFit 이 <html data-woori-fit / data-woori-side> 와 변수를 단다):
+ *   셸 레이아웃은 360dp 폭 그대로, 높이 = 화면 높이 / k. 그린 모습만 scale(k) (위끝 가운데 기준) → 넓은 폰은 폭을 채우고, 태블릿은 폰 비율 기둥이
+ *   화면 높이를 채운다. k < 1(360dp 보다 좁거나 640dp 보다 낮은 화면)도 같다: 레이아웃 폭 360 을 화면 가운데에 두고 줄인다
+ *   (margin auto 는 상자가 화면보다 넓으면 왼쪽에 붙으므로 가운데를 직접 계산한다 — 그린 모습은 화면 안 [0, 폭]).
  *   기둥이 화면보다 좁으면 양옆은 --woori-side-bg + 옅은 그림자 (흰 바탕 양옆이 어색하지 않게). 프레임 모드에는 이 속성들이 없다.
  */
 :root {
@@ -124,7 +145,12 @@ a {
   background: var(--woori-side-bg);
 }
 
+:root[data-woori-fit='scale'] {
+  --woori-shell-w: var(--woori-col-w);
+}
+
 :root[data-woori-fit='scale'] .woori-shell {
+  margin: 0 0 0 calc(50% - var(--woori-col-w) / 2);
   transform-origin: 50% 0;
   transform: scale(var(--woori-fit-scale, 1));
 }
@@ -135,13 +161,18 @@ a {
     0 6px 32px rgb(0 0 0 / 0.08);
 }
 
-/* 토스트 (WooriEnv wooriToast, App WooriToastHost) — 셸 안 아래 가운데. 프레임·shot 모드에서는 만들지 않는다 */
+/* 토스트 (WooriEnv wooriToast, App WooriToastHost) — 셸 안 아래 가운데. 프레임·shot 모드에서는 만들지 않는다.
+   폭: left 50% 인 절대 위치 상자는 저절로 셸 폭의 반(180)까지만 넓어진다 → max-content 로 글자 폭만큼, 최대 312 에서 줄바꿈.
+   한글은 낱말 가운데에서 끊지 않는다 (keep-all — '누르/면' 이 아니라 '누르면 / 종료됩니다'). 띄어쓰기 없는 긴 글자는 그래도 끊는다 */
 .woori-toast {
   position: absolute;
   left: 50%;
   bottom: 96px;
   z-index: 1000;
+  width: max-content;
   max-width: 312px;
+  word-break: keep-all;
+  overflow-wrap: break-word;
   padding: 11px 18px;
   border-radius: 20px;
   background: rgb(43 47 54 / 0.92);

@@ -426,6 +426,11 @@
   margin-top: -1px;
 }
 
+/* ⋮ 는 그림(.woori-home__art 은 누름을 지나 보냄)이지만 눌린 자리로 잡혀야 카드 탭(거래내역) 대신 토스트가 된다 (HOME_TODO_IN_CARD) */
+.woori-home__won .woori-home__kebab {
+  pointer-events: auto;
+}
+
 .woori-home__limit-chip {
   border-radius: 10px;
   background: #eff0f3;

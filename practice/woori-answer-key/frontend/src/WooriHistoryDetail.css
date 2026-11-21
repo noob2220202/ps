@@ -12,13 +12,14 @@
   top: 0;
   z-index: 2;
 }
-/* 머리 아래 ~ 하단 바 위 (52–726) 내용 스크롤 (영상에서는 스크롤하지 않음 — 설계) */
+/* 머리 아래 ~ 하단 바 위 (52–726) 내용 스크롤 (영상에서는 스크롤하지 않음 — 설계).
+   키가 다른 화면: 하단 바 위끝(페이지 아래끝 − 74.667)까지 늘고 준다 — 프레임 모드는 800.667 − 126.667 = 674 그대로 */
 .woori-hd__scroll {
   position: absolute;
   left: 0;
   top: 52px;
   width: 360px;
-  height: 674px;
+  height: calc(var(--woori-page-h) - 126.667px);
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
@@ -115,10 +116,11 @@
   border: 1px solid #f3f3f3;
   border-radius: 8px;
 }
+/* 하단 바: 페이지 아래끝 기준 (단추는 bottom 16 — 같이 아래에 붙는다) */
 .woori-hd__bar {
   position: absolute;
   left: 0;
-  top: 726px;
+  top: calc(var(--woori-page-h) - 74.667px); /* 영상 top 726 */
   width: 360px;
   height: 74.667px;
   background: var(--woori-bg, #ffffff);

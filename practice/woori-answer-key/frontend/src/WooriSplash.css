@@ -1,9 +1,16 @@
-/* WooriSplash — 스플래시 (spec/launch.md 2.1·3.2, 놓는 값은 spec/launch.assets.json css 그대로: 정수 상자 + 소수 transform) */
+/* WooriSplash — 스플래시 (spec/launch.md 2.1·3.2, 놓는 값은 spec/launch.assets.json css 그대로: 정수 상자 + 소수 transform)
+ * 세로 자리는 영상 셸(800.667dp) 값을 키가 다른 화면에 옮긴 것 (프레임 모드에서는 --woori-page-h = 800.667px 라 영상 값 그대로):
+ *   로고(트랙·채움·원·WON) = 셸 세로 가운데 기준 (영상 로고 무리 357–442 의 가운데 ≈ 셸 가운데 400.333): top = y + (셸 높이 − 800.667) / 2
+ *   iF · MA · '우리은행' = 셸 아래끝 기준 (WooriLayout wooriBottomTop 과 같은 식): top = 셸 높이 − (800.667 − y)
+ *   → 640dp 에서도 로고 아래끝 361.7 · iF 414.3 · MA 484.3–523.3 · 우리은행 581.3–602.3 으로 겹치거나 잘리지 않는다.
+ */
 .woori-splash {
   position: relative;
   height: 100%;
   overflow: clip;
   background: #ffffff;
+  /* 로고 무리를 셸 가운데에 두는 세로 이동 (프레임 모드 0) */
+  --woori-splash-dy: calc((var(--woori-page-h) - 800.667px) / 2);
 }
 
 .woori-splash img {
@@ -16,7 +23,7 @@
 
 .woori-splash__track {
   left: 142px;
-  top: 362px;
+  top: calc(362px + var(--woori-splash-dy));
   width: 75px;
   height: 41px;
   transform: translate(0.35px, 0.68px) scale(1.002, 0.997073);
@@ -26,7 +33,7 @@
 .woori-splash__fill {
   position: absolute;
   left: 142px;
-  top: 362px;
+  top: calc(362px + var(--woori-splash-dy));
   width: 76px;
   height: 41px;
   transform: translate(0.35px, 0.68px);
@@ -43,7 +50,7 @@
 
 .woori-splash__circle {
   left: 142px;
-  top: 357px;
+  top: calc(357px + var(--woori-splash-dy));
   width: 51px;
   height: 51px;
   transform: translate(0.49px, 0.83px) scale(0.992157);
@@ -94,7 +101,7 @@
 
 .woori-splash__won {
   left: 142px;
-  top: 417px;
+  top: calc(417px + var(--woori-splash-dy));
   width: 76px;
   height: 25px;
   transform: translate(0.2642px, 0.6042px) scale(1.00171, 1.0175);
@@ -102,7 +109,7 @@
 
 .woori-splash__if {
   left: 132px;
-  top: 575px;
+  top: calc(var(--woori-page-h) - 225.667px); /* 영상 top 575 */
   width: 95px;
   height: 50px;
   transform: translate(0.6622px, 0.0417px) scale(1.00352, 0.99);
@@ -110,7 +117,7 @@
 
 .woori-splash__ma {
   left: 121px;
-  top: 645px;
+  top: calc(var(--woori-page-h) - 155.667px); /* 영상 top 645 */
   width: 117px;
   height: 39px;
   transform: translate(0.0026px, 0.8542px) scale(1.00241, 1.00481);
@@ -118,7 +125,7 @@
 
 .woori-splash__woori {
   left: 149px;
-  top: 742px;
+  top: calc(var(--woori-page-h) - 58.667px); /* 영상 top 742 */
   width: 62px;
   height: 21px;
   transform: translate(0.1227px, 0.7917px) scale(1.00666, 0.982143);

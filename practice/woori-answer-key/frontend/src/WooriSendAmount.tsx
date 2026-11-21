@@ -5,7 +5,11 @@
 //   → 시트 한 프레임에 닫힘 + 스피너 → /send/confirm?ticket=…
 // 데이터는 모두 wooriApi (이름·계좌는 시드의 더미). 비밀번호는 백엔드가 검사한다(dev 더미). 누른 키 위치는 어디에도 기록하지 않는다
 // (눌림 회색 칸은 CSS :active 뿐, 입력 숫자는 ref 에만 두고 보낸 뒤 지운다).
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
+// 키가 다른 화면(APK, 셸 640–900dp): 키패드 층·폼 버튼 층은 아래끝 기준(.woori-amt__layer--bottom), 머리·계좌·금액은 위끝 기준.
+//   셸이 낮아 빠른 금액 줄이 금액 묶음에 닿으면 빠른 금액~[확인] 사이를 고르게 눌러 담는다(keypadSqueeze, 설계). 프레임 모드는 영상 그대로.
+// 영상에 없는 설계: 폼 단계 금액 줄 탭 = 키패드로 돌아가 고치기 · 통장표기 › = 편집 시트(20자, [다음] 검사에 실어 보냄)
+//   · 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert — 확인 화면도 쓴다) · 받는 분을 못 찾으면 토스트 + /send 로.
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { artSrc, bankArtName, type WooriArtName } from './WooriArt.ts'
 import { WooriButton } from './WooriButton.tsx'
@@ -14,10 +18,10 @@ import { useWooriStages } from './WooriLoadingPage.tsx'
 import { WooriOverlay, WooriSheet } from './WooriSheet.tsx'
 import { WooriSpinner } from './WooriSpinner.tsx'
 import { useShotReady, useShotState } from './WooriShot.ts'
-import { useWooriNavigate } from './WooriNav.ts'
-import { WOORI_BOTTOM_FIX } from './WooriLayout.ts'
+import { isFrameMode, useBackTo, useWooriNavigate } from './WooriNav.ts'
+import { WOORI_BOTTOM_FIX, WOORI_VIDEO_PAGE_H } from './WooriLayout.ts'
 import { wooriApi, WooriApiError, type Account, type LookupResult, type Ticket } from './WooriApi.ts'
-import { wooriTodo } from './WooriEnv.ts'
+import { wooriLiveApp, wooriToast, wooriTodo } from './WooriEnv.ts'
 import './WooriSendAmount.css'
 
 /* ───────────────────────── 위치 도우미 ───────────────────────── */
@@ -117,6 +121,46 @@ function shuffledDigits(seedText: string): number[] {
 /** 시트 열림 (3.5: easeOutCubic 245ms + 딤 linear 305ms, 7ms 늦게) */
 const SHEET_MOTION = { open: { duration: 245, easing: 'cubic-bezier(0.33, 1, 0.68, 1)', dimDuration: 305, dimEasing: 'linear', dimDelay: 7 } }
 
+/** 통장표기 최대 글자 수 (backend transfer.js LABEL_MAX_LENGTH) */
+const LABEL_MAX = 20
+/** 고쳐서 다시 해야 하는 [다음] 오류 → 안내 시트를 닫으면 키패드로 (설계) */
+const AMOUNT_ERRORS: ReadonlySet<string> = new Set(['INSUFFICIENT_BALANCE', 'DAILY_LIMIT_EXCEEDED', 'INVALID_AMOUNT'])
+
+/* ── 키 작은 화면 (APK) ── */
+/** 키패드 묶음: 빠른 금액 줄 top · 키패드 [확인] top (영상 dp) */
+const KP_QUICK_TOP = 460
+const KP_CONFIRM_TOP = 730.333
+/** 금액 묶음(출금가능금액 줄 아래끝)과 빠른 금액 줄 사이 최소 간격 (설계) */
+const KP_MIN_GAP = 16
+/** 눌러 담는 최대 양 (키 줄 간격 52 → 43dp 쯤) */
+const KP_SQUEEZE_MAX = 48
+
+/**
+ * 아래끝 기준 키패드의 빠른 금액 줄이 금액 묶음(아래끝 upperBottom)에 KP_MIN_GAP 보다 가까워지는 만큼(dp).
+ * 셸 640dp + 처음 보내는 계좌 칩에서 38dp 쯤 — 그만큼 빠른 금액~[확인] 사이를 고르게 줄인다(kpY). 프레임 모드·보통 폰은 0.
+ */
+function keypadSqueeze(pageH: number, upperBottom: number): number {
+  const quickTop = pageH - (WOORI_VIDEO_PAGE_H - KP_QUICK_TOP)
+  return Math.min(KP_SQUEEZE_MAX, Math.max(0, upperBottom + KP_MIN_GAP - quickTop))
+}
+/** 영상 y (키패드 층 안) → 눌러 담은 y: [확인] 자리는 그대로, 위로 갈수록 sq 까지 내려온다. sq 0 이면 y 그대로 */
+const kpY = (y: number, sq: number) => (sq ? y + (sq * (KP_CONFIRM_TOP - y)) / (KP_CONFIRM_TOP - KP_QUICK_TOP) : y)
+
+/** 화면 루트 높이 dp — 실제 앱만 잰다. 프레임 모드는 영상 셸 높이 그대로 (영상 비교 화면이 바뀌지 않게) */
+function usePageHeight(ref: RefObject<HTMLElement | null>): number {
+  const [h, setH] = useState(WOORI_VIDEO_PAGE_H)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el || isFrameMode()) return
+    const apply = () => setH(el.clientHeight || WOORI_VIDEO_PAGE_H)
+    apply()
+    const ro = new ResizeObserver(apply)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref])
+  return h
+}
+
 /* ───────────────────────── shot 상태 ───────────────────────── */
 
 type Phase = 'keypad' | 'hide' | 'form'
@@ -175,10 +219,10 @@ async function loadData(params: URLSearchParams): Promise<AmountData> {
   if ((!bankCode || !digits) && toId) {
     const list = await wooriApi.getRecipients('recommend')
     const r = list.find((x) => String(x.id) === toId)
-    if (r) {
-      bankCode = r.bankCode
-      digits = r.accountNumber.replace(/\D/g, '')
-    }
+    // 지운 받는 분 · 내계좌 탭 행(account-N) 등 목록에 없는 id: 은행 없이 조회하면 '금융회사를 선택해 주세요' 가 나와 헷갈린다
+    if (!r) throw new Error('받는 분을 찾을 수 없어요')
+    bankCode = r.bankCode
+    digits = r.accountNumber.replace(/\D/g, '')
   }
   const to = await wooriApi.lookup(bankCode, digits)
   return { from, to, bankCode: to.bankCode, digits }
@@ -205,6 +249,16 @@ export default function WooriSendAmount() {
       alive = false
     }
   }, [paramKey])
+  // 받는 분을 못 찾음 등 (실제 앱): 막힌 오류 화면 대신 토스트 + 받는 분 고르는 /send 로 (기록에 있으면 거기까지 뒤로)
+  const backToSend = useBackTo('/send')
+  useEffect(() => {
+    if (!loadError || !wooriLiveApp()) return
+    wooriToast(loadError)
+    backToSend()
+  }, [loadError, backToSend])
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  const pageH = usePageHeight(rootRef)
 
   // 단계적 그리기: 데이터가 온 순간부터 (영상: 흰 화면 + 스피너 → 단계마다 한 프레임 교체)
   const stage = useWooriStages(AMOUNT_STAGES_MS, { start: data != null, shotStage: s ? s.stage : null })
@@ -229,6 +283,13 @@ export default function WooriSendAmount() {
   const [dots, setDots] = useState(0)
   const [pwError, setPwError] = useState<string | null>(null)
   const pinRef = useRef('')
+  // 오류 안내 시트 (window.alert 대신). keypad = 닫으면 키패드로 돌아가 금액을 고친다
+  const [alert, setAlert] = useState<{ text: string; open: boolean; keypad: boolean } | null>(null)
+  // 통장표기 (설계): 고친 값만 둔다. 없으면 ticket 값 → 기본값 (받는 분 = 보내는 사람 이름, 내 = 받는 분 예금주 — backend 와 같음)
+  const [labels, setLabels] = useState<{ recipient?: string; my?: string }>({})
+  const [labelEdit, setLabelEdit] = useState<{ field: 'recipient' | 'my'; open: boolean } | null>(null)
+  const [labelDraft, setLabelDraft] = useState('')
+  const labelInput = useRef<HTMLInputElement>(null)
 
   // shot: 시트 상태면 ticket 을 미리 받는다 (중복 경고 문구·섞는 시드)
   const shotNeedsTicket = !!s?.sheet
@@ -301,12 +362,20 @@ export default function WooriSendAmount() {
     })
   }
 
-  // [다음] → 검사
+  /** 폼 → 키패드 (금액 줄 탭 · 금액 오류 안내 뒤, 설계). 입력한 숫자는 그대로, ticket 은 [다음] 에서 새로 */
+  const reopenKeypad = () => {
+    if (s) return
+    setTicket(null)
+    setFieldsLive('none')
+    setPhase('keypad')
+  }
+
+  // [다음] → 검사 (고친 통장표기도 실어 보낸다 → ticket → 확인·완료 화면)
   const onNext = () => {
     if (!data || busy || !amount) return
     setBusy(true)
     wooriApi
-      .checkTransfer({ fromAccountId: data.from.id, bankCode: data.bankCode, accountNumber: data.digits, amount })
+      .checkTransfer({ fromAccountId: data.from.id, bankCode: data.bankCode, accountNumber: data.digits, amount, recipientLabel: labels.recipient, myLabel: labels.my })
       .then((t) => {
         setTicket(t)
         if (t.duplicate) setDup('open')
@@ -314,8 +383,29 @@ export default function WooriSendAmount() {
       })
       .catch((e: unknown) => {
         setBusy(false)
-        window.alert(e instanceof Error ? e.message : String(e))
+        const keypadAfter = e instanceof WooriApiError && AMOUNT_ERRORS.has(e.code ?? '')
+        setAlert({ text: e instanceof Error ? e.message : String(e), open: true, keypad: keypadAfter })
       })
+  }
+
+  /* ── 통장표기 편집 시트 (설계) ── */
+  const labelValue = (field: 'recipient' | 'my', d: AmountData) =>
+    field === 'recipient' ? (labels.recipient ?? tk?.recipientLabel ?? d.from.ownerName) : (labels.my ?? tk?.myLabel ?? d.to.holderName)
+  const openLabel = (field: 'recipient' | 'my') => {
+    if (s || !data || busy) return
+    setLabelDraft(labelValue(field, data))
+    setLabelEdit({ field, open: true })
+  }
+  const closeLabel = () => {
+    labelInput.current?.blur()
+    setLabelEdit((l) => (l ? { ...l, open: false } : l))
+  }
+  const saveLabel = () => {
+    if (!labelEdit) return
+    // 비우면 기본값으로 (backend 도 빈 값 = 기본값)
+    const v = [...labelDraft.trim()].slice(0, LABEL_MAX).join('')
+    setLabels((cur) => ({ ...cur, [labelEdit.field]: v || undefined }))
+    closeLabel()
   }
   const openPassword = () => {
     pinRef.current = ''
@@ -378,12 +468,15 @@ export default function WooriSendAmount() {
   const onCancel = useCallback(() => go('/home', { replace: true }), [go])
 
   if (loadError) {
+    // 실제 앱은 위 effect 가 토스트 + /send 로 보낸다 (글자는 프레임·shot 모드에서만)
     return (
-      <div className="woori-amt">
+      <div ref={rootRef} className="woori-amt">
         <WooriHeader onBack={onBack} rightText="취소" onRight={onCancel} />
-        <p className="woori-amt__t" style={txt(20, 80, 15, 500)}>
-          {loadError}
-        </p>
+        {!wooriLiveApp() && (
+          <p className="woori-amt__t" style={txt(20, 80, 15, 500)}>
+            {loadError}
+          </p>
+        )}
       </div>
     )
   }
@@ -395,16 +488,19 @@ export default function WooriSendAmount() {
   const off = first ? 36 : 0
   const fromArt: WooriArtName = (data && logoArt(data.from.logo)) || 'banks.woori'
   const toArt = data ? logoArt(data.to.logo) : undefined
+  // 키 작은 화면: 키패드를 눌러 담는 양 (금액 묶음 아래끝 = 출금가능금액 줄 271 + 14)
+  const sq = keypadSqueeze(pageH, 271 + off + 14)
+  const kpF = 1 - sq / (KP_CONFIRM_TOP - KP_QUICK_TOP)
 
   return (
-    <div className="woori-amt">
+    <div ref={rootRef} className="woori-amt">
       {st >= 1 && <WooriHeader onBack={onBack} rightText="취소" onRight={onCancel} />}
 
-      {/* 머리 아래 내용 (계좌 2줄 · 칩 · 금액) */}
+      {/* 머리 아래 내용 (계좌 2줄 · 칩 · 금액). ⌄ · 사기의심조회 는 영상에 없는 화면 → wooriTodo */}
       {showAccounts && data && (
         <div className={'woori-amt__layer' + (keypad ? ' woori-amt__upper--keypad' : '')}>
           <Icon name={fromArt} x={20} y={67.667} w={24} h={24} />
-          <div className="woori-amt__row" style={txt(49.94, 71, 17, 500, {}, 0.25)}>
+          <div className="woori-amt__row" style={txt(49.94, 71, 17, 500, {}, 0.25)} onClick={wooriTodo}>
             <span>
               <b style={{ fontWeight: 700 }}>{data.from.bankName} 계좌</b>에서
             </span>
@@ -415,7 +511,7 @@ export default function WooriSendAmount() {
           </p>
 
           {toArt && <Icon name={toArt} x={20} y={143.333} w={24} h={24} />}
-          <div className="woori-amt__row" style={txt(49.97, 147, 17, 500)}>
+          <div className="woori-amt__row" style={txt(49.97, 147, 17, 500)} onClick={wooriTodo}>
             <span>
               <b style={{ fontWeight: 700 }}>{data.to.holderName} 님 계좌</b>로
             </span>
@@ -426,7 +522,7 @@ export default function WooriSendAmount() {
           </p>
 
           {first && (
-            <div className="woori-amt__chip-first" style={at(20, 203)}>
+            <div className="woori-amt__chip-first" style={at(20, 203)} onClick={wooriTodo}>
               {chev ? <Icon name="send-b.siren" w={15.775} h={15.125} inline style={{ margin: '-1.708px -2.187px 0 -1.588px' }} /> : <span style={{ width: 12 }} />}
               <span style={{ marginLeft: 5.94, color: '#746770' }}>처음 보내는 계좌예요.</span>
               <span style={{ marginLeft: 2.65, color: '#3f323a' }}>사기의심조회</span>
@@ -460,14 +556,18 @@ export default function WooriSendAmount() {
               </p>
             </>
           )}
+          {/* 폼 단계: 금액 줄을 누르면 키패드로 돌아가 고친다 (설계 — 보이지 않는 누름 상자) */}
+          {phase === 'form' && !s && (
+            <button type="button" className="woori-amt__btn-reset woori-amt__hit" style={{ top: 218 + off, height: 80 }} aria-label="금액 고치기" onClick={reopenKeypad} />
+          )}
         </div>
       )}
 
-      {/* 앱 키패드 */}
+      {/* 앱 키패드 (아래끝 기준 층). 셸이 낮으면 sq 만큼 빠른 금액~[확인] 사이를 줄인다 — sq 0 이면 영상 자리 그대로 */}
       {keypad && (
-        <div className="woori-amt__layer">
+        <div className="woori-amt__layer woori-amt__layer--bottom">
           {QUICK.map((q, i) => (
-            <button key={q.label} type="button" className="woori-amt__btn-reset woori-amt__quick" style={at(20 + i * 65.6, 460)} onClick={() => quick(q.add)}>
+            <button key={q.label} type="button" className="woori-amt__btn-reset woori-amt__quick" style={at(20 + i * 65.6, kpY(KP_QUICK_TOP, sq))} onClick={() => quick(q.add)}>
               <span className="woori-amt__quick-label" style={q.label === '전액' ? { letterSpacing: '-0.005em' } : undefined}>
                 {q.label}
               </span>
@@ -476,15 +576,28 @@ export default function WooriSendAmount() {
           {AMOUNT_KEYS.map((key) => {
             const top = 506 + key.row * 52
             return (
-              <button key={key.k} type="button" className="woori-amt__btn-reset woori-amt__key" style={{ left: key.col * 120, top }} onClick={() => typeKey(key.k)} aria-label={key.k}>
-                <span className="woori-amt__key-label" style={{ ...at(key.l - key.col * 120, AMOUNT_ROW_TOP[key.row] - top, key.dy), letterSpacing: key.ls }}>
+              <button
+                key={key.k}
+                type="button"
+                className="woori-amt__btn-reset woori-amt__key"
+                style={{ left: key.col * 120, top: kpY(top, sq), ...(sq ? { height: 52 * kpF } : {}) }}
+                onClick={() => typeKey(key.k)}
+                aria-label={key.k}
+              >
+                <span className="woori-amt__key-label" style={{ ...at(key.l - key.col * 120, (AMOUNT_ROW_TOP[key.row] - top) * kpF, key.dy), letterSpacing: key.ls }}>
                   {key.k}
                 </span>
               </button>
             )
           })}
-          <button type="button" className="woori-amt__btn-reset woori-amt__key" style={{ left: 240, top: 662 }} onClick={() => typeKey('<')} aria-label="지우기">
-            <Icon name="send-b.keypad-backspace" x={48} y={14.333} w={24} h={24} color="#33353a" />
+          <button
+            type="button"
+            className="woori-amt__btn-reset woori-amt__key"
+            style={{ left: 240, top: kpY(662, sq), ...(sq ? { height: 52 * kpF } : {}) }}
+            onClick={() => typeKey('<')}
+            aria-label="지우기"
+          >
+            <Icon name="send-b.keypad-backspace" x={48} y={14.333 * kpF} w={24} h={24} color="#33353a" />
           </button>
           <WooriButton
             className="woori-amt__kp-confirm"
@@ -514,9 +627,9 @@ export default function WooriSendAmount() {
         </div>
       )}
 
-      {/* 폼: 통장표기 묶음 · 유의사항 · [추가이체][다음] */}
+      {/* 폼 (아래끝 기준 층): 통장표기 묶음 · 유의사항 · [추가이체][다음] */}
       {phase === 'form' && data && (
-        <div className="woori-amt__layer">
+        <div className="woori-amt__layer woori-amt__layer--bottom">
           {fields !== 'none' && (
             <div
               className={'woori-amt__layer' + (fields === 'anim' ? ' woori-amt__fields--in' : '')}
@@ -526,14 +639,14 @@ export default function WooriSendAmount() {
                 받는 분 통장표기
               </p>
               <p className="woori-amt__t" style={{ ...txt(0, 494, 15, 600, { color: '#707275' }, -0.25), left: undefined, right: 44 }}>
-                {tk?.recipientLabel ?? data.to.holderName}
+                {labelValue('recipient', data)}
               </p>
               <Icon name="history.chevron-right" x={328.7} y={492.45} w={16} h={16} color="#9a9ca0" />
               <p className="woori-amt__t" style={txt(19.94, 548, 16, 500, { color: '#39393b' }, -0.25)}>
                 내 통장표기
               </p>
               <p className="woori-amt__t" style={{ ...txt(0, 548, 15, 600, { color: '#707275' }), left: undefined, right: 44 }}>
-                {tk?.myLabel ?? data.from.ownerName}
+                {labelValue('my', data)}
               </p>
               <Icon name="history.chevron-right" x={328.7} y={546.7} w={16} h={16} color="#9a9ca0" />
               <div className="woori-amt__line" style={{ left: 20, top: 588, width: 320, background: '#ebebeb' }} />
@@ -541,6 +654,13 @@ export default function WooriSendAmount() {
                 <span>더보기</span>
                 <Icon name="history.chevron-down-12" w={12} h={12} inline color="#717376" style={{ marginLeft: 5.4, marginTop: 1.2 }} />
               </div>
+              {/* 통장표기 줄 › = 편집 시트 (설계 — 줄 전체가 누름 상자, 보이지 않음) */}
+              {!s && (
+                <>
+                  <button type="button" className="woori-amt__btn-reset woori-amt__hit" style={{ top: 475, height: 52 }} aria-label="받는 분 통장표기 바꾸기" onClick={() => openLabel('recipient')} />
+                  <button type="button" className="woori-amt__btn-reset woori-amt__hit" style={{ top: 529, height: 52 }} aria-label="내 통장표기 바꾸기" onClick={() => openLabel('my')} />
+                </>
+              )}
             </div>
           )}
           <p className="woori-amt__t" style={txt(120.55, 689, 14, 600, { color: '#6f7174' }, 0.25)} onClick={wooriTodo}>
@@ -650,7 +770,11 @@ export default function WooriSendAmount() {
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className={'woori-amt__dot' + (i < dotCount ? ' woori-amt__dot--on' : '')} style={at(138 + i * 24, 451.06 - PW_TOP)} />
           ))}
-          <p className={'woori-amt__center' + (pwError ? ' woori-amt__pw-error' : '')} style={{ ...at(0, 512 - PW_TOP), fontSize: 14, fontWeight: 600, letterSpacing: '-0.005em', color: pwError ? undefined : '#717274' }}>
+          <p
+            className={'woori-amt__center' + (pwError ? ' woori-amt__pw-error' : '')}
+            style={{ ...at(0, 512 - PW_TOP), fontSize: 14, fontWeight: 600, letterSpacing: '-0.005em', color: pwError ? undefined : '#717274' }}
+            onClick={pwError ? undefined : wooriTodo}
+          >
             {pwError ?? '비밀번호가 기억나지 않아요'}
           </p>
           {!pwError && <div className="woori-amt__line" style={{ ...at(104.54, 527.64 - PW_TOP), width: 150.89, height: 1.02, background: '#717274' }} />}
@@ -665,6 +789,59 @@ export default function WooriSendAmount() {
         </WooriSheet>
       )}
 
+      {/* 통장표기 편집 시트 (설계 — 영상에 없음): 20자, 비우면 기본값. 글자는 시스템 키보드 */}
+      {labelEdit && data && (
+        <WooriSheet
+          open={labelEdit.open}
+          motion={SHEET_MOTION}
+          className="woori-amt__label-sheet"
+          label={labelEdit.field === 'recipient' ? '받는 분 통장표기' : '내 통장표기'}
+          onOpened={() => labelInput.current?.focus({ preventScroll: true })}
+          onClosed={() => setLabelEdit(null)}
+          onBack={closeLabel}
+        >
+          <button type="button" className="woori-amt__btn-reset woori-amt__sheet-x" style={at(315.8, 31.95)} aria-label="닫기" onClick={closeLabel}>
+            <Icon name="history.close-x" x={0} y={0} w={24} h={24} color="#3b3a3b" />
+          </button>
+          <p className="woori-amt__t" style={txt(20, 36, 22, 700)}>
+            {labelEdit.field === 'recipient' ? '받는 분 통장표기' : '내 통장표기'}
+          </p>
+          <input
+            ref={labelInput}
+            className="woori-amt__label-input"
+            type="text"
+            value={labelDraft}
+            placeholder={labelEdit.field === 'recipient' ? data.from.ownerName : data.to.holderName}
+            maxLength={LABEL_MAX}
+            enterKeyHint="done"
+            aria-label={labelEdit.field === 'recipient' ? '받는 분 통장표기' : '내 통장표기'}
+            onChange={(e) => setLabelDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') saveLabel()
+            }}
+          />
+          <p className="woori-amt__label-count">
+            {[...labelDraft].length}/{LABEL_MAX}
+          </p>
+          <WooriButton className="woori-amt__btn" style={{ ...at(16, 252 - 74), width: 328 }} onClick={saveLabel}>
+            확인
+          </WooriButton>
+        </WooriSheet>
+      )}
+
+      {/* 오류 안내 시트 (설계): 출금가능금액 부족 등. 금액 오류면 닫은 뒤 키패드로 */}
+      {alert && (
+        <WooriSendAlert
+          text={alert.text}
+          open={alert.open}
+          onClose={() => setAlert((a) => (a ? { ...a, open: false } : a))}
+          onClosed={() => {
+            if (alert.keypad) reopenKeypad()
+            setAlert(null)
+          }}
+        />
+      )}
+
       {spinner && (
         <WooriOverlay>
           <div className="woori-amt__spinner-top">
@@ -673,6 +850,29 @@ export default function WooriSendAmount() {
         </WooriOverlay>
       )}
     </div>
+  )
+}
+
+/**
+ * 이체 오류 안내 시트 (설계 — 영상에 없음). window.alert 는 APK 에서 영어 'OK' 단추의 안드로이드 기본 대화상자가 되므로 대신 쓴다.
+ * 중복 경고 시트와 같은 모양(⚠ · 22dp 둥근 위 모서리 · 같은 열림 곡선) + 문구(줄 수만큼 시트가 길어짐) + [확인]. 폰 뒤로 = [확인].
+ * 확인 화면([이체] 오류)도 쓴다. open 이 false 가 되면 닫히고, 다 닫히면 onClosed.
+ */
+export function WooriSendAlert({ text, open, onClose, onClosed }: { text: string; open: boolean; onClose: () => void; onClosed: () => void }) {
+  return (
+    <WooriSheet open={open} motion={SHEET_MOTION} className="woori-amt__alert" label="알림" onClosed={onClosed} onBack={onClose}>
+      <div className="woori-amt__warn" aria-hidden>
+        <img className="woori-amt__warn-tri" src={artSrc('send-b.warning-triangle')} alt="" />
+        <img className="woori-amt__warn-bar" src={artSrc('send-b.warning-bang-bar')} alt="" />
+        <img className="woori-amt__warn-dot" src={artSrc('send-b.warning-bang-dot')} alt="" />
+      </div>
+      <p className="woori-amt__alert-text" role="alert">
+        {text}
+      </p>
+      <WooriButton className="woori-amt__alert-ok" onClick={onClose}>
+        확인
+      </WooriButton>
+    </WooriSheet>
   )
 }
 

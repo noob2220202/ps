@@ -2,7 +2,10 @@
 //   ?ticket=<tk-…> (금액 화면이 비밀번호 확인 뒤 넘긴다) · 개발/shot: ?bank=<spec 코드>&acct=<숫자>&amount=<원> 이면 검사(check)로 ticket 을 만든다
 //   흰 페이지+스피너 → 머리 → [이체] 비활성 → 금액 화면과 같은 계좌 2줄 → 로고 헤더 모핑(easeInOutCubic 805ms, 로고 24→48dp)
 //   + 로고 사이 → 반복(800ms) → [이체] 활성 + 안내 → [이체] = 버튼 안 흰 스피너 → POST /api/transfers → /send/done?tx=…
-import { useCallback, useEffect, useState, type CSSProperties } from 'react'
+// 키가 다른 화면(APK): 안내 문구·[이체]는 아래끝 기준(atB — 프레임 모드는 영상 자리 그대로), 위 내용은 424dp 에서 끝나 640dp 셸에서도 겹치지 않는다.
+// 처리 중(버튼 안 스피너)에는 ‹·취소·폰 뒤로를 받지 않는다 — 돈은 이미 나가는 중이라 떠나도 완료 화면이 뒤따라 왔다 (설계).
+// [이체] 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert). 다시 눌러도 안 되는 오류(4xx)면 [확인] 뒤 금액 화면으로.
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { artSrc, bankArtName, hasArt, type WooriArtName } from './WooriArt.ts'
 import { WooriButton } from './WooriButton.tsx'
@@ -12,7 +15,9 @@ import { WooriOverlay } from './WooriSheet.tsx'
 import { WooriSpinner } from './WooriSpinner.tsx'
 import { useShotReady, useShotState } from './WooriShot.ts'
 import { useWooriNavigate } from './WooriNav.ts'
-import { wooriApi, type Ticket } from './WooriApi.ts'
+import { wooriBottomTop } from './WooriLayout.ts'
+import { wooriApi, WooriApiError, type Ticket } from './WooriApi.ts'
+import { WooriSendAlert } from './WooriSendAmount.tsx'
 import './WooriSendConfirm.css'
 
 const r3 = (v: number) => Math.round(v * 1000) / 1000
@@ -23,6 +28,12 @@ function at(x: number, y: number, dy = 0): CSSProperties {
   const fy = r3(y - ly + dy)
   return { left: lx, top: ly, ...(fx || fy ? { translate: `${fx}px ${fy}px` } : {}) }
 }
+/** at() 의 아래끝 기준판: 영상 top y 인 상자를 페이지 아래끝에서 같은 거리에 (WooriLayout wooriBottomTop — 프레임 모드는 at() 과 같은 자리) */
+function atB(x: number, y: number, dy = 0): CSSProperties {
+  const p = at(x, y, dy)
+  return { ...p, top: wooriBottomTop(p.top as number) }
+}
+const NOOP = () => {}
 function txt(x: number, y: number, size: number, weight: number, extra: CSSProperties = {}, dy = 0): CSSProperties {
   return { ...at(x, y, dy), fontSize: size, fontWeight: weight, ...extra }
 }
@@ -100,25 +111,48 @@ export default function WooriSendConfirm() {
   const [processing, setProcessing] = useState(false)
   const [bigSpinner, setBigSpinner] = useState(false)
   const busy = s ? !!s.processing : processing
+  // 오류 안내 시트 (window.alert 대신). leave = 닫은 뒤 금액 화면으로
+  const [alert, setAlert] = useState<{ text: string; open: boolean; leave: boolean } | null>(null)
+
+  // 처리 타이머는 페이지가 내려가면 지운다 (내려간 뒤 완료 화면으로 끌고 가지 않게)
+  const mounted = useRef(true)
+  const timers = useRef<number[]>([])
+  useEffect(() => {
+    mounted.current = true
+    const list = timers.current
+    return () => {
+      mounted.current = false
+      list.forEach((t) => window.clearTimeout(t))
+    }
+  }, [])
+  const later = (ms: number, f: () => void) => {
+    const id = window.setTimeout(f, ms)
+    timers.current.push(id)
+    return id
+  }
 
   const onTransfer = () => {
     if (!tk || processing) return
     setProcessing(true)
     const t0 = performance.now()
-    const big = window.setTimeout(() => setBigSpinner(true), 500)
+    const big = later(500, () => setBigSpinner(true))
     wooriApi.executeTransfer(tk.ticket).then(
       (res) => {
+        if (!mounted.current) return
         const wait = Math.max(0, 900 - (performance.now() - t0))
-        window.setTimeout(() => {
+        later(wait, () => {
           window.clearTimeout(big)
           go(`/send/done?tx=${encodeURIComponent(res.done.transactionId)}`, { replace: true })
-        }, wait)
+        })
       },
       (e: unknown) => {
+        if (!mounted.current) return
         window.clearTimeout(big)
         setBigSpinner(false)
         setProcessing(false)
-        window.alert(e instanceof Error ? e.message : String(e))
+        // 4xx (이미 처리됨 · 한도 · 잔액 등)는 다시 눌러도 같다 → [확인] 뒤 금액 화면으로 돌아가 다시
+        const leave = e instanceof WooriApiError && e.status >= 400 && e.status < 500
+        setAlert({ text: e instanceof Error ? e.message : String(e), open: true, leave })
       },
     )
   }
@@ -139,7 +173,8 @@ export default function WooriSendConfirm() {
 
   return (
     <div className={rootClass}>
-      {st >= 1 && <WooriHeader onBack={onBack} rightText="취소" onRight={onCancel} />}
+      {/* 처리 중에는 ‹·취소·폰 뒤로를 받지 않는다 (모습은 그대로) */}
+      {st >= 1 && <WooriHeader onBack={processing ? NOOP : onBack} rightText="취소" onRight={processing ? NOOP : onCancel} />}
       {error && (
         <p className="woori-cf__t" style={txt(20, 80, 15, 500)}>
           {error}
@@ -222,8 +257,9 @@ export default function WooriSendConfirm() {
         </>
       )}
 
+      {/* 안내 · [이체]: 아래끝 기준 */}
       {tk && st >= 7 && (
-        <p className="woori-cf__center" style={{ ...at(0, 694), fontSize: 14, fontWeight: 500, color: 'var(--woori-blue-text)' }}>
+        <p className="woori-cf__center" style={{ ...atB(0, 694), fontSize: 14, fontWeight: 500, color: 'var(--woori-blue-text)' }}>
           {tk.display.footnote}
         </p>
       )}
@@ -231,7 +267,7 @@ export default function WooriSendConfirm() {
       {st >= 2 && (
         <WooriButton
           className="woori-cf__transfer"
-          style={{ ...at(16, 726.667), ...(s?.pressed ? ({ '--woori-btn-press-scale': 1 } as CSSProperties) : {}) }}
+          style={{ ...atB(16, 726.667), ...(s?.pressed ? ({ '--woori-btn-press-scale': 1 } as CSSProperties) : {}) }}
           disabled={st < 7 || busy || !tk}
           data-pressed={s?.pressed ? '' : undefined}
           onClick={onTransfer}
@@ -253,6 +289,19 @@ export default function WooriSendConfirm() {
             <WooriSpinner />
           </div>
         </WooriOverlay>
+      )}
+
+      {/* [이체] 오류 안내 (설계) */}
+      {alert && (
+        <WooriSendAlert
+          text={alert.text}
+          open={alert.open}
+          onClose={() => setAlert((a) => (a ? { ...a, open: false } : a))}
+          onClosed={() => {
+            setAlert(null)
+            if (alert.leave) go(-1)
+          }}
+        />
       )}
     </div>
   )

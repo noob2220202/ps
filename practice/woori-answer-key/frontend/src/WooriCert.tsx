@@ -3,9 +3,10 @@
 //   PIN 입력 중 보안 키패드는 녹화되지 않았다 → **설계값(영상에 없음)**: 계좌 비밀번호 시트 키패드 체계(3열 120dp x 4줄 65dp, 판 535.17–800.67,
 //   숫자 25dp/500, [전체삭제] 16/600, [←] send-b.keypad-backspace, 누름 강조 97.5x56 r6 #e6eaee). 열 때마다 0–9 를 섞는다.
 //   누른 키의 위치는 어디에도 남기지 않는다 (개인정보 D15) — 입력한 자릿값도 저장하지 않고 개수만 센다.
+//   키패드 판·[다른 방법으로 로그인] 은 셸 아래끝 기준 (wooriPlaceBottom): 영상 셸 800.667dp 에서는 위 값 그대로, 키 작은 폰(640dp~)에서도 4줄이 다 보인다.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { artSrc } from './WooriArt.ts'
-import { wooriPlace } from './WooriLayout.ts'
+import { wooriPlaceBottom } from './WooriLayout.ts'
 import { useWooriNavigate } from './WooriNav.ts'
 import { useShotReady, useShotState } from './WooriShot.ts'
 import { WooriSpinner } from './WooriSpinner.tsx'
@@ -41,7 +42,7 @@ function shuffled(): number[] {
   return a
 }
 
-/** 키패드 판 위끝 (앱 dp) · 줄 높이 · 칸 폭 */
+/** 키패드 판 위끝 (영상 셸 기준 앱 dp — 실제로는 셸 아래끝에서 265.5dp 위) · 줄 높이 · 칸 폭 */
 const PAD_TOP = 535.17
 const ROW = 65
 const COL = 120
@@ -118,12 +119,12 @@ export default function WooriCert() {
         <img src={artSrc(autoLogin ? 'launch.check-circle-outline' : 'launch.check-circle-off')} alt="" />
         <span>자동 로그인</span>
       </button>
-      <button type="button" className="woori-cert__other" style={wooriPlace(94, 728.667)} onClick={wooriTodo}>
+      <button type="button" className="woori-cert__other" style={wooriPlaceBottom(94, 728.667)} onClick={wooriTodo}>
         <span>다른 방법으로 로그인</span>
       </button>
 
       {showKeypad && (
-        <div className="woori-cert__pad" style={wooriPlace(0, PAD_TOP)} role="group" aria-label="보안 키패드">
+        <div className="woori-cert__pad" style={wooriPlaceBottom(0, PAD_TOP)} role="group" aria-label="보안 키패드">
           {keys.map((k, i) => {
             const style: CSSProperties = { left: COL * k.c, top: ROW * k.r }
             return (

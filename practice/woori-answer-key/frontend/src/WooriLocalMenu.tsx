@@ -2,6 +2,8 @@
 //
 //   - 숨은 메뉴 '시나리오 되돌리기': 화면 맨 위 가운데(제목 자리) 5번 빠른 탭(WooriLocal.ts 가 WOORI_LOCAL_MENU_EVENT 를 보낸다) → 대화상자
 //     (v1 시작 345원 · v2 시작 344원 · v2 끝 342원, '시계를 영상 시각에 고정' = POST /api/dev/reset {now:'video'}). 고르면 처음 화면(/)부터 다시 연다.
+//     앱이 기기에 적어 둔 것(sessionStorage·localStorage 의 'woori.' 키 — 기록 칸 전환표, 홈 캐시, 알림 지움, 팝업 '오늘은 그만 보기' 등)도
+//     지워 처음 설치한 것처럼 시작한다. 테마(WooriTheme WOORI_THEME_KEY)와 프레임 모드(WooriNav WOORI_FRAME_KEY)만 남긴다.
 //     열려 있으면 폰 뒤로 버튼('woori-back')을 가장 먼저 받아 닫힌다 (WooriEnv 뒤로 처리 스택, dialog 우선순위).
 //     연습에 필요한 값 안내: 계좌 비밀번호 1234 · 인증서 비밀번호는 아무 6자리 · 이 메뉴 여는 곳.
 //   - 진짜 상태바·내비 바 뒤 색 = 화면이 바라는 띠 색 (useWooriFrameBands → 네이티브 WooriBars 플러그인, android MainActivity 옆).
@@ -12,7 +14,8 @@ import { Capacitor, registerPlugin } from '@capacitor/core'
 import { useEffect, useState } from 'react'
 import { SCENARIOS } from 'woori-backend/seed.js'
 import { useWooriBack, useWooriFit, WOORI_BACK_PRIO, WOORI_LOCAL_MENU_EVENT } from './WooriEnv.ts'
-import { resolveColor, useWooriFrameBands } from './WooriTheme.ts'
+import { WOORI_FRAME_KEY } from './WooriNav.ts'
+import { resolveColor, useWooriFrameBands, WOORI_THEME_KEY } from './WooriTheme.ts'
 
 type ScenarioId = 'v1-start' | 'v2-start' | 'v2-end'
 const SCENARIO_ROWS: readonly { id: ScenarioId; label: string; note: string }[] = [
@@ -23,6 +26,26 @@ const SCENARIO_ROWS: readonly { id: ScenarioId; label: string; note: string }[] 
 
 function won(n: number): string {
   return `${n.toLocaleString('ko-KR')}원`
+}
+
+/** 되돌리기 뒤에도 남기는 저장 키 (보기 설정 — 시나리오 상태가 아니다) */
+const KEEP_KEYS: ReadonlySet<string> = new Set([WOORI_THEME_KEY, WOORI_FRAME_KEY])
+
+/** sessionStorage·localStorage 의 앱 키('woori.' 로 시작)를 지운다 (KEEP_KEYS 빼고). 저장소를 못 쓰면 넘어간다 */
+function clearWooriStorage() {
+  for (const pick of [() => window.sessionStorage, () => window.localStorage]) {
+    try {
+      const store = pick()
+      const keys: string[] = []
+      for (let i = 0; i < store.length; i++) {
+        const k = store.key(i)
+        if (k?.startsWith('woori.') && !KEEP_KEYS.has(k)) keys.push(k)
+      }
+      for (const k of keys) store.removeItem(k)
+    } catch {
+      /* 없어도 된다 */
+    }
+  }
 }
 
 interface MenuInfo {
@@ -70,11 +93,7 @@ function WooriLocalMenu() {
         body: JSON.stringify(videoClock ? { scenario, now: 'video' } : { scenario }),
       })
       if (!res.ok) throw new Error(`reset ${res.status}`)
-      try {
-        window.sessionStorage.removeItem('woori.nav.arrivals')
-      } catch {
-        /* 없어도 된다 */
-      }
+      clearWooriStorage()
       window.location.replace('/')
     } catch (e) {
       setBusy(false)

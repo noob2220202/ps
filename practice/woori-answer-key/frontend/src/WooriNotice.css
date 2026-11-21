@@ -69,6 +69,15 @@
   border-radius: 50%;
   background: var(--woori-primary, #2286f2);
 }
+/* 화면 읽기에만 ('읽지 않음' — 파란 점의 뜻) */
+.woori-notice__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .woori-notice__check {
   box-sizing: border-box;
   position: relative;

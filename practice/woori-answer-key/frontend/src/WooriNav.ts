@@ -205,6 +205,7 @@ export const WOORI_PAGES = [
   '/home',
   '/history',
   '/history/:txId',
+  '/notice',
   '/send',
   '/send/account',
   '/send/account/bank',
@@ -582,6 +583,9 @@ export function readShot(search: string = typeof window === 'undefined' ? '' : w
   const v = new URLSearchParams(search).get('shot')
   return v && v.length > 0 ? v : null
 }
+
+/** 프레임 모드 저장 키 (sessionStorage '1' = 켬, main.tsx initFrameMode · index.html 인라인 스크립트). 숨은 메뉴의 되돌리기도 지우지 않는다 */
+export const WOORI_FRAME_KEY = 'woori.frame'
 
 /** 프레임 모드(?frame=1, 세션 동안 유지)인지 — main.tsx 가 <html data-frame="1"> 을 단다 */
 export function isFrameMode(): boolean {

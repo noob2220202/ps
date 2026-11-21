@@ -7,6 +7,33 @@
   overflow: hidden;
   background: var(--woori-bg, #ffffff);
 }
+/* 단추([공유][확인], 영상 top 726.667) 위 12dp 까지의 자기 스크롤 영역 (실제 앱 — 셸이 ≈730dp 보다 낮으면 광고 카드까지 스크롤).
+ * 안쪽 내용 상자가 자리 기준 (원점 = 페이지 원점 → 글자·카드 자리는 그대로).
+ * 프레임 모드는 셸이 늘 800.667 이라 내용(≈663)이 넘치지 않는다 → 스크롤 컨테이너로 만들지 않는다
+ * (만들면 기기 화소 맞춤 transform 이 있어도 체크 원 가장자리 AA 가 바뀌어 영상 비교 화면이 달라졌다). */
+.woori-done__scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--woori-page-h) - 86px);
+}
+:root:not([data-frame='1']) .woori-done__scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.woori-done__scroll::-webkit-scrollbar {
+  display: none;
+}
+.woori-done__content {
+  position: relative;
+}
+/* 광고 카드 위 글자·그림: 누름을 카드로 */
+.woori-done__pass {
+  pointer-events: none;
+}
+
 .woori-done__t {
   position: absolute;
   margin: 0;

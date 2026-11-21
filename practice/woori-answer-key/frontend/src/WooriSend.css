@@ -17,6 +17,7 @@
 .woori-send__tab-text,
 .woori-send__row-line1,
 .woori-send__acct,
+.woori-send__empty,
 .woori-send__contact-text {
   position: absolute;
   margin: 0;
@@ -52,6 +53,15 @@
 .woori-send__icon {
   display: block;
   pointer-events: none;
+}
+
+/* 카메라 누름 자리: 입력 줄 오른끝 304–360 × 116–172 (입력 줄 단추 위 — 그림은 입력 줄 안 img, 누름 없음). 설계: wooriTodo */
+.woori-send__camera {
+  position: absolute;
+  left: 304px;
+  top: 116px;
+  width: 56px;
+  height: 56px;
 }
 
 .woori-send__underline {
@@ -105,6 +115,49 @@
   font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--woori-text-secondary);
+}
+
+/* 글자 상자가 25.5x15 뿐이라 누름 자리만 넓힌다 (≈ 50x39, 그리지 않음 — 아래 행 목록 상자 위끝 290 에 닿지 않게) */
+.woori-send__edit::before {
+  content: '';
+  position: absolute;
+  inset: -12px -12px;
+}
+
+/* 편집 중 '완료' (설계 — 머리 오른쪽 글자·알림 완료와 같은 파랑) */
+.woori-send__edit--on {
+  color: var(--woori-blue-text);
+}
+
+/* 빈 목록 안내 (설계): 행 이름 줄 자리 */
+.woori-send__empty {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-tertiary);
+}
+
+/*
+ * 행 목록 스크롤 상자 (설계 — 영상은 1행): 머리말 아래 290 부터 연락처 줄 위 12dp(아래끝 72 = 원 위끝 60 + 12)까지.
+ * 키 작은 폰(셸 640dp~)에서 행이 연락처 줄 밑으로 숨지 않고 이 안에서 스크롤한다. 안쪽 좌표 = 페이지 dp − 290 (WooriSend LIST_TOP).
+ * 프레임 모드: useWooriScrollFix(.woori-scroll-fix) 가 원점을 기기 화소에 맞춘다 → 행이 영상 자리 그대로.
+ */
+.woori-send__list {
+  position: absolute;
+  left: 0;
+  top: 290px;
+  bottom: 72px;
+  width: 360px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none; /* 안드로이드는 오버레이 스크롤바 */
+}
+
+.woori-send__list::-webkit-scrollbar {
+  display: none;
+}
+
+.woori-send__list-content {
+  position: relative;
 }
 
 .woori-send__sk {
@@ -164,6 +217,44 @@
   pointer-events: none;
 }
 
+/* ☆ 켬 (설계): 같은 별 길을 --woori-primary 로 채운다 (테두리 굵기·모서리는 send-a.star-outline 그림과 같다) */
+.woori-send__star-on {
+  display: block;
+  pointer-events: none;
+  fill: var(--woori-primary);
+  stroke: var(--woori-primary);
+  stroke-width: 2.033px;
+  stroke-linejoin: round;
+}
+
+/* ☆ 누름 자리 304–352 × 48 (가운데 = ☆ 가운데 328, 315.167) */
+.woori-send__star-btn {
+  position: absolute;
+  left: 304px;
+  width: 48px;
+  height: 48px;
+}
+
+/* 편집 중 [삭제] 알약 (설계 — 거래 상세 [보기] 알약 모양): 1dp #dddddd 테두리 · r14 · 13/600 --woori-text-body. 누름 자리는 ::before 로 60x46 */
+.woori-send__del {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dddddd;
+  border-radius: 14px;
+  background: var(--woori-bg);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--woori-text-body);
+}
+
+.woori-send__del::before {
+  content: '';
+  position: absolute;
+  inset: -9px -8px;
+}
+
 /* 바닥 줄: 원 아래끝 = 뷰포트 아래 20dp (bottom 20 · 높이 40 → WOORI_BOTTOM_FIX). 안쪽 좌표는 줄 위끝 기준 */
 .woori-send__contact {
   position: absolute;
@@ -207,6 +298,12 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--woori-text);
+}
+
+/* 연락처 줄 누름 자리 (줄 전체 + 위아래 8dp, 그리지 않음). 설계: wooriTodo — 연락처 이체는 답지 밖 */
+.woori-send__contact-btn {
+  position: absolute;
+  inset: -8px 0;
 }
 
 .woori-send__veil {

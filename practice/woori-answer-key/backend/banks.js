@@ -9,7 +9,7 @@
 //   short  짧은 이름 — 추천 칩('카카오뱅크', '한국씨티', '수협', '농협', '국민', '우리'), 받는 계좌 줄('지역농축협 12345652789012')
 //   prefix 이 앱에서 이체한 출금 행의 거래내역 표시 이름 앞말. 영상: 지역농축협 → '농협정우진', 카카오뱅크 → '카카정우진' (붙여 씀).
 //          나머지는 설계값 = 짧은 이름 앞 두 글자 (prefixSrc 'design')
-//   logo   프론트 에셋 이름 (inventory assets: bank-woori … bank-cu). 한국씨티는 칩 글자만 보였고 로고 에셋이 없다 → null
+//   logo   프론트 에셋 이름 (inventory assets: bank-woori … bank-cu, bank-citi). 한국씨티 로고는 추천 칩(16dp)에서 딴 그림 (spec/banks.json chipOnly)
 //   inGrid 그리드 21곳에 있는지. 지역농축협(최근입금계좌·조회 결과)·한국씨티(추천 칩)는 그리드에 안 보였다.
 
 const BANKS = [
@@ -37,7 +37,7 @@ const BANKS = [
   ['CU', '신협', '신협', '신협', 'design', 'bank-cu', '048', true],
   // ↓ 그리드에 없음
   ['NHLOCAL', '지역농축협', '지역농축협', '농협', 'video', 'bank-nh', '012', false], // 최근입금계좌 '지역농축협', 로고는 농협 마크
-  ['CITI', '한국씨티은행', '한국씨티', '씨티', 'design', null, '027', false], // 추천 칩 '한국씨티' 에만 나옴
+  ['CITI', '한국씨티은행', '한국씨티', '씨티', 'design', 'bank-citi', '027', false], // 추천 칩 '한국씨티' 에만 나옴 (로고 = 칩 그림)
 ].map(([code, name, short, prefix, prefixSrc, logo, kftc, inGrid], i) => ({
   code,
   name,
