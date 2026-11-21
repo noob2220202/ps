@@ -1244,7 +1244,11 @@ export default function WooriHome() {
                   <img src={artSrc('home.ai-chat-sparkle')} alt="" />
                 </span>
               </span>
-              {view.header === 'full' && <Art name="home.bell-dot" x={276} y={14} w={24} h={24} />}
+              {view.header === 'full' && (
+                <button type="button" className="woori-home__icon-btn woori-home__bell" style={wooriPlace(276, 14)} aria-label="알림" onClick={() => go('/notice')}>
+                  <img src={artSrc('home.bell-dot')} alt="" width={24} height={24} draggable={false} />
+                </button>
+              )}
               <Art name="home.menu" x={316} y={14} w={24} h={24} />
             </>
           )}

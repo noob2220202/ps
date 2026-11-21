@@ -601,6 +601,11 @@
   display: block;
 }
 
+.woori-home__bell {
+  width: 24px;
+  height: 24px;
+}
+
 .woori-home__banner-count10 {
   position: absolute;
   left: 0;

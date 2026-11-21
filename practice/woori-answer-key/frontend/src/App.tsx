@@ -4,6 +4,7 @@
 //   /home                WooriHome          홈
 //   /history             WooriHistory       거래내역조회 (?type=all|in|out&period=3m). 조회조건 시트는 화면 상태
 //   /history/:txId       WooriHistoryDetail 거래내역 상세 — 목록 위 오버레이 (rise 로 열면 목록이 아래에 마운트된 채 남는다)
+//   /notice              WooriNotice        알림 (설계: 영상에 없음 — 홈 머리 종 아이콘, 목록·편집 삭제만 최소로)
 //   /send                WooriSend          어디로 이체하시겠어요?
 //   /send/account        WooriSendAccount   계좌번호 입력 (push + 아래 페이지 흰 베일)
 //   /send/account/bank   WooriSendBank      금융회사 선택 (push)
@@ -24,6 +25,7 @@ import WooriDone from './WooriDone.tsx'
 import WooriHistory from './WooriHistory.tsx'
 import WooriHistoryDetail from './WooriHistoryDetail.tsx'
 import WooriHome from './WooriHome.tsx'
+import WooriNotice from './WooriNotice.tsx'
 import {
   isFrameMode,
   readShot,
@@ -52,6 +54,7 @@ function WooriRoutes({ location }: { location: Location }) {
       <Route path="/home" element={<WooriHome />} />
       <Route path="/history" element={<WooriHistory />} />
       <Route path="/history/:txId" element={<WooriHistoryDetail />} />
+      <Route path="/notice" element={<WooriNotice />} />
       <Route path="/send" element={<WooriSend />} />
       <Route path="/send/account" element={<WooriSendAccount />} />
       <Route path="/send/account/bank" element={<WooriSendBank />} />

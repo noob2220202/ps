@@ -1,0 +1,142 @@
+/* WooriNotice — /notice (설계: 영상에 없는 화면. 머리는 WooriHeader 공용, 목록은 history 행 간격을 참고한 설계값) */
+.woori-notice {
+  position: relative;
+  width: 360px;
+  height: 100%;
+  overflow: hidden;
+  background: var(--woori-bg, #ffffff);
+}
+.woori-notice__scroll {
+  position: absolute;
+  left: 0;
+  top: 52px;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.woori-notice__scroll::-webkit-scrollbar {
+  display: none;
+}
+.woori-notice__empty {
+  margin: 220px 0 0;
+  padding: 0;
+  font-size: 14px;
+  color: var(--woori-text-tertiary, #828487);
+  text-align: center;
+}
+.woori-notice__all,
+.woori-notice__row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font: inherit;
+  color: inherit;
+}
+.woori-notice__all {
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--woori-text-body, #4a4b4e);
+  border-bottom: 1px solid var(--woori-divider, #e6e6e6);
+}
+.woori-notice__row {
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--woori-divider, #e6e6e6);
+}
+.woori-notice__lead {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.woori-notice__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--woori-primary, #2286f2);
+}
+.woori-notice__check {
+  box-sizing: border-box;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--woori-toggle-off, #7d858c);
+  background: #ffffff;
+}
+.woori-notice__check.is-on {
+  border-color: var(--woori-primary, #2286f2);
+  background: var(--woori-primary, #2286f2);
+}
+.woori-notice__check.is-on::after {
+  content: '\2713';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+.woori-notice__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.woori-notice__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--woori-text, #33353a);
+}
+.woori-notice__desc {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--woori-text-body, #4a4b4e);
+}
+.woori-notice__time {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--woori-text-tertiary, #828487);
+}
+.woori-notice__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 92px;
+  background: var(--woori-bg, #ffffff);
+  box-shadow: 0 -1px 0 var(--woori-divider, #e6e6e6);
+  z-index: 2;
+}
+.woori-notice__delete-btn {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 18px;
+  height: 56px;
+  z-index: 3;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
