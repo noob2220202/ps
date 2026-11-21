@@ -13,5 +13,11 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(WooriBarsPlugin.class);
         super.onCreate(savedInstanceState);
+        // 시스템 글꼴 크기(설정 > 글꼴 크기)를 웹뷰 글자 확대로 따르지 않는다: 레이아웃이 360dp 기준 절대 위치 + px 줄 높이라
+        // 글자만 커지면 겹치고 잘린다 (웹뷰 기본 textZoom = 100 × fontScale). 매니페스트 configChanges 에 fontScale 이 있어
+        // 글꼴 크기를 바꿔도 액티비티를 다시 만들지 않는다(앱이 처음 화면으로 돌아가지 않는다).
+        if (getBridge() != null && getBridge().getWebView() != null) {
+            getBridge().getWebView().getSettings().setTextZoom(100);
+        }
     }
 }

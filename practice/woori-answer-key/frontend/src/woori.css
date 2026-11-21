@@ -194,6 +194,8 @@ a {
   --woori-snap-y: 0px;
   /* 아래에 붙는 상자(bottom + height 정수)의 반올림 보정 (WooriLayout WOORI_BOTTOM_FIX): 800.667 높이 때문에 위끝이 x.667 → +0.333 으로 반올림된다 */
   --woori-bottom-fix: 0px;
+  /* 아래끝 기준 자리의 기준 높이 (WooriLayout wooriBottomTop): 실제 앱은 담는 상자 높이(100%), 프레임 모드는 영상 셸 높이 */
+  --woori-page-h: 100%;
 }
 
 :root[data-frame='1'] {
@@ -202,6 +204,7 @@ a {
   --woori-snap-x: 0.2918px;
   --woori-snap-y: 0.292px;
   --woori-bottom-fix: -0.333px;
+  --woori-page-h: 800.667px;
 }
 
 :root[data-frame='1'] .woori-frame {

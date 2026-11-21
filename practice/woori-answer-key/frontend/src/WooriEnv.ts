@@ -134,6 +134,38 @@ export function wooriTodo(e?: { stopPropagation?: () => void }): void {
   wooriToast(WOORI_TODO_TEXT)
 }
 
+/**
+ * 글자를 클립보드에 넣고 토스트 (계좌번호 복사 아이콘 등 — 영상에는 누르는 장면이 없다: 설계).
+ * navigator.clipboard 가 없거나 막히면(오래된 웹뷰·http) 숨은 textarea + execCommand('copy'). 둘 다 안 되면 실패 토스트.
+ * onClick 에 바로 쓸 때는 e.stopPropagation() 을 먼저 (카드 탭으로 번지지 않게).
+ */
+export function wooriCopy(text: string, doneText = '계좌번호가 복사되었어요'): void {
+  const fallback = (): boolean => {
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = text
+      ta.setAttribute('readonly', '')
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      ta.style.pointerEvents = 'none'
+      document.body.appendChild(ta)
+      ta.select()
+      const ok = document.execCommand('copy')
+      ta.remove()
+      return ok
+    } catch {
+      return false
+    }
+  }
+  const report = (ok: boolean) => wooriToast(ok ? doneText : '복사하지 못했어요')
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => report(true),
+      () => report(fallback()),
+    )
+  } else report(fallback())
+}
+
 export function useWooriToast(): WooriToastItem | null {
   return useSyncExternalStore(
     (f) => {

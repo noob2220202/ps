@@ -129,3 +129,32 @@ export function wooriPlace(xDp: number, yDp: number): CSSProperties {
  * transform 애니메이션과 함께 써도 된다 (translate 는 따로 합쳐진다). 시트 패널은 style 로 넘긴다.
  */
 export const WOORI_BOTTOM_FIX: CSSProperties = { translate: '0 var(--woori-bottom-fix)' }
+
+/* ───────────────────────── 키가 다른 화면 (APK) — 아래끝 기준 자리 ───────────────────────── */
+//
+// 영상 앱 뷰포트(셸)는 800.667dp 지만 실제 폰 웹뷰는 상태바·내비 바를 뺀 높이라 대개 690–780dp 다 (WooriEnv 화면 맞춤이
+// 레이아웃 높이를 640dp 아래로는 내리지 않는다). 영상에서 아래쪽에 붙어 있던 것(키패드 · [확인] · [이체] 단추 등)을
+// top 고정값으로 두면 키 작은 폰에서 잘린다 → 아래끝 기준으로 놓는다:
+//   top: calc(var(--woori-page-h) - (800.667 − y)px)
+//   --woori-page-h = 실제 앱 100% (담는 상자 높이) · 프레임 모드 800.667px (woori.css)
+//   → 프레임 모드에서는 top: y 와 계산값이 똑같다 (영상 비교 픽셀 그대로). 실제 앱에서는 페이지 아래끝과의 거리를 지킨다.
+// 담는 상자(가장 가까운 position 조상)가 페이지 높이(셸 높이)인 절대 위치 상자에만 쓴다 (스크롤 내용 상자 안에서는 뜻이 달라진다).
+// CSS 파일에서는 같은 식을 그대로: top: calc(var(--woori-page-h) - 74px)   /* 영상 top 726.667 */
+
+/** 영상 앱 뷰포트(셸) 높이 dp = 프레임 모드 --woori-shell-h */
+export const WOORI_VIDEO_PAGE_H = 800.667
+
+/** 영상에서 top = yDp 인 상자의 아래끝 기준 top 값 (style.top 에 그대로) */
+export function wooriBottomTop(yDp: number): string {
+  return `calc(var(--woori-page-h) - ${round4(WOORI_VIDEO_PAGE_H - yDp)}px)`
+}
+
+/** wooriPlace 의 아래끝 기준판: 정수 left + 아래끝 기준 top(정수 y 부분) + 남는 소수는 translate */
+export function wooriPlaceBottom(xDp: number, yDp: number): CSSProperties {
+  const x = Math.floor(xDp)
+  const y = Math.floor(yDp)
+  const fx = round4(xDp - x)
+  const fy = round4(yDp - y)
+  const top = wooriBottomTop(y)
+  return fx || fy ? { left: x, top, translate: `${fx}px ${fy}px` } : { left: x, top }
+}

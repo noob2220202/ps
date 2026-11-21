@@ -3,7 +3,8 @@
 
 그림: 짙은 초록 바탕 + 흰 답안지(모서리 둥근 종이) + 회색 글줄 두 개 + 초록 체크 표시. 도형만 쓴다.
 좌표는 적응형 아이콘 전경 108 x 108 단위(안전 영역 21–87) 하나로 정하고, 같은 도형으로
-  - res/drawable/ic_launcher_foreground_won.xml  (벡터, 적응형 아이콘 전경·단색 아이콘)
+  - res/drawable/ic_launcher_foreground_won.xml  (벡터, 적응형 아이콘 전경)
+  - res/drawable/ic_launcher_monochrome_won.xml  (벡터, Android 13+ 테마 아이콘용 단색 — 알파만 쓰이므로 종이는 테두리로, 글줄·체크는 그대로)
   - res/mipmap-*/ic_launcher.png · ic_launcher_round.png · ic_launcher_foreground.png (API 24–25 용 PNG)
   - res/mipmap-anydpi-v26/ic_launcher(_round).xml, res/values/ic_launcher_background.xml
   - res/drawable/splash.xml (흰 바탕 — Capacitor 기본 스플래시 그림을 지운다)
@@ -93,12 +94,43 @@ def vector_xml():
 '''
 
 
+def monochrome_xml():
+    """테마 아이콘(Android 13+)은 단색 층의 알파만 본다 → 꽉 찬 종이 위 글줄·체크는 사라진다. 종이를 테두리(획)로 그린다."""
+    x0, y0, x1, y1 = PAPER_BOX
+    sw = 3.0
+    h = sw / 2
+    a, b, c, e, rr = x0 + h, y0 + h, x1 - h, y1 - h, PAPER_R - h
+    outline = (f'M{a + rr},{b} H{c - rr} A{rr},{rr} 0 0 1 {c},{b + rr} V{e - rr} A{rr},{rr} 0 0 1 {c - rr},{e} '
+               f'H{a + rr} A{rr},{rr} 0 0 1 {a},{e - rr} V{b + rr} A{rr},{rr} 0 0 1 {a + rr},{b} Z')
+
+    def rrect(a, b, c, e, rr):
+        return (f'M{a + rr},{b} H{c - rr} A{rr},{rr} 0 0 1 {c},{b + rr} V{e - rr} A{rr},{rr} 0 0 1 {c - rr},{e} '
+                f'H{a + rr} A{rr},{rr} 0 0 1 {a},{e - rr} V{b + rr} A{rr},{rr} 0 0 1 {a + rr},{b} Z')
+
+    lines = ''.join(
+        f'    <path android:fillColor="#FFFFFFFF" android:pathData="{rrect(a2, b2, c2, e2, 2)}" />\n' for (a2, b2, c2, e2) in LINES)
+    p = CHECK_PTS
+    check = f'M{p[0][0]},{p[0][1]} L{p[1][0]},{p[1][1]} L{p[2][0]},{p[2][1]}'
+    return f'''<?xml version="1.0" encoding="utf-8"?>
+<!-- WON 답지 테마 아이콘 단색 층 (tools/woori_apk_icon.py 가 만든다 — 손으로 고치지 않는다). 알파만 쓰인다: 종이 테두리 + 글줄 + 체크 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="{sw}" android:fillColor="#00000000" android:pathData="{outline}" />
+{lines}    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="{CHECK_W}" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="{check}" />
+</vector>
+'''
+
+
 ADAPTIVE = '''<?xml version="1.0" encoding="utf-8"?>
 <!-- tools/woori_apk_icon.py 가 만든다 -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@color/ic_launcher_background"/>
     <foreground android:drawable="@drawable/ic_launcher_foreground_won"/>
-    <monochrome android:drawable="@drawable/ic_launcher_foreground_won"/>
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome_won"/>
 </adaptive-icon>
 '''
 
@@ -131,6 +163,8 @@ def main():
     os.makedirs(os.path.join(RES, 'drawable'), exist_ok=True)
     with open(os.path.join(RES, 'drawable', 'ic_launcher_foreground_won.xml'), 'w', encoding='utf-8') as fh:
         fh.write(vector_xml())
+    with open(os.path.join(RES, 'drawable', 'ic_launcher_monochrome_won.xml'), 'w', encoding='utf-8') as fh:
+        fh.write(monochrome_xml())
     with open(os.path.join(RES, 'values', 'ic_launcher_background.xml'), 'w', encoding='utf-8') as fh:
         fh.write(f'<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">{BG}</color>\n</resources>\n')
     # Capacitor 기본 그림(로고 스플래시·전경 벡터·격자 바탕) 지우기

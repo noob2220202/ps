@@ -254,6 +254,11 @@ node ../tools/woori-local-check.cjs        # (루트 npm run check:local) dist-a
 | 큰 화면 | 프레임 모드가 아니면 `installWooriFit`(main.tsx): 앱 레이아웃은 360dp 폭 그대로, 셸을 `transform: scale(k)` (위끝 가운데). 폰 모양(폭을 채워도 높이 600dp 이상)은 k = max(1, 폭/360) → 폭을 꽉 채움 (360x800 · 412x915 · 384x854 → 1 · 1.144 · 1.067), 그 밖(태블릿)은 k = max(1, min(폭/360, 높이/800)) → 폰 비율 기둥이 화면 높이를 채움 (800x1280 → 1.6, 1280x800 → 1). k 는 그 폭에서 본 가장 큰 높이로 정해 시스템 키보드가 떠도 바뀌지 않는다 (셸 높이만 줄어 [확인] 이 키보드 위). 기둥이 화면보다 좁으면 `<html data-woori-side="1">` → 양옆 `--woori-side-bg`(#e9ebee)+옅은 그림자, APK 상태바·내비 바도 그 색 |
 | 토스트 | 영상에 없어 동작이 없는 단추·메뉴(공유·메모·☆·더보기·관리·모으기·복사·🔍·편집·카메라·추가이체·홈 머리 아이콘·공지·카드·배너 그림·추천·탭바 홈 외 탭 …)는 '답지에는 없는 화면이에요' (`wooriTodo`). 탭바 '홈' = 맨 위로. **프레임 모드·shot 모드에서는 토스트를 만들지 않는다** (화면 모양·shot 그대로) |
 | 키보드 | 삼성 키보드 재현은 끄고 진짜 시스템 키보드: 화면은 `wooriUsesSystemKeyboard()`(로컬 빌드 + 프레임 아님)일 때 재현 키보드를 그리지 않는다 (화면 몫) |
+| 화면 방향 | 세로 고정 (`android:screenOrientation="portrait"`). 가로로 돌리면 셸이 360dp 남짓으로 낮아져 인증서 키패드가 화면 밖으로 나가 로그인이 안 되던 것. 큰 화면(sw600dp 이상)은 Android 16 이 방향 고정을 무시하지만 '큰 화면' 맞춤이 받는다 |
+| 글꼴 크기 | 시스템 글꼴 크기를 따르지 않는다: `MainActivity` 가 웹뷰 `setTextZoom(100)` (기본은 100 × fontScale — 절대 위치 + px 줄 높이 레이아웃이라 글자만 커지면 겹친다). `configChanges` 에 `fontScale` 이 있어 글꼴 크기를 바꿔도 앱이 처음 화면으로 돌아가지 않는다 |
+| 서명 · 버전 | 저장소의 고정 연습용 키 `frontend/android/app/woori-debug.keystore` (비밀번호 `android`, 안드로이드 기본 디버그 키와 같은 성격 — 비밀 아님)로 서명, versionCode = git 커밋 수 (`build-apk.sh` → `-PwooriVersionCode`). 새 APK 가 이전 설치 위에 덮어 깔려 폰에 저장된 잔액·거래내역이 남는다. 이 키 이전(컨테이너마다 새 디버그 키)으로 깐 APK 는 한 번만 지우고 깔아야 한다 |
+| 상태바 · 내비 바 | `WooriBars` 플러그인이 DecorView 배경을 띠 색 Drawable 로 둔다. SystemBars 가 시작·설정 변경 때 배경을 흰색으로 바꿔 버리므로 칠할 때마다 다시 달고, 시작·설정 변경 때는 SystemBars 다음 차례로 다시 건다. Android 14 이하(edge-to-edge 아님)는 `window.setStatusBarColor` · `setNavigationBarColor` 도 같이 |
+| 테마 아이콘 | Android 13+ 테마(단색) 아이콘은 단색 층의 알파만 쓰므로 따로 그린 `ic_launcher_monochrome_won.xml`(종이 테두리 + 글줄 + 체크)을 쓴다 (`tools/woori_apk_icon.py`) |
 
 - 웹 빌드(플래그 없음)는 바뀌지 않는다: `main.tsx` 의 `import.meta.env.VITE_WOORI_LOCAL === '1'` 분기가 접혀 로컬 코드·sql.js 가 번들에 없다. vite.config 는 별칭 `woori-backend` 하나만 더한다.
 - 로컬 모드는 **빌드로만** 돈다 (`vite dev` 는 backend 의 CommonJS 를 브라우저로 옮기지 않는다). 브라우저에서 보려면 `VITE_WOORI_LOCAL=1 npx vite build` 뒤 `dist-apk` 를 아무 정적 서버(SPA 대체)로.

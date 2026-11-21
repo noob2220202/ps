@@ -167,11 +167,20 @@ async function main() {
     ok('홈 화면에 345원 (화면 작업 진행 중이면 참고값)', /345\s*원/.test(homeText), (homeText.match(/.{0,20}345.{0,10}/s) || [homeText.slice(0, 80)])[0].replace(/\s+/g, ' '));
     ok('로컬 표시 <html data-woori-local="1">', (await page.evaluate(() => document.documentElement.dataset.wooriLocal)) === '1');
 
-    // 2) 이체 1원
+    // 2) 이체 1원 — 처음 실행은 실제 시계라 시드의 1원 이체(2026-11-21)는 그날에만 '오늘 같은 이체'다
+    const clock0 = (await call('GET', '/dev/clock')).body;
+    const seedDay = clock0.now.slice(0, 10) === '2026-11-21';
     const tr = await transferOne(call);
-    ok('이체 check 200 · 중복 경고(오늘 같은 1원)', tr.check.status === 200 && !!tr.check.body.duplicate, tr.check.body?.display?.duplicateAgo);
+    ok(
+      `이체 check 200 · 중복 경고 ${seedDay ? '있음 (오늘 = 시드 1원 날)' : '없음 (시드 1원은 다른 날)'}`,
+      tr.check.status === 200 && !!tr.check.body.duplicate === seedDay,
+      `${clock0.now} ${tr.check.body?.display?.duplicateAgo ?? '-'}`,
+    );
     ok('비밀번호 1234 → verified', tr.pin.status === 200 && tr.pin.body.state === 'verified');
     ok('이체 실행 201 · 잔액 344원', tr.exec.status === 201 && tr.exec.body.balanceAfter === 344, tr.exec.body?.transaction?.displayName);
+    const recips1 = await call('GET', '/recipients');
+    const again = await call('POST', '/transfers/check', { fromAccountId: 1, recipientId: recips1.body[0].id, amount: 1 });
+    ok('방금 보낸 1원을 또 → 중복 경고 (방금 전)', again.status === 200 && !!again.body.duplicate, again.body?.display?.duplicateAgo);
     const wrong = await call('POST', '/transfers/password', { ticket: tr.check.body.ticket, pin: '0000' });
     ok('이미 끝난 ticket 비밀번호 → backend 와 같은 오류 모양', wrong.status >= 400 && typeof wrong.body.code === 'string', `${wrong.status} ${wrong.body.code}`);
     const badJson = await call('POST', '/transfers/check', '{"x":');

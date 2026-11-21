@@ -5,7 +5,8 @@
 #
 # 1) 웹 빌드  VITE_WOORI_LOCAL=1 vite build → frontend/dist-apk  (backend 순수 로직을 sql.js 위에서 앱 안에 품는다 — frontend/src/WooriLocal.ts)
 # 2) npx cap sync android              (dist-apk → android/app/src/main/assets/public, 플러그인 @capacitor/app)
-# 3) gradle assembleDebug              (frontend/android, --max-workers=$WOORI_GRADLE_WORKERS 기본 2)
+# 3) gradle assembleDebug              (frontend/android, --max-workers=$WOORI_GRADLE_WORKERS 기본 2, versionCode = git 커밋 수,
+#                                       서명 = 저장소의 고정 연습용 키 frontend/android/app/woori-debug.keystore)
 # 4) 복사 → tools/out/apk/WON-answer-key-debug.apk (gitignore)
 #
 # 필요: Node 22, JDK 21, Android SDK (platforms;android-36 · build-tools;35.0.0, 라이선스 수락) — ANDROID_HOME (기본 /opt/android-sdk).
@@ -46,7 +47,10 @@ GRADLE="./gradlew"
 if command -v gradle >/dev/null 2>&1 && gradle --version 2>/dev/null | grep -q "^Gradle $WANT\$"; then
   GRADLE="gradle"
 fi
-"$GRADLE" --no-daemon --max-workers="$WORKERS" assembleDebug
+# versionCode = git 커밋 수 (새 빌드가 이전 설치 위로 덮어 깔리게). git 이 없으면 1
+VERSION_CODE="$(git -C "$ROOT" rev-list --count HEAD 2>/dev/null || echo 1)"
+echo "   versionCode $VERSION_CODE"
+"$GRADLE" --no-daemon --max-workers="$WORKERS" -PwooriVersionCode="$VERSION_CODE" assembleDebug
 
 echo "== 4/4 복사"
 mkdir -p "$OUT_DIR"

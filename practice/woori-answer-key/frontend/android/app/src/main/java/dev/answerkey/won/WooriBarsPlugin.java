@@ -1,5 +1,6 @@
 package dev.answerkey.won;
 
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -7,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import androidx.annotation.NonNull;
@@ -22,19 +24,32 @@ import com.getcapacitor.annotation.CapacitorPlugin;
  * 진짜 상태바·내비 바 뒤의 색. 웹뷰는 SystemBars(insetsHandling 'native', viewport-fit=cover 없음) 덕에 두 바 사이에만 놓이고,
  * 바 자리에는 DecorView 의 안쪽 여백(padding)이 보인다 → 그 여백을 화면이 바라는 띠 색(WooriTheme 의 statusbar · navbar)으로 칠한다.
  * 색이 어두우면 바 아이콘을 밝게 바꾼다. JS: registerPlugin('WooriBars').setColors({ statusBar: '#rrggbb', navBar: '#rrggbb' })
+ *
+ * SystemBars 와의 순서: SystemBars 는 시작할 때(메인 스레드에 post)와 설정이 바뀔 때마다(회전 · 다크 모드 등) setStyle 끝에서
+ * DecorView.setBackgroundColor(windowBackground) 를 불러 배경 Drawable 을 흰 ColorDrawable 로 바꿔 버리고 바 아이콘 밝기도 되돌린다.
+ * → 띠를 칠할 때마다 배경이 우리 BandDrawable 인지 확인해 다시 달고(apply), 시작·설정 변경 때는 SystemBars 다음 차례로 post 해서
+ *   마지막 색과 아이콘 밝기를 다시 건다.
+ * Android 14 이하(edge-to-edge 아님)는 바 자리를 시스템이 window 의 statusBarColor · navigationBarColor 로 칠하므로 그 값도 같이 준다.
  */
 @CapacitorPlugin(name = "WooriBars")
 public class WooriBarsPlugin extends Plugin {
 
     private BandDrawable band;
+    private int lastStatus = Color.WHITE;
+    private int lastNav = Color.WHITE;
+    private boolean hasColors = false;
 
     @Override
     public void load() {
-        getActivity().runOnUiThread(() -> {
-            View decor = getActivity().getWindow().getDecorView();
-            band = new BandDrawable(decor);
-            decor.setBackground(band);
-        });
+        // SystemBars 가 먼저 post 해 둔 setStyle 다음에 돈다 (같은 메인 스레드 Handler 순서)
+        getBridge().executeOnMainThread(this::apply);
+    }
+
+    @Override
+    protected void handleOnConfigurationChanged(Configuration newConfig) {
+        super.handleOnConfigurationChanged(newConfig);
+        // SystemBars.handleOnConfigurationChanged 의 setStyle 이 배경·아이콘 밝기를 되돌린 뒤에 다시 건다
+        getBridge().executeOnMainThread(this::apply);
     }
 
     @PluginMethod
@@ -42,18 +57,35 @@ public class WooriBarsPlugin extends Plugin {
         final int status = parse(call.getString("statusBar"), Color.WHITE);
         final int nav = parse(call.getString("navBar"), status);
         getActivity().runOnUiThread(() -> {
-            Window window = getActivity().getWindow();
-            View decor = window.getDecorView();
-            if (band == null) {
-                band = new BandDrawable(decor);
-                decor.setBackground(band);
-            }
-            band.setColors(status, nav);
-            WindowInsetsControllerCompat c = WindowCompat.getInsetsController(window, decor);
-            c.setAppearanceLightStatusBars(isLight(status));
-            c.setAppearanceLightNavigationBars(isLight(nav));
+            lastStatus = status;
+            lastNav = nav;
+            hasColors = true;
+            apply();
             call.resolve();
         });
+    }
+
+    /** 메인 스레드에서: 배경을 BandDrawable 로 (바뀌어 있으면 다시) 달고 마지막 색 · 아이콘 밝기를 건다 */
+    private void apply() {
+        if (getActivity() == null) return;
+        Window window = getActivity().getWindow();
+        View decor = window.getDecorView();
+        if (band == null) band = new BandDrawable(decor);
+        if (decor.getBackground() != band) decor.setBackground(band);
+        band.setColors(lastStatus, lastNav);
+        if (!hasColors) return;
+        if (Build.VERSION.SDK_INT < 35) {
+            setLegacyBarColors(window, lastStatus, lastNav);
+        }
+        WindowInsetsControllerCompat c = WindowCompat.getInsetsController(window, decor);
+        c.setAppearanceLightStatusBars(isLight(lastStatus));
+        c.setAppearanceLightNavigationBars(isLight(lastNav));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void setLegacyBarColors(Window window, int status, int nav) {
+        window.setStatusBarColor(status);
+        window.setNavigationBarColor(nav);
     }
 
     private static int parse(@Nullable String s, int fallback) {
