@@ -53,7 +53,7 @@ test('server.js: WOORI_API_PORT 로 열고, WOORI_DB_PATH 파일을 쓰고, WOOR
   const file = path.join(dir, 'server.db');
   const port = await freePort();
   const child = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', path.join(__dirname, '..', 'server.js')], {
-    env: { ...process.env, WOORI_API_PORT: String(port), WOORI_DB_PATH: file, WOORI_NOW: '2026-11-21T11:09:11', WOORI_SCENARIO: '' },
+    env: { ...process.env, WOORI_API_PORT: String(port), WOORI_DB_PATH: file, WOORI_NOW: '2026-11-21T11:09:11', WOORI_SCENARIO: '', WOORI_NO_STATEMENT: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   t.after(() => child.kill('SIGTERM'));

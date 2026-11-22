@@ -20,3 +20,6 @@ frontend/android/app/src/main/assets/public/
 *.apk
 *.aab
 .gradle/
+
+# 실제 계좌 거래내역 PDF 에서 옮긴 기본 데이터 — 개인 정보라 저장소에 올리지 않는다 (backend/statement.js)
+backend/data/statement.json

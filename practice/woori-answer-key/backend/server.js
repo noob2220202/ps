@@ -2,6 +2,16 @@
 // 실행: npm start. 포트 WOORI_API_PORT (기본 4100), DB WOORI_DB_PATH (기본 backend/woori.db), 시계 WOORI_NOW (README)
 const { openDb } = require('./db');
 const { createApp } = require('./app');
+const { setStatement } = require('./statement');
+
+// 거래 명세 기본 데이터 (backend/data/statement.json — 있을 때만, .gitignore). 없으면 영상 시드. WOORI_NO_STATEMENT=1 이면 있어도 안 쓴다 (테스트)
+if (process.env.WOORI_NO_STATEMENT !== '1') {
+  try {
+    setStatement(require('./data/statement.json'));
+  } catch (e) {
+    if (e.code !== 'MODULE_NOT_FOUND') throw e;
+  }
+}
 
 const port = Number(process.env.WOORI_API_PORT) || 4100;
 const db = openDb();

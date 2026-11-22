@@ -30,6 +30,11 @@ declare module 'woori-backend/schema.js' {
   export const SCHEMA: string
 }
 
+declare module 'woori-backend/statement.js' {
+  /** backend/statement.js — 거래 명세 기본 데이터를 넣는다 (null = 없음) */
+  export function setStatement(data: unknown): void
+}
+
 declare module 'woori-backend/app.js' {
   /** node:sqlite DatabaseSync 와 같은 모양 (exec · prepare → run/get/all) */
   export interface WooriBackendDb {

@@ -26,9 +26,13 @@ import initSqlJs, { type SqlJsDatabase, type SqlValue } from 'sql.js'
 import sqlWasmUrl from 'sql.js/dist/sql-wasm-browser.wasm?url'
 import { createApp, type WooriBackendDb } from 'woori-backend/app.js'
 import { SCHEMA } from 'woori-backend/schema.js'
+import { setStatement } from 'woori-backend/statement.js'
 import { WOORI_BACK_EVENT, wooriToast } from './WooriEnv.ts'
 import express from './WooriLocalExpress.cjs'
 import WooriLocalRoot from './WooriLocalMenu.tsx'
+
+// 거래 명세 기본 데이터 (backend/data/statement.json — .gitignore, 있을 때만 빌드에 들어간다. backend/statement.js)
+setStatement(Object.values(import.meta.glob('../../backend/data/statement.json', { eager: true, import: 'default' }))[0] ?? null)
 
 /* ───────────────────────── Node 전역 껍데기 ───────────────────────── */
 

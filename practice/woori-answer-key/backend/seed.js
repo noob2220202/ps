@@ -25,6 +25,7 @@ const { BANKS, getBank, transferDisplayName } = require('./banks');
 const { withTransaction } = require('./schema');
 const { setOverride } = require('./clock');
 const { isValidLocalIso } = require('./util');
+const { getStatement } = require('./statement');
 
 const MAIN_ACCOUNT_ID = 1;
 /** 계좌 비밀번호 (더미, README). WOORI_ACCOUNT_PIN 으로 바꿀 수 있다 */
@@ -304,12 +305,104 @@ function buildSeed(name) {
   return { scenario, clock: { ...SCENARIOS[scenario].clock }, account, transactions, recipients, directory };
 }
 
+// ───────────────────────── 거래 명세 PDF 시드 (backend/statement.js) ─────────────────────────
+const STATEMENT_DAY_FROM = 8 * 3600 + 10 * 60; // 같은 날 거래를 펼칠 시각 범위 (PDF 에 시각이 없다)
+const STATEMENT_DAY_TO = 21 * 3600 + 35 * 60;
+
+/** PDF 기재내용의 잘린 끝을 다듬는다: '카카오페이(택시' → '카카오페이(택시)', '씨유(CU) 그' → '씨유(CU)', '김호성 우체' → '김호성' */
+function cleanStatementName(text) {
+  let t = String(text ?? '').trim().replace(/\s+(그|우체)$/, '');
+  if (t.endsWith('(')) t = t.slice(0, -1).trim();
+  else if ((t.match(/\(/g) ?? []).length > (t.match(/\)/g) ?? []).length) t += ')';
+  return t;
+}
+
+const hms = (sec) => [Math.floor(sec / 3600), Math.floor((sec % 3600) / 60), sec % 60].map((n) => String(n).padStart(2, '0')).join(':');
+
+/**
+ * 거래 명세(statement.json) → 시드. 영상 시드(v1-start)의 은행 · 조회 디렉터리는 그대로 쓰고, 내 계좌 · 거래내역만 바꾼다.
+ *   거래 시각: 명세에는 날짜만 있다 → 같은 날 안에서 PDF 순서(최신 → 과거)대로 8:10~21:35 사이에 고르게 펼친다 (초는 고정 규칙으로 흩뜨림).
+ *   종류: 입금 = deposit(의뢰인 = 기재내용), 출금 = withdraw (받는 계좌번호가 명세에 없어 이체(transfer)로는 못 만든다).
+ *   거래구분(code) = 적요, 관리점(branch) = 취급점.  받는 분(최근입금계좌)은 비워 둔다 — 관리 패널 '받는 분'에서 등록.
+ */
+function buildStatementSeed(st) {
+  const base = buildSeed('v1-start');
+  const rows = st.rows; // 최신순
+  const byDate = new Map();
+  rows.forEach((r, i) => {
+    if (!byDate.has(r.date)) byDate.set(r.date, []);
+    byDate.get(r.date).push(i);
+  });
+  const at = new Array(rows.length);
+  for (const [date, idxs] of byDate) {
+    const n = idxs.length;
+    const step = (STATEMENT_DAY_TO - STATEMENT_DAY_FROM) / n;
+    idxs.forEach((rowIdx, j) => {
+      // j = 0 이 그날 가장 늦은 거래. 과거일수록 이른 시각
+      const sec = Math.floor(STATEMENT_DAY_FROM + (n - 1 - j + 0.5) * step) + ((rowIdx * 37) % Math.max(1, Math.min(59, Math.floor(step / 2))));
+      at[rowIdx] = `${date}T${hms(sec)}`;
+    });
+  }
+  const oldestFirst = rows.map((r, i) => ({ r, t: at[i] })).reverse();
+  const transactions = oldestFirst.map(({ r, t }, i) => {
+    const amount = (r.in ?? 0) - (r.out ?? 0);
+    const kind = amount > 0 ? 'deposit' : 'withdraw';
+    const name = cleanStatementName(r.text);
+    return {
+      seq: i + 1,
+      id: txIdFor(t),
+      accountId: MAIN_ACCOUNT_ID,
+      occurredAt: t,
+      displayName: name,
+      amount,
+      balanceAfter: r.bal,
+      kind,
+      code: (r.kind || '').trim() || '지급',
+      branch: (r.branch || '').trim() || (kind === 'deposit' ? DEPOSIT_DETAIL.branch : WITHDRAW_DETAIL.branch),
+      requester: kind === 'deposit' ? name : null,
+      counterpartyName: null,
+      counterpartyBank: null,
+      counterpartyAccount: null,
+      recipientLabel: null,
+      myLabel: null,
+      fee: 0,
+      chequeAmount: 0,
+      detailSrc: 'rule',
+      source: 'statement',
+      note: null,
+      personKey: null,
+    };
+  });
+  // 잔액이 처음(가장 오래된 거래 앞)부터 끝까지 이어지는지 — 안 이어지면 명세를 잘못 옮긴 것
+  for (let i = 1; i < transactions.length; i++) {
+    if (transactions[i].balanceAfter !== transactions[i - 1].balanceAfter + transactions[i].amount) {
+      throw new Error(`statement: 잔액이 이어지지 않는다 (${transactions[i].occurredAt} ${transactions[i].displayName})`);
+    }
+  }
+  const last = transactions[transactions.length - 1];
+  if (st.balance != null && st.balance !== last.balanceAfter) throw new Error(`statement: balance ${st.balance} != 마지막 거래 잔액 ${last.balanceAfter}`);
+  const a = st.account;
+  const account = {
+    ...base.account,
+    digits: a.digits,
+    ownerName: a.ownerName,
+    product: a.product || base.account.product,
+    balance: last.balanceAfter,
+    badge: null,
+    dailyLimit: null,
+  };
+  const directory = base.directory.map((d) =>
+    d.bankCode === ACCOUNT.bankCode && d.digits === ACCOUNT.digits ? { ...d, digits: a.digits, holderName: a.ownerName } : d,
+  );
+  return { scenario: 'statement', clock: { ...base.clock }, account, transactions, recipients: [], directory, source: 'statement' };
+}
+
 /**
  * DB 를 시나리오 상태로 통째로 다시 채운다 (원자적). 이체 표(ticket)도 지운다.
- * @param {{now?: string|null}} [opts] now: 개발용 시계 고정 ('YYYY-MM-DDTHH:mm:ss'). 없으면 덮어쓰기를 지운다 (WOORI_NOW → 실제 시각)
+ * @param {{now?: string|null, seed?: object}} [opts] seed: buildStatementSeed 결과 등 (없으면 name 시나리오). now: 개발용 시계 고정 ('YYYY-MM-DDTHH:mm:ss'). 없으면 덮어쓰기를 지운다 (WOORI_NOW → 실제 시각)
  */
 function resetDb(db, name = 'v1-start', opts = {}) {
-  const seed = buildSeed(name);
+  const seed = opts.seed ?? buildSeed(name);
   withTransaction(db, () => {
     db.exec(`
       DELETE FROM tickets;
@@ -345,18 +438,20 @@ function resetDb(db, name = 'v1-start', opts = {}) {
     for (const d of seed.directory) insDir.run(d.bankCode, d.digits, d.holderName);
 
     setOverride(db, opts.now ?? null);
+    db.prepare("INSERT INTO meta (key, value) VALUES ('seed_source', ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value").run(seed.source ?? 'video');
   });
   return seed;
 }
 
 /**
  * 🔔 관리 패널 '이 프로필 데이터' (bank-app-clone POST /api/reset 과 같은 두 가지). 지금 이름(owner_name)은 그대로 둔다.
- *   'example' 예시 데이터로 = v1-start 시드
+ *   'example' 예시 데이터로 = 거래 명세(statement.json)가 있으면 그것, 없으면 v1-start 시드
  *   'empty'   빈 상태로     = 계좌·거래내역·받는 분을 모두 지우고 통장 0원 (대표 계좌만 남는다)
  */
 function resetMode(db, mode) {
   const name = db.prepare('SELECT owner_name FROM accounts WHERE id = ?').get(MAIN_ACCOUNT_ID)?.owner_name;
-  resetDb(db, 'v1-start');
+  const st = getStatement();
+  resetDb(db, 'v1-start', st ? { seed: buildStatementSeed(st) } : {});
   withTransaction(db, () => {
     if (mode === 'empty') {
       db.exec(`
@@ -376,16 +471,30 @@ function resetMode(db, mode) {
   });
 }
 
-/** DB 가 비어 있으면 WOORI_SCENARIO(기본 'v1-start') 로 채운다. 채웠으면 true */
+/**
+ * DB 가 비어 있으면 채운다: 거래 명세(statement.json)가 있으면 그것, 없으면 WOORI_SCENARIO(기본 'v1-start'). 채웠으면 true.
+ * 이미 데이터가 있어도, 명세가 있는데 한 번도 시드 출처(meta 'seed_source')를 남긴 적 없는 옛 저장본이면 명세로 한 번 바꿔 채운다
+ * (이 기능이 들어오기 전에 깔린 APK 의 저장본 — 그 뒤로는 어떤 리셋이든 출처가 남아 다시 건드리지 않는다).
+ */
 function ensureSeeded(db) {
+  const st = getStatement();
   const n = db.prepare('SELECT COUNT(*) AS n FROM accounts').get().n;
-  if (n > 0) return false;
-  resetDb(db, resolveScenario(process.env.WOORI_SCENARIO || 'v1-start') ?? 'v1-start');
+  if (n > 0) {
+    const src = db.prepare("SELECT value FROM meta WHERE key = 'seed_source'").get();
+    if (st && !src) {
+      resetDb(db, 'v1-start', { seed: buildStatementSeed(st) });
+      return true;
+    }
+    return false;
+  }
+  if (st) resetDb(db, 'v1-start', { seed: buildStatementSeed(st) });
+  else resetDb(db, resolveScenario(process.env.WOORI_SCENARIO || 'v1-start') ?? 'v1-start');
   return true;
 }
 
 module.exports = {
   buildSeed,
+  buildStatementSeed,
   resetDb,
   resetMode,
   ensureSeeded,
