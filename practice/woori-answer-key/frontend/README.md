@@ -272,11 +272,13 @@ node ../tools/woori-local-check.cjs        # (루트 npm run check:local) dist-a
 - 로컬 모드는 **빌드로만** 돈다 (`vite dev` 는 backend 의 CommonJS 를 브라우저로 옮기지 않는다). 브라우저에서 보려면 `VITE_WOORI_LOCAL=1 npx vite build` 뒤 `dist-apk` 를 아무 정적 서버(SPA 대체)로.
 - 웹뷰 디버깅: 디버그 APK 는 `webContentsDebuggingEnabled` — PC Chrome `chrome://inspect`.
 
-### 검증 (2026-11-21)
+### 검증 (2026-11-22)
 
 | 명령 | 결과 |
 |---|---|
-| `bash tools/build-apk.sh` | APK 16 MB (debug), `aapt2 dump badging`: `dev.answerkey.won` · 'WON 답지' · target 36, 자산에 sql wasm · `viewport-fit` 없음 |
+| `bash tools/build-apk.sh` | APK 23 MB (debug), `aapt dump badging`: `dev.answerkey.won` · 'WON 답지' · versionCode 993673 (빌드 시각) · min 24 · target 36, 자산에 sql wasm · `viewport-fit` 없음 |
+| `node tools/lint.cjs` · `npx tsc -b` · `backend npm test` | lint OK · tsc 오류 0 · 테스트 50 통과 · 1 건너뜀 · 실패 0 |
+| `node tools/shot.cjs --full` (프레임·shot 224 상태) | 다듬기 전 기준 화소와 224/224 같음 — `send-a/account-keyboard` · `account-typing` 은 키보드 윗변 한 줄(y 802)이 가끔 흔들린다 (다듬기 전 서버에서도 같은 흔들림, 다시 찍으면 같음) |
 | `node tools/woori-local-check.cjs` (Chromium, 백엔드 서버 없음) | 처음 실행 345원(홈 화면 글자 포함) → fetch 로 이체 1원 201 · 344원 → 새로고침·브라우저 다시 열기 뒤 344원 · 거래 +1 → 숨은 메뉴(맨 위 가운데) 5탭 → 비밀번호 안내 → v1 시작 → 345원·거래 수 원래대로 · 시계 11:09:11 고정 · 네트워크 `/api` 0건 · **실제 backend(Express+node:sqlite)와 68쌍 응답 같음** (GET 25종 × 2 시나리오 · 오류 400/404 · 이체 흐름 · 커서) · 저장 실패 흉내(IndexedDB put 던짐) → 이체 507 `STORAGE_FAILED` · 메모리 잔액 그대로 → 되살리면 같은 ticket 201 |
 | 전체 흐름 (Playwright, dist-apk, 360x800 DPR 2.625 터치 · 412x915 · 384x854 · 태블릿 800x1280 · 1280x800) | 스플래시 → 인증서 → 로그인 로딩 → 홈(팝업 뒤로 닫기) → 거래내역 → 기간 이번달·6개월·1년(입금)·3개월 · 직접입력+과거순 · 초기화 각각 적용(필터 줄·기간 줄) → 상세 → 뒤로 → 홈 → 이체 1원(중복 경고·비밀번호 1234, 시트마다 뒤로 닫기) → 완료 → 거래내역 새 -1원 → 홈 344원 · 계좌번호 직접 입력(높이 480 = 키보드, [확인] 보임) · 홈 뒤로 2번 = 종료 · 콘솔 오류 0 (41/41). 프레임 shot 7개(home/top-banner1 · popup-idle · history/all-top · sheet-all · send-b/amount-keypad · dup-idle · send-a/account-typed) 고치기 전·후 화소 같음 |
 
