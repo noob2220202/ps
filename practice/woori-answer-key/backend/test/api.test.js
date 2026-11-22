@@ -33,7 +33,7 @@ describe('health / accounts', () => {
     const a = r.body[0];
     assert.deepEqual(
       [a.id, a.bank, a.bankName, a.bankShort, a.product, a.productNoSpace, a.number, a.badge, a.balance, a.withdrawable],
-      [1, 'woori', '우리은행', '우리', 'WON 통장', 'WON통장', '1002-123-456789', '한도제한', 345, 345],
+      [1, 'woori', '우리은행', '우리', 'WON 통장', 'WON통장', '1002-123-456789', null, 345, 345],
     );
     assert.deepEqual((await srv.get('/accounts/1')).body, a);
     assert.equal((await srv.get('/accounts/2')).status, 404);

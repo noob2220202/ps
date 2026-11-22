@@ -39,7 +39,7 @@ const ACCOUNT = {
   digits: '1002123456789', // 화면 '1002-123-456789' (더미 — 실제와 자리수·하이픈 모양·앞 4자리 1002 같음)
   product: 'WON 통장',
   ownerName: '정우진', // 영상의 받는 분/본인 더미 (privacy.json). 받는 분 통장표기 기본값
-  badge: '한도제한',
+  badge: null, // 예전엔 '한도제한' 칩 (홈 · 거래내역) — 뺐다
   dailyLimit: DAILY_LIMIT,
 };
 
