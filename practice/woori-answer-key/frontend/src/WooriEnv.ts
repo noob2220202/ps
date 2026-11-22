@@ -20,9 +20,6 @@ export const WOORI_LOCAL: boolean = import.meta.env.VITE_WOORI_LOCAL === '1'
  */
 export const WOORI_BACK_EVENT = 'woori-back'
 
-/** 로컬 모드 숨은 메뉴를 여는 window 이벤트 (WooriLocal.ts 모서리 탭 → WooriLocalMenu.tsx) */
-export const WOORI_LOCAL_MENU_EVENT = 'woori-local-menu'
-
 /** APK(Capacitor 네이티브) 안인지 */
 export function wooriIsNative(): boolean {
   return typeof document !== 'undefined' && document.documentElement.dataset.wooriNative === '1'
@@ -46,7 +43,7 @@ export const WOORI_BACK_PRIO = {
   page: 10,
   /** 그 페이지의 시트·팝업 (WooriSheet onBack) */
   sheet: 20,
-  /** App 밖 대화상자 (숨은 메뉴) */
+  /** App 밖 대화상자 (지금은 없다 — 시트·페이지보다 먼저 받을 것) */
   dialog: 30,
 } as const
 
@@ -196,9 +193,9 @@ export function useWooriToast(): WooriToastItem | null {
 //   줄어드는 것은 시스템 키보드 몫). 그 밖에 높이가 줄면(화면 분할 · 팝업 창) 처음 연 것처럼 다시 맞춘다. 입력칸에서 막 빠진 뒤 KBD_CLOSE_MS
 //   동안은 아직 키보드가 닫히는 중으로 본다 (닫히며 오는 중간 높이에 k 가 튀지 않게) — 그 뒤 한 번 더 맞춰 자리를 잡는다 (onWooriKeyboardSettled).
 //   기둥이 화면보다 좁으면 양옆 바탕(--woori-side-bg)이 보이고 <html data-woori-side="1">. APK 상태바·내비 바는 양옆이 기둥으로 보일 만큼
-//   넓을 때(한쪽 gutter ≥ 8dp)만 그 색 (WooriLocalMenu — 1dp 남짓 틈에 바 색까지 바꾸지 않는다).
+//   넓을 때(한쪽 gutter ≥ 8dp)만 그 색 (WooriLocalMenu WooriLocalBars — 1dp 남짓 틈에 바 색까지 바꾸지 않는다).
 // 결과는 <html data-woori-fit="scale">(k ≠ 1 일 때) + --woori-fit-scale · --woori-shell-h. 포인터 좌표를 앱 dp 로 바꿀 때는 wooriFitScale() 로 나눈다
-// (k < 1 도 같다. 셸 getBoundingClientRect 폭 ÷ offsetWidth 로 재도 된다 — WooriLocal appPoint).
+// (k < 1 도 같다. 셸 getBoundingClientRect 폭 ÷ offsetWidth 로 재도 된다).
 
 export interface WooriFit {
   scale: number

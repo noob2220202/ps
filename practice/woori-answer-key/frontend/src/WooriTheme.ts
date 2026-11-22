@@ -136,7 +136,7 @@ export function resolveColor(css: string, theme: WooriThemeName = getTheme()): s
 
 /* ───────────────────────── 테마 ───────────────────────── */
 
-/** 테마 저장 키 (sessionStorage). 숨은 메뉴의 시나리오 되돌리기도 이것은 지우지 않는다 (WooriLocalMenu) */
+/** 테마 저장 키 (sessionStorage) */
 export const WOORI_THEME_KEY = 'woori.theme'
 const STORAGE_KEY = WOORI_THEME_KEY
 const themeListeners = new Set<() => void>()

@@ -212,7 +212,7 @@ const AMOUNT_ERRORS: ReadonlySet<string> = new Set(['INSUFFICIENT_BALANCE', 'DAI
 /**
  * 비밀번호를 맞힌 뒤 확인 화면으로 가기 전에 남기는 폼 (sessionStorage): 받는 분 쿼리(key)·입력한 숫자·고친 통장표기.
  * 뒤로(POP) 돌아온 금액 화면만 읽는다. 새로 들어오면(push·replace·첫 로드) 지우고, 확인 화면은 [이체] 성공·취소 때 지운다
- * → 보낸 금액이 다시 채워지지 않는다. 숨은 메뉴의 되돌리기도 woori.* 라 지운다.
+ * → 보낸 금액이 다시 채워지지 않는다.
  */
 export const WOORI_SEND_DRAFT_KEY = 'woori.send.draft'
 interface SendDraft {

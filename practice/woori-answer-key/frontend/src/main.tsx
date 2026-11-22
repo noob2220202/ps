@@ -92,7 +92,7 @@ function render() {
   )
 }
 
-// 로컬 빌드(VITE_WOORI_LOCAL=1, 서버 없는 APK — tools/build-apk.sh): '/api' 를 앱 안 backend(sql.js)로 가로채고 숨은 메뉴를 단 뒤 그린다.
+// 로컬 빌드(VITE_WOORI_LOCAL=1, 서버 없는 APK — tools/build-apk.sh): '/api' 를 앱 안 backend(sql.js)로 가로채고(상태바 색 루트도 단다) 그린다.
 // 웹 빌드에선 조건이 false 로 접혀 이 import 가 번들에서 빠지고, 지금처럼 바로 그린다.
 if (import.meta.env.VITE_WOORI_LOCAL === '1') {
   void import('./WooriLocal.ts').then(

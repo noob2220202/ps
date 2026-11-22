@@ -11,12 +11,10 @@
 //     처음 실행(저장본 없음)이면 createApp 의 ensureSeeded 가 v1-start(잔액 345원)로 채운다. 스키마가 바뀐 저장본은 버리고 새로 채운다.
 //     쓰기가 실패하면(기기 저장 공간 부족 등) 메모리 DB 를 마지막으로 저장된 바이트로 되돌리고 507 {code:'STORAGE_FAILED'} (한국어 error)
 //     → 화면은 backend 오류처럼 안내하고, 메모리와 저장본(= 다시 켰을 때)이 어긋나지 않는다 (이체가 메모리에서만 된 것처럼 보이지 않게).
-//   - 시계: backend 와 같다 (덮어쓰기 meta → 실제 시각, Asia/Seoul). 숨은 메뉴(WooriLocalMenu)에서 시나리오 되돌리기 + '영상 시각 고정'.
-//   - 숨은 메뉴 열기: 화면 **맨 위 가운데(제목 자리, 앱 x 130–230dp · y 0–44dp)** 를 1.5초 안에 5번 빠르게 탭. 두 번째 탭부터는 앱에 넘기지 않는다.
-//     (예전 왼쪽 위 모서리 32x32 는 머리 ‹(16,14,24,24)와 겹쳐 첫 탭이 뒤로 갔다 — 제목 자리에는 눌리는 단추가 없다.
-//      홈에서는 지갑 아이콘(196–220) 이 걸치지만 동작 없는 아이콘이다.) 좌표는 셸 기준 앱 dp (큰 화면 확대 배율을 나눈다).
+//   - 시계: backend 와 같다 (덮어쓰기 meta → 실제 시각, Asia/Seoul). 처음 상태로 되돌리는 화면 안 메뉴는 없다 — 앱 데이터를 지우면
+//     (안드로이드 설정 → 앱 → 저장공간 → 데이터 삭제) 다음 실행에 v1-start 로 다시 채운다. /api/dev/reset · /api/dev/clock 은 도구(woori-local-check)용으로 남는다.
 //   - 폰 뒤로 버튼(@capacitor/app backButton, APK 에서만): 먼저 window 에 취소 가능한 WOORI_BACK_EVENT('woori-back') →
-//     WooriEnv 의 뒤로 처리 스택(숨은 메뉴 > 열린 시트·팝업 > 페이지 머리 ‹·✕)이 하나만 받는다. 아무도 막지 않으면
+//     WooriEnv 의 뒤로 처리 스택(열린 시트·팝업 > 페이지 머리 ‹·✕)이 하나만 받는다. 아무도 막지 않으면
 //     처음 화면(/ 스플래시 · /cert 인증서·로그인 로딩 · /home 홈)이면 '한 번 더 누르면 종료' 토스트 → 2초 안에 또 누르면 exitApp,
 //     그 밖은 기록이 있으면 history.back() (WooriNav 가 들어온 전환의 반대로 돌아간다), 없으면 홈으로.
 //   - <html data-woori-local="1">, APK 안이면 data-woori-native="1" (WooriEnv.ts)
@@ -28,7 +26,7 @@ import initSqlJs, { type SqlJsDatabase, type SqlValue } from 'sql.js'
 import sqlWasmUrl from 'sql.js/dist/sql-wasm-browser.wasm?url'
 import { createApp, type WooriBackendDb } from 'woori-backend/app.js'
 import { SCHEMA } from 'woori-backend/schema.js'
-import { WOORI_BACK_EVENT, WOORI_LOCAL_MENU_EVENT, wooriToast } from './WooriEnv.ts'
+import { WOORI_BACK_EVENT, wooriToast } from './WooriEnv.ts'
 import express from './WooriLocalExpress.cjs'
 import WooriLocalRoot from './WooriLocalMenu.tsx'
 
@@ -352,64 +350,6 @@ export function installWooriLocalFetch(): void {
   }
 }
 
-/* ───────────────────────── 시작 (숨은 메뉴 · 뒤로 버튼) ───────────────────────── */
-
-/** 숨은 메뉴 자리: 앱 dp (셸 기준) — 화면 맨 위 가운데, 제목 자리 */
-const MENU_ZONE = { x0: 130, x1: 230, y0: 0, y1: 44 } as const
-const TAPS = 5
-const TAP_WINDOW_MS = 1500
-const TAP_GAP_MS = 500
-
-/** 화면 좌표 → 셸(앱 뷰포트) 기준 dp. 큰 화면 확대(scale)·가운데 놓기를 되돌린다 */
-function appPoint(clientX: number, clientY: number): { x: number; y: number } | null {
-  const shell = document.querySelector<HTMLElement>('.woori-shell')
-  if (!shell) return null
-  const r = shell.getBoundingClientRect()
-  const k = shell.offsetWidth ? r.width / shell.offsetWidth : 1
-  return { x: (clientX - r.left) / k, y: (clientY - r.top) / k }
-}
-
-function inMenuZone(clientX: number, clientY: number): boolean {
-  const p = appPoint(clientX, clientY)
-  return !!p && p.x >= MENU_ZONE.x0 && p.x <= MENU_ZONE.x1 && p.y >= MENU_ZONE.y0 && p.y <= MENU_ZONE.y1
-}
-
-/** 맨 위 가운데 5번 빠른 탭 → 숨은 메뉴. 두 번째 탭부터는 앱에 넘기지 않는다 */
-function installMenuTaps() {
-  let taps: number[] = []
-  let swallowUntil = 0
-  window.addEventListener(
-    'pointerdown',
-    (e) => {
-      if (!e.isPrimary || !inMenuZone(e.clientX, e.clientY)) {
-        taps = []
-        return
-      }
-      const t = e.timeStamp
-      if (taps.length && (t - taps[taps.length - 1] > TAP_GAP_MS || t - taps[0] > TAP_WINDOW_MS)) taps = []
-      taps.push(t)
-      if (taps.length >= 2) {
-        e.preventDefault()
-        e.stopPropagation()
-        swallowUntil = performance.now() + 700
-      }
-      if (taps.length >= TAPS) {
-        taps = []
-        window.dispatchEvent(new Event(WOORI_LOCAL_MENU_EVENT))
-      }
-    },
-    { capture: true },
-  )
-  const swallow = (e: MouseEvent) => {
-    if (performance.now() < swallowUntil && inMenuZone(e.clientX, e.clientY)) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  }
-  window.addEventListener('pointerup', swallow, { capture: true })
-  window.addEventListener('click', swallow, { capture: true })
-}
-
 /* ───────────────────────── 폰 뒤로 버튼 ───────────────────────── */
 
 /** 뒤로가 '앱 종료' 가 되는 처음 화면 (스플래시 · 인증서(로그인 로딩 포함) · 홈) */
@@ -456,7 +396,7 @@ function installBackButton(native: boolean) {
 
 let started = false
 
-/** 로컬 모드 시작: fetch 가로채기 → (sql.js·저장본 미리 띄우기) → 숨은 메뉴 → (APK 면) 뒤로 버튼. main.tsx 가 App 을 그리기 전에 부른다 */
+/** 로컬 모드 시작: fetch 가로채기 → (sql.js·저장본 미리 띄우기) → (APK 면) 뒤로 버튼. main.tsx 가 App 을 그리기 전에 부른다 */
 export function startWooriLocal(): void {
   if (started) return
   started = true
@@ -466,7 +406,6 @@ export function startWooriLocal(): void {
   if (native) html.dataset.wooriNative = '1'
   installWooriLocalFetch()
   void wooriLocalRuntime().catch((err: unknown) => console.error('[woori-local] 시작 실패', err))
-  installMenuTaps()
   installBackButton(native)
   const host = document.createElement('div')
   host.id = 'woori-local-root'

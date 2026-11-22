@@ -12,7 +12,7 @@
  *   2. 새 브라우저 프로필: 처음 실행 → 시드 v1-start (홈 잔액 345원).
  *   3. fetch 로 이체 흐름 (최근입금계좌 → check → 비밀번호 1234 → 실행 1원) → 201, 잔액 344원.
  *   4. 새로고침, 그리고 브라우저를 닫았다 같은 프로필로 다시 열기 → 잔액 344원·거래 1건 더 (IndexedDB 에 남음).
- *   5. 숨은 메뉴: 화면 맨 위 가운데(제목 자리) 5번 탭 → 대화상자(비밀번호 안내 포함) → 'v1 시작' → 처음 화면부터 다시 열림 → 345원.
+ *   5. 숨은 메뉴 없음: 화면 맨 위 가운데 5번 탭 → 대화상자 없음. 도구용 /api/dev/reset (v1-start, 영상 시각) → 처음 화면부터 다시 열림 → 345원.
  *   6. 같은 응답인지: 같은 시나리오·같은 시계(now:'video')로 backend/app.js 를 실제 Express(node:sqlite 메모리 DB)로도 띄워
  *      여러 GET 과 이체 흐름의 JSON 을 그대로 비교한다 (로컬 = sql.js + WooriLocalExpress).
  *   7. 저장 실패 흉내 (IndexedDB put 이 던진다 = 기기 저장 공간 부족): 이체 실행 → 507 STORAGE_FAILED(한국어 안내), 메모리 잔액도 그대로
@@ -212,23 +212,22 @@ async function main() {
     const next = await call('GET', `/accounts/1/transactions?limit=30&cursor=${encodeURIComponent(page2.body.nextCursor)}`);
     ok('커서 다음 쪽 (Buffer base64url 껍데기)', next.status === 200 && next.body.items.length > 0 && next.body.items[0].id !== page2.body.items[0].id, next.body.items?.[0]?.id);
 
-    // 5) 숨은 메뉴 → v1 시작
-    // 자리: 셸(앱 뷰포트) 맨 위 가운데 (앱 x 130–230dp · y 0–44dp, WooriLocal.ts MENU_ZONE) — 머리 ‹ 와 겹치지 않는다
+    // 5) 숨은 메뉴는 없다: 맨 위 가운데(예전 메뉴 자리, 앱 x 130–230dp · y 0–44dp) 5번 탭 → 대화상자 없음.
+    //    처음 상태로 되돌리기는 도구용 /api/dev/reset (앱 데이터 삭제와 같은 결과) → 처음 화면부터 다시 연다
     const sb = await page.locator('.woori-shell').boundingBox();
     const k = sb.width / 360;
     for (let i = 0; i < 5; i++) await page.mouse.click(sb.x + 180 * k, sb.y + 20 * k, { delay: 20 });
-    const dlg = page.locator('.woori-local-menu__card');
-    await dlg.waitFor({ state: 'visible', timeout: 5000 });
-    ok('맨 위 가운데 5번 탭 → 시나리오 되돌리기 대화상자', await dlg.isVisible());
-    const hint = await page.locator('[data-testid="woori-local-hint"]').innerText();
-    ok('대화상자에 비밀번호 안내 (계좌 1234 · 인증서 아무 6자리)', /1234/.test(hint) && /아무 6자리/.test(hint), hint.replace(/\s+/g, ' '));
-    await page.locator('[data-testid="woori-local-now"]').filter({ hasText: '344원' }).waitFor({ timeout: 5000 }).catch(() => {});
-    const nowText = await page.locator('[data-testid="woori-local-now"]').innerText();
-    ok('대화상자의 지금 잔액 344원', /344원/.test(nowText), nowText);
+    await page.waitForTimeout(600);
+    ok('맨 위 가운데 5번 탭 → 숨은 메뉴 없음', (await page.locator('.woori-local-menu').count()) === 0 && (await page.getByText('시나리오 되돌리기').count()) === 0);
+    const rs = await call('POST', '/dev/reset', { scenario: 'v1-start', now: 'video' });
+    ok('도구용 되돌리기 POST /dev/reset → 200', rs.status === 200, rs.status);
     await page.evaluate(() => {
       window.__wooriBeforeReset = true;
+      for (const store of [sessionStorage, localStorage]) {
+        for (const key of Object.keys(store)) if (key.startsWith('woori.')) store.removeItem(key);
+      }
+      window.location.replace('/');
     });
-    await page.locator('[data-scenario="v1-start"]').click();
     await page.waitForFunction(() => !window.__wooriBeforeReset && document.readyState === 'complete', null, { timeout: 10000 });
     call = pageCall(page);
     const acc3 = await call('GET', '/accounts');

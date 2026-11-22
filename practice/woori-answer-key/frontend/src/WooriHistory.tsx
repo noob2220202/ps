@@ -366,7 +366,7 @@ export default function WooriHistory() {
     const id = window.setTimeout(() => {
       leave.current = null
       setBusySpinner(false)
-      // 그 사이 다른 페이지가 위에 왔으면(숨은 메뉴의 이동 등) 가지 않는다
+      // 그 사이 다른 페이지가 위에 왔으면(다른 이동 등) 가지 않는다
       if (topRef.current) fn()
     }, ms)
     leave.current = { to, id }

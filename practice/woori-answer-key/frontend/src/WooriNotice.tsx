@@ -2,7 +2,7 @@
 //   범위: 알림 목록 + 편집(여러 개 선택해 삭제)만. 홈 머리의 지갑·AI·☰(프로필 등)는 그대로 wooriTodo 로 둔다.
 //   내용은 영상 속 홈 공지·배너 문구에서 그대로 가져왔다(새로 지어내지 않음) — 이번 행운은.. / 첫 급여 NpayP / 해외결제 적립.
 //   읽음·지움은 모듈 보관(화면을 떠났다 와도 남는다) + 실제 앱이면 기기에도 남긴다 (localStorage 'woori.notice.v1' — 앱을 다시 켜도 그대로,
-//   숨은 메뉴 시나리오 되돌리기가 'woori.' 키와 함께 지운다). 저장소를 못 쓰면 이번 실행 동안만. 서버에는 저장하지 않는다(APK 로컬 데모).
+//   앱 데이터를 지우면 함께 사라진다). 저장소를 못 쓰면 이번 실행 동안만. 서버에는 저장하지 않는다(APK 로컬 데모).
 import { useState } from 'react'
 import { WooriButton } from './WooriButton.tsx'
 import { wooriLiveApp } from './WooriEnv.ts'
