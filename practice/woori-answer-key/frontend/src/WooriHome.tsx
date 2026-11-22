@@ -411,6 +411,30 @@ function Art({ name, x, y, w, h, transform, className, style }: { name: WooriArt
   )
 }
 
+/**
+ * 다른 은행 계좌 카드의 겹친 로고 원 5개 — 실제 앱 전용 벡터판 (프레임·shot 은 home.other-bank-logos 비트맵 그대로).
+ * 비트맵(hq 564x156)에 원 모형을 맞춘 값 → dp (카드 기준): 원 32dp = 흰 테 1dp + 원판 30dp, 간격 24dp (8dp 겹침),
+ * 첫 원 상자 left 100 · top 16 (맞춤값 원 중심 116.20 + 23.94i, 32.05 · 원판 r 14.97–15.00 · 테 0.99), 오른쪽 원이 위.
+ * 은행 원판 = banks.*.hq.svg 상자 전체 (clip r=280/560) → 30dp 에 그대로 (로고 배율 1.00, 어긋남 ≤0.23dp).
+ * … 원: 원판 #e3e3e3, 점 지름 3.6dp #919192, 점 간격 6.46dp, 원 중심보다 0.3dp 아래 (반값 폭으로 잰 값).
+ */
+const OTHER_BANK_LOGOS: WooriArtName[] = ['banks.kakao', 'banks.toss', 'banks.kb', 'banks.hana']
+function OtherBankLogos() {
+  return (
+    <div className="woori-home__banks" aria-hidden="true">
+      {OTHER_BANK_LOGOS.map((name, i) => (
+        <img key={name} src={artSrc(name)} alt="" draggable={false} style={{ left: i * 24 }} />
+      ))}
+      <svg viewBox="0 0 32 32" style={{ left: 96 }}>
+        <circle cx="16" cy="16" r="15" fill="#e3e3e3" />
+        <circle cx="9.54" cy="16.3" r="1.8" fill="#919192" />
+        <circle cx="16" cy="16.3" r="1.8" fill="#919192" />
+        <circle cx="22.46" cy="16.3" r="1.8" fill="#919192" />
+      </svg>
+    </div>
+  )
+}
+
 function Box({ x, y, w, h, className, style, children }: { x: number; y: number; w: number; h: number; className?: string; style?: CSSProperties; children?: ReactNode }) {
   return (
     <div className={'woori-home__box' + (className ? ' ' + className : '')} style={{ ...wooriPlace(x, y), width: w, height: h, ...style }}>
@@ -1053,7 +1077,12 @@ export default function WooriHome() {
             {/* 다른 은행 계좌 카드 */}
             {view.otherBank !== 'none' && (
               <div className="woori-home__card" style={{ left: 16, top: 252, width: 328, height: lay.otherH }}>
-                {view.otherBank === 'full' && <Art name="home.other-bank-logos" x={99} y={15} w={129} h={36} transform="translate(0.5157px, 0.0417px) scale(0.999543, 0.993056)" />}
+                {view.otherBank === 'full' &&
+                  (!shot && wooriLiveApp() ? (
+                    <OtherBankLogos />
+                  ) : (
+                    <Art name="home.other-bank-logos" x={99} y={15} w={129} h={36} transform="translate(0.5157px, 0.0417px) scale(0.999543, 0.993056)" />
+                  ))}
                 <Art name="home.close-x-small" x={300} y={12} w={16} h={16} />
                 <div style={{ position: 'absolute', inset: 0, top: view.otherBank === 'full' ? 0 : -32 }}>
                   <T x={42.813} y={59} size={15} weight={500} color="#4c4d4f" ty={0.25}>

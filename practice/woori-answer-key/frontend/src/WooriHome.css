@@ -381,6 +381,33 @@
   background: #ffffff;
 }
 
+/* 다른 은행 계좌 카드의 겹친 로고 원 (실제 앱 벡터판, OtherBankLogos): 32dp 흰 원(테 1dp) 안에 30dp 원판, 뒤 원이 위 */
+.woori-home__banks {
+  position: absolute;
+  left: 100px;
+  top: 16px;
+  width: 128px;
+  height: 32px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.woori-home__banks > img,
+.woori-home__banks > svg {
+  position: absolute;
+  top: 0;
+  display: block;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.woori-home__banks > img {
+  padding: 1px;
+}
+
 .woori-home__add-btn {
   border-radius: 16.167px;
   background: #2286f2;
