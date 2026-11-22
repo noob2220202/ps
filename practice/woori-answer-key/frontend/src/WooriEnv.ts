@@ -5,7 +5,7 @@
 //
 // 이 모듈이 가진 실제 앱(프레임 모드 아님) 몫 세 가지 — 프레임 모드·shot 모드에서는 아무것도 하지 않는다 (영상 비교 화면이 바뀌지 않게):
 //   1. 뒤로 처리 스택 useWooriBack — 폰 뒤로 버튼(WOORI_BACK_EVENT)을 열린 대화상자 > 시트·팝업 > 페이지(머리 ‹·✕) 순서로 하나만 받는다
-//   2. 토스트 wooriToast · wooriTodo('답지에는 없는 화면이에요') — App 이 셸 안에 그린다 (WooriToastHost)
+//   2. 토스트 wooriToast — App 이 셸 안에 그린다 (WooriToastHost). wooriTodo = 영상에 없는 곳 누름: 아무것도 하지 않는다(토스트 없음)
 //   3. 화면 맞춤 installWooriFit — 앱(360dp 기준 레이아웃) 전체를 화면 폭·높이에 맞춰 확대·축소한다 (레이아웃 높이 640dp 바닥, 아래 '화면 맞춤').
 //      시스템 키보드 판단 wooriKeyboardMayBeUp · onWooriKeyboardSettled 는 금액 화면(통장표기 시트 뒤 폼 자리)도 같이 쓴다
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
@@ -105,9 +105,6 @@ export interface WooriToastItem {
   text: string
 }
 
-/** 영상에 없어 동작이 없는 단추·메뉴를 눌렀을 때 (프레임·shot 모드에서는 안 나온다) */
-export const WOORI_TODO_TEXT = '답지에는 없는 화면이에요'
-
 let toastNow: WooriToastItem | null = null
 let toastSeq = 0
 let toastTimer = 0
@@ -129,10 +126,12 @@ export function wooriToast(text: string, ms = 2000): void {
   emitToast()
 }
 
-/** onClick 에 바로: 바깥(예: 카드 탭)으로 번지지 않게 막고 '답지에는 없는 화면이에요' */
+/**
+ * onClick 에 바로: 영상에 없는 곳 누름 — 바깥(예: 카드 탭)으로 번지지 않게 막기만 하고 아무것도 하지 않는다.
+ * (예전에는 '답지에는 없는 화면이에요' 토스트를 띄웠다 — 아무 데나 누를 때마다 떠서 뺐다)
+ */
 export function wooriTodo(e?: { stopPropagation?: () => void }): void {
   e?.stopPropagation?.()
-  wooriToast(WOORI_TODO_TEXT)
 }
 
 /**
