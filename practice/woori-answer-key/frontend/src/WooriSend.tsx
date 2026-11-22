@@ -453,7 +453,9 @@ export default function WooriSend() {
   }
 
   // 줄을 빼는 누름([삭제] · 자주 탭 ☆ 끔): 아래 행이 한 프레임에 같은 자리로 올라오므로 연타(REMOVE_GAP_MS 안)는 한 번만 받는다 — 두 줄이 빠지지 않게.
-  // 그 단추에 포커스가 있었으면(키보드·TalkBack) 다음 줄 같은 단추로 옮긴다 (줄이 없으면 고른 탭) — 포커스가 페이지 밖으로 새지 않게
+  // 그 단추에 포커스가 있었으면(키보드·TalkBack, 터치 탭도 단추에 포커스를 둔다) 다음 줄 같은 단추로 옮긴다 (줄이 없으면 고른 탭) — 포커스가 페이지 밖으로 새지 않게.
+  // 옮길 때 목록을 스크롤하지 않는다(preventScroll): 다음 줄 단추는 방금 누른 단추 자리(화면에 있던 자리)로 올라오고 탭은 늘 보인다 —
+  // 반쯤 가려진 줄의 ☆·[삭제] 를 눌렀을 때 목록이 다음 단추를 다 보이려 튀지 않게
   const lastRemove = useRef(-Infinity)
   const refocus = useRef<{ sel: string; at: number } | null>(null)
   const beginRemove = (sel: string, at: number) => {
@@ -469,7 +471,7 @@ export default function WooriSend() {
     refocus.current = null
     const same = root.querySelectorAll<HTMLElement>(f.sel)
     const next = same.length ? same[Math.min(f.at, same.length - 1)] : root.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
-    next?.focus()
+    next?.focus({ preventScroll: true })
   }, [recipients, root])
 
   // 저장 실패: 그 줄을 누르기 전 모습으로 제자리에 되돌리고 다시 불러온다 (다시 불러오기마저 실패해도 목록이 비거나 틀리지 않게)

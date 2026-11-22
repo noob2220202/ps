@@ -15,6 +15,7 @@
 // 폰 뒤로 버튼: 시트가 열려 있으면 닫기, 아니면 ‹ 와 같이 홈 (스펙 4.1 'OS 뒤로').
 // 기다리는 이동(‹ 676ms · [이체] 645ms · 출금 행 21ms)은 하나만 — 그 사이 행·시트·다른 이동을 누르면 앞의 것은 버린다 (언마운트·덮임도).
 // 계좌번호 복사 아이콘 = 클립보드 복사('우리은행 1002-…', 홈과 같은 글자) + 토스트 (설계). 오버레이 스크롤바는 실제 앱에서 스크롤 상자 높이로 잰다 (키가 다른 화면).
+//   실제 앱은 스크롤되지 않는 문서와 앱이 옮긴 자리([적용하기] 의 맨 위로 · 합계 닫힘의 끝 맞춤)에 스크롤바를 띄우지 않는다 (손가락 스크롤만).
 // 실제 앱만: 문서 높이는 내용 끝까지(영상 셸 800.667 바닥 없음), 긴 이름(통장표기)은 금액 앞에서 말줄임 (WooriHistory.css).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -287,6 +288,8 @@ export default function WooriHistory() {
   const doneSpin = useWooriStages(DONE_SPINNER_AT, { start: fromDone, shotStage: s ? 1 : null })
   const rootRef = useRef<HTMLDivElement>(null)
   const sbRef = useRef<HTMLDivElement>(null)
+  /** 앱이 스스로 옮긴 스크롤 자리 — 그 자리의 스크롤 이벤트 한 번은 스크롤바 없이 (실제 앱, onScroll) */
+  const quietTop = useRef<number | null>(null)
   const timers = useRef<number[]>([])
   /** 기다리는 이동 하나 (to = 갈 곳) */
   const leave = useRef<{ to: string; id: number } | null>(null)
@@ -389,6 +392,15 @@ export default function WooriHistory() {
       setStuck(st >= STICK_AT)
       const sb = sbRef.current
       if (!sb) return
+      // 실제 앱: 스크롤되지 않는 문서(빈·짧은 목록 · 다시 불러오는 중)와 앱이 옮긴 자리([적용하기] 의 맨 위로 · 합계 닫힘의 끝 맞춤)에는
+      // 스크롤바를 띄우지 않는다 (안드로이드 오버레이 스크롤바와 같게 — 손가락 스크롤만). 프레임 모드는 그대로
+      const quiet = quietTop.current
+      quietTop.current = null
+      if (wooriLiveApp() && (el.scrollHeight - el.clientHeight < 1 || (quiet != null && Math.abs(st - quiet) < 1))) {
+        sb.classList.remove('is-fading')
+        sb.style.opacity = '0'
+        return
+      }
       const docH = el.scrollHeight
       const max = Math.max(1, docH - el.clientHeight)
       // 보이는 높이: 프레임 모드는 영상 셸 값, 실제 앱은 스크롤 상자 높이 (APK 는 상태바·내비 바를 뺀 640–900dp)
@@ -431,7 +443,11 @@ export default function WooriHistory() {
       }
     } else next = { ...next, from: undefined, to: undefined }
     const el = scroller()
-    if (el) el.scrollTop = 0
+    if (el) {
+      // 이 맨 위로는 스크롤바 없이 (이미 맨 위면 이벤트가 오지 않는다 — 다음 손가락 스크롤을 삼키지 않게)
+      if (el.scrollTop > 0) quietTop.current = 0
+      el.scrollTop = 0
+    }
     setStuck(false)
     setSheetOpen(false)
     // 눌린 색은 내려가기 시작한 뒤 ≈33ms 까지 (3.5)
@@ -451,6 +467,18 @@ export default function WooriHistory() {
       return { ...p, period, from: p.from ?? page?.range.fromDate, to: p.to ?? page?.range.toDate }
     })
   const closeSheet = () => setSheetOpen(false)
+  // 기간 내 합계 펼침·닫힘: 닫혀서 문서가 줄면 스크롤 자리가 새 끝으로 당겨진다 → 그 자리의 스크롤 이벤트는 스크롤바 없이
+  const sumFrom = useRef<number | null>(null)
+  const toggleSum = () => {
+    sumFrom.current = scroller()?.scrollTop ?? null
+    setSumOpen((v) => !v)
+  }
+  useLayoutEffect(() => {
+    const from = sumFrom.current
+    sumFrom.current = null
+    const el = findScroller(rootRef.current)
+    if (from != null && el && Math.abs(el.scrollTop - from) >= 1) quietTop.current = el.scrollTop
+  }, [sumOpen])
   const onTransfer = () => leaveLater('/send', () => go('/send'), TRANSFER_GO_MS)
   const onBack = () => leaveLater('/home', goHome, BACK_GO_MS)
   // 폰 뒤로 버튼: 시트는 WooriSheet onBack, 그 밖은 ‹ 와 같이 (들어오는 중 ‹ 가 아직 없어도)
@@ -518,7 +546,7 @@ export default function WooriHistory() {
           {block(false)}
           {listShown && (
             <>
-              <button type="button" className="woori-hi__sum" style={{ ...place(20, 457.667), height: 52 + sumExtra }} onClick={() => setSumOpen((v) => !v)}>
+              <button type="button" className="woori-hi__sum" style={{ ...place(20, 457.667), height: 52 + sumExtra }} onClick={toggleSum}>
                 <span className="woori-hi__sum-label">기간 내 합계</span>
                 {iconsOn && <img className={'woori-hi__sum-chevron' + (sumOpen ? ' is-open' : '')} src="/woori/history/chevron-down.svg" alt="" />}
                 {sumOpen && page && (

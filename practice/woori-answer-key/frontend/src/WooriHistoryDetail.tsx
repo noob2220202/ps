@@ -7,7 +7,8 @@
 //   항목 표: 첫 행 위끝 171.667, 행 높이 46.333 (2줄 값 69 · 알약 행 51) + 1dp 구분선 #f2f2f2 (마지막 행 아래 없음)
 //     라벨 15/500 --woori-text-secondary 왼쪽 20 · 값 15/500 자간 −0.5px tabular 오른끝 340 · 글자 top = 행 위끝 + 16.333
 //   마지막 행 아래끝 + 46: '…' 검색하기 16/500 + › (333, 글자 top + 1, 8×13)
-//   실제 앱만(설계): 긴 이름·통장표기는 말줄임 — 제목 · 검색 줄의 이름 · 받는 분 통장표기 값 (WooriHistoryDetail.css)
+//   실제 앱만(설계): 긴 이름·통장표기는 말줄임 — 제목 · 검색 줄의 이름 · 받는 분 통장표기 값 (WooriHistoryDetail.css) ·
+//     출금형 숨은 상자(영상 자국)는 그리지 않고 내용은 검색 줄 아래 40dp 에서 끝 (스크롤 끝 = 검색 줄 + 하단 바 위 여백)
 //   하단 바 726–800.667 흰색: [공유] x16 w102.333 · [확인] x126.333 w217.667, top 728.667 h56 r12
 //   키가 다른 화면(APK, 640–900dp): 하단 바·단추는 페이지 아래끝에 붙고 내용 스크롤 영역은 머리 아래 ~ 하단 바 위 (CSS --woori-page-h — 프레임 모드는 영상 값 그대로)
 // 열기 3.1: translateY 100dp → 0 + opacity 0 → 1, 둘 다 cubic-bezier(0,0,0.2,1) 265ms.
@@ -78,6 +79,10 @@ const TEXT_FIT: Readonly<Record<string, number>> = {
   '546.667': 546.25,
 }
 
+/** 내용 끝: 검색 줄 글자 위끝부터 (영상 — 출금형 숨은 상자 아래끝 + 1.333). 실제 앱은 검색 줄 글자 16 + 아래 40 (영상의 검색 줄 686 ~ 하단 바 726) */
+const SEARCH_TO_END = 108
+const SEARCH_TO_END_LIVE = 16 + 40
+
 /** "'이름' 검색하기" → [이름, "' 검색하기"] (실제 앱에서 이름만 말줄임하려고 — 이 꼴이 아니면 null) */
 const SEARCH_RE = /^'(.*)(' 검색하기)$/
 
@@ -144,17 +149,21 @@ export default function WooriHistoryDetail() {
   const fields = detail ? detail.display.fields.filter((f) => stage >= 1 || detail.kind !== 'withdraw-transfer' || !LATE_KEYS.has(f.key)) : []
   const { rows, dividers, end } = layoutRows(fields)
   const searchTop = r3(end + 46)
-  const showHiddenBox = detail?.kind === 'withdraw-transfer' && stage >= 1
+  // 출금형 숨은 상자는 영상 자국(윗변만 하단 바 위로 보이고 내용 모름) — 실제 앱에서는 그리지 않고 내용을 검색 줄 아래 40dp 에서 끝낸다:
+  // 키 작은 폰에서 스크롤 끝이 빈 테두리 상자·긴 빈칸이 아니라 검색 줄 + 보통 여백 (설계). 프레임·shot 모드는 영상 그대로
+  const live = wooriLiveApp()
+  const showHiddenBox = !live && detail?.kind === 'withdraw-transfer' && stage >= 1
+  const contentH = Math.ceil(searchTop + (live ? SEARCH_TO_END_LIVE : SEARCH_TO_END) - HEADER_H)
   const showSpinner = !shot && (isWithdraw ? stage < 2 : false)
   // [확인] 눌림 색은 닫히는 동안 그대로 (3.3 ③)
   const confirmPressed = shot?.state.pressed === true || closing
   // 실제 앱: 검색 줄의 이름만 말줄임 (긴 통장표기에도 ' 검색하기 와 › 가 보이게 — WooriHistoryDetail.css). 프레임·shot 모드는 글자 한 덩어리 그대로
-  const searchParts = detail && wooriLiveApp() ? SEARCH_RE.exec(detail.display.search) : null
+  const searchParts = detail && live ? SEARCH_RE.exec(detail.display.search) : null
 
   return (
     <div className="woori-hd">
       <div ref={scrollRef} className="woori-hd__scroll woori-scroll-fix">
-        <div className="woori-hd__content woori-scroll-fix__content" style={{ height: Math.ceil(searchTop + 108 - HEADER_H) }}>
+        <div className="woori-hd__content woori-scroll-fix__content" style={{ height: contentH }}>
           {detail && (
             <>
               <p className="woori-hd__name" style={at(20, 88)}>

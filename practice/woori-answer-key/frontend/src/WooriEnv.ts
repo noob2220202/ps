@@ -6,7 +6,8 @@
 // 이 모듈이 가진 실제 앱(프레임 모드 아님) 몫 세 가지 — 프레임 모드·shot 모드에서는 아무것도 하지 않는다 (영상 비교 화면이 바뀌지 않게):
 //   1. 뒤로 처리 스택 useWooriBack — 폰 뒤로 버튼(WOORI_BACK_EVENT)을 열린 대화상자 > 시트·팝업 > 페이지(머리 ‹·✕) 순서로 하나만 받는다
 //   2. 토스트 wooriToast · wooriTodo('답지에는 없는 화면이에요') — App 이 셸 안에 그린다 (WooriToastHost)
-//   3. 화면 맞춤 installWooriFit — 앱(360dp 기준 레이아웃) 전체를 화면 폭·높이에 맞춰 확대·축소한다 (레이아웃 높이 640dp 바닥, 아래 '화면 맞춤')
+//   3. 화면 맞춤 installWooriFit — 앱(360dp 기준 레이아웃) 전체를 화면 폭·높이에 맞춰 확대·축소한다 (레이아웃 높이 640dp 바닥, 아래 '화면 맞춤').
+//      시스템 키보드 판단 wooriKeyboardMayBeUp · onWooriKeyboardSettled 는 금액 화면(통장표기 시트 뒤 폼 자리)도 같이 쓴다
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
 import { isFrameMode, readShot } from './WooriNav.ts'
 
@@ -184,14 +185,17 @@ export function useWooriToast(): WooriToastItem | null {
 //   폰 모양(폭을 채워도 높이가 640dp 이상 남는 화면): k = 폭/360 → 폭을 꽉 채운다 (360x800 · 412x915 · 384x854 → 1 · 1.144 · 1.067,
 //     글자 크게 보기로 폭이 좁아진 320x690 → 0.889: 줄여서 360dp 를 다 보인다)
 //   그 밖(높이가 모자란 폰, 태블릿 세로·가로, 폴더블): 폰 비율 기둥 — k = min(폭/360, max(높이/800, min(한도, 높이/640)))
-//     한도 = 폭에 따라: 폰 폭(450dp 까지)은 폭/360 → k = 높이/640 (레이아웃 640dp 바닥을 지키는 만큼 키운다 — 폰 모양과 이어져 1dp 차이로
-//       튀지 않는다: 412x732 → 1.144, 412x700 → 1.094, 411x659 → 1.030, 360x600 → 0.9375, 320x568 → 0.8875)
-//     450–540dp 는 한도를 1 까지 차츰 내리고(폭이 1dp 바뀌어도 튀지 않게), 540dp 위(태블릿)는 1:
-//       높이 800 이상 → 높이/800 (기둥 높이 800dp 로 화면을 채운다: 800x1280 → 1.6, 1280x800 → 1) · 640–800 → 1 (레이아웃 높이 = 화면 높이)
-//   셸 레이아웃 높이 = 지금 높이 / k. 입력칸에 포커스가 있을 때(시스템 키보드는 그때만 뜬다) 웹뷰 높이만 줄면 k 는 그대로
-//   (그 폭에서 본 가장 큰 높이로 정한다) → 앱만 위로 줄어든다 (그동안은 640 아래일 수 있다 — 화면이 키보드 위로 줄어드는 것은 시스템 키보드 몫).
-//   입력칸이 없는데 높이가 줄면(화면 분할 · 팝업 창) 처음 연 것처럼 다시 맞춘다. 입력칸에서 막 빠진 뒤 KBD_CLOSE_MS 동안은 아직 키보드가
-//   닫히는 중으로 본다 (닫히며 오는 중간 높이에 k 가 튀지 않게) — 그 뒤 한 번 더 맞춰 자리를 잡는다.
+//     한도 = max(폭 몫, 경계 몫)
+//       폭 몫 = max(1, min(폭/360, 2.5 − 폭/360)): 폰 폭(450dp 까지)은 폭/360 → k = 높이/640 (레이아웃 640dp 바닥을 지키는 만큼 키운다:
+//         412x732 → 1.144, 412x700 → 1.094, 411x659 → 1.030, 360x600 → 0.9375, 320x568 → 0.8875) · 450–540dp 는 1 까지 차츰 · 540dp 위(태블릿)는 1
+//       경계 몫 = 폭을 채운 레이아웃 높이(높이 ÷ 폭/360)가 560 → 640dp 일 때 1 → 폭/360 으로 차츰 (FIT_RAMP_H). 폰 모양 경계(그 높이 640)에서
+//         한도가 폭/360 이 되어 k 가 폰 모양과 이어진다 — 450dp 넘는 폭에서도 폭·높이 1dp 차이로 튀지 않는다 (300–1400 x 400–2000 을 1dp 씩 훑어
+//         한 걸음 0.013 아래). 폰 폭은 폭 몫이 이미 폭/360 이라 경계 몫이 바꾸는 것이 없다
+//       태블릿(경계 몫이 1 인 곳): 높이 800 이상 → 높이/800 (기둥 높이 800dp 로 화면을 채운다: 800x1280 → 1.6, 1280x800 → 1) · 640–800 → 1 (레이아웃 높이 = 화면 높이)
+//   셸 레이아웃 높이 = 지금 높이 / k. 시스템 키보드가 떠 있을 수 있는 동안(wooriKeyboardMayBeUp — 키보드는 입력칸에 포커스가 있을 때만 뜬다)
+//   웹뷰 높이만 줄면 k 는 그대로 (그 폭에서 본 가장 큰 높이로 정한다) → 앱만 위로 줄어든다 (그동안은 640 아래일 수 있다 — 화면이 키보드 위로
+//   줄어드는 것은 시스템 키보드 몫). 그 밖에 높이가 줄면(화면 분할 · 팝업 창) 처음 연 것처럼 다시 맞춘다. 입력칸에서 막 빠진 뒤 KBD_CLOSE_MS
+//   동안은 아직 키보드가 닫히는 중으로 본다 (닫히며 오는 중간 높이에 k 가 튀지 않게) — 그 뒤 한 번 더 맞춰 자리를 잡는다 (onWooriKeyboardSettled).
 //   기둥이 화면보다 좁으면 양옆 바탕(--woori-side-bg)이 보이고 <html data-woori-side="1">. APK 상태바·내비 바는 양옆이 기둥으로 보일 만큼
 //   넓을 때(한쪽 gutter ≥ 8dp)만 그 색 (WooriLocalMenu — 1dp 남짓 틈에 바 색까지 바꾸지 않는다).
 // 결과는 <html data-woori-fit="scale">(k ≠ 1 일 때) + --woori-fit-scale · --woori-shell-h. 포인터 좌표를 앱 dp 로 바꿀 때는 wooriFitScale() 로 나눈다
@@ -212,6 +216,8 @@ const COL_W = 360
 const COL_H = 800
 /** 셸 레이아웃 높이의 바닥 (dp). 폭을 꽉 채워도 이만큼 높이가 남으면 폰으로 보고 폭을 채운다 */
 const MIN_H = 640
+/** 폭을 채운 레이아웃 높이가 이만큼부터 MIN_H 까지면 한도를 폭/360 쪽으로 차츰 올린다 (폰 모양 경계에서 k 가 튀지 않게, dp) */
+const FIT_RAMP_H = 560
 /** 입력칸에서 포커스가 빠진 뒤 이만큼은 키보드가 닫히는 중으로 본다 (ms) */
 const KBD_CLOSE_MS = 1000
 
@@ -226,9 +232,14 @@ export function wooriFitScale(): number {
 /** 폭·높이(CSS px) → 배율. stableH = 그 폭에서 본 가장 큰 높이 (키보드로 줄어든 높이는 쓰지 않는다) */
 export function wooriFitScaleFor(width: number, stableH: number): number {
   const kw = width / COL_W
-  if (stableH / kw >= MIN_H) return kw
-  // 높이가 모자랄 때 키울 수 있는 한도: 폰 폭(kw ≤ 1.25)은 kw (→ 높이/640, 폰 모양과 이어진다), 1.25–1.5 는 1 까지 차츰, 그 위(태블릿)는 1
-  const cap = Math.max(1, Math.min(kw, 2.5 - kw))
+  // 폭을 채웠을 때의 레이아웃 높이 (dp)
+  const fillH = stableH / kw
+  if (fillH >= MIN_H) return kw
+  // 높이가 모자랄 때 키울 수 있는 한도 = max(폭 몫, 경계 몫).
+  //   폭 몫: 폰 폭(kw ≤ 1.25)은 kw (→ 높이/640, 폰 모양과 이어진다), 1.25–1.5 는 1 까지 차츰, 그 위(태블릿)는 1
+  //   경계 몫: fillH 가 FIT_RAMP_H → MIN_H 일 때 1 → kw (폰 모양 경계에서 한도 = kw → k = kw 로 이어진다)
+  const ramp = Math.min(1, Math.max(0, (fillH - FIT_RAMP_H) / (MIN_H - FIT_RAMP_H)))
+  const cap = Math.max(1, Math.min(kw, 2.5 - kw), 1 + (kw - 1) * ramp)
   return Math.min(kw, Math.max(stableH / COL_H, Math.min(cap, stableH / MIN_H)))
 }
 
@@ -241,6 +252,42 @@ function opensKeyboard(el: Element | null): boolean {
   return el instanceof HTMLElement && el.isContentEditable
 }
 
+let leftInputAt = -Infinity
+let kbdSettleTimer = 0
+let kbdListening = false
+const kbdSettleSubs = new Set<() => void>()
+
+/** 입력칸에서 포커스가 빠진 때를 적는다 (한 번만 듣는다). KBD_CLOSE_MS 가 지나 키보드가 다 닫혔으면 onWooriKeyboardSettled 를 부른다 */
+function listenKeyboardFocus(): void {
+  if (kbdListening || typeof document === 'undefined') return
+  kbdListening = true
+  document.addEventListener('focusout', (e) => {
+    if (!opensKeyboard(e.target as Element | null)) return
+    leftInputAt = performance.now()
+    window.clearTimeout(kbdSettleTimer)
+    kbdSettleTimer = window.setTimeout(() => {
+      for (const f of kbdSettleSubs) f()
+    }, KBD_CLOSE_MS + 50)
+  })
+}
+
+/**
+ * 시스템 키보드가 떠 있을 수 있는지: 키보드를 띄우는 입력칸에 포커스가 있거나, 거기서 빠진 지 KBD_CLOSE_MS 안 (닫히는 중).
+ * 아니면 웹뷰 높이가 줄어도 키보드가 아니다 (화면 분할 · 팝업 창) → 줄어든 높이를 그대로 쓴다.
+ * 화면 맞춤(installWooriFit)과 금액 화면 높이(WooriSendAmount usePageHeight)가 같은 판단을 쓴다
+ */
+export function wooriKeyboardMayBeUp(): boolean {
+  listenKeyboardFocus()
+  return opensKeyboard(document.activeElement) || performance.now() - leftInputAt < KBD_CLOSE_MS
+}
+
+/** 입력칸에서 빠지고 KBD_CLOSE_MS 가 지나 키보드가 다 닫혔을 때 f (높이를 한 번 더 잰다 — 그동안 줄어든 높이가 그대로면 그 높이로). 돌려준 함수로 그만 듣는다 */
+export function onWooriKeyboardSettled(f: () => void): () => void {
+  listenKeyboardFocus()
+  kbdSettleSubs.add(f)
+  return () => kbdSettleSubs.delete(f)
+}
+
 let fitInstalled = false
 
 /** main.tsx 가 프레임 모드가 아닐 때 한 번 부른다 */
@@ -250,15 +297,12 @@ export function installWooriFit(): void {
   const root = document.documentElement
   let stableW = -1
   let stableH = 0
-  let leftInputAt = -Infinity
-  let settleTimer = 0
   const apply = () => {
     const w = window.innerWidth
     const h = window.innerHeight
     if (!w || !h) return
-    // 키보드일 수 있는 때: 입력칸에 포커스가 있거나 막 빠졌을 때 (닫히는 중). 아니면 줄어든 높이로 다시 맞춘다 (화면 분할 · 팝업 창)
-    const typing = opensKeyboard(document.activeElement) || performance.now() - leftInputAt < KBD_CLOSE_MS
-    if (Math.abs(w - stableW) > 1 || (h < stableH && !typing)) {
+    // 키보드일 수 있는 때(입력칸에 포커스가 있거나 막 빠졌을 때 — 닫히는 중)가 아니면 줄어든 높이로 다시 맞춘다 (화면 분할 · 팝업 창)
+    if (Math.abs(w - stableW) > 1 || (h < stableH && !wooriKeyboardMayBeUp())) {
       stableW = w
       stableH = h
     } else stableH = Math.max(stableH, h)
@@ -285,12 +329,7 @@ export function installWooriFit(): void {
   window.addEventListener('resize', apply)
   window.visualViewport?.addEventListener('resize', apply)
   // 입력칸에서 빠짐 → 키보드가 닫히는 동안은 기다렸다가, 끝나면 한 번 더 맞춘다 (높이가 그대로 작으면 그 높이로 자리 잡는다)
-  document.addEventListener('focusout', (e) => {
-    if (!opensKeyboard(e.target as Element | null)) return
-    leftInputAt = performance.now()
-    window.clearTimeout(settleTimer)
-    settleTimer = window.setTimeout(apply, KBD_CLOSE_MS + 50)
-  })
+  onWooriKeyboardSettled(apply)
 }
 
 export function useWooriFit(): WooriFit {

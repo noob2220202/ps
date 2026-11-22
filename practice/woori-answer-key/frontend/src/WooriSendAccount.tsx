@@ -12,9 +12,10 @@
 //     보이지 않는 입력칸의 캐럿은 늘 값 끝 (그린 커서 자리. 탭·화살표로 옮겨진 캐럿에 숫자가 끼어들지 않게, 설계).
 //   설계(영상에 없음): 조회 중 ✕·폰 뒤로 = 조회를 끊고 닫는다 (끊긴 조회는 금액 페이지로 가지 않는다) · 번호를 고치면 조회 오류 글자를 지운다 ·
 //     조회 오류 글자: 번호 탓(자리수·형식 400 INVALID_ACCOUNT_NUMBER, 없는 계좌 404) = '계좌번호를 다시 확인해 주세요', 그 밖 = '잠시 후 다시 시도해 주세요' ·
-//     시스템 키보드로 셸이 아주 낮아지면(≈340–400dp) 페이지 높이 바닥 400dp — [확인] 이 칩·오류 글자를 덮지 않고 페이지 스크롤로 닿는다 (CSS).
+//     시스템 키보드로 셸이 아주 낮아지면(≈340–400dp) 페이지 높이 바닥 400dp — [확인] 이 칩·오류 글자를 덮지 않는다 (CSS).
+//     그때 입력칸에 포커스가 있으면 레이어 스크롤을 끝에 둬 [확인] 이 통째로 키보드 위 (셸 높이가 바뀔 때 · 칩·오류 글자가 생길 때만 다시).
 // 입력값은 사람이 친 숫자다 — 이 파일에는 계좌번호를 쓰지 않는다 (shot 의 입력값은 자리수만 맞춘 채움 숫자, 비교에서는 개인정보 마스크).
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import './WooriSendAccount.css'
 import { wooriApi, WooriApiError, type BankChip, type Recipient } from './WooriApi.ts'
 import { artSrc } from './WooriArt.ts'
@@ -26,7 +27,7 @@ import { WooriSendWhereView } from './WooriSend.tsx'
 import { amountUrl, bankLogoArt, chipToBank, fbox, SEND_A_MOTION, SEND_SHOT_DIGITS, setSendNext, takePickedBank, textAt } from './WooriSendFlow.ts'
 import { useShotReady, useShotState } from './WooriShot.ts'
 import { WooriSpinner } from './WooriSpinner.tsx'
-import { useWooriBack } from './WooriEnv.ts'
+import { useWooriBack, wooriLiveApp } from './WooriEnv.ts'
 
 export interface SendBank {
   code: string
@@ -49,6 +50,9 @@ const T_BANK_LINE = 281
 const T_PRESS = 167
 const T_SPINNER = 118
 const T_CLOSE = 1013
+
+/** 입력칸 줄 위끝 (dp, CSS .woori-send-account__field) — 키보드로 셸이 아주 낮아 페이지를 끝으로 올려도 이 줄은 화면 안에 */
+const FIELD_TOP = 120
 
 /** 칩 폭 (dp, 글자에 맞춘 잰 값 2.4) — 없는 은행은 글자 수로 */
 const CHIP_W: Readonly<Record<string, number>> = { WOORI: 65.833, KAKAO: 104.667, NH: 65.667, KB: 65.667, SH: 65.667, CITI: 91.7 }
@@ -455,6 +459,33 @@ export default function WooriSendAccount() {
         }, Math.max(0, T_SPINNER + 50 - (performance.now() - t0)))
       })
   }, [bank, value, go])
+
+  // 실제 앱(설계): 시스템 키보드로 셸이 400dp 보다 낮으면 페이지가 바닥 400dp 로 넘친다(CSS). 입력칸에 포커스가 있고 [확인] 이 있으면
+  // 레이어 스크롤을 끝에 둔다 — [확인] 이 통째로 키보드 위, 입력칸·칩·오류 글자도 보인다 (더 낮으면 입력칸 줄이 먼저 — FIELD_TOP).
+  // 셸 높이가 바뀔 때(ResizeObserver) · 칩·오류 글자가 새로 생길 때만 다시 둔다 (없어질 때는 그대로) — 사용자가 올려 본 스크롤과 다투지 않게.
+  // 키보드가 내려가면 페이지가 셸 높이로 돌아가 스크롤 0 ([확인] 은 아래끝). 프레임·shot 모드는 하지 않는다
+  const keepEnd = !s && wooriLiveApp() && bank != null
+  const pinEnd = useCallback(() => {
+    const input = inputRef.current
+    const sc = input?.closest<HTMLElement>('.woori-layer__scroll')
+    if (!keepEnd || !sc || document.activeElement !== input) return
+    const end = sc.scrollHeight - sc.clientHeight
+    if (end >= 1) sc.scrollTop = Math.min(end, FIELD_TOP)
+  }, [keepEnd])
+  useLayoutEffect(() => {
+    const sc = inputRef.current?.closest<HTMLElement>('.woori-layer__scroll')
+    if (!keepEnd || !sc) return
+    const ro = new ResizeObserver(pinEnd)
+    ro.observe(sc)
+    return () => ro.disconnect()
+  }, [keepEnd, pinEnd])
+  const hasChips = (chips?.length ?? 0) > 0
+  const shown = useRef({ chips: hasChips, error: error != null })
+  useLayoutEffect(() => {
+    const was = shown.current
+    shown.current = { chips: hasChips, error: error != null }
+    if ((hasChips && !was.chips) || (error != null && !was.error)) pinEnd()
+  }, [hasChips, error, pinEnd])
 
   const shotBank = s?.bank ? (banks?.find((b) => b.code === SHOT_BANK_CODE) ?? null) : null
   const ready = chips != null && (!s?.bank || banks != null) && (!s?.push || under != null)

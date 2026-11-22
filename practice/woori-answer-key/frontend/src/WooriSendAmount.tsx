@@ -8,9 +8,10 @@
 // 키가 다른 화면(APK, 셸 640–900dp): 키패드 층·폼 버튼 층은 아래끝 기준(.woori-amt__layer--bottom), 머리·계좌·금액은 위끝 기준.
 //   셸이 낮아 빠른 금액 줄이 금액 묶음에 닿으면 빠른 금액~[확인] 사이를 고르게 눌러 담는다(keypadSqueeze, 설계). 프레임 모드는 영상 그대로.
 // 영상에 없는 설계: 폼 단계 금액 줄 탭 = 키패드로 돌아가 고치기 · 통장표기 › = 편집 시트(10자, [다음] 검사에 실어 보냄)
-//   · 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert — 확인 화면도 쓴다) · 받는 분을 못 찾으면 토스트 + /send 로
+//   · 오류는 네이티브 alert 대신 안내 시트(WooriSendAlert — 확인 화면도 쓴다. 비밀번호 확인은 틀림·잠김만 시트 안 한 줄, 그 밖은 시트를 닫고 안내 시트)
+//   · 받는 분을 못 찾으면 토스트 + /send 로
 //   · 확인 화면에서 뒤로 = 채운 폼 그대로(금액·통장표기, 비밀번호는 [다음] 으로 다시 — sessionStorage WOORI_SEND_DRAFT_KEY, 실제 앱만).
-//   · 통장표기 시트의 시스템 키보드로 셸이 줄어도 뒤 폼은 키보드 전 자리 그대로 (usePageHeight stable).
+//   · 통장표기 시트의 시스템 키보드로 셸이 줄어도 뒤 폼은 키보드 전 자리 그대로 (usePageHeight stable — 키보드가 아니게 줄면 그 높이).
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { artSrc, bankArtName, type WooriArtName } from './WooriArt.ts'
@@ -23,7 +24,7 @@ import { useShotReady, useShotState } from './WooriShot.ts'
 import { isFrameMode, useArrivedByPop, useBackTo, useWooriNavigate } from './WooriNav.ts'
 import { WOORI_BOTTOM_FIX, WOORI_VIDEO_PAGE_H } from './WooriLayout.ts'
 import { wooriApi, WooriApiError, type Account, type LookupResult, type Ticket } from './WooriApi.ts'
-import { wooriLiveApp, wooriToast, wooriTodo } from './WooriEnv.ts'
+import { onWooriKeyboardSettled, wooriKeyboardMayBeUp, wooriLiveApp, wooriToast, wooriTodo } from './WooriEnv.ts'
 import './WooriSendAmount.css'
 
 /* ───────────────────────── 위치 도우미 ───────────────────────── */
@@ -128,6 +129,82 @@ const SHEET_MOTION = { open: { duration: 245, easing: 'cubic-bezier(0.33, 1, 0.6
  * 한글 10자(≈130dp)·'W' 10자(≈146dp)까지 폼·확인 화면 줄에서 제목과 겹치지 않는다 (설계 — 은행 통장표기는 보통 7–10자)
  */
 const LABEL_MAX = 10
+/** 코드 포인트 수 ('n/10' · backend 와 같은 셈) */
+const cpLen = (s: string) => [...s].length
+
+type GraphemeSegmenter = { segment: (s: string) => Iterable<{ segment: string }> }
+const segmenterCtor = (Intl as unknown as { Segmenter?: new (locale: string, o: { granularity: 'grapheme' }) => GraphemeSegmenter }).Segmenter
+const graphemeSegmenter = segmenterCtor ? new segmenterCtor('ko', { granularity: 'grapheme' }) : null
+/** 앞 글자에 붙는 코드 포인트 (그 앞에서 자르면 묶음이 깨진다): ZWJ · 이형 선택자 · 피부색 · 키캡 · 결합 부호 · 태그(지역 깃발) · 한글 중성·종성 자모 */
+const joinsPrev = (c: number) =>
+  c === 0x200d ||
+  (c >= 0xfe00 && c <= 0xfe0f) ||
+  (c >= 0xe0100 && c <= 0xe01ef) ||
+  (c >= 0x1f3fb && c <= 0x1f3ff) ||
+  c === 0x20e3 ||
+  (c >= 0x0300 && c <= 0x036f) ||
+  (c >= 0x1ab0 && c <= 0x1aff) ||
+  (c >= 0x1dc0 && c <= 0x1dff) ||
+  (c >= 0x20d0 && c <= 0x20ff) ||
+  (c >= 0xfe20 && c <= 0xfe2f) ||
+  (c >= 0xe0020 && c <= 0xe007f) ||
+  (c >= 0x1160 && c <= 0x11ff) ||
+  (c >= 0xd7b0 && c <= 0xd7ff)
+const isRegional = (c: number) => c >= 0x1f1e6 && c <= 0x1f1ff
+/**
+ * 글자 묶음(grapheme: 국기 · ZWJ 이모지 · 피부색 · 키캡 · 결합 글자)으로 나눈다. Intl.Segmenter 가 없는 오래된 웹뷰(Chrome 87 전)는
+ * 코드 포인트로 나누되 ZWJ 뒤 · 앞 글자에 붙는 코드 포인트 앞에서는 나누지 않고, 국기 글자(regional indicator)는 둘씩 묶는다
+ */
+function graphemes(s: string): string[] {
+  if (graphemeSegmenter) return Array.from(graphemeSegmenter.segment(s), (x) => x.segment)
+  const out: string[] = []
+  let ri = 0
+  for (const ch of s) {
+    const c = ch.codePointAt(0) ?? 0
+    const last = out.length ? out[out.length - 1] : ''
+    const join = last !== '' && (joinsPrev(c) || last.endsWith('\u200d') || (isRegional(c) && ri % 2 === 1))
+    ri = isRegional(c) ? (join ? ri + 1 : 1) : 0
+    if (join) out[out.length - 1] = last + ch
+    else out.push(ch)
+  }
+  return out
+}
+/** src 앞에서부터 글자 묶음째로, UTF-16 maxUnits · 코드 포인트 maxCp 안에서 가장 긴 앞부분 (묶음을 가르지 않는다) */
+function fitGraphemes(src: string, maxUnits: number, maxCp: number): string {
+  let units = 0
+  let cps = 0
+  for (const g of graphemes(src)) {
+    const n = cpLen(g)
+    if (units + g.length > maxUnits || cps + n > maxCp) break
+    units += g.length
+    cps += n
+  }
+  return src.slice(0, units)
+}
+/** 통장표기 값을 LABEL_MAX 코드 포인트로 (글자 묶음 경계에서) */
+const cutLabel = (s: string) => fitGraphemes(s, Infinity, LABEL_MAX)
+/**
+ * 통장표기 칸 maxLength (UTF-16): 남은 코드 포인트 하나에 2 단위(이모지 한 글자)까지 더 받는다. 가득 차면 넣기를 브라우저가 막고(값 그대로),
+ * 조합 중인 한글은 확정될 때 통째로 빠진다 (조합 중에는 자르지 않는다). 남은 자리보다 많이 들어온 몫(붙여넣기 · 묶음 가운데서 잘린 이모지)은
+ * takeLabel 이 뒤 글자 앞에서 코드 포인트 · 글자 묶음 경계로 줄인다 → 이모지도 정확히 10자까지
+ */
+const labelMaxLength = (base: string) => base.length + 2 * Math.max(0, LABEL_MAX - cpLen(base))
+/**
+ * 이번에 들어온 글자를 한도 안으로: maxLength 가 묶음 가운데서 잘라 넣었거나(🇰🇷 → 🇰) 코드 포인트가 넘쳤으면 그 몫을 글자 묶음 경계로 줄인다.
+ *   before · start · end = 넣기 전 값·선택, text = 넣으려던 글자 (beforeinput data · 조합 끝 data), after = 넣은 뒤 값.
+ *   뒤 글자(사용자가 이미 쓴 몫)는 그대로. caret = 남긴 몫 바로 뒤. 넣기 전 값과 앞뒤가 맞지 않으면(자동 고침 등) null
+ */
+function fitLabelInsert(before: string, start: number, end: number, text: string | null, after: string): { value: string; caret: number } | null {
+  const head = before.slice(0, start)
+  const tail = before.slice(end)
+  if (after.length < head.length + tail.length || !after.startsWith(head) || !after.endsWith(tail)) return null
+  const ins = after.slice(head.length, after.length - tail.length)
+  // type=text 는 줄바꿈을 지운다 — 그렇게 바뀐 글자면 들어온 몫만 본다
+  const want = text?.replace(/[\r\n]/g, '') ?? ''
+  const src = want.length > ins.length && want.startsWith(ins) ? want : ins
+  const keep = fitGraphemes(src, ins.length, LABEL_MAX - cpLen(head) - cpLen(tail))
+  return { value: head + keep + tail, caret: head.length + keep.length }
+}
 /** 고쳐서 다시 해야 하는 [다음] 오류 → 안내 시트를 닫으면 키패드로 (설계) */
 const AMOUNT_ERRORS: ReadonlySet<string> = new Set(['INSUFFICIENT_BALANCE', 'DAILY_LIMIT_EXCEEDED', 'INVALID_AMOUNT'])
 
@@ -191,7 +268,8 @@ const kpY = (y: number, sq: number) => (sq ? y + (sq * (KP_CONFIRM_TOP - y)) / (
 /**
  * 화면 루트 높이 dp — 실제 앱만 잰다. 프레임 모드는 영상 셸 높이 그대로 (영상 비교 화면이 바뀌지 않게).
  *   h      지금 높이 (키패드 눌러 담기 keypadSqueeze)
- *   stable 같은 창 폭에서 본 가장 큰 높이(소수까지) = 시스템 키보드가 떠서 줄기 전 높이 (installWooriFit 의 k 와 같은 방식).
+ *   stable 시스템 키보드가 떠서 줄기 전 높이(소수까지): 키보드가 떠 있을 수 있는 동안(wooriKeyboardMayBeUp — installWooriFit 과 같은 판단)은
+ *          그 창 폭에서 본 가장 큰 높이를 지키고, 그 밖(새 창 폭 · 화면 분할 · 팝업 창으로 줄어듦)에는 지금 높이.
  *          통장표기 시트가 떠 있는 동안 폼 층을 이 높이 기준에 둔다 (설계)
  */
 function usePageHeight(ref: RefObject<HTMLElement | null>): { h: number; stable: number } {
@@ -203,7 +281,7 @@ function usePageHeight(ref: RefObject<HTMLElement | null>): { h: number; stable:
     const apply = () => {
       const h = el.clientHeight || WOORI_VIDEO_PAGE_H
       const exact = parseFloat(getComputedStyle(el).height) || h
-      const fresh = Math.abs(window.innerWidth - winW) > 1
+      const fresh = Math.abs(window.innerWidth - winW) > 1 || !wooriKeyboardMayBeUp()
       winW = window.innerWidth
       setDims((d) => {
         const stable = fresh ? exact : Math.max(d.stable, exact)
@@ -213,7 +291,12 @@ function usePageHeight(ref: RefObject<HTMLElement | null>): { h: number; stable:
     apply()
     const ro = new ResizeObserver(apply)
     ro.observe(el)
-    return () => ro.disconnect()
+    // 키보드가 닫히는 동안 줄어든 높이가 그대로 남으면(그 사이 창이 줄었다) 다 닫힌 뒤 그 높이로
+    const off = onWooriKeyboardSettled(apply)
+    return () => {
+      ro.disconnect()
+      off()
+    }
   }, [ref])
   return dims
 }
@@ -353,7 +436,12 @@ export default function WooriSendAmount() {
   const [labels, setLabels] = useState<{ recipient?: string; my?: string }>(draft?.labels ?? {})
   const [labelEdit, setLabelEdit] = useState<{ field: 'recipient' | 'my'; open: boolean } | null>(null)
   const [labelDraft, setLabelDraft] = useState('')
+  // 조합(IME) 밖에서 마지막으로 받은 값 — maxLength 는 이것으로 잰다 (조합 중인 글자로 한도가 늘지 않게)
+  const [labelBase, setLabelBase] = useState('')
   const labelInput = useRef<HTMLInputElement>(null)
+  const labelComposing = useRef(false)
+  // 지금 들어오는 글자 (beforeinput · compositionstart 에서 적는다): 넣기 전 값·선택과 넣으려던 글자
+  const labelPending = useRef<{ before: string; start: number; end: number; text: string | null } | null>(null)
 
   // shot: 시트 상태면 ticket 을 미리 받는다 (중복 경고 문구·섞는 시드)
   const shotNeedsTicket = !!s?.sheet
@@ -448,9 +536,13 @@ export default function WooriSendAmount() {
       })
       .catch((e: unknown) => {
         setBusy(false)
-        const keypadAfter = e instanceof WooriApiError && AMOUNT_ERRORS.has(e.code ?? '')
-        setAlert({ text: e instanceof Error ? e.message : String(e), open: true, keypad: keypadAfter })
+        showError(e)
       })
+  }
+  /** 오류 → 안내 시트 (글자가 길어도 줄을 바꿔 다 보인다). 금액을 고쳐야 하는 오류면 닫은 뒤 키패드로 */
+  const showError = (e: unknown) => {
+    const keypadAfter = e instanceof WooriApiError && AMOUNT_ERRORS.has(e.code ?? '')
+    setAlert({ text: e instanceof Error ? e.message : String(e), open: true, keypad: keypadAfter })
   }
 
   /* ── 통장표기 편집 시트 (설계) ── */
@@ -458,8 +550,55 @@ export default function WooriSendAmount() {
     field === 'recipient' ? (labels.recipient ?? tk?.recipientLabel ?? d.from.ownerName) : (labels.my ?? tk?.myLabel ?? d.to.holderName)
   const openLabel = (field: 'recipient' | 'my') => {
     if (s || !data || busy) return
-    setLabelDraft(labelValue(field, data))
+    const v = labelValue(field, data)
+    setLabelDraft(v)
+    setLabelBase(v)
+    labelComposing.current = false
+    labelPending.current = null
     setLabelEdit({ field, open: true })
+  }
+  const labelOpen = labelEdit != null
+  useEffect(() => {
+    const el = labelInput.current
+    if (!labelOpen || !el) return
+    // 조합 밖에서 넣는 글자(타자 · 붙여넣기 · 이모지)만 적는다. 조합은 compositionstart 가 적는다
+    const onBeforeInput = (e: InputEvent) => {
+      if (e.isComposing || labelComposing.current || e.inputType === 'insertCompositionText') return
+      if (!e.inputType.startsWith('insert')) {
+        labelPending.current = null
+        return
+      }
+      const p = { before: el.value, start: el.selectionStart ?? el.value.length, end: el.selectionEnd ?? el.value.length, text: e.data ?? e.dataTransfer?.getData('text/plain') ?? null }
+      labelPending.current = p
+      // 가득 차 막힌 넣기는 input 없이 끝나는데 Chromium 은 커서를 넣으려던 글자 수만큼 옮긴다 → 값이 그대로면 커서도 제자리로
+      window.setTimeout(() => {
+        if (labelPending.current !== p) return
+        labelPending.current = null
+        if (el.value === p.before) el.setSelectionRange(p.start, p.end)
+      })
+    }
+    el.addEventListener('beforeinput', onBeforeInput)
+    return () => el.removeEventListener('beforeinput', onBeforeInput)
+  }, [labelOpen])
+  /**
+   * 조합 밖에서 바뀐 값을 받는다. 이번에 들어온 몫이 넘치거나 묶음을 가르면 그 몫만 줄이고(fitLabelInsert — 뒤 글자는 그대로), 커서를 그 몫
+   * 바로 뒤에 둔다 (Chromium 은 잘리기 전 글자 수만큼 옮겨 둔다 · 확정 때 통째로 빠진 조합이면 제자리). DOM 을 먼저 고쳐 React 가 값을 다시
+   * 쓰며 커서를 끝으로 옮기지 않게 한다
+   */
+  const takeLabel = (el: HTMLInputElement, compositionText?: string) => {
+    const p = labelPending.current
+    labelPending.current = null
+    let v = el.value
+    const fit = p ? fitLabelInsert(p.before, p.start, p.end, compositionText ?? p.text, v) : null
+    if (fit) {
+      if (fit.value !== v) {
+        v = fit.value
+        el.value = v
+      }
+      if (el.selectionStart !== fit.caret || el.selectionEnd !== fit.caret) el.setSelectionRange(fit.caret, fit.caret)
+    }
+    setLabelDraft(v)
+    setLabelBase(v)
   }
   const closeLabel = () => {
     labelInput.current?.blur()
@@ -467,8 +606,8 @@ export default function WooriSendAmount() {
   }
   const saveLabel = () => {
     if (!labelEdit) return
-    // 비우면 기본값으로 (backend 도 빈 값 = 기본값)
-    const v = [...labelDraft.trim()].slice(0, LABEL_MAX).join('')
+    // 비우면 기본값으로 (backend 도 빈 값 = 기본값). 조합 중인 글자로 넘쳤으면 조합 전 값 (확정되면 빠질 글자), 그래도 길면 묶음 경계에서 자른다
+    const v = cutLabel((cpLen(labelDraft) > LABEL_MAX ? labelBase : labelDraft).trim())
     setLabels((cur) => ({ ...cur, [labelEdit.field]: v || undefined }))
     // 지난 [다음] 의 ticket 통장표기는 이제 옛 값 → 버린다 (비운 칸이 옛 값 대신 기본값으로 바로 보이게. [다음] 이 새로 만든다)
     setTicket(null)
@@ -523,7 +662,15 @@ export default function WooriSendAmount() {
         if (e instanceof WooriApiError && e.code === 'WRONG_PIN') {
           const b = e.body as { failCount?: number; maxFailures?: number } | null
           setPwError(`비밀번호가 맞지 않아요 (${b?.failCount ?? '?'}/${b?.maxFailures ?? 5})`)
-        } else setPwError(e instanceof Error ? e.message : String(e))
+        } else if (e instanceof WooriApiError && e.code === 'PIN_LOCKED') {
+          // '비밀번호를 5회 잘못 입력했습니다' — 한 줄에 든다. 이 ticket 은 더 못 쓴다 (✕ 뒤 [다음] 이 새로 만든다)
+          setPwError(e.message)
+        } else {
+          // 저장 실패(STORAGE_FAILED) · ticket 오류 · 네트워크 등: 한 줄 자리에는 길어 넘친다 → 시트를 닫고 안내 시트 ([다음] 검사 오류와 같다).
+          // 폼은 그대로 — [다음] 이 새 ticket 으로 다시 한다
+          setPwOpen(false)
+          showError(e)
+        }
       },
     )
   }
@@ -866,8 +1013,8 @@ export default function WooriSendAmount() {
         </WooriSheet>
       )}
 
-      {/* 통장표기 편집 시트 (설계 — 영상에 없음): 10자(코드 포인트 — maxLength 는 UTF-16 이라 이모지 10개가 '10/20' 에서 막혔다), 비우면 기본값.
-          글자는 시스템 키보드 */}
+      {/* 통장표기 편집 시트 (설계 — 영상에 없음): 10자(코드 포인트 — 'n/10' · backend 와 같은 셈), 비우면 기본값. 글자는 시스템 키보드.
+          한도는 남은 코드 포인트만큼 늘리는 maxLength (labelMaxLength): 넘치는 입력은 막고 쓴 글자는 그대로, 이모지 묶음은 가르지 않는다 (takeLabel) */}
       {labelEdit && data && (
         <WooriSheet
           open={labelEdit.open}
@@ -892,13 +1039,27 @@ export default function WooriSendAmount() {
             placeholder={labelEdit.field === 'recipient' ? data.from.ownerName : data.to.holderName}
             enterKeyHint="done"
             aria-label={labelEdit.field === 'recipient' ? '받는 분 통장표기' : '내 통장표기'}
-            onChange={(e) => setLabelDraft([...e.target.value].slice(0, LABEL_MAX).join(''))}
+            maxLength={labelMaxLength(labelBase)}
+            onChange={(e) => {
+              // 조합 중에는 그대로 받는다 (한도는 확정될 때 maxLength 가 지킨다 — 조합 중인 음절을 가르지 않게)
+              if (labelComposing.current || (e.nativeEvent as InputEvent).isComposing) setLabelDraft(e.target.value)
+              else takeLabel(e.target)
+            }}
+            onCompositionStart={(e) => {
+              const el = e.currentTarget
+              labelComposing.current = true
+              labelPending.current = { before: el.value, start: el.selectionStart ?? el.value.length, end: el.selectionEnd ?? el.value.length, text: null }
+            }}
+            onCompositionEnd={(e) => {
+              labelComposing.current = false
+              takeLabel(e.currentTarget, e.data)
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') saveLabel()
             }}
           />
           <p className="woori-amt__label-count">
-            {[...labelDraft].length}/{LABEL_MAX}
+            {Math.min(cpLen(labelDraft), LABEL_MAX)}/{LABEL_MAX}
           </p>
           <WooriButton className="woori-amt__btn" style={{ ...at(16, 252 - 74), width: 328 }} onClick={saveLabel}>
             확인

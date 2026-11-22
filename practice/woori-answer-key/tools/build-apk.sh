@@ -6,7 +6,7 @@
 # 1) 웹 빌드  VITE_WOORI_LOCAL=1 vite build → frontend/dist-apk  (backend 순수 로직을 sql.js 위에서 앱 안에 품는다 — frontend/src/WooriLocal.ts)
 # 2) npx cap sync android              (dist-apk → android/app/src/main/assets/public, 플러그인 @capacitor/app)
 # 3) gradle assembleDebug              (frontend/android, --max-workers=$WOORI_GRADLE_WORKERS 기본 2,
-#                                       versionCode = HEAD 커밋 시각(2025-01-01 UTC 부터 분), 서명 = 저장소의 고정 연습용 키
+#                                       versionCode = 빌드 시각(2025-01-01 UTC 부터 분, build.gradle 기본값과 같다), 서명 = 저장소의 고정 연습용 키
 #                                       frontend/android/app/woori-debug.keystore)
 # 4) 복사 → tools/out/apk/WON-answer-key-debug.apk (gitignore)
 #
@@ -48,13 +48,12 @@ GRADLE="./gradlew"
 if command -v gradle >/dev/null 2>&1 && gradle --version 2>/dev/null | grep -q "^Gradle $WANT\$"; then
   GRADLE="gradle"
 fi
-# versionCode = HEAD 커밋 시각의 2025-01-01 00:00 UTC 부터 분 (새 빌드가 이전 설치 위로 덮어 깔리게).
-# 커밋 수(rev-list --count)는 얕은 클론(shallow)에서 깊이에 따라 줄어 새 빌드가 '낮은 버전'으로 거절됐다 — 커밋 시각(%ct)은 깊이 1 클론에서도 같다.
-# git 이 없으면 지금 시각. 예전 값(커밋 수 150 남짓)보다 늘 크고 Android 한도 2100000000 보다 한참 작다 (build.gradle 기본값과 같은 단위)
+# versionCode = 빌드 시각의 2025-01-01 00:00 UTC 부터 분 (새 빌드가 이전 설치 위로 덮어 깔리게). build.gradle 이 -P 없이 쓰는 값과 같은 시계·단위라
+# 이 스크립트 · Android Studio · ./gradlew 직접 중 어느 길로 빌드해도 나중 빌드가 늘 더 크다 (옛 커밋을 다시 빌드하면 더 커질 뿐 — 해 없음).
+# 예전 값은 '낮은 버전'으로 거절될 때가 있었다 (지우고 깔면 폰에 저장된 잔액·거래내역이 사라진다): 커밋 수(rev-list --count)는 얕은 클론에서 줄고,
+# HEAD 커밋 시각(%ct)은 같은 커밋을 gradle 로 먼저 빌드해 깐 APK 보다 작다. 예전 값(커밋 수 150 남짓)보다 늘 크고 Android 한도 2100000000 보다 한참 작다
 VERSION_EPOCH=1735689600
-COMMIT_TIME="$(git -C "$ROOT" log -1 --format=%ct HEAD 2>/dev/null || true)"
-case "$COMMIT_TIME" in '' | *[!0-9]*) COMMIT_TIME="$(date +%s)" ;; esac
-VERSION_CODE="$(( (COMMIT_TIME - VERSION_EPOCH) / 60 ))"
+VERSION_CODE="$(( ($(date +%s) - VERSION_EPOCH) / 60 ))"
 echo "   versionCode $VERSION_CODE"
 "$GRADLE" --no-daemon --max-workers="$WORKERS" -PwooriVersionCode="$VERSION_CODE" assembleDebug
 

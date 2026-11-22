@@ -23,6 +23,10 @@
   background: #fff;
   color: #1a1a1a;
   box-shadow: 0 8px 32px rgb(0 0 0 / 0.25);
+  /* 줄바꿈: 한글은 낱말 가운데에서 끊지 않는다 (keep-all — '시나리/오의' 가 아니라 '시나리오의', 토스트·알림과 같음).
+     안내·시계 줄·값 안내·시나리오 설명 모두 이 상자 안이라 상속. 띄어쓰기 없는 긴 글자는 그래도 끊는다 (anywhere — 값 안내 dd 가 줄어들 수 있게) */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .woori-local-menu__title {
