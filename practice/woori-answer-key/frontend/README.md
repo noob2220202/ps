@@ -276,7 +276,7 @@ node ../tools/woori-local-check.cjs        # (루트 npm run check:local) dist-a
 
 | 명령 | 결과 |
 |---|---|
-| `bash tools/build-apk.sh` | APK 23 MB (debug), `aapt dump badging`: `dev.answerkey.won` · 'WON 답지' · versionCode 993673 (빌드 시각) · min 24 · target 36, 자산에 sql wasm · `viewport-fit` 없음 |
+| `bash tools/build-apk.sh` | APK 23 MB (debug), `aapt dump badging`: `dev.answerkey.won` · 'WON 답지' · versionCode 993748 (빌드 시각) · min 24 · target 36, 자산에 sql wasm · 시작 화면 배지 hq svg · `viewport-fit` 없음 |
 | `node tools/lint.cjs` · `npx tsc -b` · `backend npm test` | lint OK · tsc 오류 0 · 테스트 50 통과 · 1 건너뜀 · 실패 0 |
 | `node tools/shot.cjs --full` (프레임·shot 224 상태) | 다듬기 전 기준 화소와 224/224 같음 — `send-a/account-keyboard` · `account-typing` 은 키보드 윗변 한 줄(y 802)이 가끔 흔들린다 (다듬기 전 서버에서도 같은 흔들림, 다시 찍으면 같음) |
 | `node tools/woori-local-check.cjs` (Chromium, 백엔드 서버 없음) | 처음 실행 345원(홈 화면 글자 포함) → fetch 로 이체 1원 201 · 344원 → 새로고침·브라우저 다시 열기 뒤 344원 · 거래 +1 → 맨 위 가운데 5탭 = 숨은 메뉴 없음 → 도구용 되돌리기(`/api/dev/reset` v1 시작) → 345원·거래 수 원래대로 · 시계 11:09:11 고정 · 네트워크 `/api` 0건 · **실제 backend(Express+node:sqlite)와 68쌍 응답 같음** (GET 25종 × 2 시나리오 · 오류 400/404 · 이체 흐름 · 커서) · 저장 실패 흉내(IndexedDB put 던짐) → 이체 507 `STORAGE_FAILED` · 메모리 잔액 그대로 → 되살리면 같은 ticket 201 |
