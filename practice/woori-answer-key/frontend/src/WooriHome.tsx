@@ -19,6 +19,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { artSrc, type WooriArtName } from './WooriArt.ts'
 import { wooriApi, type Account } from './WooriApi.ts'
+import { WooriDevPanel } from './WooriDevPanel.tsx'
 import { wooriCopy, wooriFitScale, wooriLiveApp, wooriTodo } from './WooriEnv.ts'
 import { useWooriScrollFix, wooriPlace, wooriScrollTo } from './WooriLayout.ts'
 import { isFrameMode, useWooriNavigate } from './WooriNav.ts'
@@ -773,6 +774,7 @@ export default function WooriHome() {
   const [popupClosing, setPopupClosing] = useState(false)
   const [rolled, setRolled] = useState(false)
   const [tapSpinner, setTapSpinner] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false)
   // shot 'popup-close': 열린 시트를 그린 뒤 한 프레임 뒤에 닫아 closing 단계를 만든다 (애니메이션은 freeze 가 0 위상에 세운다)
   const [shotClosing, setShotClosing] = useState(false)
   useEffect(() => {
@@ -1344,7 +1346,7 @@ export default function WooriHome() {
                 </span>
               </span>
               {view.header === 'full' && (
-                <button type="button" className="woori-home__icon-btn woori-home__bell" style={wooriPlace(276, 14)} aria-label="알림" onClick={() => go('/notice')}>
+                <button type="button" className="woori-home__icon-btn woori-home__bell" style={wooriPlace(276, 14)} aria-label="알림 (관리 패널)" onClick={() => setPanelOpen(true)}>
                   <img src={artSrc('home.bell-dot')} alt="" width={24} height={24} draggable={false} />
                 </button>
               )}
@@ -1431,6 +1433,7 @@ export default function WooriHome() {
           </button>
         </div>
       </WooriSheet>
+      <WooriDevPanel open={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   )
 }
