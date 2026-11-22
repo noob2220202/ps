@@ -40,7 +40,7 @@ const ACCOUNT = {
   product: 'WON 통장',
   ownerName: '정우진', // 영상의 받는 분/본인 더미 (privacy.json). 받는 분 통장표기 기본값
   badge: null, // 예전엔 '한도제한' 칩 (홈 · 거래내역) — 뺐다
-  dailyLimit: DAILY_LIMIT,
+  dailyLimit: null, // 예전엔 DAILY_LIMIT(1,000,000원) — 한도 없앰 (transfer.checkLimits 는 null 이면 제한 없음)
 };
 
 /** 받는 분 계좌 (더미). key 로 거래·최근입금계좌·조회 디렉터리를 묶는다 */

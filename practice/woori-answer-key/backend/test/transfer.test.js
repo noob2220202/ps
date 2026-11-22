@@ -228,15 +228,13 @@ describe('검사·실행 검증', () => {
     assert.equal((await srv.get('/accounts/1')).body.balance, 45);
   });
 
-  test('한도제한 계좌 1일 이체한도 1,000,000원 (설계값, 이 앱의 이체만)', async () => {
+  test('1일 이체한도 없음 (예전 설계값 1,000,000원은 뺐다)', async () => {
     srv.db.prepare('UPDATE accounts SET balance = 5000000').run();
-    assert.equal((await sendMoney(srv, { ...V1_CHECK, amount: 999_999 })).transfer.status, 201); // 11:02:40 의 1원 + 999,999 = 1,000,000
-    const over = await srv.post('/transfers/check', V1_CHECK);
-    assert.equal(over.status, 422);
-    assert.equal(over.body.code, 'DAILY_LIMIT_EXCEEDED');
-    assert.equal((await srv.get('/accounts/1')).body.remainingDailyLimit, 0);
-    await srv.post('/dev/clock', { now: '2026-11-22T09:00:00' }); // 다음 날은 다시
-    assert.equal((await sendMoney(srv, { ...V1_CHECK, amount: 1_000_000 })).transfer.status, 201);
+    assert.equal((await sendMoney(srv, { ...V1_CHECK, amount: 999_999 })).transfer.status, 201);
+    assert.equal((await sendMoney(srv, { ...V1_CHECK, amount: 2_000_000 })).transfer.status, 201); // 한도를 넘어도 된다
+    const a = (await srv.get('/accounts/1')).body;
+    assert.equal(a.dailyLimit, null);
+    assert.equal(a.remainingDailyLimit, null);
   });
 
   test('거래시각: 시계가 마지막 거래보다 이르면 마지막 시각으로, 같은 초 두 번은 id 뒤에 -2', async () => {
