@@ -241,8 +241,8 @@ WON 로고는 그림 한 장이 아니라 **도형 3겹**으로 그린다(애니
 | 이름 (`launch.…`) | 파일 | frame 상자 px | 상태 | 만든 법 · 검증 |
 |---|---|---|---|---|
 | `splash-won-wordmark` | png 333x111 (x3) | 207, 653, 111, 37 | splash-logo-start·end | 'WON' 글자(#00259f). 중앙값 → EDSR x3 → 역투영 → 흰색 기준 color-to-alpha. 합성·면적 축소 vs 중앙값 0.74 · shot(끝) 1.96 |
-| `splash-if-award` | png 417x216 | 193, 882, 139, 72 | 〃 | iF DESIGN AWARD 2026. 빨간 사각 안(흰 글자 포함)은 α=1. 0.34 · shot 1.48 |
-| `splash-ma-cert` | png 513x171 | 176, 985, 171, 57 | 〃 | MA 모바일 접근성 인증. 남색 판 볼록 껍질 안(흰 MA 포함)은 α=1. 0.43 · shot 1.43 |
+| `splash-if-award` | png 417x216 | 193, 882, 139, 72 | 〃 | iF DESIGN AWARD 2026. 빨간 사각 안(흰 글자 포함)은 α=1. 0.34 · shot 1.48 · 실제 앱(hq): `splash-if-award.hq.svg` 벡터 — 같은 417x216 상자, 사각·iF 기호는 hq png 가장자리에 맞춤, 글자는 Carlito Bold 윤곽(DPR1 겹침 평균 차 10.7, 평평한 곳 1.1, 어긋남 0) |
+| `splash-ma-cert` | png 513x171 | 176, 985, 171, 57 | 〃 | MA 모바일 접근성 인증. 남색 판 볼록 껍질 안(흰 MA 포함)은 α=1. 0.43 · shot 1.43 · 실제 앱(hq): `splash-ma-cert.hq.svg` 벡터 — 같은 513x171 상자, 판 4변·모서리·M·A 획은 hq png 에 맞춤, 'Mobile Accessibility' Inter Regular #888 · '모바일 접근성 인증' Pretendard 500 #686868 윤곽(DPR1 겹침 평균 차 5.8, 어긋남 0). 두 SVG 는 `python3 tools/woori_badges_svg.py` 로 다시 만든다 |
 | `splash-woori-wordmark` | png 273x90 | 217, 1126, 91, 30 | 〃 | '우리은행'. 0.84 · shot 2.20. 네 그림 + 세 겹을 놓은 스플래시 전체(앱 영역) shot 평균차: 끝 0.127 · 시작 0.235 |
 | `splash-logo-track` | svg | 207.125, 573.110, 109.571, 59.462 | 〃 | WON 로고 맨 아래 겹 75.15x40.88dp #d0d0d0 |
 | `splash-logo-fill` | svg | 207.125, 573.110, 109.571, 59.636 | 〃 | 가운데 겹 75.15x41.0dp 그라데이션 — 왼끝 고정 `overflow:hidden` 상자의 폭만 25.44→49.86dp |

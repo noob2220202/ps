@@ -119,7 +119,7 @@
    "shotMADFractionalSize": 7.62,
    "shotMADFrameRes1x": 0.16
   },
-  "hq": "woori/launch/splash-if-award.hq.png"
+  "hq": "woori/launch/splash-if-award.hq.svg"
  },
  {
   "name": "splash-ma-cert",
@@ -180,7 +180,7 @@
    "shotMADFractionalSize": 3.19,
    "shotMADFrameRes1x": 0.2
   },
-  "hq": "woori/launch/splash-ma-cert.hq.png"
+  "hq": "woori/launch/splash-ma-cert.hq.svg"
  },
  {
   "name": "splash-woori-wordmark",

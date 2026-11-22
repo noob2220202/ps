@@ -159,8 +159,8 @@ export interface WooriArtFile {
 
 export const WOORI_ART: Record<WooriArtName, WooriArtFile> = {
   "launch.splash-won-wordmark": { file: "woori/launch/splash-won-wordmark.png", kind: "png", scale: 3, transparent: true, intrinsic: [333, 111], hq: "woori/launch/splash-won-wordmark.hq.svg", note: "'WON' 글자 로고 (남색 #00259f — 로고 원과 같은 색, 잉크 Y<60 화소 중앙값 (0,37,159))" },
-  "launch.splash-if-award": { file: "woori/launch/splash-if-award.png", kind: "png", scale: 3, transparent: true, intrinsic: [417, 216], hq: "woori/launch/splash-if-award.hq.png", note: "iF DESIGN AWARD 2026 (빨간 사각 2개, 코어 (230,0,18))" },
-  "launch.splash-ma-cert": { file: "woori/launch/splash-ma-cert.png", kind: "png", scale: 3, transparent: true, intrinsic: [513, 171], hq: "woori/launch/splash-ma-cert.hq.png", note: "MA 모바일 접근성 인증 마크(남색 (35,63,144)) + 'Mobile Accessibility / 모바일 접근성 인증' 글자" },
+  "launch.splash-if-award": { file: "woori/launch/splash-if-award.png", kind: "png", scale: 3, transparent: true, intrinsic: [417, 216], hq: "woori/launch/splash-if-award.hq.svg", note: "iF DESIGN AWARD 2026 (빨간 사각 2개, 코어 (230,0,18))" },
+  "launch.splash-ma-cert": { file: "woori/launch/splash-ma-cert.png", kind: "png", scale: 3, transparent: true, intrinsic: [513, 171], hq: "woori/launch/splash-ma-cert.hq.svg", note: "MA 모바일 접근성 인증 마크(남색 (35,63,144)) + 'Mobile Accessibility / 모바일 접근성 인증' 글자" },
   "launch.splash-woori-wordmark": { file: "woori/launch/splash-woori-wordmark.png", kind: "png", scale: 3, transparent: true, intrinsic: [273, 90], hq: "woori/launch/splash-woori-wordmark.hq.svg", note: "'우리은행' 글자 로고 (파랑, 가장 진한 3% 중앙값 #0c5997 — 획이 가늘어 코덱이 옅게 만든 값)" },
   "launch.splash-logo-track": { file: "woori/launch/splash-logo-track.svg", kind: "svg", scale: 1, transparent: true, color: "#d0d0d0", note: "WON 로고 맨 아래 겹: 회색 알약 트랙 75.15x40.88dp, #d0d0d0, 양 끝 반원(rx 20.44)" },
   "launch.splash-logo-fill": { file: "woori/launch/splash-logo-fill.svg", kind: "svg", scale: 1, transparent: true, color: "linear-gradient(90deg, #2bc8f4 0, #cefffd 35.80dp, #e9ffff 41.88dp, #ffffff 46.65dp) (트랙 왼끝 기준)", note: "WON 로고 가운데 겹: 하늘색 그라데이션 알약(트랙과 같은 왼끝·폭 75.15dp, 높이 41.0dp, rx 20.5)" },
