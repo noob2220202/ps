@@ -459,7 +459,7 @@ export default function WooriHistory() {
     later(() => setFilled(true), RELOAD_FILL_MS)
     later(() => setBusySpinner(false), RELOAD_SPIN_MS)
   }
-  const reset = () => setPending({ ...DEFAULT_QUERY, from: page?.range.fromDate, to: page?.range.toDate })
+  const reset = () => setPending({ ...DEFAULT_QUERY, period: liveDefaultPeriod(), from: page?.range.fromDate, to: page?.range.toDate })
   const pickPeriod = (period: TxPeriod) =>
     setPending((p) => {
       if (period !== 'custom' || (p.from && p.to)) return { ...p, period }
@@ -635,7 +635,10 @@ interface HistQuery {
   to?: string
 }
 
+/** 영상 값 (shot · 프레임 모드의 영상 비교용): 3개월 · 전체 · 최신순 */
 const DEFAULT_QUERY: HistQuery = { type: 'all', period: '3m', order: 'desc' }
+/** 실제 앱에서 거래내역에 들어갔을 때 · [초기화] 값: 영상과 같되 조회기간만 '이번달' (시트에서 3개월 등으로 바꿀 수 있다). 프레임 모드는 영상 그대로 */
+const liveDefaultPeriod = (): TxPeriod => (isFrameMode() ? DEFAULT_QUERY.period : 'thisMonth')
 const PERIODS: readonly TxPeriod[] = ['thisMonth', '3m', '6m', '1y', 'custom']
 const PERIOD_LABEL: Record<TxPeriod, string> = { thisMonth: '이번달', '3m': '3개월', '6m': '6개월', '1y': '1년', custom: '직접입력' }
 const ORDER_LABEL: Record<TxOrder, string> = { desc: '최신순', asc: '과거순' }
@@ -645,7 +648,7 @@ function queryKeyOf(q: HistQuery): string {
   return [q.type, q.period, q.order, q.period === 'custom' ? `${q.from}~${q.to}` : ''].join('|')
 }
 
-/** URL ?type=all|in|out&period=thisMonth|3m|6m|1y|custom&from=&to=&order=desc|asc (없으면 영상 값 3개월·전체·최신순) */
+/** URL ?type=all|in|out&period=thisMonth|3m|6m|1y|custom&from=&to=&order=desc|asc (period 가 없으면 실제 앱은 이번달·전체·최신순, 프레임 모드는 영상 값 3개월) */
 function initialQuery(search: string): HistQuery {
   const p = new URLSearchParams(search)
   const t = p.get('type')
@@ -654,12 +657,12 @@ function initialQuery(search: string): HistQuery {
   const to = p.get('to') ?? undefined
   const q: HistQuery = {
     type: t === 'in' || t === 'out' ? t : 'all',
-    period: period && PERIODS.includes(period) ? period : '3m',
+    period: period && PERIODS.includes(period) ? period : liveDefaultPeriod(),
     order: p.get('order') === 'asc' ? 'asc' : 'desc',
   }
   if (q.period === 'custom') {
     if (from && to && ISO_DATE.test(from) && ISO_DATE.test(to) && from <= to) Object.assign(q, { from, to })
-    else q.period = '3m'
+    else q.period = liveDefaultPeriod()
   }
   return q
 }
