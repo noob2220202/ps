@@ -18,7 +18,7 @@
 //   폰 뒤로 버튼: 팝업이 떠 있으면 [닫기] 와 같이 닫는다 (팝업이 없으면 WooriLocal 이 '한 번 더 누르면 종료').
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { artSrc, type WooriArtName } from './WooriArt.ts'
-import { wooriApi, type Account } from './WooriApi.ts'
+import { useWooriDataVersion, wooriApi, type Account } from './WooriApi.ts'
 import { WooriDevPanel } from './WooriDevPanel.tsx'
 import { wooriCopy, wooriFitScale, wooriLiveApp, wooriTodo } from './WooriEnv.ts'
 import { useWooriScrollFix, wooriPlace, wooriScrollTo } from './WooriLayout.ts'
@@ -795,9 +795,10 @@ export default function WooriHome() {
   } else view = READY
   if (tapSpinner) view = { ...view, spinner: true }
 
-  // 계좌 (API)
+  // 계좌 (API). 🔔 관리 패널이 데이터를 바꾸면(dataVersion) 다시 받는다
   const [account, setAccount] = useState<Account | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const dataVersion = useWooriDataVersion()
   useEffect(() => {
     const ac = new AbortController()
     wooriApi
@@ -807,7 +808,7 @@ export default function WooriHome() {
         if (!ac.signal.aborted) setLoadError(e instanceof Error ? e.message : String(e))
       })
     return () => ac.abort()
-  }, [])
+  }, [dataVersion])
 
   // 띠 색: 홈·로그인 로딩 #eff0f3 (OS). 팝업 동안 내비 검정은 WooriSheet 가 바란다
   const navBlack = shot?.state.navbarBlack || view.popup !== 'none' || (first && stage >= 14 && !popupDone)

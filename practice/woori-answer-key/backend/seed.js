@@ -349,6 +349,33 @@ function resetDb(db, name = 'v1-start', opts = {}) {
   return seed;
 }
 
+/**
+ * 🔔 관리 패널 '이 프로필 데이터' (bank-app-clone POST /api/reset 과 같은 두 가지). 지금 이름(owner_name)은 그대로 둔다.
+ *   'example' 예시 데이터로 = v1-start 시드
+ *   'empty'   빈 상태로     = 계좌·거래내역·받는 분을 모두 지우고 통장 0원 (대표 계좌만 남는다)
+ */
+function resetMode(db, mode) {
+  const name = db.prepare('SELECT owner_name FROM accounts WHERE id = ?').get(MAIN_ACCOUNT_ID)?.owner_name;
+  resetDb(db, 'v1-start');
+  withTransaction(db, () => {
+    if (mode === 'empty') {
+      db.exec(`
+        DELETE FROM tickets;
+        DELETE FROM transactions;
+        DELETE FROM recipients;
+      `);
+      const own = db.prepare('SELECT bank_code, account_digits FROM accounts WHERE id = ?').get(MAIN_ACCOUNT_ID);
+      db.prepare('DELETE FROM directory WHERE NOT (bank_code = ? AND account_digits = ?)').run(own.bank_code, own.account_digits);
+      db.prepare('UPDATE accounts SET balance = 0 WHERE id = ?').run(MAIN_ACCOUNT_ID);
+    }
+    if (name) {
+      db.prepare('UPDATE accounts SET owner_name = ?').run(name);
+      const own = db.prepare('SELECT bank_code, account_digits FROM accounts WHERE id = ?').get(MAIN_ACCOUNT_ID);
+      db.prepare('UPDATE directory SET holder_name = ? WHERE bank_code = ? AND account_digits = ?').run(name, own.bank_code, own.account_digits);
+    }
+  });
+}
+
 /** DB 가 비어 있으면 WOORI_SCENARIO(기본 'v1-start') 로 채운다. 채웠으면 true */
 function ensureSeeded(db) {
   const n = db.prepare('SELECT COUNT(*) AS n FROM accounts').get().n;
@@ -360,6 +387,7 @@ function ensureSeeded(db) {
 module.exports = {
   buildSeed,
   resetDb,
+  resetMode,
   ensureSeeded,
   resolveScenario,
   txIdFor,

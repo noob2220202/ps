@@ -3,6 +3,7 @@
 // 금액은 원 단위 정수, 시각은 로컬 'YYYY-MM-DDTHH:mm:ss' (Asia/Seoul, 시간대 표기 없음).
 // 오류 응답은 늘 { error: 한국어 메시지, code: 'INVALID_AMOUNT' 같은 코드 (+ failCount·maxFailures) } → WooriApiError.
 // 이름·계좌번호는 시드의 더미 값이다 (실제 값은 저장소에 없다).
+import { useSyncExternalStore } from 'react'
 
 /* ───────────────────────── 응답 모양 ───────────────────────── */
 
@@ -253,6 +254,38 @@ export interface TransferResult {
   done: Done
 }
 
+/** 🔔 관리 패널 */
+export interface Profile {
+  userName: string
+}
+
+/** 받는 분 = 계좌번호 조회 디렉터리 한 줄. id 'KB-56780101876543' */
+export interface Payee {
+  id: string
+  bank: { code: string; name: string; short: string; logo: string | null }
+  number: string
+  holder: string
+  /** ☆ (이체 '자주' 탭) */
+  favorite: boolean
+  /** 이체 '추천' 탭 최근입금계좌에 보임 */
+  showRecent: boolean
+}
+
+/** PATCH /api/transactions/:id — 거래내역 상세에 보이는 값 */
+export interface TxPatch {
+  merchant?: string
+  amount?: number
+  at?: string
+  code?: string
+  branch?: string
+  chequeAmount?: number
+  requester?: string
+  counterBank?: string
+  counterNumber?: string
+  counterHolder?: string
+  recipientLabel?: string
+}
+
 export interface HealthResult {
   ok: boolean
   db: 'ok' | 'empty'
@@ -334,13 +367,6 @@ export const wooriApi = {
 
   getAccounts: (signal?: AbortSignal) => request<Account[]>('GET', '/accounts', undefined, signal),
   getAccount: (id: number, signal?: AbortSignal) => request<Account>('GET', `/accounts/${enc(String(id))}`, undefined, signal),
-  /** 🔔 관리 패널 '내 정보' — 이름만 */
-  updateAccountOwnerName: (id: number, ownerName: string) => request<Account>('PATCH', `/accounts/${enc(String(id))}`, { ownerName }),
-  /** 🔔 관리 패널 '거래' 입금하기(amount > 0)/출금하기(amount < 0) — 늘 맨 뒤에 덧붙는다 */
-  addTransaction: (accountId: number, merchant: string, amount: number) =>
-    request<TxItem>('POST', `/accounts/${enc(String(accountId))}/transactions`, { merchant, amount }),
-  /** 🔔 되돌리기 — 그 계좌의 가장 최근 거래이면서 addTransaction 으로 추가한 것만 (아니면 403/409) */
-  deleteTransaction: (id: string) => request<{ ok: true }>('DELETE', `/transactions/${enc(id)}`),
 
   /** 거래내역 한 쪽 (기본 3개월·전체·최신순, 30건). 다음 쪽은 nextCursor 를 cursor 로 */
   getTransactions: (accountId: number, q: TxQuery = {}, signal?: AbortSignal) =>
@@ -354,12 +380,6 @@ export const wooriApi = {
 
   getRecipients: (tab: RecipientTab = 'recommend', signal?: AbortSignal) =>
     request<Recipient[]>('GET', `/recipients${qs({ tab })}`, undefined, signal),
-  /** 🔔 관리 패널 '받는 분 등록' */
-  addRecipient: (bankCode: string, accountNumber: string, holder: string) =>
-    request<Recipient>('POST', '/recipients', { bankCode, accountNumber, holder }),
-  /** 🔔 관리 패널 '편집' — 예금주 이름·계좌번호 (기관은 고정) */
-  updateRecipient: (id: number, fields: { holder?: string; accountNumber?: string }) =>
-    request<Recipient>('PATCH', `/recipients/${enc(String(id))}`, fields),
   /** 즐겨찾기 ☆. favorite 생략(빈 본문)이면 토글 */
   setRecipientFavorite: (id: number, favorite?: boolean) =>
     request<Recipient>('POST', `/recipients/${enc(String(id))}/favorite`, favorite === undefined ? {} : { favorite }),
@@ -387,6 +407,47 @@ export const wooriApi = {
   /** 개발용: 시나리오 리셋 (now: 'video' 면 그 녹화의 시계로 고정) */
   devReset: (scenario: DevScenario, now?: string) => request<DevResetResult>('POST', '/dev/reset', now ? { scenario, now } : { scenario }),
   devClock: (now?: string | null) => (now === undefined ? request<ClockView>('GET', '/dev/clock') : request<ClockView>('POST', '/dev/clock', { now })),
+
+  /* 🔔 관리 패널 (WooriDevPanel — bank-app-clone src/api/endpoints 와 같은 자리) */
+  getProfile: () => request<Profile>('GET', '/profile'),
+  updateProfile: (body: { userName: string }) => request<Profile>('PATCH', '/profile', body),
+  reset: (mode: 'empty' | 'example') => request<{ ok: true }>('POST', '/reset', { mode }),
+  /** 금융회사 전부 (그리드 밖 지역농축협 등 포함) */
+  getAllBanks: () => request<Bank[]>('GET', '/banks?all=1'),
+  addAccount: (body: { name?: string; number: string; balance: number }) => request<Account>('POST', '/accounts', body),
+  updateAccount: (id: number, body: { balance?: number; name?: string; number?: string }) => request<Account>('PATCH', `/accounts/${enc(String(id))}`, body),
+  deleteAccount: (id: number) => request<{ ok: true }>('DELETE', `/accounts/${enc(String(id))}`),
+  createTransaction: (accountId: number, body: { merchant: string; amount: number; code?: string; at?: string }) =>
+    request<TxItem>('POST', `/accounts/${enc(String(accountId))}/transactions`, body),
+  updateTransaction: (id: string, body: TxPatch) => request<TxDetail>('PATCH', `/transactions/${enc(id)}`, body),
+  deleteTransaction: (id: string) => request<{ ok: true }>('DELETE', `/transactions/${enc(id)}`),
+  getPayees: () => request<Payee[]>('GET', '/payees'),
+  addPayee: (body: { bankCode: string; number: string; holder: string; showRecent?: boolean }) => request<Payee>('POST', '/payees', body),
+  updatePayee: (id: string, body: { holder?: string; number?: string; showRecent?: boolean; favorite?: boolean }) =>
+    request<Payee>('PATCH', `/payees/${enc(id)}`, body),
+  deletePayee: (id: string) => request<{ ok: true }>('DELETE', `/payees/${enc(id)}`),
+}
+
+/* ───────────────────────── 🔔 관리 패널 데이터 버전 ───────────────────────── */
+// bank-app-clone client.invalidate() 와 같은 요령: 패널이 데이터를 바꾸면 버전을 올리고, 열려 있는 화면(홈)이 다시 받는다.
+
+let dataVersion = 0
+const dataSubs = new Set<() => void>()
+
+export function notifyWooriDataChanged(): void {
+  dataVersion++
+  for (const f of dataSubs) f()
+}
+
+export function useWooriDataVersion(): number {
+  return useSyncExternalStore(
+    (f) => {
+      dataSubs.add(f)
+      return () => dataSubs.delete(f)
+    },
+    () => dataVersion,
+    () => 0,
+  )
 }
 
 export type WooriApi = typeof wooriApi

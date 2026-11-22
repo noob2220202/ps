@@ -153,6 +153,20 @@ function getTxRow(db, id) {
   return db.prepare('SELECT * FROM transactions WHERE id = ?').get(String(id));
 }
 
+/**
+ * 거래마다의 '거래후 잔액'을 계좌 잔액에서 거꾸로 다시 맞춘다 (최신 거래 = 지금 잔액, 그 앞은 거기서 금액을 뺀 값).
+ * bank-app-clone 서버 listTransactions 와 같은 규칙 — 🔔 관리 패널에서 잔액·거래(금액·시각)를 고치거나 지우면 부른다.
+ */
+function recomputeBalances(db, accountId) {
+  let running = db.prepare('SELECT balance FROM accounts WHERE id = ?').get(accountId).balance;
+  const rows = db.prepare('SELECT seq, amount, balance_after FROM transactions WHERE account_id = ? ORDER BY occurred_at DESC, seq DESC').all(accountId);
+  const upd = db.prepare('UPDATE transactions SET balance_after = ? WHERE seq = ?');
+  for (const r of rows) {
+    if (r.balance_after !== running) upd.run(running, r.seq);
+    running -= r.amount;
+  }
+}
+
 /** 그 날짜(YYYY-MM-DD)에 이 계좌에서 이 앱으로 이체한 합계 (한도 계산용, 양수) */
 function transferredOn(db, accountId, date) {
   return db
@@ -195,6 +209,7 @@ module.exports = {
   recipientInfo,
   getAccountRow,
   getTxRow,
+  recomputeBalances,
   transferredOn,
   findDirectoryEntry,
   isFirstTime,

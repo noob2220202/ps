@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { ensureSeeded } = require('./seed');
 const { lookup } = require('./transfer');
+const panel = require('./panel');
 const { now } = require('./clock');
 const { ApiError } = require('./util');
 
@@ -35,6 +36,21 @@ function createApp({ db, hooks = {}, enableDev = process.env.WOORI_DISABLE_DEV !
   api.use('/banks', require('./routes/banks')(db));
   api.post('/lookup', (req, res) => res.json(lookup(db, req.body)));
   api.use('/transfers', require('./routes/transfers')(db, hooks));
+
+  // 🔔 관리 패널 (backend/panel.js — bank-app-clone 과 같은 API): 내 정보 · 데이터 리셋 · 받는 분
+  api.get('/profile', (req, res) => res.json(panel.getProfile(db)));
+  api.patch('/profile', (req, res) => res.json(panel.patchProfile(db, req.body)));
+  api.post('/reset', (req, res) => {
+    panel.reset(db, req.body);
+    res.json({ ok: true });
+  });
+  api.get('/payees', (req, res) => res.json(panel.listPayees(db)));
+  api.post('/payees', (req, res) => res.status(201).json(panel.addPayee(db, req.body)));
+  api.patch('/payees/:id', (req, res) => res.json(panel.patchPayee(db, req.params.id, req.body)));
+  api.delete('/payees/:id', (req, res) => {
+    panel.deletePayee(db, req.params.id);
+    res.json({ ok: true });
+  });
 
   if (enableDev) api.use('/dev', require('./routes/dev')(db));
 

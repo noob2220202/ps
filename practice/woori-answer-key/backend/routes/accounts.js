@@ -1,17 +1,11 @@
 'use strict';
 // GET /api/accounts, GET /api/accounts/:id, GET /api/accounts/:id/transactions, GET /api/accounts/:id/transactions/:txId
-//   PATCH /api/accounts/:id {ownerName} · POST /api/accounts/:id/transactions {merchant,amount} — 🔔 관리 패널
+//   🔔 관리 패널: POST /api/accounts · PATCH/DELETE /api/accounts/:id · POST /api/accounts/:id/transactions (backend/panel.js)
 const express = require('express');
 const { toAccount, toListItem, toDetail, getAccountRow, getTxRow, transferredOn } = require('../repo');
 const { now } = require('../clock');
-const { withTransaction } = require('../schema');
-const { uniqueTxId } = require('../transfer');
-const { DEPOSIT_DETAIL, WITHDRAW_DETAIL } = require('../seed');
-const { parseDate, minusMonths, dotDate, won, ApiError, one } = require('../util');
-
-const OWNER_NAME_MAX = 10; // 내 정보 '이름' (DevPanel BasicForm 과 같은 한도)
-const MERCHANT_MAX = 20;
-const MAX_AMOUNT = 1_000_000_000; // accounts.balance CHECK 와 같은 상한
+const panel = require('../panel');
+const { parseDate, minusMonths, dotDate, ApiError, one } = require('../util');
 
 const PERIODS = { thisMonth: '이번달', '3m': '3개월', '6m': '6개월', '1y': '1년', custom: '직접입력' }; // 조회조건 시트 조회기간
 const TYPES = { all: '전체', in: '입금', out: '출금' }; // 거래구분
@@ -65,49 +59,14 @@ module.exports = function accountsRouter(db) {
     res.json(accountView(db, row));
   });
 
-  // 🔔 관리 패널 '내 정보' — 이름만 (계좌번호·상품명은 시나리오 고정값이라 안 둔다)
-  router.patch('/:id', (req, res) => {
-    const row = getAccountRow(db, req.params.id);
-    if (!row) throw new ApiError(404, '계좌를 찾을 수 없습니다', 'ACCOUNT_NOT_FOUND');
-    const { ownerName } = req.body ?? {};
-    if (typeof ownerName !== 'string' || !ownerName.trim()) throw new ApiError(400, '이름을 입력해 주세요', 'INVALID_OWNER_NAME');
-    const name = ownerName.trim();
-    if ([...name].length > OWNER_NAME_MAX) throw new ApiError(400, `이름은 ${OWNER_NAME_MAX}자 이하로 입력해 주세요`, 'INVALID_OWNER_NAME');
-    db.prepare('UPDATE accounts SET owner_name = ? WHERE id = ?').run(name, row.id);
-    res.json(accountView(db, getAccountRow(db, row.id)));
+  // 🔔 관리 패널 (backend/panel.js — bank-app-clone 과 같은 동작)
+  router.post('/', (req, res) => res.status(201).json(panel.addAccount(db, req.body)));
+  router.patch('/:id', (req, res) => res.json(panel.patchAccount(db, req.params.id, req.body)));
+  router.delete('/:id', (req, res) => {
+    panel.deleteAccount(db, req.params.id);
+    res.json({ ok: true });
   });
-
-  // 🔔 관리 패널 '거래' 입금하기/출금하기 — 늘 맨 뒤에 덧붙인다(occurred_at 이 마지막 거래보다 이르면 맞춘다, transfer.execute 와 같은 규칙).
-  // 과거 거래(영상 · 지어낸 행)의 시각·금액은 고치지 않는다 — 답지 정확도 보호. 되돌리기는 DELETE /api/transactions/:id (방금 추가한 것만).
-  router.post('/:id/transactions', (req, res) => {
-    const acct = getAccountRow(db, req.params.id);
-    if (!acct) throw new ApiError(404, '계좌를 찾을 수 없습니다', 'ACCOUNT_NOT_FOUND');
-    const { merchant, amount } = req.body ?? {};
-    if (typeof merchant !== 'string' || !merchant.trim()) throw new ApiError(400, '거래처를 입력해 주세요', 'INVALID_MERCHANT');
-    const name = merchant.trim();
-    if ([...name].length > MERCHANT_MAX) throw new ApiError(400, `거래처는 ${MERCHANT_MAX}자 이하로 입력해 주세요`, 'INVALID_MERCHANT');
-    if (!Number.isSafeInteger(amount) || amount === 0) throw new ApiError(400, '0이 아닌 정수 금액을 입력해 주세요', 'INVALID_AMOUNT');
-    if (Math.abs(amount) > MAX_AMOUNT) throw new ApiError(400, `거래 금액은 ${won(MAX_AMOUNT)}까지예요`, 'INVALID_AMOUNT');
-    if (acct.balance + amount < 0) throw new ApiError(422, `잔액이 부족해요 (현재 ${won(acct.balance)})`, 'INSUFFICIENT_BALANCE');
-    if (acct.balance + amount > MAX_AMOUNT) throw new ApiError(422, `잔액은 ${won(MAX_AMOUNT)}까지예요`, 'INVALID_AMOUNT');
-
-    const row = withTransaction(db, () => {
-      const lastTx = db.prepare('SELECT MAX(occurred_at) AS t FROM transactions WHERE account_id = ?').get(acct.id).t;
-      const clockAt = now(db);
-      const at = lastTx && clockAt < lastTx ? lastTx : clockAt;
-      const balanceAfter = acct.balance + amount;
-      const id = uniqueTxId(db, at);
-      const tmpl = amount > 0 ? DEPOSIT_DETAIL : WITHDRAW_DETAIL;
-      db.prepare(`INSERT INTO transactions
-        (id, account_id, occurred_at, display_name, amount, balance_after, kind, code, branch, requester,
-         counterparty_name, counterparty_bank, counterparty_account, recipient_label, my_label, fee, cheque_amount, detail_src, source, note)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 'rule', 'app', '관리 패널에서 추가')`)
-        .run(id, acct.id, at, name, amount, balanceAfter, amount > 0 ? 'deposit' : 'withdraw', tmpl.code, tmpl.branch);
-      db.prepare('UPDATE accounts SET balance = ? WHERE id = ?').run(balanceAfter, acct.id);
-      return db.prepare('SELECT * FROM transactions WHERE id = ?').get(id);
-    });
-    res.status(201).json(toListItem(row));
-  });
+  router.post('/:id/transactions', (req, res) => res.status(201).json(panel.addTransaction(db, req.params.id, req.body)));
 
   // ?period=thisMonth|3m|6m|1y|custom &from=&to= &type=all|in|out &order=desc|asc &cursor= &limit=
   router.get('/:id/transactions', (req, res) => {
