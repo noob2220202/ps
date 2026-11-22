@@ -57,6 +57,25 @@
   font-size: 18px;
   color: #8a8a8e;
 }
+.woori-dev-panel__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 14px 10px;
+}
+.woori-dev-panel__tabs button {
+  flex: 1;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 10px;
+  background: #f1f2f4;
+  color: #6b6b70;
+  font-size: 13px;
+  font-weight: 600;
+}
+.woori-dev-panel__tabs button.on {
+  background: #185ba4;
+  color: #fff;
+}
 .woori-dev-panel__body {
   flex: 1;
   overflow-y: auto;
@@ -64,15 +83,82 @@
 }
 
 .woori-dev-tab__h {
-  margin: 4px 0 8px;
+  margin: 18px 0 8px;
   font-size: 14px;
   font-weight: 700;
+}
+.woori-dev-tab__h--first {
+  margin-top: 4px;
 }
 .woori-dev-tab__hint {
   margin: 4px 0 10px;
   font-size: 12px;
   line-height: 1.5;
   color: #8a8a8e;
+}
+
+.woori-dev-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+.woori-dev-field__label {
+  font-size: 12px;
+  color: #6b6b70;
+}
+.woori-dev-field input,
+.woori-dev-field select {
+  border: 1px solid #e0e1e4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: inherit;
+  background: #fff;
+}
+
+.woori-dev-money__box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e0e1e4;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.woori-dev-money__box input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font-size: 15px;
+  font-weight: 700;
+  color: inherit;
+  background: none;
+  text-align: right;
+}
+.woori-dev-money__box span {
+  font-size: 13px;
+  color: #8a8a8e;
+}
+.woori-dev-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.woori-dev-chip {
+  padding: 6px 10px;
+  border: 1px solid #e0e1e4;
+  border-radius: 999px;
+  background: #fff;
+  color: #333;
+  font-size: 12px;
+}
+.woori-dev-chip--ghost {
+  color: #8a8a8e;
+}
+
+.woori-dev-add {
+  margin-bottom: 10px;
 }
 
 .woori-dev-row {
@@ -105,6 +191,12 @@
   background: #fdeceb;
   color: #d64545;
 }
+.woori-dev-btn--in {
+  background: #185ba4;
+}
+.woori-dev-btn--out {
+  background: #d64545;
+}
 
 .woori-dev-recipient {
   display: flex;
@@ -113,6 +205,16 @@
   padding: 10px 0;
   border-bottom: 1px solid #f1f2f4;
 }
+.woori-dev-recipient__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+}
 .woori-dev-recipient__name {
   font-size: 14px;
   font-weight: 600;
@@ -120,6 +222,34 @@
 .woori-dev-recipient__num {
   font-size: 12px;
   color: #8a8a8e;
+}
+.woori-dev-recipient__edit {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f8f8fa;
+}
+
+.woori-dev-tx {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f2f4;
+  font-size: 13px;
+}
+.woori-dev-tx__main {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  gap: 8px;
+}
+.woori-dev-tx__in {
+  color: #185ba4;
 }
 
 .woori-dev-toast {

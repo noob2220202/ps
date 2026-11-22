@@ -359,5 +359,5 @@ function getDone(db, txId) {
 }
 
 module.exports = {
-  lookup, check, getTicket, verifyPin, execute, getDone, parseBankAccount, agoText, LABEL_MAX_LENGTH, PIN_MAX_FAILURES,
+  lookup, check, getTicket, verifyPin, execute, getDone, parseBankAccount, agoText, uniqueTxId, LABEL_MAX_LENGTH, PIN_MAX_FAILURES,
 };

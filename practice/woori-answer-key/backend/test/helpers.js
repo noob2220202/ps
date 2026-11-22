@@ -31,6 +31,7 @@ async function startServer(db = openDb(':memory:'), { enableDev = true } = {}) {
     port,
     get: (p) => call('GET', p),
     post: (p, b) => call('POST', p, b),
+    patch: (p, b) => call('PATCH', p, b),
     del: (p) => call('DELETE', p),
     reset: (scenario, now) => call('POST', '/dev/reset', now === undefined ? { scenario } : { scenario, now }),
     close: () =>

@@ -334,6 +334,13 @@ export const wooriApi = {
 
   getAccounts: (signal?: AbortSignal) => request<Account[]>('GET', '/accounts', undefined, signal),
   getAccount: (id: number, signal?: AbortSignal) => request<Account>('GET', `/accounts/${enc(String(id))}`, undefined, signal),
+  /** 🔔 관리 패널 '내 정보' — 이름만 */
+  updateAccountOwnerName: (id: number, ownerName: string) => request<Account>('PATCH', `/accounts/${enc(String(id))}`, { ownerName }),
+  /** 🔔 관리 패널 '거래' 입금하기(amount > 0)/출금하기(amount < 0) — 늘 맨 뒤에 덧붙는다 */
+  addTransaction: (accountId: number, merchant: string, amount: number) =>
+    request<TxItem>('POST', `/accounts/${enc(String(accountId))}/transactions`, { merchant, amount }),
+  /** 🔔 되돌리기 — 그 계좌의 가장 최근 거래이면서 addTransaction 으로 추가한 것만 (아니면 403/409) */
+  deleteTransaction: (id: string) => request<{ ok: true }>('DELETE', `/transactions/${enc(id)}`),
 
   /** 거래내역 한 쪽 (기본 3개월·전체·최신순, 30건). 다음 쪽은 nextCursor 를 cursor 로 */
   getTransactions: (accountId: number, q: TxQuery = {}, signal?: AbortSignal) =>
@@ -347,6 +354,12 @@ export const wooriApi = {
 
   getRecipients: (tab: RecipientTab = 'recommend', signal?: AbortSignal) =>
     request<Recipient[]>('GET', `/recipients${qs({ tab })}`, undefined, signal),
+  /** 🔔 관리 패널 '받는 분 등록' */
+  addRecipient: (bankCode: string, accountNumber: string, holder: string) =>
+    request<Recipient>('POST', '/recipients', { bankCode, accountNumber, holder }),
+  /** 🔔 관리 패널 '편집' — 예금주 이름·계좌번호 (기관은 고정) */
+  updateRecipient: (id: number, fields: { holder?: string; accountNumber?: string }) =>
+    request<Recipient>('PATCH', `/recipients/${enc(String(id))}`, fields),
   /** 즐겨찾기 ☆. favorite 생략(빈 본문)이면 토글 */
   setRecipientFavorite: (id: number, favorite?: boolean) =>
     request<Recipient>('POST', `/recipients/${enc(String(id))}/favorite`, favorite === undefined ? {} : { favorite }),
