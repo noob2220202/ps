@@ -1,6 +1,6 @@
 {
   "appId": "dev.answerkey.won",
-  "appName": "WON 답지",
+  "appName": "우리WON뱅킹",
   "webDir": "dist-apk",
   "loggingBehavior": "debug",
   "android": {
