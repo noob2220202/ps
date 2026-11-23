@@ -15,8 +15,8 @@ const { digitsOnly, formatAccount, isValidLocalIso, ApiError } = require('./util
 const OWN_BANK = 'WOORI';
 const OWN_DIGITS = 13; // 우리은행 계좌번호 1002-123-456789
 const DEFAULT_ACCOUNT_NAME = 'WON 통장';
-const MONEY_MAX = 1_000_000_000;
-const TX_MAX = 10_000_000; // bank-app-clone TX_MAX (한 번에 1천만원까지)
+// 금액 한도 없음 — 원본(bank-app-clone)의 한 번에 1천만원 · 잔액 10억원 제한은 뺐다. JS 가 정확히 셀 수 있는 정수(약 9천조원)까지만
+const MONEY_MAX = Number.MAX_SAFE_INTEGER;
 
 /** bank-app-clone bad(): 400 + fields (패널은 fields 의 첫 값을 알림으로) */
 function bad(message, fields) {
@@ -25,7 +25,7 @@ function bad(message, fields) {
 function conflict(message, fields) {
   return new ApiError(409, message, 'CONFLICT', fields ? { fields } : undefined);
 }
-const money = (v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= MONEY_MAX);
+const money = (v) => v === undefined || (Number.isSafeInteger(v) && v >= 0);
 const checkName = (name) =>
   name === undefined ? null : typeof name !== 'string' || !name.trim() || name.trim().length > 20 ? '계좌 이름은 1~20자' : null;
 
@@ -90,7 +90,7 @@ function addAccount(db, body) {
   const digits = digitsOnly(number);
   const numberError = checkOwnNumber(digits);
   if (numberError) fields.number = numberError;
-  if (!Number.isInteger(balance) || balance < 0 || balance > MONEY_MAX) fields.balance = '0원 이상 10억원 이하';
+  if (!Number.isSafeInteger(balance) || balance < 0) fields.balance = '0원 이상';
   if (Object.keys(fields).length) throw bad('입력값을 확인해 주세요', fields);
   if (myAccountByNumber(db, OWN_BANK, digits)) throw conflict('이미 추가된 계좌예요', { number: '이미 추가된 계좌예요' });
   if (db.prepare('SELECT 1 FROM directory WHERE bank_code = ? AND account_digits = ?').get(OWN_BANK, digits)) {
@@ -116,7 +116,7 @@ function patchAccount(db, id, body) {
   const { balance, number, name } = body ?? {};
   const nameError = checkName(name);
   if (nameError) throw bad(nameError, { name: nameError });
-  if (!money(balance)) throw bad('입력값을 확인해 주세요', { balance: '0원 이상 10억원 이하' });
+  if (!money(balance)) throw bad('입력값을 확인해 주세요', { balance: '0원 이상' });
   let digits = row.account_digits;
   if (number !== undefined) {
     digits = digitsOnly(number);
@@ -177,13 +177,12 @@ function addTransaction(db, accountId, body) {
   const fields = {};
   if (typeof merchant !== 'string' || !merchant.trim()) fields.merchant = '거래처를 입력해 주세요';
   else if (merchant.trim().length > 20) fields.merchant = '20자 이하';
-  if (!Number.isInteger(amount) || amount === 0) fields.amount = '0이 아닌 금액을 입력해 주세요';
-  else if (Math.abs(amount) > TX_MAX) fields.amount = '한 번에 1천만원까지';
+  if (!Number.isSafeInteger(amount) || amount === 0) fields.amount = '0이 아닌 금액을 입력해 주세요';
   const when = at === undefined ? null : normalizeAt(at);
   if (at !== undefined && !when) fields.at = '날짜 형식 오류';
   if (Object.keys(fields).length) throw bad('입력값을 확인해 주세요', fields);
   if (row.balance + amount < 0) throw new ApiError(400, `잔액이 부족해요 (현재 ${row.balance.toLocaleString('ko-KR')}원)`, 'INSUFFICIENT_BALANCE');
-  if (row.balance + amount > MONEY_MAX) throw bad('잔액은 10억원까지예요', { amount: '잔액은 10억원까지' });
+  if (row.balance + amount > MONEY_MAX) throw bad('금액이 너무 커요', { amount: '금액이 너무 커요' });
 
   const kind = amount > 0 ? 'deposit' : 'withdraw';
   const tx = withTransaction(db, () => {
@@ -227,15 +226,14 @@ function patchTransaction(db, id, body) {
   }
   let delta = 0;
   if ('amount' in b) {
-    if (!Number.isInteger(b.amount) || b.amount === 0) fields.amount = '0이 아닌 금액을 입력해 주세요';
-    else if (Math.abs(b.amount) > TX_MAX) fields.amount = '한 번에 1천만원까지';
+    if (!Number.isSafeInteger(b.amount) || b.amount === 0) fields.amount = '0이 아닌 금액을 입력해 주세요';
     else {
       delta = b.amount - t.amount;
       next.amount = b.amount;
     }
   }
   if ('chequeAmount' in b) {
-    if (!Number.isInteger(b.chequeAmount) || b.chequeAmount < 0 || b.chequeAmount > MONEY_MAX) fields.chequeAmount = '0원 이상';
+    if (!Number.isSafeInteger(b.chequeAmount) || b.chequeAmount < 0) fields.chequeAmount = '0원 이상';
     else next.cheque_amount = b.chequeAmount;
   }
   if ('requester' in b) next.requester = text20(b.requester) || null;
@@ -263,7 +261,7 @@ function patchTransaction(db, id, body) {
 
   const acct = getAccountRow(db, t.account_id);
   if (acct.balance + delta < 0) throw new ApiError(400, `잔액이 부족해요 (현재 ${acct.balance.toLocaleString('ko-KR')}원)`, 'INSUFFICIENT_BALANCE');
-  if (acct.balance + delta > MONEY_MAX) throw bad('잔액은 10억원까지예요', { amount: '잔액은 10억원까지' });
+  if (acct.balance + delta > MONEY_MAX) throw bad('금액이 너무 커요', { amount: '금액이 너무 커요' });
 
   // 종류: 입금 / 받는 분이 있는 출금 = 이체 / 그 밖의 출금
   next.kind = next.amount > 0 ? 'deposit' : next.counterparty_bank && next.counterparty_account && next.counterparty_name ? 'transfer' : 'withdraw';

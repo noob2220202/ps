@@ -174,7 +174,7 @@ function MoneyInput({ value, onChange, quick = [1000, 10000, 100000] }: { value:
           inputMode="numeric"
           value={value ? value.toLocaleString('ko-KR') : ''}
           placeholder="0"
-          onChange={(e) => onChange(Math.min(Number(e.target.value.replace(/\D/g, '')) || 0, 1_000_000_000))}
+          onChange={(e) => onChange(Math.min(Number(e.target.value.replace(/\D/g, '')) || 0, Number.MAX_SAFE_INTEGER))}
         />
         <span>원</span>
       </div>

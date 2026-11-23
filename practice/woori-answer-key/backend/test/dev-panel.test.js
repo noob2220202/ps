@@ -106,6 +106,18 @@ describe('거래', () => {
     await assertChain();
   });
 
+
+  test('금액 한도 없음: 1천만원 · 10억원을 넘는 거래도 추가·수정할 수 있다', async () => {
+    const big = await srv.post('/accounts/1/transactions', { merchant: '큰 입금', amount: 5_000_000_000 });
+    assert.equal(big.status, 201);
+    assert.equal((await srv.get('/accounts/1')).body.balance, 5_000_000_345);
+    assert.equal((await srv.post('/accounts/1/transactions', { merchant: '큰 출금', amount: -2_000_000_000 })).status, 201);
+    const r = await srv.patch('/transactions/tx-20261120-212947', { amount: 300_000_000 }); // 영상 +100,000 → +3억
+    assert.equal(r.status, 200);
+    assert.equal((await srv.patch('/accounts/1', { balance: 20_000_000_000 })).status, 200);
+    await assertChain();
+  });
+
   test('잔액 부족 · 잘못된 값', async () => {
     assert.equal((await srv.post('/accounts/1/transactions', { merchant: '마트', amount: -1000 })).body.code, 'INSUFFICIENT_BALANCE');
     assert.equal((await srv.post('/accounts/1/transactions', { merchant: '', amount: 1 })).status, 400);
