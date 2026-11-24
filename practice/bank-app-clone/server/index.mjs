@@ -79,8 +79,11 @@ const TOSS = APP === "toss";
 // 다른 앱 응답은 그대로. NH 계좌는 bank_code 'nh' — 여기서 APP === "nh"(콕뱅크)를 보면 안 됨
 const ALLONE = APP === "allone";
 // 관리 패널 거래 한 건 금액 상한: 다른 앱은 1천만원, 올원은 잔액 상한(10억)과 같게 (큰 입금 · 출금도 한 줄로)
-const TX_MAX = ALLONE ? 1_000_000_000 : 10_000_000;
-const TX_MAX_MSG = ALLONE ? "한 번에 10억원까지" : "한 번에 1천만원까지";
+// 올원뱅크는 금액 한도가 없다 (거래 한 번 · 잔액 · 이체) — 다른 앱은 그대로. 올원은 JS 가 정확히 셀 수 있는 정수(약 9천조원)까지만
+const TX_MAX = ALLONE ? Number.MAX_SAFE_INTEGER : 10_000_000;
+const TX_MAX_MSG = ALLONE ? "너무 큰 금액이에요" : "한 번에 1천만원까지";
+const MONEY_MAX = ALLONE ? Number.MAX_SAFE_INTEGER : 1_000_000_000; // 잔액 · 이번달 쓴 돈 상한
+const MONEY_MAX_MSG = ALLONE ? "0원 이상" : "0원 이상 10억원 이하";
 
 const getProfile = () => {
   const p = db().prepare("SELECT * FROM profile WHERE id = 1").get();
@@ -450,7 +453,7 @@ app.patch("/api/profile", (req, res) => {
   if (userName !== undefined && !(typeof userName === "string" && /^.{1,10}$/u.test(userName.trim()))) fields.userName = "이름은 1~10자";
   if (cardLast4 !== undefined && !(typeof cardLast4 === "string" && /^\d{4}$/.test(cardLast4))) fields.cardLast4 = "숫자 4자리";
   // cardSpend: null = 자동 계산으로 되돌리기
-  if (cardSpend !== undefined && cardSpend !== null && !(Number.isInteger(cardSpend) && cardSpend >= 0 && cardSpend <= 1_000_000_000))
+  if (cardSpend !== undefined && cardSpend !== null && !(Number.isInteger(cardSpend) && cardSpend >= 0 && cardSpend <= MONEY_MAX))
     fields.cardSpend = "0원 이상 10억원 이하";
   if (cashbackCount !== undefined && !(Number.isInteger(cashbackCount) && cashbackCount >= 0 && cashbackCount <= 99)) fields.cashbackCount = "0~99건";
   if (suspended !== undefined && typeof suspended !== "boolean") fields.suspended = "켜기/끄기";
@@ -491,7 +494,7 @@ app.post("/api/accounts", (req, res) => {
   const digits = digitsOf(number);
   const numberError = bank && checkNumber(bank, digits);
   if (numberError) fields.number = numberError;
-  if (!Number.isInteger(balance) || balance < 0 || balance > 1_000_000_000) fields.balance = "0원 이상 10억원 이하";
+  if (!Number.isInteger(balance) || balance < 0 || balance > MONEY_MAX) fields.balance = MONEY_MAX_MSG;
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
 
   const formatted = formatAccountNumber(bankCode, digits);
@@ -526,9 +529,9 @@ app.patch("/api/accounts/:id", (req, res) => {
   const { balance, number, safebox, name } = req.body ?? {};
   const nameError = checkName(name);
   if (nameError) throw bad(nameError, { name: nameError });
-  const money = (v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 1_000_000_000);
-  if (!money(balance)) throw bad("입력값을 확인해 주세요", { balance: "0원 이상 10억원 이하" });
-  if (!money(safebox)) throw bad("입력값을 확인해 주세요", { safebox: "0원 이상 10억원 이하" });
+  const money = (v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= MONEY_MAX);
+  if (!money(balance)) throw bad("입력값을 확인해 주세요", { balance: MONEY_MAX_MSG });
+  if (!money(safebox)) throw bad("입력값을 확인해 주세요", { safebox: MONEY_MAX_MSG });
   if (safebox !== undefined && row.kind !== "main") throw bad("세이프박스는 카카오뱅크 통장에만 있어요");
   const tossSave = TOSS && toss.accountPatch(req.body ?? {}); // favorite · openedAt · sort · role (잘못된 값이면 여기서 400)
   const blocked = ALLONE ? req.body?.blocked : undefined; // 올원 지급정지 (🔔 패널)
@@ -584,7 +587,7 @@ app.post("/api/accounts/:id/transactions", (req, res) => {
   if (Object.keys(fields).length) throw bad("입력값을 확인해 주세요", fields);
   if (row.balance + amount < 0)
     throw new HttpError(400, "INSUFFICIENT_BALANCE", `잔액이 부족해요 (현재 ${row.balance.toLocaleString("ko-KR")}원)`);
-  if (row.balance + amount > 1_000_000_000) throw bad("잔액은 10억원까지예요", { amount: "잔액은 10억원까지" }); // PATCH 잔액과 같은 상한
+  if (row.balance + amount > MONEY_MAX) throw bad(ALLONE ? "너무 큰 금액이에요" : "잔액은 10억원까지예요", { amount: ALLONE ? "너무 큰 금액" : "잔액은 10억원까지" }); // PATCH 잔액과 같은 상한
 
   const id = transaction(() => {
     const r = db()
@@ -692,7 +695,7 @@ app.patch("/api/transactions/:id", (req, res) => {
 
   const acct = findAccount(t.account_id);
   if (acct.balance + balanceDelta < 0) throw new HttpError(400, "INSUFFICIENT_BALANCE", `잔액이 부족해요 (현재 ${acct.balance.toLocaleString("ko-KR")}원)`);
-  if (acct.balance + balanceDelta > 1_000_000_000) throw bad("잔액은 10억원까지예요", { amount: "잔액은 10억원까지" });
+  if (acct.balance + balanceDelta > MONEY_MAX) throw bad(ALLONE ? "너무 큰 금액이에요" : "잔액은 10억원까지예요", { amount: ALLONE ? "너무 큰 금액" : "잔액은 10억원까지" });
 
   transaction(() => {
     if (sets.length) db().prepare(`UPDATE transactions SET ${sets.join(", ")} WHERE id = ?`).run(...vals, t.id);
@@ -962,7 +965,7 @@ app.post("/api/transfers", (req, res) => {
   const to = findRecipient(bankCode, number);
   const fields = {};
   if (!Number.isInteger(amount) || amount <= 0) fields.amount = "보낼 금액을 입력해 주세요";
-  else if (amount > 10_000_000) fields.amount = "한 번에 1천만원까지";
+  else if (!ALLONE && amount > 10_000_000) fields.amount = "한 번에 1천만원까지";
   for (const [k, v] of Object.entries({ memoTo, memoMe }))
     if (v !== undefined && (typeof v !== "string" || v.trim().length > 20)) fields[k] = "20자 이하";
   if (Object.keys(fields).length) throw bad(Object.values(fields)[0], fields);

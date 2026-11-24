@@ -14,7 +14,7 @@ import { prefetch, useApi } from "../../api/useApi";
 import { aoApi, aoPaths, type AoHome, type AoTransferRecord } from "../api";
 import { aoBankName } from "../bank";
 import { aoViaOf } from "../flow";
-import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLine, aoDailyRemaining, aoNum, aoTopupError } from "../format";
+import { AO_LIMITS, aoAccountNumber, aoAmountReading, aoBankLine, aoDailyRemaining, aoIsUnlimited, aoNum, aoTopupError } from "../format";
 import { AO_AMOUNT_SHEET } from "../motion";
 import { aoHereKey, LOAD, useAoBack } from "../nav";
 import { AoBankLogo, AoButton, AoChevronDownIcon, AoHeader, AoPage, AoSheet, aoLoad, aoToast } from "../ui";
@@ -30,6 +30,8 @@ const TOAST_PANEL = 419;
 
 // "500만" · "100만" · "99만 9,000" (원은 따로)
 const manText = (n: number) => aoAmountReading(n).replace(/원$/, "");
+// 한도가 없으면(AO_LIMITS) '무제한'
+const limitText = (n: number) => (aoIsUnlimited(n) ? "무제한" : `${manText(n)} 원`);
 
 export function Topup() {
   const [params] = useSearchParams();
@@ -229,10 +231,10 @@ export function Topup() {
         {error && <p className="ao-send-topup__error">{error}</p>}
         {/* 값 숫자는 Roboto 700 (C3 9.2: 숫자 간격 7.33 = Roboto, Pretendard 700 은 8.3 이라 3pt 넓음) */}
         <p className="ao-send-topup__limit ao-send-topup__limit--1">
-          1회 한도 {sel ? <><b className="ao-num">{manText(AO_LIMITS.perTransfer)}</b> 원</> : <><b className="ao-num">0</b>원</>}
+          1회 한도 {sel ? <b className="ao-num">{limitText(AO_LIMITS.perTransfer)}</b> : <><b className="ao-num">0</b>원</>}
         </p>
         <p className="ao-send-topup__limit ao-send-topup__limit--2">
-          1일 잔여한도 {sel && daily > 0 ? <><b className="ao-num">{manText(daily)}</b> 원</> : <><b className="ao-num">0</b>원</>}
+          1일 잔여한도 {sel && daily > 0 ? <b className="ao-num">{limitText(daily)}</b> : <><b className="ao-num">0</b>원</>}
         </p>
       </div>
 

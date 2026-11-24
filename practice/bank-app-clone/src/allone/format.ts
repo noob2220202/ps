@@ -108,8 +108,10 @@ export function aoInRange(at: string, range: { from: Date; to: Date }) {
   return t >= range.from.getTime() && t < end;
 }
 
-// ---------- 한도 (표시 상수 + 화면 검사, 서버 한도 없음 — plan.md §0.10) ----------
-export const AO_LIMITS = { perTransfer: 5_000_000, daily: 1_000_000 } as const;
+// ---------- 한도: 없음 (예전 녹화 값은 1회 500만 · 1일 100만 — 무제한으로 바꿨다. 화면 검사는 그대로 두고 값만 최대로) ----------
+export const AO_LIMITS = { perTransfer: Number.MAX_SAFE_INTEGER, daily: Number.MAX_SAFE_INTEGER } as const;
+/** 한도 글자: 한도가 없으면 '무제한' */
+export const aoIsUnlimited = (n: number) => n >= Number.MAX_SAFE_INTEGER / 2;
 // 1일 잔여한도 = 1,000,000 − 오늘 그 계좌에서 한 잔액채우기 합계 (GET /api/transfers?from=)
 export function aoDailyRemaining(records: AoTransferRecord[] | undefined, today = new Date()) {
   const day = `${today.getFullYear()}-${p2(today.getMonth() + 1)}-${p2(today.getDate())}`;
@@ -118,7 +120,7 @@ export function aoDailyRemaining(records: AoTransferRecord[] | undefined, today 
     .reduce((s, r) => s + r.amount, 0);
   return Math.max(0, AO_LIMITS.daily - used);
 }
-// T2 다음: 0 < 금액 ≤ 출금 계좌 잔액, ≤ 5,000,000
+// T2 다음: 0 < 금액 ≤ 출금 계좌 잔액 (1회 한도 없음)
 export const aoCanSend = (amount: number, balance: number) => amount > 0 && amount <= balance && amount <= AO_LIMITS.perTransfer;
 // T5 잔액채우기 검사 (오류 문구는 transfer.md §5.3) — 통과면 null
 export function aoTopupError(amount: number, available: number, dailyRemaining: number) {

@@ -44,7 +44,7 @@ export function AmountSheet({
   }
 
   const onKey = (k: PadKey) => {
-    const next = padApply(value, k, 10);
+    const next = padApply(value, k, 13);
     const added = k === "back" ? 0 : Math.max(0, next.length - value.length);
     setValue(next);
     setRoll((r) => ({ key: r.key + 1, n: added }));
