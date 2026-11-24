@@ -1,0 +1,21 @@
+{
+  "appId": "dev.answerkey.allone",
+  "appName": "NH올원뱅크",
+  "webDir": "www",
+  "loggingBehavior": "debug",
+  "android": {
+    "path": "android",
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "style": "LIGHT"
+    },
+    "CapacitorHttp": {
+      "enabled": false
+    }
+  }
+}

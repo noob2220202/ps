@@ -1,0 +1,73 @@
+apply plugin: 'com.android.application'
+
+// versionCode = 빌드 시각의 2025-01-01 00:00 UTC 부터 분. tools/build-apk.sh 는 같은 값(date +%s 로 잰 빌드 시각)을 -PalloneVersionCode 로 넘기고,
+// 넘기지 않으면(Android Studio · ./gradlew 직접) 여기서 지금 시각으로 잰다 → 어느 길로 빌드해도, 클론 깊이(shallow)와도 무관하게 나중 빌드가 늘 더 커서
+// 이전 설치 위로 덮어 깔린다 (예전 커밋 수 150 남짓보다 크고, 한도 2100000000 보다 한참 작다). -P 로 다른 값을 주면 그 값
+def alloneVersionCode = (project.findProperty('alloneVersionCode') ?: (System.currentTimeMillis() - 1735689600000L).intdiv(60000L)) as int
+
+android {
+    namespace = "dev.answerkey.allone"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "dev.answerkey.allone"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode alloneVersionCode
+        versionName "1.0.${alloneVersionCode}"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    // 서명: 저장소에 둔 고정 연습용 키(allone-debug.keystore, 비밀번호 android — 안드로이드 기본 디버그 키와 같은 성격, 비밀 아님).
+    // 컨테이너마다 새로 생기는 ~/.android/debug.keystore 로 서명하면 새 APK 가 이전 설치 위에 깔리지 않아(서명 불일치)
+    // 지우고 다시 깔아야 하고, 그러면 폰에 저장된 잔액·거래내역이 사라진다.
+    signingConfigs {
+        alloneDebug {
+            storeFile file('allone-debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.alloneDebug
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

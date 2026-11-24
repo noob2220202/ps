@@ -15,7 +15,7 @@ import { TransferScreen } from "./screens/transfer/TransferScreen";
 import { AmountScreen } from "./screens/transfer/AmountScreen";
 import { TransferDoneScreen } from "./screens/transfer/TransferDoneScreen";
 import { ProfilePicker } from "./profile/ProfilePicker";
-import { ALLONE, APP, KAKAO2, TOSS, currentProfileId } from "./profile/session";
+import { ALLONE, APK, APP, KAKAO2, TOSS, currentProfileId } from "./profile/session";
 import { NhSplash } from "./nh/NhSplash";
 import { NhLoadingLayer } from "./nh/common";
 import { HanaLoadingLayer } from "./hana/common";
@@ -285,9 +285,10 @@ export default function App() {
             <ScreenStack render={render} />
           ))}
       </PhoneFrame>
-      <OsSwitch />
-      <RecordingBar />
-      <FakeCursor />
+      {/* APK: PC 에서 녹화 · 기기 전환하는 도구는 없다 */}
+      {!APK && <OsSwitch />}
+      {!APK && <RecordingBar />}
+      {!APK && <FakeCursor />}
     </StatusBarProvider>
   );
 }

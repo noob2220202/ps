@@ -41,3 +41,13 @@ server/data-ibk2/
 server/data-kakao2/
 server/data-toss/
 server/data-allone/
+
+# NH올원뱅크 APK (apk-allone/) — 빌드 산출물·Gradle 캐시
+apk-allone/www/
+apk-allone/out/
+apk-allone/android/.gradle/
+apk-allone/android/build/
+apk-allone/android/app/build/
+apk-allone/android/app/src/main/assets/public/
+apk-allone/android/capacitor-cordova-android-plugins/
+*.apk

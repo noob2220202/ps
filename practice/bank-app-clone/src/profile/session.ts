@@ -2,7 +2,12 @@
 // (새로고침은 같은 세션이라 유지됨 → 기기/테마를 바꾸려고 다시 불러올 때 또 묻지 않음)
 const KEY = "profile";
 
+// APK(서버 없는 로컬 모드, src/apk/): 로그인 · 프로필 고르기가 없다 — 프로필은 늘 이 하나 (src/apk/local.ts 가 이 id 로 DB 를 만든다)
+export const APK = import.meta.env.VITE_APK === "1";
+export const APK_PROFILE_ID = "pa1100000";
+
 export function currentProfileId(): string | null {
+  if (APK) return APK_PROFILE_ID;
   try {
     return sessionStorage.getItem(KEY);
   } catch {
@@ -11,6 +16,7 @@ export function currentProfileId(): string | null {
 }
 
 export function setCurrentProfile(id: string | null) {
+  if (APK) return;
   try {
     if (id) sessionStorage.setItem(KEY, id);
     else sessionStorage.removeItem(KEY);

@@ -1,0 +1,14 @@
+{
+  "name": "allone-apk",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NH올원뱅크 APK (Capacitor) — 웹 번들은 ../ 에서 npm run build:allone-apk (www/), 네이티브 껍데기는 android/. 의존성은 ../node_modules 를 쓴다",
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  }
+}

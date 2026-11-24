@@ -343,6 +343,21 @@ python3 scripts/kakao-intro-erase.py 원본녹화.MP4 src/assets/intro/kakao-ope
 그림 12개(`src/assets/local/k2-*` — 광고 사진 · 배너 · 카드 · 목록 아이콘)는 녹화 프레임에서 자른 것(멈춘 장면은 여러 장 평균)이고, 이름 · 번호가 든 곳은 자르지 않았어요.
 상태바 · 아이콘 · 스피너는 SVG. 구현 방법은 `SOLUTION.md` 25장.
 
+## 📱 NH올원뱅크 APK (서버 없이 폰 혼자) — `apk-allone/`
+
+올원뱅크(allone)를 웹 서버 없이 폰 안에서만 도는 안드로이드 앱으로 만든다. 우리WON뱅킹 APK(`practice/woori-answer-key`)와 같은 방식.
+
+```bash
+npm run apk:allone     # = bash apk-allone/build-apk.sh → apk-allone/out/NH-allone-debug.apk (gitignore)
+npm run build:allone-apk   # 웹 번들만 (apk-allone/www)
+```
+
+- **로그인 · 프로필 고르기 없음.** 앱을 켜면 바로 올원뱅크 시작 흐름(간편비밀번호 6자리 → 홈). 프로필은 하나(`pa1100000`), 처음 켜면 예시 데이터(홍길동)로 채우고 🔔 관리 패널에서 바꾼다. 패널에서 프로필 · 로그아웃 · 녹화 도구(캡쳐 · 인트로 · 녹화)는 뺐다.
+- **서버 코드는 그대로** (`server/index.mjs` 한 글자도 안 고침). `--mode allone-apk` 빌드에서만 `vite.config.ts` 가 Node 모듈(`node:sqlite` · `fs` · `path` · `url` · `crypto` · `async_hooks`) · `express` · `server/auth.mjs` 를 `src/apk/shim/` 의 껍데기로 바꿔 끼워 웹뷰 안에서 돌린다. DB 는 sql.js(SQLite wasm), 바뀐 요청마다 IndexedDB 에 저장 → 앱을 다시 켜도 그대로 (앱 데이터를 지우면 처음으로). 요청은 `window.fetch` 를 감싸 폰 안에서 처리, GET 은 원래 서버처럼 250ms 늦춘다. 진입점 `src/apk/local.ts`.
+- 화면 쪽 분기는 `VITE_APK=1`(`.env.allone-apk`) — `src/profile/session.ts` 의 `APK` (프로필 고정 · 녹화 도구 숨김). 폰 화면(500px 이하) 맞춤은 원래 올원뱅크 CSS(`allone.css`)가 하던 것을 그대로 쓴다.
+- 네이티브 껍데기: `apk-allone/android/` (Capacitor 8, 패키지 `dev.answerkey.allone`, 이름 NH올원뱅크). 필요: Node 22 · JDK 21 · Android SDK(`platforms;android-36` · `build-tools;35.0.0`, 기본 `/opt/android-sdk`).
+- 서명은 저장소의 고정 연습용 키(`app/allone-debug.keystore`) → 새 빌드가 이전 설치 위에 덮어 깔리고 폰의 데이터가 남는다. 배포용 아님.
+
 ## 🍀 NH올원뱅크 allone (아이폰 · 녹화 인트로)
 
 포트 9119(`npm run start:allone`)로 들어가면 로그인 → 프로필 고르기 → 흰 시작화면 → 스플래시 → 간편비밀번호 → 올원뱅크 홈.

@@ -15,7 +15,7 @@ import { BankIcon } from "../components/BankIcon";
 import { Icon } from "../components/icons/Icon";
 import { BankPicker } from "../screens/transfer/TransferScreen";
 import { ProfileAvatar } from "../profile/ProfileAvatar";
-import { ALLONE, APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
+import { ALLONE, APK, APP, HAS_INTRO, KAKAO2, currentProfileId, setCurrentProfile } from "../profile/session";
 import { kbAdEnabled, kbAdHiddenUntil, kbAdResetHide, kbVariantMode, setKbAdEnabled, setKbVariantMode } from "../kbank/prefs";
 import { TossAccountFields } from "../toss/devpanel/TossAccountFields";
 import { TossPanelSection } from "../toss/devpanel/TossPanelSection";
@@ -157,16 +157,17 @@ function BasicForm({ run, initial, onClose }: { run: Run; initial: HomeData; onC
 
   return (
     <div className="tab">
-      <CurrentProfile />
+      {/* APK(src/apk/): 프로필 · 로그인 · PC 녹화 도구가 없다 — 이름 · 데이터 관리만 */}
+      {!APK && <CurrentProfile />}
       {/* kakao2 · allone 은 녹화 기기(아이폰 · 라이트 모드), 토스는 갤럭시 · 다크로 고정이라 기기 · 테마 고르기 없음 */}
       {!KAKAO2 && APP !== "toss" && !ALLONE && (
         <Field label="기기">
           <Segmented value={OS} options={[["android", "Galaxy"], ["ios", "iPhone"]]} onChange={(v) => reopen(`os=${v}`)} />
         </Field>
       )}
-      <CaptureToggle />
-      <IntroVideoToggle />
-      <RecordButton onStart={onClose} />
+      {!APK && <CaptureToggle />}
+      {!APK && <IntroVideoToggle />}
+      {!APK && <RecordButton onStart={onClose} />}
       {!THEME_LOCK && (
         <Field label="테마">
           <Segmented value={THEME_CHOICE} options={[["system", "시스템"], ["light", "라이트"], ["dark", "다크"]]} onChange={(v) => reopen(`theme=${v}`)} />
