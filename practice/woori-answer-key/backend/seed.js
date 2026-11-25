@@ -325,6 +325,17 @@ const hms = (sec) => [Math.floor(sec / 3600), Math.floor((sec % 3600) / 60), sec
  *   종류: 입금 = deposit(의뢰인 = 기재내용), 출금 = withdraw (받는 계좌번호가 명세에 없어 이체(transfer)로는 못 만든다).
  *   거래구분(code) = 적요, 관리점(branch) = 취급점.  받는 분(최근입금계좌)은 비워 둔다 — 관리 패널 '받는 분'에서 등록.
  */
+/** 명세 내용의 짧은 지문 (FNV-1a) — 명세가 바뀌면 다른 값 → 옛 저장본을 한 번 다시 채운다 */
+function statementFingerprint(st) {
+  const text = JSON.stringify(st);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
 function buildStatementSeed(st) {
   const base = buildSeed('v1-start');
   const rows = st.rows; // 최신순
@@ -347,7 +358,7 @@ function buildStatementSeed(st) {
   const transactions = oldestFirst.map(({ r, t }, i) => {
     const amount = (r.in ?? 0) - (r.out ?? 0);
     const kind = amount > 0 ? 'deposit' : 'withdraw';
-    const name = cleanStatementName(r.text);
+    const name = cleanStatementName(r.text) || String(r.kind || '').trim() || '거래'; // 적요가 비면(CD지급 등) 거래구분으로
     return {
       seq: i + 1,
       id: txIdFor(t),
@@ -394,7 +405,7 @@ function buildStatementSeed(st) {
   const directory = base.directory.map((d) =>
     d.bankCode === ACCOUNT.bankCode && d.digits === ACCOUNT.digits ? { ...d, digits: a.digits, holderName: a.ownerName } : d,
   );
-  return { scenario: 'statement', clock: { ...base.clock }, account, transactions, recipients: [], directory, source: 'statement' };
+  return { scenario: 'statement', clock: { ...base.clock }, account, transactions, recipients: [], directory, source: `statement:${statementFingerprint(st)}` };
 }
 
 /**
@@ -473,15 +484,17 @@ function resetMode(db, mode) {
 
 /**
  * DB 가 비어 있으면 채운다: 거래 명세(statement.json)가 있으면 그것, 없으면 WOORI_SCENARIO(기본 'v1-start'). 채웠으면 true.
- * 이미 데이터가 있어도, 명세가 있는데 한 번도 시드 출처(meta 'seed_source')를 남긴 적 없는 옛 저장본이면 명세로 한 번 바꿔 채운다
- * (이 기능이 들어오기 전에 깔린 APK 의 저장본 — 그 뒤로는 어떤 리셋이든 출처가 남아 다시 건드리지 않는다).
+ * 이미 데이터가 있어도, 명세가 있는데 시드 출처(meta 'seed_source')가 없거나 다른 명세('statement:<지문>')면 지금 명세로 한 번 바꿔 채운다
+ * (APK 를 새 명세로 덮어 깔았을 때 · 이 기능 전에 깔린 저장본 — 같은 명세면 다시 건드리지 않아 폰에서 고친 데이터는 남는다).
  */
 function ensureSeeded(db) {
   const st = getStatement();
   const n = db.prepare('SELECT COUNT(*) AS n FROM accounts').get().n;
   if (n > 0) {
     const src = db.prepare("SELECT value FROM meta WHERE key = 'seed_source'").get();
-    if (st && !src) {
+    // 명세가 있고, 출처가 없거나(옛 저장본) 다른 명세(내용이 바뀜)로 채운 저장본이면 지금 명세로 한 번 바꿔 채운다.
+    // 영상 시나리오로 리셋해 둔 저장본('video')은 건드리지 않는다
+    if (st && (!src || (String(src.value).startsWith('statement') && src.value !== `statement:${statementFingerprint(st)}`))) {
       resetDb(db, 'v1-start', { seed: buildStatementSeed(st) });
       return true;
     }

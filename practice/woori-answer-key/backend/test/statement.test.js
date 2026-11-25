@@ -16,7 +16,7 @@ const FAKE = {
     { date: '2026-11-19', kind: '타행이체', text: '김민지(친구', out: null, in: 40_000, bal: 135_000, branch: '003019' },
     { date: '2026-11-17', kind: '체크우리', text: '씨유(CU) 그', out: 3_000, in: null, bal: 95_000, branch: '시너지추진부' },
     { date: '2026-11-17', kind: '', text: '월급', out: null, in: 8_000, bal: 98_000, branch: '' },
-    { date: '2026-11-16', kind: '타행이체', text: '쿠팡', out: 10_000, in: null, bal: 90_000, branch: '수유동금융센터' },
+    { date: '2026-11-16', kind: 'CD지급', text: '', out: 10_000, in: null, bal: 90_000, branch: '수유동금융센터' },
   ],
 };
 
@@ -55,9 +55,9 @@ describe('buildStatementSeed', () => {
   test('종류 · 거래구분 · 관리점 · 잘린 이름 다듬기', () => {
     const s = buildStatementSeed(FAKE);
     const by = (name) => s.transactions.find((t) => t.displayName === name);
-    assert.equal(by('쿠팡').kind, 'withdraw');
-    assert.equal(by('쿠팡').code, '타행이체');
-    assert.equal(by('쿠팡').branch, '수유동금융센터');
+    assert.equal(by('CD지급').kind, 'withdraw'); // 적요가 비면 거래구분이 이름
+    assert.equal(by('CD지급').code, 'CD지급');
+    assert.equal(by('CD지급').branch, '수유동금융센터');
     assert.equal(by('김민지(친구)').kind, 'deposit');
     assert.equal(by('김민지(친구)').requester, '김민지(친구)');
     assert.ok(by('씨유(CU)'), "'씨유(CU) 그' → '씨유(CU)'");
@@ -84,7 +84,7 @@ describe('처음 실행 · 예시 데이터로 · 옛 저장본', () => {
     assert.equal(ensureSeeded(db), true);
     assert.equal(db.prepare('SELECT balance FROM accounts').get().balance, 130_000);
     assert.equal(db.prepare('SELECT COUNT(*) AS n FROM transactions').get().n, 5);
-    assert.equal(db.prepare("SELECT value FROM meta WHERE key = 'seed_source'").get().value, 'statement');
+    assert.match(db.prepare("SELECT value FROM meta WHERE key = 'seed_source'").get().value, /^statement:[0-9a-f]{8}$/);
     assert.equal(ensureSeeded(db), false, '두 번째부터는 건드리지 않는다');
   });
 
@@ -107,6 +107,24 @@ describe('처음 실행 · 예시 데이터로 · 옛 저장본', () => {
     assert.equal(ensureSeeded(db), true);
     assert.equal(db.prepare('SELECT balance FROM accounts').get().balance, 130_000);
     assert.equal(ensureSeeded(db), false);
+  });
+
+  test('같은 명세면 다시 안 채우고, 명세 내용이 바뀌면(새 APK) 한 번 다시 채운다', () => {
+    ensureSeeded(db);
+    db.prepare('UPDATE accounts SET owner_name = ?').run('폰에서바꾼이름');
+    assert.equal(ensureSeeded(db), false);
+    assert.equal(db.prepare('SELECT owner_name FROM accounts').get().owner_name, '폰에서바꾼이름');
+    const NEXT = structuredClone(FAKE);
+    NEXT.rows.unshift({ date: '2026-11-20', kind: '체크우리', text: '새 거래', out: 1_000, in: null, bal: 129_000, branch: '시너지추진부' });
+    NEXT.balance = 129_000;
+    setStatement(NEXT);
+    try {
+      assert.equal(ensureSeeded(db), true);
+      assert.equal(db.prepare('SELECT balance FROM accounts').get().balance, 129_000);
+      assert.equal(ensureSeeded(db), false);
+    } finally {
+      setStatement(FAKE);
+    }
   });
 
   test('영상 시나리오로 리셋하면 출처가 video 로 남아 다시 명세로 안 바뀐다', () => {
