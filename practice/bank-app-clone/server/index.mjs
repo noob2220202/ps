@@ -608,10 +608,19 @@ function findTx(id) {
 
 // GET과 PATCH(저장 뒤)가 같은 모양을 돌려주게 모아 둠
 // i-ONE Bank 받은 이체의 상대 정보 { transfer: { bank, number, holder } } (내 계좌에서 온 이체가 아니면 null → 펼치면 아무것도 안 붙음)
-function receivedFrom(txId) {
-  const r = db().prepare("SELECT from_account_id FROM transfers WHERE in_tx_id = ?").get(txId);
+function receivedFrom(t) {
+  // 거래에 저장된 상대 정보(은행만 있어도 됨) 우선 → 없으면 연결된 보낸 계좌
+  if (t.cp_bank && bankByCode(t.cp_bank))
+    return { transfer: { bank: bankInfo(bankByCode(t.cp_bank)), ...(t.cp_number && { number: digitsOf(t.cp_number) }), ...(t.cp_holder && { holder: t.cp_holder }) } };
+  const r = db().prepare("SELECT from_account_id FROM transfers WHERE in_tx_id = ?").get(t.id);
   const src = r && db().prepare("SELECT * FROM accounts WHERE id = ?").get(r.from_account_id);
   return src ? { transfer: { bank: bankInfo(bankByCode(src.bank_code ?? APP)), number: digitsOf(src.number), holder: getProfile().userName } } : null;
+}
+
+function sentTo(t) {
+  return t.cp_bank && bankByCode(t.cp_bank)
+    ? { transfer: { bank: bankInfo(bankByCode(t.cp_bank)), ...(t.cp_number && { number: digitsOf(t.cp_number) }), ...(t.cp_holder && { holder: t.cp_holder }) } }
+    : null;
 }
 
 function txDetailJson(id) {
@@ -633,7 +642,7 @@ function txDetailJson(id) {
     ...(sent && { transfer: { bank: bankInfo(bankByCode(sent.bank_code)), number: sent.number, holder: sent.holder } }),
     // i-ONE Bank: 내 계좌로 받은 이체(in_tx_id)의 상세에도 보낸 쪽(은행 · 계좌번호 · 이름)을 상대 정보로 — 받는 쪽 '상대은행 · 상대계좌' 가 '-' 로 비지 않게.
     // 🔔 패널에서 지정한 상대 정보(sent)가 있으면 그게 먼저. 다른 앱 응답은 그대로
-    ...(!sent && APP === "ibk" && t.amount > 0 && receivedFrom(t.id)),
+    ...(!sent && APP === "ibk" && (t.amount > 0 ? receivedFrom(t) : sentTo(t))),
     ...(sent?.memo_to && { memoTo: sent.memo_to }), // 받는 분 통장에 찍힌 글자 (케이뱅크 거래 상세 '받는 분에게 표기')
     ...(TOSS && toss.txDetailFields(t)), // 토스 상세: kindLabel (입금/출금) · counterparty (입금처 / 출금처)
     ...(ALLONE && { ao: aoTxDetail(t, sent) }), // 올원 상세: accountId · payee {id, favorite} (☆)
@@ -714,6 +723,7 @@ app.patch("/api/transactions/:id", (req, res) => {
     if (touchesCounter) {
       const number = String(body.counterNumber ?? "").replace(/\D/g, "");
       const holder = String(body.counterHolder ?? "").trim();
+      db().prepare("UPDATE transactions SET cp_bank = ?, cp_number = ?, cp_holder = ? WHERE id = ?").run(counterBank?.code ?? null, number || null, holder || null, t.id);
       const existing = db().prepare("SELECT id FROM transfers WHERE out_tx_id = ?").get(t.id);
       if (counterBank && number && holder) {
         const amount = Math.abs(body.amount ?? t.amount);
@@ -1017,6 +1027,7 @@ app.post("/api/transfers", (req, res) => {
     let inTx = null;
     if (to.accountId) {
       inTx = insertTx.run(to.accountId, at, memoToText, amount).lastInsertRowid;
+      db().prepare("UPDATE transactions SET cp_bank = ?, cp_number = ?, cp_holder = ? WHERE id = ?").run(from.bank_code ?? APP, from.number, getProfile().userName, inTx);
       addBalance.run(amount, to.accountId);
     }
     const r = db()

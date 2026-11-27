@@ -164,6 +164,15 @@ function migrate(d) {
   if (!columns("accounts").includes("name")) d.exec("ALTER TABLE accounts ADD COLUMN name TEXT"); // 상품 이름 (콕뱅크 "자립예탁금")
   if (!columns("transactions").includes("memo")) d.exec("ALTER TABLE transactions ADD COLUMN memo TEXT"); // 콕뱅크 거래메모
   if (!columns("transactions").includes("kind")) d.exec("ALTER TABLE transactions ADD COLUMN kind TEXT"); // 🔔 패널에서 거래구분 직접 지정
+  // 거래에 붙는 상대(보낸/받은) 은행·계좌·예금주 스냅샷 — 상대 계좌(내 다른 계좌)를 지우거나 계좌번호를 안 넣어도 은행이 상세에 남게
+  if (!columns("transactions").includes("cp_bank")) {
+    d.exec("ALTER TABLE transactions ADD COLUMN cp_bank TEXT; ALTER TABLE transactions ADD COLUMN cp_number TEXT; ALTER TABLE transactions ADD COLUMN cp_holder TEXT");
+    // 이미 있던 받은 이체는 보낸 계좌 정보로 채움
+    d.exec(`UPDATE transactions SET
+      cp_bank = (SELECT COALESCE(a.bank_code, 'kakao') FROM transfers t JOIN accounts a ON a.id = t.from_account_id WHERE t.in_tx_id = transactions.id),
+      cp_number = (SELECT a.number FROM transfers t JOIN accounts a ON a.id = t.from_account_id WHERE t.in_tx_id = transactions.id)
+      WHERE id IN (SELECT in_tx_id FROM transfers WHERE in_tx_id IS NOT NULL)`);
+  }
   if (!columns("profile").includes("card_spend")) d.exec("ALTER TABLE profile ADD COLUMN card_spend INTEGER");
   if (!columns("profile").includes("cashback_count")) d.exec("ALTER TABLE profile ADD COLUMN cashback_count INTEGER NOT NULL DEFAULT 2");
   if (!columns("accounts").includes("safebox")) d.exec("ALTER TABLE accounts ADD COLUMN safebox INTEGER NOT NULL DEFAULT 0");

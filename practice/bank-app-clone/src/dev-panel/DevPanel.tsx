@@ -1076,8 +1076,8 @@ function TxEditForm({ tx, banks, run, onSaved }: { tx: Transaction; banks: Bank[
     setMemo(detail.data.memo ?? "");
     if (detail.data.transfer) {
       setBank(banks.find((b) => b.code === detail.data.transfer!.bank.code) ?? bank);
-      setCounterNumber(detail.data.transfer.number);
-      setCounterHolder(detail.data.transfer.holder);
+      setCounterNumber(detail.data.transfer.number ?? "");
+      setCounterHolder(detail.data.transfer.holder ?? "");
     }
   }
   const ready = detail.status === "done" && loadedFor === tx.id;
